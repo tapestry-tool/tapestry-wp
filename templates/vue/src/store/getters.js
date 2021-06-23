@@ -107,36 +107,11 @@ export function getQuestion(state) {
 
 export function getAnswers(state) {
   return (nodeId, questionId) => {
-    if (state.userAnswers.hasOwnProperty(nodeId)) {
-      if (state.userAnswers[nodeId].hasOwnProperty("activity")) {
-        if (state.userAnswers[nodeId].activity.hasOwnProperty(questionId)) {
-          if (
-            typeof state.userAnswers[nodeId].activity[questionId].answers !==
-            "string"
-          )
-            return state.userAnswers[nodeId].activity[questionId].answers
-        }
-      }
+    if (state?.userAnswers?.[nodeId]?.activity?.[questionId]?.answers) {
+      return state.userAnswers[nodeId].activity[questionId].answers
+    } else {
+      return {}
     }
-  }
-}
-
-export function getEntry(_, { getQuestion }) {
-  return (questionId, answerType) => {
-    const question = getQuestion(questionId)
-    if (!question) {
-      return null
-    }
-    const entry = question.entries[answerType]
-    if (!entry) {
-      return null
-    }
-    /* If the answer is an audio, then entry is the audio file in base64. */
-    if (answerType === "audioId") {
-      return { type: "audio", entry: "data:audio/ogg; codecs=opus;base64," + entry }
-    }
-    const answers = getAnswersFromEntry(entry)
-    return formatEntry(answers, answerType)
   }
 }
 
@@ -184,25 +159,6 @@ export function favourites(state) {
 
 export function isFavourite(_, { favourites }) {
   return id => favourites.findIndex(fid => fid == id) > -1
-}
-
-/* An answer is a value where its key is numeric */
-function getAnswersFromEntry(entry) {
-  return Object.entries(entry)
-    .filter(obj => !isNaN(parseInt(obj[0], 10)))
-    .map(i => i[1])
-}
-
-function formatEntry(answers, answerType) {
-  if (answerType === "textId") {
-    return {
-      type: "text",
-      entry: answers[0],
-    }
-  }
-  if (answerType === "checklistId") {
-    return { type: "checklist", entry: answers.filter(answer => answer !== "") }
-  }
 }
 
 export function xOrFx({ settings }) {

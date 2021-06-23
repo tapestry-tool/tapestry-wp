@@ -79,13 +79,14 @@
               <b-form-input
                 v-model="question.text"
                 :data-testid="`question-title-${index}`"
+                :data-qa="`question-text-${index}`"
               />
             </b-form-group>
             <b-card-sub-title class="mt-2 mb-2">Answer Options</b-card-sub-title>
             <b-form-group class="mt-3">
               <b-form-checkbox
                 v-model="question.answerTypes.text.enabled"
-                data-qa="question-answer-text"
+                :data-qa="`question-answer-text-${index}`"
                 switch
               >
                 Text entry
@@ -93,14 +94,14 @@
               <div v-if="question.answerTypes.text.enabled" class="mt-2 pl-4 ml-2">
                 <b-form-radio-group v-model="question.answerTypes.text.isMultiLine">
                   <b-form-radio
-                    data-qa="question-answer-text-multi"
+                    :data-qa="`question-answer-text-multi-${index}`"
                     name="multi-line"
                     :value="true"
                   >
                     Multi-line
                   </b-form-radio>
                   <b-form-radio
-                    data-qa="question-answer-text-single"
+                    :data-qa="`question-answer-text-single-${index}`"
                     name="single-line"
                     :value="false"
                   >
@@ -118,7 +119,7 @@
                   <b-form-input
                     id="placeholder"
                     v-model="question.answerTypes.text.placeholder"
-                    data-qa="question-answer-text-single-placeholder"
+                    :data-qa="`question-answer-text-single-placeholder-${index}`"
                   ></b-form-input>
                 </div>
               </div>
@@ -126,7 +127,7 @@
             <b-form-group>
               <b-form-checkbox
                 v-model="question.answerTypes.audio.enabled"
-                data-qa="question-answer-audio"
+                :data-qa="`question-answer-audio-${index}`"
                 switch
               >
                 Audio recorder
@@ -248,7 +249,7 @@ export default {
   methods: {
     getPreviousQuestions(currentQuestion) {
       const allQuestions = Object.values(this.nodes)
-        .filter(node => Boolean(node.typeData.activity.questions))
+        .filter(node => Boolean(node.typeData.activity?.questions))
         .flatMap(node => node.typeData.activity.questions)
       return allQuestions.filter(qn => qn.id !== currentQuestion.id)
     },

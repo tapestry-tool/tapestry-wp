@@ -120,7 +120,6 @@ export default {
       }
     },
     states() {
-      // NOTE: SAVED state is used to determine if the audio already exists in the backend
       return {
         NOT_SUPPORTED: "not-supported",
         LOADING: "loading",
@@ -135,11 +134,7 @@ export default {
   watch: {
     id() {
       let answersObject = this.getAnswers(this.node.id, this.question.id)
-      if (
-        answersObject !== undefined &&
-        answersObject.audio &&
-        answersObject.audio.url
-      ) {
+      if (answersObject?.audio?.url) {
         this.state = this.states.SAVED
         this.audio = wpData.uploadDirArray.baseurl + "/" + answersObject.audio.url
       } else {

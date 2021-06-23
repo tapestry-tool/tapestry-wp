@@ -2,7 +2,12 @@
   <div ref="activity" class="activity-media">
     <h1 v-if="showTitle" class="media-title">{{ node.title }}</h1>
     <completion-screen v-if="showCompletionScreen" :question="activeQuestion">
-      <button v-if="hasNext" class="button-completion" @click="next">
+      <button
+        v-if="hasNext"
+        class="button-completion"
+        data-qa="completion-next-button"
+        @click="next"
+      >
         <i class="fas fa-arrow-circle-right fa-4x"></i>
         <p>Next question</p>
       </button>
@@ -113,14 +118,10 @@ export default {
           this.node.id,
           currentQuestion.id
         )
-        if (currentQuestionAnswer !== undefined) {
-          if (
-            currentQuestionAnswer.text !== "" ||
-            (currentQuestionAnswer.hasOwnProperty("audio") &&
-              currentQuestionAnswer.audio.url !== "")
-          ) {
-            currentQuestion.completed = true
-          }
+        if (Object.keys(currentQuestionAnswer).length === 0) {
+          currentQuestion.completed = false
+        } else {
+          currentQuestion.completed = true
         }
       }
     },
