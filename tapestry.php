@@ -387,3 +387,26 @@ function tapestry_tool_log_event() {
 
     wp_die();
 }
+
+// TYDE Roles
+
+register_activation_hook(__FILE__, 'add_tyde_roles');
+function add_tyde_roles()
+{
+    add_role(
+        'dyad',
+        'Dyad',
+        [
+            'read' => true,
+            'edit_posts' => true,
+        ]
+    );
+    add_role(
+        'youth',
+        'Youth',
+        [
+            'read' => true,
+            'edit_posts' => true,
+        ]
+    );
+}
