@@ -221,6 +221,7 @@ describe("Activity", () => {
   })
 
   it("should be able to complete with a list-based answer", () => {
+    cy.fixture("one-node.json").as("oneNode")
     cy.setup("@oneNode")
 
     cy.getSelectedNode().then(node => {
