@@ -1,5 +1,5 @@
 <template>
-  <b-form @submit="handleTextSubmit">
+  <b-form class="grid-container" @submit="handleTextSubmit">
     <p class="form-input">
       <b-form-textarea
         v-if="question.answerTypes.text.isMultiLine"
@@ -61,8 +61,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.form-input {
-  margin: auto;
-  max-width: 600px;
+.grid-container {
+  display: grid;
+  align-content: center;
+  height: 250px;
 }
 </style>

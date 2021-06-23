@@ -352,6 +352,8 @@ export default {
   justify-content: center;
   height: 100%;
   width: 100%;
+  max-width: 600px;
+  margin: auto;
 
   .button-nav {
     border-radius: 50%;
