@@ -138,15 +138,48 @@ export default {
             "got here",
             this.question.answerTypes.dragDrop.fromBucketArray[j].itemArray[k]
           )
-          this.findIfExistInToBucket(
-            this.question.answerTypes.dragDrop.fromBucketArray[j].itemArray[k]
+          console.log(
+            "found it?",
+            this.findIfExistInToBucket(
+              this.question.answerTypes.dragDrop.fromBucketArray[j].itemArray[k]
+            )
           )
+          if (
+            this.findIfExistInToBucket(
+              this.question.answerTypes.dragDrop.fromBucketArray[j].itemArray[k]
+            )
+          ) {
+            this.question.answerTypes.dragDrop.fromBucketArray[j].itemArray.splice(
+              k,
+              1
+            )
+            k -= 1
+          }
           // TODO FINISH HERE for cleaning up fromBucketArray
         }
       }
     },
     findIfExistInToBucket(item) {
       console.log("item is", item)
+      for (
+        let j = 0;
+        j < this.question.answerTypes.dragDrop.toBucketArray.length;
+        j++
+      ) {
+        for (
+          let k = 0;
+          k < this.question.answerTypes.dragDrop.toBucketArray[j].itemArray.length;
+          k++
+        ) {
+          if (
+            this.question.answerTypes.dragDrop.toBucketArray[j].itemArray[k].id ===
+            item.id
+          ) {
+            return true
+          }
+        }
+      }
+      return false
     },
     updateDragDropAnswer() {
       for (let i = 0; i < this.toBucketArray.length; i++) {
