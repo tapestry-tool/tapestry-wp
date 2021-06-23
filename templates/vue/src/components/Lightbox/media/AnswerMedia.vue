@@ -83,6 +83,8 @@ export default {
     hasAnswer() {
       return this.answers.length ? true : false
     },
+  },
+  methods: {
     getFullUrl(url){
       return wpData.uploadDirArray.baseurl + "/" + url
     }
