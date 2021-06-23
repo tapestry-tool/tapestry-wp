@@ -27,7 +27,7 @@
           <tapestry-activity
             v-if="questionAnswer[0] === 'audio'"
             :type="questionAnswer[0]"
-            :answerData="questionAnswer[1].url"
+            :answerData="getFullUrl(questionAnswer[1].url)"
           ></tapestry-activity>
           <tapestry-activity
             v-else
@@ -50,6 +50,8 @@
 import { mapGetters, mapState } from "vuex"
 import TapestryActivity from "./ActivityMedia/TapestryActivity"
 import TapestryIcon from "@/components/common/TapestryIcon"
+import { data as wpData } from "@/services/wp"
+
 export default {
   name: "answer-media",
   components: {
@@ -81,6 +83,9 @@ export default {
     hasAnswer() {
       return this.answers.length ? true : false
     },
+    getFullUrl(url){
+      return wpData.uploadDirArray.baseurl + "/" + url
+    }
   },
   mounted() {
     this.$emit("complete")
