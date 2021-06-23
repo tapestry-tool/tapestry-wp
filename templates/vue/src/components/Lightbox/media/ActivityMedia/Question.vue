@@ -182,38 +182,19 @@ export default {
       return ""
     },
     textFormCompleted() {
-      if (this.userAnswers?.[this.node.id]?.activity?.[this.question.id]) {
-        if (
-          this.userAnswers[this.node.id].activity[this.question.id].hasOwnProperty(
-            "answers"
-          )
-        ) {
-          if (
-            this.userAnswers[this.node.id].activity[
-              this.question.id
-            ].answers.hasOwnProperty("text")
-          ) {
-            return true
-          }
-        }
+      if (
+        this.userAnswers?.[this.node.id]?.activity?.[this.question.id]?.answers?.text
+      ) {
+        return true
       }
       return false
     },
     audioFormCompleted() {
-      if (this.userAnswers?.[this.node.id]?.activity?.[this.question.id]) {
-        if (
-          this.userAnswers[this.node.id].activity[this.question.id].hasOwnProperty(
-            "answers"
-          )
-        ) {
-          if (
-            this.userAnswers[this.node.id].activity[
-              this.question.id
-            ].answers.hasOwnProperty("audio")
-          ) {
-            return true
-          }
-        }
+      if (
+        this.userAnswers?.[this.node.id]?.activity?.[this.question.id]?.answers
+          ?.audio
+      ) {
+        return true
       }
       return false
     },

@@ -1,5 +1,5 @@
 describe("Activity", () => {
-  it("should be able to switch between questions in a activity", () => {
+  it("should be able to switch between questions in an activity", () => {
     cy.fixture("one-node.json").as("oneNode")
     cy.setup("@oneNode")
 
@@ -151,7 +151,7 @@ describe("Activity", () => {
     })
   })
 
-  it("should be able to complete with a text-based answer", () => {
+  it("should be able to complete an activity with a text-based answer", () => {
     cy.fixture("one-node.json").as("oneNode")
     cy.setup("@oneNode")
 
