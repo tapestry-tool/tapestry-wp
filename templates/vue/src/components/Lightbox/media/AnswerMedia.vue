@@ -7,11 +7,14 @@
       data-qa="answer-display"
     >
       <h2>{{ question.text }}</h2>
-      <h4 v-show="followUpText && hasAnswer" class="mb-4">
+      <h4 v-show="hasNewFollowUpText && hasAnswer" class="mb-4">
         {{ answer.followUpText }}
       </h4>
-      <h4 v-show="!followUpText && hasAnswer" class="mb-4">
-        {{ question.followUpText }}
+      <h4
+        v-show="!hasNewFollowUpText && question.followUp.enabled && hasAnswer"
+        class="mb-4"
+      >
+        {{ question.followUp.text }}
       </h4>
       <b-tabs>
         <b-tab v-for="questionAnswer in answers" :key="questionAnswer.type">
@@ -68,7 +71,7 @@ export default {
     question() {
       return this.getQuestion(this.answer.questionID)
     },
-    followUpText() {
+    hasNewFollowUpText() {
       return this.answer.followUpText !== ""
     },
     answers() {
