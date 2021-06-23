@@ -66,7 +66,7 @@ export default {
   },
   computed: {
     ...mapState(["userAnswers"]),
-    ...mapGetters(["getEntry", "getQuestion", "getAnswers"]),
+    ...mapGetters(["getQuestion", "getAnswers"]),
     answer() {
       return this.node.answers
     },
@@ -84,14 +84,14 @@ export default {
       return this.answers.length ? true : false
     },
   },
-  methods: {
-    getFullUrl(url){
-      return wpData.uploadDirArray.baseurl + "/" + url
-    }
-  },
   mounted() {
     this.$emit("complete")
     this.$emit("load")
+  },
+  methods: {
+    getFullUrl(url) {
+      return wpData.uploadDirArray.baseurl + "/" + url
+    },
   },
 }
 </script>
