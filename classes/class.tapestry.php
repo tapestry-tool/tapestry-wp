@@ -173,7 +173,7 @@ class Tapestry implements ITapestry
         if (empty($this->rootId)) {
             $this->rootId = $node->id;
         }
-                
+
         $this->_saveToDatabase();
 
         return $node;
