@@ -38,6 +38,7 @@
       v-if="state === states.PAUSED || state === states.RECORDING"
       :disabled="duration === 0"
       class="my-3"
+      data-qa="done-button-audio"
       @click="stopRecording"
     >
       <i class="fas fa-check"></i>
