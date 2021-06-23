@@ -188,9 +188,9 @@ export default {
       return []
     },
     enabledAnswerTypes() {
-      return Object.entries(this.question.answerTypes).filter(
-        answerType => answerType.enabled
-      )
+      return Object.entries(this.question.answerTypes).filter(([, value]) => {
+        return value.enabled
+      })
     },
     answer() {
       if (this.formOpened && this.answers?.[this.formType]) {
@@ -262,7 +262,7 @@ export default {
   watch: {
     question() {
       this.answers = this.getAnswers(this.node.id, this.question.id)
-      openFormIfSingle()
+      this.openFormIfSingle()
     },
   },
   created() {
