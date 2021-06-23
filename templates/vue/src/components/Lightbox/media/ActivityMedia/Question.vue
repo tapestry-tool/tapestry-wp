@@ -120,16 +120,10 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getAnswers", "getQuestion"]),
+    ...mapGetters(["getAnswers"]),
     ...mapState(["userAnswers"]),
     isLoggedIn() {
       return wp.isLoggedIn()
-    },
-    lastQuestion() {
-      if (this.question.followUp.questionId !== null) {
-        return this.getQuestion(this.question.followUp.questionId)
-      }
-      return this.getQuestion(this.question.followUp.questionId)
     },
     previousQuestionAnswers() {
       if (this.question.followUp.questionId !== null) {
