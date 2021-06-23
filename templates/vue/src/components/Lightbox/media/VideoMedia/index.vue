@@ -108,6 +108,9 @@ const VideoEvents = {
   Close: "close",
 }
 
+// How often to send progress updates (in seconds)
+const updateProgressInterval = 4
+
 export default {
   components: {
     TapestryMedia: () => import("../TapestryMedia"),
@@ -147,6 +150,7 @@ export default {
        * spinner on the bottom right of the node when this is currently in progress.
        */
       completing: false,
+      rogressLastUpdated: 0,
     }
   },
   computed: {
@@ -284,7 +288,15 @@ export default {
               }
 
               this.lastTime = currentTime
-              this.$emit("timeupdate", { amountViewed, currentTime })
+
+              let currTimestamp = Date.now()
+              if (
+                (currTimestamp - this.progressLastUpdated) / 1000 >
+                updateProgressInterval
+              ) {
+                this.$emit("update-progress", { amountViewed })
+                this.progressLastUpdated = currTimestamp
+              }
               break
             }
           }

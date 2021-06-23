@@ -26,8 +26,11 @@
 <script>
 import { mapActions, mapState } from "vuex"
 import client from "@/services/TapestryAPI"
-import { SEEK_THRESHOLD } from "../video.config"
+import { SEEK_THRESHOLD } from "./video.config"
 import Helpers from "@/utils/Helpers"
+
+// How often to update the H5P settings (in seconds)
+const updateSettingsInterval = 10
 
 export default {
   name: "h5p-video-media",
@@ -56,6 +59,7 @@ export default {
       frameHeight: null,
       frameWidth: null,
       refreshed: false,
+      settingsLastUpdated: 0,
     }
   },
   computed: {
@@ -113,7 +117,15 @@ export default {
         })
       }
       this.lastTime = currentTime
-      this.updateSettings(video)
+
+      let currTimestamp = Date.now()
+      if (
+        (currTimestamp - this.settingsLastUpdated) / 1000 >
+        updateSettingsInterval
+      ) {
+        this.updateSettings(video)
+        this.settingsLastUpdated = currTimestamp
+      }
     },
 
     setFrameDimensions() {
