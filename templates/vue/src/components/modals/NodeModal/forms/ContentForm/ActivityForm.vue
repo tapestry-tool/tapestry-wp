@@ -155,6 +155,49 @@
                   v-model="question.answerTypes.list.placeholder"
                   data-qa="question-answer-list-placeholder"
                 ></b-form-input>
+                <b-card-group>
+                  <b-card>
+                    <b-form-group>
+                      <b-form-checkbox
+                        id="list-min-fields"
+                        v-model="status1"
+                        name="list-min-fields"
+                        value="accepted1"
+                        unchecked-value="not_accepted1"
+                        label-cols-sm="1"
+                      >
+                        Min
+                      </b-form-checkbox>
+                      <b-form-input
+                        v-model="text"
+                        placeholder="Min fields"
+                        label="Minimum fields"
+                        default="1"
+                        label-cols-sm="2"
+                      ></b-form-input>
+                    </b-form-group>
+                  </b-card>
+                  <b-card>
+                    <b-form-group>
+                      <b-form-checkbox
+                        id="list-max-fields"
+                        v-model="status2"
+                        name="list-max-fields"
+                        value="accepted2"
+                        unchecked-value="not_accepted2"
+                      >
+                        Max
+                      </b-form-checkbox>
+                      <b-form-input
+                        v-model="text"
+                        placeholder="Max fields"
+                        label="Maximum fields"
+                        default="1"
+                        label-cols-sm="4"
+                      ></b-form-input>
+                    </b-form-group>
+                  </b-card>
+                </b-card-group>
               </div>
             </b-form-group>
           </b-card>

@@ -71,6 +71,7 @@ export default {
   data() {
     return {
       answerList: this.answers,
+      savedList: this.answers,
       isAnswerValid: true,
       isSubmitValid: true,
       userInput: "",
@@ -110,6 +111,9 @@ export default {
       if (this.isSubmitValid) {
         this.$emit("submit", this.answerList)
       }
+    },
+    handleClose() {
+      this.$emit("submit", this.savedList)
     },
   },
 }
