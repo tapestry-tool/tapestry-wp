@@ -52,7 +52,7 @@
           <list-question
             v-else-if="formType === 'list'"
             :question="question"
-            :answers="answer ? answer : []"
+            :answers="answer.length > 0 ? answer : []"
             @submit="handleSubmit"
           ></list-question>
         </div>
