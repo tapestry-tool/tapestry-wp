@@ -214,20 +214,11 @@ export default {
       return false
     },
     multipleChoiceFormCompleted() {
-      if (this.userAnswers?.[this.node.id]?.activity?.[this.question.id]) {
-        if (
-          this.userAnswers[this.node.id].activity[this.question.id].hasOwnProperty(
-            "answers"
-          )
-        ) {
-          if (
-            this.userAnswers[this.node.id].activity[
-              this.question.id
-            ].answers.hasOwnProperty("multipleChoice")
-          ) {
-            return true
-          }
-        }
+      if (
+        this.userAnswers?.[this.node.id]?.activity?.[this.question.id]?.answers
+          ?.multipleChoice
+      ) {
+        return true
       }
       return false
     },
