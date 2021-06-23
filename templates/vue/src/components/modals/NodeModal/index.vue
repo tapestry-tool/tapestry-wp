@@ -952,6 +952,32 @@ export default {
         if (!validMultipleChoiceValues) {
           errMsgs.push("Please enter a text for all multiple choice options")
         }
+        const validMultipleChoiceImages = questionsWithMultipleChoiceEnabled.every(
+          question => {
+            const hasMultipleAnswer =
+              question.answerTypes.multipleChoice.hasMultipleAnswers
+            const useImages = question.answerTypes.multipleChoice.useImages
+            console.log("hasMultipleAnswer is", hasMultipleAnswer)
+            if (hasMultipleAnswer && useImages) {
+              /// loop through checkboxArray
+              return question.answerTypes.multipleChoice.checkboxArray.every(
+                option => {
+                  return option.imageurl != ""
+                }
+              )
+            } else if (!hasMultipleAnswer && useImages) {
+              /// loop through radioArray
+              return question.answerTypes.multipleChoice.radioArray.every(option => {
+                return option.imageurl != ""
+              })
+            } else if (!useImages) {
+              return true
+            }
+          }
+        )
+        if (!validMultipleChoiceImages) {
+          errMsgs.push("Please upload an image for all multiple choice options")
+        }
       }
 
       return errMsgs
