@@ -39,18 +39,25 @@
             class="mb-3"
           >
             <b-form-group>
-              <b-form-checkbox v-model="question.isFollowUp" switch>
-                {{ question.isFollowUp ? "Yes" : "No" }}
+              <b-form-checkbox
+                v-model="question.followUp.enabled"
+                switch
+                @change="togglingFollowUp(question)"
+              >
+                {{ question.followUp.enabled ? "Yes" : "No" }}
               </b-form-checkbox>
             </b-form-group>
-            <b-form-group v-if="question.isFollowUp" label="Show this text first:">
+            <b-form-group
+              v-if="question.followUp.enabled"
+              label="Show this text first:"
+            >
               <b-form-input
                 v-model="question.followUp.text"
                 placeholder="Previously, you said:"
               ></b-form-input>
             </b-form-group>
             <b-form-group
-              v-if="question.isFollowUp"
+              v-if="question.followUp.enabled"
               label="Then show user answer to the following activity:"
             >
               <combobox
@@ -190,6 +197,7 @@ import RichTextForm from "./RichTextForm"
 const defaultQuestion = {
   text: "",
   followUp: {
+    enabled: false,
     text: "",
     nodeId: null,
     questionId: null,
@@ -264,6 +272,11 @@ export default {
     },
     getGroupTitle(question, index) {
       return `Question #${index + 1}: ${question.text || "Untitled"}`
+    },
+    togglingFollowUp(question) {
+      question.followUp.text = ""
+      question.followUp.questionId = ""
+      question.followUp.nodeId = ""
     },
   },
 }

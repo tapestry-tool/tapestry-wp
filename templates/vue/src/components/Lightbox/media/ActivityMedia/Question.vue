@@ -1,11 +1,15 @@
 <template>
   <div class="question">
-    <button v-if="formOpened" class="button-nav m-auto" @click="back">
+    <button
+      v-if="formOpened && enabledAnswerTypes.length > 1"
+      class="button-nav m-auto"
+      @click="back"
+    >
       <i class="fas fa-arrow-left"></i>
     </button>
     <loading v-if="submitting" label="Submitting..." />
     <div v-else>
-      <div v-if="question.followUp.questionId !== null" class="follow-up">
+      <div v-if="question.followUp.enabled" class="follow-up">
         <div
           v-if="previousQuestionAnswers.length"
           class="answer-container mx-auto mb-3"
@@ -264,6 +268,7 @@ export default {
     this.answers = this.getAnswers(this.node.id, this.question.id)
   },
   mounted() {
+    this.openFormIfSingle()
     const enabledAnswerTypes = Object.entries(this.question.answerTypes)
       .filter(([, value]) => {
         return value.enabled
@@ -280,6 +285,14 @@ export default {
     back() {
       client.recordAnalyticsEvent("user", "back", "question", this.question.id)
       this.formOpened = false
+    },
+    openFormIfSingle() {
+      if (this.enabledAnswerTypes.length === 1) {
+        this.formType = this.enabledAnswerTypes.map(item => item[0])[0]
+        this.formOpened = true
+      } else {
+        this.formOpened = false
+      }
     },
     openForm(answerType) {
       client.recordAnalyticsEvent(
