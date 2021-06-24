@@ -9,6 +9,7 @@
         >
           <b-form-input v-model="answerList[index]"></b-form-input>
           <b-button
+            v-show="numOfFields < maxFields"
             class="btn"
             variant="primary"
             data-qa="list-add-button"
@@ -17,6 +18,7 @@
             Add
           </b-button>
           <button
+            v-show="numOfFields > minFields"
             class="btn btn-primary"
             variant="danger"
             @click="deleteAnswer(index)"
@@ -70,7 +72,7 @@ export default {
       answerList: this.answers,
       savedAnswers: this.answers,
       // isAnswerValid: true,
-      // isSubmitValid: true,
+      isSubmitValid: true,
       // userInput: "",
     }
   },
@@ -85,10 +87,8 @@ export default {
         ? parseInt(this.question.answerTypes.list.maxFields.value, 10)
         : 0
     },
-  },
-  watch: {
-    userInput(newAnswer) {
-      this.userInput = newAnswer
+    numOfFields() {
+      return this.answerList.length
     },
   },
   created() {
@@ -119,7 +119,13 @@ export default {
     },
     handleListSubmit(event) {
       event.preventDefault()
-      this.isSubmitValid = this.answerList.length > 0
+      this.isSubmitValid = true
+      // for (let answer of this.answerList) {
+      //   if (answer === "") {
+      //     this.isSubmitValid = false
+      //     break
+      //   }
+      // }
       if (this.isSubmitValid) {
         this.$emit("submit", this.answerList)
       }
