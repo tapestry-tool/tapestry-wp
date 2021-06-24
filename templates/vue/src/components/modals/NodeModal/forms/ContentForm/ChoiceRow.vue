@@ -1,9 +1,5 @@
 <template>
-  <div
-    v-if="multipleAnswerSelected"
-    style="z-index: 9999 !important;"
-    class="container"
-  >
+  <div v-if="multipleAnswerSelected" class="container">
     <span id="handle" v-handle class="fas fa-bars fa-s"></span>
     <b-form-checkbox :value="item.id">
       <b-form-group v-if="useImages">
@@ -20,7 +16,7 @@
     </b-form-checkbox>
     <b-form-input
       v-model="item.value"
-      style="width: 50%; margin-left: -20px;"
+      class="formInput"
       :placeholder="placeholder"
       :data-qa="`choicerow-checkbox-input-${item.id}`"
     ></b-form-input>
@@ -34,7 +30,7 @@
     </b-button>
   </div>
 
-  <div v-else style="z-index: 9999 !important;" class="container">
+  <div v-else class="container">
     <span id="handle" v-handle class="fas fa-bars fa-s"></span>
     <b-form-checkbox
       :value="item.id"
@@ -54,7 +50,7 @@
     </b-form-checkbox>
     <b-form-input
       v-model="item.value"
-      style="width: 50%; margin-left: -20px;"
+      class="formInput"
       :placeholder="placeholder"
       :data-qa="`choicerow-radio-input-${item.id}`"
     ></b-form-input>
@@ -129,12 +125,17 @@ export default {
 </script>
 
 <style lang="scss">
+.formInput {
+  width: 50%;
+  margin-left: -20px;
+}
 .inputchoice {
   width: 50%;
 }
 .container {
   display: flex;
   align-items: center;
+  z-index: 9999 !important;
 }
 #handle {
   margin-right: 5px;

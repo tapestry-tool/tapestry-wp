@@ -160,17 +160,17 @@
                     name="multiple-answer"
                     :value="true"
                   >
-                    Select Multiple Answers(Checkbox)
+                    Select Multiple Answers
                   </b-form-radio>
                   <b-form-radio
                     data-qa="question-answer-multipleChoice-singleAnswer"
                     name="single-answer"
                     :value="false"
                   >
-                    Select Single Answer(Radio Button)
+                    Select Single Answer
                   </b-form-radio>
                 </b-form-radio-group>
-                <div v-if="question.answerTypes.multipleChoice.enabled" label="">
+                <div v-if="question.answerTypes.multipleChoice.enabled">
                   <multiple-choice-form
                     :question="question"
                     data-qa="authoring-multiplechoice-form"

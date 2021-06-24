@@ -1,5 +1,5 @@
 <template>
-  <div style="float:left; clear:both;">
+  <div class="container">
     <b-form-checkbox
       v-if="isCheckBox"
       :value="item.id"
@@ -50,6 +50,11 @@ export default {
 </script>
 
 <style lang="scss">
+.container {
+  float: left;
+  clear: both;
+}
+
 .imageChoice {
   width: 200px;
 }

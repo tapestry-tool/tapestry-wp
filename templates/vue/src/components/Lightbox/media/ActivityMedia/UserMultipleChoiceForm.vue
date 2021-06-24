@@ -71,9 +71,6 @@ export default {
     radioValidAnswerState() {
       return Boolean(this.userSelectedRadio)
     },
-    multipleChoiceId() {
-      return this.question.answers.multipleChoiceId
-    },
   },
   watch: {
     question() {

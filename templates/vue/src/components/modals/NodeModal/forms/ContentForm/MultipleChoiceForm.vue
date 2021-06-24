@@ -1,6 +1,10 @@
 <template>
   <div>
-    <b-form-group :label="multipleAnswerSelected ? 'Checkbox Form' : 'Radio Form'">
+    <b-form-group
+      :label="
+        multipleAnswerSelected ? 'Multiple Answers Form' : 'Single Answer Form'
+      "
+    >
       <b-form-group>
         <b-form-checkbox v-model="useImages" data-qa="multiplechoice-thumbnail">
           Use Images
@@ -13,7 +17,10 @@
           :useDragHandle="true"
           @input="updateOrderingCheckBoxArray"
         >
-          <b-form-checkbox-group v-model="preSelectedCheckBoxOptions">
+          <b-form-checkbox-group
+            v-model="preSelectedCheckBoxOptions"
+            class="checkboxGroup"
+          >
             <choice-row
               v-for="(choiceRow, index) in choiceRows"
               :key="choiceRow.id"
@@ -44,7 +51,10 @@
           :useDragHandle="true"
           @input="updateOrderingRadioArray"
         >
-          <b-form-checkbox-group v-model="preSelectedRadioOptions">
+          <b-form-checkbox-group
+            v-model="preSelectedRadioOptions"
+            class="radioGroup"
+          >
             <choice-row
               v-for="(choiceRow, index) in choiceRowsRadio"
               :key="choiceRow.id"
@@ -246,6 +256,12 @@ export default {
 </script>
 
 <style lang="scss">
+.checkboxGroup {
+  height: 120px;
+}
+.radioGroup {
+  height: 120px;
+}
 .addButton {
   margin-top: 10px;
   margin-left: 30px;
