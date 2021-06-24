@@ -2,11 +2,11 @@
   <div style="float:left; clear:both;">
     <b-form-checkbox
       v-if="isCheckBox"
-      :value="item.value"
+      :value="item.id"
       :data-qa="`user-choicerow-checkbox-checked-${item.id}`"
     >
       <b-img
-        v-if="hasImage"
+        v-if="hasImage && item.imageurl !== null"
         :src="item.imageurl"
         class="imageChoice"
         :data-qa="`user-choicerow-checkbox-thumbnail-${item.id}`"
@@ -15,11 +15,11 @@
     </b-form-checkbox>
     <b-form-radio
       v-else-if="!isCheckBox"
-      :value="item.value"
+      :value="item.id"
       :data-qa="`user-choicerow-radio-checked-${item.id}`"
     >
       <b-img
-        v-if="hasImage"
+        v-if="hasImage && item.imageurl !== null"
         :src="item.imageurl"
         class="imageChoice"
         :data-qa="`user-choicerow-radio-thumbnail-${item.id}`"

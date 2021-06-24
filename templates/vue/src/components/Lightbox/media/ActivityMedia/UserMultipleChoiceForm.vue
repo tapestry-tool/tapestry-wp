@@ -11,7 +11,6 @@
           :data-qa="`user-choicerow-checkbox-${userChoiceRow.id}`"
         ></user-choice-row>
       </b-form-checkbox-group>
-      <!-- <p> You Selected: {{userSelectedCheckbox}}</p> -->
     </b-form-group>
 
     <b-form-group v-else>
@@ -25,7 +24,6 @@
           :data-qa="`user-choicerow-radio-${userChoiceRow.id}`"
         ></user-choice-row>
       </b-form-radio-group>
-      <!-- <p> You Selected: {{userSelectedRadio}}</p> -->
     </b-form-group>
     <b-form-invalid-feedback
       :state="isAnswerValid"
@@ -57,7 +55,7 @@ export default {
       required: true,
     },
     answer: {
-      type: [String, Array],
+      type: [String, Number, Array],
       required: true,
     },
   },
@@ -97,9 +95,17 @@ export default {
       this.userSelectedRadio = this.getPreSelectedRadioValue()
     } else {
       if (this.question.answerTypes.multipleChoice.hasMultipleAnswers) {
-        this.userSelectedCheckbox = this.answer
+        if (typeof this.answer !== "object") {
+          this.userSelectedCheckbox = []
+        } else {
+          this.userSelectedCheckbox = this.answer
+        }
       } else {
-        this.userSelectedRadio = this.answer
+        if (typeof this.answer !== "number") {
+          this.userSelectedRadio = null
+        } else {
+          this.userSelectedRadio = this.answer
+        }
       }
     }
   },
@@ -127,7 +133,7 @@ export default {
           for (var i = 0; i < selectedCheckBoxIDs.length; i++) {
             for (var j = 0; j < checkboxArray.length; j++) {
               if (checkboxArray[j].id === selectedCheckBoxIDs[i]) {
-                selectedValue.push(checkboxArray[j].value)
+                selectedValue.push(checkboxArray[j].id)
               }
             }
           }
@@ -148,7 +154,7 @@ export default {
           var selectedValue = ""
           for (var i = 0; i < radioArray.length; i++) {
             if (radioArray[i].id === matchingID) {
-              selectedValue = radioArray[i].value
+              selectedValue = radioArray[i].id
             }
           }
           return selectedValue

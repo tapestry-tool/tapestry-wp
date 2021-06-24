@@ -22,6 +22,7 @@
             :key="answer.type"
             :type="answer.type"
             :answerData="answer.answerData"
+            :followUpQuestion="getQuestion(question.followUp.questionId)"
           ></tapestry-activity>
         </div>
         <div v-else>
@@ -138,7 +139,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getAnswers"]),
+    ...mapGetters(["getAnswers", "getQuestion"]),
     ...mapState(["userAnswers"]),
     isLoggedIn() {
       return wp.isLoggedIn()
@@ -298,7 +299,6 @@ export default {
           break
         }
       }
-      console.log("submitted answer is", submittedAnswer)
       await this.completeQuestion({
         nodeId: this.node.id,
         questionId: this.question.id,
