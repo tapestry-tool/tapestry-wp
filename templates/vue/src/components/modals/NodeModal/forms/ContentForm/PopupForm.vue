@@ -25,8 +25,8 @@ export default {
     },
     isCandidate: {
       type: Boolean,
-      required: true
-    }
+      required: true,
+    },
   },
   computed: {
     isPopup() {
@@ -34,6 +34,17 @@ export default {
     },
     popupTime() {
       return this.isPopup ? this.node.popup.time : 0
+    },
+  },
+  watch: {
+    /* NOTE: This is a fix for a problem where you set a popup for a valid canidate and then change your media type 
+             (i.e. Set popup for a text and change it to multi-content). This is necessary as the popup is set inside
+             this component and not by the Publish button
+    */
+    isCandidate() {
+      if (!this.isCandidate) {
+        this.$set(this.node, "popup", null)
+      }
     },
   },
   methods: {
@@ -47,17 +58,6 @@ export default {
       }
     },
   },
-  watch:{
-    /* NOTE: This is a fix for a problem where you set a popup for a valid canidate and then change your media type 
-             (i.e. Set popup for a text and change it to multi-content). This is necessary as the popup is set inside
-             this component and not by the Publish button
-    */
-    isCandidate(){
-      if(!this.isCandidate) {
-        this.$set(this.node, "popup", null)
-      }
-    }
-  }
 }
 </script>
 
