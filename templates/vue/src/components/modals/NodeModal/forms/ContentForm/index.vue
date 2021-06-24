@@ -54,7 +54,7 @@
       <b-form-input v-model="node.typeData.subAccordionText"></b-form-input>
     </b-form-group>
     <b-form-group v-show="isPopupCandidate" label="Popup">
-      <popup-form :node="node" :isCandidate="isPopupCandidate"/>
+      <popup-form :node="node" :is-candidate="isPopupCandidate"/>
     </b-form-group>
     <b-form-group label="Content Type">
       <b-form-select
