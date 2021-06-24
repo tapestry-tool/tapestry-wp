@@ -163,6 +163,7 @@
                         v-model="question.answerTypes.list.minFields.value"
                         :disabled="!question.answerTypes.list.minFields.enabled"
                         placeholder="Min # fields"
+                        type="number"
                       ></b-form-input>
                     </div>
                   </div>
@@ -179,6 +180,7 @@
                         v-model="question.answerTypes.list.maxFields.value"
                         :disabled="!question.answerTypes.list.maxFields.enabled"
                         placeholder="Max # fields"
+                        type="number"
                       ></b-form-input>
                     </div>
                   </div>

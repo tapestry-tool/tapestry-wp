@@ -7,9 +7,15 @@
           :key="answer.index"
           class="answerItem"
         >
-          {{
-            answer
-          }}
+          <b-form-input v-model="answerList[index]"></b-form-input>
+          <b-button
+            class="btn"
+            variant="primary"
+            data-qa="list-add-button"
+            @click="addAnswer"
+          >
+            Add
+          </b-button>
           <button
             class="btn btn-primary"
             variant="danger"
@@ -19,7 +25,7 @@
           </button>
         </ul>
       </div>
-      <div class="input">
+      <!-- <div class="input">
         <b-form-input
           v-model="userInput"
           class="textInput"
@@ -30,15 +36,7 @@
           "
           @keydown.enter.prevent="addAnswer()"
         ></b-form-input>
-        <b-button
-          class="btn"
-          variant="primary"
-          data-qa="list-add-button"
-          @click="addAnswer"
-        >
-          Add
-        </b-button>
-      </div>
+      </div> -->
       <div class="submission">
         <b-button class="submit-btn" variant="primary" @click="handleListSubmit">
           Submit
@@ -64,8 +62,7 @@ export default {
     },
     answers: {
       type: Array,
-      required: false,
-      default: () => this.createFields(),
+      required: true,
     },
   },
   data() {
@@ -79,16 +76,30 @@ export default {
   },
   computed: {
     minFields() {
-      return this.question.answerTypes.list.minFields
+      return this.question.answerTypes.list.minFields.enabled
+        ? parseInt(this.question.answerTypes.list.minFields.value, 10)
+        : 0
     },
     maxFields() {
-      return this.question.answerTypes.list.maxFields
+      return this.question.answerTypes.list.maxFields.enabled
+        ? parseInt(this.question.answerTypes.list.maxFields.value, 10)
+        : 0
     },
   },
   watch: {
     userInput(newAnswer) {
       this.userInput = newAnswer
     },
+  },
+  created() {
+    if (this.answers.length === 0) {
+      let numOfFields =
+        this.answers.length > 0 ? this.answers.length : this.minFields.value
+      for (let i = 0; i < numOfFields; i++) {
+        this.userInput = ""
+        this.addAnswer()
+      }
+    }
   },
   methods: {
     deleteAnswer(index) {
@@ -109,9 +120,6 @@ export default {
     addAnswer() {
       this.answerList.push(this.userInput)
       this.userInput = ""
-    },
-    createFields() {
-      this.answers
     },
     handleListSubmit(event) {
       event.preventDefault()
