@@ -7,49 +7,44 @@
           :key="answer.index"
           class="answerItem"
         >
-          <b-form-input v-model="answerList[index]"></b-form-input>
+          <b-form-input
+            v-model="answerList[index]"
+            :placeholder="
+              question.answerTypes.list.placeholder
+                ? question.answerTypes.list.placeholder
+                : 'Enter text and press Enter'
+            "
+          ></b-form-input>
           <b-button
-            v-show="numOfFields < maxFields"
-            class="btn"
+            :disabled="numOfFields >= maxFields"
             variant="primary"
             data-qa="list-add-button"
+            :class="{
+              'enabled btn-primary': !(numOfFields >= maxFields),
+              disabled: numOfFields >= maxFields,
+            }"
             @click="addAnswer"
+            @keydown.enter.prevent="addAnswer"
           >
-            Add
+            +
           </b-button>
-          <button
-            v-show="numOfFields > minFields"
-            class="btn btn-primary"
-            variant="danger"
+          <b-button
+            :disabled="numOfFields <= minFields"
+            :class="{
+              'enabled btn-danger': !(numOfFields <= minFields),
+              disabled: numOfFields <= minFields,
+            }"
             @click="deleteAnswer(index)"
           >
-            Delete
-          </button>
+            -
+          </b-button>
         </ul>
       </div>
-      <!-- <div class="input">
-        <b-form-input
-          v-model="userInput"
-          class="textInput"
-          :placeholder="
-            question.answerTypes.list.placeholder
-              ? question.answerTypes.list.placeholder
-              : 'Enter text and press Enter'
-          "
-          @keydown.enter.prevent="addAnswer()"
-        ></b-form-input>
-      </div> -->
       <div class="submission">
         <b-button class="submit-btn" variant="primary" @click="handleListSubmit">
           Submit
         </b-button>
       </div>
-      <!-- <b-form-invalid-feedback :state="isAnswerValid">
-        Please enter a response.
-      </b-form-invalid-feedback> -->
-      <!-- <b-form-invalid-feedback :state="isSubmitValid">
-        Please enter at least one answer.
-      </b-form-invalid-feedback> -->
     </div>
   </b-form>
 </template>
@@ -73,19 +68,16 @@ export default {
       savedAnswers: this.answers,
       // isAnswerValid: true,
       isSubmitValid: true,
-      // userInput: "",
     }
   },
   computed: {
     minFields() {
-      return this.question.answerTypes.list.minFields.enabled
-        ? parseInt(this.question.answerTypes.list.minFields.value, 10)
-        : 0
+      return parseInt(this.question.answerTypes.list.minFields, 10)
     },
     maxFields() {
       return this.question.answerTypes.list.maxFields.enabled
         ? parseInt(this.question.answerTypes.list.maxFields.value, 10)
-        : 0
+        : 100000
     },
     numOfFields() {
       return this.answerList.length
@@ -120,12 +112,6 @@ export default {
     handleListSubmit(event) {
       event.preventDefault()
       this.isSubmitValid = true
-      // for (let answer of this.answerList) {
-      //   if (answer === "") {
-      //     this.isSubmitValid = false
-      //     break
-      //   }
-      // }
       if (this.isSubmitValid) {
         this.$emit("submit", this.answerList)
       }
@@ -158,35 +144,31 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding-left: 10px;
-  padding: 8px;
+  padding: 4px;
 }
 .list ul button {
   float: right;
   position: relative;
   padding: 20px;
-  background-color: #f44336;
-  height: 30px;
-  width: 100px;
   display: flex;
   align-items: center;
   justify-content: center;
-}
-.input {
-  justify-content: center;
-  align-items: center;
-  margin-top: 30px;
-}
-.textInput {
-  float: left;
-  width: 85%;
-}
-.btn btn-primary {
-  margin-top: 10px;
-  margin-left: 30px;
-  height: 30px;
-  width: 100px;
+  height: 20px;
+  width: 50px;
   float: right;
+  font-size: 30px;
+  font-weight: bold;
 }
+
+.enabled {
+  background-color: white;
+}
+
+.disabled {
+  outline: none;
+  pointer-events: none;
+}
+
 .submit-btn {
   float: center;
   margin-top: 30px;

@@ -152,16 +152,12 @@
                 <div class="list-options">
                   <div class="checkbox-input">
                     <div class="list-checkbox">
-                      <b-form-checkbox
-                        v-model="question.answerTypes.list.minFields.enabled"
-                      >
-                        Min
-                      </b-form-checkbox>
+                      <label for="min-field">Min</label>
                     </div>
                     <div class="list-input">
                       <b-form-input
-                        v-model="question.answerTypes.list.minFields.value"
-                        :disabled="!question.answerTypes.list.minFields.enabled"
+                        id="min-field"
+                        v-model="question.answerTypes.list.minFields"
                         placeholder="Min # fields"
                         type="number"
                       ></b-form-input>
@@ -250,7 +246,7 @@ const defaultQuestion = {
     list: {
       enabled: false,
       placeholder: "",
-      minFields: { enabled: true, value: 1 },
+      minFields: 1,
       maxFields: { enabled: false, value: null },
     },
   },
