@@ -92,7 +92,7 @@ export default class Helpers {
    * @param {Object} src
    * @param {Object} other
    */
-  static isDifferent(src, other) {
+  static isDifferentObject(src, other) {
     const srcKeys = Object.keys(src)
     const otherKeys = Object.keys(other)
 
@@ -114,7 +114,7 @@ export default class Helpers {
       }
       // Check 3b: Deep compare if property is an object
       if (typeof src[key] === "object") {
-        return this.isDifferent(src[key], other[key])
+        return this.isDifferentObject(src[key], other[key])
       }
       // Check 3c: Simple value check
       if (src[key] !== other[key]) {

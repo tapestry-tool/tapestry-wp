@@ -181,7 +181,7 @@ export default {
       newSettings.muted = this.player.isMuted()
       newSettings.volume = this.player.getVolume()
       newSettings.playbackRate = this.player.getPlaybackRate()
-      if (Helpers.isDifferent(this.h5pSettings, newSettings)) {
+      if (Helpers.isDifferentObject(this.h5pSettings, newSettings)) {
         this.updateH5pSettings(newSettings)
       }
     },

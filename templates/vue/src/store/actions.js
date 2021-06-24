@@ -88,7 +88,7 @@ export async function updateLockedStatus({ commit, getters, dispatch }) {
       if (node) {
         const { accessible, unlocked } = progress
         if (
-          Helpers.isDifferent(
+          Helpers.isDifferentObject(
             {
               accessible: node.accessible,
               unlocked: node.unlocked,
@@ -175,7 +175,7 @@ async function unlockNodes({ commit, getters, dispatch }) {
       const currentNode = getters.getNode(id)
       if (
         currentNode &&
-        Helpers.isDifferent(
+        Helpers.isDifferentObject(
           {
             accessible: nodeProgress.accessible,
             unlocked: nodeProgress.unlocked,

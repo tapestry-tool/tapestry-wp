@@ -213,7 +213,7 @@ export default {
       if (
         this.h5pSettings &&
         this.newSettings &&
-        Helpers.isDifferent(this.h5pSettings, newSettings)
+        Helpers.isDifferentObject(this.h5pSettings, newSettings)
       ) {
         client.recordAnalyticsEvent(
           "user",
