@@ -17,7 +17,11 @@
         {{ question.followUp.text }}
       </h4>
       <b-tabs>
-        <b-tab v-for="questionAnswer in answers" :key="questionAnswer.type">
+        <b-tab 
+          v-for="questionAnswer in answers"
+          :key="questionAnswer.type"
+          title-link-class="answer-tab-link-title" 
+        >
           <template #title>
             <div class="icon">
               <tapestry-icon :icon="questionAnswer[0]" />
@@ -117,5 +121,9 @@ export default {
 .answer-container {
   width: 75%;
   margin-top: 20px;
+}
+
+.answer-tab-link-title:not(.active) > div {
+  color: white;
 }
 </style>
