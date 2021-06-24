@@ -1,9 +1,17 @@
 <template>
-  <div class="tapestry-activity">
-    <div v-if="showIcon" class="icon"><tapestry-icon :icon="type" /></div>
-    <div v-if="type === 'text'" class="text">{{ answerData }}</div>
-    <audio v-if="type === 'audio'" controls :src="answerData"></audio>
-  </div>
+  <b-container class="tapestry-activity">
+    <b-row>
+      <b-col v-if="showIcon" align-self="center" cols="2"><tapestry-icon :icon="type"/></b-col>
+      <b-col v-if="type === 'text'" align-self="center">
+        <div class="text">
+          {{ answerData }}
+        </div>
+      </b-col>
+      <b-col v-if="type === 'audio'" align-self="center">
+        <audio controls :src="answerData"></audio>
+      </b-col>
+    </b-row>
+  </b-container>
 </template>
 
 <script>
@@ -35,33 +43,14 @@ export default {
 
 <style lang="scss" scoped>
 .tapestry-activity {
-  position: relative;
-  align-items: center;
   background: #262626;
-  border-radius: 8px;
-  display: flex;
+  border-radius: 0 0 8px 8px;
   margin-bottom: 8px;
-  padding: 8px 16px 8px 38px;
-  justify-content: center;
+  padding: 8px 16px 8px 16px;
 
-  &:last-child {
-    margin-bottom: 0;
+  .text{
+    text-align: left;
   }
 
-  .icon {
-    height: 24px;
-    width: 24px;
-    position: absolute;
-    left: 8px;
-  }
-
-  * {
-    margin: 0;
-    padding: 0;
-  }
-}
-
-.text {
-  white-space: pre-wrap;
 }
 </style>
