@@ -71,7 +71,7 @@ export default {
       savedAnswers: this.answers,
       // isAnswerValid: true,
       // isSubmitValid: true,
-      userInput: "",
+      // userInput: "",
     }
   },
   computed: {
@@ -93,10 +93,7 @@ export default {
   },
   created() {
     if (this.answers.length === 0) {
-      let numOfFields =
-        this.answers.length > 0 ? this.answers.length : this.minFields.value
-      for (let i = 0; i < numOfFields; i++) {
-        this.userInput = ""
+      for (let i = 0; i < this.minFields; i++) {
         this.addAnswer()
       }
     }
@@ -118,8 +115,7 @@ export default {
         .catch(err => console.log(err))
     },
     addAnswer() {
-      this.answerList.push(this.userInput)
-      this.userInput = ""
+      this.answerList.push("")
     },
     handleListSubmit(event) {
       event.preventDefault()
