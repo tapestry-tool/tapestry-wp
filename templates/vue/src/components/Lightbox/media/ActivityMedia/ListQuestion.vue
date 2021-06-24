@@ -19,7 +19,7 @@
           variant="primary"
           data-qa="list-add-button"
           :class="{
-            'enabled btn-primary': !(numOfFields >= maxFields),
+            'btn-primary': !(numOfFields >= maxFields),
             disabled: numOfFields >= maxFields,
           }"
           @click="addAnswer"
@@ -30,7 +30,7 @@
         <b-button
           :disabled="numOfFields <= minFields"
           :class="{
-            'enabled btn-danger': !(numOfFields <= minFields),
+            'btn-danger': !(numOfFields <= minFields),
             disabled: numOfFields <= minFields,
           }"
           @click="deleteAnswer(index)"
@@ -147,10 +147,6 @@ export default {
   float: right;
   font-size: 30px;
   font-weight: bold;
-}
-
-.enabled {
-  background-color: white;
 }
 
 .disabled {

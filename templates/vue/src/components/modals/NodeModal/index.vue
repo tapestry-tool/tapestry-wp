@@ -921,25 +921,20 @@ export default {
         if (!validPreviousAnswers) {
           errMsgs.push("Please select a previous activity to display")
         }
-        // if (this.node.typeData.activity.questions[0].answerTypes.list.enabled) {
-        //   let listQuestion = this.node.typeData.activity.questions.answerTypes.list
-        //   if (listQuestion.minFields < 1) {
-        //     errMsgs.push("Please have at minimum 1 answer field")
-        //   }
-        //   if (listQuestion.maxFields.enabled) {
-        //     if (listQuestion.maxFields.value < 1) {
-        //       errMsgs.push("Max number of fields cannot be less than 1")
-        //     }
-        //     if (
-        //       this.node.typeData.activity.questions.list.maxFields <
-        //       this.node.typeData.activity.questions.list.minFields
-        //     ) {
-        //       errMsgs.push(
-        //         "Please ensure than the min number of fields does not exceed the max number of fields"
-        //       )
-        //     }
-        //   }
-        // }
+        if (this.node.typeData.activity.questions[0].answerTypes.list.enabled) {
+          let listQuestion = this.node.typeData.activity.questions[0].answerTypes
+            .list
+          if (listQuestion.minFields < 1) {
+            errMsgs.push("Minimum # of fields for list activity must be > 1")
+          }
+          if (listQuestion.maxFields.enabled) {
+            if (listQuestion.maxFields.value < listQuestion.minFields) {
+              errMsgs.push(
+                "Maximum # of fields for list activity must be > minumum # fields"
+              )
+            }
+          }
+        }
       }
 
       return errMsgs
