@@ -148,56 +148,47 @@
               >
                 List Answer
               </b-form-checkbox>
-              <div v-if="question.answerTypes.list.enabled" class="mt-2 pl-4">
-                <label for="placeholder">Placeholder (optional):</label>
-                <b-form-input
-                  id="placeholder"
-                  v-model="question.answerTypes.list.placeholder"
-                  data-qa="question-answer-list-placeholder"
-                ></b-form-input>
-                <b-card-group>
-                  <b-card>
-                    <b-form-group>
+              <div v-if="question.answerTypes.list.enabled" class="mt-2 pl-4 ml-2">
+                <div class="list-options">
+                  <div class="checkbox-input">
+                    <div class="list-checkbox">
                       <b-form-checkbox
-                        id="list-min-fields"
-                        v-model="status1"
-                        name="list-min-fields"
-                        value="accepted1"
-                        unchecked-value="not_accepted1"
-                        label-cols-sm="1"
+                        v-model="question.answerTypes.list.minFields.enabled"
                       >
                         Min
                       </b-form-checkbox>
+                    </div>
+                    <div class="list-input">
                       <b-form-input
-                        v-model="text"
-                        placeholder="Min fields"
-                        label="Minimum fields"
-                        default="1"
-                        label-cols-sm="2"
+                        v-model="question.answerTypes.list.minFields.value"
+                        :disabled="!question.answerTypes.list.minFields.enabled"
+                        placeholder="Min # fields"
                       ></b-form-input>
-                    </b-form-group>
-                  </b-card>
-                  <b-card>
-                    <b-form-group>
+                    </div>
+                  </div>
+                  <div class="checkbox-input">
+                    <div class="list-checkbox">
                       <b-form-checkbox
-                        id="list-max-fields"
-                        v-model="status2"
-                        name="list-max-fields"
-                        value="accepted2"
-                        unchecked-value="not_accepted2"
+                        v-model="question.answerTypes.list.maxFields.enabled"
                       >
                         Max
                       </b-form-checkbox>
+                    </div>
+                    <div class="list-input">
                       <b-form-input
-                        v-model="text"
-                        placeholder="Max fields"
-                        label="Maximum fields"
-                        default="1"
-                        label-cols-sm="4"
+                        v-model="question.answerTypes.list.maxFields.value"
+                        :disabled="!question.answerTypes.list.maxFields.enabled"
+                        placeholder="Max # fields"
                       ></b-form-input>
-                    </b-form-group>
-                  </b-card>
-                </b-card-group>
+                    </div>
+                  </div>
+                  <label for="placeholder">Placeholder (optional):</label>
+                  <b-form-input
+                    id="placeholder"
+                    v-model="question.answerTypes.list.placeholder"
+                    data-qa="question-answer-list-placeholder"
+                  ></b-form-input>
+                </div>
               </div>
             </b-form-group>
           </b-card>
@@ -257,6 +248,8 @@ const defaultQuestion = {
     list: {
       enabled: false,
       placeholder: "",
+      minFields: { enabled: true, value: 1 },
+      maxFields: { enabled: false, value: null },
     },
   },
   confirmation: {
@@ -343,5 +336,19 @@ export default {
   .not-collapsed .when-closed {
     display: none;
   }
+}
+
+.checkbox-input {
+  float: left;
+}
+
+.list-checkbox {
+  float: left;
+  width: 100px;
+}
+
+.list-input {
+  float: right;
+  width: calc(100% - 100px);
 }
 </style>
