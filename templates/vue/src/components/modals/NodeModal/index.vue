@@ -971,6 +971,16 @@ export default {
         if (!validMultipleChoiceImages) {
           errMsgs.push("Please upload an image for all multiple choice options")
         }
+      } else if (this.node.mediaType === "answer") {
+        const hasActivityId = this.node.answers.activityID
+        if (!hasActivityId) {
+          errMsgs.push("Please select an activity")
+        }
+
+        const hasQuestionId = this.node.answers.questionID
+        if (!hasQuestionId) {
+          errMsgs.push("Please select a question")
+        }
       }
 
       return errMsgs
