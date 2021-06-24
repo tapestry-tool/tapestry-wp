@@ -1,52 +1,50 @@
 <template>
-  <b-form>
-    <div class="container">
-      <div class="list">
-        <ul
-          v-for="(answer, index) in answerList"
-          :key="answer.index"
-          class="answerItem"
+  <div class="container">
+    <div class="list">
+      <ul
+        v-for="(answer, index) in answerList"
+        :key="answer.index"
+        class="answerItem"
+      >
+        <b-form-input
+          v-model="answerList[index]"
+          :placeholder="
+            question.answerTypes.list.placeholder
+              ? question.answerTypes.list.placeholder
+              : 'Enter text and press Enter'
+          "
+        ></b-form-input>
+        <b-button
+          :disabled="numOfFields >= maxFields"
+          variant="primary"
+          data-qa="list-add-button"
+          :class="{
+            'enabled btn-primary': !(numOfFields >= maxFields),
+            disabled: numOfFields >= maxFields,
+          }"
+          @click="addAnswer"
+          @keydown.enter.prevent="addAnswer"
         >
-          <b-form-input
-            v-model="answerList[index]"
-            :placeholder="
-              question.answerTypes.list.placeholder
-                ? question.answerTypes.list.placeholder
-                : 'Enter text and press Enter'
-            "
-          ></b-form-input>
-          <b-button
-            :disabled="numOfFields >= maxFields"
-            variant="primary"
-            data-qa="list-add-button"
-            :class="{
-              'enabled btn-primary': !(numOfFields >= maxFields),
-              disabled: numOfFields >= maxFields,
-            }"
-            @click="addAnswer"
-            @keydown.enter.prevent="addAnswer"
-          >
-            +
-          </b-button>
-          <b-button
-            :disabled="numOfFields <= minFields"
-            :class="{
-              'enabled btn-danger': !(numOfFields <= minFields),
-              disabled: numOfFields <= minFields,
-            }"
-            @click="deleteAnswer(index)"
-          >
-            -
-          </b-button>
-        </ul>
-      </div>
-      <div class="submission">
-        <b-button class="submit-btn" variant="primary" @click="handleListSubmit">
-          Submit
+          +
         </b-button>
-      </div>
+        <b-button
+          :disabled="numOfFields <= minFields"
+          :class="{
+            'enabled btn-danger': !(numOfFields <= minFields),
+            disabled: numOfFields <= minFields,
+          }"
+          @click="deleteAnswer(index)"
+        >
+          -
+        </b-button>
+      </ul>
     </div>
-  </b-form>
+    <div class="submission">
+      <b-button class="submit-btn" variant="primary" @click="handleListSubmit">
+        Submit
+      </b-button>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -64,10 +62,7 @@ export default {
   },
   data() {
     return {
-      answerList: this.answers,
-      savedAnswers: this.answers,
-      // isAnswerValid: true,
-      isSubmitValid: true,
+      answerList: this.answers.map(x => x),
     }
   },
   computed: {
@@ -84,7 +79,7 @@ export default {
     },
   },
   created() {
-    if (this.answers.length === 0) {
+    if (this.answerList.length === 0) {
       for (let i = 0; i < this.minFields; i++) {
         this.addAnswer()
       }
@@ -111,13 +106,7 @@ export default {
     },
     handleListSubmit(event) {
       event.preventDefault()
-      this.isSubmitValid = true
-      if (this.isSubmitValid) {
-        this.$emit("submit", this.answerList)
-      }
-    },
-    handleClose() {
-      this.$emit("submit", this.savedAnswers)
+      this.$emit("submit", this.answerList)
     },
   },
 }
