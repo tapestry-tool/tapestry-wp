@@ -27,11 +27,13 @@
           <tapestry-activity
             v-if="questionAnswer[0] === 'audio'"
             :type="questionAnswer[0]"
+            :show-icon="false"
             :answerData="getFullUrl(questionAnswer[1].url)"
           ></tapestry-activity>
           <tapestry-activity
             v-else
             :type="questionAnswer[0]"
+            :show-icon="false"
             :answerData="questionAnswer[1]"
           ></tapestry-activity>
         </b-tab>

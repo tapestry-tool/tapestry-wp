@@ -1,6 +1,6 @@
 <template>
   <div class="tapestry-activity">
-    <div class="icon"><tapestry-icon :icon="type" /></div>
+    <div v-if="showIcon" class="icon"><tapestry-icon :icon="type" /></div>
     <div v-if="type === 'text'" class="text">{{ answerData }}</div>
     <audio v-if="type === 'audio'" controls :src="answerData"></audio>
   </div>
@@ -23,6 +23,11 @@ export default {
     answerData: {
       type: [String, Array],
       required: true,
+    },
+    showIcon: {
+      type: Boolean,
+      required: false,
+      default: true
     },
   },
 }
