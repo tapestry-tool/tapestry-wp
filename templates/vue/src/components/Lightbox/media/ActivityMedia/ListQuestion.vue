@@ -44,12 +44,12 @@
           Submit
         </b-button>
       </div>
-      <b-form-invalid-feedback :state="isAnswerValid">
+      <!-- <b-form-invalid-feedback :state="isAnswerValid">
         Please enter a response.
-      </b-form-invalid-feedback>
-      <b-form-invalid-feedback :state="isSubmitValid">
+      </b-form-invalid-feedback> -->
+      <!-- <b-form-invalid-feedback :state="isSubmitValid">
         Please enter at least one answer.
-      </b-form-invalid-feedback>
+      </b-form-invalid-feedback> -->
     </div>
   </b-form>
 </template>
@@ -65,17 +65,25 @@ export default {
     answers: {
       type: Array,
       required: false,
-      default: () => [],
+      default: () => this.createFields(),
     },
   },
   data() {
     return {
       answerList: this.answers,
-      savedList: this.answers,
-      isAnswerValid: true,
-      isSubmitValid: true,
+      savedAnswers: this.answers,
+      // isAnswerValid: true,
+      // isSubmitValid: true,
       userInput: "",
     }
+  },
+  computed: {
+    minFields() {
+      return this.question.answerTypes.list.minFields
+    },
+    maxFields() {
+      return this.question.answerTypes.list.maxFields
+    },
   },
   watch: {
     userInput(newAnswer) {
@@ -99,11 +107,11 @@ export default {
         .catch(err => console.log(err))
     },
     addAnswer() {
-      this.isAnswerValid = this.userInput !== ""
-      if (this.isAnswerValid) {
-        this.answerList.push(this.userInput)
-      }
+      this.answerList.push(this.userInput)
       this.userInput = ""
+    },
+    createFields() {
+      this.answers
     },
     handleListSubmit(event) {
       event.preventDefault()
@@ -113,7 +121,7 @@ export default {
       }
     },
     handleClose() {
-      this.$emit("submit", this.savedList)
+      this.$emit("submit", this.savedAnswers)
     },
   },
 }
