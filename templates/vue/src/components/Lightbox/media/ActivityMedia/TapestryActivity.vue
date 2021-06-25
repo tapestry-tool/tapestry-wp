@@ -48,7 +48,7 @@ export default {
   margin-bottom: 8px;
   padding: 8px 16px 8px 16px;
 
-  .text{
+  .text {
     text-align: left;
   }
 

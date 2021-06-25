@@ -6,15 +6,9 @@
       class="answer-container mx-auto mb-3"
       data-qa="answer-display"
     >
-      <h2>{{ question.text }}</h2>
-      <h4 v-show="hasNewFollowUpText && hasAnswer" class="mb-4">
-        {{ answer.followUpText }}
-      </h4>
-      <h4
-        v-show="!hasNewFollowUpText && question.followUp.enabled && hasAnswer"
-        class="mb-4"
-      >
-        {{ question.followUp.text }}
+      <h2 v-if="answer.precedingText">{{ answer.precedingText }}</h2>
+      <h2 v-else>{{ question.text }}</h2>
+        
       </h4>
       <b-tabs>
         <b-tab 
@@ -80,9 +74,6 @@ export default {
     },
     question() {
       return this.getQuestion(this.answer.questionId)
-    },
-    hasNewFollowUpText() {
-      return this.answer.followUpText !== ""
     },
     answers() {
       const answers = this.getAnswers(this.answer.activityId, this.answer.questionId)
