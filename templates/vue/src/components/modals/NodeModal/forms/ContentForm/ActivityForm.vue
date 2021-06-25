@@ -257,7 +257,7 @@ export default {
   methods: {
     getPreviousQuestions(currentQuestion) {
       const allQuestions = Object.values(this.nodes)
-        .filter(node => Boolean(node.typeData.activity.questions))
+        .filter(node => Boolean(node.typeData.activity?.questions))
         .flatMap(node => node.typeData.activity.questions)
       return allQuestions.filter(qn => qn.id !== currentQuestion.id)
     },

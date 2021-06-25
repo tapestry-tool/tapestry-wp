@@ -97,6 +97,7 @@ import RichTextForm from "./RichTextForm"
 import UrlEmbedForm from "./UrlEmbedForm"
 import VideoForm from "./VideoForm"
 import WpPostForm from "./WpPostForm"
+import AnswerForm from "./AnswerForm"
 
 export default {
   components: {
@@ -109,6 +110,7 @@ export default {
     UrlEmbedForm,
     VideoForm,
     WpPostForm,
+    AnswerForm,
   },
   props: {
     node: {
@@ -141,6 +143,10 @@ export default {
         { value: "url-embed", text: "External Link" },
         { value: "wp-post", text: "Wordpress Post" },
         { value: "activity", text: "Activity" },
+        {
+          label: "Advanced",
+          options: [{ value: "answer", text: "Answer" }],
+        },
         { value: "multi-content", text: "Multi-Content" }, // must be last item
       ],
       shouldShowTitle: this.node.typeData.showTitle !== false,
