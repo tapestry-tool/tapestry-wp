@@ -905,6 +905,20 @@ export default {
         if (!validPreviousAnswers) {
           errMsgs.push("Please select a previous activity to display")
         }
+        if (this.node.typeData.activity.questions[0].answerTypes.list.enabled) {
+          let listQuestion = this.node.typeData.activity.questions[0].answerTypes
+            .list
+          if (listQuestion.minFields < 1) {
+            errMsgs.push("Minimum # of fields for list activity must be > 1")
+          }
+          if (listQuestion.maxFields.enabled) {
+            if (listQuestion.maxFields.value < listQuestion.minFields) {
+              errMsgs.push(
+                "Maximum # of fields for list activity must be > minumum # fields"
+              )
+            }
+          }
+        }
       } else if (this.node.mediaType === "answer") {
         const hasActivityId = this.node.typeData.activityId
         if (!hasActivityId) {
