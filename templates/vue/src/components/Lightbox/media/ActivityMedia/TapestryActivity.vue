@@ -1,6 +1,6 @@
 <template>
   <b-container class="tapestry-activity">
-    <b-row>
+    <b-row align-v="center" style="min-height:150px;">
       <b-col v-if="showIcon" align-self="center" cols="2"><tapestry-icon :icon="type"/></b-col>
       <b-col v-if="type === 'text'" align-self="center">
         <div class="text">
