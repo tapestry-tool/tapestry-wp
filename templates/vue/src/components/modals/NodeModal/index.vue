@@ -961,7 +961,7 @@ export default {
               )
             } else if (!hasMultipleAnswer && useImages) {
               return question.answerTypes.multipleChoice.radioArray.every(option => {
-                return option.imageurl != ""
+                return option.imageurl != "" && option.imageurl != null
               })
             } else if (!useImages) {
               return true
