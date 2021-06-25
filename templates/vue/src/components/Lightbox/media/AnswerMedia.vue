@@ -76,16 +76,16 @@ export default {
     ...mapState(["userAnswers"]),
     ...mapGetters(["getQuestion", "getAnswers"]),
     answer() {
-      return this.node.answers
+      return this.node.typeData
     },
     question() {
-      return this.getQuestion(this.answer.questionID)
+      return this.getQuestion(this.answer.questionId)
     },
     hasNewFollowUpText() {
       return this.answer.followUpText !== ""
     },
     answers() {
-      const answers = this.getAnswers(this.answer.activityID, this.answer.questionID)
+      const answers = this.getAnswers(this.answer.activityId, this.answer.questionId)
       return answers ? Object.entries(answers) : null
     },
     hasAnswer() {

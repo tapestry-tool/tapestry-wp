@@ -2,7 +2,7 @@
   <div>
     <b-form-group data-qa="activity-combobox" label="Activity">
       <combobox
-        v-model="activityNodeId"
+        v-model="node.typeData.activityId"
         :options="activityNodes"
         data-qa="choose-activity-node"
         item-text="title"
@@ -21,8 +21,8 @@
       label="Question"
     >
       <combobox
-        v-model="currentQuestion"
-        :options="currentQuestions"
+        v-model="node.typeData.questionId"
+        :options="availableQuestionIds"
         data-qa="choose-question"
         item-text="text"
         item-value="id"
@@ -39,7 +39,7 @@
       label="Show this text first"
       description="If empty, will default to the follow-up text of the activity form."
     >
-      <b-form-input v-model="followUpText" data-qa="follow-up-text"></b-form-input>
+      <b-form-input v-model="node.typeData.followUpText" data-qa="follow-up-text"></b-form-input>
     </b-form-group>
   </div>
 </template>
@@ -57,13 +57,6 @@ export default {
       required: true,
     },
   },
-  data() {
-    return {
-      activityNodeId: "",
-      currentQuestion: "",
-      followUpText: "",
-    }
-  },
   computed: {
     ...mapState(["nodes"]),
     activityNodes() {
@@ -72,49 +65,15 @@ export default {
       )
       return activityNodes
     },
-    currentQuestions() {
+    availableQuestionIds() {
       const questions = Object.values(this.activityNodes)
-        .filter(node => node.id == this.activityNodeId)
+        .filter(node => node.id == this.node.typeData.activityId)
         .flatMap(node => node.typeData.activity.questions)
 
       return questions
     },
   },
-  watch: {
-    activityNodeId(activityID) {
-      if (activityID) {
-        const questions = Object.values(this.activityNodes)
-          .filter(node => node.id == activityID)
-          .flatMap(node => node.quiz)
-        this.currentQuestions = questions
-      }
-    },
-    currentQuestion(id) {
-      if (id) {
-        let selectedQuestion = []
-        selectedQuestion = this.currentQuestions.filter(
-          question => question.id == id
-        )
-        this.currentQuestion = selectedQuestion[0].id
-      }
-    },
-  },
-  mounted() {
-    const prevAnswers = this.node.answers
-    if (prevAnswers) {
-      this.activityNodeId = prevAnswers.activityID
-      this.currentQuestion = prevAnswers.questionID
-      this.followUpText = prevAnswers.followUpText
-    }
-  },
-  updated() {
-    const answerObject = {
-      activityID: this.activityNodeId,
-      questionID: this.currentQuestion,
-      followUpText: this.followUpText,
-    }
-    this.node.answers = answerObject
-  },
+
 }
 </script>
 
