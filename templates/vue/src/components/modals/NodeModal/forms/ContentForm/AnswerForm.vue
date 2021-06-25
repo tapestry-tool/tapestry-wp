@@ -19,7 +19,7 @@
     <b-form-group data-qa="question-select" label="Question">
       <combobox
         v-model="node.typeData.questionId"
-        :options="availableQuestionIds"
+        :options="availableQuestions"
         data-qa="choose-question"
         item-text="text"
         item-value="id"
@@ -34,12 +34,15 @@
     </b-form-group>
     <b-form-group
       label="Show this text first"
-      description="If empty, will default to the follow-up text of the activity form."
     >
-      <b-form-input
-        v-model="node.typeData.followUpText"
+      <b-form-input 
+        v-if="node.typeData.questionId"
+        v-model="node.typeData.precedingText"
         data-qa="follow-up-text"
-      ></b-form-input>
+        :placeholder="originalQuestionText"
+        description="If empty, will default to the original question text"
+        >
+        </b-form-input>
     </b-form-group>
   </div>
 </template>
@@ -65,12 +68,18 @@ export default {
       )
       return activityNodes
     },
-    availableQuestionIds() {
+    availableQuestions() {
       const questions = Object.values(this.activityNodes)
         .filter(node => node.id == this.node.typeData.activityId)
         .flatMap(node => node.typeData.activity.questions)
 
       return questions
+    },
+    originalQuestionText(){
+      return this.availableQuestions.find(
+        question => question.id === this.node.typeData.questionId
+      ).text
+
     },
   },
 }
