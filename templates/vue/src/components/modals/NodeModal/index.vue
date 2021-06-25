@@ -956,7 +956,7 @@ export default {
             if (hasMultipleAnswer && useImages) {
               return question.answerTypes.multipleChoice.checkboxArray.every(
                 option => {
-                  return option.imageurl != ""
+                  return option.imageurl != "" && option.imageurl != null
                 }
               )
             } else if (!hasMultipleAnswer && useImages) {
