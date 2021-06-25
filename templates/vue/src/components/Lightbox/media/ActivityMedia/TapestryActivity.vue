@@ -12,6 +12,13 @@
       <b-col v-if="type === 'audio'" align-self="center">
         <audio controls :src="answerData"></audio>
       </b-col>
+      <b-col v-if="type === 'list'">
+        <ol>
+          <li v-for="answer in answerData" :key="answer.index">
+            {{ answer }}
+          </li>
+        </ol>
+      </b-col>
     </b-row>
   </b-container>
 </template>
