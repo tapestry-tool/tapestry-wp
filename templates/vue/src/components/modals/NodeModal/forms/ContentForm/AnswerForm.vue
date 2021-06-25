@@ -22,7 +22,7 @@
     >
       <combobox
         v-model="node.typeData.questionId"
-        :options="availableQuestion"
+        :options="availableQuestions"
         data-qa="choose-question"
         item-text="text"
         item-value="id"
@@ -39,6 +39,7 @@
       label="Show this text first"
     >
       <b-form-input 
+        v-if="node.typeData.questionId"
         v-model="node.typeData.precedingText"
         data-qa="follow-up-text"
         :placeholder="originalQuestionText"
@@ -70,7 +71,7 @@ export default {
       )
       return activityNodes
     },
-    availableQuestion() {
+    availableQuestions() {
       const questions = Object.values(this.activityNodes)
         .filter(node => node.id == this.node.typeData.activityId)
         .flatMap(node => node.typeData.activity.questions)
@@ -78,9 +79,10 @@ export default {
       return questions
     },
     originalQuestionText(){
-      return this.availableQuestion.find(
+      return this.availableQuestions.find(
         question => question.id === this.node.typeData.questionId
       ).text
+
     },
   },
 
