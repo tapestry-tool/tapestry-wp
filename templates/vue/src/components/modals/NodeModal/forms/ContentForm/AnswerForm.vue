@@ -1,0 +1,79 @@
+<template>
+  <div>
+    <b-form-group data-qa="activity-combobox" label="Activity">
+      <combobox
+        v-model="node.typeData.activityId"
+        :options="activityNodes"
+        data-qa="choose-activity-node"
+        item-text="title"
+        item-value="id"
+        empty-message="Please select an Activity first"
+      >
+        <template v-slot="slotProps">
+          <p>
+            {{ slotProps.option.title }}
+          </p>
+        </template>
+      </combobox>
+    </b-form-group>
+    <b-form-group data-qa="question-select" label="Question">
+      <combobox
+        v-model="node.typeData.questionId"
+        :options="availableQuestionIds"
+        data-qa="choose-question"
+        item-text="text"
+        item-value="id"
+        empty-message="Please select an activity first."
+      >
+        <template v-slot="slotProps">
+          <p>
+            {{ slotProps.option.text }}
+          </p>
+        </template>
+      </combobox>
+    </b-form-group>
+    <b-form-group
+      label="Show this text first"
+      description="If empty, will default to the follow-up text of the activity form."
+    >
+      <b-form-input
+        v-model="node.typeData.followUpText"
+        data-qa="follow-up-text"
+      ></b-form-input>
+    </b-form-group>
+  </div>
+</template>
+
+<script>
+import { mapState } from "vuex"
+import Combobox from "@/components/modals/common/Combobox"
+export default {
+  components: {
+    Combobox,
+  },
+  props: {
+    node: {
+      type: Object,
+      required: true,
+    },
+  },
+  computed: {
+    ...mapState(["nodes"]),
+    activityNodes() {
+      const activityNodes = Object.values(this.nodes).filter(
+        node => node.mediaType == "activity"
+      )
+      return activityNodes
+    },
+    availableQuestionIds() {
+      const questions = Object.values(this.activityNodes)
+        .filter(node => node.id == this.node.typeData.activityId)
+        .flatMap(node => node.typeData.activity.questions)
+
+      return questions
+    },
+  },
+}
+</script>
+
+<style scoped></style>
