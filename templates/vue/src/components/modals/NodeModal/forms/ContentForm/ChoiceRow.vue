@@ -14,12 +14,14 @@
         />
       </b-form-group>
     </b-form-checkbox>
-    <b-form-input
-      v-model="item.value"
-      class="formInput"
-      :placeholder="placeholder"
-      :data-qa="`choicerow-checkbox-input-${item.id}`"
-    ></b-form-input>
+    <div :class="useImages ? 'inputContainerImage' : 'inputContainer'">
+      <b-form-input
+        v-model="item.value"
+        class="formInput"
+        :placeholder="placeholder"
+        :data-qa="`choicerow-checkbox-input-${item.id}`"
+      ></b-form-input>
+    </div>
     <b-button
       :disabled="removeButtonDisabled"
       squared
@@ -48,12 +50,14 @@
         />
       </b-form-group>
     </b-form-checkbox>
-    <b-form-input
-      v-model="item.value"
-      class="formInput"
-      :placeholder="placeholder"
-      :data-qa="`choicerow-radio-input-${item.id}`"
-    ></b-form-input>
+    <div :class="useImages ? 'inputContainerImage' : 'inputContainer'">
+      <b-form-input
+        v-model="item.value"
+        class="formInput"
+        :placeholder="placeholder"
+        :data-qa="`choicerow-radio-input-${item.id}`"
+      ></b-form-input>
+    </div>
     <b-button
       :disabled="removeButtonDisabled"
       squared
@@ -125,8 +129,15 @@ export default {
 </script>
 
 <style lang="scss">
+.inputContainer {
+  margin-right: -20px;
+  width: 500px;
+}
+.inputContainerImage {
+  margin-right: -20px;
+  width: 100px;
+}
 .formInput {
-  width: 50%;
   margin-left: -20px;
 }
 .inputchoice {
