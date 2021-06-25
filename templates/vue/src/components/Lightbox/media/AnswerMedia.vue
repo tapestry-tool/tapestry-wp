@@ -17,7 +17,11 @@
         {{ question.followUp.text }}
       </h4>
       <b-tabs>
-        <b-tab v-for="questionAnswer in answers" :key="questionAnswer.type">
+        <b-tab 
+          v-for="questionAnswer in answers"
+          :key="questionAnswer.type"
+          title-link-class="answer-tab-link-title" 
+        >
           <template #title>
             <div class="icon">
               <tapestry-icon :icon="questionAnswer[0]" />
@@ -27,12 +31,16 @@
           <tapestry-activity
             v-if="questionAnswer[0] === 'audio'"
             :type="questionAnswer[0]"
+            :show-icon="true"
             :answerData="getFullUrl(questionAnswer[1].url)"
+            class="tab-content"
           ></tapestry-activity>
           <tapestry-activity
             v-else
             :type="questionAnswer[0]"
+            :show-icon="false"
             :answerData="questionAnswer[1]"
+            class="tab-content"
           ></tapestry-activity>
         </b-tab>
       </b-tabs>
@@ -66,32 +74,32 @@ export default {
   },
   computed: {
     ...mapState(["userAnswers"]),
-    ...mapGetters(["getEntry", "getQuestion", "getAnswers"]),
+    ...mapGetters(["getQuestion", "getAnswers"]),
     answer() {
-      return this.node.answers
+      return this.node.typeData
     },
     question() {
-      return this.getQuestion(this.answer.questionID)
+      return this.getQuestion(this.answer.questionId)
     },
     hasNewFollowUpText() {
       return this.answer.followUpText !== ""
     },
     answers() {
-      const answers = this.getAnswers(this.answer.activityID, this.answer.questionID)
+      const answers = this.getAnswers(this.answer.activityId, this.answer.questionId)
       return answers ? Object.entries(answers) : null
     },
     hasAnswer() {
       return this.answers.length ? true : false
     },
   },
-  methods: {
-    getFullUrl(url){
-      return wpData.uploadDirArray.baseurl + "/" + url
-    }
-  },
   mounted() {
     this.$emit("complete")
     this.$emit("load")
+  },
+  methods: {
+    getFullUrl(url) {
+      return wpData.uploadDirArray.baseurl + "/" + url
+    },
   },
 }
 </script>
@@ -115,5 +123,9 @@ export default {
 .answer-container {
   width: 75%;
   margin-top: 20px;
+}
+
+.answer-tab-link-title:not(.active) > div {
+  color: white;
 }
 </style>

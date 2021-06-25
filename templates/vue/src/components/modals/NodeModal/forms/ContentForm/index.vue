@@ -136,18 +136,25 @@ export default {
     return {
       addDesc: false,
       mediaTypes: [
-        { value: "", text: "Select content type" },
-        { value: "text", text: "Text" },
-        { value: "video", text: "Video" },
-        { value: "h5p", text: "H5P" },
-        { value: "url-embed", text: "External Link" },
-        { value: "wp-post", text: "Wordpress Post" },
-        { value: "activity", text: "Activity" },
+        {
+          label: "Basic",
+          options: [
+            { value: "", text: "Select content type" },
+            { value: "text", text: "Text" },
+            { value: "video", text: "Video" },
+            { value: "h5p", text: "H5P" },
+            { value: "url-embed", text: "External Link" },
+            { value: "wp-post", text: "Wordpress Post" },
+            { value: "activity", text: "Activity" },
+            { value: "multi-content", text: "Multi-Content" },
+          ]
+        },
         {
           label: "Advanced",
-          options: [{ value: "answer", text: "Answer" }],
+          options: [
+            { value: "answer", text: "Answer" }
+          ],
         },
-        { value: "multi-content", text: "Multi-Content" }, // must be last item
       ],
       shouldShowTitle: this.node.typeData.showTitle !== false,
       addMenuTitle: false,

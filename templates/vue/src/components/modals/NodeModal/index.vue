@@ -972,12 +972,12 @@ export default {
           errMsgs.push("Please upload an image for all multiple choice options")
         }
       } else if (this.node.mediaType === "answer") {
-        const hasActivityId = this.node.answers.activityID
+        const hasActivityId = this.node.typeData.activityId
         if (!hasActivityId) {
           errMsgs.push("Please select an activity")
         }
 
-        const hasQuestionId = this.node.answers.questionID
+        const hasQuestionId = this.node.typeData.questionId
         if (!hasQuestionId) {
           errMsgs.push("Please select a question")
         }
