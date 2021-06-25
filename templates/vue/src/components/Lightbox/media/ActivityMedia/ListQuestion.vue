@@ -8,6 +8,7 @@
       >
         <b-form-input
           v-model="answerList[index]"
+          :data-qa="`list-input-${index}`"
           :placeholder="
             question.answerTypes.list.placeholder
               ? question.answerTypes.list.placeholder
@@ -17,7 +18,7 @@
         <b-button
           :disabled="numOfFields >= maxFields"
           variant="primary"
-          data-qa="list-add-button"
+          :data-qa="`list-add-${index}`"
           :class="{
             'btn-primary': !(numOfFields >= maxFields),
             disabled: numOfFields >= maxFields,
@@ -29,6 +30,8 @@
         </b-button>
         <b-button
           :disabled="numOfFields <= minFields"
+          variant="danger"
+          :data-qa="`list-del-${index}`"
           :class="{
             'btn-danger': !(numOfFields <= minFields),
             disabled: numOfFields <= minFields,
@@ -40,7 +43,12 @@
       </ul>
     </div>
     <div class="submission">
-      <b-button class="submit-btn" variant="primary" @click="handleListSubmit">
+      <b-button
+        class="submit-btn"
+        data-qa="list-submit-btn"
+        variant="primary"
+        @click="handleListSubmit"
+      >
         Submit
       </b-button>
     </div>
