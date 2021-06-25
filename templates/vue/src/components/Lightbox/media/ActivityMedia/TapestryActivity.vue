@@ -1,7 +1,9 @@
 <template>
   <b-container class="tapestry-activity">
     <b-row align-v="center" style="min-height:150px;">
-      <b-col v-if="showIcon" align-self="center" cols="2"><tapestry-icon :icon="type"/></b-col>
+      <b-col v-if="showIcon" align-self="center" cols="2">
+        <tapestry-icon :icon="type" />
+      </b-col>
       <b-col v-if="type === 'text'" align-self="center">
         <div class="text">
           {{ answerData }}
@@ -11,23 +13,23 @@
         <audio controls :src="answerData"></audio>
       </b-col>
       <b-col v-if="type === 'tasks'" align-self="center">
-      <ul v-if="followUpQuestion.answerTypes.multipleChoice.hasMultipleAnswers">
-        <li v-for="answer in answerData" :key="answer.index">
-          <previous-activity-choice-row
-            :item="getMultipleChoiceOptionObject(answer)"
-            :useImages="followUpQuestion.answerTypes.multipleChoice.useImages"
-          />
-        </li>
-      </ul>
-      <ul v-else>
-        <li>
-          <previous-activity-choice-row
-            :item="getRadioMultipleChoiceOptionObject(answerData)"
-            :useImages="followUpQuestion.answerTypes.multipleChoice.useImages"
-          />
-        </li>
-      </ul>
-    </b-col>
+        <ul v-if="followUpQuestion.answerTypes.multipleChoice.hasMultipleAnswers">
+          <li v-for="answer in answerData" :key="answer.index">
+            <previous-activity-choice-row
+              :item="getMultipleChoiceOptionObject(answer)"
+              :useImages="followUpQuestion.answerTypes.multipleChoice.useImages"
+            />
+          </li>
+        </ul>
+        <ul v-else>
+          <li>
+            <previous-activity-choice-row
+              :item="getRadioMultipleChoiceOptionObject(answerData)"
+              :useImages="followUpQuestion.answerTypes.multipleChoice.useImages"
+            />
+          </li>
+        </ul>
+      </b-col>
     </b-row>
   </b-container>
 </template>
@@ -60,7 +62,7 @@ export default {
     showIcon: {
       type: Boolean,
       required: false,
-      default: true
+      default: true,
     },
   },
   methods: {
@@ -89,6 +91,7 @@ export default {
           return this.followUpQuestion.answerTypes.multipleChoice.radioArray[i]
         }
       }
+    },
   },
 }
 </script>
@@ -100,9 +103,8 @@ export default {
   margin-bottom: 8px;
   padding: 8px 16px 8px 16px;
 
-  .text{
+  .text {
     text-align: left;
   }
-
 }
 </style>
