@@ -22,7 +22,7 @@
             :key="answer.type"
             :type="answer.type"
             :answerData="answer.answerData"
-            :followUpQuestion="getQuestion(question.followUp.questionId)"
+            :question="getQuestion(question.followUp.questionId)"
           ></tapestry-activity>
         </div>
         <div v-else>
@@ -170,7 +170,7 @@ export default {
               var tempObj = { type: key, answerData: value }
               previousAnswers.push(tempObj)
             } else if (key === "multipleChoice") {
-              var multiObj = { type: "tasks", answerData: value }
+              var multiObj = { type: "multipleChoice", answerData: value }
               previousAnswers.push(multiObj)
             } else {
               var tempAudioObj = {

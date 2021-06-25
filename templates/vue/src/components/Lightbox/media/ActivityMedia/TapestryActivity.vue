@@ -2,7 +2,8 @@
   <b-container class="tapestry-activity">
     <b-row align-v="center" style="min-height:150px;">
       <b-col v-if="showIcon" align-self="center" cols="2">
-        <tapestry-icon :icon="type" />
+        <tapestry-icon v-if="type === 'multipleChoice'" icon="tasks" />
+        <tapestry-icon v-else :icon="type" />
       </b-col>
       <b-col v-if="type === 'text'" align-self="center">
         <div class="text">
@@ -12,12 +13,12 @@
       <b-col v-if="type === 'audio'" align-self="center">
         <audio controls :src="answerData"></audio>
       </b-col>
-      <b-col v-if="type === 'tasks'" align-self="center">
-        <ul v-if="followUpQuestion.answerTypes.multipleChoice.hasMultipleAnswers">
+      <b-col v-if="type === 'multipleChoice'" align-self="center">
+        <ul v-if="question.answerTypes.multipleChoice.hasMultipleAnswers">
           <li v-for="answer in answerData" :key="answer.index">
             <previous-activity-choice-row
               :item="getMultipleChoiceOptionObject(answer)"
-              :useImages="followUpQuestion.answerTypes.multipleChoice.useImages"
+              :useImages="question.answerTypes.multipleChoice.useImages"
             />
           </li>
         </ul>
@@ -25,7 +26,7 @@
           <li>
             <previous-activity-choice-row
               :item="getRadioMultipleChoiceOptionObject(answerData)"
-              :useImages="followUpQuestion.answerTypes.multipleChoice.useImages"
+              :useImages="question.answerTypes.multipleChoice.useImages"
             />
           </li>
         </ul>
@@ -48,13 +49,13 @@ export default {
     type: {
       type: String,
       required: true,
-      validator: val => ["text", "audio", "tasks"].includes(val),
+      validator: val => ["text", "audio", "multipleChoice"].includes(val),
     },
     answerData: {
       type: [String, Array, Number],
       required: true,
     },
-    followUpQuestion: {
+    question: {
       type: Object,
       required: false,
       default: () => ({}),
@@ -69,26 +70,22 @@ export default {
     getMultipleChoiceOptionObject(id) {
       for (
         let i = 0;
-        i < this.followUpQuestion.answerTypes.multipleChoice.checkboxArray.length;
+        i < this.question.answerTypes.multipleChoice.checkboxArray.length;
         i++
       ) {
-        if (
-          this.followUpQuestion.answerTypes.multipleChoice.checkboxArray[i].id === id
-        ) {
-          return this.followUpQuestion.answerTypes.multipleChoice.checkboxArray[i]
+        if (this.question.answerTypes.multipleChoice.checkboxArray[i].id === id) {
+          return this.question.answerTypes.multipleChoice.checkboxArray[i]
         }
       }
     },
     getRadioMultipleChoiceOptionObject(id) {
       for (
         let i = 0;
-        i < this.followUpQuestion.answerTypes.multipleChoice.radioArray.length;
+        i < this.question.answerTypes.multipleChoice.radioArray.length;
         i++
       ) {
-        if (
-          this.followUpQuestion.answerTypes.multipleChoice.radioArray[i].id === id
-        ) {
-          return this.followUpQuestion.answerTypes.multipleChoice.radioArray[i]
+        if (this.question.answerTypes.multipleChoice.radioArray[i].id === id) {
+          return this.question.answerTypes.multipleChoice.radioArray[i]
         }
       }
     },

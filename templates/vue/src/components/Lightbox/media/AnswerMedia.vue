@@ -34,6 +34,7 @@
             :type="questionAnswer[0]"
             :show-icon="false"
             :answerData="questionAnswer[1]"
+            :question="question"
             class="tab-content"
           ></tapestry-activity>
         </b-tab>
