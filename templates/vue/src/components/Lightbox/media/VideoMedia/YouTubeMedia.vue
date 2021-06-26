@@ -6,7 +6,7 @@
       :player-width="dimensions.width - 15"
       :player-height="dimensions.height - 40"
       :player-vars="{
-        autoplay: 0,
+        autoplay: autoplay ? 1 : 0,
         playsinline: 1,
         modestbranding: 1,
         rel: 0,
@@ -30,7 +30,7 @@ import { SEEK_THRESHOLD } from "./video.config"
 import { data as wpData } from "@/services/wp"
 
 // Set as per https://developers.google.com/youtube/iframe_api_reference#Playback_status
-const youtubeStates = {
+const YouTubeStates = {
   unstarted: -1,
   ended: 0,
   playing: 1,
@@ -46,10 +46,6 @@ export default {
       type: Object,
       required: true,
     },
-    playing: {
-      type: Boolean,
-      required: true,
-    },
     dimensions: {
       type: Object,
       required: true,
@@ -62,12 +58,20 @@ export default {
       required: false,
       default: "",
     },
+    playing: {
+      type: Boolean,
+      required: true,
+    },
+    autoplay: {
+      type: Boolean,
+      required: true,
+    },
   },
   data() {
     return {
       videoDimensions: null,
       player: null,
-      playerStatus: youtubeStates.unstarted,
+      playerStatus: YouTubeStates.unstarted,
     }
   },
   computed: {
@@ -100,9 +104,9 @@ export default {
     },
     playerIsPlaying() {
       return [
-        youtubeStates.playing,
-        youtubeStates.buffering,
-        youtubeStates.cued,
+        YouTubeStates.playing,
+        YouTubeStates.buffering,
+        YouTubeStates.cued,
       ].includes(this.playerStatus)
     },
   },
@@ -113,7 +117,7 @@ export default {
       }
       if (playing) {
         if (
-          this.playerStatus === youtubeStates.unstarted ||
+          this.playerStatus === YouTubeStates.unstarted ||
           this.player.getCurrentTime() === 0
         ) {
           this.player.seekTo(this.progress * this.totalDuration)
@@ -150,7 +154,11 @@ export default {
     ready(event) {
       this.player = event.target
 
-      this.player.pauseVideo()
+      if (this.autoplay) {
+        this.handlePlay()
+      } else {
+        this.player.pauseVideo()
+      }
       this.applySettings()
 
       const currentTime = this.progress * this.totalDuration

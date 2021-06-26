@@ -15,6 +15,7 @@
         :node="node"
         :dimensions="dimensions"
         :playing="state === states.Playing"
+        :autoplay="context == 'lightbox' ? autoplay : false"
         :context="context"
         @change:dimensions="$emit('change:dimensions', $event)"
         @complete="$emit('complete', nodeId)"
@@ -63,6 +64,7 @@
         v-if="state === states.Finished"
         class="screen"
         :node="node"
+        :context="context"
         @rewatch="transition(events.Rewatch)"
         @close="transition(events.Close)"
       />
@@ -81,6 +83,11 @@ import PlayScreen from "../common/PlayScreen"
 import { COMPLETION_THRESHOLD } from "./video.config"
 import Loading from "@/components/common/Loading"
 import client from "@/services/TapestryAPI"
+
+/**
+ * This boolean sets whether the video should autoplay
+ */
+const autoplay = false
 
 /**
  * Video states and events as defined by the state machine diagram on Notion.
@@ -137,9 +144,10 @@ export default {
   },
   data() {
     return {
-      autoplay: false,
       state: VideoStates.Loading,
+      showPlayScreen: true,
       hideVideo: false,
+      autoplay: autoplay,
       activePopupId: null,
       /**
        * Completing a node is done asynchronously, and we want to show a small
@@ -195,9 +203,6 @@ export default {
         this.state
       )
     },
-    showPlayScreen() {
-      return this.node.mediaType !== "h5p"
-    },
     showTitle() {
       return this.context === "page" && this.node.typeData.showTitle !== false
     },
@@ -220,6 +225,9 @@ export default {
      * name, as well as perform any necessary side effects.
      */
     transition(eventName, context) {
+      if (eventName == VideoEvents.Play) {
+        this.showPlayScreen = this.node.mediaType !== "h5p"
+      }
       switch (this.state) {
         case VideoStates.Loading: {
           switch (eventName) {
@@ -238,6 +246,7 @@ export default {
                       time: context.currentTime,
                     }
                   )
+                  this.showPlayScreen = this.node.mediaType !== "h5p"
                 }
               } else {
                 this.state = VideoStates.H5P
@@ -280,6 +289,7 @@ export default {
                 // End of video
                 if (amountViewed >= 1) {
                   this.state = VideoStates.Finished
+                  this.showPlayScreen = true
                 }
               }
 
@@ -331,10 +341,7 @@ export default {
       this.lastTime = currentTime
     },
     getLoadState() {
-      if (this.node.progress < 1) {
-        return this.autoplay ? VideoStates.Playing : VideoStates.Paused
-      }
-      return VideoStates.Finished
+      return autoplay ? VideoStates.Playing : VideoStates.Paused
     },
     handlePopupComplete() {
       if (!this.isPopupComplete) {

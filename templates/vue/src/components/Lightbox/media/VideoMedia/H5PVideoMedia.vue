@@ -51,6 +51,10 @@ export default {
       type: Boolean,
       required: true,
     },
+    autoplay: {
+      type: Boolean,
+      required: true,
+    },
   },
   data() {
     return {
@@ -330,7 +334,12 @@ export default {
           h5pIframeComponent.setFrameDimensions
         )
         const videoDuration = h5pVideo.getDuration()
-        h5pVideo.seek(mediaProgress * videoDuration)
+        if (this.autoplay) {
+          h5pVideo.seek(mediaProgress * videoDuration)
+          this.handlePlay()
+        } else {
+          this.handlePause()
+        }
         this.lastTime = mediaProgress * videoDuration
         h5pIframeComponent.applySettings(h5pVideo)
         /**
