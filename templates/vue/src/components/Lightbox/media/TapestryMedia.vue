@@ -21,7 +21,6 @@
     />
     <video-media
       v-if="isVideoNode"
-      :autoplay="autoplay"
       :dimensions="dimensions"
       :context="context"
       :node-id="nodeId"
@@ -113,11 +112,6 @@ export default {
       type: String,
       required: false,
       default: "lightbox",
-    },
-    autoplay: {
-      type: Boolean,
-      required: false,
-      default: true,
     },
   },
   data() {

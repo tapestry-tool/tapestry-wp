@@ -7,10 +7,12 @@
       :player-height="dimensions.height - 40"
       :player-vars="{
         autoplay: 0,
+        playsinline: 1,
         modestbranding: 1,
         rel: 0,
         iv_load_policy: 3,
         enablejsapi: 1,
+        origin: origin,
       }"
       @ready="ready"
       @paused="handlePause"
@@ -24,8 +26,18 @@
 import { mapState, mapActions } from "vuex"
 import Helpers from "@/utils/Helpers"
 import client from "@/services/TapestryAPI"
-
 import { SEEK_THRESHOLD } from "./video.config"
+import { data as wpData } from "@/services/wp"
+
+// Set as per https://developers.google.com/youtube/iframe_api_reference#Playback_status
+const youtubeStates = {
+  unstarted: -1,
+  ended: 0,
+  playing: 1,
+  paused: 2,
+  buffering: 3,
+  cued: 5,
+}
 
 export default {
   name: "video-media",
@@ -55,6 +67,7 @@ export default {
     return {
       videoDimensions: null,
       player: null,
+      playerStatus: youtubeStates.unstarted,
     }
   },
   computed: {
@@ -67,21 +80,60 @@ export default {
       }
       return 0
     },
+    totalDuration() {
+      if (this.node.mediaDuration !== undefined) {
+        return this.node.mediaDuration
+      } else if (this.player) {
+        return this.player.getDuration()
+      } else {
+        return 0
+      }
+    },
     showTitle() {
       return this.context === "page" && this.node.typeData.showTitle !== false
     },
     isMultiContentContext() {
       return this.context === "page" || this.context === "multi-content"
     },
+    origin() {
+      return wpData.wpUrl
+    },
+    playerIsPlaying() {
+      return [
+        youtubeStates.playing,
+        youtubeStates.buffering,
+        youtubeStates.cued,
+      ].includes(this.playerStatus)
+    },
   },
   watch: {
     playing(playing) {
+      if (!this.player) {
+        return
+      }
       if (playing) {
+        if (
+          this.playerStatus === youtubeStates.unstarted ||
+          this.player.getCurrentTime() === 0
+        ) {
+          this.player.seekTo(this.progress * this.totalDuration)
+          this.playerStatus = this.player.getPlayerState()
+        }
         this.player.playVideo()
         this.startInterval()
       } else {
         this.stopInterval()
         this.player.pauseVideo()
+      }
+    },
+    playerStatus() {
+      // Sometimes YouTube doesn't fire the @play / @pause events so
+      // this makes sure we handle that to keep our state up to date
+      if (!this.playing && this.playerIsPlaying) {
+        this.handlePlay()
+      }
+      if (this.playing && !this.playerIsPlaying) {
+        this.handlePause()
       }
     },
   },
@@ -91,22 +143,24 @@ export default {
       this.updateVideoProgress()
       this.updateSettings()
     }
+    this.stopInterval()
   },
   methods: {
     ...mapActions(["updateH5pSettings"]),
     ready(event) {
       this.player = event.target
 
-      const currentTime = this.progress * this.player.getDuration()
-      this.lastTime = currentTime
-      this.player.seekTo(currentTime, true)
+      this.player.pauseVideo()
       this.applySettings()
 
+      const currentTime = this.progress * this.totalDuration
       this.$emit("load", { currentTime })
     },
     reset() {
-      this.player.seekTo(0, true)
-      setTimeout(() => this.$emit("play"), 200)
+      if (this.player) {
+        this.player.seekTo(0, true)
+        setTimeout(() => this.$emit("play"), 200)
+      }
     },
     close() {
       this.updateVideoProgress()
@@ -115,16 +169,17 @@ export default {
     },
     updateVideoProgress(ended = false) {
       if (this.player) {
+        this.playerStatus = this.player.getPlayerState()
+
         const currentTime = this.player.getCurrentTime()
-        const duration = this.player.getDuration()
 
         if (Math.abs(currentTime - this.lastTime) > SEEK_THRESHOLD) {
           this.$emit("seeked", { currentTime })
           setTimeout(() => this.$emit("play"), 200)
         } else {
           this.$emit("timeupdate", {
-            amountViewed: ended ? 1 : currentTime / duration,
-            currentTime: ended ? duration : currentTime,
+            amountViewed: ended ? 1 : currentTime / this.totalDuration,
+            currentTime: ended ? this.totalDuration : currentTime,
           })
         }
         this.lastTime = currentTime

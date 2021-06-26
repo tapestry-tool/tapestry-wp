@@ -31,7 +31,6 @@
           :dimensions="dimensions"
           :node-id="activePopupId"
           :context="context"
-          :autoplay="autoplay"
           @complete="handlePopupComplete"
           @close="transition(events.Continue)"
         />
@@ -131,10 +130,6 @@ export default {
       type: Object,
       required: true,
     },
-    autoplay: {
-      type: Boolean,
-      required: true,
-    },
     context: {
       type: String,
       required: true,
@@ -142,6 +137,7 @@ export default {
   },
   data() {
     return {
+      autoplay: false,
       state: VideoStates.Loading,
       hideVideo: false,
       activePopupId: null,
@@ -150,7 +146,7 @@ export default {
        * spinner on the bottom right of the node when this is currently in progress.
        */
       completing: false,
-      rogressLastUpdated: 0,
+      progressLastUpdated: 0,
     }
   },
   computed: {
