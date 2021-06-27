@@ -88,62 +88,50 @@ export default class Helpers {
   }
 
   /**
-   * Checks if two objects are different from one another
-   * @param {Object} src
-   * @param {Object} other
+   * Checks if two operands are different from one another
+   * Note: We evaluate Null, "", {}, [], false, 0, and Undefined all as being the same
+   * @param src
+   * @param other
    */
   static isDifferent(src, other) {
-    // src and other are objects
-    if (
-      typeof src === "object" &&
-      src !== null &&
-      typeof other === "object" &&
-      other !== null
-    ) {
-      const srcKeys = Object.keys(src)
-      const otherKeys = Object.keys(other)
-
-      // Check 1: If one object has more keys than the other
-      if (srcKeys.length !== otherKeys.length) {
-        return true
-      }
-
-      // Check 2: If they have the same keys
-      if (!srcKeys.every(key => otherKeys.includes(key))) {
-        return true
-      }
-
-      // Check 3: If the key values are equal
-      for (const key of Object.keys(src)) {
-        // Check 3a: Type check
-        if (typeof src[key] != typeof other[key]) {
-          return true
-        }
-        // Check 3b: Deep compare if property is an object
-        if (typeof src[key] === "object") {
-          return this.isDifferent(src[key], other[key])
-        }
-        // Check 3c: Simple value check
-        if (src[key] !== other[key]) {
-          return true
-        }
-      }
+    // This means we evaluate Null, "", {}, [], false, 0, and Undefined all as being the same
+    if (!src && !other) {
       return false
     }
 
-    // src and other are arrays
-    if (Array.isArray(src) && Array.isArray(other)) {
+    // General type check
+    if (typeof src !== typeof other || Array.isArray(src) !== Array.isArray(other)) {
+      return true
+    }
+
+    // Arrays
+    if (Array.isArray(src)) {
       if (
-        src.length === other.length &&
-        src.every((val, index) => val === other[index])
+        src.length !== other.length &&
+        src.some(key => !other.includes(key)) &&
+        src.some(key => this.isDifferent(src[key], other[key]))
       ) {
         return true
       }
       return false
     }
 
-    // basic variable check
-    if (src === other) {
+    // Objects
+    if (typeof src === "object") {
+      const srcKeys = Object.keys(src)
+      const otherKeys = Object.keys(other)
+      if (
+        srcKeys.length !== otherKeys.length ||
+        srcKeys.some(key => !otherKeys.includes(key)) ||
+        srcKeys.some(key => this.isDifferent(src[key], other[key]))
+      ) {
+        return true
+      }
+      return false
+    }
+
+    // Other
+    if (src !== other) {
       return true
     }
 

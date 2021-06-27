@@ -214,11 +214,7 @@ export default {
          */
         newSettings.caption = {}
       }
-      if (
-        this.h5pSettings &&
-        this.newSettings &&
-        Helpers.isDifferent(this.h5pSettings, newSettings)
-      ) {
+      if (Helpers.isDifferent(this.h5pSettings, newSettings)) {
         client.recordAnalyticsEvent(
           "user",
           "update-settings",
