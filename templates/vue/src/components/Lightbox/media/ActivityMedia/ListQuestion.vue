@@ -87,8 +87,12 @@ export default {
     },
   },
   created() {
-    if (this.answerList.length === 0) {
+    if (this.numOfFields === 0) {
       for (let i = 0; i < this.minFields; i++) {
+        this.addAnswer()
+      }
+    } else {
+      for (let i = this.numOfFields; i < this.minFields; i++) {
         this.addAnswer()
       }
     }

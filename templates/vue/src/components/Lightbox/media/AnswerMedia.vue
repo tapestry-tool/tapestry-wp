@@ -8,8 +8,6 @@
     >
       <h2 v-if="answer.precedingText">{{ answer.precedingText }}</h2>
       <h2 v-else>{{ question.text }}</h2>
-        
-      </h4>
       <b-tabs>
         <b-tab
           v-for="questionAnswer in answers"
