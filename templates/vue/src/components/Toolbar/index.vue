@@ -12,11 +12,11 @@
         @change="updateViewBox"
         @change:max-depth="maxDepth = $event"
       ></tapestry-depth-slider>
-      <user-settings-button
-        v-if="avatarPopup"
-        data-qa="user-settings-button"
-      ></user-settings-button>
     </div>
+    <user-settings-button
+      v-if="avatarsEnabled"
+      data-qa="user-settings-button"
+    ></user-settings-button>
   </div>
 </template>
 
@@ -53,7 +53,7 @@ export default {
     showMap() {
       return this.settings.renderMap
     },
-    avatarPopup() {
+    avatarsEnabled() {
       return wp.isLoggedIn() && process.env.VUE_APP_AVATAR === "TRUE"
     },
   },
