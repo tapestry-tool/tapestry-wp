@@ -1,10 +1,10 @@
 <template>
   <b-modal
-    id="settings-modal"
-    data-qa="settings-modal"
+    id="user-settings-modal"
+    data-qa="user-ettings-modal"
     :visible="show"
     size="lg"
-    title="Tapestry Settings"
+    title="User Settings"
     scrollable
     body-class="p-0"
     @hidden="$emit('close')"
@@ -28,11 +28,9 @@
         data-qa="submit-button"
         size="sm"
         variant="primary"
-        :disabled="fileUploading || !inputsValid"
         @click="updateSettings"
       >
-        <b-spinner v-if="fileUploading"></b-spinner>
-        <div :style="!fileUploading ? '' : 'opacity: 50%;'">Submit</div>
+        Submit
       </b-button>
     </template>
   </b-modal>

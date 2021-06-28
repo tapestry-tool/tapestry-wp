@@ -1,7 +1,7 @@
 <template>
   <button data-qa="user-settings" class="user-settings-button" @click="open">
     <tapestry-icon icon="user"></tapestry-icon>
-    <avatar-form :show="avatarFormOpen"></avatar-form>
+    <user-settings-modal :show="avatarFormOpen" :tab="Avatar"></user-settings-modal>
   </button>
 </template>
 
@@ -9,11 +9,11 @@
 import TapestryIcon from "@/components/common/TapestryIcon"
 import client from "@/services/TapestryAPI"
 import { names } from "@/config/routes"
-import AvatarForm from "../modals/UserSettingsModal/AvatarForm.vue"
+import UserSettingsModal from "../modals/UserSettingsModal"
 
 export default {
   components: {
-    AvatarForm,
+    UserSettingsModal,
     TapestryIcon,
   },
   computed: {
