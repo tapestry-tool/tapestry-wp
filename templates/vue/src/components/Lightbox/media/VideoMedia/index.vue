@@ -15,7 +15,7 @@
         :node="node"
         :dimensions="dimensions"
         :playing="state === states.Playing"
-        :autoplay="context == 'lightbox' ? autoplay : false"
+        :autoplay="autoplay"
         :context="context"
         @change:dimensions="$emit('change:dimensions', $event)"
         @complete="$emit('complete', nodeId)"
@@ -85,11 +85,6 @@ import Loading from "@/components/common/Loading"
 import client from "@/services/TapestryAPI"
 
 /**
- * This boolean sets whether the video should autoplay
- */
-const autoplay = false
-
-/**
  * Video states and events as defined by the state machine diagram on Notion.
  * See:
  *   - https://www.notion.so/tapestrytool/977-Add-ability-to-create-timed-pop-up-for-Videos-1cda32c4c0e0486f8a20936bdabc0990#1212f47603534300a92aea2d59c5a248
@@ -147,7 +142,6 @@ export default {
       state: VideoStates.Loading,
       showPlayScreen: true,
       hideVideo: false,
-      autoplay: autoplay,
       activePopupId: null,
       /**
        * Completing a node is done asynchronously, and we want to show a small
@@ -205,6 +199,9 @@ export default {
     },
     showTitle() {
       return this.context === "page" && this.node.typeData.showTitle !== false
+    },
+    autoplay() {
+      return this.context == "lightbox"
     },
   },
   watch: {
@@ -341,7 +338,7 @@ export default {
       this.lastTime = currentTime
     },
     getLoadState() {
-      return autoplay ? VideoStates.Playing : VideoStates.Paused
+      return this.autoplay ? VideoStates.Playing : VideoStates.Paused
     },
     handlePopupComplete() {
       if (!this.isPopupComplete) {
