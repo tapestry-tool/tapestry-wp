@@ -375,7 +375,6 @@ export default class Helpers {
         y: 3000,
       },
       childOrdering: [],
-      quiz: [],
       license: "",
       references: "",
       unlocked: true,

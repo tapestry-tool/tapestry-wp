@@ -88,10 +88,8 @@
 
 <script>
 import { mapGetters } from "vuex"
-import GravityFormsApi from "@/services/GravityFormsApi"
 import ActivityForm from "./ActivityForm"
 import MultiContentForm from "./MultiContentForm"
-import GravityFormForm from "./GravityFormForm"
 import H5pForm from "./H5pForm"
 import PopupForm from "./PopupForm"
 import TextForm from "./TextForm"
@@ -104,7 +102,6 @@ export default {
   components: {
     ActivityForm,
     MultiContentForm,
-    GravityFormForm,
     H5pForm,
     PopupForm,
     TextForm,
@@ -144,7 +141,6 @@ export default {
         { value: "url-embed", text: "External Link" },
         { value: "wp-post", text: "Wordpress Post" },
         { value: "activity", text: "Activity" },
-        { value: "gravity-form", text: "Gravity Form", disabled: true },
         { value: "multi-content", text: "Multi-Content" }, // must be last item
       ],
       shouldShowTitle: this.node.typeData.showTitle !== false,
@@ -187,18 +183,6 @@ export default {
     shouldShowTitle(shouldShowTitle) {
       this.node.typeData.showTitle = shouldShowTitle
     },
-  },
-  mounted() {
-    GravityFormsApi.exists().then(exists => {
-      const i = this.mediaTypes.findIndex(
-        mediaType => mediaType.value == "gravity-form"
-      )
-      if (exists) {
-        this.mediaTypes[i].disabled = false
-      } else {
-        this.mediaTypes[i].text += " (plugin unavailable)"
-      }
-    })
   },
   methods: {
     handleTypeChange(evt) {

@@ -1,15 +1,5 @@
 <template>
-  <activity-screen
-    v-if="showActivityScreen"
-    :id="node.id"
-    @back="showActivityScreen = false"
-    @close="$emit('close')"
-  />
-  <div v-else data-qa="end-screen" class="end-screen">
-    <button v-if="showQuizButton" @click="handleClick($event, 'show-quiz')">
-      <i class="fas fa-question-circle fa-4x"></i>
-      <p>{{ buttonText }}</p>
-    </button>
+  <div data-qa="end-screen" class="end-screen">
     <button @click="handleClick($event, 'rewatch')">
       <i class="fas fa-redo fa-4x"></i>
       <p>Rewatch</p>
@@ -23,13 +13,9 @@
 
 <script>
 import client from "@/services/TapestryAPI"
-import ActivityScreen from "./ActivityScreen"
 
 export default {
   name: "end-screen",
-  components: {
-    ActivityScreen,
-  },
   props: {
     node: {
       type: Object,
@@ -40,32 +26,13 @@ export default {
       required: true,
     },
   },
-  data() {
-    return {
-      showActivityScreen: false,
-    }
-  },
-  computed: {
-    showQuizButton() {
-      return Boolean(this.node.quiz && this.node.quiz.length)
-    },
-    buttonText() {
-      const allDone = this.node.quiz.every(question => question.completed)
-      return allDone ? "Reanswer Question" : "Answer Question"
-    },
-  },
   methods: {
     handleClick(evt, type) {
       client.recordAnalyticsEvent("user", "click", "end-screen", this.node.id, {
         x: evt.clientX,
         y: evt.clientY,
       })
-
-      if (type === "show-quiz") {
-        this.showActivityScreen = true
-      } else {
-        this.$emit(type)
-      }
+      this.$emit(type)
     },
   },
 }

@@ -78,8 +78,8 @@ import { mapGetters } from "vuex"
 import UrlVideoMedia from "./UrlVideoMedia"
 import H5PVideoMedia from "./H5PVideoMedia"
 import YouTubeMedia from "./YouTubeMedia"
-import EndScreen from "../common/EndScreen"
-import PlayScreen from "../common/PlayScreen"
+import EndScreen from "./EndScreen"
+import PlayScreen from "./PlayScreen"
 import { COMPLETION_THRESHOLD } from "./video.config"
 import Loading from "@/components/common/Loading"
 import client from "@/services/TapestryAPI"
@@ -143,12 +143,12 @@ export default {
       showPlayScreen: true,
       hideVideo: false,
       activePopupId: null,
+      progressLastUpdated: 0,
       /**
        * Completing a node is done asynchronously, and we want to show a small
        * spinner on the bottom right of the node when this is currently in progress.
        */
       completing: false,
-      progressLastUpdated: 0,
     }
   },
   computed: {

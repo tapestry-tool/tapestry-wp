@@ -867,11 +867,6 @@ export default {
         }
       }
 
-      const quiz = this.node.quiz
-      if (!this.validateQuiz(quiz)) {
-        errMsgs.push("Please enter at least one answer ID for each question")
-      }
-
       if (!this.node.mediaType) {
         errMsgs.push("Please select a Content Type")
       } else if (this.node.mediaType === "video") {
@@ -892,6 +887,40 @@ export default {
         if (this.node.typeData.mediaURL === "") {
           errMsgs.push("Please enter an Embed URL")
         }
+      } else if (this.node.mediaType === "activity") {
+        const validActivityTitles = this.node.typeData.activity.questions.every(
+          question => {
+            return question.text
+          }
+        )
+        if (!validActivityTitles) {
+          errMsgs.push("Please enter a question text for all questions")
+        }
+
+        const validActivityOptions = this.node.typeData.activity.questions.every(
+          question => {
+            const answerTypes = Object.values(question.answerTypes)
+            return answerTypes.some(answerType => answerType.enabled)
+          }
+        )
+        if (!validActivityOptions) {
+          errMsgs.push("Please enable at least one answer type for each question")
+        }
+
+        const questionsWithPreviousActivity = this.node.typeData.activity.questions.filter(
+          question => {
+            return question.isFollowUp
+          }
+        )
+        const validPreviousAnswers = questionsWithPreviousActivity.every(
+          question => {
+            const previousAnswer = question.followUp.questionId
+            return previousAnswer
+          }
+        )
+        if (!validPreviousAnswers) {
+          errMsgs.push("Please select a previous activity to display")
+        }
       }
 
       return errMsgs
@@ -902,20 +931,10 @@ export default {
         (typeData.hasOwnProperty("youtubeID") || typeData.mediaURL.endsWith(".mp4"))
       )
     },
-    validateQuiz(quiz) {
-      return quiz.every(question => {
-        return Object.values(question.answers).some(
-          value => value && value.length > 0
-        )
-      })
-    },
     updateOrderingArray(arr) {
       this.node.childOrdering = arr
     },
     handleTypeChange(evt) {
-      this.node.quiz = this.node.quiz.filter(q =>
-        Object.values(q.answers).reduce((acc, { value }) => acc || value == "")
-      )
       if (evt === "multi-content") this.node.presentationStyle = "accordion"
     },
     async setLinkData() {
