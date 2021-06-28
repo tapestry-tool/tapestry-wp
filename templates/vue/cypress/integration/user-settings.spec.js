@@ -5,16 +5,16 @@ describe("User Settings", () => {
   })
 
   it(`should be able to save and edit an Avatar`, () => {
-    if (!process.env.VUE_APP_AVATAR) {
+    if (!process.env.VUE_APP_AVATARS) {
       console.error("No environment variable set for Avatar Popups")
       return
     }
-    if (!(process.env.VUE_APP_AVATAR === "TRUE")) {
-      console.log(".env variable VUE_APP_AVATAR is not set to TRUE")
+    if (!(process.env.VUE_APP_AVATARS === "TRUE")) {
+      console.log(".env variable VUE_APP_AVATARS is not set to TRUE")
       return
     }
 
-    // test assumes avatars are enabled, e.g. VUE_APP_AVATAR === "TRUE"
+    // test assumes avatars are enabled, e.g. VUE_APP_AVATARS === "TRUE"
     cy.store()
       .its("state.avatar")
       .then(avatar => {

@@ -54,7 +54,7 @@ export default {
       return this.settings.renderMap
     },
     avatarsEnabled() {
-      return wp.isLoggedIn() && process.env.VUE_APP_AVATAR === "TRUE"
+      return wp.isLoggedIn() && process.env.VUE_APP_AVATARS === "TRUE"
     },
   },
   methods: {
