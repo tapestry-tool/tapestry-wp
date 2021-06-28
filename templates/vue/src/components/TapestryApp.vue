@@ -32,6 +32,7 @@ import { mapMutations, mapState } from "vuex"
 import TapestryMap from "./TapestryMap"
 import AvatarForm from "@/components/modals/UserSettingsModal/AvatarForm.vue"
 import Helpers from "@/utils/Helpers"
+import { isLoggedIn } from "@/services/wp"
 
 export default {
   components: {
@@ -58,10 +59,7 @@ export default {
       return !(!this.avatar || Object.keys(this.avatar).length === 0)
     },
     avatarPopup() {
-      if (process.env.VUE_APP_AVATAR_POPUP) {
-        return true
-      }
-      return false
+      return Boolean(process.env.VUE_APP_AVATAR_POPUP) && isLoggedIn()
     },
   },
   watch: {

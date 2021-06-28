@@ -12,11 +12,11 @@
     <b-container fluid class="px-0">
       <b-tabs card>
         <b-tab
-          title="Appearance"
-          :active="tab === 'appearance'"
-          @click="$emit('change:tab', 'appearance')"
+          title="Avatar"
+          :active="tab === 'avatar'"
+          @click="$emit('change:tab', 'avatar')"
         ></b-tab>
-        <avatar-form></avatar-form>
+        <avatar-form ref="AvatarForm"></avatar-form>
       </b-tabs>
     </b-container>
     <template slot="modal-footer">
@@ -28,16 +28,15 @@
         data-qa="submit-button"
         size="sm"
         variant="primary"
-        @click="updateSettings"
+        @click="saveAvatar"
       >
-        Submit
+        Save Avatar
       </b-button>
     </template>
   </b-modal>
 </template>
 
 <script>
-import { mapActions } from "vuex"
 import DragSelectModular from "@/utils/dragSelectModular"
 import AvatarForm from "./AvatarForm"
 
@@ -58,22 +57,24 @@ export default {
     },
   },
   mounted() {
-    this.getSettings()
     this.$root.$on("bv::modal::show", (_, modalId) => {
-      if (modalId === "settings-modal") {
+      if (modalId === "user-settings-modal") {
         DragSelectModular.removeDragSelectListener()
       }
     })
     this.$root.$on("bv::modal::hide", (_, modalId) => {
-      if (modalId === "settings-modal") {
+      if (modalId === "user-settings-modal") {
         DragSelectModular.addDragSelectListener()
         this.$emit("close")
       }
     })
   },
   methods: {
-    ...mapActions(["getTapestryExport"]),
     closeModal() {
+      this.$emit("close")
+    },
+    saveAvatar() {
+      this.$refs.AvatarForm.saveAvatar()
       this.$emit("close")
     },
   },
@@ -81,50 +82,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.depth-slider {
-  border: none;
-  padding: 0;
-  max-width: 350px;
-}
-
-.depth-slider-description {
-  color: #6c757d;
-  font-size: 80%;
-}
-
-.spinner {
-  padding: 3rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-#export-button {
-  position: relative;
-  > span {
-    position: absolute;
-    height: 1.5em;
-    width: 1.5em;
-  }
-  &.disabled {
-    pointer-events: none;
-    cursor: not-allowed;
-  }
-}
-
-#optimize-thumbnails-button {
-  position: relative;
-  > span {
-    position: absolute;
-    height: 1.5em;
-    width: 1.5em;
-  }
-  &.disabled {
-    pointer-events: none;
-    cursor: not-allowed;
-  }
-}
-
 #save-button {
   position: relative;
 

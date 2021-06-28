@@ -1,7 +1,17 @@
 <template>
-  <button data-qa="user-settings" class="user-settings-button" @click="open">
+  <button
+    :visible="avatarPopup"
+    data-qa="user-settings"
+    class="user-settings-button"
+    @click="open"
+  >
     <tapestry-icon icon="user"></tapestry-icon>
-    <user-settings-modal :show="avatarFormOpen" :tab="Avatar"></user-settings-modal>
+    <user-settings-modal
+      :show="avatarFormOpen"
+      :tab="tab"
+      @close="close"
+      @change:tab="changeTab"
+    ></user-settings-modal>
   </button>
 </template>
 
@@ -10,6 +20,7 @@ import TapestryIcon from "@/components/common/TapestryIcon"
 import client from "@/services/TapestryAPI"
 import { names } from "@/config/routes"
 import UserSettingsModal from "../modals/UserSettingsModal"
+import { isLoggedIn } from "@/services/wp"
 
 export default {
   components: {
@@ -32,6 +43,9 @@ export default {
     tab() {
       return this.$route.params.tab
     },
+    avatarPopup() {
+      return Boolean(process.env.VUE_APP_AVATAR_POPUP) && isLoggedIn()
+    },
   },
   watch: {
     tab: {
@@ -52,14 +66,19 @@ export default {
   },
   methods: {
     open() {
-      console.log("Is open")
       this.avatarFormOpen = true
       client.recordAnalyticsEvent("user", "open", "user-settings")
     },
     close() {
-      console.log("Is close")
       this.avatarFormOpen = false
       client.recordAnalyticsEvent("user", "close", "user-settings")
+    },
+    changeTab(tab) {
+      this.$router.push({
+        name: names.USERSETTINGS,
+        params: { nodeId: this.$route.params.nodeId, tab },
+        query: this.$route.query,
+      })
     },
   },
 }

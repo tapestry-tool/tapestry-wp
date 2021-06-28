@@ -391,7 +391,6 @@ export default {
   },
   mounted() {
     this.setExistingAvatar()
-    console.log(this.avatar)
   },
   methods: {
     ...mapActions(["updateAvatar"]),
