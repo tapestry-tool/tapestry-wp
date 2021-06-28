@@ -12,7 +12,7 @@
       <i class="fas fa-redo fa-4x"></i>
       <p>Rewatch</p>
     </button>
-    <button @click="handleClick($event, 'close')">
+    <button v-if="context == 'lightbox'" @click="handleClick($event, 'close')">
       <i class="far fa-times-circle fa-4x"></i>
       <p>Close</p>
     </button>
@@ -35,6 +35,10 @@ export default {
     },
     dimensions: {
       type: Object,
+      required: true,
+    },
+    context: {
+      type: String,
       required: true,
     },
   },

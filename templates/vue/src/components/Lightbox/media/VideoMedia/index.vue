@@ -15,6 +15,7 @@
         :node="node"
         :dimensions="dimensions"
         :playing="state === states.Playing"
+        :autoplay="autoplay"
         :context="context"
         @change:dimensions="$emit('change:dimensions', $event)"
         @complete="$emit('complete', nodeId)"
@@ -31,7 +32,6 @@
           :dimensions="dimensions"
           :node-id="activePopupId"
           :context="context"
-          :autoplay="autoplay"
           @complete="handlePopupComplete"
           @close="transition(events.Continue)"
         />
@@ -65,6 +65,7 @@
         class="screen"
         :node="node"
         :dimensions="dimensions"
+        :context="context"
         @change:dimensions="$emit('change:dimensions', $event)"
         @rewatch="transition(events.Rewatch)"
         @close="transition(events.Close)"
@@ -133,10 +134,6 @@ export default {
       type: Object,
       required: true,
     },
-    autoplay: {
-      type: Boolean,
-      required: true,
-    },
     context: {
       type: String,
       required: true,
@@ -145,6 +142,7 @@ export default {
   data() {
     return {
       state: VideoStates.Loading,
+      showPlayScreen: true,
       hideVideo: false,
       activePopupId: null,
       progressLastUpdated: 0,
@@ -201,11 +199,11 @@ export default {
         this.state
       )
     },
-    showPlayScreen() {
-      return this.node.mediaType !== "h5p"
-    },
     showTitle() {
       return this.context === "page" && this.node.typeData.showTitle !== false
+    },
+    autoplay() {
+      return this.context == "lightbox"
     },
   },
   watch: {
@@ -226,6 +224,9 @@ export default {
      * name, as well as perform any necessary side effects.
      */
     transition(eventName, context) {
+      if (eventName == VideoEvents.Play) {
+        this.showPlayScreen = this.node.mediaType !== "h5p"
+      }
       switch (this.state) {
         case VideoStates.Loading: {
           switch (eventName) {
@@ -244,6 +245,7 @@ export default {
                       time: context.currentTime,
                     }
                   )
+                  this.showPlayScreen = this.node.mediaType !== "h5p"
                 }
               } else {
                 this.state = VideoStates.H5P
@@ -286,6 +288,7 @@ export default {
                 // End of video
                 if (amountViewed >= 1) {
                   this.state = VideoStates.Finished
+                  this.showPlayScreen = true
                 }
               }
 
@@ -337,10 +340,7 @@ export default {
       this.lastTime = currentTime
     },
     getLoadState() {
-      if (this.node.progress < 1) {
-        return this.autoplay ? VideoStates.Playing : VideoStates.Paused
-      }
-      return VideoStates.Finished
+      return this.autoplay ? VideoStates.Playing : VideoStates.Paused
     },
     handlePopupComplete() {
       if (!this.isPopupComplete) {

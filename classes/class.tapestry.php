@@ -174,11 +174,6 @@ class Tapestry implements ITapestry
             $this->rootId = $node->id;
         }
 
-        $nodeArray = [$node];
-        $nodeArray = $this->_addH5PMeta($nodeArray);
-        $node = array_values($nodeArray)[0];
-        $node = $tapestryNode->save($node);
-
         $this->_saveToDatabase();
 
         return $node;
