@@ -64,9 +64,7 @@
         v-if="state === states.Finished"
         class="screen"
         :node="node"
-        :dimensions="dimensions"
         :context="context"
-        @change:dimensions="$emit('change:dimensions', $event)"
         @rewatch="transition(events.Rewatch)"
         @close="transition(events.Close)"
       />

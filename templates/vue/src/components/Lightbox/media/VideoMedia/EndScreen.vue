@@ -1,13 +1,5 @@
 <template>
-  <activity-media
-    v-if="showActivityScreen"
-    :dimensions="dimensions"
-    :node="node"
-    @change:dimensions="$emit('change:dimensions', $event)"
-    @complete="$emit('close')"
-    @close="showActivityScreen = false"
-  />
-  <div v-else data-qa="end-screen" class="end-screen">
+  <div data-qa="end-screen" class="end-screen">
     <button @click="handleClick($event, 'rewatch')">
       <i class="fas fa-redo fa-4x"></i>
       <p>Rewatch</p>
@@ -21,19 +13,11 @@
 
 <script>
 import client from "@/services/TapestryAPI"
-import ActivityMedia from "../ActivityMedia"
 
 export default {
   name: "end-screen",
-  components: {
-    ActivityMedia,
-  },
   props: {
     node: {
-      type: Object,
-      required: true,
-    },
-    dimensions: {
       type: Object,
       required: true,
     },
@@ -41,11 +25,6 @@ export default {
       type: String,
       required: true,
     },
-  },
-  data() {
-    return {
-      showActivityScreen: false,
-    }
   },
   methods: {
     handleClick(evt, type) {

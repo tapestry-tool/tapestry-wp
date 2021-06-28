@@ -30,7 +30,7 @@ import { SEEK_THRESHOLD } from "./video.config"
 import Helpers from "@/utils/Helpers"
 
 // How often to update the H5P settings (in seconds)
-const updateSettingsInterval = 1
+const updateSettingsInterval = 10
 
 export default {
   name: "h5p-video-media",
@@ -122,33 +122,13 @@ export default {
       }
       this.lastTime = currentTime
 
-      /**
-       * An H5P video is just one of the many types H5Ps can be, so we only want to
-       * trigger this if the H5P is in fact a video.
-       */
-      if (video) {
-        const currentTime = video.getCurrentTime()
-        const duration = video.getDuration()
-
-        if (Math.abs(currentTime - this.lastTime) > SEEK_THRESHOLD) {
-          this.$emit("seeked", { currentTime })
-        } else {
-          this.$emit("timeupdate", {
-            amountViewed: currentTime / duration,
-            currentTime,
-          })
-        }
-
-        this.lastTime = currentTime
-
-        let currTimestamp = Date.now()
-        if (
-          (currTimestamp - this.settingsLastUpdated) / 1000 >
-          updateSettingsInterval
-        ) {
-          this.updateSettings(video)
-          this.settingsLastUpdated = currTimestamp
-        }
+      let currTimestamp = Date.now()
+      if (
+        (currTimestamp - this.settingsLastUpdated) / 1000 >
+        updateSettingsInterval
+      ) {
+        this.updateSettings(video)
+        this.settingsLastUpdated = currTimestamp
       }
     },
 
