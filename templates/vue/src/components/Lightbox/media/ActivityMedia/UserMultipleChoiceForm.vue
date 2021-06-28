@@ -122,11 +122,12 @@ export default {
     },
     getPreSelectedCheckBoxValue() {
       if (this.question.answerTypes.multipleChoice.hasMultipleAnswers) {
-        var selectedCheckBoxIDs = this.question.answerTypes.multipleChoice
+        const selectedCheckBoxIDs = this.question.answerTypes.multipleChoice
           .preSelectedCheckBoxOptions
         if (selectedCheckBoxIDs.length > 0) {
-          var checkboxArray = this.question.answerTypes.multipleChoice.checkboxArray
-          var selectedValue = []
+          const checkboxArray = this.question.answerTypes.multipleChoice
+            .checkboxArray
+          let selectedValue = []
           for (var i = 0; i < selectedCheckBoxIDs.length; i++) {
             for (var j = 0; j < checkboxArray.length; j++) {
               if (checkboxArray[j].id === selectedCheckBoxIDs[i]) {
@@ -145,15 +146,11 @@ export default {
         if (
           this.question.answerTypes.multipleChoice.preSelectedRadioOptions.length > 0
         ) {
-          var matchingID = this.question.answerTypes.multipleChoice
+          const matchingID = this.question.answerTypes.multipleChoice
             .preSelectedRadioOptions[0]
-          var radioArray = this.question.answerTypes.multipleChoice.radioArray
-          var selectedValue = ""
-          for (var i = 0; i < radioArray.length; i++) {
-            if (radioArray[i].id === matchingID) {
-              selectedValue = radioArray[i].id
-            }
-          }
+          const radioArray = this.question.answerTypes.multipleChoice.radioArray
+          let selectedValue = ""
+          selectedValue = radioArray.find(option => option.id === matchingID).id
           return selectedValue
         } else {
           return ""
