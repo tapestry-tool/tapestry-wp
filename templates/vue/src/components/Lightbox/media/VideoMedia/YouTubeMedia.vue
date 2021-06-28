@@ -153,16 +153,16 @@ export default {
     ...mapActions(["updateH5pSettings"]),
     ready(event) {
       this.player = event.target
-
-      if (this.autoplay) {
-        this.handlePlay()
-      } else {
-        this.player.pauseVideo()
-      }
       this.applySettings()
 
       const currentTime = this.progress * this.totalDuration
       this.$emit("load", { currentTime })
+
+      if (this.autoplay) {
+        setTimeout(() => this.handlePlay(), 2000)
+      } else {
+        this.player.pauseVideo()
+      }
     },
     reset() {
       if (this.player) {
