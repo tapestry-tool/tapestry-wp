@@ -1,7 +1,7 @@
 <template>
   <div id="app-container" :class="{ 'sidebar-open': isSidebarOpen }">
     <toolbar style="margin-bottom: 100px;" />
-    <b-modal id="avatar-modal" size="xl" :visible="!hasAvatar && avatarPopup">
+    <b-modal id="avatar-modal" size="xl" :visible="!hasAvatar && avatarsEnabled">
       <b-container class="avatar-container">
         <avatar-form ref="AvatarForm" />
       </b-container>
@@ -58,8 +58,8 @@ export default {
     hasAvatar() {
       return !(!this.avatar || Object.keys(this.avatar).length === 0)
     },
-    avatarPopup() {
-      return isLoggedIn() && process.env.VUE_APP_AVATAR === "TRUE"
+    avatarsEnabled() {
+      return isLoggedIn() && process.env.VUE_APP_AVATARS === "TRUE"
     },
   },
   watch: {

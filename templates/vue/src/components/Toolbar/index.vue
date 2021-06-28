@@ -13,10 +13,12 @@
         @change:max-depth="maxDepth = $event"
       ></tapestry-depth-slider>
     </div>
-    <user-settings-button
-      v-if="avatarsEnabled"
-      data-qa="user-settings-button"
-    ></user-settings-button>
+    <div class="allUsers">
+      <user-settings-button
+        v-if="avatarsEnabled"
+        data-qa="user-settings-button"
+      ></user-settings-button>
+    </div>
   </div>
 </template>
 
@@ -84,8 +86,24 @@ export default {
   border-radius: 4px;
   border-bottom-right-radius: 0;
   border-bottom-left-radius: 0;
-  padding: 8px 6px 8px 12px;
+  padding: 8px 0px 8px 12px;
   margin-left: auto;
   position: relative;
+}
+
+.allUsers {
+  background: #fbfbfb;
+  box-shadow: 0 0 0 0 #ddd;
+  display: flex;
+  align-items: center;
+  border-radius: 4px;
+  padding: 8px 0px 8px 0px;
+  position: relative;
+}
+
+.user-settings-button {
+  margin: auto;
+  text-align: center;
+  width: 100%;
 }
 </style>
