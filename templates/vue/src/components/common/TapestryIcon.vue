@@ -31,7 +31,6 @@ const textContent = {
   play: "\uf04b",
   text: "Aa",
   "comment-dots": "\uf4ad",
-  bullseye: "\uf140",
 }
 
 const aliases = {
