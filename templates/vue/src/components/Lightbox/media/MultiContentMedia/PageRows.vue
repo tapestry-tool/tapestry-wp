@@ -43,7 +43,6 @@
                 :node-id="row.node.id"
                 :dimensions="dimensions"
                 context="page"
-                :autoplay="false"
                 style="color: white; margin-bottom: 24px;"
                 @complete="updateProgress(row.node.id)"
                 @load="handleLoad($refs.rowRefs[index])"
@@ -179,7 +178,7 @@ export default {
   },
   methods: {
     ...mapMutations(["updateNode"]),
-    ...mapActions(["completeNode", "updateNodeProgress", "toggleFavourite"]),
+    ...mapActions(["completeNode", "toggleFavourite"]),
     handleLoad(el) {
       this.$emit("load", el)
     },

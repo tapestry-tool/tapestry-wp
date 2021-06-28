@@ -41,7 +41,8 @@ export default {
           ");"
         )
       }
-      return ""
+      // to account for player controls
+      return "height: calc(100% - 80px);"
     },
   },
 }

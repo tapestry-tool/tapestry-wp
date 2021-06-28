@@ -88,30 +88,53 @@ export default class Helpers {
   }
 
   /**
-   * Shallowly checks if two objects are different from one another
-   * @param {Object} src
-   * @param {Object} other
+   * Checks if two operands are different from one another
+   * Note: We evaluate Null, "", {}, [], false, 0, and Undefined all as being the same
+   * @param src
+   * @param other
    */
   static isDifferent(src, other) {
-    const srcKeys = Object.keys(src)
-    const otherKeys = Object.keys(other)
+    // This means we evaluate Null, "", {}, [], false, 0, and Undefined all as being the same
+    if (!src && !other) {
+      return false
+    }
 
-    // Check 1: If one object has more keys than the other
-    if (srcKeys.length !== otherKeys.length) {
+    // General type check
+    if (typeof src !== typeof other || Array.isArray(src) !== Array.isArray(other)) {
       return true
     }
 
-    // Check 2: If they have the same keys
-    if (!srcKeys.every(key => otherKeys.includes(key))) {
-      return true
-    }
-
-    // Check 3: If the key values are equal
-    for (const key of Object.keys(src)) {
-      if (src[key] !== other[key]) {
+    // Arrays
+    if (Array.isArray(src)) {
+      if (
+        src.length !== other.length &&
+        src.some(key => !other.includes(key)) &&
+        src.some(key => this.isDifferent(src[key], other[key]))
+      ) {
         return true
       }
+      return false
     }
+
+    // Objects
+    if (typeof src === "object") {
+      const srcKeys = Object.keys(src)
+      const otherKeys = Object.keys(other)
+      if (
+        srcKeys.length !== otherKeys.length ||
+        srcKeys.some(key => !otherKeys.includes(key)) ||
+        srcKeys.some(key => this.isDifferent(src[key], other[key]))
+      ) {
+        return true
+      }
+      return false
+    }
+
+    // Other
+    if (src !== other) {
+      return true
+    }
+
     return false
   }
 
@@ -358,6 +381,7 @@ export default class Helpers {
       unlocked: true,
       accessible: true,
       reviewComments: [],
+      popup: null,
     }
     return Helpers.deepMerge(baseNode, overrides)
   }
