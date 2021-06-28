@@ -59,7 +59,7 @@ export default {
       return !(!this.avatar || Object.keys(this.avatar).length === 0)
     },
     avatarPopup() {
-      return Boolean(process.env.VUE_APP_AVATAR_POPUP) && isLoggedIn()
+      return isLoggedIn() && process.env.VUE_APP_AVATAR_POPUP === "TRUE"
     },
   },
   watch: {

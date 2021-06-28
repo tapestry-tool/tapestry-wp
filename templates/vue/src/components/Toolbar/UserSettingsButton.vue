@@ -1,10 +1,5 @@
 <template>
-  <button
-    :visible="avatarPopup"
-    data-qa="user-settings"
-    class="user-settings-button"
-    @click="open"
-  >
+  <button data-qa="user-settings" class="user-settings-button" @click="open">
     <tapestry-icon icon="user"></tapestry-icon>
     <user-settings-modal
       :show="avatarFormOpen"
@@ -20,7 +15,6 @@ import TapestryIcon from "@/components/common/TapestryIcon"
 import client from "@/services/TapestryAPI"
 import { names } from "@/config/routes"
 import UserSettingsModal from "../modals/UserSettingsModal"
-import { isLoggedIn } from "@/services/wp"
 
 export default {
   components: {
@@ -42,9 +36,6 @@ export default {
     },
     tab() {
       return this.$route.params.tab
-    },
-    avatarPopup() {
-      return Boolean(process.env.VUE_APP_AVATAR_POPUP) && isLoggedIn()
     },
   },
   watch: {
