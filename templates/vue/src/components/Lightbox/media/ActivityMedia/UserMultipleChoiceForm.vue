@@ -122,39 +122,12 @@ export default {
     },
     getPreSelectedCheckBoxValue() {
       if (this.question.answerTypes.multipleChoice.hasMultipleAnswers) {
-        const selectedCheckBoxIDs = this.question.answerTypes.multipleChoice
-          .preSelectedCheckBoxOptions
-        if (selectedCheckBoxIDs.length > 0) {
-          const checkboxArray = this.question.answerTypes.multipleChoice
-            .checkboxArray
-          let selectedValue = []
-          for (var i = 0; i < selectedCheckBoxIDs.length; i++) {
-            for (var j = 0; j < checkboxArray.length; j++) {
-              if (checkboxArray[j].id === selectedCheckBoxIDs[i]) {
-                selectedValue.push(checkboxArray[j].id)
-              }
-            }
-          }
-          return selectedValue
-        } else {
-          return []
-        }
+        return this.question.answerTypes.multipleChoice.preSelectedCheckBoxOptions
       }
     },
     getPreSelectedRadioValue() {
       if (!this.question.answerTypes.multipleChoice.hasMultipleAnswers) {
-        if (
-          this.question.answerTypes.multipleChoice.preSelectedRadioOptions.length > 0
-        ) {
-          const matchingID = this.question.answerTypes.multipleChoice
-            .preSelectedRadioOptions[0]
-          const radioArray = this.question.answerTypes.multipleChoice.radioArray
-          let selectedValue = ""
-          selectedValue = radioArray.find(option => option.id === matchingID).id
-          return selectedValue
-        } else {
-          return ""
-        }
+        return this.question.answerTypes.multipleChoice.preSelectedRadioOptions[0]
       }
     },
     checkBoxValidAnswerState() {
