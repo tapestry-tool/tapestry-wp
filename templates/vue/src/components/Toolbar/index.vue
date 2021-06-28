@@ -7,7 +7,6 @@
         v-if="canEdit"
         :max-depth="maxDepth"
       ></settings-modal-button>
-      <cos-button></cos-button>
       <tapestry-depth-slider
         v-show="!showMap && hasDepth"
         @change="updateViewBox"
@@ -21,7 +20,6 @@
 import { mapMutations, mapState } from "vuex"
 import TapestryDepthSlider from "./TapestryDepthSlider"
 import SettingsModalButton from "./SettingsModalButton"
-import CosButton from "./CoSButton"
 import TapestryFilter from "./TapestryFilter"
 import ReviewNotifications from "./ReviewNotifications"
 import * as wp from "@/services/wp"
@@ -32,7 +30,6 @@ export default {
     TapestryFilter,
     SettingsModalButton,
     ReviewNotifications,
-    CosButton,
   },
   data() {
     return {
