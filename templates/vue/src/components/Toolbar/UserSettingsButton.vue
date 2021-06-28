@@ -1,5 +1,5 @@
 <template>
-  <button data-qa="user-settings-button" class="user-settings-button" @click="open">
+  <button class="user-settings-button" @click="open">
     <tapestry-icon icon="user"></tapestry-icon>
     <user-settings-modal
       :show="avatarFormOpen"

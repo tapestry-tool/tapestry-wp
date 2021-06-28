@@ -1,7 +1,7 @@
 <template>
   <b-modal
     id="user-settings-modal"
-    data-qa="user-ettings-modal"
+    data-qa="user-settings-modal"
     :visible="show"
     size="lg"
     title="User Settings"
@@ -25,7 +25,7 @@
       </b-button>
       <b-button
         id="save-button"
-        data-qa="submit-button"
+        data-qa="avatar-submit-button"
         size="sm"
         variant="primary"
         @click="saveAvatar"
