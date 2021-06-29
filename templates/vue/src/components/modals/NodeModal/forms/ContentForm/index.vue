@@ -53,8 +53,8 @@
     <b-form-group v-if="node.hasSubAccordion" label="Subaccordion Text">
       <b-form-input v-model="node.typeData.subAccordionText"></b-form-input>
     </b-form-group>
-    <b-form-group v-if="isPopupCandidate" label="Popup">
-      <popup-form :node="node" />
+    <b-form-group v-show="isPopupCandidate" label="Popup">
+      <popup-form :node="node" :is-candidate="isPopupCandidate" />
     </b-form-group>
     <b-form-group label="Content Type">
       <b-form-select
