@@ -7,13 +7,15 @@
         </div>
       </b-col>
       <b-col v-if="type === 'audio'" align-self="center">
-        <audio controls :src="answerData"></audio>
+        <audio controls :src="urlAnswer"></audio>
       </b-col>
     </b-row>
   </b-container>
 </template>
 
 <script>
+import { data as wpData } from "@/services/wp"
+
 export default {
   name: "tapestry-activity",
   props: {
@@ -23,10 +25,15 @@ export default {
       validator: val => ["text", "audio"].includes(val),
     },
     answerData: {
-      type: [String, Array],
+      type: [Object],
       required: true,
     },
   },
+  computed:{
+    urlAnswer() {
+      return wpData.uploadDirArray.baseurl + "/" + this.answerData.url + "?" + Date.now()
+    }
+  }
 }
 </script>
 

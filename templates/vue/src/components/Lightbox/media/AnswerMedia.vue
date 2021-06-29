@@ -8,19 +8,13 @@
     >
       <h4>{{ answer.precedingText || question.text }}</h4>
       <b-tabs vertical no-nav-style nav-class="nav-tablist">
-        <b-tab v-for="questionAnswer in answers" :key="questionAnswer.type">
+        <b-tab v-for="questionAnswer in answers" :key="questionAnswer[0]">
           <template #title>
             <div class="icon">
               <tapestry-icon :icon="questionAnswer[0]" />
             </div>
           </template>
           <tapestry-activity
-            v-if="questionAnswer[0] === 'audio'"
-            :type="questionAnswer[0]"
-            :answerData="getFullUrl(questionAnswer[1].url)"
-          ></tapestry-activity>
-          <tapestry-activity
-            v-else
             :type="questionAnswer[0]"
             :answerData="questionAnswer[1]"
           ></tapestry-activity>
@@ -40,7 +34,6 @@
 import { mapGetters, mapState } from "vuex"
 import TapestryActivity from "./ActivityMedia/TapestryActivity"
 import TapestryIcon from "@/components/common/TapestryIcon"
-import { data as wpData } from "@/services/wp"
 
 export default {
   name: "answer-media",
@@ -74,11 +67,6 @@ export default {
   mounted() {
     this.$emit("complete")
     this.$emit("load")
-  },
-  methods: {
-    getFullUrl(url) {
-      return wpData.uploadDirArray.baseurl + "/" + url
-    },
   },
 }
 </script>
