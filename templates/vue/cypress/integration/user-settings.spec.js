@@ -7,7 +7,7 @@ describe("User Settings", () => {
   it(`should be able to save and edit an Avatar`, () => {
     // process.env.AVATARS will always be undefined, so this test will be skipped.
     // We only want this test to run if process.env.AVATARS === "TRUE"
-    if (!process.env.VUE_APP_AVATARS) {
+    if (process.env.VUE_APP_AVATARS) {
       return
     }
     cy.store()

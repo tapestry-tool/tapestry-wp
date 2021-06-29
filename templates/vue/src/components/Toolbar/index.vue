@@ -1,7 +1,7 @@
 <template>
   <div class="toolbar">
     <tapestry-filter v-if="!showMap" style="z-index: 10;" />
-    <div class="slider-wrapper">
+    <div v-show="isLoggedIn" class="slider-wrapper">
       <user-settings-button
         v-if="avatarsEnabled"
         data-qa="user-settings-button"
@@ -49,6 +49,9 @@ export default {
     canEdit() {
       return wp.canEditTapestry()
     },
+    isLoggedIn() {
+      return wp.isLoggedIn()
+    },
     hasDepth() {
       return this.maxDepth > 1 && this.settings.defaultDepth > 0
     },
@@ -56,7 +59,7 @@ export default {
       return this.settings.renderMap
     },
     avatarsEnabled() {
-      return wp.isLoggedIn() && process.env.VUE_APP_AVATARS === "TRUE"
+      return this.isLoggedIn && process.env.VUE_APP_AVATARS === "TRUE"
     },
   },
   methods: {
