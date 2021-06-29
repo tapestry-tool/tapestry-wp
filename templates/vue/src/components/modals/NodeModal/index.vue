@@ -917,6 +917,9 @@ export default {
                 "Maximum # of fields for list activity must be >= minumum # fields"
               )
             }
+            if (listQuestion.maxFields.value > 100) {
+              errMsgs.push("Maximum # fields must be <= 100")
+            }
           }
         }
       } else if (this.node.mediaType === "answer") {

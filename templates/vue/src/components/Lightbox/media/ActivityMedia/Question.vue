@@ -56,7 +56,7 @@
           <list-question
             v-else-if="formType === 'list'"
             :question="question"
-            :answers="answer.length > 0 ? answer : []"
+            :answers="answer ? answer : []"
             @submit="handleSubmit"
           ></list-question>
         </div>
@@ -235,28 +235,8 @@ export default {
       return false
     },
     listFormCompleted() {
-      if (this.userAnswers.hasOwnProperty(this.node.id)) {
-        if (this.userAnswers[this.node.id].hasOwnProperty("activity")) {
-          if (
-            this.userAnswers[this.node.id].activity.hasOwnProperty(this.question.id)
-          ) {
-            if (
-              this.userAnswers[this.node.id].activity[
-                this.question.id
-              ].hasOwnProperty("answers")
-            ) {
-              if (
-                this.userAnswers[this.node.id].activity[
-                  this.question.id
-                ].answers.hasOwnProperty("list")
-              ) {
-                return true
-              }
-            }
-          }
-        }
-      }
-      return false
+      return this.userAnswers?.[this.node.id]?.activity?.[this.question.id]?.answers
+        ?.list
     },
   },
   watch: {

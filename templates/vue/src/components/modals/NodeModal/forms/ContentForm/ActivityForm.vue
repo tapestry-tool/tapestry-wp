@@ -247,7 +247,7 @@ const defaultQuestion = {
       enabled: false,
       placeholder: "",
       minFields: 1,
-      maxFields: { enabled: false, value: null },
+      maxFields: { enabled: false, value: 100 },
     },
   },
   confirmation: {

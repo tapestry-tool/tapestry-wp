@@ -20,7 +20,7 @@
           variant="primary"
           :data-qa="`list-add-${index}`"
           :class="{
-            'btn-primary': !(numOfFields >= maxFields),
+            'btn-primary': numOfFields < maxFields,
             disabled: numOfFields >= maxFields,
           }"
           @click="addAnswer"
@@ -33,7 +33,7 @@
           variant="danger"
           :data-qa="`list-del-${index}`"
           :class="{
-            'btn-danger': !(numOfFields <= minFields),
+            'btn-danger': numOfFields > minFields,
             disabled: numOfFields <= minFields,
           }"
           @click="deleteAnswer(index)"
@@ -56,6 +56,8 @@
 </template>
 
 <script>
+const MAX_FIELDS_ALLOWED = 100
+
 export default {
   name: "list-question",
   props: {
@@ -80,7 +82,7 @@ export default {
     maxFields() {
       return this.question.answerTypes.list.maxFields.enabled
         ? parseInt(this.question.answerTypes.list.maxFields.value, 10)
-        : 100000
+        : MAX_FIELDS_ALLOWED
     },
     numOfFields() {
       return this.answerList.length
@@ -102,7 +104,7 @@ export default {
       this.$bvModal
         .msgBoxConfirm("This answer will be removed.", {
           modalClass: "node-modal-confirmation",
-          title: "Are you sure you want to delete this answer?",
+          title: "Are you sure you want to delete this answer from the list?",
           okTitle: "Yes, delete!",
           okVariant: "danger",
         })
@@ -164,6 +166,7 @@ export default {
 .disabled {
   outline: none;
   pointer-events: none;
+  cursor: not-allowed;
 }
 
 .submit-btn {
