@@ -211,20 +211,11 @@ export default {
       return false
     },
     dragDropFormCompleted() {
-      if (this.userAnswers?.[this.node.id]?.activity?.[this.question.id]) {
-        if (
-          this.userAnswers[this.node.id].activity[this.question.id].hasOwnProperty(
-            "answers"
-          )
-        ) {
-          if (
-            this.userAnswers[this.node.id].activity[
-              this.question.id
-            ].answers.hasOwnProperty("dragDrop")
-          ) {
-            return true
-          }
-        }
+      if (
+        this.userAnswers?.[this.node.id]?.activity?.[this.question.id]?.answers
+          ?.dragDrop
+      ) {
+        return true
       }
       return false
     },
