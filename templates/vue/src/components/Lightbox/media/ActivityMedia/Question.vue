@@ -138,16 +138,10 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getAnswers", "getQuestion"]),
+    ...mapGetters(["getAnswers"]),
     ...mapState(["userAnswers"]),
     isLoggedIn() {
       return wp.isLoggedIn()
-    },
-    lastQuestion() {
-      if (this.question.followUp.questionId !== null) {
-        return this.getQuestion(this.question.followUp.questionId)
-      }
-      return this.getQuestion(this.question.followUp.questionId)
     },
     previousQuestionAnswers() {
       if (this.question.followUp.questionId !== null) {
@@ -200,38 +194,19 @@ export default {
       return ""
     },
     textFormCompleted() {
-      if (this.userAnswers?.[this.node.id]?.activity?.[this.question.id]) {
-        if (
-          this.userAnswers[this.node.id].activity[this.question.id].hasOwnProperty(
-            "answers"
-          )
-        ) {
-          if (
-            this.userAnswers[this.node.id].activity[
-              this.question.id
-            ].answers.hasOwnProperty("text")
-          ) {
-            return true
-          }
-        }
+      if (
+        this.userAnswers?.[this.node.id]?.activity?.[this.question.id]?.answers?.text
+      ) {
+        return true
       }
       return false
     },
     audioFormCompleted() {
-      if (this.userAnswers?.[this.node.id]?.activity?.[this.question.id]) {
-        if (
-          this.userAnswers[this.node.id].activity[this.question.id].hasOwnProperty(
-            "answers"
-          )
-        ) {
-          if (
-            this.userAnswers[this.node.id].activity[
-              this.question.id
-            ].answers.hasOwnProperty("audio")
-          ) {
-            return true
-          }
-        }
+      if (
+        this.userAnswers?.[this.node.id]?.activity?.[this.question.id]?.answers
+          ?.audio
+      ) {
+        return true
       }
       return false
     },
