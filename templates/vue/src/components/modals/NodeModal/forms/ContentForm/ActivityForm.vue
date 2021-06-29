@@ -150,37 +150,42 @@
               </b-form-checkbox>
               <div v-if="question.answerTypes.list.enabled" class="mt-2 pl-4 ml-2">
                 <div class="list-options">
-                  <div class="checkbox-input">
-                    <div class="list-checkbox">
-                      <label for="min-field">Min</label>
-                    </div>
-                    <div class="list-input">
-                      <b-form-input
-                        id="min-field"
-                        v-model="question.answerTypes.list.minFields"
-                        placeholder="Min # fields"
-                        type="number"
-                      ></b-form-input>
+                  <div class="list-field-options">
+                    <b-form-checkbox
+                      v-model="question.answerTypes.list.maxFields.enabled"
+                      class="list-max-checkbox"
+                    ></b-form-checkbox>
+                    <div class="list-row-container">
+                      <div class="list-option-row">
+                        <label for="min-field">
+                          Minimum answer fields
+                        </label>
+                        <b-form-input
+                          id="min-field"
+                          v-model="question.answerTypes.list.minFields"
+                          placeholder="Min # fields"
+                          type="number"
+                          class="list-input"
+                        ></b-form-input>
+                      </div>
+                      <div class="list-option-row">
+                        <label for="max-field">
+                          Maximum answer fields
+                        </label>
+                        <b-form-input
+                          id="max-field"
+                          v-model="question.answerTypes.list.maxFields.value"
+                          :disabled="!question.answerTypes.list.maxFields.enabled"
+                          placeholder="Max # fields"
+                          type="number"
+                          class="list-input"
+                        ></b-form-input>
+                      </div>
                     </div>
                   </div>
-                  <div class="checkbox-input">
-                    <div class="list-checkbox">
-                      <b-form-checkbox
-                        v-model="question.answerTypes.list.maxFields.enabled"
-                      >
-                        Max
-                      </b-form-checkbox>
-                    </div>
-                    <div class="list-input">
-                      <b-form-input
-                        v-model="question.answerTypes.list.maxFields.value"
-                        :disabled="!question.answerTypes.list.maxFields.enabled"
-                        placeholder="Max # fields"
-                        type="number"
-                      ></b-form-input>
-                    </div>
-                  </div>
-                  <label for="placeholder">Placeholder (optional):</label>
+                  <label for="placeholder">
+                    Placeholder for answer fields (optional):
+                  </label>
                   <b-form-input
                     id="placeholder"
                     v-model="question.answerTypes.list.placeholder"
@@ -336,17 +341,33 @@ export default {
   }
 }
 
-.checkbox-input {
-  float: left;
+.list-options {
+  display: flex;
+  flex-direction: column;
 }
 
-.list-checkbox {
-  float: left;
-  width: 100px;
+.list-field-options {
+  display: flex;
+}
+
+.list-row-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.list-option-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.list-max-checkbox {
+  position: relative;
+  top: 60px;
+  right: 10px;
 }
 
 .list-input {
-  float: right;
-  width: calc(100% - 100px);
+  width: 60%;
 }
 </style>
