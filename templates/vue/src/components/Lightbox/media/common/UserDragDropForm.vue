@@ -1,5 +1,6 @@
 <template>
   <b-form @submit="handleDragDropSubmit">
+    <p>question data is {{ question }}</p>
     <p>dragDropAnswer is {{ dragDropAnswer }}</p>
     <p>answer is {{ answer }}</p>
     <p>toBucketArray is {{ toBucketArray }}</p>
@@ -74,7 +75,7 @@ export default {
       isAnswerValid: true,
       toBucketArray: this.question.answerTypes.dragDrop.toBucketArray,
       fromBucketArray: this.question.answerTypes.dragDrop.fromBucketArray,
-      dragDropAnswer: [],
+      dragDropAnswer: {},
     }
   },
   computed: {
@@ -110,7 +111,7 @@ export default {
   },
   methods: {
     initialize() {
-      for (const toBucket of this.answer) {
+      for (const toBucket of this.answer.toBucketArray) {
         console.log("current toBucket is", toBucket)
         for (
           let i = 0;
@@ -126,70 +127,25 @@ export default {
         }
       }
 
-      for (
-        let j = 0;
-        j < this.question.answerTypes.dragDrop.fromBucketArray.length;
-        j++
-      ) {
+      for (const fromBucket of this.answer.fromBucketArray) {
         for (
-          let k = 0;
-          k < this.question.answerTypes.dragDrop.fromBucketArray[j].itemArray.length;
-          k++
-        ) {
-          console.log(
-            "got here",
-            this.question.answerTypes.dragDrop.fromBucketArray[j].itemArray[k]
-          )
-          console.log(
-            "found it?",
-            this.findIfExistInToBucket(
-              this.question.answerTypes.dragDrop.fromBucketArray[j].itemArray[k]
-            )
-          )
-          if (
-            this.findIfExistInToBucket(
-              this.question.answerTypes.dragDrop.fromBucketArray[j].itemArray[k]
-            )
-          ) {
-            this.question.answerTypes.dragDrop.fromBucketArray[j].itemArray.splice(
-              k,
-              1
-            )
-            k -= 1
-          }
-          // TODO FINISH HERE for cleaning up fromBucketArray
-        }
-      }
-    },
-    findIfExistInToBucket(item) {
-      console.log("item is", item)
-      for (
-        let j = 0;
-        j < this.question.answerTypes.dragDrop.toBucketArray.length;
-        j++
-      ) {
-        for (
-          let k = 0;
-          k < this.question.answerTypes.dragDrop.toBucketArray[j].itemArray.length;
-          k++
+          let i = 0;
+          i < this.question.answerTypes.dragDrop.fromBucketArray.length;
+          i++
         ) {
           if (
-            this.question.answerTypes.dragDrop.toBucketArray[j].itemArray[k].id ===
-            item.id
+            this.question.answerTypes.dragDrop.fromBucketArray[i].id ===
+            fromBucket.id
           ) {
-            return true
+            this.question.answerTypes.dragDrop.fromBucketArray[i].itemArray =
+              fromBucket.itemArray
           }
         }
       }
-      return false
     },
     updateDragDropAnswer() {
-      this.dragDropAnswer = []
-      for (let i = 0; i < this.toBucketArray.length; i++) {
-        if (this.toBucketArray[i].itemArray.length > 0) {
-          this.dragDropAnswer.push(this.toBucketArray[i])
-        }
-      }
+      this.dragDropAnswer.fromBucketArray = this.question.answerTypes.dragDrop.fromBucketArray
+      this.dragDropAnswer.toBucketArray = this.question.answerTypes.dragDrop.toBucketArray
     },
     handleDragDropSubmit(event) {
       event.preventDefault()
