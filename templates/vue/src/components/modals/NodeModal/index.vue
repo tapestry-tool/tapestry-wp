@@ -908,16 +908,18 @@ export default {
         if (this.node.typeData.activity.questions[0].answerTypes.list.enabled) {
           let listQuestion = this.node.typeData.activity.questions[0].answerTypes
             .list
-          if (listQuestion.minFields < 1) {
+          let minValue = parseInt(listQuestion.minFields, 10)
+          if (minValue < 1) {
             errMsgs.push("Minimum # of fields for list activity must be >= 1")
           }
           if (listQuestion.maxFields.enabled) {
-            if (listQuestion.maxFields.value < listQuestion.minFields) {
+            let maxValue = parseInt(listQuestion.maxFields.value, 10)
+            if (maxValue < minValue) {
               errMsgs.push(
                 "Maximum # of fields for list activity must be >= minumum # fields"
               )
             }
-            if (listQuestion.maxFields.value > 100) {
+            if (maxValue > 100) {
               errMsgs.push("Maximum # fields must be <= 100")
             }
           }
