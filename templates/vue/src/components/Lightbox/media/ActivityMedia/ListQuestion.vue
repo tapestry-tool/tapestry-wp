@@ -16,26 +16,18 @@
           "
         ></b-form-input>
         <b-button
-          :disabled="numOfFields >= maxFields"
+          v-show="numOfFields < maxFields"
           variant="primary"
           :data-qa="`list-add-${index}`"
-          :class="{
-            'btn-primary': numOfFields < maxFields,
-            disabled: numOfFields >= maxFields,
-          }"
           @click="addAnswer"
           @keydown.enter.prevent="addAnswer"
         >
           +
         </b-button>
         <b-button
-          :disabled="numOfFields <= minFields"
+          v-show="numOfFields > minFields"
           variant="danger"
           :data-qa="`list-del-${index}`"
-          :class="{
-            'btn-danger': numOfFields > minFields,
-            disabled: numOfFields <= minFields,
-          }"
           @click="deleteAnswer(index)"
         >
           -
@@ -161,12 +153,6 @@ export default {
   float: right;
   font-size: 30px;
   font-weight: bold;
-}
-
-.disabled {
-  outline: none;
-  pointer-events: none;
-  cursor: not-allowed;
 }
 
 .submit-btn {
