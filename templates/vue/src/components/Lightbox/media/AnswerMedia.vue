@@ -2,7 +2,6 @@
   <div class="answers">
     <h3>{{ node.title }}</h3>
     <div
-      v-if="answer !== null"
       class="answer-container mx-auto mb-3"
       data-qa="answer-display"
     >
@@ -23,9 +22,6 @@
       <div v-show="!hasAnswer" class="media-wrapper">
         You have not completed this question yet.
       </div>
-    </div>
-    <div v-else>
-      <p>Please fill in the answer form.</p>
     </div>
   </div>
 </template>
