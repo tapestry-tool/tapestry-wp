@@ -5,16 +5,11 @@ describe("User Settings", () => {
   })
 
   it(`should be able to save and edit an Avatar`, () => {
+    // process.env.AVATARS will always be undefined, so this test will be skipped.
+    // We only want this test to run if process.env.AVATARS === "TRUE"
     if (!process.env.VUE_APP_AVATARS) {
-      console.error("No environment variable set for Avatar Popups")
       return
     }
-    if (!(process.env.VUE_APP_AVATARS === "TRUE")) {
-      console.log(".env variable VUE_APP_AVATARS is not set to TRUE")
-      return
-    }
-
-    // test assumes avatars are enabled, e.g. VUE_APP_AVATARS === "TRUE"
     cy.store()
       .its("state.avatar")
       .then(avatar => {

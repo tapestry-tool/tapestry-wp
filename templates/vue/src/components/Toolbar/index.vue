@@ -1,23 +1,23 @@
 <template>
   <div class="toolbar">
     <tapestry-filter v-if="!showMap" style="z-index: 10;" />
-    <div v-show="canEdit || (!showMap && hasDepth)" class="slider-wrapper">
-      <review-notifications v-if="canEdit && settings.submitNodesEnabled" />
-      <settings-modal-button
-        v-if="canEdit"
-        :max-depth="maxDepth"
-      ></settings-modal-button>
-      <tapestry-depth-slider
-        v-show="!showMap && hasDepth"
-        @change="updateViewBox"
-        @change:max-depth="maxDepth = $event"
-      ></tapestry-depth-slider>
-    </div>
-    <div class="allUsers">
+    <div class="slider-wrapper">
       <user-settings-button
         v-if="avatarsEnabled"
         data-qa="user-settings-button"
       ></user-settings-button>
+      <div v-show="canEdit || (!showMap && hasDepth)" class="canEdit">
+        <review-notifications v-if="canEdit && settings.submitNodesEnabled" />
+        <settings-modal-button
+          v-if="canEdit"
+          :max-depth="maxDepth"
+        ></settings-modal-button>
+        <tapestry-depth-slider
+          v-show="!showMap && hasDepth"
+          @change="updateViewBox"
+          @change:max-depth="maxDepth = $event"
+        ></tapestry-depth-slider>
+      </div>
     </div>
   </div>
 </template>
@@ -78,6 +78,7 @@ export default {
   padding: 0 5vw;
   transition: all 0.2s ease-out;
 }
+
 .slider-wrapper {
   background: #fbfbfb;
   box-shadow: 0 0 7px 0 #ddd;
@@ -86,24 +87,12 @@ export default {
   border-radius: 4px;
   border-bottom-right-radius: 0;
   border-bottom-left-radius: 0;
-  padding: 8px 0px 8px 12px;
+  padding: 8px 6px 8px 12px;
   margin-left: auto;
   position: relative;
 }
 
-.allUsers {
-  background: #fbfbfb;
-  box-shadow: 0 0 0 0 #ddd;
+.canEdit {
   display: flex;
-  align-items: center;
-  border-radius: 4px;
-  padding: 8px 0px 8px 0px;
-  position: relative;
-}
-
-.user-settings-button {
-  margin: auto;
-  text-align: center;
-  width: 100%;
 }
 </style>
