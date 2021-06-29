@@ -5,7 +5,7 @@
       class="answer-container mx-auto mb-3"
       data-qa="answer-display"
     >
-      <h4>{{ answer.precedingText || question.text }}</h4>
+      <h4>{{ answersTypeData.precedingText || question.text }}</h4>
       <b-tabs vertical no-nav-style nav-class="nav-tablist">
         <b-tab v-for="questionAnswer in answers" :key="questionAnswer[0]">
           <template #title>
@@ -46,14 +46,14 @@ export default {
   computed: {
     ...mapState(["userAnswers"]),
     ...mapGetters(["getQuestion", "getAnswers"]),
-    answer() {
+    answersTypeData() {
       return this.node.typeData
     },
     question() {
-      return this.getQuestion(this.answer.questionId)
+      return this.getQuestion(this.answersTypeData.questionId)
     },
     answers() {
-      const answers = this.getAnswers(this.answer.activityId, this.answer.questionId)
+      const answers = this.getAnswers(this.answersTypeData.activityId, this.answersTypeData.questionId)
       return answers ? Object.entries(answers) : null
     },
     hasAnswer() {
