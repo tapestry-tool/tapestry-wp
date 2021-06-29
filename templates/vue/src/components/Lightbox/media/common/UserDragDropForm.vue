@@ -1,10 +1,11 @@
 <template>
   <b-form @submit="handleDragDropSubmit">
     <p>dragDropAnswer is {{ dragDropAnswer }}</p>
+    <p>answer is {{ answer }}</p>
     <p>toBucketArray is {{ toBucketArray }}</p>
     <p>fromBucketArray is {{ fromBucketArray }}</p>
     <b-row align-h="between">
-      <b-col cols="3">
+      <b-col cols="4">
         <b style="color: #009688">From buckets</b>
         <user-drag-drop-bucket
           v-for="bucket in question.answerTypes.dragDrop.fromBucketArray"
@@ -17,7 +18,7 @@
           :isFromBucket="true"
         />
       </b-col>
-      <b-col cols="3">
+      <b-col cols="4">
         <b style="color: #3f51b5">To buckets</b>
         <user-drag-drop-bucket
           v-for="bucket in question.answerTypes.dragDrop.toBucketArray"
@@ -64,7 +65,7 @@ export default {
       required: true,
     },
     answer: {
-      type: [String, Object],
+      type: [String, Object, Array],
       required: true,
     },
   },
@@ -73,7 +74,7 @@ export default {
       isAnswerValid: true,
       toBucketArray: this.question.answerTypes.dragDrop.toBucketArray,
       fromBucketArray: this.question.answerTypes.dragDrop.fromBucketArray,
-      dragDropAnswer: {},
+      dragDropAnswer: [],
     }
   },
   computed: {
@@ -97,29 +98,30 @@ export default {
     },
   },
   created() {
-    //console.log(this.answer)
+    console.log("this.answer is", this.answer)
+    console.log("type of this.answer is", typeof this.answer)
     //console.log("type of this.answer is", typeof this.answer)
     if (this.answer !== "") {
       //console.log("initialize backend answer here")
+      console.log("this.answer is", this.answer)
       this.dragDropAnswer = this.answer
       this.initialize()
     }
   },
   methods: {
     initialize() {
-      for (const key of Object.keys(this.answer)) {
+      for (const toBucket of this.answer) {
+        console.log("current toBucket is", toBucket)
         for (
           let i = 0;
           i < this.question.answerTypes.dragDrop.toBucketArray.length;
           i++
         ) {
           if (
-            this.question.answerTypes.dragDrop.toBucketArray[i].id ===
-            this.answer[key].bucketId
+            this.question.answerTypes.dragDrop.toBucketArray[i].id === toBucket.id
           ) {
-            this.question.answerTypes.dragDrop.toBucketArray[
-              i
-            ].itemArray = this.answer[key].itemArray
+            this.question.answerTypes.dragDrop.toBucketArray[i].itemArray =
+              toBucket.itemArray
           }
         }
       }
@@ -182,15 +184,10 @@ export default {
       return false
     },
     updateDragDropAnswer() {
+      this.dragDropAnswer = []
       for (let i = 0; i < this.toBucketArray.length; i++) {
         if (this.toBucketArray[i].itemArray.length > 0) {
-          let bucketValue = this.toBucketArray[i].value
-          console.log("bucketValue is", bucketValue)
-          console.log(this.toBucketArray[i].itemArray)
-          this.dragDropAnswer[bucketValue] = {
-            bucketId: this.toBucketArray[i].id,
-            itemArray: this.toBucketArray[i].itemArray,
-          }
+          this.dragDropAnswer.push(this.toBucketArray[i])
         }
       }
     },
