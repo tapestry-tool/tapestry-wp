@@ -223,6 +223,15 @@
           </b-form-group>
           <b-form-group
             class="mt-4"
+            label="Enable TYDE mode"
+            description="TO BE EDITED"
+          >
+            <b-form-checkbox v-model="tydeModeEnabled" switch>
+              {{ tydeModeEnabled ? "Enabled" : "Disabled" }}
+            </b-form-checkbox>
+          </b-form-group>
+          <b-form-group
+            class="mt-4"
             label="Enable analytics"
             description="When enabled, analytics such as mouse clicks will be saved."
           >
@@ -359,6 +368,7 @@ export default {
       isExporting: false,
       renderImages: true,
       analyticsEnabled: false,
+      tydeModeEnabled:false,
       draftNodesEnabled: true,
       submitNodesEnabled: true,
       renderMap: false,
@@ -434,6 +444,7 @@ export default {
         defaultDepth = 3,
         renderImages = true,
         renderMap = false,
+        tydeModeEnabled = false,
         analyticsEnabled = false,
         draftNodesEnabled = true,
         submitNodesEnabled = true,
@@ -449,6 +460,7 @@ export default {
       this.defaultDepth = defaultDepth
       this.renderImages = renderImages
       this.renderMap = renderMap
+      this.tydeModeEnabled = tydeModeEnabled
       this.analyticsEnabled = analyticsEnabled
       this.draftNodesEnabled = draftNodesEnabled
       this.submitNodesEnabled = submitNodesEnabled
@@ -466,6 +478,7 @@ export default {
         defaultDepth: parseInt(this.defaultDepth),
         renderImages: this.renderImages,
         renderMap: this.renderMap,
+        tydeModeEnabled: this.tydeModeEnabled,
         analyticsEnabled: this.analyticsEnabled,
         draftNodesEnabled: this.draftNodesEnabled,
         submitNodesEnabled: this.submitNodesEnabled,
