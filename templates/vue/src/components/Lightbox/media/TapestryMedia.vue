@@ -68,7 +68,6 @@
     <answer-media
       v-if="node.mediaType === 'answer'"
       :node="node"
-      :context="context"
       @complete="complete"
       @close="$emit('close')"
       @load="handleLoad"
