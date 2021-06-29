@@ -1,9 +1,6 @@
 <template>
   <b-container class="tapestry-activity">
     <b-row align-v="center" style="min-height:150px;">
-      <b-col v-if="showIcon" align-self="center" cols="2">
-        <tapestry-icon :icon="type" />
-      </b-col>
       <b-col v-if="type === 'text'" align-self="center">
         <div class="text">
           {{ answerData }}
@@ -17,13 +14,8 @@
 </template>
 
 <script>
-import TapestryIcon from "@/components/common/TapestryIcon"
-
 export default {
   name: "tapestry-activity",
-  components: {
-    TapestryIcon,
-  },
   props: {
     type: {
       type: String,
@@ -34,11 +26,6 @@ export default {
       type: [String, Array],
       required: true,
     },
-    showIcon: {
-      type: Boolean,
-      required: false,
-      default: true,
-    },
   },
 }
 </script>
@@ -46,12 +33,13 @@ export default {
 <style lang="scss" scoped>
 .tapestry-activity {
   background: #262626;
-  border-radius: 0 0 8px 8px;
+  border-radius: 8px;
   margin-bottom: 8px;
   padding: 8px 16px 8px 16px;
-
   .text {
     text-align: left;
+    padding-left: 1em;
+    border-left: solid 1px #666;
   }
 }
 </style>
