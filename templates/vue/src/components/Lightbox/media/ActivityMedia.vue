@@ -55,7 +55,7 @@ export default {
       }
     },
     performDyadNodeCheck() {
-      return wp.getCurrentUser().roles.includes("copilot") || !this.node.isDyad;
+      return wp.getCurrentUser().roles.includes("copilot") || !this.node.isDyad
     },
   },
 }

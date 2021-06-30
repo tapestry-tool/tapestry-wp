@@ -592,7 +592,7 @@ class TapestryNode implements ITapestryNode
             'license' => $this->license,
             'references' => $this->references,
             'mapCoordinates' => $this->mapCoordinates,
-            'isDyad' => $this->isDyad
+            'isDyad' => $this->isDyad,
         ];
     }
 
