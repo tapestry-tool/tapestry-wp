@@ -16,10 +16,7 @@
         </template>
       </combobox>
     </b-form-group>
-    <b-form-group
-      data-qa="question-select"
-      label="Question"
-    >
+    <b-form-group data-qa="question-select" label="Question">
       <combobox
         v-model="node.typeData.questionId"
         :options="availableQuestions"
@@ -35,17 +32,14 @@
         </template>
       </combobox>
     </b-form-group>
-    <b-form-group
-      label="Show this text first"
-    >
-      <b-form-input 
+    <b-form-group label="Show this text first">
+      <b-form-input
         v-if="node.typeData.questionId"
         v-model="node.typeData.precedingText"
         data-qa="follow-up-text"
         :placeholder="originalQuestionText"
         description="If empty, will default to the original question text"
-        >
-        </b-form-input>
+      ></b-form-input>
     </b-form-group>
   </div>
 </template>
@@ -78,14 +72,12 @@ export default {
 
       return questions
     },
-    originalQuestionText(){
+    originalQuestionText() {
       return this.availableQuestions.find(
         question => question.id === this.node.typeData.questionId
       ).text
-
     },
   },
-
 }
 </script>
 

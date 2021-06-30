@@ -18,10 +18,10 @@
             {{ question.followUp.text || "Previously, you said:" }}
           </h3>
           <tapestry-activity
-            v-for="answer in previousQuestionAnswers"
-            :key="answer.type"
-            :type="answer.type"
-            :answerData="answer.answerData"
+            v-for="previousAnswer in previousQuestionAnswers"
+            :key="previousAnswer.type"
+            :type="previousAnswer.type"
+            :answerData="previousAnswer.answerData"
             :question="getQuestion(question.followUp.questionId)"
           ></tapestry-activity>
         </div>
@@ -138,7 +138,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getAnswers", "getQuestion"]),
+    ...mapGetters(["getAnswers"]),
     ...mapState(["userAnswers"]),
     isLoggedIn() {
       return wp.isLoggedIn()

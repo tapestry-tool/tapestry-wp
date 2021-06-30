@@ -41,7 +41,7 @@ describe("Activity", () => {
       cy.submitModal()
       cy.openLightbox(node.id)
 
-      cy.route("POST", "**/quiz*").as("submit")
+      cy.route("POST", "/users/activity/**").as("submit")
 
       cy.lightbox().within(() => {
         const dataTransfer = new DataTransfer()
@@ -105,7 +105,7 @@ describe("Activity", () => {
       cy.submitModal()
       cy.openLightbox(node.id)
 
-      cy.route("POST", "**/quiz*").as("submit")
+      cy.route("POST", "/users/activity/**").as("submit")
 
       cy.lightbox().within(() => {
         //cy.get("input").type(answer)
@@ -137,6 +137,7 @@ describe("Activity", () => {
 
     cy.getSelectedNode().then(node => {
       cy.openModal("edit", node.id)
+
       cy.changeMediaType("activity")
 
       const question = `Put Colors into the right bucket`

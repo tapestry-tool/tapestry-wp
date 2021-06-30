@@ -6,33 +6,22 @@
       class="answer-container mx-auto mb-3"
       data-qa="answer-display"
     >
-      <h2 v-if="answer.precedingText">{{ answer.precedingText }}</h2>
-      <h2 v-else>{{ question.text }}</h2>
-        
-      </h4>
-      <b-tabs>
-        <b-tab 
-          v-for="questionAnswer in answers"
-          :key="questionAnswer.type"
-          title-link-class="answer-tab-link-title" 
-        >
+      <h4>{{ answer.precedingText || question.text }}</h4>
+      <b-tabs vertical no-nav-style nav-class="nav-tablist">
+        <b-tab v-for="questionAnswer in answers" :key="questionAnswer.type">
           <template #title>
             <div class="icon">
               <tapestry-icon :icon="questionAnswer[0]" />
-              {{ questionAnswer[0] }}
             </div>
           </template>
           <tapestry-activity
             v-if="questionAnswer[0] === 'audio'"
             :type="questionAnswer[0]"
-            :show-icon="true"
             :answerData="getFullUrl(questionAnswer[1].url)"
-            class="tab-content"
           ></tapestry-activity>
           <tapestry-activity
             v-else
             :type="questionAnswer[0]"
-            :show-icon="false"
             :answerData="questionAnswer[1]"
             :question="question"
             class="tab-content"
@@ -95,7 +84,14 @@ export default {
   },
 }
 </script>
-
+<style lang="scss">
+.nav-tablist a {
+  color: #777;
+  &.active {
+    color: #fff;
+  }
+}
+</style>
 <style lang="scss" scoped>
 .media-wrapper {
   position: relative;
@@ -109,15 +105,11 @@ export default {
   justify-content: center;
 }
 .answers {
-  color: white;
+  color: #fff;
   margin-top: 15px;
 }
 .answer-container {
   width: 75%;
   margin-top: 20px;
-}
-
-.answer-tab-link-title:not(.active) > div {
-  color: white;
 }
 </style>

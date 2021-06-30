@@ -79,12 +79,13 @@ export default {
 <style lang="scss" scoped>
 .tapestry-activity {
   background: #262626;
-  border-radius: 0 0 8px 8px;
+  border-radius: 8px;
   margin-bottom: 8px;
   padding: 8px 16px 8px 16px;
-
   .text {
     text-align: left;
+    padding-left: 1em;
+    border-left: solid 1px #666;
   }
 }
 
