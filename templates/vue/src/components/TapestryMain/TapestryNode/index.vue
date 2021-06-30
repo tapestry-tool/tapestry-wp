@@ -319,6 +319,10 @@ export default {
   },
   mounted() {
     this.$emit("mounted")
+    if (this.root) {
+      this.$el.focus()
+      this.$el.blur()
+    }
     this.$refs.circle.setAttribute("r", this.radius)
     const nodeRef = this.$refs.node
     d3.select(nodeRef).call(
