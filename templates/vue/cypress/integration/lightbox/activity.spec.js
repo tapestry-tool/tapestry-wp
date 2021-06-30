@@ -9,7 +9,6 @@ describe("Activity", () => {
 
       const question = `Question Number 1`
       const fromBucketLabel1 = "From bucket 1"
-      const fromBucketLabel2 = "From bucket 2"
       const toBucketLabel1 = "To bucket 1"
       const toBucketLabel2 = "To bucket 2"
 
@@ -29,18 +28,7 @@ describe("Activity", () => {
         .getByTestId("import-file-input")
         .attachFile("reddit.png")
 
-      cy.getByTestId("add-from-bucket-button").click({ force: true })
-      cy.getByTestId("from-bucket-label-2")
-        .click({ force: true })
-        .type(fromBucketLabel2)
-      cy.getByTestId("add-bucket-item-button-2").click({ force: true })
-
-      cy.getByTestId("bucket-item-thumbnail-2")
-        .getByTestId("import-file-input")
-        .attachFile("reddit.png")
-
       cy.getByTestId("bucket-item-text-1").type("item 1")
-      cy.getByTestId("bucket-item-text-2").type("item 2")
 
       cy.getByTestId("to-bucket-label-200")
         .click({ force: true })
@@ -59,8 +47,6 @@ describe("Activity", () => {
         const dataTransfer = new DataTransfer()
         cy.getByTestId("user-bucket-item-1").trigger("dragstart", { dataTransfer })
         cy.getByTestId("user-to-bucket-200").trigger("drop", { dataTransfer })
-        cy.getByTestId("user-bucket-item-2").trigger("dragstart", { dataTransfer })
-        cy.getByTestId("user-to-bucket-201").trigger("drop", { dataTransfer })
 
         cy.contains(/submit/i).click()
         cy.contains("Thanks!").should("be.visible")
