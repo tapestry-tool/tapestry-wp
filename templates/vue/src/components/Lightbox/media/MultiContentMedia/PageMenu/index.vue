@@ -35,20 +35,23 @@
           },
         ]"
       >
-        <ul
-          v-for="(menu, index) in menuGroups"
-          :key="index"
-          class="page-menu-item fa-ul"
-        >
-          <page-menu-item
-            v-for="row in menu"
-            :key="row.node.id"
-            :node="row.node"
-            :lockRows="lockRows"
-            :disabled="disabledRow(row.node)"
-            @scroll-to="scrollToRef"
-          />
-        </ul>
+        <div v-for="(menu, index) in menuGroups" :key="index" class="menu-wrapper">
+          <b-card class="menu">
+            <ul class="page-menu-item fa-ul">
+              <!-- <b-collapse id="`collapse-${index}`" class="mt-2"> -->
+              <page-menu-item
+                v-for="row in menu"
+                :key="row.node.id"
+                :node="row.node"
+                :lockRows="lockRows"
+                :disabled="disabledRow(row.node)"
+                style="z-index: 10"
+                @scroll-to="scrollToRef"
+              />
+              <!-- </b-collapse> -->
+            </ul>
+          </b-card>
+        </div>
       </div>
     </aside>
   </div>
@@ -191,7 +194,7 @@ export default {
 .page-nav-wrapper {
   .page-nav {
     position: relative;
-    color: white;
+    color: black;
     background: #5d656c;
     padding: 2.2rem 1.5rem;
     transform: translateY(0);
@@ -274,6 +277,12 @@ export default {
         display: none;
       }
     }
+  }
+
+  .menu {
+    z-index: 100;
+    position: relative;
+    float: none;
   }
 }
 </style>
