@@ -181,15 +181,6 @@ export default {
       })
     },
   },
-  getRows(node) {
-    return node.childOrdering.map(id => {
-      const node = this.getNode(id)
-      const children = this.isMultiContent(node.id)
-        ? node.childOrdering.map(this.getNode)
-        : this.getDirectChildren(id).map(this.getNode)
-      return { node, children }
-    })
-  },
 }
 </script>
 
