@@ -8,7 +8,7 @@
         :data-qa="`bucket-item-backgroundcolor-${bucketItem.id}`"
         @change="handleItemColorChange"
       />
-      <b-form-group v-if="question.answerTypes.dragDrop.useImages">
+      <b-form-group v-if="useImages">
         <file-upload
           v-model="bucketItem.imageurl"
           input-test-id="node-bucketitem-thumbnail-url"
@@ -58,6 +58,10 @@ export default {
       required: true,
     },
     removeItemPresent: {
+      type: Boolean,
+      required: true,
+    },
+    useImages: {
       type: Boolean,
       required: true,
     },

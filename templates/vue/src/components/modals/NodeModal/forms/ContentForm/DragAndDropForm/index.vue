@@ -23,6 +23,7 @@
         :isFromBucket="true"
         :fromBucketArray="fromBuckets"
         :toBucketArray="toBuckets"
+        :useImages="useImages"
         :data-qa="`from-bucket-${bucket.id}`"
         @remove="fromBuckets.splice(bucketIndex, 1)"
         @add="addNewFromBucketItem(bucketIndex)"
@@ -49,6 +50,7 @@
         :isFromBucket="false"
         :fromBucketArray="fromBuckets"
         :toBucketArray="toBuckets"
+        :useImages="useImages"
         :data-qa="`to-bucket-${bucket.id}`"
         @remove="toBuckets.splice(index, 1)"
       />

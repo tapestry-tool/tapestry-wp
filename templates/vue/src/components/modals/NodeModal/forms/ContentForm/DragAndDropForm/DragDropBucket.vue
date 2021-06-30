@@ -9,6 +9,7 @@
           :node="node"
           :question="question"
           :bucketItem="item"
+          :useImages="useImages"
           :data-qa="`bucket-item-${bucket.id}-${item.id}`"
           :removeItemPresent="removeButtonItemPresent"
           @remove="bucket.itemArray.splice(index, 1)"
@@ -97,6 +98,10 @@ export default {
     },
     toBucketArray: {
       type: Array,
+      required: true,
+    },
+    useImages: {
+      type: Boolean,
       required: true,
     },
   },
