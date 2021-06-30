@@ -1,6 +1,5 @@
 <template>
   <div class="question">
-    <p>question data is {{ question }}</p>
     <button
       v-if="formOpened && enabledAnswerTypes.length > 1"
       class="button-nav m-auto"
@@ -23,6 +22,7 @@
             :key="answer.type"
             :type="answer.type"
             :answerData="answer.answerData"
+            :question="getQuestion(question.followUp.questionId)"
           ></tapestry-activity>
         </div>
         <div v-else>
@@ -138,7 +138,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getAnswers"]),
+    ...mapGetters(["getAnswers", "getQuestion"]),
     ...mapState(["userAnswers"]),
     isLoggedIn() {
       return wp.isLoggedIn()
@@ -168,6 +168,9 @@ export default {
             if (key === "text") {
               var tempObj = { type: key, answerData: value }
               previousAnswers.push(tempObj)
+            } else if (key === "dragDrop") {
+              var dragDropObj = { type: key, answerData: value }
+              previousAnswers.push(dragDropObj)
             } else {
               var tempAudioObj = {
                 type: key,
@@ -228,7 +231,6 @@ export default {
   },
   created() {
     this.answers = this.getAnswers(this.node.id, this.question.id)
-    console.log("this.answers is", this.answers)
   },
   mounted() {
     this.openFormIfSingle()
@@ -286,10 +288,6 @@ export default {
           break
         }
       }
-      console.log("submitted answer is", submittedAnswer)
-      console.log("answer type is", this.formType)
-      console.log("node id is", this.node.id)
-      console.log("question id is", this.question.id)
       await this.completeQuestion({
         nodeId: this.node.id,
         questionId: this.question.id,

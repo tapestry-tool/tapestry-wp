@@ -2,6 +2,9 @@
   <b-container class="tapestry-activity">
     <b-row align-v="center" style="min-height:150px;">
       <b-col v-if="showIcon" align-self="center" cols="2">
+        <div v-if="type === 'dragDrop'" class="dragdropicon">
+          <img :src="dragDropIcon" />
+        </div>
         <tapestry-icon :icon="type" />
       </b-col>
       <b-col v-if="type === 'text'" align-self="center">
@@ -12,11 +15,23 @@
       <b-col v-if="type === 'audio'" align-self="center">
         <audio controls :src="answerData"></audio>
       </b-col>
+      <b-col v-if="type === 'dragDrop'" align-self="center">
+        <ul class="flexContainer">
+          <li
+            v-for="answer in getDragDropBuckets"
+            :key="answer.index"
+            class="flexItem"
+          >
+            <previous-activity-bucket :bucket="answer" :question="question" />
+          </li>
+        </ul>
+      </b-col>
     </b-row>
   </b-container>
 </template>
 
 <script>
+import PreviousActivityBucket from "./PreviousActivityBucket"
 import TapestryIcon from "@/components/common/TapestryIcon"
 import DragDropIcon from "@/assets/icons/drag_drop.svg"
 import { data } from "@/services/wp"
@@ -25,6 +40,7 @@ export default {
   name: "tapestry-activity",
   components: {
     TapestryIcon,
+    PreviousActivityBucket,
   },
   props: {
     type: {
@@ -33,8 +49,13 @@ export default {
       validator: val => ["text", "audio", "dragDrop"].includes(val),
     },
     answerData: {
-      type: [String, Array],
+      type: [String, Array, Object],
       required: true,
+    },
+    question: {
+      type: Object,
+      required: false,
+      default: () => ({}),
     },
     showIcon: {
       type: Boolean,
@@ -45,6 +66,11 @@ export default {
   computed: {
     dragDropIcon() {
       return `${data.vue_uri}/${DragDropIcon.split("dist")[1]}`
+    },
+    getDragDropBuckets() {
+      return this.answerData.toBucketArray.filter(
+        toBucket => toBucket.itemArray.length > 0
+      )
     },
   },
 }
@@ -62,10 +88,18 @@ export default {
   }
 }
 
+.flexContainer {
+  display: flex;
+  margin-left: 30px;
+}
+.flexItem {
+  margin-right: 20px;
+}
+
 .dragdropicon {
   height: 30px;
   width: 30px;
   position: absolute;
-  left: 8px;
+  top: 150px;
 }
 </style>
