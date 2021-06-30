@@ -35,9 +35,13 @@
           },
         ]"
       >
-        <ul class="page-menu-item fa-ul">
+        <ul
+          v-for="(menu, index) in menuGroups"
+          :key="index"
+          class="page-menu-item fa-ul"
+        >
           <page-menu-item
-            v-for="row in rows"
+            v-for="row in menu"
             :key="row.node.id"
             :node="row.node"
             :lockRows="lockRows"
@@ -94,6 +98,21 @@ export default {
           : this.getDirectChildren(id).map(this.getNode)
         return { node, children }
       })
+    },
+    menuGroups() {
+      const menu = []
+      const mainMenu = []
+      this.rows.forEach(row => {
+        if (row.node.typeData.isSecondaryNode) {
+          let subMenu = []
+          subMenu.push(row)
+          menu.push(subMenu)
+        } else {
+          mainMenu.push(row)
+        }
+      })
+      menu.unshift(mainMenu)
+      return menu
     },
     lockRows() {
       return this.node.typeData.lockRows
@@ -155,6 +174,15 @@ export default {
         }
       })
     },
+  },
+  getRows(node) {
+    return node.childOrdering.map(id => {
+      const node = this.getNode(id)
+      const children = this.isMultiContent(node.id)
+        ? node.childOrdering.map(this.getNode)
+        : this.getDirectChildren(id).map(this.getNode)
+      return { node, children }
+    })
   },
 }
 </script>
