@@ -39,7 +39,6 @@ class TapestryNode implements ITapestryNode
     private $backgroundColor;
     private $textColor;
     private $skippable;
-    private $quiz;
     private $fullscreen;
     private $childOrdering;
     private $fitWindow;
@@ -48,6 +47,7 @@ class TapestryNode implements ITapestryNode
     private $references;
     private $mapCoordinates;
     private $isDyad;
+    private $popup;
 
     /**
      * Constructor.
@@ -89,7 +89,6 @@ class TapestryNode implements ITapestryNode
         $this->backgroundColor = '#8396a1';
         $this->textColor = 'white';
         $this->skippable = true;
-        $this->quiz = [];
         $this->fullscreen = false;
         $this->childOrdering = [];
         $this->fitWindow = true;
@@ -101,6 +100,7 @@ class TapestryNode implements ITapestryNode
             'lng' => '',
         ];
         $this->isDyad = false;
+        $this->popup = null;
 
         if (TapestryHelpers::isValidTapestryNode($this->nodeMetaId)) {
             $node = $this->_loadFromDatabase();
@@ -226,9 +226,6 @@ class TapestryNode implements ITapestryNode
         if (isset($node->skippable) && is_bool($node->skippable)) {
             $this->skippable = $node->skippable;
         }
-        if (isset($node->quiz) && is_array($node->quiz)) {
-            $this->quiz = $node->quiz;
-        }
         if (isset($node->fullscreen) && is_bool($node->fullscreen)) {
             $this->fullscreen = $node->fullscreen;
         }
@@ -252,6 +249,9 @@ class TapestryNode implements ITapestryNode
         }
         if (isset($node->mapCoordinates) && is_object($node->mapCoordinates)) {
             $this->mapCoordinates = $node->mapCoordinates;
+        }
+        if (property_exists($node, 'popup')) {
+            $this->popup = $node->popup;
         }
     }
 
@@ -355,7 +355,6 @@ class TapestryNode implements ITapestryNode
     public function getMeta()
     {
         $node = $this->get();
-        $node->quiz = [];
         $node->typeData = (object) [
             'progress' => [
                 0 => [
@@ -370,14 +369,6 @@ class TapestryNode implements ITapestryNode
         ];
 
         return $node;
-    }
-
-    public function getContent()
-    {
-        return [
-            'quiz' => (array) $this->quiz,
-            'typeData' => $this->typeData,
-        ];
     }
 
     public function isAvailableToUser($userId = 0)
@@ -583,7 +574,6 @@ class TapestryNode implements ITapestryNode
             'backgroundColor' => $this->backgroundColor,
             'textColor' => $this->textColor,
             'skippable' => $this->skippable,
-            'quiz' => $this->quiz,
             'fullscreen' => $this->fullscreen,
             'conditions' => $this->conditions,
             'childOrdering' => $this->childOrdering,
@@ -593,6 +583,7 @@ class TapestryNode implements ITapestryNode
             'references' => $this->references,
             'mapCoordinates' => $this->mapCoordinates,
             'isDyad' => $this->isDyad,
+            'popup' => $this->popup,
         ];
     }
 
@@ -603,7 +594,6 @@ class TapestryNode implements ITapestryNode
             'title' => $node->title,
             'permissions' => $node->permissions,
             'coordinates' => $node->coordinates,
-            'quiz' => $node->quiz,
         ];
     }
 

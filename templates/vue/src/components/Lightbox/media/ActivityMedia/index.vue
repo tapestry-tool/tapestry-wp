@@ -1,7 +1,13 @@
 <template>
-  <div class="activity-screen">
+  <div ref="activity" class="activity-media">
+    <h1 v-if="showTitle" class="media-title">{{ node.title }}</h1>
     <completion-screen v-if="showCompletionScreen" :question="activeQuestion">
-      <button v-if="hasNext" class="button-completion" @click="next">
+      <button
+        v-if="hasNext"
+        class="button-completion"
+        data-qa="completion-next-button"
+        @click="next"
+      >
         <i class="fas fa-arrow-circle-right fa-4x"></i>
         <p>Next question</p>
       </button>
@@ -15,14 +21,24 @@
       :question="activeQuestion"
       :node="node"
       @submit="handleSubmit"
-      @back="$emit('back')"
+      @back="$emit('close')"
     ></question>
     <footer v-if="!showCompletionScreen" class="question-footer">
       <p class="question-step">{{ currentQuestionText }}</p>
-      <button class="button-nav" :disabled="!hasPrev" @click="prev">
+      <button
+        v-if="questions.length > 1"
+        class="button-nav"
+        :disabled="!hasPrev"
+        @click="prev"
+      >
         <i class="fas fa-arrow-left"></i>
       </button>
-      <button class="button-nav" :disabled="!hasNext" @click="next">
+      <button
+        v-if="questions.length > 1"
+        class="button-nav"
+        :disabled="!hasNext"
+        @click="next"
+      >
         <i class="fas fa-arrow-right"></i>
       </button>
     </footer>
@@ -33,18 +49,28 @@
 import client from "@/services/TapestryAPI"
 import Question from "./Question"
 import CompletionScreen from "./CompletionScreen"
-import { mapGetters } from "vuex"
+import { mapActions, mapGetters } from "vuex"
+import * as wp from "@/services/wp"
 
 export default {
-  name: "activity-screen",
+  name: "activity-media",
   components: {
     CompletionScreen,
     Question,
   },
   props: {
-    id: {
-      type: [Number, String],
+    node: {
+      type: Object,
       required: true,
+    },
+    dimensions: {
+      type: Object,
+      required: true,
+    },
+    context: {
+      type: String,
+      required: false,
+      default: "",
     },
   },
   data() {
@@ -54,30 +80,67 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getNode"]),
-    node() {
-      return this.getNode(this.id)
+    ...mapGetters(["getAnswers"]),
+    showTitle() {
+      return this.context === "page" && this.node.typeData.showTitle !== false
     },
-    quiz() {
-      return this.node.quiz
+    questions() {
+      return this.node.typeData.activity.questions
     },
     activeQuestion() {
-      return this.quiz[this.activeQuestionIndex]
+      return this.questions[this.activeQuestionIndex]
     },
     currentQuestionText() {
-      return `${this.activeQuestionIndex + 1}/${this.quiz.length}`
+      return `${this.activeQuestionIndex + 1}/${this.questions.length}`
     },
     hasNext() {
-      return this.activeQuestionIndex !== this.quiz.length - 1
+      return this.activeQuestionIndex !== this.questions.length - 1
     },
     hasPrev() {
       return this.activeQuestionIndex !== 0
     },
+    performDyadNodeCheck() {
+      return wp.getCurrentUser().roles.includes("copilot") || !this.node.isDyad
+    },
+  },
+  mounted() {
+    this.$emit("change:dimensions", {
+      width: this.dimensions.width,
+      height: this.$refs.activity.clientHeight - 100,
+    })
+    this.$emit("load")
+  },
+  created() {
+    this.markQuestionsComplete()
   },
   methods: {
+    ...mapActions(["updateNodeProgress"]),
+    markQuestionsComplete() {
+      for (let i = 0; i < this.questions.length; i++) {
+        const currentQuestion = this.questions[i]
+        const currentQuestionAnswer = this.getAnswers(
+          this.node.id,
+          currentQuestion.id
+        )
+        if (Object.keys(currentQuestionAnswer).length === 0) {
+          currentQuestion.completed = false
+        } else {
+          currentQuestion.completed = true
+        }
+      }
+    },
     handleSubmit() {
       this.showCompletionScreen = true
-      this.$emit("submit")
+      const numberCompleted = this.questions.filter(question => question.completed)
+        .length
+      const progress = numberCompleted / this.node.typeData.activity.questions.length
+      if (this.performDyadNodeCheck()) {
+        this.updateNodeProgress({ id: this.node.id, progress }).then(() => {
+          if (progress === 1) {
+            this.$emit("complete")
+          }
+        })
+      }
     },
     next() {
       this.showCompletionScreen = false
@@ -104,21 +167,28 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.activity-screen {
+.activity-media {
   display: flex;
-  background-size: cover;
   flex-direction: column;
   align-items: flex-end;
   justify-content: space-between;
-  position: absolute;
-  left: 0;
-  top: 0;
   width: 100%;
   min-height: 100%;
   background: #111;
   color: #eee;
   z-index: 10;
   padding: 24px;
+
+  .media-title {
+    text-align: left;
+    font-size: 1.75rem;
+    font-weight: 500;
+    margin-bottom: 0.9em;
+
+    :before {
+      display: none;
+    }
+  }
 }
 
 .question-footer {

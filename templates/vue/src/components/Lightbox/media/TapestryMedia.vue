@@ -20,25 +20,24 @@
       @load="handleLoad"
     />
     <video-media
-      v-if="node.mediaFormat === 'mp4'"
-      :autoplay="autoplay"
-      :node="node"
+      v-if="isVideoNode"
       :dimensions="dimensions"
       :context="context"
+      :node-id="nodeId"
+      @change:dimensions="$emit('change:dimensions', $event)"
       @load="handleLoad"
+      @update-progress="updateProgress"
       @complete="complete"
-      @timeupdate="updateProgress"
       @close="$emit('close')"
     />
-    <youtube-media
-      v-if="node.mediaFormat === 'youtube'"
-      :autoplay="autoplay"
-      :node="node"
+    <h5p-media
+      v-if="node.mediaType === 'h5p' && !isVideoNode"
       :dimensions="dimensions"
       :context="context"
+      :node="node"
+      @change:dimensions="$emit('change:dimensions', $event)"
       @load="handleLoad"
       @complete="complete"
-      @timeupdate="updateProgress"
       @close="$emit('close')"
     />
     <external-media
@@ -49,26 +48,6 @@
       @load="handleLoad"
       @complete="complete"
     />
-    <h5p-media
-      v-if="node.mediaFormat === 'h5p'"
-      :autoplay="autoplay"
-      :dimensions="dimensions"
-      :context="context"
-      :node="node"
-      @change:dimensions="$emit('change:dimensions', $event)"
-      @load="handleLoad"
-      @timeupdate="updateProgress"
-      @complete="complete"
-      @close="$emit('close')"
-    />
-    <gravity-form
-      v-if="node.mediaType === 'gravity-form' && !showCompletionScreen"
-      :id="node.typeData.mediaURL"
-      :node="node"
-      :context="context"
-      @submit="handleFormSubmit"
-      @load="handleLoad"
-    ></gravity-form>
     <wp-post-media
       v-if="node.mediaType === 'wp-post'"
       :node="node"
@@ -78,13 +57,14 @@
     ></wp-post-media>
     <activity-media
       v-if="node.mediaType === 'activity'"
+      :dimensions="dimensions"
       :node="node"
       :context="context"
+      @change:dimensions="$emit('change:dimensions', $event)"
       @complete="complete"
       @close="$emit('close')"
       @load="handleLoad"
     />
-    <completion-screen v-if="showCompletionScreen" />
   </div>
 </template>
 
@@ -92,27 +72,21 @@
 import { mapActions, mapGetters } from "vuex"
 import TextMedia from "./TextMedia"
 import VideoMedia from "./VideoMedia"
-import ExternalMedia from "./ExternalMedia"
 import H5PMedia from "./H5PMedia"
+import ExternalMedia from "./ExternalMedia"
 import ActivityMedia from "./ActivityMedia"
-import YouTubeMedia from "./YouTubeMedia"
 import WpPostMedia from "./WpPostMedia"
-import GravityForm from "./common/GravityForm"
-import CompletionScreen from "./common/ActivityScreen/CompletionScreen"
-import * as wp from "./../../../services/wp"
+import * as wp from "@/services/wp"
 
 export default {
   name: "tapestry-media",
   components: {
     TextMedia,
     VideoMedia,
-    ExternalMedia,
     "h5p-media": H5PMedia,
-    GravityForm,
+    ExternalMedia,
     WpPostMedia,
-    CompletionScreen,
     ActivityMedia,
-    "youtube-media": YouTubeMedia,
   },
   props: {
     nodeId: {
@@ -121,22 +95,17 @@ export default {
     },
     dimensions: {
       type: Object,
-      required: true,
+      required: false,
+      default: () => ({}),
     },
     context: {
       type: String,
       required: false,
       default: "lightbox",
     },
-    autoplay: {
-      type: Boolean,
-      required: false,
-      default: true,
-    },
   },
   data() {
     return {
-      showCompletionScreen: false,
       timeSinceLastSaved: new Date(),
     }
   },
@@ -144,6 +113,14 @@ export default {
     ...mapGetters(["getNode"]),
     node() {
       return this.getNode(this.nodeId)
+    },
+    isVideoNode() {
+      if (this.node.mediaType === "h5p" || this.node.mediaFormat === "h5p") {
+        if (this.node.typeData.h5pMeta.library === "H5P.InteractiveVideo") {
+          return true
+        }
+      }
+      return ["mp4", "youtube"].includes(this.node.mediaFormat)
     },
   },
   beforeDestroy() {
@@ -165,25 +142,21 @@ export default {
         },
       })
     },
-    handleFormSubmit() {
-      this.showCompletionScreen = true
-      this.complete()
-    },
     handleLoad(args) {
       this.$emit("load", args)
     },
-    updateProgress(amountViewed) {
+    updateProgress({ amountViewed }) {
       if (this.performDyadNodeCheck()) {
         this.updateNodeProgress({ id: this.nodeId, progress: amountViewed })
       }
     },
-    complete() {
+    complete(nodeId) {
       if (this.performDyadNodeCheck()) {
-        this.$emit("complete")
+        this.$emit("complete", nodeId)
       }
     },
     performDyadNodeCheck() {
-      return wp.getCurrentUser().roles.includes("copilot") || !this.node.isDyad
+      return wp.getCurrentUser().roles.includes("dyad") || !this.node.isDyad
     },
   },
 }

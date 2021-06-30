@@ -231,7 +231,6 @@ export default {
         case "text":
           return "text"
         case "activity":
-        case "gravity-form":
           return "tasks"
         case "url-embed":
           return "window-maximize"

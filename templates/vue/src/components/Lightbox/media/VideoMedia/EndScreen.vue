@@ -1,14 +1,10 @@
 <template>
   <div data-qa="end-screen" class="end-screen">
-    <button v-if="showQuizButton" @click="handleClick($event, 'show-quiz')">
-      <i class="fas fa-question-circle fa-4x"></i>
-      <p>{{ buttonText }}</p>
-    </button>
     <button @click="handleClick($event, 'rewatch')">
       <i class="fas fa-redo fa-4x"></i>
       <p>Rewatch</p>
     </button>
-    <button @click="handleClick($event, 'close')">
+    <button v-if="context == 'lightbox'" @click="handleClick($event, 'close')">
       <i class="far fa-times-circle fa-4x"></i>
       <p>Close</p>
     </button>
@@ -25,14 +21,9 @@ export default {
       type: Object,
       required: true,
     },
-  },
-  computed: {
-    showQuizButton() {
-      return Boolean(this.node.quiz && this.node.quiz.length)
-    },
-    buttonText() {
-      const allDone = this.node.quiz.every(question => question.completed)
-      return allDone ? "Reanswer Question" : "Answer Question"
+    context: {
+      type: String,
+      required: true,
     },
   },
   methods: {
