@@ -37,19 +37,22 @@
       >
         <div v-for="(menu, index) in menuGroups" :key="index" class="menu-wrapper">
           <b-card class="menu">
-            <ul class="page-menu-item fa-ul">
-              <!-- <b-collapse id="`collapse-${index}`" class="mt-2"> -->
-              <page-menu-item
-                v-for="row in menu"
-                :key="row.node.id"
-                :node="row.node"
-                :lockRows="lockRows"
-                :disabled="disabledRow(row.node)"
-                style="z-index: 10"
-                @scroll-to="scrollToRef"
-              />
-              <!-- </b-collapse> -->
-            </ul>
+            <b-card-text v-b-toggle="`collapse-${index}`">
+              Menu {{ index + 1 }}
+            </b-card-text>
+            <b-collapse :id="`collapse-${index}`" class="mt-2">
+              <ul class="page-menu-item fa-ul">
+                <page-menu-item
+                  v-for="row in menu"
+                  :key="row.node.id"
+                  :node="row.node"
+                  :lockRows="lockRows"
+                  :disabled="disabledRow(row.node)"
+                  style="z-index: 10"
+                  @scroll-to="scrollToRef"
+                />
+              </ul>
+            </b-collapse>
           </b-card>
         </div>
       </div>
@@ -279,10 +282,18 @@ export default {
     }
   }
 
+  .menu-wrapper {
+    display: flex;
+    flex-direction: column;
+    margin-top: 8px;
+    margin-bottom: 8px;
+  }
+
   .menu {
     z-index: 100;
     position: relative;
     float: none;
+    background: white;
   }
 }
 </style>
