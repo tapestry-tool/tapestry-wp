@@ -100,7 +100,5 @@ export default {
 .dragdropicon {
   height: 30px;
   width: 30px;
-  position: absolute;
-  top: 150px;
 }
 </style>

@@ -138,7 +138,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getAnswers"]),
+    ...mapGetters(["getAnswers", "getQuestion"]),
     ...mapState(["userAnswers"]),
     isLoggedIn() {
       return wp.isLoggedIn()

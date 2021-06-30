@@ -39,6 +39,6 @@ export default {
   overflow-wrap: break-word;
 }
 .bucketLabel {
-  font-size: 28px;
+  font-size: 23px;
 }
 </style>
