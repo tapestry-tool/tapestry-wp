@@ -1,10 +1,5 @@
 <template>
   <b-form @submit="handleDragDropSubmit">
-    <p>question data is {{ question }}</p>
-    <p>dragDropAnswer is {{ dragDropAnswer }}</p>
-    <p>answer is {{ answer }}</p>
-    <p>toBucketArray is {{ toBucketArray }}</p>
-    <p>fromBucketArray is {{ fromBucketArray }}</p>
     <b-row align-h="between">
       <b-col cols="4">
         <b style="color: #009688">From buckets</b>

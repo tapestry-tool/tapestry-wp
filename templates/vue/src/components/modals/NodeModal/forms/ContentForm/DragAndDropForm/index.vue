@@ -1,6 +1,5 @@
 <template>
   <div>
-    <p>question data is {{ question }}</p>
     <b-form-group>
       <b>From buckets</b>
       <b-form-checkbox v-model="useImages" data-qa="dragdrop-useImages">

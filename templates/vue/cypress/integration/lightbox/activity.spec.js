@@ -13,8 +13,8 @@ describe("Activity", () => {
       const toBucketLabel1 = "To bucket 1"
       const toBucketLabel2 = "To bucket 2"
 
-      cy.contains(/add question/i).click()
-      cy.contains(/question text/i).click()
+      cy.contains(/add question/i).click({ force: true })
+      cy.contains(/question text/i).click({ force: true })
       cy.focused().type(question)
       cy.getByTestId("question-answer-dragdrop").click({ force: true })
       cy.getByTestId("from-bucket-label-1")
