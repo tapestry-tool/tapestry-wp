@@ -53,8 +53,8 @@
     <b-form-group v-if="node.hasSubAccordion" label="Subaccordion Text">
       <b-form-input v-model="node.typeData.subAccordionText"></b-form-input>
     </b-form-group>
-    <b-form-group v-if="isPopupCandidate" label="Popup">
-      <popup-form :node="node" />
+    <b-form-group v-show="isPopupCandidate" label="Popup">
+      <popup-form :node="node" :is-candidate="isPopupCandidate" />
     </b-form-group>
     <b-form-group label="Content Type">
       <b-form-select
@@ -136,10 +136,10 @@ export default {
     return {
       addDesc: false,
       mediaTypes: [
+        { value: "", text: "Select content type" },
         {
           label: "Basic",
           options: [
-            { value: "", text: "Select content type" },
             { value: "text", text: "Text" },
             { value: "video", text: "Video" },
             { value: "h5p", text: "H5P" },
@@ -147,13 +147,11 @@ export default {
             { value: "wp-post", text: "Wordpress Post" },
             { value: "activity", text: "Activity" },
             { value: "multi-content", text: "Multi-Content" },
-          ]
+          ],
         },
         {
           label: "Advanced",
-          options: [
-            { value: "answer", text: "Answer" }
-          ],
+          options: [{ value: "answer", text: "Answer" }],
         },
       ],
       shouldShowTitle: this.node.typeData.showTitle !== false,

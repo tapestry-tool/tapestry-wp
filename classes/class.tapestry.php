@@ -631,7 +631,7 @@ class Tapestry implements ITapestry
                 if (count($H5PURLParts) >= 2) {
                     $H5PId = $H5PURLParts[1];
                     $H5PIndex = array_search($H5PId, array_column($allH5Ps, 'id'));
-                    if ($H5PIndex) {
+                    if ($H5PIndex || 0 == $H5PIndex) {
                         $nodes[$i]->typeData->h5pMeta = $allH5Ps[$H5PIndex];
                     }
                 }

@@ -1,10 +1,6 @@
 <template>
   <b-container class="tapestry-activity">
     <b-row align-v="center" style="min-height:150px;">
-      <b-col v-if="showIcon" align-self="center" cols="2">
-        <tapestry-icon v-if="type === 'multipleChoice'" icon="tasks" />
-        <tapestry-icon v-else :icon="type" />
-      </b-col>
       <b-col v-if="type === 'text'" align-self="center">
         <div class="text">
           {{ answerData }}
@@ -36,13 +32,11 @@
 </template>
 
 <script>
-import TapestryIcon from "@/components/common/TapestryIcon"
 import PreviousActivityChoiceRow from "./PreviousActivityChoiceRow.vue"
 
 export default {
   name: "tapestry-activity",
   components: {
-    TapestryIcon,
     PreviousActivityChoiceRow,
   },
   props: {
@@ -59,11 +53,6 @@ export default {
       type: Object,
       required: false,
       default: () => ({}),
-    },
-    showIcon: {
-      type: Boolean,
-      required: false,
-      default: true,
     },
   },
   methods: {
@@ -96,12 +85,13 @@ export default {
 <style lang="scss" scoped>
 .tapestry-activity {
   background: #262626;
-  border-radius: 0 0 8px 8px;
+  border-radius: 8px;
   margin-bottom: 8px;
   padding: 8px 16px 8px 16px;
-
   .text {
     text-align: left;
+    padding-left: 1em;
+    border-left: solid 1px #666;
   }
 }
 </style>
