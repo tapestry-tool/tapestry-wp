@@ -94,12 +94,7 @@ export default {
     },
   },
   created() {
-    console.log("this.answer is", this.answer)
-    console.log("type of this.answer is", typeof this.answer)
-    //console.log("type of this.answer is", typeof this.answer)
     if (this.answer !== "") {
-      //console.log("initialize backend answer here")
-      console.log("this.answer is", this.answer)
       this.dragDropAnswer = this.answer
       this.initialize()
     }
@@ -107,7 +102,6 @@ export default {
   methods: {
     initialize() {
       for (const toBucket of this.answer.toBucketArray) {
-        console.log("current toBucket is", toBucket)
         for (
           let i = 0;
           i < this.question.answerTypes.dragDrop.toBucketArray.length;
@@ -147,7 +141,6 @@ export default {
       this.isAnswerValid = this.toBucketValidAnswerState
       if (this.isAnswerValid) {
         this.updateDragDropAnswer()
-        console.log("submitted result", this.dragDropAnswer)
         this.$emit("submit", this.dragDropAnswer)
       }
     },

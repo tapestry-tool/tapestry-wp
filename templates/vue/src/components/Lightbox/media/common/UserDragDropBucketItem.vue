@@ -59,9 +59,6 @@ export default {
       e.dataTransfer.setData("itemId", item.id)
       e.dataTransfer.setData("parentBucketId", parentBucket.id)
       e.dataTransfer.setData("isFromBucketItem", isFromBucketItem)
-      console.log(item)
-      console.log(parentBucket)
-      console.log(isFromBucketItem)
     },
   },
 }

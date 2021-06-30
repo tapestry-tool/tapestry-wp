@@ -107,40 +107,27 @@ export default {
       const isFromBucket = booleanValue === "true"
       if (isFromBucket) {
         let parentBucket = this.findBucketInFromBucketArray(parentBucketId)
-        console.log("parent bucket is", parentBucket)
         let item = this.findItemInParentBucketArray(parentBucket, itemId)
-        console.log("about to be added item is", item)
         bucket.itemArray.push(item)
       } else {
-        console.log("move items within to buckets")
         let parentBucket = this.findBucketInToBucketArray(parentBucketId)
-        console.log("parent to bucket is", parentBucket)
         let item = this.findItemInParentBucketArray(parentBucket, itemId)
-        console.log("about to be added item is", item)
         bucket.itemArray.push(item)
       }
     },
     findBucketInFromBucketArray: function(parentBucketId) {
-      console.log("passed in parent bucket id is", parentBucketId)
       let foundBucket = ""
       for (let i = 0; i < this.fromBucketArray.length; i++) {
-        console.log("current from bucket is", this.fromBucketArray[i])
-        console.log("current from bucket id is", this.fromBucketArray[i].id)
         if (this.fromBucketArray[i].id === Number(parentBucketId)) {
-          console.log("got here")
           foundBucket = this.fromBucketArray[i]
         }
       }
       return foundBucket
     },
     findItemInParentBucketArray: function(parentBucket, itemId) {
-      console.log("passed in parent bucket id is", parentBucket)
       let foundItem = ""
       for (let i = 0; i < parentBucket.itemArray.length; i++) {
-        console.log("current parent bucket item is", parentBucket.itemArray[i])
-        console.log("current parent bucket item id is", parentBucket.itemArray[i].id)
         if (parentBucket.itemArray[i].id === Number(itemId)) {
-          console.log("got here")
           foundItem = parentBucket.itemArray[i]
           parentBucket.itemArray.splice(i, 1)
         }
@@ -148,13 +135,9 @@ export default {
       return foundItem
     },
     findBucketInToBucketArray: function(parentBucketId) {
-      console.log("passed in parent bucket id is", parentBucketId)
       let foundBucket = ""
       for (let i = 0; i < this.toBucketArray.length; i++) {
-        console.log("current to bucket is", this.toBucketArray[i])
-        console.log("current to bucket id is", this.toBucketArray[i].id)
         if (this.toBucketArray[i].id === Number(parentBucketId)) {
-          console.log("got here")
           foundBucket = this.toBucketArray[i]
         }
       }
