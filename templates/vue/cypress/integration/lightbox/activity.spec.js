@@ -35,14 +35,11 @@ describe("Activity", () => {
         .type(fromBucketLabel2)
       cy.getByTestId("add-bucket-item-button-2").click({ force: true })
 
-      cy.getByTestId("bucket-item-useimage-2").click({ force: true })
       cy.getByTestId("bucket-item-thumbnail-2")
         .getByTestId("import-file-input")
         .attachFile("reddit.png")
 
-      cy.getByTestId("bucket-item-usetext-1").click({ force: true })
       cy.getByTestId("bucket-item-text-1").type("item 1")
-      cy.getByTestId("bucket-item-usetext-2").click({ force: true })
       cy.getByTestId("bucket-item-text-2").type("item 2")
 
       cy.getByTestId("to-bucket-label-200")
@@ -59,7 +56,6 @@ describe("Activity", () => {
       cy.route("POST", "**/quiz*").as("submit")
 
       cy.lightbox().within(() => {
-        //cy.get("input").type(answer)
         const dataTransfer = new DataTransfer()
         cy.getByTestId("user-bucket-item-1").trigger("dragstart", { dataTransfer })
         cy.getByTestId("user-to-bucket-200").trigger("drop", { dataTransfer })
@@ -67,10 +63,6 @@ describe("Activity", () => {
         cy.getByTestId("user-to-bucket-201").trigger("drop", { dataTransfer })
 
         cy.contains(/submit/i).click()
-        cy.contains(/submitting/i).should("be.visible")
-
-        cy.wait("@submit")
-
         cy.contains("Thanks!").should("be.visible")
         cy.contains(/done/i).click()
       })
