@@ -6,7 +6,7 @@
       :is-sidebar-open="isSidebarOpen"
       data-qa="tapestry-map"
     />
-    <tapestry-main v-else ref="graph" :viewBox="viewBox" />
+    <tapestry-main v-else-if="showTapestry" ref="graph" :viewBox="viewBox" />
   </div>
 </template>
 
@@ -18,6 +18,7 @@ import TapestryMain from "./TapestryMain"
 import { mapMutations, mapState } from "vuex"
 import TapestryMap from "./TapestryMap"
 import Helpers from "@/utils/Helpers"
+import { getCurrentUser } from "@/services/wp"
 
 export default {
   components: {
@@ -33,6 +34,20 @@ export default {
   },
   computed: {
     ...mapState(["nodes", "links", "selection", "settings", "rootId"]),
+    showTapestry() {
+      const user = getCurrentUser()
+      const isAdmin = user.roles.some(role => role === "administrator")
+
+      if (!isAdmin && this.settings.tydeModeEnabled) {
+        const rootNode = this.nodes[this.rootId]
+        const hasEditPermissions = user.roles.some(role => {
+          return rootNode.permissions[role].some(premission => premission === "edit")
+        })
+
+        return hasEditPermissions
+      }
+      return true
+    },
     isSidebarOpen() {
       return Boolean(this.$route.query.sidebar)
     },
