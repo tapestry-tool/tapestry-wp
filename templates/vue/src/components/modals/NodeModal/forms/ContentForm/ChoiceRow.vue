@@ -1,19 +1,19 @@
 <template>
   <div v-if="multipleAnswerSelected" class="container">
     <span id="handle" v-handle class="fas fa-bars fa-s"></span>
-    <b-form-checkbox :value="item.id">
-      <b-form-group v-if="useImages">
-        <file-upload
-          v-model="item.imageurl"
-          input-test-id="node-choiceRow-thumbnail-url"
-          :data-qa="`choicerow-checkbox-thumbnail-${item.id}`"
-          :show-url-upload="false"
-          :show-image-preview="true"
-          file-types="image/*"
-          @isUploading="handleUploadChange"
-        />
-      </b-form-group>
-    </b-form-checkbox>
+    <b-form-checkbox :value="item.id" />
+    <b-form-group v-if="useImages">
+      <file-upload
+        v-model="item.imageurl"
+        input-test-id="node-choiceRow-thumbnail-url"
+        :data-qa="`choicerow-checkbox-thumbnail-${item.id}`"
+        :show-url-upload="false"
+        :show-image-preview="true"
+        :compact-mode="true"
+        file-types="image/*"
+        @isUploading="handleUploadChange"
+      />
+    </b-form-group>
     <div :class="useImages ? 'inputContainerImage' : 'inputContainer'">
       <b-form-input
         v-model="item.value"
