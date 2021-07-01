@@ -20,6 +20,8 @@ import TapestryMap from "./TapestryMap"
 import Helpers from "@/utils/Helpers"
 import { getCurrentUser } from "@/services/wp"
 
+const currentUser = getCurrentUser()
+
 export default {
   components: {
     TapestryMap,
@@ -30,17 +32,17 @@ export default {
     return {
       loading: true,
       viewBox: "2200 2700 1600 1100",
+      currentUser: null,
     }
   },
   computed: {
     ...mapState(["nodes", "links", "selection", "settings", "rootId"]),
     showTapestry() {
-      const user = getCurrentUser()
-      const isAdmin = user.roles.some(role => role === "administrator")
+      const isAdmin = currentUser.roles.some(role => role === "administrator")
 
       if (!isAdmin && this.settings.tydeModeEnabled) {
         const rootNode = this.nodes[this.rootId]
-        const hasEditPermissions = user.roles.some(role => {
+        const hasEditPermissions = currentUser.roles.some(role => {
           return rootNode.permissions[role].some(premission => premission === "edit")
         })
 
@@ -71,9 +73,21 @@ export default {
       this.editNode(id)
     })
     client.recordAnalyticsEvent("app", "load", "tapestry")
+    /* NOTE: Opening the default Node for a specific role 
+             in fullscreen only if this role cannot edit the 
+             default node, otherwise the regular tapestry will
+             open
+    */
+    if (this.settings.tydeModeEnabled) {
+      const userMainRole = currentUser.roles[0] || "public"
+      const defaultNodeId = this.settings.tydeModeDefualtNodes[userMainRole]
+      this.setTydeMode(true)
+      this.openNode(defaultNodeId)
+    }
   },
+  created() {},
   methods: {
-    ...mapMutations(["select", "unselect", "clearSelection"]),
+    ...mapMutations(["select", "unselect", "clearSelection", "setTydeMode"]),
     updateViewBox() {
       const MAX_RADIUS = 240
       const MIN_TAPESTRY_WIDTH_FACTOR = 1.5

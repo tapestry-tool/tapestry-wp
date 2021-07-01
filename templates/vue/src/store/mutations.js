@@ -147,3 +147,8 @@ export function addApiError(state, error) {
 export function setTapestryErrorReporting(state, isEnabled) {
   state.displayErrors = isEnabled
 }
+
+// tyde mode
+export function setTydeMode(state, isTydeMode) {
+  state.tydeMode = isTydeMode
+}

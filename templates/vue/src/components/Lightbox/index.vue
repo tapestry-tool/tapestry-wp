@@ -3,12 +3,12 @@
     id="lightbox"
     data-qa="lightbox"
     :class="{
-      'full-screen': node.fullscreen,
+      'full-screen': node.fullscreen || tydeMode,
       'content-text': node.mediaType === 'text' || node.mediaType === 'wp-post',
     }"
     :node-id="nodeId"
     :content-container-style="lightboxContentStyles"
-    :allow-close="canSkip"
+    :allow-close="canSkip && !tydeMode"
     @close="handleUserClose"
   >
     <multi-content-media
@@ -85,7 +85,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(["h5pSettings", "rootId"]),
+    ...mapState(["h5pSettings", "rootId", "tydeMode"]),
     ...mapGetters(["getNode", "isMultiContent", "isMultiContentRow"]),
     node() {
       const node = this.getNode(this.nodeId)
@@ -102,7 +102,7 @@ export default {
         height: this.dimensions.height + "px",
       }
 
-      if (this.node.fullscreen) {
+      if (this.node.fullscreen || this.tydeMode) {
         styles.top = "auto"
         styles.left = "auto"
         styles.width = "100vw"

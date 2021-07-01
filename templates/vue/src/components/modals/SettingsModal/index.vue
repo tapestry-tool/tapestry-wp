@@ -232,7 +232,7 @@
           </b-form-group>
           <b-form-group v-if="tydeModeEnabled">
             <b-row v-for="role in roles" :key="role" style="margin: 17px 0;">
-              <b-col>{{ role }}</b-col>
+              <b-col class="text-capitalize">{{ role }}</b-col>
               <b-col>
                 <combobox
                   v-model="tydeModeDefualtNodes[role]"
@@ -430,9 +430,7 @@ export default {
       return true
     },
     roles() {
-      return Object.keys(defaultPermissions).map(
-        item => item.charAt(0).toUpperCase() + item.slice(1)
-      )
+      return Object.keys(defaultPermissions)
     },
   },
   created() {
