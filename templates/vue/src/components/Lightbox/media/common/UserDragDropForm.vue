@@ -1,5 +1,6 @@
 <template>
   <b-form @submit="handleDragDropSubmit">
+    <p>question data is {{ question }}</p>
     <b-row align-h="between">
       <b-col cols="4">
         <b style="color: #009688">From buckets</b>
@@ -94,6 +95,10 @@ export default {
     },
   },
   created() {
+    console.log(
+      "11 this.question from bucket is",
+      this.question.answerTypes.dragDrop.fromBucketArray
+    )
     if (this.answer !== "") {
       this.dragDropAnswer = this.answer
       this.initialize()
@@ -101,6 +106,12 @@ export default {
   },
   methods: {
     initialize() {
+      // update all imageurls and text fields here
+      console.log("this.answer is", this.answer)
+      console.log(
+        "this.question from bucket is",
+        this.question.answerTypes.dragDrop.fromBucketArray
+      )
       for (const toBucket of this.answer.toBucketArray) {
         for (
           let i = 0;
@@ -110,6 +121,37 @@ export default {
           if (
             this.question.answerTypes.dragDrop.toBucketArray[i].id === toBucket.id
           ) {
+            // update all imageurls and text fields here
+            // update all imageurls and text fields here
+            for (let j = 0; j < toBucket.itemArray.length; j++) {
+              for (
+                let k = 0;
+                k <
+                this.question.answerTypes.dragDrop.toBucketArray[i].itemArray.length;
+                k++
+              ) {
+                if (
+                  toBucket.itemArray[j].id ===
+                  this.question.answerTypes.dragDrop.toBucketArray[i].itemArray[k].id
+                ) {
+                  toBucket.itemArray[
+                    j
+                  ].color = this.question.answerTypes.dragDrop.toBucketArray[
+                    i
+                  ].itemArray[k].color
+                  toBucket.itemArray[
+                    j
+                  ].imageurl = this.question.answerTypes.dragDrop.toBucketArray[
+                    i
+                  ].itemArray[k].imageurl
+                  toBucket.itemArray[
+                    j
+                  ].text = this.question.answerTypes.dragDrop.toBucketArray[
+                    i
+                  ].itemArray[k].text
+                }
+              }
+            }
             this.question.answerTypes.dragDrop.toBucketArray[i].itemArray =
               toBucket.itemArray
           }
@@ -126,6 +168,38 @@ export default {
             this.question.answerTypes.dragDrop.fromBucketArray[i].id ===
             fromBucket.id
           ) {
+            // update all imageurls and text fields here
+            for (let j = 0; j < fromBucket.itemArray.length; j++) {
+              for (
+                let k = 0;
+                k <
+                this.question.answerTypes.dragDrop.fromBucketArray[i].itemArray
+                  .length;
+                k++
+              ) {
+                if (
+                  fromBucket.itemArray[j].id ===
+                  this.question.answerTypes.dragDrop.fromBucketArray[i].itemArray[k]
+                    .id
+                ) {
+                  fromBucket.itemArray[
+                    j
+                  ].color = this.question.answerTypes.dragDrop.fromBucketArray[
+                    i
+                  ].itemArray[k].color
+                  fromBucket.itemArray[
+                    j
+                  ].imageurl = this.question.answerTypes.dragDrop.fromBucketArray[
+                    i
+                  ].itemArray[k].imageurl
+                  fromBucket.itemArray[
+                    j
+                  ].text = this.question.answerTypes.dragDrop.fromBucketArray[
+                    i
+                  ].itemArray[k].text
+                }
+              }
+            }
             this.question.answerTypes.dragDrop.fromBucketArray[i].itemArray =
               fromBucket.itemArray
           }
