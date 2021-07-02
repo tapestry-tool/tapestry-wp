@@ -16,7 +16,7 @@
       v-if="node.mediaType === 'text'"
       :node="node"
       :context="context"
-      :isContentInMultiContent="isContentInMultiContent"
+      :isContentInMultiContent="isMultiContentRow(node.id)"
       @complete="complete"
       @load="handleLoad"
     />
@@ -103,11 +103,6 @@ export default {
       required: false,
       default: "lightbox",
     },
-    isContentInMultiContent: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
   },
   data() {
     return {
@@ -115,7 +110,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getNode"]),
+    ...mapGetters(["getNode", "isMultiContentRow"]),
     node() {
       return this.getNode(this.nodeId)
     },
