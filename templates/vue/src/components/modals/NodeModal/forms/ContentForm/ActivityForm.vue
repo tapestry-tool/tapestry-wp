@@ -217,7 +217,7 @@ import { mapState } from "vuex"
 import Combobox from "@/components/modals/common/Combobox"
 import Helpers from "@/utils/Helpers"
 import RichTextForm from "./RichTextForm"
-import MultipleChoiceForm from "./MultipleChoiceForm.vue"
+import MultipleChoiceForm from "./MultipleChoiceForm"
 
 const defaultQuestion = {
   text: "",

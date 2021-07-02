@@ -2,27 +2,26 @@
   <b-form class="container" @submit="handleMultipleChoiceSubmit">
     <b-form-group v-if="question.answerTypes.multipleChoice.hasMultipleAnswers">
       <b-form-checkbox-group v-model="userSelectedCheckbox">
-        <user-choice-row
+        <multiple-choice-question-item
           v-for="userChoiceRow in question.answerTypes.multipleChoice.checkboxArray"
           :key="userChoiceRow.id"
           :item="userChoiceRow"
           :isCheckBox="question.answerTypes.multipleChoice.hasMultipleAnswers"
           :hasImage="question.answerTypes.multipleChoice.useImages"
           :data-qa="`user-choicerow-checkbox-${userChoiceRow.id}`"
-        ></user-choice-row>
+        ></multiple-choice-question-item>
       </b-form-checkbox-group>
     </b-form-group>
-
     <b-form-group v-else>
       <b-form-radio-group v-model="userSelectedRadio">
-        <user-choice-row
+        <multiple-choice-question-item
           v-for="userChoiceRow in question.answerTypes.multipleChoice.radioArray"
           :key="userChoiceRow.id"
           :item="userChoiceRow"
           :isCheckBox="question.answerTypes.multipleChoice.hasMultipleAnswers"
           :hasImage="question.answerTypes.multipleChoice.useImages"
           :data-qa="`user-choicerow-radio-${userChoiceRow.id}`"
-        ></user-choice-row>
+        ></multiple-choice-question-item>
       </b-form-radio-group>
     </b-form-group>
     <b-form-invalid-feedback
@@ -39,11 +38,11 @@
 </template>
 
 <script>
-import UserChoiceRow from "./UserChoiceRow"
+import MultipleChoiceQuestionItem from "./MultipleChoiceQuestionItem"
 export default {
-  name: "user-multiple-choice-form",
+  name: "multiple-choice-question",
   components: {
-    UserChoiceRow,
+    MultipleChoiceQuestionItem,
   },
   props: {
     node: {

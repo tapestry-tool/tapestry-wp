@@ -11,7 +11,7 @@
 
 <script>
 export default {
-  name: "user-choice-row",
+  name: "completed-multiple-choice-item",
   props: {
     item: {
       type: Object,

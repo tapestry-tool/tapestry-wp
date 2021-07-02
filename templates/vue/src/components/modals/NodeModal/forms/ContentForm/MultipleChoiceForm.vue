@@ -91,7 +91,7 @@
 </template>
 
 <script>
-import ChoiceRow from "./ChoiceRow.vue"
+import ChoiceRow from "./ChoiceRow"
 import { ContainerMixin } from "vue-slicksort"
 const SortableList = {
   mixins: [ContainerMixin],

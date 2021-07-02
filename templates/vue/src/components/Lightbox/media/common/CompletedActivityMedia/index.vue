@@ -12,7 +12,7 @@
       <b-col v-if="type === 'multipleChoice'" align-self="center">
         <ul v-if="question.answerTypes.multipleChoice.hasMultipleAnswers">
           <li v-for="answer in answerData" :key="answer.index">
-            <previous-activity-choice-row
+            <completed-multiple-choice-item
               :item="getMultipleChoiceOptionObject(answer)"
               :useImages="question.answerTypes.multipleChoice.useImages"
             />
@@ -20,7 +20,7 @@
         </ul>
         <ul v-else>
           <li>
-            <previous-activity-choice-row
+            <completed-multiple-choice-item
               :item="getRadioMultipleChoiceOptionObject(answerData)"
               :useImages="question.answerTypes.multipleChoice.useImages"
             />
@@ -32,12 +32,12 @@
 </template>
 
 <script>
-import PreviousActivityChoiceRow from "./PreviousActivityChoiceRow.vue"
+import CompletedMultipleChoiceItem from "./CompletedMultipleChoiceItem"
 
 export default {
   name: "tapestry-activity",
   components: {
-    PreviousActivityChoiceRow,
+    CompletedMultipleChoiceItem,
   },
   props: {
     type: {
