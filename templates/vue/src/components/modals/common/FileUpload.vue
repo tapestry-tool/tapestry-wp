@@ -1,26 +1,28 @@
 <template>
   <b-container fluid class="upload-container px-0">
-    <b-row v-if="isUploading">
-      <b-col cols="auto" class="upload-label mr-auto text-muted">
-        <p>Upload in progress ...</p>
-      </b-col>
-      <b-col cols="auto">
-        <b-button size="sm" variant="light" @click="cancelUpload">
-          Cancel Upload
-        </b-button>
-      </b-col>
-    </b-row>
-    <b-row v-if="isUploading">
-      <b-col class="progress-wrapper">
-        <b-progress
-          data-qa="progress"
-          :value="uploadPercentage"
-          :max="100"
-          :animated="uploadPercentage < 100"
-        ></b-progress>
-      </b-col>
-    </b-row>
-    <b-row v-if="!isUploading">
+    <template v-if="isUploading && !compactMode">
+      <b-row>
+        <b-col cols="auto" class="upload-label mr-auto text-muted">
+          <p>Upload in progress ...</p>
+        </b-col>
+        <b-col cols="auto">
+          <b-button size="sm" variant="light" @click="cancelUpload">
+            Cancel Upload
+          </b-button>
+        </b-col>
+      </b-row>
+      <b-row>
+        <b-col class="progress-wrapper">
+          <b-progress
+            data-qa="progress"
+            :value="uploadPercentage"
+            :max="100"
+            :animated="uploadPercentage < 100"
+          ></b-progress>
+        </b-col>
+      </b-row>
+    </template>
+    <b-row v-if="!isUploading || compactMode">
       <b-col v-if="showImagePreview" class="thumbnail-col">
         <svg
           width="130"
@@ -53,68 +55,118 @@
             No image
           </text>
         </svg>
+        <div v-if="compactMode" class="compact-mode-container">
+          <b-button-group
+            v-if="(value && !changeImage) || isUploading"
+            class="w-100"
+          >
+            <b-button
+              v-if="isUploading"
+              size="sm"
+              variant="light"
+              @click="cancelUpload"
+            >
+              <i class="fas fa-window-close"></i>
+            </b-button>
+            <template v-else>
+              <b-button variant="danger" size="sm" @click="removeImage">
+                <i class="fas fa-trash-alt"></i>
+              </b-button>
+              <b-button variant="light" size="sm" @click="changeImage = true">
+                <i class="fas fa-pencil-alt"></i>
+              </b-button>
+            </template>
+          </b-button-group>
+          <b-form-file
+            v-if="!value || (changeImage && !isUploading)"
+            ref="file"
+            name="async-upload"
+            class="image-file"
+            placeholder="Click to choose a file or drop file here to upload"
+            drop-placeholder="Drop file here..."
+            :accept="fileTypes"
+            :disabled="isUploading"
+            required
+            data-qa="import-file-input"
+            @dragover.prevent
+            @drop.prevent="uploadFile"
+            @change="uploadFile"
+          ></b-form-file>
+          <b-progress
+            v-if="isUploading"
+            data-qa="progress"
+            :value="uploadPercentage"
+            :max="100"
+            :animated="uploadPercentage < 100"
+          ></b-progress>
+        </div>
       </b-col>
       <b-col>
-        <div v-if="showImagePreview && value">
-          <h6>Operations:</h6>
-          <button class="btn btn-outline-danger btn-sm mb-2" @click="removeImage">
-            Remove image
-          </button>
-          <br />
-          <button
-            v-if="!changeImage"
-            class="btn btn-outline-primary btn-sm"
-            @click="changeImage = true"
-          >
-            Change image
-          </button>
-          <h6 v-else>Change image:</h6>
-        </div>
-        <b-row v-if="!showImagePreview || !value || changeImage">
-          <b-col :class="{ 'pr-0': showUrlUpload }">
-            <b-form-file
-              ref="file"
-              name="async-upload"
-              class="image-file"
-              placeholder="Choose a file or drop it here..."
-              drop-placeholder="Drop file here..."
-              :accept="fileTypes"
-              :disabled="isUploading"
-              required
-              data-qa="import-file-input"
-              @dragover.prevent
-              @drop.prevent="uploadFile"
-              @change="uploadFile"
-            ></b-form-file>
-          </b-col>
-          <template v-if="showUrlUpload">
-            <b-col cols="1" class="divider">
-              <h6 class="text-muted">OR</h6>
-            </b-col>
-            <b-col :class="{ 'pl-0': !showImagePreview }">
-              <b-form-input
-                name="text-input"
-                :placeholder="placeholder"
-                :value="value"
-                :data-qa="inputTestId"
-                :data-testid="inputTestId"
+        <div v-if="!compactMode">
+          <div v-if="showImagePreview && value">
+            <h6>Operations:</h6>
+            <b-button
+              class="mb-2"
+              variant="outline-danger"
+              size="sm"
+              @click="removeImage"
+            >
+              Remove image
+            </b-button>
+            <br />
+            <b-button
+              v-if="!changeImage"
+              variant="outline-primary"
+              size="sm"
+              @click="changeImage = true"
+            >
+              Change image
+            </b-button>
+            <h6 v-else>Change image:</h6>
+          </div>
+          <b-row v-if="!showImagePreview || !value || changeImage">
+            <b-col :class="{ 'pr-0': showUrlUpload }">
+              <b-form-file
+                ref="file"
+                name="async-upload"
+                class="image-file"
+                placeholder="Choose a file or drop it here..."
+                drop-placeholder="Drop file here..."
+                :accept="fileTypes"
                 :disabled="isUploading"
                 required
-                @input="$emit('input', $event)"
-              />
+                data-qa="import-file-input"
+                @dragover.prevent
+                @drop.prevent="uploadFile"
+                @change="uploadFile"
+              ></b-form-file>
             </b-col>
-          </template>
-        </b-row>
+            <template v-if="showUrlUpload">
+              <b-col cols="1" class="divider">
+                <h6 class="text-muted">OR</h6>
+              </b-col>
+              <b-col :class="{ 'pl-0': !showImagePreview }">
+                <b-form-input
+                  name="text-input"
+                  :placeholder="placeholder"
+                  :value="value"
+                  :data-qa="inputTestId"
+                  :data-testid="inputTestId"
+                  :disabled="isUploading"
+                  required
+                  @input="$emit('input', $event)"
+                />
+              </b-col>
+            </template>
+          </b-row>
+        </div>
       </b-col>
     </b-row>
-    <b-alert v-if="error" show variant="danger">
-      File upload failed: {{ error.message || error.data.message }}
-    </b-alert>
-    <b-alert v-else-if="!confirmedUpload" show variant="success">
+    <b-alert v-if="!compactMode && !confirmedUpload" show variant="success">
       <b-row>
         <b-col cols="auto" class="upload-label mr-auto text-muted">
-          Upload completed successfully. Press the "Submit" button to save your
-          changes.
+          Upload completed successfully. Make sure to publish / save to keep this
+          image.
         </b-col>
         <b-col cols="auto">
           <b-button size="sm" variant="secondary" @click="confirmUpload">
@@ -128,6 +180,7 @@
 
 <script>
 import axios from "axios"
+import { mapMutations } from "vuex"
 import { data as wpData } from "@/services/wp"
 
 export default {
@@ -169,6 +222,11 @@ export default {
       required: false,
       default: "",
     },
+    compactMode: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   data() {
     return {
@@ -192,6 +250,7 @@ export default {
     }
   },
   methods: {
+    ...mapMutations(["addApiError"]),
     uploadFile(event) {
       const formData = new FormData()
       formData.append("action", "upload-attachment")
@@ -256,7 +315,10 @@ export default {
         .finally(() => {
           if (this.isUploading) {
             this.isUploading = false
-            this.confirmedUpload = false
+            this.changeImage = false
+            if (!this.compactMode) {
+              this.confirmedUpload = false
+            }
             setTimeout(() => {
               this.$emit("isUploading", this.isUploading)
             }, 1200)
@@ -297,16 +359,52 @@ export default {
       if (axios.isCancel(error)) {
         console.log("Request canceled", error.message)
       } else {
-        this.error = error
+        const errMsg = error.message || error.data.message
+        this.addApiError({ error: `Unable to upload file: ${errMsg}` })
       }
     },
   },
 }
 </script>
+<style lang="scss">
+.thumbnail-col {
+  .custom-file-label {
+    display: flex;
+    height: 100%;
+    max-height: 100%;
+    overflow: hidden;
+    padding: 0 5px;
+    bottom: auto;
+    align-items: center;
+    text-align: center;
+    font-size: 0.9em;
+    font-weight: bold;
+    color: #fff;
+    background: #393c3ebd;
+    border: none;
+
+    &::after {
+      display: none;
+    }
+  }
+}
+</style>
 <style lang="scss" scoped>
+.compact-mode-container {
+  position: absolute;
+  width: 120px;
+  left: 20px;
+  bottom: 4px;
+}
+
 .thumbnail-col {
   -ms-flex: 0 0 160px;
   flex: 0 0 160px;
+
+  .b-form-file {
+    height: 120px;
+    display: block;
+  }
 }
 
 .image-file {

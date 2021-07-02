@@ -37,6 +37,10 @@ export default {
       type: Boolean,
       required: true,
     },
+    autoplay: {
+      type: Boolean,
+      required: true,
+    },
   },
   data() {
     return {
@@ -133,6 +137,14 @@ export default {
           this.$emit("timeupdate", { amountViewed, currentTime })
         }
         this.lastTime = currentTime
+      }
+    },
+    mounted() {
+      const video = this.$refs.video
+      if (this.autoplay) {
+        video.play()
+      } else {
+        video.pause()
       }
     },
   },
