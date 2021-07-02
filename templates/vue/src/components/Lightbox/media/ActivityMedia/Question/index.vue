@@ -17,12 +17,12 @@
           <h3 class="mb-4">
             {{ question.followUp.text || "Previously, you said:" }}
           </h3>
-          <tapestry-activity
-            v-for="answer in previousQuestionAnswers"
-            :key="answer.type"
-            :type="answer.type"
-            :answerData="answer.answerData"
-          ></tapestry-activity>
+          <completed-activity-media
+            v-for="previousAnswer in previousQuestionAnswers"
+            :key="previousAnswer.type"
+            :type="previousAnswer.type"
+            :answerData="previousAnswer.answerData"
+          ></completed-activity-media>
         </div>
         <div v-else>
           <p>You haven't done the previous activity yet.</p>
@@ -104,7 +104,7 @@ import AudioRecorder from "./AudioRecorder"
 import TextQuestion from "./TextQuestion"
 import ListQuestion from "./ListQuestion"
 import Loading from "@/components/common/Loading"
-import TapestryActivity from "./TapestryActivity"
+import CompletedActivityMedia from "../../common/CompletedActivityMedia"
 import * as wp from "@/services/wp"
 import { data as wpData } from "@/services/wp"
 
@@ -114,9 +114,9 @@ export default {
     AnswerButton,
     AudioRecorder,
     TextQuestion,
-    Loading,
-    TapestryActivity,
     ListQuestion,
+    Loading,
+    CompletedActivityMedia,
   },
   props: {
     question: {
@@ -137,16 +137,10 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getAnswers", "getQuestion"]),
+    ...mapGetters(["getAnswers"]),
     ...mapState(["userAnswers"]),
     isLoggedIn() {
       return wp.isLoggedIn()
-    },
-    lastQuestion() {
-      if (this.question.followUp.questionId !== null) {
-        return this.getQuestion(this.question.followUp.questionId)
-      }
-      return this.getQuestion(this.question.followUp.questionId)
     },
     previousQuestionAnswers() {
       if (this.question.followUp.questionId !== null) {
@@ -199,38 +193,19 @@ export default {
       return ""
     },
     textFormCompleted() {
-      if (this.userAnswers?.[this.node.id]?.activity?.[this.question.id]) {
-        if (
-          this.userAnswers[this.node.id].activity[this.question.id].hasOwnProperty(
-            "answers"
-          )
-        ) {
-          if (
-            this.userAnswers[this.node.id].activity[
-              this.question.id
-            ].answers.hasOwnProperty("text")
-          ) {
-            return true
-          }
-        }
+      if (
+        this.userAnswers?.[this.node.id]?.activity?.[this.question.id]?.answers?.text
+      ) {
+        return true
       }
       return false
     },
     audioFormCompleted() {
-      if (this.userAnswers?.[this.node.id]?.activity?.[this.question.id]) {
-        if (
-          this.userAnswers[this.node.id].activity[this.question.id].hasOwnProperty(
-            "answers"
-          )
-        ) {
-          if (
-            this.userAnswers[this.node.id].activity[
-              this.question.id
-            ].answers.hasOwnProperty("audio")
-          ) {
-            return true
-          }
-        }
+      if (
+        this.userAnswers?.[this.node.id]?.activity?.[this.question.id]?.answers
+          ?.audio
+      ) {
+        return true
       }
       return false
     },

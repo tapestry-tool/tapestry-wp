@@ -6,34 +6,24 @@
       class="answer-container mx-auto mb-3"
       data-qa="answer-display"
     >
-      <h2 v-if="answer.precedingText">{{ answer.precedingText }}</h2>
-      <h2 v-else>{{ question.text }}</h2>
-      <b-tabs>
-        <b-tab
-          v-for="questionAnswer in answers"
-          :key="questionAnswer.type"
-          title-link-class="answer-tab-link-title"
-        >
+      <h4>{{ answer.precedingText || question.text }}</h4>
+      <b-tabs vertical no-nav-style nav-class="nav-tablist">
+        <b-tab v-for="questionAnswer in answers" :key="questionAnswer.type">
           <template #title>
             <div class="icon">
               <tapestry-icon :icon="questionAnswer[0]" />
-              {{ questionAnswer[0] }}
             </div>
           </template>
-          <tapestry-activity
+          <completed-activity-media
             v-if="questionAnswer[0] === 'audio'"
             :type="questionAnswer[0]"
-            :show-icon="true"
             :answerData="getFullUrl(questionAnswer[1].url)"
-            class="tab-content"
-          ></tapestry-activity>
-          <tapestry-activity
+          ></completed-activity-media>
+          <completed-activity-media
             v-else
             :type="questionAnswer[0]"
-            :show-icon="false"
             :answerData="questionAnswer[1]"
-            class="tab-content"
-          ></tapestry-activity>
+          ></completed-activity-media>
         </b-tab>
       </b-tabs>
       <div v-show="!hasAnswer" class="media-wrapper">
@@ -48,14 +38,14 @@
 
 <script>
 import { mapGetters, mapState } from "vuex"
-import TapestryActivity from "./ActivityMedia/TapestryActivity"
+import CompletedActivityMedia from "./common/CompletedActivityMedia"
 import TapestryIcon from "@/components/common/TapestryIcon"
 import { data as wpData } from "@/services/wp"
 
 export default {
   name: "answer-media",
   components: {
-    TapestryActivity,
+    CompletedActivityMedia,
     TapestryIcon,
   },
   props: {
@@ -92,7 +82,14 @@ export default {
   },
 }
 </script>
-
+<style lang="scss">
+.nav-tablist a {
+  color: #777;
+  &.active {
+    color: #fff;
+  }
+}
+</style>
 <style lang="scss" scoped>
 .media-wrapper {
   position: relative;
@@ -106,15 +103,11 @@ export default {
   justify-content: center;
 }
 .answers {
-  color: white;
+  color: #fff;
   margin-top: 15px;
 }
 .answer-container {
   width: 75%;
   margin-top: 20px;
-}
-
-.answer-tab-link-title:not(.active) > div {
-  color: white;
 }
 </style>
