@@ -153,6 +153,7 @@
                   <div class="list-field-options">
                     <b-form-checkbox
                       v-model="question.answerTypes.list.maxFields.enabled"
+                      data-qa="list-max-checkbox"
                       class="list-max-checkbox"
                     ></b-form-checkbox>
                     <div class="list-row-container">
@@ -163,6 +164,7 @@
                         <b-form-input
                           id="min-field"
                           v-model="question.answerTypes.list.minFields"
+                          data-qa="min-list-fields-input"
                           placeholder="Min # of answer fields"
                           type="number"
                           class="list-input"
@@ -176,6 +178,7 @@
                           id="max-field"
                           v-model="question.answerTypes.list.maxFields.value"
                           :disabled="!question.answerTypes.list.maxFields.enabled"
+                          data-qa="max-list-fields-input"
                           placeholder="Max # of answer fields"
                           type="number"
                           class="list-input"

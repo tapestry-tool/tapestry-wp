@@ -270,4 +270,56 @@ describe("Activity", () => {
       cy.lightbox().should("not.exist")
     })
   })
+
+  it("should be able to support maximum allowable answers in the list answer type", () => {
+    cy.fixture("one-node.json").as("oneNode")
+    cy.setup("@oneNode")
+
+    cy.getSelectedNode().then(node => {
+      cy.openModal("edit", node.id)
+      cy.changeMediaType("Activity")
+      cy.contains(/add question/i).click()
+
+      const listQuestion = `Name 100 things.`
+      const listPlaceholder = "Thing:"
+      const minFieldsValue = " 95"
+
+      cy.contains(/question text/i).click()
+      cy.focused().type(listQuestion)
+      cy.getByTestId("question-answer-list").click({ force: true })
+      cy.getByTestId("question-answer-list-placeholder").type(listPlaceholder)
+      cy.getByTestId("min-list-fields-input").clear()
+      cy.getByTestId("min-list-fields-input").type(minFieldsValue)
+      cy.getByTestId("list-max-checkbox").click({ force: true })
+
+      cy.submitModal()
+      cy.openLightbox(node.id)
+
+      cy.route("POST", "**/quiz*").as("submit")
+
+      cy.lightbox().within(() => {
+        cy.get(`[placeholder="${listPlaceholder}"]`).should("be.visible")
+        cy.get(`[class="media-wrapper"]`).scrollTo("bottom")
+        cy.getByTestId("list-add-94").click()
+        cy.getByTestId("list-add-95").click()
+        cy.getByTestId("list-add-96").click()
+        cy.getByTestId("list-add-97").click()
+        cy.getByTestId("list-add-98").click()
+        cy.getByTestId("list-add-98").should("not.be.visible")
+        cy.getByTestId("list-submit-btn").click()
+
+        cy.contains(/thanks/i).should("be.visible")
+        cy.contains(/done/i).click()
+      })
+
+      cy.openLightbox(node.id)
+      cy.lightbox().within(() => {
+        cy.get(`[class="list"]`)
+          .find("ul")
+          .should("have.length", 100)
+        cy.getByTestId("close-lightbox").click()
+      })
+      cy.lightbox().should("not.exist")
+    })
+  })
 })
