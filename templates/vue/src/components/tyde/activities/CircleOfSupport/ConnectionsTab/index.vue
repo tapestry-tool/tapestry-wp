@@ -1,6 +1,12 @@
 <template>
   <div :class="['wrapper', { show: isOpen, hidden: isHidden }]">
-    <cos-popup-button style="left: 2rem" aria-label="Connections" @click="toggle">
+    <cos-popup-button
+      id="connections-tab-popup-trigger"
+      :disabled="toolTipPositioned"
+      style="left: 2rem"
+      aria-label="Connections"
+      @click="toggle()"
+    >
       <tapestry-icon v-if="isOpen" icon="chevron-down" />
       <span v-else>😊</span>
     </cos-popup-button>
@@ -43,7 +49,7 @@ import ConnectionsList from "./ConnectionsList"
 const States = {
   Home: 0,
   Add: 1,
-  Edit: 2,
+  Edit: 3, // Should match editing state in the community
 }
 
 export default {
@@ -67,6 +73,10 @@ export default {
       required: false,
       default: false,
     },
+    toolTipPositioned: {
+      type: Boolean,
+      required: true,
+    },
   },
   data() {
     return {
@@ -89,10 +99,15 @@ export default {
   },
   methods: {
     toggle() {
-      if (this.isOpen) {
-        this.state = States.Home
+      // FIX : Disable attribute for community-list does not work as it is a self-made component
+      if (!this.toolTipPositioned) {
+        this.$emit("toggle")
+        if (this.isOpen) {
+          this.state = States.Home
+          this.$emit("connection-closed")
+        }
+        this.isOpen = !this.isOpen
       }
-      this.isOpen = !this.isOpen
     },
     hide() {
       if (this.isOpen) {
@@ -140,6 +155,7 @@ export default {
       switch (this.state) {
         case States.Add:
           await this.addNewConnection()
+          this.$emit("connection-submitted")
           break
         case States.Edit:
           await this.updateConnection()
@@ -174,7 +190,9 @@ export default {
     },
     async updateConnection() {
       const currentCommunities = this.getCommunities(this.connection.id)
-      await client.cos.updateConnection(this.connection.id, { ...this.connection })
+      await client.cos.updateConnection(this.connection.id, {
+        ...this.connection,
+      })
 
       const { additions, deletions } = this.getDifferences(
         currentCommunities.map(community => community.id),

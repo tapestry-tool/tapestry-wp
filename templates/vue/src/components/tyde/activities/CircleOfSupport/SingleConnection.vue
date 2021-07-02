@@ -5,7 +5,7 @@
     :style="{ opacity: isDragging ? 0.2 : 1, '--size': fontSize }"
     @click="$emit('click')"
   >
-    <p>{{ connection.name }}</p>
+    <p class="ob-connection">{{ connection.name }}</p>
     <h1>{{ connection.avatar }}</h1>
     <ul v-if="variant !== 'name'" class="community-list">
       <li

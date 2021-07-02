@@ -9,12 +9,15 @@
     <connections-tab
       ref="connections"
       class="tab"
+      :toolTipPositioned="this.toolTipPositioned"
       :connections="connections"
       :communities="communities"
       @back="handleBack"
       @add-connection="$emit('add-connection', $event)"
       @edit-connection="handleEditConnection"
       @add-community="$emit('add-community', $event)"
+      @connection-submitted="$emit('connection-submitted')"
+      @connection-closed="$emit('connection-closed')"
     />
     <add-community-tab
       v-model="community"
@@ -24,10 +27,19 @@
       @add-community="$emit('add-community', $event)"
       @toggle="toggleCommunityTab"
     />
+
+    <onboarding
+      :communities="communities"
+      :connections="connections"
+      @tooltip-positioned="handleToolTipPositioned"
+      @tooltip-removed="handleTooltipRemoved"
+      @add-community="$emit('add-community', $event)"
+    />
   </div>
 </template>
 
 <script>
+import OnBoarding from "./onboarding/index.vue"
 import AddCommunityTab from "./AddCommunityTab"
 import ConnectionsTab from "../ConnectionsTab"
 import CommunitiesList from "./CommunitiesList"
@@ -38,6 +50,7 @@ const States = {
   AddCommunity: 1,
   EditCommunity: 2,
   EditConnection: 3,
+  AddConnection: 4,
 }
 
 export default {
@@ -45,6 +58,7 @@ export default {
     AddCommunityTab,
     CommunitiesList,
     ConnectionsTab,
+    onboarding: OnBoarding,
   },
   props: {
     connections: {
@@ -65,6 +79,7 @@ export default {
         icon: "👨‍👩‍👦",
         color: "",
       },
+      toolTipPositioned: false,
     }
   },
   computed: {
@@ -83,13 +98,17 @@ export default {
       this.lastState = lastState
     },
   },
+
   methods: {
     toggleCommunityTab() {
-      if (this.isCommunityTabOpen) {
-        this.state = States.Home
-      } else {
-        this.resetCommunity()
-        this.state = States.AddCommunity
+      // FIX : Disable attribute for community-list does not work as it is a self-made component
+      if (!this.toolTipPositioned) {
+        if (this.isCommunityTabOpen) {
+          this.state = States.Home
+        } else {
+          this.resetCommunity()
+          this.state = States.AddCommunity
+        }
       }
     },
     editCommunity(community) {
@@ -117,11 +136,29 @@ export default {
       this.handleBack()
       this.$emit("edit-connection", event)
     },
+    handleToolTipPositioned() {
+      this.toolTipPositioned = true
+    },
+    handleTooltipRemoved() {
+      this.toolTipPositioned = false
+    },
   },
 }
 </script>
 
 <style scoped>
+* {
+  font-family: "Avenir", Helvetica, Arial, sans-serif;
+}
+
+.welcome-communities {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
 .tab {
   width: 100%;
   position: absolute;
