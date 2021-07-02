@@ -100,7 +100,7 @@ export default {
       return this.activeQuestionIndex !== 0
     },
     performDyadNodeCheck() {
-      return wp.getCurrentUser().roles.includes("copilot") || !this.node.isDyad
+      return wp.getCurrentUser().roles.includes("youth") || !this.node.isDyad
     },
   },
   mounted() {

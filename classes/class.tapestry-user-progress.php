@@ -168,10 +168,14 @@ class TapestryUserProgress implements ITapestryUserProgress
 
             $progress_value = get_user_meta($userId, 'tapestry_'.$this->postId.'_progress_node_'.$nodeId, true);
 
-            if ($isDyad) {
+            $user_meta = get_userdata($userId); 
+            $user_roles = $user_meta->roles;
+
+            if ($isDyad && in_array('dyad', $user_roles, true)) {
                 // overwrite $progress_value to that of $teenId
-                $teenId = get_the_author_meta('teen_id', $this->_userId);
-                $progress_value = get_user_meta($teenId, 'tapestry_'.$this->postId.'_progress_node_'.$nodeId, true);
+                // if the user is a parent account
+                $teenId = get_user_meta($userId, 'linked_dyad_user_id');
+                $progress_value = get_user_meta($teenId[0], 'tapestry_'.$this->postId.'_progress_node_'.$nodeId, true);
             }
 
             $progress->$nodeId = new stdClass();

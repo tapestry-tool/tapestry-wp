@@ -156,7 +156,7 @@ export default {
       }
     },
     performDyadNodeCheck() {
-      return wp.getCurrentUser().roles.includes("dyad") || !this.node.isDyad
+      return wp.getCurrentUser().roles.includes("youth") || !this.node.isDyad
     },
   },
 }
