@@ -14,18 +14,17 @@
               <tapestry-icon :icon="questionAnswer[0]" />
             </div>
           </template>
-          <tapestry-activity
+          <completed-activity-media
             v-if="questionAnswer[0] === 'audio'"
             :type="questionAnswer[0]"
             :answerData="getFullUrl(questionAnswer[1].url)"
-          ></tapestry-activity>
-          <tapestry-activity
+          ></completed-activity-media>
+          <completed-activity-media
             v-else
             :type="questionAnswer[0]"
             :answerData="questionAnswer[1]"
             :question="question"
-            class="tab-content"
-          ></tapestry-activity>
+          ></completed-activity-media>
         </b-tab>
       </b-tabs>
       <div v-show="!hasAnswer" class="media-wrapper">
@@ -40,14 +39,14 @@
 
 <script>
 import { mapGetters, mapState } from "vuex"
-import TapestryActivity from "./ActivityMedia/TapestryActivity"
+import CompletedActivityMedia from "./common/CompletedActivityMedia"
 import TapestryIcon from "@/components/common/TapestryIcon"
 import { data as wpData } from "@/services/wp"
 
 export default {
   name: "answer-media",
   components: {
-    TapestryActivity,
+    CompletedActivityMedia,
     TapestryIcon,
   },
   props: {

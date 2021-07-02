@@ -9,7 +9,7 @@
       @drop.prevent="drop($event, bucket)"
     >
       <b class="bucketLabel">{{ bucket.value }}</b>
-      <user-drag-drop-bucket-item
+      <drag-drop-question-bucket-item
         v-for="item in bucket.itemArray"
         :key="item.id"
         :node="node"
@@ -29,7 +29,7 @@
       @drop.prevent="drop($event, bucket)"
     >
       <b class="bucketLabel">{{ bucket.value }}</b>
-      <user-drag-drop-bucket-item
+      <drag-drop-question-bucket-item
         v-for="item in bucket.itemArray"
         :key="item.id"
         :node="node"
@@ -44,10 +44,10 @@
 </template>
 
 <script>
-import UserDragDropBucketItem from "./UserDragDropBucketItem"
+import DragDropQuestionBucketItem from "./DragDropQuestionBucketItem"
 export default {
   components: {
-    UserDragDropBucketItem,
+    DragDropQuestionBucketItem,
   },
   props: {
     question: {

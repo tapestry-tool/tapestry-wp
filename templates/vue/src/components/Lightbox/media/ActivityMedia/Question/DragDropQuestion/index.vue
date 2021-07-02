@@ -3,7 +3,7 @@
     <b-row align-h="between">
       <b-col cols="4">
         <b style="color: #009688">From buckets</b>
-        <user-drag-drop-bucket
+        <drag-drop-question-bucket
           v-for="bucket in question.answerTypes.dragDrop.fromBucketArray"
           :key="bucket.id"
           :node="node"
@@ -16,7 +16,7 @@
       </b-col>
       <b-col cols="4">
         <b style="color: #3f51b5">To buckets</b>
-        <user-drag-drop-bucket
+        <drag-drop-question-bucket
           v-for="bucket in question.answerTypes.dragDrop.toBucketArray"
           :key="bucket.id"
           :node="node"
@@ -46,10 +46,10 @@
 </template>
 
 <script>
-import UserDragDropBucket from "./UserDragDropBucket"
+import DragDropQuestionBucket from "./DragDropQuestionBucket"
 export default {
   components: {
-    UserDragDropBucket,
+    DragDropQuestionBucket,
   },
   props: {
     question: {

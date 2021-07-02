@@ -1,7 +1,7 @@
 <template>
   <div class="fromBucketContainer" :data-qa="`user-from-bucket-${bucket.id}`">
     <b class="bucketLabel">{{ bucket.value }}</b>
-    <previous-activity-bucket-item
+    <completed-activity-drag-drop-bucket-item
       v-for="item in bucket.itemArray"
       :key="item.id"
       :bucketItem="item"
@@ -11,10 +11,10 @@
   </div>
 </template>
 <script>
-import PreviousActivityBucketItem from "./PreviousActivityBucketItem"
+import CompletedActivityDragDropBucketItem from "./CompletedActivityDragDropBucketItem"
 export default {
   components: {
-    PreviousActivityBucketItem,
+    CompletedActivityDragDropBucketItem,
   },
   props: {
     bucket: {

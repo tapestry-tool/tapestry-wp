@@ -1,5 +1,5 @@
 <template>
-  <b-container class="tapestry-activity">
+  <b-container class="completed-activity-media">
     <b-row align-v="center" style="min-height:150px;">
       <b-col v-if="showIcon" align-self="center" cols="2">
         <div v-if="type === 'dragDrop'" class="dragdropicon">
@@ -22,7 +22,10 @@
             :key="answer.index"
             class="flexItem"
           >
-            <previous-activity-bucket :bucket="answer" :question="question" />
+            <completed-activity-drag-drop-bucket
+              :bucket="answer"
+              :question="question"
+            />
           </li>
         </ul>
       </b-col>
@@ -31,16 +34,16 @@
 </template>
 
 <script>
-import PreviousActivityBucket from "./PreviousActivityBucket"
+import CompletedActivityDragDropBucket from "./CompletedActivityDragDropBucket"
 import TapestryIcon from "@/components/common/TapestryIcon"
 import DragDropIcon from "@/assets/icons/drag_drop.svg"
 import { data } from "@/services/wp"
 
 export default {
-  name: "tapestry-activity",
+  name: "completed-activity-media",
   components: {
     TapestryIcon,
-    PreviousActivityBucket,
+    CompletedActivityDragDropBucket,
   },
   props: {
     type: {
@@ -77,7 +80,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.tapestry-activity {
+.completed-activity-media {
   background: #262626;
   border-radius: 8px;
   margin-bottom: 8px;

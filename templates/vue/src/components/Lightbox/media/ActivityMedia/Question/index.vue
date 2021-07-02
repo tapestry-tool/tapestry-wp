@@ -17,13 +17,13 @@
           <h3 class="mb-4">
             {{ question.followUp.text || "Previously, you said:" }}
           </h3>
-          <tapestry-activity
+          <completed-activity-media
             v-for="previousAnswer in previousQuestionAnswers"
             :key="previousAnswer.type"
             :type="previousAnswer.type"
             :answerData="previousAnswer.answerData"
             :question="getQuestion(question.followUp.questionId)"
-          ></tapestry-activity>
+          ></completed-activity-media>
         </div>
         <div v-else>
           <p>You haven't done the previous activity yet.</p>
@@ -54,7 +54,7 @@
             :node="node"
             @submit="handleSubmit"
           />
-          <user-drag-drop-form
+          <drag-drop-question
             v-else-if="formType === 'dragDrop'"
             :question="question"
             :node="node"
@@ -103,9 +103,9 @@ import client from "@/services/TapestryAPI"
 import AnswerButton from "./AnswerButton"
 import AudioRecorder from "./AudioRecorder"
 import TextQuestion from "./TextQuestion"
-import UserDragDropForm from "../common/UserDragDropForm.vue"
+import DragDropQuestion from "./DragDropQuestion"
 import Loading from "@/components/common/Loading"
-import TapestryActivity from "./TapestryActivity"
+import CompletedActivityMedia from "../../common/CompletedActivityMedia"
 import * as wp from "@/services/wp"
 import { data as wpData } from "@/services/wp"
 
@@ -115,9 +115,9 @@ export default {
     AnswerButton,
     AudioRecorder,
     TextQuestion,
+    DragDropQuestion,
     Loading,
-    TapestryActivity,
-    UserDragDropForm,
+    CompletedActivityMedia,
   },
   props: {
     question: {
