@@ -16,6 +16,7 @@
       v-if="node.mediaType === 'text'"
       :node="node"
       :context="context"
+      :isContentInMultiContent="isContentInMultiContent"
       @complete="complete"
       @load="handleLoad"
     />
@@ -101,6 +102,11 @@ export default {
       type: String,
       required: false,
       default: "lightbox",
+    },
+    isContentInMultiContent: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   data() {

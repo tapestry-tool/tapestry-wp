@@ -52,6 +52,7 @@
                 :node-id="row.node.id"
                 :dimensions="dimensions"
                 context="multi-content"
+                :isContentInMultiContent="isContentInMultiContent"
                 style="color: white; margin-bottom: 24px;"
                 @complete="updateProgress(row.node.id)"
                 @close="toggle(row.node.id)"
@@ -193,6 +194,9 @@ export default {
       } else {
         return null
       }
+    },
+    isContentInMultiContent() {
+      return this.node.mediaType === "multi-content"
     },
   },
   mounted() {

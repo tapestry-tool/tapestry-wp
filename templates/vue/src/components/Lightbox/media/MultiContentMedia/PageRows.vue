@@ -43,6 +43,7 @@
                 :node-id="row.node.id"
                 :dimensions="dimensions"
                 context="page"
+                :isContentInMultiContent="isContentInMultiContent"
                 style="color: white; margin-bottom: 24px;"
                 @complete="updateProgress(row.node.id)"
                 @load="handleLoad($refs.rowRefs[index])"
@@ -171,6 +172,9 @@ export default {
       } else {
         return null
       }
+    },
+    isContentInMultiContent() {
+      return this.node.mediaType === "multi-content"
     },
   },
   mounted() {

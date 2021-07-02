@@ -1,5 +1,11 @@
 <template>
-  <article :class="{ article: true, 'page-style': context == 'page' }">
+  <article
+    :class="{
+      article: true,
+      multiContentArticle: isContentInMultiContent,
+      'page-style': context == 'page',
+    }"
+  >
     <h1 v-if="showTitle">{{ node.title }}</h1>
     <div v-html="content"></div>
   </article>
@@ -17,6 +23,11 @@ export default {
       type: String,
       required: false,
       default: "",
+    },
+    isContentInMultiContent: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   computed: {
@@ -41,6 +52,30 @@ export default {
 .article {
   padding: 1em;
   background: rgb(238, 238, 238);
+  text-align: left;
+  min-height: 100%;
+
+  h1 {
+    font-size: 1.75rem;
+    font-weight: 500;
+    margin-bottom: 1em;
+
+    :before {
+      display: none;
+    }
+  }
+
+  div {
+    font-family: "Source Sans Pro", sans-serif;
+    font-size: 16px;
+    white-space: pre-wrap;
+    margin-bottom: 0.9em;
+  }
+}
+
+.multiContentArticle {
+  padding: 1em;
+  background: rgb(38, 38, 38);
   text-align: left;
   min-height: 100%;
 
