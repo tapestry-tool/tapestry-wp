@@ -38,12 +38,14 @@ export default {
   width: 75vw;
 
   border-radius: 30px;
-  border: solid 2px blueviolet;
+  border: solid 2px #c4e4ea;
+
+  background-color: whitesmoke;
 }
 .active::after {
   content: "";
   display: block;
-  border: 1px solid blue;
+  border: 1px solid #4197ac;
   margin: 0 auto;
   max-width: 50px;
 }
