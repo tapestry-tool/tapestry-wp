@@ -38,7 +38,7 @@
         <div v-for="(menu, index) in menuGroups" :key="index" class="menu-wrapper">
           <b-card class="menu">
             <b-card-text v-b-toggle="`collapse-${index}`">
-              Menu {{ index + 1 }}
+              {{ getMenuName(index) }}
             </b-card-text>
             <b-collapse :id="`collapse-${index}`" class="mt-2">
               <ul class="page-menu-item fa-ul">
@@ -179,6 +179,13 @@ export default {
           }
         }
       })
+    },
+    getMenuName(index) {
+      if (index === 0) {
+        return this.node.title
+      } else {
+        return this.menuGroups[index][0].node.title
+      }
     },
   },
 }
