@@ -73,21 +73,20 @@ export default {
       this.editNode(id)
     })
     client.recordAnalyticsEvent("app", "load", "tapestry")
-    /* NOTE: Opening the default Node for a specific role 
-             in fullscreen only if this role cannot edit the 
-             default node, otherwise the regular tapestry will
-             open
-    */
-    if (this.settings.tydeModeEnabled) {
-      const userMainRole = currentUser.roles[0] || "public"
-      const defaultNodeId = this.settings.tydeModeDefualtNodes[userMainRole]
-      this.setTydeMode(true)
-      this.openNode(defaultNodeId)
-    }
+
+    this.setupTydeMode()
   },
-  created() {},
+  updated() {
+    this.setupTydeMode()
+  },
   methods: {
-    ...mapMutations(["select", "unselect", "clearSelection", "setTydeMode"]),
+    ...mapMutations([
+      "select",
+      "unselect",
+      "clearSelection",
+      "setTydeModeDefault",
+      "setTydeModeState",
+    ]),
     updateViewBox() {
       const MAX_RADIUS = 240
       const MIN_TAPESTRY_WIDTH_FACTOR = 1.5
@@ -176,6 +175,24 @@ export default {
         params: { nodeId: id, type: "edit", tab: "content" },
         query: this.$route.query,
       })
+    },
+    setupTydeMode() {
+      /* NOTE: Opening the default Node for a specific role 
+             in fullscreen only if this role cannot edit the 
+             default node, otherwise the regular tapestry will
+             open
+      */
+      if (this.settings.tydeModeEnabled) {
+        const userMainRole = currentUser.roles[0] || "public"
+        const defaultNodeId = this.settings.tydeModeDefualtNodes[userMainRole]
+        this.setTydeModeState(true)
+        this.setTydeModeDefault({
+          name: names.LIGHTBOX,
+          params: { nodeId: defaultNodeId },
+          query: this.$route.query,
+        })
+        this.openNode(defaultNodeId)
+      }
     },
   },
 }

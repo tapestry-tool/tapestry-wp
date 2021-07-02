@@ -3,12 +3,12 @@
     id="lightbox"
     data-qa="lightbox"
     :class="{
-      'full-screen': node.fullscreen || tydeMode,
+      'full-screen': node.fullscreen || tydeMode.state,
       'content-text': node.mediaType === 'text' || node.mediaType === 'wp-post',
     }"
     :node-id="nodeId"
     :content-container-style="lightboxContentStyles"
-    :allow-close="canSkip && !tydeMode"
+    :allow-close="canSkip && !tydeMode.state"
     @close="handleUserClose"
   >
     <multi-content-media
