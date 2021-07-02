@@ -27,12 +27,14 @@ export async function updateH5pSettings({ commit, dispatch }, newSettings) {
 export async function addNode({ commit, dispatch, getters, state }, newNode) {
   try {
     const response = await client.addNode(JSON.stringify(newNode))
-
     const nodeToAdd = { ...newNode }
     const id = response.data.id
     nodeToAdd.id = id
     nodeToAdd.author = response.data.author
     nodeToAdd.permissions = response.data.permissions
+    if (response.data.typeData.h5pMeta) {
+      nodeToAdd.typeData.h5pMeta = response.data.typeData.h5pMeta
+    }
 
     commit("addNode", nodeToAdd)
     commit("updateVisibleNodes", [...state.visibleNodes, id])
@@ -184,8 +186,7 @@ async function unlockNodes({ commit, getters, dispatch }) {
         const { accessible, unlocked, content, conditions } = nodeProgress
         const newNode = { accessible, unlocked, conditions }
         if (accessible) {
-          const { quiz, typeData } = content
-          newNode.quiz = quiz
+          const { typeData } = content
           newNode.typeData = typeData
         }
         commit("updateNode", { id, newNode })
@@ -223,32 +224,20 @@ export async function getTapestryExport({ dispatch }) {
 
 export async function completeQuestion(
   { commit, dispatch },
-  { answerType, formId, nodeId, questionId }
+  { nodeId, questionId, answerType, answer }
 ) {
   try {
-    await client.completeQuestion(nodeId, questionId)
-    if (answerType !== "audioId") {
-      const entry = await client.getUserEntry(formId)
-      commit("updateEntry", { answerType, entry, nodeId, questionId })
-    }
-    commit("completeQuestion", { nodeId, questionId })
+    await client.completeQuestion(nodeId, questionId, answerType, answer)
+    commit("completeQuestion", { nodeId, questionId, answerType, answer })
   } catch (error) {
     dispatch("addApiError", error)
   }
 }
 
-export async function saveAudio(
-  { commit, dispatch },
-  { audio, nodeId, questionId }
-) {
+export async function saveAudio({ dispatch }, { nodeId, questionId, audio }) {
   try {
-    await client.saveAudio(audio, nodeId, questionId)
-    commit("updateEntry", {
-      answerType: "audioId",
-      entry: { audio },
-      nodeId,
-      questionId,
-    })
+    const response = await client.saveAudio(nodeId, questionId, audio)
+    return response
   } catch (error) {
     dispatch("addApiError", error)
   }

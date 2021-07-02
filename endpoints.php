@@ -9,7 +9,6 @@ require_once __DIR__.'/classes/class.tapestry-node.php';
 require_once __DIR__.'/classes/class.tapestry-group.php';
 require_once __DIR__.'/classes/class.tapestry-user-progress.php';
 require_once __DIR__.'/classes/class.tapestry-audio.php';
-require_once __DIR__.'/classes/class.tapestry-form.php';
 require_once __DIR__.'/classes/class.tapestry-h5p.php';
 require_once __DIR__.'/classes/class.constants.php';
 require_once __DIR__.'/utilities/class.tapestry-user.php';
@@ -71,20 +70,6 @@ $REST_API_ENDPOINTS = [
             'methods' => $REST_API_PUT_METHOD,
             'callback' => 'updateTapestrySettings',
             'permission_callback' => 'TapestryPermissions::putTapestrySettings',
-        ],
-    ],
-    'GET_GF_EXISTS' => (object) [
-        'ROUTE' => '/gf/exists',
-        'ARGUMENTS' => [
-            'methods' => $REST_API_GET_METHOD,
-            'callback' => 'getGfExists',
-        ],
-    ],
-    'GET_GF_FORMS' => (object) [
-        'ROUTE' => '/gf/forms',
-        'ARGUMENTS' => [
-            'methods' => $REST_API_GET_METHOD,
-            'callback' => 'getGfForms',
         ],
     ],
     'POST_TAPESTRY_GROUP' => (object) [
@@ -186,13 +171,6 @@ $REST_API_ENDPOINTS = [
             'callback' => 'getUserProgressByPostId',
         ],
     ],
-    'GET_TAPESTRY_USER_ENTRY' => (object) [
-        'ROUTE' => 'users/entries',
-        'ARGUMENTS' => [
-            'methods' => $REST_API_GET_METHOD,
-            'callback' => 'getUserEntry',
-        ],
-    ],
     'UPDATE_TAPESTRY_USER_PROGRESS' => (object) [
         'ROUTE' => 'users/progress',
         'ARGUMENTS' => [
@@ -207,8 +185,8 @@ $REST_API_ENDPOINTS = [
             'callback' => 'completeByNodeId',
         ],
     ],
-    'UPDATE_TAPESTRY_USER_QUIZ_PROGRESS' => (object) [
-        'ROUTE' => 'users/quiz',
+    'UPDATE_TAPESTRY_USER_ACTIVITY_PROGRESS' => (object) [
+        'ROUTE' => 'users/activity',
         'ARGUMENTS' => [
             'methods' => $REST_API_POST_METHOD,
             'callback' => 'completeQuestionById',
@@ -250,7 +228,7 @@ $REST_API_ENDPOINTS = [
         ],
     ],
     'POST_USER_AUDIO' => (object) [
-        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/audio',
+        'ROUTE' => 'users/activity/audio/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)',
         'ARGUMENTS' => [
             'methods' => $REST_API_POST_METHOD,
             'callback' => 'postUserAudio',
@@ -261,13 +239,6 @@ $REST_API_ENDPOINTS = [
         'ARGUMENTS' => [
             'methods' => $REST_API_GET_METHOD,
             'callback' => 'getAllH5P',
-        ],
-    ],
-    'GET_FORM_ENTRY' => (object) [
-        'ROUTE' => '/gf/entries',
-        'ARGUMENTS' => [
-            'methods' => $REST_API_GET_METHOD,
-            'callback' => 'getGfEntry',
         ],
     ],
     'GET_TAPESTRY_USER_FAVOURITES' => (object) [
@@ -395,40 +366,6 @@ function getAllH5P()
         $controller = new TapestryH5P();
 
         return $controller->get();
-    } catch (TapestryError $e) {
-        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
-    }
-}
-
-function getGfExists()
-{
-    try {
-        $tapestryForms = new TapestryForm();
-
-        return TapestryForm::exists();
-    } catch (TapestryError $e) {
-        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
-    }
-}
-
-function getGfForms()
-{
-    try {
-        $tapestryForms = new TapestryForm();
-
-        return $tapestryForms->getAll();
-    } catch (TapestryError $e) {
-        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
-    }
-}
-
-function getGfEntry($request)
-{
-    $formId = $request['form_id'];
-    try {
-        $controller = new TapestryForm();
-
-        return $controller->getEntry($formId);
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
@@ -688,7 +625,6 @@ function addTapestryGroup($request)
             throw new TapestryError('INVALID_POST_ID');
         }
         $tapestry = new Tapestry($postId);
-
         return $tapestry->addGroup($group);
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
@@ -1228,21 +1164,6 @@ function getTapestryNodeHasDraftChildren($request)
     }
 }
 
-function getUserEntry($request)
-{
-    $postId = $request['post_id'];
-    $nodeMetaId = $request['node_id'];
-    $formId = $request['form_id'];
-
-    try {
-        $userProgress = new TapestryUserProgress($postId, $nodeMetaId);
-
-        return $userProgress->getUserEntries($formId);
-    } catch (TapestryError $e) {
-        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
-    }
-}
-
 /**
  * Update a single node progress for the current user by passing in node id, post id and progress value
  * Example: /wp-json/tapestry-tool/v1/users/progress?post_id=44&node_id=1&progress_value=0.2.
@@ -1254,7 +1175,6 @@ function updateProgressByNodeId($request)
     $postId = $request['post_id'];
     $nodeMetaId = $request['node_id'];
     $progressValue = $request['progress_value'];
-
     try {
         $userProgress = new TapestryUserProgress($postId, $nodeMetaId);
         $userProgress->updateUserProgress($progressValue);
@@ -1285,8 +1205,8 @@ function completeByNodeId($request)
 }
 
 /**
- * Set quiz as completed for the current user
- * Example: /wp-json/tapestry-tool/v1/users/quiz?post_id=44&node_id=1&question_id=abcd.
+ * Set activity as completed for the current user
+ * Example: /wp-json/tapestry-tool/v1/users/activity?post_id=44&node_id=1&question_id=abcd.
  *
  * @param object $request HTTP request
  *
@@ -1297,10 +1217,13 @@ function completeQuestionById($request)
     $postId = $request['post_id'];
     $nodeMetaId = $request['node_id'];
     $questionId = $request['question_id'];
+    $body = json_decode($request->get_body());
+    $answerData = $body->answer;
+    $answerType = $body->answerType;
 
     try {
         $userProgress = new TapestryUserProgress($postId, $nodeMetaId);
-        $userProgress->completeQuestion($questionId);
+        $userProgress->completeQuestion($questionId, $answerType, $answerData);
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
@@ -1427,37 +1350,6 @@ function postUserAudio($request)
         $TapestryAudio = new TapestryAudio($postId, $nodeMetaId, $questionId);
 
         return $TapestryAudio->save($audio);
-    } catch (TapestryError $e) {
-        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
-    }
-}
-
-/**
- * Get recorded audio of a node for a user.
- *
- * @param object $request HTTP request
- *
- * @return object $response HTTP response
- */
-function getUserAudio($request)
-{
-    $postId = $request['tapestryPostId'];
-    $nodeMetaId = $request['nodeMetaId'];
-    $questionId = $request['questionId'];
-
-    try {
-        if (!TapestryHelpers::isValidTapestry($postId)) {
-            throw new TapestryError('INVALID_POST_ID');
-        }
-        if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
-            throw new TapestryError('INVALID_NODE_META_ID');
-        }
-        if (0 == wp_get_current_user()->ID) {
-            throw new TapestryError('INVALID_USER_ID');
-        }
-        $TapestryAudio = new TapestryAudio($postId, $nodeMetaId, $questionId);
-
-        return $TapestryAudio->get();
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }

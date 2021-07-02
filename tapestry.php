@@ -111,9 +111,10 @@ add_action('pre_get_posts', 'add_tapestry_post_types_to_query');
 /*
  * Add custom tapestry_thumb size
  */
-add_action( 'after_setup_theme', 'tapestry_theme_setup' );
-function tapestry_theme_setup() {
-    add_image_size( 'tapestry_thumb', 420, 420, true );
+add_action('after_setup_theme', 'tapestry_theme_setup');
+function tapestry_theme_setup()
+{
+    add_image_size('tapestry_thumb', 420, 420, true);
 }
 
 /*
@@ -159,9 +160,7 @@ function tapestry_enqueue_vue_app()
                     'hide_empty' => true,
                     'fields' => 'names',
                 ]),
-                'gf_rest_url' => get_home_url().'/gravityformsapi',
                 'nonce' => wp_create_nonce('wp_rest'),
-                'gf_nonce' => wp_create_nonce('gf_api'),
                 'wpUserId' => apply_filters('determine_current_user', false),
                 'adminAjaxUrl' => admin_url('admin-ajax.php'),
                 'file_upload_nonce' => wp_create_nonce('media-form'),
@@ -169,6 +168,7 @@ function tapestry_enqueue_vue_app()
                 'roles' => $wp_roles->get_names(),
                 'wpCanEditTapestry' => current_user_can('edit_post', get_the_ID()),
                 'currentUser' => wp_get_current_user(),
+                'uploadDirArray' => wp_upload_dir(),
             ]
         );
 
@@ -182,33 +182,15 @@ function tapestry_enqueue_libraries()
     global $post;
     global $TAPESTRY_VERSION_NUMBER;
     if ('tapestry' == get_post_type($post) && !post_password_required($post)) {
-
         $LIBS_FOLDER_URL = plugin_dir_url(__FILE__).'templates/libs/';
 
         // CSS
-
         wp_enqueue_style('font-awesome-5', 'https://use.fontawesome.com/releases/v5.5.0/css/all.css', [], null);
         wp_enqueue_style('tapestry-css', plugin_dir_url(__FILE__).'templates/tapestry.css', [], $TAPESTRY_VERSION_NUMBER);
 
-        if (class_exists('GFCommon')) {
-            wp_enqueue_style('gf-formsmain', GFCommon::get_base_url().'/css/formsmain.min.css');
-        }
-        if (class_exists('GFImageChoices')) {
-            $GF_Image_Choices_Object = new GFImageChoices();
-            wp_enqueue_style('gf-img-choices', $LIBS_FOLDER_URL.'gf-image-ui.css', [], $TAPESTRY_VERSION_NUMBER);
-            wp_enqueue_style('gf-img-choices', $GF_Image_Choices_Object->get_base_url().'/css/gf_image_choices.css', [], $TAPESTRY_VERSION_NUMBER);
-        }
-
         // JS
-
-        if (class_exists('GFImageChoices')) {
-            $GF_Image_Choices_Object = new GFImageChoices();
-            wp_enqueue_script('gf-img-choices', $GF_Image_Choices_Object->get_base_url().'/js/gf_image_choices.js', ['jquery-min']);
-        }
-        wp_enqueue_script( 'heartbeat' );
-      
+        wp_enqueue_script('heartbeat');
         wp_enqueue_script('es2015-test', $LIBS_FOLDER_URL.'es2015-test.js');
-
     }
 }
 
@@ -297,59 +279,6 @@ function create_new_tapestry()
 
 add_shortcode('new_tapestry_button', 'create_new_tapestry');
 
-// Gravity Forms Pluggin
-
-// Hook up the AJAX ajctions
-add_action('wp_ajax_nopriv_gf_button_get_form', 'gf_button_ajax_get_form');
-add_action('wp_ajax_gf_button_get_form', 'gf_button_ajax_get_form');
-
-// Add the "button" action to the gravityforms shortcode
-// e.g. [gravityforms action="button" id=1 text="button text"]
-add_filter('gform_shortcode_button', 'gf_button_shortcode', 10, 3);
-function gf_button_shortcode($shortcode_string, $attributes, $content)
-{
-    $a = shortcode_atts([
-        'id' => 0,
-        'text' => 'Show me the form!',
-    ], $attributes);
-
-    $form_id = absint($a['id']);
-
-    if ($form_id < 1) {
-        return 'Missing the ID attribute.';
-    }
-
-    // Enqueue the scripts and styles
-    gravity_form_enqueue_scripts($form_id, true);
-
-    $ajax_url = admin_url('admin-ajax.php');
-
-    $html = sprintf('<button id="gf_button_get_form_%d">%s</button>', $form_id, $a['text']);
-    $html .= sprintf('<div id="gf_button_form_container_%d" style="display:none;"></div>', $form_id);
-    $html .= "<script>
-				(function (SHFormLoader, $) {
-				$('#gf_button_get_form_{$form_id}').click(function(){
-                    var button = $(this);
-					$.get('{$ajax_url}?action=gf_button_get_form&form_id={$form_id}',function(response){
-						$('#gf_button_form_container_{$form_id}').html(response).fadeIn();
-                        button.remove();
-						if(window['gformInitDatepicker']) {gformInitDatepicker();}
-					});
-				});
-			}(window.SHFormLoader = window.SHFormLoader || {}, jQuery));
-			</script>";
-
-    return $html;
-}
-
-function gf_button_ajax_get_form()
-{
-    $form_id = isset($_GET['form_id']) ? absint($_GET['form_id']) : 0;
-    gravity_form($form_id, false, false, false, false, true);
-    die();
-}
-// End of Gravity Forms Pluggin
-
 function replace_special_apostrophe($str)
 {
     return str_replace('’', "'", $str);
@@ -371,7 +300,7 @@ function prefix_title_entity_decode($response)
 
 // Analytics
 
-register_activation_hook( __FILE__, 'create_tapestry_analytics_schema' );
+register_activation_hook(__FILE__, 'create_tapestry_analytics_schema');
 function create_tapestry_analytics_schema()
 {
     $analytics = new TapestryAnalytics();
@@ -380,10 +309,33 @@ function create_tapestry_analytics_schema()
 
 add_action('wp_ajax_nopriv_tapestry_tool_log_event', 'tapestry_tool_log_event');
 add_action('wp_ajax_tapestry_tool_log_event', 'tapestry_tool_log_event');
-function tapestry_tool_log_event() {
-
+function tapestry_tool_log_event()
+{
     $analytics = new TapestryAnalytics();
     $analytics->log($_POST);
 
     wp_die();
+}
+
+// TYDE Roles
+
+register_activation_hook(__FILE__, 'add_tyde_roles');
+function add_tyde_roles()
+{
+    add_role(
+        'dyad',
+        'Dyad',
+        [
+            'read' => true,
+            'edit_posts' => true,
+        ]
+    );
+    add_role(
+        'youth',
+        'Youth',
+        [
+            'read' => true,
+            'edit_posts' => true,
+        ]
+    );
 }
