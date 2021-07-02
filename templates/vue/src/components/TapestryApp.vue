@@ -80,13 +80,7 @@ export default {
     this.setupTydeMode()
   },
   methods: {
-    ...mapMutations([
-      "select",
-      "unselect",
-      "clearSelection",
-      "setTydeModeDefault",
-      "setTydeModeState",
-    ]),
+    ...mapMutations(["select", "unselect", "clearSelection", "setTydeModeDefault"]),
     updateViewBox() {
       const MAX_RADIUS = 240
       const MIN_TAPESTRY_WIDTH_FACTOR = 1.5
@@ -185,7 +179,6 @@ export default {
       if (this.settings.tydeModeEnabled) {
         const userMainRole = currentUser.roles[0] || "public"
         const defaultNodeId = this.settings.tydeModeDefualtNodes[userMainRole]
-        this.setTydeModeState(true)
         this.setTydeModeDefault({
           name: names.LIGHTBOX,
           params: { nodeId: defaultNodeId },
