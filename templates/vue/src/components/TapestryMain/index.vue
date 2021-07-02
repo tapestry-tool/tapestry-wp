@@ -126,9 +126,23 @@ export default {
       this.$root.$emit("add-node", null)
     },
     test(nodes) {
-      const rootNode = null
-      for (const [id, node] of Object.entries(nodes)) {
-        console.log(node)
+      let originalNodeOrder = Object.entries(nodes)
+      const rootNodeId = this.rootId
+      let newNodeOrder = {}
+      let queue = []
+      // First, find the root node
+      for (const [id, node] of originalNodeOrder) {
+        if (id == rootNodeId) {
+          newNodeOrder[id] = node
+          for (const id of node.childOrdering) {
+            queue.push(id)
+          }
+        }
+      }
+      while (newNodeOrder.length != Object.keys(nodes).length) {
+        const queueLength = queue.length
+        const level = []
+
       }
       return nodes
     },
