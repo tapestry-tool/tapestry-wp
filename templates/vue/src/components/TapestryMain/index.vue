@@ -15,7 +15,7 @@
       </g>
       <g v-if="dragSelectEnabled && dragSelectReady" class="nodes">
         <tapestry-node
-          v-for="(node, id) in nodes"
+          v-for="(node, id) in test(nodes)"
           :key="id"
           :node="node"
           class="node"
@@ -39,7 +39,7 @@
 
 <script>
 import DragSelectModular from "@/utils/dragSelectModular"
-import { mapMutations, mapState } from "vuex"
+import { mapMutations, mapState, mapGetters } from "vuex"
 import TapestryNode from "./TapestryNode"
 import TapestryLink from "./TapestryLink"
 import RootNodeButton from "./RootNodeButton"
@@ -61,6 +61,9 @@ export default {
       dragSelectReady: false,
       activeNode: null,
     }
+  },
+  created() {
+    // console.log(this.nodes)
   },
   mounted() {
     if (this.dragSelectEnabled) {
@@ -118,8 +121,16 @@ export default {
   },
   methods: {
     ...mapMutations(["select", "unselect", "clearSelection"]),
+    ...mapGetters(["getNode", "isMultiContent", "isMultiContentRow"]),
     addRootNode() {
       this.$root.$emit("add-node", null)
+    },
+    test(nodes) {
+      const rootNode = null
+      for (const [id, node] of Object.entries(nodes)) {
+        console.log(node)
+      }
+      return nodes
     },
 
     updateSelectableNodes() {
