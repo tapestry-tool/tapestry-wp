@@ -1,7 +1,6 @@
 <template>
   <loading v-if="loading" data-qa="tapestry-loading" style="height: 75vh;"></loading>
   <div v-else id="app">
-    <navbar v-if="settings.tydeModeEnabled && tydeMode.defaultNode"></navbar>
     <tapestry-app></tapestry-app>
     <router-view name="lightbox"></router-view>
     <node-modal></node-modal>
@@ -31,7 +30,6 @@ import TapestryError from "@/components/TapestryError"
 import Loading from "@/components/common/Loading"
 import client from "@/services/TapestryAPI"
 import { isLoggedIn } from "./services/wp"
-import Navbar from "@/components/tyde/Navbar"
 
 export default {
   name: "app",
@@ -41,7 +39,6 @@ export default {
     TapestryApp,
     Sidebar,
     TapestryError,
-    Navbar,
   },
   data() {
     return {
@@ -50,7 +47,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(["nodes", "settings", "tydeMode"]),
+    ...mapState(["nodes"]),
     isEmpty() {
       return Object.keys(this.nodes).length === 0
     },

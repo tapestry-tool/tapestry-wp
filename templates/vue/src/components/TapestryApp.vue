@@ -7,6 +7,7 @@
       data-qa="tapestry-map"
     />
     <tapestry-main v-else-if="showTapestry" ref="graph" :viewBox="viewBox" />
+    <navbar v-else></navbar>
   </div>
 </template>
 
@@ -176,7 +177,7 @@ export default {
              default node, otherwise the regular tapestry will
              open
       */
-      if (this.settings.tydeModeEnabled) {
+      if (!this.showTapestry) {
         const userMainRole = currentUser.roles[0] || "public"
         const defaultNodeId = this.settings.tydeModeDefualtNodes[userMainRole]
         console.log(defaultNodeId)
