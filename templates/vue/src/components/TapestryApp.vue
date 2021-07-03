@@ -6,8 +6,7 @@
       :is-sidebar-open="isSidebarOpen"
       data-qa="tapestry-map"
     />
-    <tapestry-main v-else-if="showTapestry" ref="graph" :viewBox="viewBox" />
-    <navbar v-else></navbar>
+    <tapestry-main v-else-if="!isTydeView" ref="graph" :viewBox="viewBox" />
   </div>
 </template>
 
@@ -38,7 +37,7 @@ export default {
   },
   computed: {
     ...mapState(["nodes", "links", "selection", "settings", "rootId"]),
-    showTapestry() {
+    isTydeView() {
       const isAdmin = currentUser.roles.some(role => role === "administrator")
 
       if (!isAdmin && this.settings.tydeModeEnabled) {
@@ -46,10 +45,10 @@ export default {
         const hasEditPermissions = currentUser.roles.some(role => {
           return rootNode.permissions[role].some(premission => premission === "edit")
         })
-
-        return hasEditPermissions
+        this.$emit("initiate-tyde-view", !hasEditPermissions)
+        return !hasEditPermissions
       }
-      return true
+      return false
     },
     isSidebarOpen() {
       return Boolean(this.$route.query.sidebar)
@@ -177,10 +176,9 @@ export default {
              default node, otherwise the regular tapestry will
              open
       */
-      if (!this.showTapestry) {
+      if (this.isTydeView) {
         const userMainRole = currentUser.roles[0] || "public"
         const defaultNodeId = this.settings.tydeModeDefualtNodes[userMainRole]
-        console.log(defaultNodeId)
         this.setTydeModeDefault({
           name: names.LIGHTBOX,
           params: { nodeId: defaultNodeId },
