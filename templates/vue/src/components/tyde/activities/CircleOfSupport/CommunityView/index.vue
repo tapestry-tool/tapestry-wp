@@ -28,6 +28,7 @@
     />
 
     <onboarding
+      v-if="initiateOnboarding"
       :communities="communities"
       :connections="connections"
       :parent-state="state"
@@ -81,6 +82,7 @@ export default {
         color: "",
       },
       toolTipPositioned: false,
+      initiateOnboarding: true,
     }
   },
   computed: {
@@ -99,7 +101,11 @@ export default {
       this.lastState = lastState
     },
   },
-
+  mounted() {
+    if (this.communities.length >= 1 && this.connections.length >= 1) {
+      this.initiateOnboarding = false
+    }
+  },
   methods: {
     toggleCommunityTab() {
       // FIX : Disable attribute for community-list does not work as it is a self-made component
