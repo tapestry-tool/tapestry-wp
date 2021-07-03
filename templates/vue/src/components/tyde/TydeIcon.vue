@@ -23,7 +23,7 @@ export default {
     size: {
       type: [String, Number],
       required: false,
-      default: 32,
+      default: 35,
     },
   },
   data() {

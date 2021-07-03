@@ -37,6 +37,19 @@ export default {
   },
   computed: {
     ...mapState(["nodes", "links", "selection", "settings", "rootId"]),
+    showTapestry() {
+      const isAdmin = currentUser.roles.some(role => role === "administrator")
+
+      if (!isAdmin && this.settings.tydeModeEnabled) {
+        const rootNode = this.nodes[this.rootId]
+        const hasEditPermissions = currentUser.roles.some(role => {
+          return rootNode.permissions[role].some(premission => premission === "edit")
+        })
+
+        return hasEditPermissions
+      }
+      return true
+    },
     isSidebarOpen() {
       return Boolean(this.$route.query.sidebar)
     },
