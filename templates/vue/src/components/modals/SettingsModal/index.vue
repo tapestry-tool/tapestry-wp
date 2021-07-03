@@ -236,7 +236,8 @@
               <b-col>
                 <combobox
                   v-model="tydeModeDefualtNodes[role]"
-                  :options="Object.values(nodes)"
+                  :options="nodesValues"
+                  :placeholder="nodesValues[0].title"
                   item-text="title"
                   item-value="id"
                 >
@@ -432,6 +433,9 @@ export default {
     roles() {
       return Object.keys(defaultPermissions)
     },
+    nodesValues() {
+      return Object.values(this.nodes)
+    },
   },
   created() {
     if (this.settings.defaultPermissions) {
@@ -494,6 +498,14 @@ export default {
       this.mapBounds = mapBounds
     },
     async updateSettings() {
+      if (this.tydeModeEnabled) {
+        Object.keys(this.tydeModeDefualtNodes).forEach(role => {
+          if (!this.tydeModeDefualtNodes[role]) {
+            this.tydeModeDefualtNodes[role] = this.nodesValues[0].id
+          }
+        })
+      }
+
       const settings = Object.assign(this.settings, {
         backgroundUrl: this.backgroundUrl,
         autoLayout: this.autoLayout,
