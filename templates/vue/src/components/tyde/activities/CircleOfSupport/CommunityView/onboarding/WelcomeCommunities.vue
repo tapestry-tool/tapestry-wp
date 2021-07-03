@@ -8,25 +8,27 @@
       </b-row>
 
       <b-row align-h="center">
-        <h4 class="ob-secondary">
+        <p class="ob-secondary" style="font-size:1.33em">
           Let's start with you — what communities are you a part of?
-        </h4>
+        </p>
       </b-row>
 
       <b-row align-h="center">
-        <h5 class="ob-secondary">Here are a few ideas to get you started.</h5>
+        <p class="ob-secondary" style="font-size:0.83em">
+          Here are a few ideas to get you started.
+        </p>
       </b-row>
 
       <b-row align-h="center" class="mt-2 mb-2">
         <b-overlay :show="loading" rounded="sm">
-        <b-button
-          pill
-          variant="secondary"
-          :disabled="canContinue()"
-          @click="addCommunities"
-        >
-          CONTINUE &#8594;
-        </b-button>
+          <b-button
+            pill
+            variant="secondary"
+            :disabled="canContinue()"
+            @click="addCommunities"
+          >
+            CONTINUE &#8594;
+          </b-button>
         </b-overlay>
       </b-row>
 
@@ -35,13 +37,13 @@
           <b-row>
             <b-col v-for="community in communities" :key="community.name">
               <label :id="community.name">
-              <input
-                v-model="communitiesToAdd"
-                type="checkbox"
-                :value="community.name"
-              />
-              <h3>{{ community.name }}</h3>
-              <h1>{{ community.icon }}</h1>
+                <input
+                  v-model="communitiesToAdd"
+                  type="checkbox"
+                  :value="community.name"
+                />
+                <h3>{{ community.name }}</h3>
+                <h1>{{ community.icon }}</h1>
               </label>
             </b-col>
           </b-row>

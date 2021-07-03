@@ -9,7 +9,7 @@
           class="ob-connection-box"
         >
           <p class="ob-connection">{{ connection.name }}</p>
-         <span style="font-size:2.5rem;">{{ connection.avatar }}</span>
+          <span style="font-size:2.5rem;">{{ connection.avatar }}</span>
         </b-col>
       </b-row>
       <b-row align-h="center">
@@ -27,14 +27,13 @@
       <b-row align-h="center">
         <b-col v-if="visibleConnections.length >= 4" class="ob-connection-box">
           <p class="ob-connection">
-            {{visibleConnections[3].name }}
+            {{ visibleConnections[3].name }}
           </p>
           <span style="font-size:2.5rem;">
             {{ visibleConnections[3].avatar }}
           </span>
         </b-col>
-         <b-col v-else class="ob-connection-box">
-        </b-col>
+        <b-col v-else class="ob-connection-box"></b-col>
         <b-col align-self="center">
           <b-button
             pill
@@ -53,8 +52,7 @@
             {{ visibleConnections[4].avatar }}
           </span>
         </b-col>
-        <b-col v-else class="ob-connection-box">
-        </b-col>
+        <b-col v-else class="ob-connection-box"></b-col>
       </b-row>
     </b-container>
   </cos-modal>

@@ -29,19 +29,19 @@ export default {
     // const container = document.getElementById("cos")
     // const target = container.querySelector(`#${this.refId}`)
     this.positioned = true
-    this.$emit('tooltip-positioned')
+    this.$emit("tooltip-positioned")
   },
 }
 </script>
 
 <style scoped lang="scss">
-.right{
+.right {
   right: 22px;
   bottom: 95px;
 }
 
 .left {
-  left:22px;
+  left: 22px;
   bottom: 95px;
 }
 .tooltip-container {

@@ -22,7 +22,7 @@
           Add Connection &#8594;
         </b-button>
       </b-row>
-      <b-row align-h="center" class="py-2"> 
+      <b-row align-h="center" class="py-2">
         <b-container>
           <b-row class="py-2">
             <b-col v-for="connection in connections" :key="connection.name">
@@ -51,5 +51,3 @@ export default {
   },
 }
 </script>
-
-
