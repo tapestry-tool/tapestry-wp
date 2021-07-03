@@ -1,7 +1,7 @@
 <template>
   <loading v-if="loading" data-qa="tapestry-loading" style="height: 75vh;"></loading>
   <div v-else id="app">
-    <navbar v-if="settings.tydeModeEnabled"></navbar>
+    <navbar v-if="settings.tydeModeEnabled && tydeMode.defaultNode"></navbar>
     <tapestry-app></tapestry-app>
     <router-view name="lightbox"></router-view>
     <node-modal></node-modal>
@@ -50,7 +50,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(["nodes", "settings"]),
+    ...mapState(["nodes", "settings", "tydeMode"]),
     isEmpty() {
       return Object.keys(this.nodes).length === 0
     },
@@ -73,8 +73,6 @@ export default {
         })
       })
     }
-
-    console.log(this.tydeMode)
     window.addEventListener("click", this.recordAnalytics)
     const data = [client.getTapestry(), client.getUserProgress()]
     Promise.all(data).then(([dataset, progress]) => {

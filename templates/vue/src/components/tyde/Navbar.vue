@@ -2,12 +2,17 @@
   <div class="nav-container">
     <b-navbar tyde="light" class="navbar">
       <b-navbar-nav class="mx-auto" fill style="width:100%;">
-        <b-nav-item :to="tydeMode.defaultNode" active active-class="active">
-          TYDE
+        <b-nav-item
+          v-for="tab in tabs"
+          :key="tab.name"
+          :ref="tab.name + '-tab'"
+          :to="tab.link"
+          active-class="active"
+          link-classes="link"
+        >
+          <tyde-icon class="selected" :icon="tab.name" />
+          <tyde-icon class="unselected" :icon="tab.name + '-unselected'" />
         </b-nav-item>
-        <b-nav-item href="#" active-class="active">Profile</b-nav-item>
-        <b-nav-item href="#" active-class="active">Goals</b-nav-item>
-        <b-nav-item href="#" active-class="active">COS</b-nav-item>
       </b-navbar-nav>
     </b-navbar>
   </div>
@@ -15,15 +20,49 @@
 
 <script>
 import { mapState } from "vuex"
+import TydeIcon from "./TydeIcon.vue"
+
 export default {
   name: "navbar",
+  components: {
+    TydeIcon,
+  },
+  data() {
+    return {}
+  },
   computed: {
     ...mapState(["tydeMode"]),
+    tabs() {
+      return [
+        {
+          name: "tyde",
+          link: this.tydeMode.defaultNode,
+        },
+        {
+          name: "profile",
+          link: "#",
+        },
+        {
+          name: "goals",
+          link: "#",
+        },
+        {
+          name: "cos",
+          link: "#",
+        },
+      ]
+    },
   },
 }
 </script>
 
 <style lang="scss">
+.active > .unselected {
+  display: none;
+}
+:not(.active) > .selected {
+  display: none;
+}
 .nav-container {
   width: 100%;
   z-index: 9999;
@@ -33,7 +72,7 @@ export default {
 }
 .navbar {
   min-width: 250px;
-  max-width: 1050px;
+  max-width: 900px;
   margin: 0 auto;
   width: 75vw;
 
@@ -42,11 +81,16 @@ export default {
 
   background-color: whitesmoke;
 }
+.link {
+  padding: 0 !important;
+}
 .active::after {
   content: "";
   display: block;
-  border: 1px solid #4197ac;
+  position: relative;
+  top: 10px;
+  border: 2px solid #4197ac;
   margin: 0 auto;
-  max-width: 50px;
+  max-width: 55px;
 }
 </style>

@@ -30,6 +30,7 @@
       :node-id="nodeId"
       :dimensions="dimensions"
       context="lightbox"
+      :class="{ 'tyde-mode': settings.tydeModeEnabled }"
       @load="handleLoad"
       @close="handleAutoClose"
       @complete="complete"
@@ -320,5 +321,9 @@ body.tapestry-lightbox-open {
     }
   }
   height: 100%;
+}
+
+.tyde-mode {
+  padding-top: 3rem;
 }
 </style>
