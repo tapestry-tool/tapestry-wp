@@ -84,7 +84,7 @@ export default {
 .link {
   padding: 0 !important;
 }
-.active::after {
+.nav-container .active::after {
   content: "";
   display: block;
   position: relative;

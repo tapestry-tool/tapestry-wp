@@ -501,7 +501,7 @@ export default {
       if (this.tydeModeEnabled) {
         Object.keys(this.tydeModeDefualtNodes).forEach(role => {
           if (!this.tydeModeDefualtNodes[role]) {
-            this.tydeModeDefualtNodes[role] = this.nodesValues[0].id
+            this.tydeModeDefualtNodes[role] = this.nodes[this.rootId]
           }
         })
       }
