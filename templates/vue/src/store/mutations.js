@@ -111,19 +111,31 @@ export function deleteLink(state, { source, target }) {
   )
 }
 
-// quizzes
-export function completeQuestion(state, { nodeId, questionId }) {
+// activities
+export function completeQuestion(state, { nodeId, questionId, answerType, answer }) {
   const node = getters.getNode(state)(nodeId)
-  const question = node.quiz.find(question => question.id === questionId)
-  question.completed = true
-}
 
-export function updateEntry(state, { answerType, entry, nodeId, questionId }) {
-  const node = getters.getNode(state)(nodeId)
-  const question = node.quiz.find(question => question.id === questionId)
-  const entries = question.entries || {}
-  entries[answerType] = Object.values(entry)[0]
-  question.entries = entries
+  const question = node.typeData.activity.questions.find(
+    question => question.id === questionId
+  )
+
+  question.completed = true
+
+  if (
+    state.userAnswers[nodeId] === undefined ||
+    state.userAnswers[nodeId].activity === undefined
+  ) {
+    state.userAnswers[nodeId] = { activity: {} }
+  }
+  if (state.userAnswers[nodeId].activity[questionId] === undefined) {
+    state.userAnswers[nodeId].activity[questionId] = { answers: {} }
+  }
+
+  if (typeof state.userAnswers[nodeId].activity[questionId].answers === "string") {
+    state.userAnswers[nodeId].activity[questionId].answers = {}
+  }
+
+  state.userAnswers[nodeId].activity[questionId].answers[answerType] = answer
 }
 
 // favourites

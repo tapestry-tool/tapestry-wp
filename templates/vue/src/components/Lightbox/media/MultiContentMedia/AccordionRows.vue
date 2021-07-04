@@ -7,7 +7,7 @@
     <template v-slot="{ isVisible, hasNext, next, toggle }">
       <div data-qa="accordion-rows">
         <div
-          v-for="(row, index) in rows"
+          v-for="(row, index) in nonPopupRows"
           :key="row.node.id"
           ref="rowRefs"
           class="accordion-row"
@@ -52,13 +52,15 @@
                 :node-id="row.node.id"
                 :dimensions="dimensions"
                 context="multi-content"
-                :autoplay="false"
                 style="color: white; margin-bottom: 24px;"
                 @complete="updateProgress(row.node.id)"
                 @close="toggle(row.node.id)"
                 @load="handleLoad($refs.rowRefs[index])"
               />
-              <p v-if="row.children.length > 0" style="color: white;">
+              <p
+                v-if="row.children.length > 0 && !areAllPopup(row)"
+                style="color: white;"
+              >
                 {{ row.node.typeData.subAccordionText }}
               </p>
               <accordion-rows
@@ -146,9 +148,6 @@ export default {
       showCompletion: false,
     }
   },
-  mounted() {
-    this.$root.$emit("observe-rows", this.$refs.rowRefs)
-  },
   computed: {
     ...mapGetters([
       "getDirectChildren",
@@ -166,6 +165,9 @@ export default {
           : this.getDirectChildren(id).map(this.getNode)
         return { node, children }
       })
+    },
+    nonPopupRows() {
+      return this.rows.filter(row => row.node.popup === null)
     },
     lockRows() {
       return this.node.typeData.lockRows
@@ -193,9 +195,12 @@ export default {
       }
     },
   },
+  mounted() {
+    this.$root.$emit("observe-rows", this.$refs.rowRefs)
+  },
   methods: {
     ...mapMutations(["updateNode"]),
-    ...mapActions(["completeNode", "updateNodeProgress", "toggleFavourite"]),
+    ...mapActions(["completeNode", "toggleFavourite"]),
     handleLoad(el) {
       this.$emit("load", el)
     },
@@ -213,6 +218,19 @@ export default {
     },
     handleAutoClose() {
       this.$emit("close")
+    },
+    areAllPopup(row) {
+      let popCount = 0
+      row.children.forEach(child => {
+        if (child.popup !== null) {
+          popCount++
+        }
+      })
+
+      if (popCount === row.children.length) {
+        return true
+      }
+      return false
     },
   },
 }

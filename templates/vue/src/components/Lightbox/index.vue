@@ -255,8 +255,8 @@ export default {
   },
   methods: {
     ...mapActions(["completeNode"]),
-    complete() {
-      this.completeNode(this.nodeId)
+    complete(nodeId) {
+      this.completeNode(nodeId || this.nodeId)
     },
     handleUserClose() {
       client.recordAnalyticsEvent("user", "close", "lightbox", this.nodeId)
@@ -273,9 +273,9 @@ export default {
         query: this.$route.query,
       })
     },
-    handleLoad(dimensions) {
-      if (dimensions) {
-        const { width, height } = dimensions
+    handleLoad(dimensions = {}) {
+      const { width, height } = dimensions
+      if (width && height) {
         this.updateDimensions({ width, height })
       }
     },

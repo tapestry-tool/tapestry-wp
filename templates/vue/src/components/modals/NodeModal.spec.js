@@ -3,24 +3,14 @@ import { render } from "@/utils/test"
 
 import oneNodeTapestry from "@/fixtures/one-node.json"
 import NodeModal from "./NodeModal"
-import GravityFormsApi from "@/services/GravityFormsApi"
 import { names } from "@/config/routes"
 
 const node = oneNodeTapestry.nodes[0]
-
-jest.mock("@/services/GravityFormsApi", () => {
-  return {
-    ...jest.requireActual("@/services/GravityFormsApi"),
-    exists: jest.fn(),
-    getAllForms: jest.fn(),
-  }
-})
 
 describe("node modal: content - video", () => {
   let screen
 
   beforeEach(async () => {
-    GravityFormsApi.exists.mockImplementation(() => Promise.resolve(false))
     screen = render(
       NodeModal,
       { fixture: oneNodeTapestry },

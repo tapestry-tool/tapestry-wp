@@ -55,7 +55,6 @@
       "hideProgress": false,
       "hideMedia": false,
       "skippable": true,
-      "quiz": [],
       "fullscreen": true,
       "conditions": [],
       "childOrdering": [
@@ -122,7 +121,6 @@
       "childOrdering": [
         2672
       ],
-      "quiz": [],
       "license": "",
       "references": "",
       "unlocked": true,
@@ -184,7 +182,6 @@
         "fy": 2765.330315153186
       },
       "childOrdering": [],
-      "quiz": [],
       "license": "",
       "references": "",
       "unlocked": true,
