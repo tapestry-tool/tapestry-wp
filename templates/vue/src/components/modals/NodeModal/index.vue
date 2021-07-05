@@ -273,6 +273,7 @@ import { sizes, nodeStatus } from "@/utils/constants"
 import { getLinkMetadata } from "@/services/LinkPreviewApi"
 import DragSelectModular from "@/utils/dragSelectModular"
 import * as wp from "@/services/wp"
+
 const shouldFetch = (url, selectedNode) => {
   if (!selectedNode.typeData.linkMetadata) {
     return true
@@ -280,6 +281,7 @@ const shouldFetch = (url, selectedNode) => {
   const oldUrl = selectedNode.typeData.linkMetadata.url
   return oldUrl != Helpers.normalizeUrl(url)
 }
+
 export default {
   name: "node-modal",
   components: {
@@ -583,10 +585,12 @@ export default {
       if (okTabs.includes(requestedTab)) {
         return true
       }
+
       // If requested tab is access, check if the user can access it
       if (requestedTab === "access") {
         return this.viewAccess
       }
+
       switch (requestedTab) {
         case "activity": {
           return this.node.mediaType === "h5p" || this.node.mediaType === "video"
@@ -598,6 +602,7 @@ export default {
           return this.node.hasMultiContentChild
         }
       }
+
       return false
     },
     hasMultiContentChild(node) {
@@ -669,6 +674,7 @@ export default {
         ) {
           // Prevent NodeModal from closing
           if (event) event.preventDefault()
+
           // Return to modal of parent node
           this.$router.push({
             name: names.MODAL,
@@ -691,9 +697,11 @@ export default {
       if (!this.hasSubmissionError) {
         this.loading = true
         this.updateNodeCoordinates()
+
         if (this.linkHasThumbnailData) {
           await this.setLinkData()
         }
+
         if (this.shouldReloadDuration()) {
           this.loadDuration = true
         } else {
@@ -715,12 +723,14 @@ export default {
       }
       this.node.reviewStatus = nodeStatus.SUBMIT
       this.node.status = nodeStatus.DRAFT
+
       this.node.reviewComments.push(
         Comment.createComment(Comment.types.STATUS_CHANGE, {
           from: null,
           to: nodeStatus.SUBMIT,
         })
       )
+
       this.handleSubmit()
     },
     async submitNode() {
@@ -757,6 +767,7 @@ export default {
       }
       await this.updateLockedStatus()
       this.loading = false
+
       /**
        * Sometimes changes in the parent node causes changes in child nodes. For
        * example, when a node goes from a video to a non-video, all child popups
@@ -841,6 +852,7 @@ export default {
     },
     validateNode() {
       const errMsgs = []
+
       if (this.node.title.length == 0) {
         errMsgs.push("Please enter a title")
       }
@@ -854,6 +866,7 @@ export default {
             " characters"
         )
       }
+
       if (this.node.popup) {
         const { time } = this.node.popup
         if (time === "") {
@@ -862,6 +875,7 @@ export default {
           errMsgs.push(`Please enter a time greater than 0.`)
         }
       }
+
       if (!this.node.mediaType) {
         errMsgs.push("Please select a Content Type")
       } else if (this.node.mediaType === "video") {
@@ -891,6 +905,7 @@ export default {
         if (!validActivityTitles) {
           errMsgs.push("Please enter a question text for all questions")
         }
+
         const validActivityOptions = this.node.typeData.activity.questions.every(
           question => {
             const answerTypes = Object.values(question.answerTypes)
@@ -900,6 +915,7 @@ export default {
         if (!validActivityOptions) {
           errMsgs.push("Please enable at least one answer type for each question")
         }
+
         const questionsWithPreviousActivity = this.node.typeData.activity.questions.filter(
           question => {
             return question.isFollowUp
@@ -942,8 +958,9 @@ export default {
         if (!hasQuestionId) {
           errMsgs.push("Please select a question")
         }
+
+        return errMsgs
       }
-      return errMsgs
     },
     isValidVideo(typeData) {
       return (
@@ -961,6 +978,7 @@ export default {
       if (shouldFetch(this.node.typeData.mediaURL, this.node)) {
         const url = this.node.typeData.mediaURL
         const { data } = await getLinkMetadata(url)
+
         if (data) {
           this.node.typeData.linkMetadata = data
           if (
@@ -1055,6 +1073,7 @@ export default {
   left: 101vw;
   width: 1px;
 }
+
 h6 {
   font-weight: 400;
 }
@@ -1064,12 +1083,14 @@ h6 {
 /* Use non-scoped styles to overwrite WP theme styles */
 table {
   border: 1px solid #dee2e6;
+
   th,
   td {
     word-break: unset;
     border: none;
   }
 }
+
 /* overwrite bootstrap styles */
 .modal-header {
   background: #f7f7f7;
@@ -1077,22 +1098,27 @@ table {
   padding-bottom: 0;
   margin-left: 5px;
   flex-direction: column;
+
   button.close {
     position: absolute;
     top: 15px;
     right: 12px;
+
     &:focus {
       outline: none;
     }
   }
 }
+
 .has-errors > .card-header {
   background: #f8d7da;
 }
+
 .modal-title {
   font-size: 1.5rem;
   font-weight: 600;
 }
+
 .nav-link:focus {
   outline: none;
 }
@@ -1105,42 +1131,51 @@ table {
   align-items: center;
   justify-content: center;
 }
+
 #node-modal-container {
   * {
     outline: none;
   }
+
   .form-control {
     padding: 15px;
     border: none;
     background: #f1f1f1;
   }
+
   .modal-header-row {
     display: flex;
     justify-content: space-between;
     width: 100%;
     margin-bottom: 0;
+
     &:last-child {
       margin-bottom: 0;
     }
   }
 }
+
 .modal-header-row {
   display: flex;
   justify-content: space-between;
   width: 100%;
   margin-bottom: 8px;
+
   &:last-child {
     margin-bottom: 0;
   }
 }
+
 .modal-header-small {
   padding-top: 8px;
   padding-bottom: 8px;
 }
+
 .modal-header-link {
   font-weight: normal;
   font-size: 16px;
 }
+
 .error-wrapper {
   position: sticky;
   z-index: 2;
@@ -1149,6 +1184,7 @@ table {
   color: #721c24;
   padding: 1em 1em 1px 2em;
 }
+
 .slick-list-item {
   display: flex;
   height: 25px;
@@ -1164,13 +1200,16 @@ table {
     margin-left: auto;
   }
 }
+
 .indented-options {
   border-left: solid 2px #ccc;
   padding-left: 1em;
 }
+
 button:disabled {
   cursor: not-allowed;
 }
+
 .buttons-container > * {
   margin: 0.25rem !important;
 }
