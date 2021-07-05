@@ -186,6 +186,7 @@ export default {
   },
   watch: {
     choiceRows(newChoiceRows) {
+      this.question.answerTypes.multipleChoice.choices = newChoiceRows
       this.question.answerTypes.multipleChoice.checkboxArray = newChoiceRows
     },
     choiceRowsRadio(newChoiceRowsRadio) {
@@ -213,6 +214,7 @@ export default {
       !this.question.answerTypes.multipleChoice.hasOwnProperty("radioArray") ||
       !this.question.answerTypes.multipleChoice.hasOwnProperty("useImages")
     ) {
+      this.question.answerTypes.multipleChoice.choices = this.choiceRows
       this.question.answerTypes.multipleChoice.checkboxArray = this.choiceRows
       this.question.answerTypes.multipleChoice.radioArray = this.choiceRowsRadio
       this.question.answerTypes.multipleChoice.nextChoiceRowId = this.nextChoiceRowId
@@ -221,6 +223,7 @@ export default {
       this.question.answerTypes.multipleChoice.preSelectedCheckBoxOptions = this.preSelectedCheckBoxOptions
       this.question.answerTypes.multipleChoice.preSelectedRadioOptions = this.preSelectedRadioOptions
     } else {
+      this.choices = this.question.answerTypes.multipleChoice.choices
       this.choiceRows = this.question.answerTypes.multipleChoice.checkboxArray
       this.choiceRowsRadio = this.question.answerTypes.multipleChoice.radioArray
       this.nextChoiceRowId = this.question.answerTypes.multipleChoice.nextChoiceRowId

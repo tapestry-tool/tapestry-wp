@@ -173,7 +173,7 @@
                 <div v-if="question.answerTypes.multipleChoice.enabled">
                   <multiple-choice-form
                     :question="question"
-                    data-qa="authoring-multiplechoice-form"
+                    data-qa="authoring-multiple-choice-form"
                     :multipleAnswerSelected="
                       question.answerTypes.multipleChoice.hasMultipleAnswers
                     "
