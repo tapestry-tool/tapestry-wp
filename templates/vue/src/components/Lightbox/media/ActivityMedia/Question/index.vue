@@ -42,23 +42,25 @@
       <div class="question-body">
         <div v-if="formOpened">
           <text-question
-            v-if="formType === 'text'"
+            v-if="formType === 'text' && !question.answerTypes.text.allowMultiple"
             :question="question"
             :answer="answer"
             @submit="handleSubmit"
           ></text-question>
+          <list-question
+            v-else-if="
+              formType === 'text' && question.answerTypes.text.allowMultiple
+            "
+            :question="question"
+            :answer="answer ? answer : []"
+            @submit="handleSubmit"
+          ></list-question>
           <audio-recorder
             v-else-if="formType === 'audio'"
             :id="question.id"
             :node="node"
             @submit="handleSubmit"
           />
-          <list-question
-            v-else-if="formType === 'list'"
-            :question="question"
-            :answer="answer ? answer : []"
-            @submit="handleSubmit"
-          ></list-question>
         </div>
         <div v-else class="question-answer-types">
           <p class="question-answer-text">I want to answer with...</p>
@@ -79,15 +81,6 @@
               @click="openForm('audio')"
             >
               audio
-            </answer-button>
-            <answer-button
-              v-if="question.answerTypes.list.enabled"
-              :completed="listFormCompleted"
-              icon="list"
-              data-qa="answer-button-list"
-              @click="openForm('list')"
-            >
-              list
             </answer-button>
           </div>
         </div>
@@ -204,14 +197,6 @@ export default {
       if (
         this.userAnswers?.[this.node.id]?.activity?.[this.question.id]?.answers
           ?.audio
-      ) {
-        return true
-      }
-      return false
-    },
-    listFormCompleted() {
-      if (
-        this.userAnswers?.[this.node.id]?.activity?.[this.question.id]?.answers?.list
       ) {
         return true
       }
