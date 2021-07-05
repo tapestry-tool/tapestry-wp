@@ -11,12 +11,6 @@
             </div>
           </template>
           <completed-activity-media
-            v-if="questionAnswer[0] === 'audio'"
-            :type="questionAnswer[0]"
-            :answerData="getFullUrl(questionAnswer[1].url)"
-          ></completed-activity-media>
-          <completed-activity-media
-            v-else
             :type="questionAnswer[0]"
             :answerData="questionAnswer[1]"
           ></completed-activity-media>

@@ -19,9 +19,9 @@
           </h3>
           <completed-activity-media
             v-for="previousAnswer in previousQuestionAnswers"
-            :key="previousAnswer.type"
-            :type="previousAnswer.type"
-            :answerData="previousAnswer.answerData"
+            :key="previousAnswer[0]"
+            :type="previousAnswer[0]"
+            :answerData="previousAnswer[1]"
           ></completed-activity-media>
         </div>
         <div v-else>

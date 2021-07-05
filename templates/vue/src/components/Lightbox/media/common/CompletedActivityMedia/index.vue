@@ -25,15 +25,17 @@ export default {
       validator: val => ["text", "audio"].includes(val),
     },
     answerData: {
-      type: [Object],
+      type: [Object, String],
       required: true,
     },
   },
-  computed:{
+  computed: {
     urlAnswer() {
-      return wpData.uploadDirArray.baseurl + "/" + this.answerData.url + "?" + Date.now()
-    }
-  }
+      return (
+        wpData.uploadDirArray.baseurl + "/" + this.answerData.url + "?" + Date.now()
+      )
+    },
+  },
 }
 </script>
 

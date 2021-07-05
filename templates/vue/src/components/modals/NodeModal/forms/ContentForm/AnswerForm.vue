@@ -73,7 +73,7 @@ export default {
       return questions
     },
     originalQuestionText() {
-      return this.availableQuestions.find(
+      return this?.availableQuestions.find(
         question => question.id === this.node.typeData.questionId
       ).text
     },
