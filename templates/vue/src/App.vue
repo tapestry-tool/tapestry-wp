@@ -1,8 +1,8 @@
 <template>
   <loading v-if="loading" data-qa="tapestry-loading" style="height: 75vh;"></loading>
   <div v-else id="app">
-    <navbar v-if="isTydeView"></navbar>
-    <tapestry-app @initiate-tyde-view="isTydeView = $event"></tapestry-app>
+    <navbar v-if="tydeMode.displayTydeMode"></navbar>
+    <tapestry-app></tapestry-app>
     <router-view name="lightbox"></router-view>
     <node-modal></node-modal>
     <sidebar v-if="!isEmpty"></sidebar>
@@ -47,11 +47,10 @@ export default {
     return {
       loading: true,
       loggedIn: true,
-      isTydeView: false,
     }
   },
   computed: {
-    ...mapState(["nodes"]),
+    ...mapState(["nodes", "tydeMode"]),
     isEmpty() {
       return Object.keys(this.nodes).length === 0
     },

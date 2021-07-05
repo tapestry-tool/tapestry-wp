@@ -45,7 +45,6 @@ export default {
         const hasEditPermissions = currentUser.roles.some(role => {
           return rootNode.permissions[role].some(premission => premission === "edit")
         })
-        this.$emit("initiate-tyde-view", !hasEditPermissions)
         return !hasEditPermissions
       }
       return false
@@ -80,7 +79,13 @@ export default {
     this.setupTydeMode()
   },
   methods: {
-    ...mapMutations(["select", "unselect", "clearSelection", "setTydeModeDefault"]),
+    ...mapMutations([
+      "select",
+      "unselect",
+      "clearSelection",
+      "setTydeModeDefault",
+      "setDisplayTydeMode",
+    ]),
     updateViewBox() {
       const MAX_RADIUS = 240
       const MIN_TAPESTRY_WIDTH_FACTOR = 1.5
@@ -176,6 +181,8 @@ export default {
              default node, otherwise the regular tapestry will
              open
       */
+      this.setDisplayTydeMode(this.isTydeView)
+
       if (this.isTydeView) {
         const userMainRole = currentUser.roles[0] || "public"
         const defaultNodeId = this.settings.tydeModeDefualtNodes[userMainRole]
@@ -184,6 +191,7 @@ export default {
           params: { nodeId: defaultNodeId },
           query: this.$route.query,
         })
+
         this.openNode(defaultNodeId)
       }
     },

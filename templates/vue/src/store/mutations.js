@@ -164,3 +164,7 @@ export function setTapestryErrorReporting(state, isEnabled) {
 export function setTydeModeDefault(state, defaultNode) {
   state.tydeMode.defaultNode = defaultNode
 }
+
+export function setDisplayTydeMode(state, shouldDisplay) {
+  state.tydeMode.displayTydeMode = shouldDisplay
+}

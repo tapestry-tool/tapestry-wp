@@ -3,12 +3,12 @@
     id="lightbox"
     data-qa="lightbox"
     :class="{
-      'full-screen': node.fullscreen || settings.tydeModeEnabled,
+      'full-screen': node.fullscreen || tydeMode.displayTydeMode,
       'content-text': node.mediaType === 'text' || node.mediaType === 'wp-post',
     }"
     :node-id="nodeId"
     :content-container-style="lightboxContentStyles"
-    :allow-close="canSkip && !settings.tydeModeEnabled"
+    :allow-close="canSkip && !tydeMode.displayTydeMode"
     @close="handleUserClose"
   >
     <multi-content-media
@@ -30,7 +30,7 @@
       :node-id="nodeId"
       :dimensions="dimensions"
       context="lightbox"
-      :class="{ 'tyde-mode': settings.tydeModeEnabled }"
+      :class="{ 'tyde-mode': tydeMode.displayTydeMode }"
       @load="handleLoad"
       @close="handleAutoClose"
       @complete="complete"
@@ -86,7 +86,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(["h5pSettings", "rootId", "settings"]),
+    ...mapState(["h5pSettings", "rootId", "tydeMode"]),
     ...mapGetters(["getNode", "isMultiContent", "isMultiContentRow"]),
     node() {
       const node = this.getNode(this.nodeId)
@@ -103,7 +103,7 @@ export default {
         height: this.dimensions.height + "px",
       }
 
-      if (this.node.fullscreen || this.settings.tydeModeEnabled) {
+      if (this.node.fullscreen || this.tydeMode.displayTydeMode) {
         styles.top = "auto"
         styles.left = "auto"
         styles.width = "100vw"
