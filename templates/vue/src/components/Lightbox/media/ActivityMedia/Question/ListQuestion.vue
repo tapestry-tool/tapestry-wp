@@ -1,18 +1,14 @@
 <template>
   <div class="container">
-    <div class="list">
-      <ul
-        v-for="(answer, index) in answerList"
-        :key="answer.index"
-        class="answerItem"
-      >
+    <ul class="list">
+      <li v-for="(answerItem, index) in answerList" :key="index" class="answerItem">
         <b-form-input
           v-model="answerList[index]"
           :data-qa="`list-input-${index}`"
           :placeholder="
             question.answerTypes.list.placeholder
               ? question.answerTypes.list.placeholder
-              : 'Enter text and press Enter'
+              : 'Type an answer and press Enter'
           "
         ></b-form-input>
         <b-button
@@ -32,8 +28,8 @@
         >
           -
         </b-button>
-      </ul>
-    </div>
+      </li>
+    </ul>
     <div class="submission">
       <b-button
         class="submit-btn"
@@ -57,14 +53,14 @@ export default {
       type: Object,
       required: true,
     },
-    answers: {
+    answer: {
       type: Array,
       required: true,
     },
   },
   data() {
     return {
-      answerList: this.answers.map(x => x),
+      answerList: this.answer.map(x => x),
     }
   },
   computed: {
@@ -81,14 +77,8 @@ export default {
     },
   },
   created() {
-    if (this.numOfFields === 0) {
-      for (let i = 0; i < this.minFields; i++) {
-        this.addAnswer()
-      }
-    } else {
-      for (let i = this.numOfFields; i < this.minFields; i++) {
-        this.addAnswer()
-      }
+    for (let i = this.numOfFields; i < this.minFields; i++) {
+      this.addAnswer()
     }
   },
   methods: {
@@ -123,25 +113,16 @@ export default {
   justify-content: center;
   align-items: center;
 }
-.list {
-  position: relative;
-  margin-top: 20px;
-}
+
 .answerItem {
+  display: flex;
   border-style: solid;
   border-radius: 6px;
-  margin: 5px;
   padding: 10px 20px;
+  margin-top: 5px;
 }
-.list ul {
-  position: relative;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-left: 10px;
-  padding: 4px;
-}
-.list ul button {
+
+.list li button {
   float: right;
   position: relative;
   padding: 20px;
@@ -153,6 +134,8 @@ export default {
   float: right;
   font-size: 30px;
   font-weight: bold;
+  margin-left: 3px;
+  margin-right: 3px;
 }
 
 .submit-btn {

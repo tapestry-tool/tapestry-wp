@@ -165,7 +165,6 @@
                           id="min-field"
                           v-model="question.answerTypes.list.minFields"
                           data-qa="min-list-fields-input"
-                          placeholder="Min # of answer fields"
                           type="number"
                           class="list-input"
                         ></b-form-input>
@@ -179,7 +178,6 @@
                           v-model="question.answerTypes.list.maxFields.value"
                           :disabled="!question.answerTypes.list.maxFields.enabled"
                           data-qa="max-list-fields-input"
-                          placeholder="Max # of answer fields"
                           type="number"
                           class="list-input"
                         ></b-form-input>
@@ -193,6 +191,7 @@
                     id="placeholder"
                     v-model="question.answerTypes.list.placeholder"
                     data-qa="question-answer-list-placeholder"
+                    :placeholder="question.answerTypes.list.placeholder"
                   ></b-form-input>
                 </div>
               </div>
@@ -253,7 +252,7 @@ const defaultQuestion = {
     },
     list: {
       enabled: false,
-      placeholder: "",
+      placeholder: "Type an answer and press Enter",
       minFields: 1,
       maxFields: { enabled: false, value: 100 },
     },

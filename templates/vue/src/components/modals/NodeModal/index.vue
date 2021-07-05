@@ -919,17 +919,17 @@ export default {
             .list
           let minValue = parseInt(listQuestion.minFields, 10)
           if (minValue < 1) {
-            errMsgs.push("Minimum # of fields for list activity must be >= 1")
+            errMsgs.push("Minimum number of fields for list activity must be >= 1")
           }
           if (listQuestion.maxFields.enabled) {
             let maxValue = parseInt(listQuestion.maxFields.value, 10)
             if (maxValue < minValue) {
               errMsgs.push(
-                "Maximum # of fields for list activity must be >= minumum # fields"
+                "Maximum number of fields for list activity must be >= minimum number fields"
               )
             }
             if (maxValue > 100) {
-              errMsgs.push("Maximum # fields must be <= 100")
+              errMsgs.push("Maximum number of fields must be <= 100")
             }
           }
         }

@@ -56,7 +56,7 @@
           <list-question
             v-else-if="formType === 'list'"
             :question="question"
-            :answers="answer ? answer : []"
+            :answer="answer ? answer : []"
             @submit="handleSubmit"
           ></list-question>
         </div>
@@ -210,8 +210,12 @@ export default {
       return false
     },
     listFormCompleted() {
-      return this.userAnswers?.[this.node.id]?.activity?.[this.question.id]?.answers
-        ?.list
+      if (
+        this.userAnswers?.[this.node.id]?.activity?.[this.question.id]?.answers?.list
+      ) {
+        return true
+      }
+      return false
     },
   },
   watch: {

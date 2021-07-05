@@ -19,11 +19,6 @@ export default {
       type: Object,
       required: true,
     },
-    // textInput: {
-    //   type: String,
-    //   required: false,
-    //   default: "",
-    // },
   },
   created() {
     if (!this.node.typeData.textContent) {
