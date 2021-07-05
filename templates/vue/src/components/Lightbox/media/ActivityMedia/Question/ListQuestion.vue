@@ -16,7 +16,7 @@
           variant="primary"
           :data-qa="`list-add-${index}`"
           @click="addAnswer"
-          @keydown.enter.prevent="addAnswer"
+          @keydown.enter="enterPress"
         >
           +
         </b-button>
@@ -76,6 +76,18 @@ export default {
       return this.answerList.length
     },
   },
+  // beforeDestroy() {
+  //   // this.removeEventListener("keydown", e => {
+  //   //   this.enterPress(e)
+  //   // })
+  //   // console.log("removed event listender")
+  // },
+  // mounted() {
+  // 	// console.log(this)
+  //   // this.addEventListener("keydown", e => {
+  //   //   this.enterPress(e)
+  //   // })
+  // },
   created() {
     for (let i = this.numOfFields; i < this.minFields; i++) {
       this.addAnswer()
@@ -99,6 +111,11 @@ export default {
     },
     addAnswer() {
       this.answerList.push("")
+    },
+    enterPress(e) {
+      if (e.key === "Enter") {
+        this.addAnswer()
+      }
     },
     handleListSubmit(event) {
       event.preventDefault()
