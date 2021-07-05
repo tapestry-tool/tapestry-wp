@@ -965,12 +965,12 @@ export default {
             if (hasMultipleAnswer && useImages) {
               return question.answerTypes.multipleChoice.checkboxArray.every(
                 option => {
-                  return option.imageurl != "" && option.imageurl != null
+                  return option.imageUrl != "" && option.imageUrl != null
                 }
               )
             } else if (!hasMultipleAnswer && useImages) {
               return question.answerTypes.multipleChoice.radioArray.every(option => {
-                return option.imageurl != "" && option.imageurl != null
+                return option.imageUrl != "" && option.imageUrl != null
               })
             } else if (!useImages) {
               return true

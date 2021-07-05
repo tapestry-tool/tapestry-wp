@@ -4,7 +4,7 @@
     <b-form-checkbox :value="item.id" />
     <b-form-group v-if="useImages">
       <file-upload
-        v-model="item.imageurl"
+        v-model="item.imageUrl"
         input-test-id="node-choiceRow-thumbnail-url"
         :data-qa="`choicerow-checkbox-thumbnail-${item.id}`"
         :show-url-upload="false"
@@ -40,7 +40,7 @@
     >
       <b-form-group v-if="useImages">
         <file-upload
-          v-model="item.imageurl"
+          v-model="item.imageUrl"
           input-test-id="node-choiceRow-thumbnail-url"
           :data-qa="`choicerow-radio-thumbnail-${item.id}`"
           :show-url-upload="false"

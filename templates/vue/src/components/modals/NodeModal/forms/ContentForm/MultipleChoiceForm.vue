@@ -10,6 +10,7 @@
           Use Images
         </b-form-checkbox>
       </b-form-group>
+      <p>question data is {{ question }}</p>
       <b-form-group v-if="multipleAnswerSelected">
         <sortable-list
           v-model="choiceRows"
@@ -125,17 +126,17 @@ export default {
       choiceRows: [
         {
           id: 1,
-          imageurl: "",
+          imageUrl: "",
           value: "",
         },
         {
           id: 2,
-          imageurl: "",
+          imageUrl: "",
           value: "",
         },
         {
           id: 3,
-          imageurl: "",
+          imageUrl: "",
           value: "",
         },
       ],
@@ -143,17 +144,17 @@ export default {
       choiceRowsRadio: [
         {
           id: 50,
-          imageurl: "",
+          imageUrl: "",
           value: "",
         },
         {
           id: 51,
-          imageurl: "",
+          imageUrl: "",
           value: "",
         },
         {
           id: 52,
-          imageurl: "",
+          imageUrl: "",
           value: "",
         },
       ],
@@ -233,14 +234,14 @@ export default {
     addNewChoice: function() {
       this.choiceRows.push({
         id: this.nextChoiceRowId++,
-        imageurl: "",
+        imageUrl: "",
         value: "",
       })
     },
     addNewChoiceRadio: function() {
       this.choiceRowsRadio.push({
         id: this.nextChoiceRowRadioId++,
-        imageurl: "",
+        imageUrl: "",
         value: "",
       })
     },

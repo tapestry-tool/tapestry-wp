@@ -1,8 +1,8 @@
 <template>
   <div>
     <b-img
-      v-if="useImages && item.imageurl != null"
-      :src="item.imageurl"
+      v-if="useImages && item.imageUrl != null"
+      :src="item.imageUrl"
       class="image-choice"
     ></b-img>
     {{ item.value }}

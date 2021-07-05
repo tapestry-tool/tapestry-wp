@@ -6,8 +6,8 @@
       :data-qa="`user-choicerow-checkbox-checked-${item.id}`"
     >
       <b-img
-        v-if="hasImage && item.imageurl !== null"
-        :src="item.imageurl"
+        v-if="hasImage && item.imageUrl !== null"
+        :src="item.imageUrl"
         class="imageChoice"
         :data-qa="`user-choicerow-checkbox-thumbnail-${item.id}`"
       ></b-img>
@@ -19,8 +19,8 @@
       :data-qa="`user-choicerow-radio-checked-${item.id}`"
     >
       <b-img
-        v-if="hasImage && item.imageurl !== null"
-        :src="item.imageurl"
+        v-if="hasImage && item.imageUrl !== null"
+        :src="item.imageUrl"
         class="imageChoice"
         :data-qa="`user-choicerow-radio-thumbnail-${item.id}`"
       ></b-img>
