@@ -1,5 +1,5 @@
 <template>
-  <b-container class="tapestry-activity">
+  <b-container class="completed-activity-media">
     <b-row align-v="center" style="min-height:150px;">
       <b-col v-if="type === 'text'" align-self="center">
         <div class="text">
@@ -17,7 +17,7 @@
 import { data as wpData } from "@/services/wp"
 
 export default {
-  name: "tapestry-activity",
+  name: "completed-activity-media",
   props: {
     type: {
       type: String,
@@ -38,7 +38,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.tapestry-activity {
+.completed-activity-media {
   background: #262626;
   border-radius: 8px;
   margin-bottom: 8px;

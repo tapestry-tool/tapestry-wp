@@ -1,10 +1,7 @@
 <template>
   <div class="answers">
     <h3>{{ node.title }}</h3>
-    <div
-      class="answer-container mx-auto mb-3"
-      data-qa="answer-display"
-    >
+    <div class="answer-container mx-auto mb-3" data-qa="answer-display">
       <h4>{{ answersTypeData.precedingText || question.text }}</h4>
       <b-tabs vertical no-nav-style nav-class="nav-tablist">
         <b-tab v-for="questionAnswer in answers" :key="questionAnswer[0]">
@@ -13,10 +10,16 @@
               <tapestry-icon :icon="questionAnswer[0]" />
             </div>
           </template>
-          <tapestry-activity
+          <completed-activity-media
+            v-if="questionAnswer[0] === 'audio'"
+            :type="questionAnswer[0]"
+            :answerData="getFullUrl(questionAnswer[1].url)"
+          ></completed-activity-media>
+          <completed-activity-media
+            v-else
             :type="questionAnswer[0]"
             :answerData="questionAnswer[1]"
-          ></tapestry-activity>
+          ></completed-activity-media>
         </b-tab>
       </b-tabs>
       <div v-show="!hasAnswer" class="media-wrapper">
@@ -28,13 +31,13 @@
 
 <script>
 import { mapGetters, mapState } from "vuex"
-import TapestryActivity from "./ActivityMedia/TapestryActivity"
+import CompletedActivityMedia from "./common/CompletedActivityMedia"
 import TapestryIcon from "@/components/common/TapestryIcon"
 
 export default {
   name: "answer-media",
   components: {
-    TapestryActivity,
+    CompletedActivityMedia,
     TapestryIcon,
   },
   props: {
@@ -53,7 +56,10 @@ export default {
       return this.getQuestion(this.answersTypeData.questionId)
     },
     answers() {
-      const answers = this.getAnswers(this.answersTypeData.activityId, this.answersTypeData.questionId)
+      const answers = this.getAnswers(
+        this.answersTypeData.activityId,
+        this.answersTypeData.questionId
+      )
       return answers ? Object.entries(answers) : null
     },
     hasAnswer() {
