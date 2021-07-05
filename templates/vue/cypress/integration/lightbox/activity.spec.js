@@ -35,11 +35,11 @@ describe("Activity", () => {
       cy.route("POST", "**/quiz*").as("submit")
 
       cy.lightbox().within(() => {
-        cy.getByTestId(`user-choicerow-checkbox-1`)
-          .getByTestId(`user-choicerow-checkbox-checked-1`)
+        cy.getByTestId(`multiple-choice-question-1`)
+          .getByTestId(`multiple-choice-question-item-1-checked`)
           .click({ force: true })
-        cy.getByTestId(`user-choicerow-checkbox-2`)
-          .getByTestId(`user-choicerow-checkbox-checked-2`)
+        cy.getByTestId(`multiple-choice-question-2`)
+          .getByTestId(`multiple-choice-question-item-2-checked`)
           .click({ force: true })
 
         cy.contains(/submit/i).click()
@@ -85,8 +85,8 @@ describe("Activity", () => {
       cy.route("POST", "**/quiz*").as("submit")
 
       cy.lightbox().within(() => {
-        cy.getByTestId(`user-choicerow-radio-52`)
-          .getByTestId(`user-choicerow-radio-checked-52`)
+        cy.getByTestId(`multiple-choice-question-radio-52`)
+          .getByTestId(`multiple-choice-radio-question-item-52-checked`)
           .click({ force: true })
 
         cy.contains(/submit/i).click()

@@ -4,26 +4,26 @@
     <b-form-checkbox
       v-if="isCheckBox"
       :value="item.id"
-      :data-qa="`user-choicerow-checkbox-checked-${item.id}`"
+      :data-qa="`multiple-choice-question-item-${item.id}-checked`"
     >
       <b-img
         v-if="hasImage && item.imageUrl !== null"
         :src="item.imageUrl"
         class="imageChoice"
-        :data-qa="`user-choicerow-checkbox-thumbnail-${item.id}`"
+        :data-qa="`multiple-choice-question-item-${item.id}-thumbnail`"
       ></b-img>
       {{ item.value }}
     </b-form-checkbox>
     <b-form-radio
       v-else-if="!isCheckBox"
       :value="item.id"
-      :data-qa="`user-choicerow-radio-checked-${item.id}`"
+      :data-qa="`multiple-choice-radio-question-item-${item.id}-checked`"
     >
       <b-img
         v-if="hasImage && item.imageUrl !== null"
         :src="item.imageUrl"
         class="imageChoice"
-        :data-qa="`user-choicerow-radio-thumbnail-${item.id}`"
+        :data-qa="`multiple-choice-radio-question-item-${item.id}-thumbnail`"
       ></b-img>
       {{ item.value }}
     </b-form-radio>

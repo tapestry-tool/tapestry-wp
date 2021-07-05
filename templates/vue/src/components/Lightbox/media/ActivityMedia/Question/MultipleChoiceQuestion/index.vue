@@ -9,7 +9,7 @@
           :item="userChoiceRow"
           :isCheckBox="question.answerTypes.multipleChoice.hasMultipleAnswers"
           :hasImage="question.answerTypes.multipleChoice.useImages"
-          :data-qa="`user-choicerow-checkbox-${userChoiceRow.id}`"
+          :data-qa="`multiple-choice-question-${userChoiceRow.id}`"
         ></multiple-choice-question-item>
       </b-form-checkbox-group>
     </b-form-group>
@@ -22,7 +22,7 @@
           :item="userChoiceRow"
           :isCheckBox="question.answerTypes.multipleChoice.hasMultipleAnswers"
           :hasImage="question.answerTypes.multipleChoice.useImages"
-          :data-qa="`user-choicerow-radio-${userChoiceRow.id}`"
+          :data-qa="`multiple-choice-question-radio-${userChoiceRow.id}`"
         ></multiple-choice-question-item>
       </b-form-radio-group>
     </b-form-group>
