@@ -130,6 +130,7 @@ export function completeQuestion(state, { nodeId, questionId, answerType, answer
   if (state.userAnswers[nodeId].activity[questionId] === undefined) {
     state.userAnswers[nodeId].activity[questionId] = { answers: {} }
   }
+
   if (typeof state.userAnswers[nodeId].activity[questionId].answers === "string") {
     state.userAnswers[nodeId].activity[questionId].answers = {}
   }
