@@ -1,6 +1,6 @@
 <template>
   <div v-if="multipleAnswerSelected" class="container">
-    <span id="handle" v-handle class="fas fa-bars fa-s"></span>
+    <span v-handle class="fas fa-bars fa-s" style="margin-right: 5px;"></span>
     <b-form-checkbox :value="item.id" />
     <b-form-group v-if="useImages">
       <file-upload
@@ -14,10 +14,10 @@
         @isUploading="handleUploadChange"
       />
     </b-form-group>
-    <div :class="useImages ? 'inputContainerImage' : 'inputContainer'">
+    <div :class="useImages ? 'input-container-image' : 'input-container'">
       <b-form-input
         v-model="item.value"
-        class="formInput"
+        class="form-input"
         :placeholder="placeholder"
         :data-qa="`choicerow-checkbox-input-${item.id}`"
       ></b-form-input>
@@ -33,7 +33,7 @@
   </div>
 
   <div v-else class="container">
-    <span id="handle" v-handle class="fas fa-bars fa-s"></span>
+    <span v-handle class="fas fa-bars fa-s" style="margin-right: 5px;"></span>
     <b-form-checkbox
       :value="item.id"
       :disabled="isDisabled && selectedRadioChoice != item.id"
@@ -50,10 +50,10 @@
         />
       </b-form-group>
     </b-form-checkbox>
-    <div :class="useImages ? 'inputContainerImage' : 'inputContainer'">
+    <div :class="useImages ? 'input-container-image' : 'input-container'">
       <b-form-input
         v-model="item.value"
-        class="formInput"
+        class="form-input"
         :placeholder="placeholder"
         :data-qa="`choicerow-radio-input-${item.id}`"
       ></b-form-input>
@@ -129,26 +129,20 @@ export default {
 </script>
 
 <style lang="scss">
-.inputContainer {
+.input-container {
   margin-right: -20px;
   width: 500px;
 }
-.inputContainerImage {
+.input-container-image {
   margin-right: -20px;
   width: 100px;
 }
-.formInput {
+.form-input {
   margin-left: -20px;
-}
-.inputchoice {
-  width: 50%;
 }
 .container {
   display: flex;
   align-items: center;
   z-index: 9999 !important;
-}
-#handle {
-  margin-right: 5px;
 }
 </style>
