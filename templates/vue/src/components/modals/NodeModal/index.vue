@@ -432,6 +432,59 @@ export default {
     isMultiContentNodeChild() {
       return this.parent && this.parent.mediaType == "multi-content"
     },
+    isMultipleChoiceValueValid() {
+      const questionsWithMultipleChoiceEnabled = this.node.typeData.activity.questions.filter(
+        question => {
+          return question.answerTypes.multipleChoice.enabled
+        }
+      )
+      const validMultipleChoiceValues = questionsWithMultipleChoiceEnabled.every(
+        question => {
+          const hasMultipleAnswer =
+            question.answerTypes.multipleChoice.hasMultipleAnswers
+          if (hasMultipleAnswer) {
+            return question.answerTypes.multipleChoice.checkboxArray.every(
+              option => {
+                return option.value != ""
+              }
+            )
+          } else {
+            return question.answerTypes.multipleChoice.radioArray.every(option => {
+              return option.value != ""
+            })
+          }
+        }
+      )
+      return validMultipleChoiceValues
+    },
+    isMultipleChoiceImageValid() {
+      const questionsWithMultipleChoiceEnabled = this.node.typeData.activity.questions.filter(
+        question => {
+          return question.answerTypes.multipleChoice.enabled
+        }
+      )
+      const validMultipleChoiceImages = questionsWithMultipleChoiceEnabled.every(
+        question => {
+          const hasMultipleAnswer =
+            question.answerTypes.multipleChoice.hasMultipleAnswers
+          const useImages = question.answerTypes.multipleChoice.useImages
+          if (hasMultipleAnswer && useImages) {
+            return question.answerTypes.multipleChoice.checkboxArray.every(
+              option => {
+                return option.imageUrl != "" && option.imageUrl != null
+              }
+            )
+          } else if (!hasMultipleAnswer && useImages) {
+            return question.answerTypes.multipleChoice.radioArray.every(option => {
+              return option.imageUrl != "" && option.imageUrl != null
+            })
+          } else if (!useImages) {
+            return true
+          }
+        }
+      )
+      return validMultipleChoiceImages
+    },
   },
   watch: {
     nodeId: {
@@ -931,52 +984,11 @@ export default {
           errMsgs.push("Please select a previous activity to display")
         }
 
-        const questionsWithMultipleChoiceEnabled = this.node.typeData.activity.questions.filter(
-          question => {
-            return question.answerTypes.multipleChoice.enabled
-          }
-        )
-
-        const validMultipleChoiceValues = questionsWithMultipleChoiceEnabled.every(
-          question => {
-            const hasMultipleAnswer =
-              question.answerTypes.multipleChoice.hasMultipleAnswers
-            if (hasMultipleAnswer) {
-              return question.answerTypes.multipleChoice.checkboxArray.every(
-                option => {
-                  return option.value != ""
-                }
-              )
-            } else {
-              return question.answerTypes.multipleChoice.radioArray.every(option => {
-                return option.value != ""
-              })
-            }
-          }
-        )
+        const validMultipleChoiceValues = this.isMultipleChoiceValueValid
         if (!validMultipleChoiceValues) {
           errMsgs.push("Please enter a text for all multiple choice options")
         }
-        const validMultipleChoiceImages = questionsWithMultipleChoiceEnabled.every(
-          question => {
-            const hasMultipleAnswer =
-              question.answerTypes.multipleChoice.hasMultipleAnswers
-            const useImages = question.answerTypes.multipleChoice.useImages
-            if (hasMultipleAnswer && useImages) {
-              return question.answerTypes.multipleChoice.checkboxArray.every(
-                option => {
-                  return option.imageUrl != "" && option.imageUrl != null
-                }
-              )
-            } else if (!hasMultipleAnswer && useImages) {
-              return question.answerTypes.multipleChoice.radioArray.every(option => {
-                return option.imageUrl != "" && option.imageUrl != null
-              })
-            } else if (!useImages) {
-              return true
-            }
-          }
-        )
+        const validMultipleChoiceImages = this.isMultipleChoiceImageValid
         if (!validMultipleChoiceImages) {
           errMsgs.push("Please upload an image for all multiple choice options")
         }
