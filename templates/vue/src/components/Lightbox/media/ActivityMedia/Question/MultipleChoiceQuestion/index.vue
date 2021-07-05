@@ -29,7 +29,7 @@
       style="clear:both"
       data-qa="invalid-feedback"
     >
-      Please Select a choice.
+      Please select a choice.
     </b-form-invalid-feedback>
     <b-button class="submit-btn mt-3" variant="primary" type="submit">
       Submit

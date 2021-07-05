@@ -3,7 +3,7 @@
     <b-img
       v-if="useImages && item.imageurl != null"
       :src="item.imageurl"
-      class="imageChoice"
+      class="image-choice"
     ></b-img>
     {{ item.value }}
   </div>
@@ -31,7 +31,7 @@ export default {
 </script>
 
 <style lang="scss">
-.imageChoice {
+.image-choice {
   width: 60px;
 }
 </style>
