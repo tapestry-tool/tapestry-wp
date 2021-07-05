@@ -11,6 +11,7 @@
         </b-form-checkbox>
       </b-form-group>
       <p>question data is {{ question }}</p>
+      <p>multipleAnswerSelected is {{ multipleAnswerSelected }}</p>
       <b-form-group v-if="multipleAnswerSelected">
         <sortable-list
           v-model="choiceRows"
@@ -113,10 +114,6 @@ export default {
       type: Object,
       required: true,
     },
-    multipleAnswerSelected: {
-      type: Boolean,
-      required: true,
-    },
   },
   data() {
     return {
@@ -162,6 +159,9 @@ export default {
     }
   },
   computed: {
+    multipleAnswerSelected() {
+      return this.question.answerTypes.multipleChoice.hasMultipleAnswers
+    },
     isRemoveButtonDisabled() {
       if (this.multipleAnswerSelected) {
         return this.choiceRows.length === 1

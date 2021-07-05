@@ -174,9 +174,6 @@
                   <multiple-choice-form
                     :question="question"
                     data-qa="authoring-multiple-choice-form"
-                    :multipleAnswerSelected="
-                      question.answerTypes.multipleChoice.hasMultipleAnswers
-                    "
                   />
                 </div>
               </div>
