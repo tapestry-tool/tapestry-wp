@@ -930,6 +930,16 @@ export default {
         if (!validPreviousAnswers) {
           errMsgs.push("Please select a previous activity to display")
         }
+      } else if (this.node.mediaType === "answer") {
+        const hasActivityId = this.node.typeData.activityId
+        if (!hasActivityId) {
+          errMsgs.push("Please select an activity")
+        }
+
+        const hasQuestionId = this.node.typeData.questionId
+        if (!hasQuestionId) {
+          errMsgs.push("Please select a question")
+        }
       }
 
       return errMsgs

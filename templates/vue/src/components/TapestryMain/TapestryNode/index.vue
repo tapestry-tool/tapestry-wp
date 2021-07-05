@@ -238,6 +238,8 @@ export default {
           return "bars"
         case "wp-post":
           return "post"
+        case "answer":
+          return "answer"
         default:
           return "exclamation"
       }
