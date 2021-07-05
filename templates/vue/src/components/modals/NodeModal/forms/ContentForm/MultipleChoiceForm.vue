@@ -16,11 +16,11 @@
           v-model="choiceRows"
           lockAxis="y"
           :useDragHandle="true"
-          @input="updateOrderingCheckBoxArray"
+          @input="updateChoicesOrdering"
         >
           <b-form-checkbox-group
-            v-model="preSelectedCheckBoxOptions"
-            :style="{ height: checkBoxGroupHeight }"
+            v-model="preSelectedOptions"
+            :style="{ height: choicesGroupHeight }"
           >
             <choice-row
               v-for="(choiceRow, index) in choiceRows"
@@ -33,7 +33,7 @@
               :multipleAnswerSelected="multipleAnswerSelected"
               :useImages="useImages"
               :removeButtonDisabled="isRemoveButtonDisabled"
-              @remove="removeChoiceRowCheckbox(index, choiceRow)"
+              @remove="removeChoiceRow(index, choiceRow)"
             ></choice-row>
           </b-form-checkbox-group>
         </sortable-list>
@@ -120,7 +120,7 @@ export default {
   },
   data() {
     return {
-      preSelectedCheckBoxOptions: [],
+      preSelectedOptions: [],
       preSelectedRadioOptions: [],
       useImages: false,
       choiceRows: [
@@ -169,7 +169,7 @@ export default {
         return this.choiceRowsRadio.length === 1
       }
     },
-    checkBoxGroupHeight() {
+    choicesGroupHeight() {
       if (this.useImages) {
         return 150 * this.choiceRows.length + "px"
       } else {
@@ -195,8 +195,8 @@ export default {
     useImages(newUseImages) {
       this.question.answerTypes.multipleChoice.useImages = newUseImages
     },
-    preSelectedCheckBoxOptions(newPreSelectedCheckBoxOptions) {
-      this.question.answerTypes.multipleChoice.preSelectedCheckBoxOptions = newPreSelectedCheckBoxOptions
+    preSelectedOptions(newPreSelectedOptions) {
+      this.question.answerTypes.multipleChoice.preSelectedOptions = newPreSelectedOptions
     },
     preSelectedRadioOptions(newPreSelectedRadioOptions) {
       this.question.answerTypes.multipleChoice.preSelectedRadioOptions = newPreSelectedRadioOptions
@@ -210,6 +210,7 @@ export default {
   },
   created() {
     if (
+      !this.question.answerTypes.multipleChoice.hasOwnProperty("choices") ||
       !this.question.answerTypes.multipleChoice.hasOwnProperty("checkboxArray") ||
       !this.question.answerTypes.multipleChoice.hasOwnProperty("radioArray") ||
       !this.question.answerTypes.multipleChoice.hasOwnProperty("useImages")
@@ -220,7 +221,7 @@ export default {
       this.question.answerTypes.multipleChoice.nextChoiceRowId = this.nextChoiceRowId
       this.question.answerTypes.multipleChoice.nextChoiceRowRadioId = this.nextChoiceRowRadioId
       this.question.answerTypes.multipleChoice.useImages = this.useImages
-      this.question.answerTypes.multipleChoice.preSelectedCheckBoxOptions = this.preSelectedCheckBoxOptions
+      this.question.answerTypes.multipleChoice.preSelectedOptions = this.preSelectedOptions
       this.question.answerTypes.multipleChoice.preSelectedRadioOptions = this.preSelectedRadioOptions
     } else {
       this.choices = this.question.answerTypes.multipleChoice.choices
@@ -229,7 +230,7 @@ export default {
       this.nextChoiceRowId = this.question.answerTypes.multipleChoice.nextChoiceRowId
       this.nextChoiceRowRadioId = this.question.answerTypes.multipleChoice.nextChoiceRowRadioId
       this.useImages = this.question.answerTypes.multipleChoice.useImages
-      this.preSelectedCheckBoxOptions = this.question.answerTypes.multipleChoice.preSelectedCheckBoxOptions
+      this.preSelectedOptions = this.question.answerTypes.multipleChoice.preSelectedOptions
       this.preSelectedRadioOptions = this.question.answerTypes.multipleChoice.preSelectedRadioOptions
     }
   },
@@ -248,11 +249,12 @@ export default {
         value: "",
       })
     },
-    removeChoiceRowCheckbox: function(index, item) {
+    removeChoiceRow: function(index, item) {
+      this.question.answerTypes.multipleChoice.choices.splice(index, 1)
       this.question.answerTypes.multipleChoice.checkboxArray.splice(index, 1)
-      for (let i = 0; i < this.preSelectedCheckBoxOptions.length; i++) {
-        if (item.id === this.preSelectedCheckBoxOptions[i]) {
-          this.preSelectedCheckBoxOptions.splice(i, 1)
+      for (let i = 0; i < this.preSelectedOptions.length; i++) {
+        if (item.id === this.preSelectedOptions[i]) {
+          this.preSelectedOptions.splice(i, 1)
         }
       }
     },
@@ -264,8 +266,9 @@ export default {
         }
       }
     },
-    updateOrderingCheckBoxArray(arr) {
+    updateChoicesOrdering(arr) {
       this.question.answerTypes.multipleChoice.checkboxArray = arr
+      this.question.answerTypes.multipleChoice.choices = arr
     },
     updateOrderingRadioArray(arr) {
       this.question.answerTypes.multipleChoice.radioArray = arr
