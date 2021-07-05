@@ -85,7 +85,7 @@
             <answer-button
               v-if="question.answerTypes.multipleChoice.enabled"
               :completed="multipleChoiceFormCompleted"
-              data-qa="answer-button-multiplechoice"
+              data-qa="answer-button-multiple-choice"
               icon="tasks"
               @click="openForm('multipleChoice')"
             >

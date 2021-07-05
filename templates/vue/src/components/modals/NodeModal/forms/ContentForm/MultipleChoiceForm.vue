@@ -6,7 +6,7 @@
       "
     >
       <b-form-group>
-        <b-form-checkbox v-model="useImages" data-qa="multiplechoice-thumbnail">
+        <b-form-checkbox v-model="useImages" data-qa="multiple-choice-thumbnail">
           Use Images
         </b-form-checkbox>
       </b-form-group>
@@ -36,7 +36,7 @@
             ></choice-row>
           </b-form-checkbox-group>
         </sortable-list>
-        <b-button class="addButton" variant="primary" squared @click="addNewChoice">
+        <b-button class="add-button" variant="primary" squared @click="addNewChoice">
           Add a choice
         </b-button>
         <p class="message">
@@ -75,7 +75,7 @@
           </b-form-checkbox-group>
         </sortable-list>
         <b-button
-          class="addButton"
+          class="add-button"
           variant="primary"
           squared
           @click="addNewChoiceRadio"
@@ -271,7 +271,7 @@ export default {
 </script>
 
 <style lang="scss">
-.addButton {
+.add-button {
   margin-top: 10px;
   margin-left: 30px;
 }
