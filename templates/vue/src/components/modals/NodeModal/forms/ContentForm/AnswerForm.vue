@@ -60,22 +60,17 @@ export default {
   computed: {
     ...mapState(["nodes"]),
     activityNodes() {
-      const activityNodes = Object.values(this.nodes).filter(
-        node => node.mediaType == "activity"
-      )
-      return activityNodes
+      return Object.values(this.nodes).filter(node => node.mediaType == "activity")
     },
     availableQuestions() {
-      const questions = Object.values(this.activityNodes)
+      return Object.values(this.activityNodes)
         .filter(node => node.id == this.node.typeData.activityId)
         .flatMap(node => node.typeData.activity.questions)
-
-      return questions
     },
     originalQuestionText() {
-      return this?.availableQuestions.find(
+      return this.availableQuestions.find(
         question => question.id === this.node.typeData.questionId
-      ).text
+      )?.text
     },
   },
 }
