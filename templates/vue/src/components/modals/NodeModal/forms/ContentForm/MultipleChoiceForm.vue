@@ -83,7 +83,8 @@
           Add a choice
         </b-button>
         <p class="message">
-          Tick any options that should be selected by default in the question
+          Select any options that should be selected by default when posing the
+          question.
         </p>
       </b-form-group>
     </b-form-group>

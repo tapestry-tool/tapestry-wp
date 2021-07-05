@@ -89,7 +89,7 @@
               icon="tasks"
               @click="openForm('multipleChoice')"
             >
-              {{ multipleChoiceLabel }}
+              multiple choice
             </answer-button>
           </div>
         </div>
@@ -222,16 +222,6 @@ export default {
         return true
       }
       return false
-    },
-    multipleChoiceLabel() {
-      if (
-        this.question.answerTypes.multipleChoice.enabled &&
-        this.question.answerTypes.multipleChoice.hasMultipleAnswers
-      ) {
-        return "Checkbox"
-      } else {
-        return "Radio"
-      }
     },
   },
   watch: {
