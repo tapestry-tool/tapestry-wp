@@ -257,7 +257,9 @@ export default {
           if (this.isUploading) {
             this.isUploading = false
             this.confirmedUpload = false
-            setTimeout(() => {this.$emit("isUploading", this.isUploading)}, 1200)
+            setTimeout(() => {
+              this.$emit("isUploading", this.isUploading)
+            }, 1200)
           }
           clearInterval(this.uploadBarInterval)
         })
