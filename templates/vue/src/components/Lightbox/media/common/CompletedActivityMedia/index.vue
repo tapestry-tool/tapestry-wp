@@ -13,7 +13,7 @@
         </div>
       </b-col>
       <b-col v-if="type === 'audio'" align-self="center">
-        <audio controls :src="answerData"></audio>
+        <audio controls :src="urlAnswer"></audio>
       </b-col>
       <b-col v-if="type === 'dragDrop'" align-self="center">
         <ul class="flexContainer">
@@ -37,7 +37,7 @@
 import CompletedActivityDragDropBucket from "./CompletedActivityDragDropBucket"
 import TapestryIcon from "@/components/common/TapestryIcon"
 import DragDropIcon from "@/assets/icons/drag_drop.svg"
-import { data } from "@/services/wp"
+import { data as wpData } from "@/services/wp"
 
 export default {
   name: "completed-activity-media",
@@ -68,11 +68,16 @@ export default {
   },
   computed: {
     dragDropIcon() {
-      return `${data.vue_uri}/${DragDropIcon.split("dist")[1]}`
+      return `${wpData.vue_uri}/${DragDropIcon.split("dist")[1]}`
     },
     getDragDropBuckets() {
       return this.answerData.toBucketArray.filter(
         toBucket => toBucket.itemArray.length > 0
+      )
+    },
+    urlAnswer() {
+      return (
+        wpData.uploadDirArray.baseurl + "/" + this.answerData.url + "?" + Date.now()
       )
     },
   },

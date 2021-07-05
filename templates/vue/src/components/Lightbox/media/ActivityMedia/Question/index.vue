@@ -19,10 +19,9 @@
           </h3>
           <completed-activity-media
             v-for="previousAnswer in previousQuestionAnswers"
-            :key="previousAnswer.type"
-            :type="previousAnswer.type"
-            :answerData="previousAnswer.answerData"
-            :question="getQuestion(question.followUp.questionId)"
+            :key="previousAnswer[0]"
+            :type="previousAnswer[0]"
+            :answerData="previousAnswer[1]"
           ></completed-activity-media>
         </div>
         <div v-else>
@@ -107,7 +106,6 @@ import DragDropQuestion from "./DragDropQuestion"
 import Loading from "@/components/common/Loading"
 import CompletedActivityMedia from "../../common/CompletedActivityMedia"
 import * as wp from "@/services/wp"
-import { data as wpData } from "@/services/wp"
 
 export default {
   name: "question",
@@ -161,29 +159,8 @@ export default {
         this.question.followUp.nodeId,
         this.question.followUp.questionId
       )
-      let previousAnswers = []
-      if (answerObject !== undefined) {
-        if (this.question.followUp.questionId !== null) {
-          for (const [key, value] of Object.entries(answerObject)) {
-            if (key === "text") {
-              var tempObj = { type: key, answerData: value }
-              previousAnswers.push(tempObj)
-            } else if (key === "dragDrop") {
-              var dragDropObj = { type: key, answerData: value }
-              previousAnswers.push(dragDropObj)
-            } else {
-              var tempAudioObj = {
-                type: key,
-                answerData:
-                  wpData.uploadDirArray.baseurl + "/" + value.url + "?" + Date.now(),
-              }
-              previousAnswers.push(tempAudioObj)
-            }
-          }
-          return previousAnswers
-        }
-      }
-      return []
+
+      return answerObject ? Object.entries(answerObject) : null
     },
     enabledAnswerTypes() {
       return Object.entries(this.question.answerTypes).filter(([, value]) => {
