@@ -16,7 +16,7 @@
       <g v-if="dragSelectEnabled && dragSelectReady" class="nodes">
         <tapestry-node
           v-for="(node, id) in test(nodes)"
-          :key="id"
+          :key="node.htmlOrdering"
           :node="node"
           class="node"
           :class="{ selectable: true }"
@@ -61,9 +61,6 @@ export default {
       dragSelectReady: false,
       activeNode: null,
     }
-  },
-  created() {
-    // console.log(this.nodes)
   },
   mounted() {
     if (this.dragSelectEnabled) {
@@ -118,6 +115,12 @@ export default {
         }
       },
     },
+    nodes: {
+      immediate: true,
+      handler(nodes) {
+        this.test(nodes)
+      },
+    },
   },
   methods: {
     ...mapMutations(["select", "unselect", "clearSelection"]),
@@ -126,25 +129,28 @@ export default {
       this.$root.$emit("add-node", null)
     },
     test(nodes) {
-      let originalNodeOrder = Object.entries(nodes)
       const rootNodeId = this.rootId
       let newNodeOrder = {}
-      let queue = []
-      // First, find the root node
-      for (const [id, node] of originalNodeOrder) {
-        if (id == rootNodeId) {
-          newNodeOrder[id] = node
-          for (const id of node.childOrdering) {
-            queue.push(id)
+      let queue = [rootNodeId]
+      let counter = 0
+      while (queue.length) {
+        const queueLength = queue.length
+
+        for (let i = 0; i < queueLength; i++) {
+          const nodeId = queue.shift()
+          const node = this.getNodeFromObject(nodes, nodeId)
+          node.htmlOrdering = counter
+          for (const childId of node.childOrdering) {
+            queue.push(childId)
           }
+          newNodeOrder[nodeId] = node
+          counter++
         }
       }
-      while (newNodeOrder.length != Object.keys(nodes).length) {
-        const queueLength = queue.length
-        const level = []
-
-      }
-      return nodes
+      return newNodeOrder
+    },
+    getNodeFromObject(nodes, id) {
+      return nodes[id]
     },
 
     updateSelectableNodes() {
@@ -155,6 +161,7 @@ export default {
     },
     updateViewBox() {
       this.$parent.updateViewBox()
+      console.log(this)
     },
     handleMouseover(id) {
       const node = this.nodes[id]
