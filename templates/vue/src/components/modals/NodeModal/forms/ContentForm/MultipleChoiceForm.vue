@@ -19,7 +19,7 @@
         >
           <b-form-checkbox-group
             v-model="preSelectedCheckBoxOptions"
-            class="checkboxGroup"
+            :style="{ height: checkBoxGroupHeight }"
           >
             <choice-row
               v-for="(choiceRow, index) in choiceRows"
@@ -53,7 +53,7 @@
         >
           <b-form-checkbox-group
             v-model="preSelectedRadioOptions"
-            class="radioGroup"
+            :style="{ height: radioGroupHeight }"
           >
             <choice-row
               v-for="(choiceRow, index) in choiceRowsRadio"
@@ -167,6 +167,20 @@ export default {
         return this.choiceRowsRadio.length === 1
       }
     },
+    checkBoxGroupHeight() {
+      if (this.useImages) {
+        return 150 * this.choiceRows.length + "px"
+      } else {
+        return 40 * this.choiceRows.length + "px"
+      }
+    },
+    radioGroupHeight() {
+      if (this.useImages) {
+        return 150 * this.choiceRowsRadio.length + "px"
+      } else {
+        return 40 * this.choiceRowsRadio.length + "px"
+      }
+    },
   },
   watch: {
     choiceRows(newChoiceRows) {
@@ -256,12 +270,6 @@ export default {
 </script>
 
 <style lang="scss">
-.checkboxGroup {
-  height: 120px;
-}
-.radioGroup {
-  height: 120px;
-}
 .addButton {
   margin-top: 10px;
   margin-left: 30px;
