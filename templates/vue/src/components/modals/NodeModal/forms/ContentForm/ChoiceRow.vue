@@ -37,19 +37,19 @@
     <b-form-checkbox
       :value="item.id"
       :disabled="isDisabled && selectedRadioChoice != item.id"
-    >
-      <b-form-group v-if="useImages">
-        <file-upload
-          v-model="item.imageUrl"
-          input-test-id="node-choiceRow-thumbnail-url"
-          :data-qa="`choicerow-radio-thumbnail-${item.id}`"
-          :show-url-upload="false"
-          :show-image-preview="true"
-          file-types="image/*"
-          @isUploading="handleUploadChange"
-        />
-      </b-form-group>
-    </b-form-checkbox>
+    />
+    <b-form-group v-if="useImages">
+      <file-upload
+        v-model="item.imageUrl"
+        input-test-id="node-choiceRow-thumbnail-url"
+        :data-qa="`choicerow-radio-thumbnail-${item.id}`"
+        :show-url-upload="false"
+        :show-image-preview="true"
+        :compact-mode="true"
+        file-types="image/*"
+        @isUploading="handleUploadChange"
+      />
+    </b-form-group>
     <div :class="useImages ? 'input-container-image' : 'input-container'">
       <b-form-input
         v-model="item.value"

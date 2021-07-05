@@ -1,6 +1,7 @@
 <template>
   <b-form class="container" @submit="handleMultipleChoiceSubmit">
     <b-form-group v-if="question.answerTypes.multipleChoice.hasMultipleAnswers">
+      <!-- // use component is here because b-form checkbox group vs b-form radio group -->
       <b-form-checkbox-group v-model="userSelectedCheckbox">
         <multiple-choice-question-item
           v-for="userChoiceRow in question.answerTypes.multipleChoice.checkboxArray"
@@ -13,6 +14,7 @@
       </b-form-checkbox-group>
     </b-form-group>
     <b-form-group v-else>
+      <!-- // use component with is prop to get rid of v if-v-else here -->
       <b-form-radio-group v-model="userSelectedRadio">
         <multiple-choice-question-item
           v-for="userChoiceRow in question.answerTypes.multipleChoice.radioArray"

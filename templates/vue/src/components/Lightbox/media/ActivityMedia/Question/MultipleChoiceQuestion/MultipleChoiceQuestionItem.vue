@@ -1,5 +1,6 @@
 <template>
   <div class="container">
+    <!-- // same logic with the is component -->
     <b-form-checkbox
       v-if="isCheckBox"
       :value="item.id"
