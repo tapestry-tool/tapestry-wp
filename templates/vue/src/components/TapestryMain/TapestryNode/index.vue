@@ -231,7 +231,6 @@ export default {
         case "text":
           return "text"
         case "activity":
-        case "gravity-form":
           return "tasks"
         case "url-embed":
           return "window-maximize"
@@ -427,7 +426,7 @@ export default {
           name: names.APP,
           params: { nodeId: this.node.id },
           query: this.$route.query,
-          path: `/nodes/${this.node.id}`
+          path: `/nodes/${this.node.id}`,
         })
       }
     },

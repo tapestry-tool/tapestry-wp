@@ -22,6 +22,7 @@ export const store = {
     visibleNodes: [],
     apiError: null,
     displayErrors: false,
+    userAnswers: {},
   },
   getters,
   mutations,

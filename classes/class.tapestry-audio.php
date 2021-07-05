@@ -39,6 +39,7 @@ class TapestryAudio implements ITapestryAudio
             wp_mkdir_p($tapestry_upload_dir);
         }
         $tapestry_user_upload_dir = $tapestry_upload_dir.'/'.$this->userId;
+        $tapestry_user_upload_url = 'tapestry/'.$this->userId;
         if (!file_exists($tapestry_user_upload_dir)) {
             wp_mkdir_p($tapestry_user_upload_dir);
         }
@@ -48,30 +49,9 @@ class TapestryAudio implements ITapestryAudio
         $decodedAudio = base64_decode($audio);
 
         if (file_put_contents($tapestry_user_upload_dir.'/'.$filename, $decodedAudio)) {
-            return $filename;
+            return $tapestry_user_upload_url.'/'.$filename;
         } else {
             throw new TapestryError('FAILED_TO_SAVE_AUDIO');
-        }
-    }
-
-    /**
-     * Get the audio based on userId, tapestryPostId and nodeMetaId.
-     *
-     * @return string $audio      base64 data string
-     */
-    public function get()
-    {
-        $filename = $this->_getFileName();
-        $upload_dir = wp_upload_dir();
-        if (false === $upload_dir['error']) {
-            $audio = file_get_contents($upload_dir['basedir'].'/tapestry/'.$this->userId.'/'.$filename);
-            $encodedAudio = base64_encode($audio);
-
-            return $encodedAudio;
-        } else {
-            error_log('Error getting user audio for tapestry: '.$upload_dir['error']);
-
-            return $upload_dir['error'];
         }
     }
 

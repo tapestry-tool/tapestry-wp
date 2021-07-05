@@ -32,10 +32,12 @@ interface ITapestryUserProgress
      * Set the question with the given id to be marked as 'completed'.
      *
      * @param int $questionId the question to mark
+     * @param string $answerData the user answer
+     * @param string $answerType the user answer type
      *
      * @return null
      */
-    public function completeQuestion($questionId);
+    public function completeQuestion($questionId, $answerData, $answerType);
 
     /**
      * Update User's h5p video setting for a tapestry post.
@@ -53,16 +55,6 @@ interface ITapestryUserProgress
      * @return string h5p $setting
      */
     public function getH5PSettings();
-
-    /**
-     * Get all gravity form entries submitted by this user.
-     * If $formId is passed, returns entries for only that form.
-     *
-     * @param int $formId
-     *
-     * @return string user entries in json format
-     */
-    public function getUserEntries($formId);
 
     /**
      * Get User's favourite nodes from a tapestry post.
