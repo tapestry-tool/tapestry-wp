@@ -170,6 +170,7 @@ export default {
    */
   mounted() {
     this.$nextTick(() => this.updateClickables())
+    console.log(this.communities)
   },
   updated() {
     this.$nextTick(() => this.updateClickables())
