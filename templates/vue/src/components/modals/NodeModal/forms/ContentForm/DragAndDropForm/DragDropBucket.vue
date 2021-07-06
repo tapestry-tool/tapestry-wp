@@ -105,9 +105,6 @@ export default {
       required: true,
     },
   },
-  data() {
-    return {}
-  },
   computed: {
     bucketClass() {
       if (this.isFromBucket) {
@@ -126,7 +123,6 @@ export default {
       return this.toBucketArray.length > 1
     },
   },
-  methods: {},
 }
 </script>
 
