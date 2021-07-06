@@ -1,5 +1,5 @@
 <template>
-  <b-form class="grid-container" @submit="handleTextSubmit">
+  <b-form class="grid-container">
     <ul v-if="question.answerTypes.text.allowMultiple" class="list">
       <li v-for="(answerItem, index) in textAnswers" :key="index" class="answerItem">
         <b-form-input
@@ -10,13 +10,13 @@
               ? question.answerTypes.text.placeholder
               : 'Type an answer and press Enter'
           "
+          @keydown.enter="addAnswer"
         ></b-form-input>
         <b-button
           v-show="numOfAnswers < maxFields"
           variant="primary"
           :data-qa="`list-add-${index}`"
           @click="addAnswer"
-          @keydown.enter="enterPress"
         >
           +
         </b-button>
@@ -43,7 +43,7 @@
     <b-form-invalid-feedback :state="isAnswerValid">
       Please enter a response.
     </b-form-invalid-feedback>
-    <b-button class="mt-3 float-right" variant="primary" type="submit">
+    <b-button class="mt-3 float-right" variant="primary" @click="handleTextSubmit">
       Submit
     </b-button>
   </b-form>
@@ -117,7 +117,9 @@ export default {
         .catch(err => console.log(err))
     },
     addAnswer() {
-      this.textAnswers.push("")
+      if (this.numOfAnswers < this.maxFields) {
+        this.textAnswers.push("")
+      }
     },
   },
 }
