@@ -1,5 +1,11 @@
 <template>
-  <tapestry-modal id="cos" data-qa="cos" class="full-screen" :allow-close="false">
+  <tapestry-modal
+    id="cos"
+    data-qa="cos"
+    class="full-screen"
+    :allow-close="false"
+    :content-container-style="cosContentStyle"
+  >
     <div id="cos" class="cos">
       <loading v-if="isLoading" />
       <div v-else class="contents">
@@ -74,6 +80,17 @@ export default {
   computed: {
     views() {
       return CosView
+    },
+    cosContentStyle() {
+      const styles = {
+        top: "auto",
+        left: "auto",
+        width: "100vw",
+        height: "100vh",
+        position: "relative",
+        background: "rgb(238, 238, 238)",
+      }
+      return styles
     },
   },
   async mounted() {
