@@ -276,7 +276,6 @@ export default {
   data() {
     return {
       questions: this.node.typeData.activity?.questions || [],
-      // textIsMultiLineSelected: undefined,
     }
   },
   computed: {

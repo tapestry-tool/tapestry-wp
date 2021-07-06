@@ -9,7 +9,7 @@
           {{ answerData }}
         </div>
       </b-col>
-      <b-col v-if="type === 'text'">
+      <b-col v-if="type === 'text' && Array.isArray(answerData)">
         <ol>
           <li v-for="answer in answerData" :key="answer.index">
             {{ answer }}
