@@ -17,7 +17,6 @@
 
 <script>
 export default {
-  components: {},
   props: {
     node: {
       type: Object,
@@ -39,9 +38,6 @@ export default {
       type: Boolean,
       required: false,
     },
-  },
-  data() {
-    return {}
   },
   computed: {
     bucketClass() {

@@ -75,9 +75,6 @@ export default {
       required: true,
     },
   },
-  data() {
-    return {}
-  },
   computed: {
     bucketClass() {
       if (this.isFromBucket) {
