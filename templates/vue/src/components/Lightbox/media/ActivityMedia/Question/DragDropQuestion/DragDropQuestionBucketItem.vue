@@ -7,7 +7,7 @@
     <div
       class="circle"
       :style="{
-        'background-image': 'url(' + bucketItem.imageurl + ')',
+        'background-image': hasImage ? 'url(' + bucketItem.imageurl + ')' : 'none',
         'background-color': bucketItem.color,
       }"
     ></div>
@@ -50,6 +50,9 @@ export default {
       } else {
         return "toBucketContainer"
       }
+    },
+    hasImage() {
+      return this.question.answerTypes.dragDrop.useImages
     },
   },
   methods: {

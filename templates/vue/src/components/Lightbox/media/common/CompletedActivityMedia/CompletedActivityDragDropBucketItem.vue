@@ -3,7 +3,7 @@
     <div
       class="circle"
       :style="{
-        'background-image': 'url(' + bucketItem.imageurl + ')',
+        'background-image': hasImage ? 'url(' + bucketItem.imageurl + ')' : 'none',
         'background-color': bucketItem.color,
       }"
     ></div>
@@ -21,6 +21,11 @@ export default {
       type: Object,
       required: false,
       default: () => ({}),
+    },
+  },
+  computed: {
+    hasImage() {
+      return this.question.answerTypes.dragDrop.useImages
     },
   },
 }
