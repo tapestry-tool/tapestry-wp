@@ -21,15 +21,16 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex"
 export default {
   name: "completed-activity-media",
   props: {
     type: {
       type: String,
       required: true,
-      validator: val => ["text", "audio", "list"].includes(val),
+      validator: val => ["text", "audio"].includes(val),
     },
-    question: {
+    node: {
       type: Object,
       required: true,
     },
@@ -39,6 +40,10 @@ export default {
     },
   },
   computed: {
+    ...mapGetters(["getQuestion"]),
+    question() {
+      return this.getQuestion(this.node.typeData.questionId)
+    },
     isListTextType() {
       return this.question.answerTypes.text.allowMultiple
     },
