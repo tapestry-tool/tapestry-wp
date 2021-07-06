@@ -15,6 +15,7 @@
           :data-qa="`bucket-item-thumbnail-${bucketItem.id}`"
           :show-url-upload="false"
           :show-image-preview="true"
+          :compact-mode="true"
           file-types="image/*"
           @isUploading="handleUploadChange"
         />

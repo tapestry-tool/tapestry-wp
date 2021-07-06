@@ -22,6 +22,7 @@
             :key="previousAnswer[0]"
             :type="previousAnswer[0]"
             :answerData="previousAnswer[1]"
+            :question="getQuestion(question.followUp.questionId)"
           ></completed-activity-media>
         </div>
         <div v-else>
