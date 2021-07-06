@@ -59,7 +59,6 @@ export default {
     },
     isTydeView() {
       const isAdmin = this.currentUser.roles.some(role => role === "administrator")
-
       if (!isAdmin && this.settings.tydeModeEnabled) {
         const rootNode = this.nodes[this.rootId]
         const hasEditPermissions = this.currentUser.roles.some(role => {
@@ -75,6 +74,9 @@ export default {
       if (!isStillLoggedIn) {
         this.$bvModal.show("loggedOutModal")
       }
+    },
+    isTydeView() {
+      this.setDisplayTydeMode(this.isTydeView)
     },
   },
   mounted() {
@@ -100,8 +102,6 @@ export default {
         })
       }
     })
-
-    this.setDisplayTydeMode(this.isTydeView)
   },
   beforeDestroy() {
     window.removeEventListener("click", this.recordAnalytics)
