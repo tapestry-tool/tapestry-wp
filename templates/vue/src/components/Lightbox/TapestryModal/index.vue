@@ -112,7 +112,6 @@ export default {
     background-size: cover;
     background-color: black;
     box-shadow: 0 0 100px -40px #000;
-    border-radius: 15px;
     height: 100%;
 
     .buttons-container {
@@ -127,6 +126,7 @@ export default {
 
   &.full-screen {
     .content {
+      border-radius: 0px;
       .buttons-container {
         top: 20px;
         right: 30px;

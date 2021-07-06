@@ -223,6 +223,35 @@
           </b-form-group>
           <b-form-group
             class="mt-4"
+            label="Enable TYDE mode"
+            description="TO BE EDITED"
+          >
+            <b-form-checkbox v-model="tydeModeEnabled" switch>
+              {{ tydeModeEnabled ? "Enabled" : "Disabled" }}
+            </b-form-checkbox>
+          </b-form-group>
+          <b-form-group v-if="tydeModeEnabled">
+            <b-row v-for="role in roles" :key="role" style="margin: 17px 0;">
+              <b-col class="text-capitalize">{{ role }}</b-col>
+              <b-col>
+                <combobox
+                  v-model="tydeModeDefualtNodes[role]"
+                  :options="nodesValues"
+                  :placeholder="nodesValues[0].title"
+                  item-text="title"
+                  item-value="id"
+                >
+                  <template v-slot="slotProps">
+                    <p>
+                      {{ slotProps.option.title }}
+                    </p>
+                  </template>
+                </combobox>
+              </b-col>
+            </b-row>
+          </b-form-group>
+          <b-form-group
+            class="mt-4"
             label="Enable analytics"
             description="When enabled, analytics such as mouse clicks will be saved."
           >
@@ -312,6 +341,7 @@ import PermissionsTable from "../common/PermissionsTable"
 import DragSelectModular from "@/utils/dragSelectModular"
 import { data as wpData } from "@/services/wp"
 import client from "@/services/TapestryAPI"
+import Combobox from "../common/Combobox.vue"
 
 const defaultPermissions = Object.fromEntries(
   [
@@ -329,6 +359,7 @@ export default {
     FileUpload,
     DuplicateTapestryButton,
     PermissionsTable,
+    Combobox,
   },
   props: {
     show: {
@@ -359,6 +390,8 @@ export default {
       isExporting: false,
       renderImages: true,
       analyticsEnabled: false,
+      tydeModeEnabled: false,
+      tydeModeDefualtNodes: {},
       draftNodesEnabled: true,
       submitNodesEnabled: true,
       renderMap: false,
@@ -397,6 +430,12 @@ export default {
       }
       return true
     },
+    roles() {
+      return Object.keys(defaultPermissions)
+    },
+    nodesValues() {
+      return Object.values(this.nodes)
+    },
   },
   created() {
     if (this.settings.defaultPermissions) {
@@ -434,6 +473,8 @@ export default {
         defaultDepth = 3,
         renderImages = true,
         renderMap = false,
+        tydeModeEnabled = false,
+        tydeModeDefualtNodes = {},
         analyticsEnabled = false,
         draftNodesEnabled = true,
         submitNodesEnabled = true,
@@ -449,12 +490,22 @@ export default {
       this.defaultDepth = defaultDepth
       this.renderImages = renderImages
       this.renderMap = renderMap
+      this.tydeModeEnabled = tydeModeEnabled
+      this.tydeModeDefualtNodes = tydeModeDefualtNodes
       this.analyticsEnabled = analyticsEnabled
       this.draftNodesEnabled = draftNodesEnabled
       this.submitNodesEnabled = submitNodesEnabled
       this.mapBounds = mapBounds
     },
     async updateSettings() {
+      if (this.tydeModeEnabled) {
+        Object.keys(this.tydeModeDefualtNodes).forEach(role => {
+          if (!this.tydeModeDefualtNodes[role]) {
+            this.tydeModeDefualtNodes[role] = this.nodes[this.rootId]
+          }
+        })
+      }
+
       const settings = Object.assign(this.settings, {
         backgroundUrl: this.backgroundUrl,
         autoLayout: this.autoLayout,
@@ -466,6 +517,8 @@ export default {
         defaultDepth: parseInt(this.defaultDepth),
         renderImages: this.renderImages,
         renderMap: this.renderMap,
+        tydeModeEnabled: this.tydeModeEnabled,
+        tydeModeDefualtNodes: this.tydeModeDefualtNodes,
         analyticsEnabled: this.analyticsEnabled,
         draftNodesEnabled: this.draftNodesEnabled,
         submitNodesEnabled: this.submitNodesEnabled,

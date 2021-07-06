@@ -53,6 +53,9 @@
     <b-form-group v-if="node.hasSubAccordion" label="Subaccordion Text">
       <b-form-input v-model="node.typeData.subAccordionText"></b-form-input>
     </b-form-group>
+    <b-form-group v-show="isPopupCandidate" label="Popup">
+      <popup-form :node="node" :is-candidate="isPopupCandidate" />
+    </b-form-group>
     <b-form-group label="Content Type">
       <b-form-select
         id="node-media-type"
@@ -85,11 +88,10 @@
 
 <script>
 import { mapGetters } from "vuex"
-import GravityFormsApi from "@/services/GravityFormsApi"
 import ActivityForm from "./ActivityForm"
 import MultiContentForm from "./MultiContentForm"
-import GravityFormForm from "./GravityFormForm"
 import H5pForm from "./H5pForm"
+import PopupForm from "./PopupForm"
 import TextForm from "./TextForm"
 import RichTextForm from "./RichTextForm"
 import UrlEmbedForm from "./UrlEmbedForm"
@@ -100,8 +102,8 @@ export default {
   components: {
     ActivityForm,
     MultiContentForm,
-    GravityFormForm,
     H5pForm,
+    PopupForm,
     TextForm,
     RichTextForm,
     UrlEmbedForm,
@@ -109,14 +111,14 @@ export default {
     WpPostForm,
   },
   props: {
+    node: {
+      type: Object,
+      required: true,
+    },
     parent: {
       type: Object,
       required: false,
       default: null,
-    },
-    node: {
-      type: Object,
-      required: true,
     },
     actionType: {
       type: String,
@@ -139,7 +141,6 @@ export default {
         { value: "url-embed", text: "External Link" },
         { value: "wp-post", text: "Wordpress Post" },
         { value: "activity", text: "Activity" },
-        { value: "gravity-form", text: "Gravity Form", disabled: true },
         { value: "multi-content", text: "Multi-Content" }, // must be last item
       ],
       shouldShowTitle: this.node.typeData.showTitle !== false,
@@ -150,6 +151,23 @@ export default {
     ...mapGetters(["isMultiContentRow"]),
     activeForm() {
       return this.node.mediaType ? this.node.mediaType + "-form" : null
+    },
+    /**
+     * If we're currently editing, a node is a popup candidate if its parent is a
+     * video node AND it's not a popup itself AND is not part of a multi content.
+     */
+    isPopupCandidate() {
+      // NOTE: Currently we do not want to allow a multi-content popup
+      if (this.parent && this.node.mediaType !== "multi-content") {
+        if (this.parent.popup || this.parent.isMultiContentChild) {
+          return false
+        }
+        if (this.parent.mediaType === "h5p") {
+          return this.parent.mediaDuration > 0
+        }
+        return this.parent.mediaType === "video"
+      }
+      return false
     },
     isMultiContentChild() {
       return (
@@ -165,18 +183,6 @@ export default {
     shouldShowTitle(shouldShowTitle) {
       this.node.typeData.showTitle = shouldShowTitle
     },
-  },
-  mounted() {
-    GravityFormsApi.exists().then(exists => {
-      const i = this.mediaTypes.findIndex(
-        mediaType => mediaType.value == "gravity-form"
-      )
-      if (exists) {
-        this.mediaTypes[i].disabled = false
-      } else {
-        this.mediaTypes[i].text += " (plugin unavailable)"
-      }
-    })
   },
   methods: {
     handleTypeChange(evt) {

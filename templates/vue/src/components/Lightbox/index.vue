@@ -3,12 +3,12 @@
     id="lightbox"
     data-qa="lightbox"
     :class="{
-      'full-screen': node.fullscreen,
+      'full-screen': node.fullscreen || tydeMode.displayTydeMode,
       'content-text': node.mediaType === 'text' || node.mediaType === 'wp-post',
     }"
     :node-id="nodeId"
     :content-container-style="lightboxContentStyles"
-    :allow-close="canSkip"
+    :allow-close="canSkip && !tydeMode.displayTydeMode"
     @close="handleUserClose"
   >
     <multi-content-media
@@ -30,6 +30,7 @@
       :node-id="nodeId"
       :dimensions="dimensions"
       context="lightbox"
+      :class="{ 'tyde-mode': tydeMode.displayTydeMode }"
       @load="handleLoad"
       @close="handleAutoClose"
       @complete="complete"
@@ -85,7 +86,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(["h5pSettings", "rootId"]),
+    ...mapState(["h5pSettings", "rootId", "tydeMode"]),
     ...mapGetters(["getNode", "isMultiContent", "isMultiContentRow"]),
     node() {
       const node = this.getNode(this.nodeId)
@@ -102,7 +103,7 @@ export default {
         height: this.dimensions.height + "px",
       }
 
-      if (this.node.fullscreen) {
+      if (this.node.fullscreen || this.tydeMode.displayTydeMode) {
         styles.top = "auto"
         styles.left = "auto"
         styles.width = "100vw"
@@ -254,8 +255,8 @@ export default {
   },
   methods: {
     ...mapActions(["completeNode"]),
-    complete() {
-      this.completeNode(this.nodeId)
+    complete(nodeId) {
+      this.completeNode(nodeId || this.nodeId)
     },
     handleUserClose() {
       client.recordAnalyticsEvent("user", "close", "lightbox", this.nodeId)
@@ -272,9 +273,9 @@ export default {
         query: this.$route.query,
       })
     },
-    handleLoad(dimensions) {
-      if (dimensions) {
-        const { width, height } = dimensions
+    handleLoad(dimensions = {}) {
+      const { width, height } = dimensions
+      if (width && height) {
         this.updateDimensions({ width, height })
       }
     },
@@ -320,5 +321,9 @@ body.tapestry-lightbox-open {
     }
   }
   height: 100%;
+}
+
+.tyde-mode {
+  padding-top: 3rem;
 }
 </style>

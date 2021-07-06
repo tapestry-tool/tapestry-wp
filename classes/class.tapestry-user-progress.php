@@ -30,7 +30,7 @@ class TapestryUserProgress implements ITapestryUserProgress
     }
 
     /**
-     * Get User's video progress for a tapestry post.
+     * Get User's progress for a tapestry post.
      *
      * @return string progress   of each node in json format
      */
@@ -82,14 +82,15 @@ class TapestryUserProgress implements ITapestryUserProgress
     /**
      * Set the question with the given id to be marked as 'completed'.
      *
-     * @param int $questionId the question to mark
+     * @param int    $questionId the question to mark
+     * @param string $answerData the user answer
      *
      * @return null
      */
-    public function completeQuestion($questionId)
+    public function completeQuestion($questionId, $answerType, $answerData)
     {
         $this->_checkPostId();
-        $this->_completeQuestion($questionId);
+        $this->_completeQuestion($questionId, $answerType, $answerData);
     }
 
     /**
@@ -119,28 +120,6 @@ class TapestryUserProgress implements ITapestryUserProgress
         return $this->_getUserH5PSettings();
     }
 
-    /**
-     * Get all gravity form entries submitted by this user.
-     *
-     * @return string user entries in json format
-     */
-    public function getUserEntries($userId = 0, $formId = 0)
-    {
-        if (!class_exists('GFAPI')) {
-            return [];
-        }
-        if (!$userId) {
-            $userId = $this->_userId;
-        }
-        $search_criteria['field_filters'][] = [
-            'key' => 'created_by',
-            'value' => $userId,
-        ];
-        $entries = GFAPI::get_entries($formId, $search_criteria);
-
-        return $this->_formatEntries($entries);
-    }
-
     public function isCompleted($nodeId, $userId)
     {
         $nodeMetadata = get_metadata_by_mid('post', $nodeId)->meta_value;
@@ -150,62 +129,6 @@ class TapestryUserProgress implements ITapestryUserProgress
         } else {
             return isset($nodeMetadata->completed) && $nodeMetadata->completed ? true : false;
         }
-    }
-
-    private function _formatEntries($entries)
-    {
-        $formEntryMap = new stdClass();
-
-        foreach ($entries as $entry) {
-            $formId = $entry['form_id'];
-
-            if (property_exists($formEntryMap, $formId)) {
-                $latestEntry = $formEntryMap->$formId;
-                if ($entry['date_updated'] > $latestEntry['date_updated']) {
-                    $formEntryMap->$formId = $entry;
-                }
-            } else {
-                $formEntryMap->$formId = $entry;
-            }
-        }
-
-        foreach ((array) $formEntryMap as $formId => $entry) {
-            $formEntryMap->$formId = $this->_getImageChoices($formId, $entry);
-        }
-
-        return $formEntryMap;
-    }
-
-    private function _getImageChoices($formId, &$entry)
-    {
-        $field_types = ['checkbox', 'radio'];
-        $form = GFAPI::get_form($formId);
-        $fields = GFAPI::get_fields_by_type($form, $field_types);
-        $image_choices_fields = [];
-        foreach ($fields as &$field) {
-            if (is_object($field) && property_exists($field, 'imageChoices_enableImages') && !empty($field->imageChoices_enableImages)) {
-                $image_choices_fields[$field->id] = $field;
-            }
-        }
-        foreach ($image_choices_fields as $id => $field) {
-            foreach ($field->inputs as $input) {
-                $label = $input['label'];
-                $correspondingChoice = array_values(array_filter(
-                    $field['choices'],
-                    function ($e) use ($label) {
-                        return $e['value'] == $label;
-                    }
-                ))[0];
-                if ('' != $entry[$input['id']]) {
-                    $inputMap = new stdClass();
-                    $inputMap->choiceText = $label;
-                    $inputMap->imageUrl = $correspondingChoice['imageChoices_image'];
-                    $entry[$input['id']] = $inputMap;
-                }
-            }
-        }
-
-        return $entry;
     }
 
     private function _updateUserProgress($progressValue)
@@ -218,12 +141,14 @@ class TapestryUserProgress implements ITapestryUserProgress
         update_user_meta($this->_userId, 'tapestry_'.$this->postId.'_node_completed_'.$this->nodeMetaId, true);
     }
 
-    private function _completeQuestion($questionId)
+    private function _completeQuestion($questionId, $answerType, $answerData)
     {
-        $nodeMetadata = get_metadata_by_mid('post', $this->nodeMetaId)->meta_value;
-        $quiz = $this->_getQuizProgress($this->nodeMetaId, $nodeMetadata, $this->_userId);
-        $quiz[$questionId]['completed'] = true;
-        update_user_meta($this->_userId, 'tapestry_'.$this->postId.'_node_quiz_'.$this->nodeMetaId, $quiz);
+        $userAnswer = get_user_meta($this->_userId, 'tapestry_'.$this->postId.'_'.$this->nodeMetaId.'_question_'.$questionId.'_answers', true);
+        if ('' === $userAnswer) {
+            $userAnswer = [];
+        }
+        $userAnswer[$answerType] = $answerData;
+        update_user_meta($this->_userId, 'tapestry_'.$this->postId.'_'.$this->nodeMetaId.'_question_'.$questionId.'_answers', $userAnswer);
     }
 
     private function _getUserProgress($nodeIdArr, $userId)
@@ -251,57 +176,32 @@ class TapestryUserProgress implements ITapestryUserProgress
 
             if ($node->accessible) {
                 $progress->$nodeId->content = [
-                    'quiz' => $node->quiz,
                     'typeData' => $node->typeData,
                 ];
             }
 
-            $nodeMetadata = get_metadata_by_mid('post', $nodeId)->meta_value;
+            $isQuestionNode = property_exists($node->typeData, 'activity');
+            if ($isQuestionNode) {
+                $questionIdArray = array_map(
+                    function ($question) {
+                        return $question->id;
+                    },
+                    $node->typeData->activity->questions
+                );
+
+                $progress->$nodeId->content['userAnswers'] = new stdClass();
+                $progress->$nodeId->content['userAnswers']->activity = new stdClass();
+                foreach ($questionIdArray as $questionId) {
+                    $answer = get_user_meta($userId, 'tapestry_'.$this->postId.'_'.$nodeId.'_question_'.$questionId.'_answers', true);
+                    $progress->$nodeId->content['userAnswers']->activity->{$questionId}->answers = $answer;
+                }
+            }
+
             $completed_value = $this->isCompleted($nodeId, $userId);
             $progress->$nodeId->completed = $completed_value;
-
-            $quiz = $this->_getQuizProgress($nodeId, $nodeMetadata, $userId);
-            $progress->$nodeId->quiz = $quiz;
         }
 
         return $progress;
-    }
-
-    private function _getQuizProgress($nodeId, $nodeMetadata, $userId)
-    {
-        $quiz = [];
-        $completed_values = get_user_meta($userId, 'tapestry_'.$this->postId.'_node_quiz_'.$nodeId, true);
-
-        $entries = $this->getUserEntries($userId);
-
-        if (isset($nodeMetadata->quiz) && is_array($nodeMetadata->quiz)) {
-            foreach ($nodeMetadata->quiz as $question) {
-                $quiz[$question->id] = [
-                    'completed' => false,
-                ];
-
-                foreach ($question->answers as $type => $gfOrH5pId) {
-                    if ('' !== $gfOrH5pId) {
-                        if ('audioId' == $type) {
-                            $tapestryAudio = new TapestryAudio($this->postId, $nodeId, $question->id, $userId);
-                            if ($tapestryAudio->audioExists()) {
-                                $quiz[$question->id][$type] = $tapestryAudio->get();
-                            }
-                        } elseif (property_exists($entries, $gfOrH5pId)) {
-                            $quiz[$question->id][$type] = $entries->$gfOrH5pId;
-                        }
-                    }
-                }
-            }
-        }
-
-        if (isset($completed_values) && is_array($completed_values)) {
-            foreach ($completed_values as $id => $info) {
-                $quiz[$id]['completed'] = $info['completed'];
-            }
-        }
-
-        return count($quiz) > 0 ? $quiz : (object) $quiz;
     }
 
     private function _updateUserH5PSettings($h5pSettingsData)

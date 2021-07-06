@@ -43,7 +43,6 @@
                 :node-id="row.node.id"
                 :dimensions="dimensions"
                 context="page"
-                :autoplay="false"
                 style="color: white; margin-bottom: 24px;"
                 @complete="updateProgress(row.node.id)"
                 @load="handleLoad($refs.rowRefs[index])"
@@ -136,9 +135,6 @@ export default {
       showCompletion: false,
     }
   },
-  mounted() {
-    this.$root.$emit("observe-rows", this.$refs.rowRefs)
-  },
   computed: {
     ...mapGetters(["getDirectChildren", "getNode", "isFavourite", "isMultiContent"]),
     ...mapState(["favourites"]),
@@ -177,9 +173,12 @@ export default {
       }
     },
   },
+  mounted() {
+    this.$root.$emit("observe-rows", this.$refs.rowRefs)
+  },
   methods: {
     ...mapMutations(["updateNode"]),
-    ...mapActions(["completeNode", "updateNodeProgress", "toggleFavourite"]),
+    ...mapActions(["completeNode", "toggleFavourite"]),
     handleLoad(el) {
       this.$emit("load", el)
     },

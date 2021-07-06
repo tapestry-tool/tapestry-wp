@@ -1,6 +1,7 @@
 <template>
   <loading v-if="loading" data-qa="tapestry-loading" style="height: 75vh;"></loading>
   <div v-else id="app">
+    <navbar v-if="tydeMode.displayTydeMode"></navbar>
     <tapestry-app></tapestry-app>
     <router-view name="lightbox"></router-view>
     <node-modal></node-modal>
@@ -30,6 +31,7 @@ import TapestryError from "@/components/TapestryError"
 import Loading from "@/components/common/Loading"
 import client from "@/services/TapestryAPI"
 import { isLoggedIn } from "./services/wp"
+import Navbar from "@/components/tyde/Navbar"
 
 export default {
   name: "app",
@@ -39,6 +41,7 @@ export default {
     TapestryApp,
     Sidebar,
     TapestryError,
+    Navbar,
   },
   data() {
     return {
@@ -47,7 +50,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(["nodes"]),
+    ...mapState(["nodes", "tydeMode"]),
     isEmpty() {
       return Object.keys(this.nodes).length === 0
     },
@@ -70,7 +73,6 @@ export default {
         })
       })
     }
-
     window.addEventListener("click", this.recordAnalytics)
     const data = [client.getTapestry(), client.getUserProgress()]
     Promise.all(data).then(([dataset, progress]) => {
