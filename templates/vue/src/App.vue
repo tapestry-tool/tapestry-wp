@@ -1,8 +1,8 @@
 <template>
   <loading v-if="loading" data-qa="tapestry-loading" style="height: 75vh;"></loading>
   <div v-else id="app">
-    <navbar v-if="tydeMode.displayTydeMode"></navbar>
-    <tapestry-app></tapestry-app>
+    <navbar v-if="isTydeView"></navbar>
+    <tapestry-app v-else></tapestry-app>
     <router-view name="lightbox"></router-view>
     <node-modal></node-modal>
     <sidebar v-if="!isEmpty"></sidebar>
@@ -32,6 +32,9 @@ import Loading from "@/components/common/Loading"
 import client from "@/services/TapestryAPI"
 import { isLoggedIn } from "./services/wp"
 import Navbar from "@/components/tyde/Navbar"
+import { getCurrentUser } from "@/services/wp"
+
+const currentUser = getCurrentUser()
 
 export default {
   name: "app",
@@ -50,9 +53,21 @@ export default {
     }
   },
   computed: {
-    ...mapState(["nodes", "tydeMode"]),
+    ...mapState(["nodes", "rootId", "settings"]),
     isEmpty() {
       return Object.keys(this.nodes).length === 0
+    },
+    isTydeView() {
+      const isAdmin = currentUser.roles.some(role => role === "administrator")
+
+      if (!isAdmin && this.settings.tydeModeEnabled) {
+        const rootNode = this.nodes[this.rootId]
+        const hasEditPermissions = currentUser.roles.some(role => {
+          return rootNode.permissions[role].some(premission => premission === "edit")
+        })
+        return !hasEditPermissions
+      }
+      return false
     },
   },
   watch: {
@@ -85,12 +100,14 @@ export default {
         })
       }
     })
+
+    this.setDisplayTydeMode(this.isTydeView)
   },
   beforeDestroy() {
     window.removeEventListener("click", this.recordAnalytics)
   },
   methods: {
-    ...mapMutations(["init"]),
+    ...mapMutations(["init", "setDisplayTydeMode"]),
     refresh() {
       this.$router.go()
     },

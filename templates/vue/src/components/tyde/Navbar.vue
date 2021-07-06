@@ -20,7 +20,11 @@
 
 <script>
 import { mapState } from "vuex"
+import { names } from "@/config/routes"
 import TydeIcon from "./TydeIcon.vue"
+import { getCurrentUser } from "@/services/wp"
+
+const currentUser = getCurrentUser()
 
 export default {
   name: "navbar",
@@ -30,13 +34,26 @@ export default {
   data() {
     return {}
   },
+
   computed: {
-    ...mapState(["tydeMode"]),
+    ...mapState(["settings", "tydeMode"]),
     tabs() {
+      /* NOTE: Opening the default Node for a specific role 
+             in fullscreen only if this role cannot edit the 
+             default node, otherwise the regular tapestry will
+             open
+      */
+
+      const userMainRole = currentUser.roles[0] || "public"
+      const defaultNodeId = this.settings.tydeModeDefualtNodes[userMainRole]
       return [
         {
           name: "tyde",
-          link: this.tydeMode.defaultNode,
+          link: {
+            name: names.LIGHTBOX,
+            params: { nodeId: defaultNodeId },
+            query: this.$route.query,
+          },
         },
         {
           name: "profile",
@@ -52,6 +69,9 @@ export default {
         },
       ]
     },
+  },
+  created() {
+    this.$router.push(this.tabs[0].link)
   },
 }
 </script>

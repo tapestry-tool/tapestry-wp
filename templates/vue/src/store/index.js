@@ -22,9 +22,7 @@ export const store = {
     visibleNodes: [],
     apiError: null,
     displayErrors: false,
-    tydeMode: {
-      displayTydeMode: false,
-    },
+    displayTydeMode: false,
     userAnswers: {},
   },
   getters,

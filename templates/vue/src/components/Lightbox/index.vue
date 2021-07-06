@@ -3,12 +3,12 @@
     id="lightbox"
     data-qa="lightbox"
     :class="{
-      'full-screen': node.fullscreen || tydeMode.displayTydeMode,
+      'full-screen': node.fullscreen || displayTydeMode,
       'content-text': node.mediaType === 'text' || node.mediaType === 'wp-post',
     }"
     :node-id="nodeId"
     :content-container-style="lightboxContentStyles"
-    :allow-close="canSkip && !tydeMode.displayTydeMode"
+    :allow-close="canSkip && !displayTydeMode"
     @close="handleUserClose"
   >
     <multi-content-media
@@ -30,7 +30,7 @@
       :node-id="nodeId"
       :dimensions="dimensions"
       context="lightbox"
-      :class="{ 'tyde-mode': tydeMode.displayTydeMode }"
+      :class="{ 'tyde-mode': displayTydeMode }"
       @load="handleLoad"
       @close="handleAutoClose"
       @complete="complete"
@@ -86,7 +86,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(["h5pSettings", "rootId", "tydeMode"]),
+    ...mapState(["h5pSettings", "rootId", "displayTydeMode"]),
     ...mapGetters(["getNode", "isMultiContent", "isMultiContentRow"]),
     node() {
       const node = this.getNode(this.nodeId)
@@ -103,7 +103,7 @@ export default {
         height: this.dimensions.height + "px",
       }
 
-      if (this.node.fullscreen || this.tydeMode.displayTydeMode) {
+      if (this.node.fullscreen || this.displayTydeMode) {
         styles.top = "auto"
         styles.left = "auto"
         styles.width = "100vw"
