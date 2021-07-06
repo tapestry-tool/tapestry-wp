@@ -10,7 +10,7 @@
         <audio controls :src="urlAnswer"></audio>
       </b-col>
       <b-col v-if="type === 'multipleChoice'" align-self="center">
-        <ul v-if="question.answerTypes.multipleChoice.hasMultipleAnswers">
+        <ul>
           <li v-for="answer in answerData" :key="answer.index">
             <completed-multiple-choice-item
               :item="getMultipleChoiceOptionObject(answer)"
@@ -18,14 +18,14 @@
             />
           </li>
         </ul>
-        <ul v-else>
+        <!-- <ul v-else>
           <li>
             <completed-multiple-choice-item
               :item="getRadioMultipleChoiceOptionObject(answerData)"
               :useImages="question.answerTypes.multipleChoice.useImages"
             />
           </li>
-        </ul>
+        </ul> -->
       </b-col>
     </b-row>
   </b-container>
