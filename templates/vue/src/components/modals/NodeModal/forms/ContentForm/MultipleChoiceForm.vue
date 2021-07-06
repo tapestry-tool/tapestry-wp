@@ -10,8 +10,8 @@
           Use Images
         </b-form-checkbox>
       </b-form-group>
-      <p>question data is {{ question }}</p>
       <p>multipleAnswerSelected is {{ multipleAnswerSelected }}</p>
+      <p>multipleChoice is {{ multipleChoice }}</p>
       <b-form-group v-if="multipleAnswerSelected">
         <sortable-list
           v-model="choiceRows"
@@ -30,7 +30,7 @@
               :item="choiceRow"
               placeholder="answer option text"
               :index="index"
-              :question="question"
+              :multipleChoice="multipleChoice"
               :multipleAnswerSelected="multipleAnswerSelected"
               :useImages="useImages"
               :removeButtonDisabled="isRemoveButtonDisabled"
@@ -64,7 +64,7 @@
               :item="choiceRow"
               placeholder="answer option text"
               :index="index"
-              :question="question"
+              :multipleChoice="multipleChoice"
               :multipleAnswerSelected="multipleAnswerSelected"
               :useImages="useImages"
               :isDisabled="preSelectedRadioOptions.length > 0"
@@ -110,7 +110,7 @@ export default {
     SortableList,
   },
   props: {
-    question: {
+    multipleChoice: {
       type: Object,
       required: true,
     },
@@ -160,7 +160,7 @@ export default {
   },
   computed: {
     multipleAnswerSelected() {
-      return this.question.answerTypes.multipleChoice.hasMultipleAnswers
+      return this.multipleChoice.hasMultipleAnswers
     },
     isRemoveButtonDisabled() {
       if (this.multipleAnswerSelected) {
@@ -186,52 +186,48 @@ export default {
   },
   watch: {
     choiceRows(newChoiceRows) {
-      this.question.answerTypes.multipleChoice.choices = newChoiceRows
-      this.question.answerTypes.multipleChoice.checkboxArray = newChoiceRows
+      this.multipleChoice.choices = newChoiceRows
     },
     choiceRowsRadio(newChoiceRowsRadio) {
-      this.question.answerTypes.multipleChoice.radioArray = newChoiceRowsRadio
+      this.multipleChoice.radioArray = newChoiceRowsRadio
     },
     useImages(newUseImages) {
-      this.question.answerTypes.multipleChoice.useImages = newUseImages
+      this.multipleChoice.useImages = newUseImages
     },
     preSelectedOptions(newPreSelectedOptions) {
-      this.question.answerTypes.multipleChoice.preSelectedOptions = newPreSelectedOptions
+      this.multipleChoice.preSelectedOptions = newPreSelectedOptions
     },
     preSelectedRadioOptions(newPreSelectedRadioOptions) {
-      this.question.answerTypes.multipleChoice.preSelectedRadioOptions = newPreSelectedRadioOptions
+      this.multipleChoice.preSelectedRadioOptions = newPreSelectedRadioOptions
     },
     nextChoiceRowId(newNextChoiceRowId) {
-      this.question.answerTypes.multipleChoice.nextChoiceRowId = newNextChoiceRowId
+      this.multipleChoice.nextChoiceRowId = newNextChoiceRowId
     },
     nextChoiceRowRadioId(newNextChoiceRowRadioId) {
-      this.question.answerTypes.multipleChoice.nextChoiceRowRadioId = newNextChoiceRowRadioId
+      this.multipleChoice.nextChoiceRowRadioId = newNextChoiceRowRadioId
     },
   },
   created() {
     if (
-      !this.question.answerTypes.multipleChoice.hasOwnProperty("choices") ||
-      !this.question.answerTypes.multipleChoice.hasOwnProperty("checkboxArray") ||
-      !this.question.answerTypes.multipleChoice.hasOwnProperty("radioArray") ||
-      !this.question.answerTypes.multipleChoice.hasOwnProperty("useImages")
+      !this.multipleChoice.hasOwnProperty("choices") ||
+      !this.multipleChoice.hasOwnProperty("radioArray") ||
+      !this.multipleChoice.hasOwnProperty("useImages")
     ) {
-      this.question.answerTypes.multipleChoice.choices = this.choiceRows
-      this.question.answerTypes.multipleChoice.checkboxArray = this.choiceRows
-      this.question.answerTypes.multipleChoice.radioArray = this.choiceRowsRadio
-      this.question.answerTypes.multipleChoice.nextChoiceRowId = this.nextChoiceRowId
-      this.question.answerTypes.multipleChoice.nextChoiceRowRadioId = this.nextChoiceRowRadioId
-      this.question.answerTypes.multipleChoice.useImages = this.useImages
-      this.question.answerTypes.multipleChoice.preSelectedOptions = this.preSelectedOptions
-      this.question.answerTypes.multipleChoice.preSelectedRadioOptions = this.preSelectedRadioOptions
+      this.multipleChoice.choices = this.choiceRows
+      this.multipleChoice.radioArray = this.choiceRowsRadio
+      this.multipleChoice.nextChoiceRowId = this.nextChoiceRowId
+      this.multipleChoice.nextChoiceRowRadioId = this.nextChoiceRowRadioId
+      this.multipleChoice.useImages = this.useImages
+      this.multipleChoice.preSelectedOptions = this.preSelectedOptions
+      this.multipleChoice.preSelectedRadioOptions = this.preSelectedRadioOptions
     } else {
-      this.choices = this.question.answerTypes.multipleChoice.choices
-      this.choiceRows = this.question.answerTypes.multipleChoice.checkboxArray
-      this.choiceRowsRadio = this.question.answerTypes.multipleChoice.radioArray
-      this.nextChoiceRowId = this.question.answerTypes.multipleChoice.nextChoiceRowId
-      this.nextChoiceRowRadioId = this.question.answerTypes.multipleChoice.nextChoiceRowRadioId
-      this.useImages = this.question.answerTypes.multipleChoice.useImages
-      this.preSelectedOptions = this.question.answerTypes.multipleChoice.preSelectedOptions
-      this.preSelectedRadioOptions = this.question.answerTypes.multipleChoice.preSelectedRadioOptions
+      this.choiceRows = this.multipleChoice.choices
+      this.choiceRowsRadio = this.multipleChoice.radioArray
+      this.nextChoiceRowId = this.multipleChoice.nextChoiceRowId
+      this.nextChoiceRowRadioId = this.multipleChoice.nextChoiceRowRadioId
+      this.useImages = this.multipleChoice.useImages
+      this.preSelectedOptions = this.multipleChoice.preSelectedOptions
+      this.preSelectedRadioOptions = this.multipleChoice.preSelectedRadioOptions
     }
   },
   methods: {
@@ -250,8 +246,7 @@ export default {
       })
     },
     removeChoiceRow: function(index, item) {
-      this.question.answerTypes.multipleChoice.choices.splice(index, 1)
-      this.question.answerTypes.multipleChoice.checkboxArray.splice(index, 1)
+      this.multipleChoice.choices.splice(index, 1)
       for (let i = 0; i < this.preSelectedOptions.length; i++) {
         if (item.id === this.preSelectedOptions[i]) {
           this.preSelectedOptions.splice(i, 1)
@@ -259,7 +254,7 @@ export default {
       }
     },
     removeChoiceRowRadio: function(index, item) {
-      this.question.answerTypes.multipleChoice.radioArray.splice(index, 1)
+      this.multipleChoice.radioArray.splice(index, 1)
       for (let i = 0; i < this.preSelectedRadioOptions.length; i++) {
         if (item.id === this.preSelectedRadioOptions[i]) {
           this.preSelectedRadioOptions.splice(i, 1)
@@ -267,11 +262,10 @@ export default {
       }
     },
     updateChoicesOrdering(arr) {
-      this.question.answerTypes.multipleChoice.checkboxArray = arr
-      this.question.answerTypes.multipleChoice.choices = arr
+      this.multipleChoice.choices = arr
     },
     updateOrderingRadioArray(arr) {
-      this.question.answerTypes.multipleChoice.radioArray = arr
+      this.multipleChoice.radioArray = arr
     },
   },
 }

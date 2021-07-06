@@ -172,7 +172,7 @@
                 </b-form-radio-group>
                 <div v-if="question.answerTypes.multipleChoice.enabled">
                   <multiple-choice-form
-                    :question="question"
+                    :multipleChoice="question.answerTypes.multipleChoice"
                     data-qa="authoring-multiple-choice-form"
                   />
                 </div>

@@ -79,7 +79,7 @@ export default {
   directives: { handle: HandleDirective },
   mixins: [ElementMixin],
   props: {
-    question: {
+    multipleChoice: {
       type: Object,
       required: true,
     },

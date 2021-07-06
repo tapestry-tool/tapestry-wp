@@ -443,11 +443,9 @@ export default {
           const hasMultipleAnswer =
             question.answerTypes.multipleChoice.hasMultipleAnswers
           if (hasMultipleAnswer) {
-            return question.answerTypes.multipleChoice.checkboxArray.every(
-              option => {
-                return option.value != ""
-              }
-            )
+            return question.answerTypes.multipleChoice.choices.every(option => {
+              return option.value != ""
+            })
           } else {
             return question.answerTypes.multipleChoice.radioArray.every(option => {
               return option.value != ""
@@ -469,11 +467,9 @@ export default {
             question.answerTypes.multipleChoice.hasMultipleAnswers
           const useImages = question.answerTypes.multipleChoice.useImages
           if (hasMultipleAnswer && useImages) {
-            return question.answerTypes.multipleChoice.checkboxArray.every(
-              option => {
-                return option.imageUrl != "" && option.imageUrl != null
-              }
-            )
+            return question.answerTypes.multipleChoice.choices.every(option => {
+              return option.imageUrl != "" && option.imageUrl != null
+            })
           } else if (!hasMultipleAnswer && useImages) {
             return question.answerTypes.multipleChoice.radioArray.every(option => {
               return option.imageUrl != "" && option.imageUrl != null

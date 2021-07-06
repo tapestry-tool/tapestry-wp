@@ -4,7 +4,7 @@
       <!-- // use component is here because b-form checkbox group vs b-form radio group -->
       <b-form-checkbox-group v-model="userSelectedCheckbox">
         <multiple-choice-question-item
-          v-for="userChoiceRow in question.answerTypes.multipleChoice.checkboxArray"
+          v-for="userChoiceRow in question.answerTypes.multipleChoice.choices"
           :key="userChoiceRow.id"
           :item="userChoiceRow"
           :isCheckBox="question.answerTypes.multipleChoice.hasMultipleAnswers"
@@ -123,7 +123,7 @@ export default {
     },
     getPreSelectedCheckBoxValue() {
       if (this.question.answerTypes.multipleChoice.hasMultipleAnswers) {
-        return this.question.answerTypes.multipleChoice.preSelectedCheckBoxOptions
+        return this.question.answerTypes.multipleChoice.preSelectedOptions
       }
     },
     getPreSelectedRadioValue() {
