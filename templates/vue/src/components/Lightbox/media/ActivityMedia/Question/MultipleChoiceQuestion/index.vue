@@ -1,8 +1,10 @@
 <template>
   <b-form class="container" @submit="handleMultipleChoiceSubmit">
-    <b-form-group v-if="question.answerTypes.multipleChoice.hasMultipleAnswers">
+    <p>multipleAnswerSelected is {{ multipleAnswerSelected }}</p>
+    <p>user selected option is {{ userSelectedOption }}</p>
+    <b-form-group>
       <!-- // use component is here because b-form checkbox group vs b-form radio group -->
-      <b-form-checkbox-group v-model="userSelectedCheckbox">
+      <component :is="multipleChoiceGroup" v-model="userSelectedOption">
         <multiple-choice-question-item
           v-for="userChoiceRow in question.answerTypes.multipleChoice.choices"
           :key="userChoiceRow.id"
@@ -11,10 +13,11 @@
           :hasImage="question.answerTypes.multipleChoice.useImages"
           :data-qa="`multiple-choice-question-${userChoiceRow.id}`"
         ></multiple-choice-question-item>
-      </b-form-checkbox-group>
+      </component>
     </b-form-group>
-    <b-form-group v-else>
-      <!-- // use component with is prop to get rid of v if-v-else here -->
+
+    <!-- <b-form-group v-else>
+      // use component with is prop to get rid of v if-v-else here
       <b-form-radio-group v-model="userSelectedRadio">
         <multiple-choice-question-item
           v-for="userChoiceRow in question.answerTypes.multipleChoice.radioArray"
@@ -25,7 +28,8 @@
           :data-qa="`multiple-choice-question-radio-${userChoiceRow.id}`"
         ></multiple-choice-question-item>
       </b-form-radio-group>
-    </b-form-group>
+    </b-form-group> -->
+
     <b-form-invalid-feedback
       :state="isAnswerValid"
       class="clearfix"
@@ -63,6 +67,7 @@ export default {
   data() {
     return {
       isAnswerValid: true,
+      userSelectedOption: this.userSelectedOptionInitialValue,
       userSelectedCheckbox: [],
       userSelectedRadio: null,
       multipleChoiceAnswer: "",
@@ -72,11 +77,29 @@ export default {
     radioValidAnswerState() {
       return Boolean(this.userSelectedRadio)
     },
+    multipleAnswerSelected() {
+      return this.question.answerTypes.multipleChoice.hasMultipleAnswers
+    },
+    userSelectedOptionInitialValue() {
+      if (this.multipleAnswerSelected) {
+        return []
+      } else {
+        return null
+      }
+    },
+    multipleChoiceGroup() {
+      if (this.multipleAnswerSelected) {
+        return "b-form-checkbox-group"
+      } else {
+        return "b-form-radio-group"
+      }
+    },
   },
   watch: {
     question() {
       if (this.answer === "") {
-        this.userSelectedCheckbox = this.getPreSelectedCheckBoxValue()
+        this.userSelectedOption = this.getPreSelectedOptionValue()
+        this.userSelectedCheckbox = this.getPreSelectedOptionValue()
         this.userSelectedRadio = this.getPreSelectedRadioValue()
       } else {
         if (this.question.answerTypes.multipleChoice.hasMultipleAnswers) {
@@ -89,7 +112,8 @@ export default {
   },
   created() {
     if (this.answer === "") {
-      this.userSelectedCheckbox = this.getPreSelectedCheckBoxValue()
+      this.userSelectedOption = this.getPreSelectedOptionValue()
+      this.userSelectedCheckbox = this.getPreSelectedOptionValue()
       this.userSelectedRadio = this.getPreSelectedRadioValue()
     } else {
       if (this.question.answerTypes.multipleChoice.hasMultipleAnswers) {
@@ -121,9 +145,11 @@ export default {
         this.$emit("submit", this.multipleChoiceAnswer)
       }
     },
-    getPreSelectedCheckBoxValue() {
-      if (this.question.answerTypes.multipleChoice.hasMultipleAnswers) {
+    getPreSelectedOptionValue() {
+      if (this.multipleAnswerSelected) {
         return this.question.answerTypes.multipleChoice.preSelectedOptions
+      } else {
+        return this.question.answerTypes.multipleChoice.preSelectedOptions[0]
       }
     },
     getPreSelectedRadioValue() {
