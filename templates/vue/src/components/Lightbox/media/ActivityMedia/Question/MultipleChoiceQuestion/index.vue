@@ -33,7 +33,7 @@
     >
       Please select a choice.
     </b-form-invalid-feedback>
-    <b-button class="submit-btn mt-3" variant="primary" type="submit">
+    <b-button class="float-left mt-3" variant="primary" type="submit">
       Submit
     </b-button>
   </b-form>
@@ -144,8 +144,5 @@ export default {
 .container {
   display: flex;
   flex-direction: column;
-}
-.submit-btn {
-  float: left;
 }
 </style>
