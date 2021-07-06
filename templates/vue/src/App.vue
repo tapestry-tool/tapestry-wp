@@ -4,6 +4,7 @@
     <navbar v-if="tydeMode.displayTydeMode"></navbar>
     <tapestry-app></tapestry-app>
     <router-view name="lightbox"></router-view>
+    <router-view name="cos"></router-view>
     <node-modal></node-modal>
     <sidebar v-if="!isEmpty"></sidebar>
     <tapestry-error></tapestry-error>

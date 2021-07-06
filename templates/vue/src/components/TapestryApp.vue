@@ -78,9 +78,7 @@ export default {
 
     this.setupTydeMode()
   },
-  updated() {
-    this.setupTydeMode()
-  },
+
   methods: {
     ...mapMutations([
       "select",
@@ -194,7 +192,6 @@ export default {
           params: { nodeId: defaultNodeId },
           query: this.$route.query,
         })
-
         this.openNode(defaultNodeId)
       }
     },

@@ -9,6 +9,7 @@ Vue.use(VueRouter)
 export const routes = [
   routeConfig.app,
   routeConfig.lightbox,
+  routeConfig.cos,
   routeConfig.multiContent,
   routeConfig.nestedMultiContent,
   routeConfig.settings,

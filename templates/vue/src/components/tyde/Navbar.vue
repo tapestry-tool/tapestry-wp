@@ -20,6 +20,7 @@
 
 <script>
 import { mapState } from "vuex"
+import { names } from "@/config/routes"
 import TydeIcon from "./TydeIcon.vue"
 
 export default {
@@ -48,7 +49,10 @@ export default {
         },
         {
           name: "cos",
-          link: "#",
+          link: {
+            name: names.COS,
+            query: this.$route.query,
+          },
         },
       ]
     },

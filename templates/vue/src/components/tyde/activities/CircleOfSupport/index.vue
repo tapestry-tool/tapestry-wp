@@ -1,47 +1,50 @@
 <template>
-  <div id="cos" class="cos">
-    <loading v-if="isLoading" />
-    <div v-else class="contents">
-      <community-view
-        v-if="view === views.Community"
-        :connections="cos.connections"
-        :communities="cos.communities"
-        @add-connection="addConnection"
-        @edit-connection="editConnection"
-        @add-community="addCommunity"
-      />
-      <circle-view
-        v-if="view === views.Circle"
-        v-model="cos.circles"
-        :connections="cos.connections"
-        :communities="cos.communities"
-        @add-connection="addConnection"
-        @edit-connection="editConnection"
-        @add-community="addCommunity"
-      />
-      <div class="switch">
-        <button
-          :class="['change-view', { active: view === views.Community }]"
-          aria-label="Community view"
-          @click="view = views.Community"
-        >
-          <div class="community-view"></div>
-        </button>
-        <button
-          :class="['change-view', { active: view === views.Circle }]"
-          aria-label="Circle view"
-          @click="view = views.Circle"
-        >
-          <div class="circle-view"></div>
-        </button>
+  <tapestry-modal id="cos" data-qa="cos" class="full-screen" :allow-close="false">
+    <div id="cos" class="cos">
+      <loading v-if="isLoading" />
+      <div v-else class="contents">
+        <community-view
+          v-if="view === views.Community"
+          :connections="cos.connections"
+          :communities="cos.communities"
+          @add-connection="addConnection"
+          @edit-connection="editConnection"
+          @add-community="addCommunity"
+        />
+        <circle-view
+          v-if="view === views.Circle"
+          v-model="cos.circles"
+          :connections="cos.connections"
+          :communities="cos.communities"
+          @add-connection="addConnection"
+          @edit-connection="editConnection"
+          @add-community="addCommunity"
+        />
+        <div class="switch">
+          <button
+            :class="['change-view', { active: view === views.Community }]"
+            aria-label="Community view"
+            @click="view = views.Community"
+          >
+            <div class="community-view"></div>
+          </button>
+          <button
+            :class="['change-view', { active: view === views.Circle }]"
+            aria-label="Circle view"
+            @click="view = views.Circle"
+          >
+            <div class="circle-view"></div>
+          </button>
+        </div>
       </div>
     </div>
-  </div>
+  </tapestry-modal>
 </template>
 
 <script>
 import client from "@/services/TapestryAPI"
 import Loading from "@/components/common/Loading"
+import TapestryModal from "@/components/Lightbox/TapestryModal"
 import CommunityView from "./CommunityView"
 import CircleView from "./CircleView"
 
@@ -55,6 +58,7 @@ export default {
     CommunityView,
     CircleView,
     Loading,
+    TapestryModal,
   },
   data() {
     return {
