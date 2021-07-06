@@ -1,8 +1,8 @@
 <template>
   <div class="container">
     <!-- // same logic with the is component -->
-    <b-form-checkbox
-      v-if="isCheckBox"
+    <component
+      :is="multipleChoiceItemForm"
       :value="item.id"
       :data-qa="`multiple-choice-question-item-${item.id}-checked`"
     >
@@ -13,8 +13,9 @@
         :data-qa="`multiple-choice-question-item-${item.id}-thumbnail`"
       ></b-img>
       {{ item.value }}
-    </b-form-checkbox>
-    <b-form-radio
+    </component>
+
+    <!-- <b-form-radio
       v-else-if="!isCheckBox"
       :value="item.id"
       :data-qa="`multiple-choice-radio-question-item-${item.id}-checked`"
@@ -26,7 +27,7 @@
         :data-qa="`multiple-choice-radio-question-item-${item.id}-thumbnail`"
       ></b-img>
       {{ item.value }}
-    </b-form-radio>
+    </b-form-radio> -->
   </div>
 </template>
 
@@ -45,6 +46,15 @@ export default {
     item: {
       type: Object,
       required: true,
+    },
+  },
+  computed: {
+    multipleChoiceItemForm() {
+      if (this.isCheckBox) {
+        return "b-form-checkbox"
+      } else {
+        return "b-form-radio"
+      }
     },
   },
 }

@@ -2,6 +2,7 @@
   <b-form class="container" @submit="handleMultipleChoiceSubmit">
     <p>multipleAnswerSelected is {{ multipleAnswerSelected }}</p>
     <p>user selected option is {{ userSelectedOption }}</p>
+    <p>multipleChoiceAnswer is {{ multipleChoiceAnswer }}</p>
     <b-form-group>
       <!-- // use component is here because b-form checkbox group vs b-form radio group -->
       <component :is="multipleChoiceGroup" v-model="userSelectedOption">
@@ -9,7 +10,7 @@
           v-for="userChoiceRow in question.answerTypes.multipleChoice.choices"
           :key="userChoiceRow.id"
           :item="userChoiceRow"
-          :isCheckBox="question.answerTypes.multipleChoice.hasMultipleAnswers"
+          :isCheckBox="multipleAnswerSelected"
           :hasImage="question.answerTypes.multipleChoice.useImages"
           :data-qa="`multiple-choice-question-${userChoiceRow.id}`"
         ></multiple-choice-question-item>
@@ -70,7 +71,7 @@ export default {
       userSelectedOption: this.userSelectedOptionInitialValue,
       userSelectedCheckbox: [],
       userSelectedRadio: null,
-      multipleChoiceAnswer: "",
+      multipleChoiceAnswer: [],
     }
   },
   computed: {
@@ -94,58 +95,64 @@ export default {
         return "b-form-radio-group"
       }
     },
+    validUserSelectedOption() {
+      if (this.multipleAnswerSelected) {
+        return this.userSelectedOption.length > 0
+      } else {
+        return Boolean(this.userSelectedOption)
+      }
+    },
   },
   watch: {
     question() {
       if (this.answer === "") {
-        this.userSelectedOption = this.getPreSelectedOptionValue()
-        this.userSelectedCheckbox = this.getPreSelectedOptionValue()
+        this.userSelectedOption = this.preSelectedValue()
+        this.userSelectedCheckbox = this.preSelectedValue()
         this.userSelectedRadio = this.getPreSelectedRadioValue()
       } else {
-        if (this.question.answerTypes.multipleChoice.hasMultipleAnswers) {
+        if (this.multipleAnswerSelected) {
+          this.userSelectedOption = this.answer
           this.userSelectedCheckbox = this.answer
         } else {
+          this.userSelectedOption = this.answer[0]
           this.userSelectedRadio = this.answer
         }
       }
     },
   },
   created() {
+    console.log("answer is", this.answer)
+    console.log("answer type is", typeof this.answer)
     if (this.answer === "") {
-      this.userSelectedOption = this.getPreSelectedOptionValue()
-      this.userSelectedCheckbox = this.getPreSelectedOptionValue()
+      this.userSelectedOption = this.preSelectedValue()
+      this.userSelectedCheckbox = this.preSelectedValue()
       this.userSelectedRadio = this.getPreSelectedRadioValue()
     } else {
-      if (this.question.answerTypes.multipleChoice.hasMultipleAnswers) {
-        if (typeof this.answer !== "object") {
-          this.userSelectedCheckbox = []
-        } else {
-          this.userSelectedCheckbox = this.answer
-        }
+      if (this.multipleAnswerSelected) {
+        console.log("got here checkbox")
+        this.userSelectedCheckbox = this.answer
+        this.userSelectedOption = this.answer
       } else {
-        if (typeof this.answer !== "number") {
-          this.userSelectedRadio = null
-        } else {
-          this.userSelectedRadio = this.answer
-        }
+        console.log("got here radio")
+        this.userSelectedRadio = this.answer
+        this.userSelectedOption = this.answer[0]
       }
     }
   },
   methods: {
     handleMultipleChoiceSubmit(event) {
       event.preventDefault()
-      if (this.question.answerTypes.multipleChoice.hasMultipleAnswers) {
-        this.isAnswerValid = this.checkBoxValidAnswerState()
-        this.multipleChoiceAnswer = this.userSelectedCheckbox
+      this.isAnswerValid = this.validUserSelectedOption
+      if (this.multipleAnswerSelected) {
+        this.multipleChoiceAnswer = this.userSelectedOption
       } else {
-        this.isAnswerValid = this.radioValidAnswerState
-        this.multipleChoiceAnswer = this.userSelectedRadio
+        this.multipleChoiceAnswer.push(this.userSelectedOption)
       }
       if (this.isAnswerValid) {
         this.$emit("submit", this.multipleChoiceAnswer)
       }
     },
-    getPreSelectedOptionValue() {
+    preSelectedValue() {
       if (this.multipleAnswerSelected) {
         return this.question.answerTypes.multipleChoice.preSelectedOptions
       } else {
