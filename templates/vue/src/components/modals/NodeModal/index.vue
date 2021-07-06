@@ -440,17 +440,9 @@ export default {
       )
       const validMultipleChoiceValues = questionsWithMultipleChoiceEnabled.every(
         question => {
-          const hasMultipleAnswer =
-            question.answerTypes.multipleChoice.hasMultipleAnswers
-          if (hasMultipleAnswer) {
-            return question.answerTypes.multipleChoice.choices.every(option => {
-              return option.value != ""
-            })
-          } else {
-            return question.answerTypes.multipleChoice.radioArray.every(option => {
-              return option.value != ""
-            })
-          }
+          return question.answerTypes.multipleChoice.choices.every(option => {
+            return option.value != ""
+          })
         }
       )
       return validMultipleChoiceValues
@@ -463,15 +455,9 @@ export default {
       )
       const validMultipleChoiceImages = questionsWithMultipleChoiceEnabled.every(
         question => {
-          const hasMultipleAnswer =
-            question.answerTypes.multipleChoice.hasMultipleAnswers
           const useImages = question.answerTypes.multipleChoice.useImages
-          if (hasMultipleAnswer && useImages) {
+          if (useImages) {
             return question.answerTypes.multipleChoice.choices.every(option => {
-              return option.imageUrl != "" && option.imageUrl != null
-            })
-          } else if (!hasMultipleAnswer && useImages) {
-            return question.answerTypes.multipleChoice.radioArray.every(option => {
               return option.imageUrl != "" && option.imageUrl != null
             })
           } else if (!useImages) {

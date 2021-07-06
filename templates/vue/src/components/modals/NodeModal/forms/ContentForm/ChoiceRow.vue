@@ -1,7 +1,10 @@
 <template>
-  <div v-if="multipleAnswerSelected" class="container">
+  <div class="container">
     <span v-handle class="fas fa-bars fa-s" style="margin-right: 5px;"></span>
-    <b-form-checkbox :value="item.id" />
+    <b-form-checkbox
+      :value="item.id"
+      :disabled="isDisabled && selectedRadioChoice != item.id"
+    />
     <b-form-group v-if="useImages">
       <file-upload
         v-model="item.imageUrl"
@@ -32,7 +35,7 @@
     </b-button>
   </div>
 
-  <div v-else class="container">
+  <!-- <div v-else class="container">
     <span v-handle class="fas fa-bars fa-s" style="margin-right: 5px;"></span>
     <b-form-checkbox
       :value="item.id"
@@ -66,7 +69,7 @@
     >
       Remove
     </b-button>
-  </div>
+  </div> -->
 </template>
 
 <script>

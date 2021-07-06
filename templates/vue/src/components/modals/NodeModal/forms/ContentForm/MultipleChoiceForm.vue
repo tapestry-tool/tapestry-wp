@@ -12,7 +12,7 @@
       </b-form-group>
       <p>multipleAnswerSelected is {{ multipleAnswerSelected }}</p>
       <p>multipleChoice is {{ multipleChoice }}</p>
-      <b-form-group v-if="multipleAnswerSelected">
+      <b-form-group>
         <sortable-list
           v-model="choiceRows"
           lockAxis="y"
@@ -33,6 +33,8 @@
               :multipleChoice="multipleChoice"
               :multipleAnswerSelected="multipleAnswerSelected"
               :useImages="useImages"
+              :isDisabled="!multipleAnswerSelected && preSelectedOptions.length > 0"
+              :selectedRadioChoice="preSelectedOptions[0]"
               :removeButtonDisabled="isRemoveButtonDisabled"
               @remove="removeChoiceRow(index, choiceRow)"
             ></choice-row>
@@ -46,7 +48,7 @@
         </p>
       </b-form-group>
 
-      <b-form-group v-else-if="!multipleAnswerSelected">
+      <!-- <b-form-group v-else-if="!multipleAnswerSelected">
         <sortable-list
           v-model="choiceRowsRadio"
           lockAxis="y"
@@ -88,7 +90,7 @@
           Select any options that should be selected by default when posing the
           question.
         </p>
-      </b-form-group>
+      </b-form-group> -->
     </b-form-group>
   </div>
 </template>
@@ -185,6 +187,9 @@ export default {
     },
   },
   watch: {
+    multipleAnswerSelected() {
+      this.preSelectedOptions = []
+    },
     choiceRows(newChoiceRows) {
       this.multipleChoice.choices = newChoiceRows
     },
