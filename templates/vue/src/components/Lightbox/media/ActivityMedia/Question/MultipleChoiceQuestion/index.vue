@@ -28,7 +28,7 @@
     </b-form-group>
     <b-form-invalid-feedback
       :state="isAnswerValid"
-      style="clear:both"
+      class="clearfix"
       data-qa="invalid-feedback"
     >
       Please select a choice.

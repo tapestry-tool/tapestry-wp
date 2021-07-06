@@ -32,10 +32,8 @@
 </template>
 
 <script>
-
 import CompletedMultipleChoiceItem from "./CompletedMultipleChoiceItem"
 import { data as wpData } from "@/services/wp"
-
 
 export default {
   name: "tapestry-activity",
@@ -58,15 +56,22 @@ export default {
       default: () => ({}),
     },
   },
+  computed: {
+    urlAnswer() {
+      return (
+        wpData.uploadDirArray.baseurl + "/" + this.answerData.url + "?" + Date.now()
+      )
+    },
+  },
   methods: {
     getMultipleChoiceOptionObject(id) {
       for (
         let i = 0;
-        i < this.question.answerTypes.multipleChoice.checkboxArray.length;
+        i < this.question.answerTypes.multipleChoice.choices.length;
         i++
       ) {
-        if (this.question.answerTypes.multipleChoice.checkboxArray[i].id === id) {
-          return this.question.answerTypes.multipleChoice.checkboxArray[i]
+        if (this.question.answerTypes.multipleChoice.choices[i].id === id) {
+          return this.question.answerTypes.multipleChoice.choices[i]
         }
       }
     },
@@ -80,13 +85,6 @@ export default {
           return this.question.answerTypes.multipleChoice.radioArray[i]
         }
       }
-    },
-  },
-  computed: {
-    urlAnswer() {
-      return (
-        wpData.uploadDirArray.baseurl + "/" + this.answerData.url + "?" + Date.now()
-      )
     },
   },
 }
