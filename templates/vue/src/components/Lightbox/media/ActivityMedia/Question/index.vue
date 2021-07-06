@@ -142,7 +142,7 @@ export default {
         this.question.followUp.nodeId,
         this.question.followUp.questionId
       )
-      
+
       return answerObject ? Object.entries(answerObject) : null
     },
     enabledAnswerTypes() {

@@ -37,7 +37,7 @@ export default {
       required: true,
     },
     answerData: {
-      type: [Object, String],
+      type: [Object, String, Array],
       required: true,
     },
   },
@@ -48,7 +48,7 @@ export default {
     },
     isListTextType() {
       return this.question.answerTypes.text.allowMultiple
-     },
+    },
     urlAnswer() {
       return (
         wpData.uploadDirArray.baseurl + "/" + this.answerData.url + "?" + Date.now()
