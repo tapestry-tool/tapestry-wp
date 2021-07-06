@@ -99,7 +99,10 @@
                 Text entry
               </b-form-checkbox>
               <div v-if="question.answerTypes.text.enabled" class="mt-2 pl-4 ml-2">
-                <b-form-radio-group v-model="question.answerTypes.text.isMultiLine">
+                <b-form-radio-group
+                  v-model="question.answerTypes.text.isMultiLine"
+                  @change="disableList(question)"
+                >
                   <b-form-radio
                     :data-qa="`question-answer-text-multi-${index}`"
                     name="multi-line"
@@ -179,15 +182,6 @@
                         </div>
                       </div>
                     </div>
-                    <!-- <label for="placeholder">
-                      Placeholder for answer fields (optional):
-                    </label>
-                    <b-form-input
-                      id="placeholder"
-                      v-model="question.answerTypes.text.list.placeholder"
-                      data-qa="question-answer-list-placeholder"
-                      :placeholder="question.answerTypes.text.list.placeholder"
-                    ></b-form-input> -->
                   </div>
                 </div>
               </div>
@@ -201,62 +195,6 @@
                 Audio recorder
               </b-form-checkbox>
             </b-form-group>
-            <!-- <b-form-group>
-              <b-form-checkbox
-                v-model="question.answerTypes.list.enabled"
-                data-qa="question-answer-list"
-                switch
-              >
-                List Answer
-              </b-form-checkbox>
-              <div v-if="question.answerTypes.list.enabled" class="mt-2 pl-4 ml-2">
-                <div class="list-options">
-                  <div class="list-field-options">
-                    <b-form-checkbox
-                      v-model="question.answerTypes.list.maxFields.enabled"
-                      data-qa="list-max-checkbox"
-                      class="list-max-checkbox"
-                    ></b-form-checkbox>
-                    <div class="list-row-container">
-                      <div class="list-option-row">
-                        <label for="min-field">
-                          Minimum answer fields
-                        </label>
-                        <b-form-input
-                          id="min-field"
-                          v-model="question.answerTypes.list.minFields"
-                          data-qa="min-list-fields-input"
-                          type="number"
-                          class="list-input"
-                        ></b-form-input>
-                      </div>
-                      <div class="list-option-row">
-                        <label for="max-field">
-                          Maximum answer fields
-                        </label>
-                        <b-form-input
-                          id="max-field"
-                          v-model="question.answerTypes.list.maxFields.value"
-                          :disabled="!question.answerTypes.list.maxFields.enabled"
-                          data-qa="max-list-fields-input"
-                          type="number"
-                          class="list-input"
-                        ></b-form-input>
-                      </div>
-                    </div>
-                  </div>
-                  <label for="placeholder">
-                    Placeholder for answer fields (optional):
-                  </label>
-                  <b-form-input
-                    id="placeholder"
-                    v-model="question.answerTypes.list.placeholder"
-                    data-qa="question-answer-list-placeholder"
-                    :placeholder="question.answerTypes.list.placeholder"
-                  ></b-form-input>
-                </div>
-              </div>
-            </b-form-group> -->
           </b-card>
           <b-card
             sub-title="Confirmation customization"
@@ -309,7 +247,6 @@ const defaultQuestion = {
       isMultiLine: false,
       allowMultiple: false,
       list: {
-        // placeholder: "",
         minFields: 1,
         maxFields: { enabled: false, value: 100 },
       },
@@ -317,12 +254,6 @@ const defaultQuestion = {
     audio: {
       enabled: false,
     },
-    // list: {
-    //   enabled: false,
-    //   placeholder: "Type an answer and press Enter",
-    //   minFields: 1,
-    //   maxFields: { enabled: false, value: 100 },
-    // },
   },
   confirmation: {
     title: "",
@@ -345,6 +276,7 @@ export default {
   data() {
     return {
       questions: this.node.typeData.activity?.questions || [],
+      // textIsMultiLineSelected: undefined,
     }
   },
   computed: {
@@ -385,6 +317,11 @@ export default {
       question.followUp.text = ""
       question.followUp.questionId = ""
       question.followUp.nodeId = ""
+    },
+    disableList(question) {
+      if (!question.answerTypes.text.isMultiLine) {
+        question.answerTypes.text.allowMultiple = false
+      }
     },
   },
 }

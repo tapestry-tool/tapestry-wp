@@ -30,14 +30,14 @@ export default {
       required: true,
     },
     answer: {
-      type: String,
+      type: [Array, String],
       required: true,
     },
   },
   data() {
     return {
       isAnswerValid: true,
-      text: this.answer,
+      text: "",
     }
   },
   watch: {
@@ -47,6 +47,13 @@ export default {
     question() {
       this.text = this.answer
     },
+  },
+  created() {
+    if (Array.isArray(this.answer)) {
+      this.text = this.answer[0]
+    } else {
+      this.text = this.answer
+    }
   },
   methods: {
     handleTextSubmit(event) {

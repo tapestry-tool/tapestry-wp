@@ -6,8 +6,8 @@
           v-model="answerList[index]"
           :data-qa="`list-input-${index}`"
           :placeholder="
-            question.answerTypes.list.placeholder
-              ? question.answerTypes.list.placeholder
+            question.answerTypes.text.placeholder
+              ? question.answerTypes.text.placeholder
               : 'Type an answer and press Enter'
           "
         ></b-form-input>
@@ -54,22 +54,23 @@ export default {
       required: true,
     },
     answer: {
-      type: Array,
+      type: [Array, String],
       required: true,
     },
   },
   data() {
     return {
-      answerList: this.answer.map(x => x),
+      // answerList: this.answer.map(x => x),
+      answerList: [],
     }
   },
   computed: {
     minFields() {
-      return parseInt(this.question.answerTypes.list.minFields, 10)
+      return parseInt(this.question.answerTypes.text.list.minFields, 10)
     },
     maxFields() {
-      return this.question.answerTypes.list.maxFields.enabled
-        ? parseInt(this.question.answerTypes.list.maxFields.value, 10)
+      return this.question.answerTypes.text.list.maxFields.enabled
+        ? parseInt(this.question.answerTypes.text.list.maxFields.value, 10)
         : MAX_FIELDS_ALLOWED
     },
     numOfFields() {
@@ -91,6 +92,13 @@ export default {
   created() {
     for (let i = this.numOfFields; i < this.minFields; i++) {
       this.addAnswer()
+    }
+    if (Array.isArray(this.answer)) {
+      for (let i = 0; i < this.answer.length; i++) {
+        this.answerList[i] = this.answer[i]
+      }
+    } else {
+      this.answerList[0] = this.answer
     }
   },
   methods: {
