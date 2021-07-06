@@ -9,6 +9,7 @@
     :node-id="nodeId"
     :content-container-style="lightboxContentStyles"
     :allow-close="canSkip && !displayTydeMode"
+    :show-fav="!displayTydeMode"
     @close="handleUserClose"
   >
     <multi-content-media
