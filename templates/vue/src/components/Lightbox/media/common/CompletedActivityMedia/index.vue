@@ -7,7 +7,7 @@
         </div>
       </b-col>
       <b-col v-if="type === 'audio'" align-self="center">
-        <audio controls :src="answerData"></audio>
+        <audio controls :src="urlAnswer"></audio>
       </b-col>
       <b-col v-if="type === 'multipleChoice'" align-self="center">
         <ul v-if="question.answerTypes.multipleChoice.hasMultipleAnswers">
@@ -32,7 +32,10 @@
 </template>
 
 <script>
+
 import CompletedMultipleChoiceItem from "./CompletedMultipleChoiceItem"
+import { data as wpData } from "@/services/wp"
+
 
 export default {
   name: "tapestry-activity",
@@ -46,7 +49,7 @@ export default {
       validator: val => ["text", "audio", "multipleChoice"].includes(val),
     },
     answerData: {
-      type: [String, Array, Number],
+      type: [Object, String, Array, Number],
       required: true,
     },
     question: {
@@ -77,6 +80,13 @@ export default {
           return this.question.answerTypes.multipleChoice.radioArray[i]
         }
       }
+    },
+  },
+  computed: {
+    urlAnswer() {
+      return (
+        wpData.uploadDirArray.baseurl + "/" + this.answerData.url + "?" + Date.now()
+      )
     },
   },
 }
