@@ -241,6 +241,12 @@ export default {
     }
   },
   created() {
+    //NOTE: compactMode cannot work without showing the image preview,
+
+    if (this.compactMode) {
+      this.showImagePreview = true
+    }
+
     if (this.showImagePreview) {
       this.imagePatternId =
         "thumbnail-preview-" +

@@ -14,7 +14,7 @@
         </ol>
       </b-col>
       <b-col v-if="type === 'audio'" align-self="center">
-        <audio controls :src="answerData"></audio>
+        <audio controls :src="urlAnswer"></audio>
       </b-col>
     </b-row>
   </b-container>
@@ -22,6 +22,8 @@
 
 <script>
 import { mapGetters } from "vuex"
+import { data as wpData } from "@/services/wp"
+
 export default {
   name: "completed-activity-media",
   props: {
@@ -35,7 +37,7 @@ export default {
       required: true,
     },
     answerData: {
-      type: [String, Array],
+      type: [Object, String],
       required: true,
     },
   },
@@ -46,6 +48,11 @@ export default {
     },
     isListTextType() {
       return this.question.answerTypes.text.allowMultiple
+     },
+    urlAnswer() {
+      return (
+        wpData.uploadDirArray.baseurl + "/" + this.answerData.url + "?" + Date.now()
+      )
     },
   },
 }

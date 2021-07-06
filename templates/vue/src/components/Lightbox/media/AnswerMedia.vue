@@ -1,27 +1,16 @@
 <template>
   <div class="answers">
     <h3>{{ node.title }}</h3>
-    <div
-      v-if="answer !== null"
-      class="answer-container mx-auto mb-3"
-      data-qa="answer-display"
-    >
-      <h4>{{ answer.precedingText || question.text }}</h4>
+    <div class="answer-container mx-auto mb-3" data-qa="answer-display">
+      <h4>{{ answersTypeData.precedingText || question.text }}</h4>
       <b-tabs vertical no-nav-style nav-class="nav-tablist">
-        <b-tab v-for="questionAnswer in answers" :key="questionAnswer.type">
+        <b-tab v-for="questionAnswer in answers" :key="questionAnswer[0]">
           <template #title>
             <div class="icon">
               <tapestry-icon :icon="questionAnswer[0]" />
             </div>
           </template>
           <completed-activity-media
-            v-if="questionAnswer[0] === 'audio'"
-            :type="questionAnswer[0]"
-            :answerData="getFullUrl(questionAnswer[1].url)"
-            :node="node"
-          ></completed-activity-media>
-          <completed-activity-media
-            v-else
             :type="questionAnswer[0]"
             :answerData="questionAnswer[1]"
             :node="node"
@@ -32,9 +21,6 @@
         You have not completed this question yet.
       </div>
     </div>
-    <div v-else>
-      <p>Please fill in the answer form.</p>
-    </div>
   </div>
 </template>
 
@@ -42,7 +28,6 @@
 import { mapGetters, mapState } from "vuex"
 import CompletedActivityMedia from "./common/CompletedActivityMedia"
 import TapestryIcon from "@/components/common/TapestryIcon"
-import { data as wpData } from "@/services/wp"
 
 export default {
   name: "answer-media",
@@ -59,14 +44,17 @@ export default {
   computed: {
     ...mapState(["userAnswers"]),
     ...mapGetters(["getQuestion", "getAnswers"]),
-    answer() {
+    answersTypeData() {
       return this.node.typeData
     },
     question() {
-      return this.getQuestion(this.answer.questionId)
+      return this.getQuestion(this.answersTypeData.questionId)
     },
     answers() {
-      const answers = this.getAnswers(this.answer.activityId, this.answer.questionId)
+      const answers = this.getAnswers(
+        this.answersTypeData.activityId,
+        this.answersTypeData.questionId
+      )
       return answers ? Object.entries(answers) : null
     },
     hasAnswer() {
@@ -76,11 +64,6 @@ export default {
   mounted() {
     this.$emit("complete")
     this.$emit("load")
-  },
-  methods: {
-    getFullUrl(url) {
-      return wpData.uploadDirArray.baseurl + "/" + url
-    },
   },
 }
 </script>
