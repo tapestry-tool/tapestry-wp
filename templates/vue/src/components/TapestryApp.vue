@@ -6,7 +6,7 @@
       :is-sidebar-open="isSidebarOpen"
       data-qa="tapestry-map"
     />
-    <tapestry-main v-else-if="!isTydeView" ref="graph" :viewBox="viewBox" />
+    <tapestry-main v-else ref="graph" :viewBox="viewBox" />
   </div>
 </template>
 
@@ -18,9 +18,6 @@ import TapestryMain from "./TapestryMain"
 import { mapMutations, mapState } from "vuex"
 import TapestryMap from "./TapestryMap"
 import Helpers from "@/utils/Helpers"
-import { getCurrentUser } from "@/services/wp"
-
-const currentUser = getCurrentUser()
 
 export default {
   components: {
@@ -32,23 +29,11 @@ export default {
     return {
       loading: true,
       viewBox: "2200 2700 1600 1100",
-      currentUser: null,
     }
   },
   computed: {
-    ...mapState(["nodes", "links", "selection", "settings", "rootId"]),
-    isTydeView() {
-      const isAdmin = currentUser.roles.some(role => role === "administrator")
+    ...mapState(["nodes", "links", "selection", "settings"]),
 
-      if (!isAdmin && this.settings.tydeModeEnabled) {
-        const rootNode = this.nodes[this.rootId]
-        const hasEditPermissions = currentUser.roles.some(role => {
-          return rootNode.permissions[role].some(premission => premission === "edit")
-        })
-        return !hasEditPermissions
-      }
-      return false
-    },
     isSidebarOpen() {
       return Boolean(this.$route.query.sidebar)
     },
@@ -75,18 +60,9 @@ export default {
       this.editNode(id)
     })
     client.recordAnalyticsEvent("app", "load", "tapestry")
-
-    this.setupTydeMode()
   },
-
   methods: {
-    ...mapMutations([
-      "select",
-      "unselect",
-      "clearSelection",
-      "setTydeModeDefault",
-      "setDisplayTydeMode",
-    ]),
+    ...mapMutations(["select", "unselect", "clearSelection"]),
     updateViewBox() {
       const MAX_RADIUS = 240
       const MIN_TAPESTRY_WIDTH_FACTOR = 1.5
@@ -175,25 +151,6 @@ export default {
         params: { nodeId: id, type: "edit", tab: "content" },
         query: this.$route.query,
       })
-    },
-    setupTydeMode() {
-      /* NOTE: Opening the default Node for a specific role 
-             in fullscreen only if this role cannot edit the 
-             default node, otherwise the regular tapestry will
-             open
-      */
-      this.setDisplayTydeMode(this.isTydeView)
-
-      if (this.isTydeView) {
-        const userMainRole = currentUser.roles[0] || "public"
-        const defaultNodeId = this.settings.tydeModeDefualtNodes[userMainRole]
-        this.setTydeModeDefault({
-          name: names.LIGHTBOX,
-          params: { nodeId: defaultNodeId },
-          query: this.$route.query,
-        })
-        this.openNode(defaultNodeId)
-      }
     },
   },
 }
