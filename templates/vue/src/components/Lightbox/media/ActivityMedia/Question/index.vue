@@ -42,19 +42,11 @@
       <div class="question-body">
         <div v-if="formOpened">
           <text-question
-            v-if="formType === 'text' && !question.answerTypes.text.allowMultiple"
-            :question="question"
-            :answer="answer"
-            @submit="handleSubmit"
-          ></text-question>
-          <list-question
-            v-else-if="
-              formType === 'text' && question.answerTypes.text.allowMultiple
-            "
+            v-if="formType === 'text'"
             :question="question"
             :answer="answer ? answer : []"
             @submit="handleSubmit"
-          ></list-question>
+          ></text-question>
           <audio-recorder
             v-else-if="formType === 'audio'"
             :id="question.id"
@@ -95,7 +87,6 @@ import client from "@/services/TapestryAPI"
 import AnswerButton from "./AnswerButton"
 import AudioRecorder from "./AudioRecorder"
 import TextQuestion from "./TextQuestion"
-import ListQuestion from "./ListQuestion"
 import Loading from "@/components/common/Loading"
 import CompletedActivityMedia from "../../common/CompletedActivityMedia"
 import * as wp from "@/services/wp"
@@ -107,7 +98,6 @@ export default {
     AnswerButton,
     AudioRecorder,
     TextQuestion,
-    ListQuestion,
     Loading,
     CompletedActivityMedia,
   },
