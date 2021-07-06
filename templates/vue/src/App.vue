@@ -1,7 +1,7 @@
 <template>
   <loading v-if="loading" data-qa="tapestry-loading" style="height: 75vh;"></loading>
   <div v-else id="app">
-    <navbar v-if="isTydeView"></navbar>
+    <navbar v-if="isTydeView" :current-user="currentUser"></navbar>
     <tapestry-app v-else></tapestry-app>
     <router-view name="lightbox"></router-view>
     <node-modal></node-modal>
@@ -34,8 +34,6 @@ import { isLoggedIn } from "./services/wp"
 import Navbar from "@/components/tyde/Navbar"
 import { getCurrentUser } from "@/services/wp"
 
-const currentUser = getCurrentUser()
-
 export default {
   name: "app",
   components: {
@@ -50,6 +48,7 @@ export default {
     return {
       loading: true,
       loggedIn: true,
+      currentUser: getCurrentUser(),
     }
   },
   computed: {
@@ -58,11 +57,11 @@ export default {
       return Object.keys(this.nodes).length === 0
     },
     isTydeView() {
-      const isAdmin = currentUser.roles.some(role => role === "administrator")
+      const isAdmin = this.currentUser.roles.some(role => role === "administrator")
 
       if (!isAdmin && this.settings.tydeModeEnabled) {
         const rootNode = this.nodes[this.rootId]
-        const hasEditPermissions = currentUser.roles.some(role => {
+        const hasEditPermissions = this.currentUser.roles.some(role => {
           return rootNode.permissions[role].some(premission => premission === "edit")
         })
         return !hasEditPermissions

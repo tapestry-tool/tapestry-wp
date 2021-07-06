@@ -22,17 +22,17 @@
 import { mapState } from "vuex"
 import { names } from "@/config/routes"
 import TydeIcon from "./TydeIcon.vue"
-import { getCurrentUser } from "@/services/wp"
-
-const currentUser = getCurrentUser()
 
 export default {
   name: "navbar",
   components: {
     TydeIcon,
   },
-  data() {
-    return {}
+  props: {
+    currentUser: {
+      type: Object,
+      required: true,
+    },
   },
 
   computed: {
@@ -44,7 +44,7 @@ export default {
              open
       */
 
-      const userMainRole = currentUser.roles[0] || "public"
+      const userMainRole = this.currentUser.roles[0] || "public"
       const defaultNodeId = this.settings.tydeModeDefualtNodes[userMainRole]
       return [
         {
@@ -57,15 +57,15 @@ export default {
         },
         {
           name: "profile",
-          link: "#",
+          link: "",
         },
         {
           name: "goals",
-          link: "#",
+          link: "",
         },
         {
           name: "cos",
-          link: "#",
+          link: "",
         },
       ]
     },
