@@ -70,7 +70,7 @@ export default {
       ]
     },
   },
-  created() {
+  mounted() {
     this.$router.push(this.tabs[0].link)
   },
 }
