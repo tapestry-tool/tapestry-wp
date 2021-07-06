@@ -18,11 +18,13 @@
             v-if="questionAnswer[0] === 'audio'"
             :type="questionAnswer[0]"
             :answerData="getFullUrl(questionAnswer[1].url)"
+            :question="question"
           ></completed-activity-media>
           <completed-activity-media
             v-else
             :type="questionAnswer[0]"
             :answerData="questionAnswer[1]"
+            :question="question"
           ></completed-activity-media>
         </b-tab>
       </b-tabs>

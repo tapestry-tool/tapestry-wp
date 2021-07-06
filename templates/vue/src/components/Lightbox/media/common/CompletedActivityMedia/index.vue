@@ -1,15 +1,12 @@
 <template>
   <b-container class="completed-activity-media">
     <b-row align-v="center" style="min-height:150px;">
-      <b-col
-        v-if="type === 'text' && !Array.isArray(answerData)"
-        align-self="center"
-      >
+      <b-col v-if="type === 'text' && !isListTextType" align-self="center">
         <div class="text">
-          {{ answerData }}
+          {{ answerData[0] }}
         </div>
       </b-col>
-      <b-col v-if="type === 'text' && Array.isArray(answerData)">
+      <b-col v-if="type === 'text' && isListTextType">
         <ol>
           <li v-for="answer in answerData" :key="answer.index">
             {{ answer }}
@@ -32,9 +29,18 @@ export default {
       required: true,
       validator: val => ["text", "audio", "list"].includes(val),
     },
+    question: {
+      type: Object,
+      required: true,
+    },
     answerData: {
       type: [String, Array],
       required: true,
+    },
+  },
+  computed: {
+    isListTextType() {
+      return this.question.answerTypes.text.allowMultiple
     },
   },
 }
