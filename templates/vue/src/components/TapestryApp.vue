@@ -30,11 +30,10 @@ export default {
     return {
       loading: true,
       viewBox: "2200 2700 1600 1100",
-      currentUser: getCurrentUser(),
     }
   },
   computed: {
-    ...mapState(["nodes", "links", "selection", "settings"]),
+    ...mapState(["nodes", "links", "selection", "settings", "rootId"]),
 
     isSidebarOpen() {
       return Boolean(this.$route.query.sidebar)
@@ -43,10 +42,11 @@ export default {
       return this.settings.analyticsEnabled
     },
     isTydeView() {
-      const isAdmin = this.currentUser.roles.some(role => role === "administrator")
+      const roles = getCurrentUser().roles
+      const isAdmin = roles.some(role => role === "administrator")
       if (!isAdmin && this.settings.tydeModeEnabled) {
         const rootNode = this.nodes[this.rootId]
-        const hasEditPermissions = this.currentUser.roles.some(role => {
+        const hasEditPermissions = roles.some(role => {
           return rootNode.permissions[role].some(premission => premission === "edit")
         })
         return !hasEditPermissions
@@ -172,7 +172,7 @@ export default {
              open
       */
         this.setDisplayTydeMode(true)
-        const userMainRole = this.currentUser.roles[0] || "public"
+        const userMainRole = getCurrentUser().roles[0] || "public"
         const defaultNodeId = this.settings.tydeModeDefualtNodes[userMainRole]
         this.$router.push({
           name: names.LIGHTBOX,

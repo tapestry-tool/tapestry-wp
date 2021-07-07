@@ -12,7 +12,7 @@
     :show-fav="!displayTydeMode"
     @close="handleUserClose"
   >
-    <navbar v-if="displayTydeMode" @change-tab="handleTabChange"></navbar>
+    <navbar v-if="displayTydeMode" @change-tab="selectedTab = newTab"></navbar>
     <multi-content-media
       v-if="node.mediaType === 'multi-content'"
       :node="node"
@@ -297,9 +297,6 @@ export default {
         width: this.lightboxDimensions.width,
         height: this.lightboxDimensions.height,
       }
-    },
-    handleTabChange(newTab) {
-      this.selectedTab = newTab
     },
   },
 }

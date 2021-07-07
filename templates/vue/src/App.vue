@@ -47,7 +47,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(["nodes", "rootId", "settings"]),
+    ...mapState(["nodes"]),
     isEmpty() {
       return Object.keys(this.nodes).length === 0
     },
