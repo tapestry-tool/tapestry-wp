@@ -10,8 +10,6 @@
           Use Images
         </b-form-checkbox>
       </b-form-group>
-      <p>multipleAnswerSelected is {{ multipleAnswerSelected }}</p>
-      <p>multipleChoice is {{ multipleChoice }}</p>
       <b-form-group>
         <sortable-list
           v-model="choiceRows"

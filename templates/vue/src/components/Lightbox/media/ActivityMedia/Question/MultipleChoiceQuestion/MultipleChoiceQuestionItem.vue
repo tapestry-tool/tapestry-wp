@@ -1,6 +1,5 @@
 <template>
   <div class="container">
-    <!-- // same logic with the is component -->
     <component
       :is="multipleChoiceItemForm"
       :value="item.id"
@@ -14,20 +13,6 @@
       ></b-img>
       {{ item.value }}
     </component>
-
-    <!-- <b-form-radio
-      v-else-if="!isCheckBox"
-      :value="item.id"
-      :data-qa="`multiple-choice-radio-question-item-${item.id}-checked`"
-    >
-      <b-img
-        v-if="hasImage && item.imageUrl !== null"
-        :src="item.imageUrl"
-        class="imageChoice"
-        :data-qa="`multiple-choice-radio-question-item-${item.id}-thumbnail`"
-      ></b-img>
-      {{ item.value }}
-    </b-form-radio> -->
   </div>
 </template>
 
