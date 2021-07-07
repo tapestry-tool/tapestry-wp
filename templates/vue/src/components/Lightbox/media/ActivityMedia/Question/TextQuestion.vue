@@ -10,6 +10,7 @@
               ? question.answerTypes.text.placeholder
               : 'Type an answer and press Enter'
           "
+          autofocus
           @keydown.enter="addAnswer"
         ></b-form-input>
         <b-button
