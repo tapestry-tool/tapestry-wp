@@ -34,7 +34,7 @@
           {{ title }}
         </h4>
         <div v-if="hasSubmissionError" class="error-wrapper">
-          <h5>Node cannot be saved due to the following error(s):</h5>
+          <h5>Operation failed due to the following error(s):</h5>
           <ul>
             <li v-for="error in errors" :key="error">{{ error }}</li>
           </ul>
@@ -205,6 +205,12 @@
             {{ warningText }}
             <br v-if="warningText" />
             {{ deleteWarningText }}
+          </b-form-invalid-feedback>
+          <b-form-invalid-feedback
+            :state="!hasUnsavedChanges"
+            class="text-right font-weight-bold"
+          >
+            You have unsaved changes
           </b-form-invalid-feedback>
         </template>
         <template #overlay>
@@ -419,6 +425,10 @@ export default {
     hasSubmissionError() {
       return this.errors.length
     },
+    hasUnsavedChanges() {
+      const oldNode = this.getNode(this.nodeId)
+      return this.type === "add" || !Helpers.nodeEqual(oldNode, this.node)
+    },
     isMultiContentNodeChild() {
       return this.parent && this.parent.mediaType == "multi-content"
     },
@@ -616,9 +626,8 @@ export default {
       }
     },
     handleClose(event) {
-      const oldNode = this.getNode(this.nodeId)
       if (
-        (this.type === "add" || !Helpers.nodeEqual(oldNode, this.node)) &&
+        this.hasUnsavedChanges &&
         (event.trigger == "backdrop" ||
           event.trigger == "headerclose" ||
           event.trigger == "esc" ||
@@ -920,6 +929,16 @@ export default {
         )
         if (!validPreviousAnswers) {
           errMsgs.push("Please select a previous activity to display")
+        }
+      } else if (this.node.mediaType === "answer") {
+        const hasActivityId = this.node.typeData.activityId
+        if (!hasActivityId) {
+          errMsgs.push("Please select an activity")
+        }
+
+        const hasQuestionId = this.node.typeData.questionId
+        if (!hasQuestionId) {
+          errMsgs.push("Please select a question")
         }
       }
 

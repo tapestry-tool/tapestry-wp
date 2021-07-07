@@ -17,12 +17,12 @@
           <h3 class="mb-4">
             {{ question.followUp.text || "Previously, you said:" }}
           </h3>
-          <tapestry-activity
-            v-for="answer in previousQuestionAnswers"
-            :key="answer.type"
-            :type="answer.type"
-            :answerData="answer.answerData"
-          ></tapestry-activity>
+          <completed-activity-media
+            v-for="previousAnswer in previousQuestionAnswers"
+            :key="previousAnswer[0]"
+            :type="previousAnswer[0]"
+            :answerData="previousAnswer[1]"
+          ></completed-activity-media>
         </div>
         <div v-else>
           <p>You haven't done the previous activity yet.</p>
@@ -88,9 +88,8 @@ import AnswerButton from "./AnswerButton"
 import AudioRecorder from "./AudioRecorder"
 import TextQuestion from "./TextQuestion"
 import Loading from "@/components/common/Loading"
-import TapestryActivity from "./TapestryActivity"
+import CompletedActivityMedia from "../../common/CompletedActivityMedia"
 import * as wp from "@/services/wp"
-import { data as wpData } from "@/services/wp"
 
 export default {
   name: "question",
@@ -99,7 +98,7 @@ export default {
     AudioRecorder,
     TextQuestion,
     Loading,
-    TapestryActivity,
+    CompletedActivityMedia,
   },
   props: {
     question: {
@@ -143,26 +142,8 @@ export default {
         this.question.followUp.nodeId,
         this.question.followUp.questionId
       )
-      let previousAnswers = []
-      if (answerObject !== undefined) {
-        if (this.question.followUp.questionId !== null) {
-          for (const [key, value] of Object.entries(answerObject)) {
-            if (key === "text") {
-              var tempObj = { type: key, answerData: value }
-              previousAnswers.push(tempObj)
-            } else {
-              var tempAudioObj = {
-                type: key,
-                answerData:
-                  wpData.uploadDirArray.baseurl + "/" + value.url + "?" + Date.now(),
-              }
-              previousAnswers.push(tempAudioObj)
-            }
-          }
-          return previousAnswers
-        }
-      }
-      return []
+
+      return answerObject ? Object.entries(answerObject) : null
     },
     enabledAnswerTypes() {
       return Object.entries(this.question.answerTypes).filter(([, value]) => {
