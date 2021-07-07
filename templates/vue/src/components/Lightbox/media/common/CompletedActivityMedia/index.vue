@@ -65,15 +65,18 @@ export default {
   },
   methods: {
     getMultipleChoiceOptionObject(id) {
-      for (
-        let i = 0;
-        i < this.question.answerTypes.multipleChoice.choices.length;
-        i++
-      ) {
-        if (this.question.answerTypes.multipleChoice.choices[i].id === id) {
-          return this.question.answerTypes.multipleChoice.choices[i]
-        }
-      }
+      // for (
+      //   let i = 0;
+      //   i < this.question.answerTypes.multipleChoice.choices.length;
+      //   i++
+      // ) {
+      //   if (this.question.answerTypes.multipleChoice.choices[i].id === id) {
+      //     return this.question.answerTypes.multipleChoice.choices[i]
+      //   }
+      // }
+      return this.question.answerTypes.multipleChoice.choices.find(
+        option => option.id === id
+      )
     },
     getRadioMultipleChoiceOptionObject(id) {
       for (

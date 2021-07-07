@@ -7,7 +7,11 @@
         <b-tab v-for="questionAnswer in answers" :key="questionAnswer[0]">
           <template #title>
             <div class="icon">
-              <tapestry-icon :icon="questionAnswer[0]" />
+              <tapestry-icon
+                v-if="questionAnswer[0] === 'multipleChoice'"
+                icon="tasks"
+              />
+              <tapestry-icon v-else :icon="questionAnswer[0]" />
             </div>
           </template>
           <completed-activity-media
