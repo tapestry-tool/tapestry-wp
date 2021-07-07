@@ -241,8 +241,7 @@ export default {
     }
   },
   created() {
-    //NOTE: compactMode cannot work without showing the image preview,
-
+    // NOTE: compactMode cannot work without showing the image preview
     if (this.compactMode) {
       this.showImagePreview = true
     }
