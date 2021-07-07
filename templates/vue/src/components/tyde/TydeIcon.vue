@@ -25,6 +25,10 @@ export default {
       required: false,
       default: 35,
     },
+    selected: {
+      type: Boolean,
+      required: true,
+    },
   },
   data() {
     return {
@@ -32,37 +36,40 @@ export default {
     }
   },
   mounted() {
-    let selected = null
-    switch (this.icon) {
-      case "tyde":
-        selected = tyde
-        break
-      case "tyde-unselected":
-        selected = tydeUnselected
-        break
-      case "goals":
-        selected = goals
-        break
-      case "goals-unselected":
-        selected = goalsUnselected
-        break
-      case "profile":
-        selected = profile
-        break
-      case "profile-unselected":
-        selected = profileUnselected
-        break
-      case "cos":
-        selected = cos
-        break
-      case "cos-unselected":
-        selected = cosUnselected
-        break
-      default:
-        selected = tyde
-        break
+    let selectedIcon = null
+
+    if (this.selected) {
+      switch (this.icon) {
+        case "tyde":
+          selectedIcon = tyde
+          break
+        case "profile":
+          selectedIcon = profile
+          break
+        case "goals":
+          selectedIcon = goals
+          break
+        case "cos":
+          selectedIcon = cos
+          break
+      }
+    } else {
+      switch (this.icon) {
+        case "tyde":
+          selectedIcon = tydeUnselected
+          break
+        case "profile":
+          selectedIcon = profileUnselected
+          break
+        case "goals":
+          selectedIcon = goalsUnselected
+          break
+        case "cos":
+          selectedIcon = cosUnselected
+          break
+      }
     }
-    this.url = this.createUrl(selected)
+    this.url = this.createUrl(selectedIcon)
   },
   methods: {
     createUrl(selected) {

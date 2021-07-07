@@ -8,9 +8,10 @@
           :ref="tab + '-tab'"
           active-class="active"
           link-classes="link"
+          :active="selectedTab === tab"
+          @click="$emit('change-tab', tab)"
         >
-          <tyde-icon class="selected" :icon="tab" />
-          <tyde-icon class="unselected" :icon="tab + '-unselected'" />
+          <tyde-icon :selected="selectedTab === tab" :icon="tab" />
         </b-nav-item>
       </b-navbar-nav>
     </b-navbar>
@@ -26,6 +27,12 @@ export default {
   components: {
     TydeIcon,
   },
+  props: {
+    selectedTab: {
+      type: String,
+      required: true,
+    },
+  },
   computed: {
     ...mapState(["settings"]),
     tabs() {
@@ -36,14 +43,6 @@ export default {
 </script>
 
 <style lang="scss">
-.navbar-nav {
-  .active > .unselected {
-    display: none;
-  }
-  :not(.active) > .selected {
-    display: none;
-  }
-}
 .nav-container {
   width: 100%;
   z-index: 9999;
