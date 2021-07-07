@@ -29,13 +29,13 @@ export default {
   },
   data() {
     return {
-      selectedTab: "tyde",
+      selectedTab: "default",
     }
   },
   computed: {
     ...mapState(["settings"]),
     tabs() {
-      return ["tyde", "profile", "goals", "cos"]
+      return ["default", "profile", "goals", "cos"]
     },
   },
   methods: {

@@ -53,7 +53,7 @@ export default {
       let selectedIcon = null
 
       switch (this.icon) {
-        case "tyde":
+        case "default":
           if (this.selected) selectedIcon = tyde
           else selectedIcon = tydeUnselected
           break
