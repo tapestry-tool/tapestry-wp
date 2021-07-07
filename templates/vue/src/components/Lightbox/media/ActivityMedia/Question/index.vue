@@ -61,7 +61,7 @@
           <div class="button-container">
             <answer-button
               v-if="question.answerTypes.text.enabled"
-              :completed="textFormCompleted"
+              :completed="formCompleted('text')"
               data-qa="answer-button-text"
               @click="openForm('text')"
             >
@@ -69,7 +69,7 @@
             </answer-button>
             <answer-button
               v-if="question.answerTypes.audio.enabled"
-              :completed="audioFormCompleted"
+              :completed="formCompleted('audio')"
               icon="microphone"
               data-qa="answer-button-audio"
               @click="openForm('audio')"
@@ -161,18 +161,11 @@ export default {
       }
       return ""
     },
-    textFormCompleted() {
+    formCompleted(answerType) {
       if (
-        this.userAnswers?.[this.node.id]?.activity?.[this.question.id]?.answers?.text
-      ) {
-        return true
-      }
-      return false
-    },
-    audioFormCompleted() {
-      if (
-        this.userAnswers?.[this.node.id]?.activity?.[this.question.id]?.answers
-          ?.audio
+        this.userAnswers?.[this.node.id]?.activity?.[this.question.id]?.answers?.[
+          answerType
+        ]
       ) {
         return true
       }
