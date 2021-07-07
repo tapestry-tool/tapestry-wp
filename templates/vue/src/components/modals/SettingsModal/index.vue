@@ -226,7 +226,11 @@
             label="Enable TYDE mode"
             description="TO BE EDITED"
           >
-            <b-form-checkbox v-model="tydeModeEnabled" switch>
+            <b-form-checkbox
+              v-model="tydeModeEnabled"
+              switch
+              @input="handleTydeModeEnable"
+            >
               {{ tydeModeEnabled ? "Enabled" : "Disabled" }}
             </b-form-checkbox>
           </b-form-group>
@@ -431,7 +435,8 @@ export default {
       return true
     },
     roles() {
-      return Object.keys(defaultPermissions)
+      console.log(wpData.roles)
+      return Object.keys(wpData.roles)
     },
     nodesValues() {
       return Object.values(this.nodes)
@@ -498,10 +503,13 @@ export default {
       this.mapBounds = mapBounds
     },
     async updateSettings() {
+      /* NOTE: this functionallity sets the root node as the defualt tyde mode node
+               for every role
+        */
       if (this.tydeModeEnabled) {
-        Object.keys(this.tydeModeDefualtNodes).forEach(role => {
+        this.roles.forEach(role => {
           if (!this.tydeModeDefualtNodes[role]) {
-            this.tydeModeDefualtNodes[role] = this.nodes[this.rootId]
+            this.tydeModeDefualtNodes[role] = this.rootId
           }
         })
       }
@@ -587,6 +595,13 @@ export default {
     },
     handleSubmitNodesEnabled(event) {
       this.submitNodesEnabled = event
+    },
+    handleTydeModeEnable() {
+      console.log(this.nodes)
+      if (!Object.keys(this.nodes)) {
+        this.tydeModeEnabled = false
+        prompt("Cannot enable TYDE mode when there are no nodes in the tapestry")
+      }
     },
   },
 }
