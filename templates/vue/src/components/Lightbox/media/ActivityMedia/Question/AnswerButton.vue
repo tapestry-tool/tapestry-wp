@@ -4,8 +4,8 @@
     <div v-if="isFaIcon" class="icon">
       <i :class="`fas fa-${icon} icon-fa`"></i>
     </div>
-    <div v-else-if="isDragAndDropIcon" class="container">
-      <img :src="dragDropIcon" class="dragDropIcon" />
+    <div v-else-if="isDragAndDropIcon" class="drag-drop-icon">
+      <img :src="dragDropIcon" />
     </div>
     <img v-else :src="textIcon" class="icon" />
     <div>
@@ -46,7 +46,7 @@ export default {
       return `${data.vue_uri}/${TextIcon.split("dist")[1]}`
     },
     isDragAndDropIcon() {
-      return this.icon === "drag and drop"
+      return this.icon === "drag-drop"
     },
     dragDropIcon() {
       return `${data.vue_uri}/${DragDropIcon.split("dist")[1]}`
@@ -106,8 +106,8 @@ button {
 
 .container {
   height: 56px;
-}
-.dragDropIcon {
-  margin-top: -30px;
+  img {
+    margin-top: -30px;
+  }
 }
 </style>

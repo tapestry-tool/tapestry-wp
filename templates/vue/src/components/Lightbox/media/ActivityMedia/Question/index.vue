@@ -85,7 +85,7 @@
             <answer-button
               v-if="question.answerTypes.dragDrop.enabled"
               :completed="dragDropFormCompleted"
-              icon="drag and drop"
+              icon="drag-drop"
               @click="openForm('dragDrop')"
             >
               drag/drop
