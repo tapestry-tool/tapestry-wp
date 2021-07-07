@@ -12,11 +12,7 @@
     :show-fav="!displayTydeMode"
     @close="handleUserClose"
   >
-    <navbar
-      v-if="displayTydeMode"
-      :selectedTab="selectedTab"
-      @change-tab="handleTabChange"
-    ></navbar>
+    <navbar v-if="displayTydeMode" @change-tab="handleTabChange"></navbar>
     <multi-content-media
       v-if="node.mediaType === 'multi-content'"
       :node="node"
@@ -91,7 +87,7 @@ export default {
       },
       showCompletionScreen: false,
       rowRefs: [],
-      selectedTab: "tyde",
+      selectedTab: "",
     }
   },
   computed: {

@@ -1,5 +1,7 @@
 <template>
-  <img :src="url" :width="size" svg />
+  <div>
+    <img :src="url" :width="size" svg />
+  </div>
 </template>
 
 <script>
@@ -35,45 +37,41 @@ export default {
       url: "",
     }
   },
+  watch: {
+    selected() {
+      this.selectIcon()
+    },
+  },
   mounted() {
-    let selectedIcon = null
-
-    if (this.selected) {
-      switch (this.icon) {
-        case "tyde":
-          selectedIcon = tyde
-          break
-        case "profile":
-          selectedIcon = profile
-          break
-        case "goals":
-          selectedIcon = goals
-          break
-        case "cos":
-          selectedIcon = cos
-          break
-      }
-    } else {
-      switch (this.icon) {
-        case "tyde":
-          selectedIcon = tydeUnselected
-          break
-        case "profile":
-          selectedIcon = profileUnselected
-          break
-        case "goals":
-          selectedIcon = goalsUnselected
-          break
-        case "cos":
-          selectedIcon = cosUnselected
-          break
-      }
-    }
-    this.url = this.createUrl(selectedIcon)
+    this.selectIcon()
   },
   methods: {
     createUrl(selected) {
       return `${data.vue_uri}/${selected.split("dist")[1]}`
+    },
+    selectIcon() {
+      let selectedIcon = null
+
+      switch (this.icon) {
+        case "tyde":
+          if (this.selected) selectedIcon = tyde
+          else selectedIcon = tydeUnselected
+          break
+        case "profile":
+          if (this.selected) selectedIcon = profile
+          else selectedIcon = profileUnselected
+          break
+        case "goals":
+          if (this.selected) selectedIcon = goals
+          else selectedIcon = goalsUnselected
+          break
+        case "cos":
+          if (this.selected) selectedIcon = cos
+          else selectedIcon = cosUnselected
+          break
+      }
+
+      this.url = this.createUrl(selectedIcon)
     },
   },
 }

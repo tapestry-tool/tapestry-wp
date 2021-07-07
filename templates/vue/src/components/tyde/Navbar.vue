@@ -9,9 +9,9 @@
           active-class="active"
           link-classes="link"
           :active="selectedTab === tab"
-          @click="$emit('change-tab', tab)"
+          @click="handleTabChange(tab)"
         >
-          <tyde-icon :selected="selectedTab === tab" :icon="tab" />
+          <tyde-icon :selected="isSelectedTap(tab)" :icon="tab" />
         </b-nav-item>
       </b-navbar-nav>
     </b-navbar>
@@ -27,16 +27,24 @@ export default {
   components: {
     TydeIcon,
   },
-  props: {
-    selectedTab: {
-      type: String,
-      required: true,
-    },
+  data() {
+    return {
+      selectedTab: "tyde",
+    }
   },
   computed: {
     ...mapState(["settings"]),
     tabs() {
       return ["tyde", "profile", "goals", "cos"]
+    },
+  },
+  methods: {
+    handleTabChange(tab) {
+      this.$emit("change-tab", tab)
+      this.selectedTab = tab
+    },
+    isSelectedTap(tab) {
+      return this.selectedTab === tab
     },
   },
 }
