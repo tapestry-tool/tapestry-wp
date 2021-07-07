@@ -161,16 +161,6 @@ export default {
       }
       return ""
     },
-    formCompleted(answerType) {
-      if (
-        this.userAnswers?.[this.node.id]?.activity?.[this.question.id]?.answers?.[
-          answerType
-        ]
-      ) {
-        return true
-      }
-      return false
-    },
   },
   watch: {
     question() {
@@ -249,6 +239,16 @@ export default {
         type: this.formType,
       })
       this.$emit("submit")
+    },
+    formCompleted(answerType) {
+      if (
+        this.userAnswers?.[this.node.id]?.activity?.[this.question.id]?.answers?.[
+          answerType
+        ]
+      ) {
+        return true
+      }
+      return false
     },
   },
 }
