@@ -6,14 +6,14 @@
 
 <script>
 import { data } from "@/services/wp"
-import tyde from "@/assets/icons/tyde.svg"
-import tydeUnselected from "@/assets/icons/tyde-unselected.svg"
-import goals from "@/assets/icons/goals.svg"
-import goalsUnselected from "@/assets/icons/goals-unselected.svg"
-import profile from "@/assets/icons/profile.svg"
-import profileUnselected from "@/assets/icons/profile-unselected.svg"
-import cos from "@/assets/icons/cos.svg"
-import cosUnselected from "@/assets/icons/cos-unselected.svg"
+import tyde from "@/assets/icons/tyde/tyde.svg"
+import tydeUnselected from "@/assets/icons/tyde/tyde-unselected.svg"
+import goals from "@/assets/icons/tyde/goals.svg"
+import goalsUnselected from "@/assets/icons/tyde/goals-unselected.svg"
+import profile from "@/assets/icons/tyde/profile.svg"
+import profileUnselected from "@/assets/icons/tyde/profile-unselected.svg"
+import cos from "@/assets/icons/tyde/cos.svg"
+import cosUnselected from "@/assets/icons/tyde/cos-unselected.svg"
 
 export default {
   name: "tyde-icon",
