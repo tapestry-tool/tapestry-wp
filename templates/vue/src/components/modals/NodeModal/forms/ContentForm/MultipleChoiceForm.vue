@@ -26,7 +26,7 @@
             <choice-row
               v-for="(choiceRow, index) in choiceRows"
               :key="choiceRow.id"
-              :data-qa="`choicerow-checkbox-${choiceRow.id}`"
+              :data-qa="`choice-row-${choiceRow.id}`"
               :item="choiceRow"
               placeholder="answer option text"
               :index="index"

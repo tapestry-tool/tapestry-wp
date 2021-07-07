@@ -9,7 +9,7 @@
       <file-upload
         v-model="item.imageUrl"
         input-test-id="node-choiceRow-thumbnail-url"
-        :data-qa="`choicerow-checkbox-thumbnail-${item.id}`"
+        :data-qa="`choice-row-thumbnail-${item.id}`"
         :show-url-upload="false"
         :show-image-preview="true"
         :compact-mode="true"
@@ -22,7 +22,7 @@
         v-model="item.value"
         class="form-input"
         :placeholder="placeholder"
-        :data-qa="`choicerow-checkbox-input-${item.id}`"
+        :data-qa="`choice-row-input-${item.id}`"
       ></b-form-input>
     </div>
     <b-button

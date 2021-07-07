@@ -16,16 +16,16 @@ describe("Activity", () => {
         force: true,
       })
 
-      cy.getByTestId(`choicerow-checkbox-1`)
-        .getByTestId(`choicerow-checkbox-input-1`)
+      cy.getByTestId(`choice-row-1`)
+        .getByTestId(`choice-row-input-1`)
         .click()
         .type("1")
-      cy.getByTestId(`choicerow-checkbox-2`)
-        .getByTestId(`choicerow-checkbox-input-2`)
+      cy.getByTestId(`choice-row-2`)
+        .getByTestId(`choice-row-input-2`)
         .click()
         .type("2")
-      cy.getByTestId(`choicerow-checkbox-3`)
-        .getByTestId(`choicerow-checkbox-input-3`)
+      cy.getByTestId(`choice-row-3`)
+        .getByTestId(`choice-row-input-3`)
         .click()
         .type("3")
 
@@ -66,16 +66,16 @@ describe("Activity", () => {
       cy.getByTestId("question-answer-multipleChoice-singleAnswer").click({
         force: true,
       })
-      cy.getByTestId(`choicerow-radio-50`)
-        .getByTestId(`choicerow-radio-input-50`)
+      cy.getByTestId(`choice-row-1`)
+        .getByTestId(`choice-row-input-1`)
         .click()
         .type("100")
-      cy.getByTestId(`choicerow-radio-51`)
-        .getByTestId(`choicerow-radio-input-51`)
+      cy.getByTestId(`choice-row-2`)
+        .getByTestId(`choice-row-input-2`)
         .click()
         .type("90")
-      cy.getByTestId(`choicerow-radio-52`)
-        .getByTestId(`choicerow-radio-input-52`)
+      cy.getByTestId(`choice-row-3`)
+        .getByTestId(`choice-row-input-3`)
         .click()
         .type("10")
 
@@ -85,8 +85,8 @@ describe("Activity", () => {
       cy.route("POST", "**/quiz*").as("submit")
 
       cy.lightbox().within(() => {
-        cy.getByTestId(`multiple-choice-question-radio-52`)
-          .getByTestId(`multiple-choice-radio-question-item-52-checked`)
+        cy.getByTestId(`multiple-choice-question-3`)
+          .getByTestId(`multiple-choice-question-item-3-checked`)
           .click({ force: true })
 
         cy.contains(/submit/i).click()
