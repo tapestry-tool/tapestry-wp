@@ -98,7 +98,7 @@ export default {
       },
       showCompletionScreen: false,
       rowRefs: [],
-      selectedTab: "",
+      selectedTab: "default",
     }
   },
   computed: {
@@ -112,7 +112,7 @@ export default {
       return this.node.completed || this.node.skippable !== false
     },
     isNodeView() {
-      return this.selectedTab === "tyde" ? true : false
+      return this.selectedTab === "default" ? true : false
     },
     tydeModeEnabled() {
       return !canEditTapestry() && this.settings.tydeModeEnabled
