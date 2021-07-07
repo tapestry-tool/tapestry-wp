@@ -6,7 +6,7 @@
       :is-sidebar-open="isSidebarOpen"
       data-qa="tapestry-map"
     />
-    <tapestry-main v-else-if="!isTydeView" ref="graph" :viewBox="viewBox" />
+    <tapestry-main v-else-if="!tydeModeEnabled" ref="graph" :viewBox="viewBox" />
   </div>
 </template>
 
@@ -41,7 +41,7 @@ export default {
     analyticsEnabled() {
       return this.settings.analyticsEnabled
     },
-    isTydeView() {
+    tydeModeEnabled() {
       return !canEditTapestry()
     },
   },
@@ -156,13 +156,12 @@ export default {
       })
     },
     setupTydeView() {
-      if (this.isTydeView) {
+      if (this.tydeModeEnabled) {
         /* NOTE: Opening the default Node for a specific role 
              in fullscreen only if this role cannot edit the 
              default node, otherwise the regular tapestry will
              open
       */
-        this.setDisplayTydeMode(true)
         const userMainRole = getCurrentUser().roles[0] || "public"
         const defaultNodeId = this.settings.tydeModeDefualtNodes[userMainRole]
         this.$router.push({
