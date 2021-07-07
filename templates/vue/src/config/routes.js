@@ -1,5 +1,4 @@
 import Lightbox from "@/components/Lightbox"
-import CircleOfSupport from "@/components/tyde/activities/CircleOfSupport"
 
 const ROOT_PATH = `/nodes/:nodeId`
 
@@ -28,13 +27,6 @@ const lightbox = {
   },
 }
 
-const cos = {
-  path: `${ROOT_PATH}/cos`,
-  name: "cos",
-  components: {
-    cos: CircleOfSupport,
-  },
-}
 const multiContent = {
   path: `${ROOT_PATH}/view/:rowId`,
   name: "multiContent",
@@ -86,7 +78,6 @@ const routes = {
   app,
   multiContent,
   lightbox,
-  cos,
   modal,
   settings,
   nestedMultiContent,

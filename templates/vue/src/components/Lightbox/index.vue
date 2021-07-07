@@ -17,31 +17,35 @@
       :selectedTab="selectedTab"
       @change-tab="handleTabChange"
     ></navbar>
-    <multi-content-media
-      v-if="node.mediaType === 'multi-content'"
-      :node="node"
-      :row-id="rowId"
-      :sub-row-id="subRowId"
-      @close="handleAutoClose"
-      @complete="complete"
-    />
-    <page-menu
-      v-if="node.typeData.showNavBar && node.presentationStyle === 'page'"
-      :node="node"
-      :rowRefs="rowRefs"
-      :dimensions="dimensions"
-    />
-    <tapestry-media
-      v-if="node.mediaType !== 'multi-content'"
-      :node-id="nodeId"
-      :dimensions="dimensions"
-      context="lightbox"
-      :class="{ 'tyde-mode': displayTydeMode }"
-      @load="handleLoad"
-      @close="handleAutoClose"
-      @complete="complete"
-      @change:dimensions="updateDimensions"
-    />
+    <circle-of-support v-if="selectedTab === 'cos'" />
+
+    <span v-if="isNodeView">
+      <multi-content-media
+        v-if="node.mediaType === 'multi-content'"
+        :node="node"
+        :row-id="rowId"
+        :sub-row-id="subRowId"
+        @close="handleAutoClose"
+        @complete="complete"
+      />
+      <page-menu
+        v-if="node.typeData.showNavBar && node.presentationStyle === 'page'"
+        :node="node"
+        :rowRefs="rowRefs"
+        :dimensions="dimensions"
+      />
+      <tapestry-media
+        v-if="node.mediaType !== 'multi-content'"
+        :node-id="nodeId"
+        :dimensions="dimensions"
+        context="lightbox"
+        :class="{ 'tyde-mode': displayTydeMode }"
+        @load="handleLoad"
+        @close="handleAutoClose"
+        @complete="complete"
+        @change:dimensions="updateDimensions"
+      />
+    </span>
   </tapestry-modal>
 </template>
 
@@ -57,6 +61,7 @@ import Helpers from "@/utils/Helpers"
 import { sizes } from "@/utils/constants"
 import DragSelectModular from "@/utils/dragSelectModular"
 import Navbar from "@/components/tyde/Navbar"
+import CircleOfSupport from "@/components/tyde/activities/CircleOfSupport"
 
 export default {
   name: "lightbox",
@@ -66,6 +71,7 @@ export default {
     TapestryModal,
     PageMenu,
     Navbar,
+    CircleOfSupport,
   },
   props: {
     nodeId: {
@@ -103,6 +109,9 @@ export default {
     },
     canSkip() {
       return this.node.completed || this.node.skippable !== false
+    },
+    isNodeView() {
+      return this.selectedTab === "tyde" ? true : false
     },
     lightboxContentStyles() {
       const styles = {
