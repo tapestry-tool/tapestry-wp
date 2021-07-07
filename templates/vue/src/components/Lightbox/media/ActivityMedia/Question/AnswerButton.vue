@@ -36,9 +36,7 @@ export default {
   },
   computed: {
     isFaIcon() {
-      return (
-        this.icon === "tasks" || this.icon === "microphone" || this.icon === "list"
-      )
+      return this.icon === "tasks" || this.icon === "microphone"
     },
     textIcon() {
       return `${data.vue_uri}/${TextIcon.split("dist")[1]}`

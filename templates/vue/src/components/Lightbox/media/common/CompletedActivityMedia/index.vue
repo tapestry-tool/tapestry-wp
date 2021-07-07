@@ -40,11 +40,20 @@ export default {
       type: [Object, String, Array],
       required: true,
     },
+    prevQuestionId: {
+      type: String,
+      required: false,
+      default: "",
+    },
   },
   computed: {
     ...mapGetters(["getQuestion"]),
     question() {
-      return this.getQuestion(this.node.typeData.questionId)
+      if (this.node.typeData.questionId) {
+        return this.getQuestion(this.node.typeData.questionId)
+      } else {
+        return this.getQuestion(this.prevQuestionId)
+      }
     },
     isListTextType() {
       return this.question.answerTypes.text.allowMultiple

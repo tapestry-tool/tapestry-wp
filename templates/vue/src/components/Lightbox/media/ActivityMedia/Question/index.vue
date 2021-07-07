@@ -22,6 +22,8 @@
             :key="previousAnswer[0]"
             :type="previousAnswer[0]"
             :answerData="previousAnswer[1]"
+            :node="node"
+            :prevQuestionId="prevQuestionId"
           ></completed-activity-media>
         </div>
         <div v-else>
@@ -116,6 +118,7 @@ export default {
       formOpened: false,
       formType: "",
       answers: {},
+      prevQuestionId: null,
     }
   },
   computed: {
@@ -135,6 +138,8 @@ export default {
           ) {
             // eslint-disable-next-line vue/no-side-effects-in-computed-properties
             this.question.followUp.nodeId = tempNodeId
+            // eslint-disable-next-line vue/no-side-effects-in-computed-properties
+            this.prevQuestionId = this.question.followUp.questionId
           }
         }
       }
