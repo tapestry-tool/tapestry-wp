@@ -435,8 +435,7 @@ export default {
       return true
     },
     roles() {
-      console.log(wpData.roles)
-      return Object.keys(wpData.roles)
+      return ["public", ...Object.keys(wpData.roles)]
     },
     nodesValues() {
       return Object.values(this.nodes)
@@ -597,10 +596,9 @@ export default {
       this.submitNodesEnabled = event
     },
     handleTydeModeEnable() {
-      console.log(this.nodes)
       if (!Object.keys(this.nodes)) {
         this.tydeModeEnabled = false
-        prompt("Cannot enable TYDE mode when there are no nodes in the tapestry")
+        alert("Cannot enable TYDE mode when there are no nodes in the tapestry")
       }
     },
   },

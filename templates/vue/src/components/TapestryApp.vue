@@ -42,7 +42,7 @@ export default {
       return this.settings.analyticsEnabled
     },
     tydeModeEnabled() {
-      return !canEditTapestry()
+      return !canEditTapestry() && this.settings.tydeModeEnabled
     },
   },
   watch: {

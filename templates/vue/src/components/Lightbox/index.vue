@@ -92,7 +92,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(["h5pSettings", "rootId"]),
+    ...mapState(["h5pSettings", "rootId", "settings"]),
     ...mapGetters(["getNode", "isMultiContent", "isMultiContentRow"]),
     node() {
       const node = this.getNode(this.nodeId)
@@ -102,7 +102,7 @@ export default {
       return this.node.completed || this.node.skippable !== false
     },
     tydeModeEnabled() {
-      return !canEditTapestry()
+      return !canEditTapestry() && this.settings.tydeModeEnabled
     },
     lightboxContentStyles() {
       const styles = {
