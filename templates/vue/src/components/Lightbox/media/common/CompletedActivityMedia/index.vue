@@ -18,14 +18,6 @@
             />
           </li>
         </ul>
-        <!-- <ul v-else>
-          <li>
-            <completed-multiple-choice-item
-              :item="getRadioMultipleChoiceOptionObject(answerData)"
-              :useImages="question.answerTypes.multipleChoice.useImages"
-            />
-          </li>
-        </ul> -->
       </b-col>
     </b-row>
   </b-container>
@@ -65,29 +57,9 @@ export default {
   },
   methods: {
     getMultipleChoiceOptionObject(id) {
-      // for (
-      //   let i = 0;
-      //   i < this.question.answerTypes.multipleChoice.choices.length;
-      //   i++
-      // ) {
-      //   if (this.question.answerTypes.multipleChoice.choices[i].id === id) {
-      //     return this.question.answerTypes.multipleChoice.choices[i]
-      //   }
-      // }
       return this.question.answerTypes.multipleChoice.choices.find(
         option => option.id === id
       )
-    },
-    getRadioMultipleChoiceOptionObject(id) {
-      for (
-        let i = 0;
-        i < this.question.answerTypes.multipleChoice.radioArray.length;
-        i++
-      ) {
-        if (this.question.answerTypes.multipleChoice.radioArray[i].id === id) {
-          return this.question.answerTypes.multipleChoice.radioArray[i]
-        }
-      }
     },
   },
 }

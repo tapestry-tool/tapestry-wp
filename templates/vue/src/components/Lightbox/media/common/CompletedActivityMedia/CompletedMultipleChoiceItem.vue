@@ -22,11 +22,6 @@ export default {
       required: true,
     },
   },
-  data() {
-    return {
-      checked: true,
-    }
-  },
 }
 </script>
 
