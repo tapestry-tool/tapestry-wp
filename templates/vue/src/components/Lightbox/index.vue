@@ -9,8 +9,14 @@
     :node-id="nodeId"
     :content-container-style="lightboxContentStyles"
     :allow-close="canSkip && !displayTydeMode"
+    :show-fav="!displayTydeMode"
     @close="handleUserClose"
   >
+    <navbar
+      v-if="displayTydeMode"
+      :selectedTab="selectedTab"
+      @change-tab="handleTabChange"
+    ></navbar>
     <multi-content-media
       v-if="node.mediaType === 'multi-content'"
       :node="node"
@@ -50,6 +56,7 @@ import { names } from "@/config/routes"
 import Helpers from "@/utils/Helpers"
 import { sizes } from "@/utils/constants"
 import DragSelectModular from "@/utils/dragSelectModular"
+import Navbar from "@/components/tyde/Navbar"
 
 export default {
   name: "lightbox",
@@ -58,6 +65,7 @@ export default {
     TapestryMedia,
     TapestryModal,
     PageMenu,
+    Navbar,
   },
   props: {
     nodeId: {
@@ -83,6 +91,7 @@ export default {
       },
       showCompletionScreen: false,
       rowRefs: [],
+      selectedTab: "tyde",
     }
   },
   computed: {
@@ -292,6 +301,9 @@ export default {
         width: this.lightboxDimensions.width,
         height: this.lightboxDimensions.height,
       }
+    },
+    handleTabChange(newTab) {
+      this.selectedTab = newTab
     },
   },
 }

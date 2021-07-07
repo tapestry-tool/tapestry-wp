@@ -11,6 +11,7 @@
             @clicked="$emit('close')"
           />
           <modal-button
+            v-if="showFav"
             icon="heart"
             icon-size="sm"
             :title="isFavourite ? 'Remove from Favourites' : 'Add to Favourites'"

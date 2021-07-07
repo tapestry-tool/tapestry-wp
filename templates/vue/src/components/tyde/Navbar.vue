@@ -4,14 +4,14 @@
       <b-navbar-nav class="mx-auto" fill style="width:100%;">
         <b-nav-item
           v-for="tab in tabs"
-          :key="tab.name"
-          :ref="tab.name + '-tab'"
-          :to="tab.link"
+          :key="tab"
+          :ref="tab + '-tab'"
           active-class="active"
           link-classes="link"
+          :active="selectedTab === tab"
+          @click="$emit('change-tab', tab)"
         >
-          <tyde-icon class="selected" :icon="tab.name" />
-          <tyde-icon class="unselected" :icon="tab.name + '-unselected'" />
+          <tyde-icon :selected="selectedTab === tab" :icon="tab" />
         </b-nav-item>
       </b-navbar-nav>
     </b-navbar>
@@ -20,7 +20,6 @@
 
 <script>
 import { mapState } from "vuex"
-import { names } from "@/config/routes"
 import TydeIcon from "./TydeIcon.vue"
 
 export default {
@@ -29,65 +28,21 @@ export default {
     TydeIcon,
   },
   props: {
-    currentUser: {
-      type: Object,
+    selectedTab: {
+      type: String,
       required: true,
     },
   },
-
   computed: {
-    ...mapState(["settings", "tydeMode"]),
+    ...mapState(["settings"]),
     tabs() {
-      /* NOTE: Opening the default Node for a specific role 
-             in fullscreen only if this role cannot edit the 
-             default node, otherwise the regular tapestry will
-             open
-      */
-
-      const userMainRole = this.currentUser.roles[0] || "public"
-      const defaultNodeId = this.settings.tydeModeDefualtNodes[userMainRole]
-      return [
-        {
-          name: "tyde",
-          link: {
-            name: names.LIGHTBOX,
-            params: { nodeId: defaultNodeId },
-            query: this.$route.query,
-          },
-        },
-        {
-          name: "profile",
-          link: "",
-        },
-        {
-          name: "goals",
-          link: "",
-        },
-        {
-          name: "cos",
-          link: {
-            name: names.COS,
-            query: this.$route.query,
-          },
-        },
-      ]
+      return ["tyde", "profile", "goals", "cos"]
     },
-  },
-  mounted() {
-    this.$router.push(this.tabs[0].link)
   },
 }
 </script>
 
 <style lang="scss">
-.navbar-nav {
-  .active > .unselected {
-    display: none;
-  }
-  :not(.active) > .selected {
-    display: none;
-  }
-}
 .nav-container {
   width: 100%;
   z-index: 9999;

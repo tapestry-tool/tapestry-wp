@@ -1,10 +1,8 @@
 <template>
   <loading v-if="loading" data-qa="tapestry-loading" style="height: 75vh;"></loading>
   <div v-else id="app">
-    <navbar v-if="isTydeView" :current-user="currentUser"></navbar>
-    <tapestry-app v-else></tapestry-app>
     <router-view name="lightbox"></router-view>
-    <router-view name="cos"></router-view>
+    <tapestry-app></tapestry-app>
     <node-modal></node-modal>
     <sidebar v-if="!isEmpty"></sidebar>
     <tapestry-error></tapestry-error>
@@ -32,8 +30,6 @@ import TapestryError from "@/components/TapestryError"
 import Loading from "@/components/common/Loading"
 import client from "@/services/TapestryAPI"
 import { isLoggedIn } from "./services/wp"
-import Navbar from "@/components/tyde/Navbar"
-import { getCurrentUser } from "@/services/wp"
 
 export default {
   name: "app",
@@ -43,13 +39,11 @@ export default {
     TapestryApp,
     Sidebar,
     TapestryError,
-    Navbar,
   },
   data() {
     return {
       loading: true,
       loggedIn: true,
-      currentUser: getCurrentUser(),
     }
   },
   computed: {
@@ -57,26 +51,12 @@ export default {
     isEmpty() {
       return Object.keys(this.nodes).length === 0
     },
-    isTydeView() {
-      const isAdmin = this.currentUser.roles.some(role => role === "administrator")
-      if (!isAdmin && this.settings.tydeModeEnabled) {
-        const rootNode = this.nodes[this.rootId]
-        const hasEditPermissions = this.currentUser.roles.some(role => {
-          return rootNode.permissions[role].some(premission => premission === "edit")
-        })
-        return !hasEditPermissions
-      }
-      return false
-    },
   },
   watch: {
     loggedIn(isStillLoggedIn) {
       if (!isStillLoggedIn) {
         this.$bvModal.show("loggedOutModal")
       }
-    },
-    isTydeView() {
-      this.setDisplayTydeMode(this.isTydeView)
     },
   },
   mounted() {
@@ -90,6 +70,7 @@ export default {
         })
       })
     }
+
     window.addEventListener("click", this.recordAnalytics)
     const data = [client.getTapestry(), client.getUserProgress()]
     Promise.all(data).then(([dataset, progress]) => {
@@ -107,7 +88,7 @@ export default {
     window.removeEventListener("click", this.recordAnalytics)
   },
   methods: {
-    ...mapMutations(["init", "setDisplayTydeMode"]),
+    ...mapMutations(["init"]),
     refresh() {
       this.$router.go()
     },
