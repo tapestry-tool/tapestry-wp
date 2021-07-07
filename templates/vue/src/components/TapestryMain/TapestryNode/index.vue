@@ -17,6 +17,7 @@
             ? 'pointer'
             : 'not-allowed',
       }"
+      :height="nodeLevel"
       @click="handleClick"
       @mouseover="handleMouseover"
       @mouseleave="handleMouseleave"
@@ -183,6 +184,16 @@ export default {
   computed: {
     ...mapState(["selection", "settings", "visibleNodes"]),
     ...mapGetters(["getNode", "getDirectChildren", "isVisible", "getParent"]),
+    nodeLevel: function() {
+      let counter = -1
+      let temp = this.node
+      while (temp != null) {
+        let nodeID = this.getParent(temp.id)
+        temp = this.getNode(nodeID)
+        counter++
+      }
+      return counter
+    },
     canReview() {
       if (!this.isLoggedIn) {
         return false
@@ -317,12 +328,21 @@ export default {
         .attr("r", newRadius)
     },
   },
+  created() {
+    let counter = -1
+    let temp = this.node
+    while (temp != null) {
+      let nodeID = this.getParent(temp.id)
+      temp = this.getNode(nodeID)
+      counter++
+    }
+  },
   mounted() {
     this.$emit("mounted")
     if (this.root) {
       this.$el.focus()
       this.$el.blur()
-    }
+    } 
     this.$refs.circle.setAttribute("r", this.radius)
     const nodeRef = this.$refs.node
     d3.select(nodeRef).call(
@@ -453,21 +473,21 @@ export default {
     handleClick(evt) {
       const allNodes = document.querySelectorAll(`g[data-id]`)
       allNodes.forEach(node => {
-        node.tabIndex = -1
+        // node.tabIndex = -1
       })
 
       const selectedNode = this.$el
-      selectedNode.tabIndex = 0
+      // selectedNode.tabIndex = 0
 
       const childrenID = this.node.childOrdering
       childrenID.forEach(childID => {
         const childDOM = document.querySelector(`[data-qa="node-${childID}"]`)
-        childDOM.tabIndex = 0
+        // childDOM.tabIndex = 0
       })
       const parentNodeID = this.getParent(this.node.id)
       if (parentNodeID) {
         const parentNode = document.querySelector(`[data-qa="node-${parentNodeID}"`)
-        parentNode.tabIndex = 0
+        // parentNode.tabIndex = 0
       }
 
       if (

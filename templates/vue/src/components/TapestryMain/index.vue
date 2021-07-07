@@ -15,8 +15,8 @@
       </g>
       <g v-if="dragSelectEnabled && dragSelectReady" class="nodes">
         <tapestry-node
-          v-for="(node, id) in test(nodes)"
-          :key="node.htmlOrdering"
+          v-for="(node, id) in orderedNodes"
+          :key="node.id"
           :node="node"
           class="node"
           :class="{ selectable: true }"
@@ -68,9 +68,24 @@ export default {
     }
     this.updateViewBox()
     this.dragSelectReady = true
+    this.$nextTick(function() {
+      let gContainer = document.getElementsByClassName("nodes")[0]
+      console.log(gContainer.children)
+      let temp = Array.from(gContainer.children)
+      temp.sort((a, b) => (a.height > b.height) ? 1 : ((b.height > a.height) ? -1 : 0))
+      console.log(temp)
+      gContainer.innerHTML = ''
+      for (let node of temp) {
+        gContainer.appendChild(node)
+      }
+    })
   },
   computed: {
     ...mapState(["nodes", "links", "selection", "settings", "rootId"]),
+    orderedNodes: function() {
+      let order = this.computeTabOrder(this.nodes)
+      return order
+    },
     background() {
       return this.settings.backgroundUrl
     },
@@ -118,7 +133,7 @@ export default {
     nodes: {
       immediate: true,
       handler(nodes) {
-        this.test(nodes)
+        // this.computeTabOrder(nodes)
       },
     },
   },
@@ -128,17 +143,21 @@ export default {
     addRootNode() {
       this.$root.$emit("add-node", null)
     },
-    test(nodes) {
+    computeTabOrder(nodes) {
       const rootNodeId = this.rootId
       let newNodeOrder = {}
       let queue = [rootNodeId]
-      let counter = 0
+      let counter = 1
       while (queue.length) {
         const queueLength = queue.length
 
         for (let i = 0; i < queueLength; i++) {
           const nodeId = queue.shift()
           const node = this.getNodeFromObject(nodes, nodeId)
+          const nodeHTML = document.querySelector(`[data-qa="node-${nodeId}"]`)
+          // console.log(`[data-qa="node-${nodeId}]`)
+          // console.log(nodeHTML)
+          // nodeHTML.tabIndex = counter
           node.htmlOrdering = counter
           for (const childId of node.childOrdering) {
             queue.push(childId)
@@ -161,7 +180,6 @@ export default {
     },
     updateViewBox() {
       this.$parent.updateViewBox()
-      console.log(this)
     },
     handleMouseover(id) {
       const node = this.nodes[id]
