@@ -7,11 +7,7 @@
         <b-tab v-for="questionAnswer in answers" :key="questionAnswer[0]">
           <template #title>
             <div class="icon">
-              <tapestry-icon
-                v-if="questionAnswer[0] === 'multipleChoice'"
-                icon="tasks"
-              />
-              <tapestry-icon v-else :icon="questionAnswer[0]" />
+              <tapestry-icon :icon="getIcon(questionAnswer[0])" />
             </div>
           </template>
           <completed-activity-media
@@ -68,6 +64,14 @@ export default {
   mounted() {
     this.$emit("complete")
     this.$emit("load")
+  },
+  methods: {
+    getIcon(answerType) {
+      if (answerType == "multipleChoice") {
+        return "tasks"
+      }
+      return answerType
+    },
   },
 }
 </script>

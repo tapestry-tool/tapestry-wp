@@ -28,7 +28,7 @@ import CompletedMultipleChoiceItem from "./CompletedMultipleChoiceItem"
 import { data as wpData } from "@/services/wp"
 
 export default {
-  name: "tapestry-activity",
+  name: "completed-activity-media",
   components: {
     CompletedMultipleChoiceItem,
   },
