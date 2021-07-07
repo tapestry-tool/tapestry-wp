@@ -3,15 +3,16 @@
     id="lightbox"
     data-qa="lightbox"
     :class="{
-      'full-screen': node.fullscreen || displayTydeMode,
+      'full-screen': node.fullscreen || isTydeView,
       'content-text': node.mediaType === 'text' || node.mediaType === 'wp-post',
     }"
     :node-id="nodeId"
     :content-container-style="lightboxContentStyles"
-    :allow-close="canSkip && !displayTydeMode"
-    :show-fav="!displayTydeMode"
+    :allow-close="canSkip && !isTydeView"
+    :show-fav="!isTydeView"
     @close="handleUserClose"
   >
+    <navbar v-if="isTydeView"></navbar>
     <multi-content-media
       v-if="node.mediaType === 'multi-content'"
       :node="node"
@@ -31,7 +32,7 @@
       :node-id="nodeId"
       :dimensions="dimensions"
       context="lightbox"
-      :class="{ 'tyde-mode': displayTydeMode }"
+      :class="{ 'tyde-mode': isTydeView }"
       @load="handleLoad"
       @close="handleAutoClose"
       @complete="complete"
@@ -51,6 +52,7 @@ import { names } from "@/config/routes"
 import Helpers from "@/utils/Helpers"
 import { sizes } from "@/utils/constants"
 import DragSelectModular from "@/utils/dragSelectModular"
+import Navbar from "@/components/tyde/Navbar"
 
 export default {
   name: "lightbox",
@@ -59,6 +61,7 @@ export default {
     TapestryMedia,
     TapestryModal,
     PageMenu,
+    Navbar,
   },
   props: {
     nodeId: {
@@ -75,6 +78,11 @@ export default {
       required: false,
       default: 0,
     },
+    isTydeView: {
+      type: Number,
+      required: false,
+      default: 0,
+    },
   },
   data() {
     return {
@@ -87,7 +95,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(["h5pSettings", "rootId", "displayTydeMode"]),
+    ...mapState(["h5pSettings", "rootId"]),
     ...mapGetters(["getNode", "isMultiContent", "isMultiContentRow"]),
     node() {
       const node = this.getNode(this.nodeId)
@@ -104,7 +112,7 @@ export default {
         height: this.dimensions.height + "px",
       }
 
-      if (this.node.fullscreen || this.displayTydeMode) {
+      if (this.node.fullscreen || this.isTydeView) {
         styles.top = "auto"
         styles.left = "auto"
         styles.width = "100vw"
