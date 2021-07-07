@@ -44,9 +44,11 @@
     <b-form-invalid-feedback :state="isAnswerValid">
       Please enter a response.
     </b-form-invalid-feedback>
-    <b-button class="mt-3 float-right" variant="primary" @click="handleTextSubmit">
-      Submit
-    </b-button>
+    <div>
+      <b-button class="submit-btn" variant="primary" @click="handleTextSubmit">
+        Submit
+      </b-button>
+    </div>
   </b-form>
 </template>
 
@@ -157,7 +159,8 @@ export default {
 }
 
 .submit-btn {
-  float: center;
+  float: right;
   margin-top: 30px;
+  width: 15%;
 }
 </style>
