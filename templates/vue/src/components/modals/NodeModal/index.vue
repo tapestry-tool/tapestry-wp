@@ -930,35 +930,39 @@ export default {
         if (!validPreviousAnswers) {
           errMsgs.push("Please select a previous activity to display")
         }
-        // if (this.node.typeData.activity.questions[0].answerTypes.list.enabled) {
-        //   let listQuestion = this.node.typeData.activity.questions[0].answerTypes
-        //     .list
-        //   let minValue = parseInt(listQuestion.minFields, 10)
-        //   if (minValue < 1) {
-        //     errMsgs.push("Minimum number of fields for list activity must be >= 1")
-        //   }
-        //   if (listQuestion.maxFields.enabled) {
-        //     let maxValue = parseInt(listQuestion.maxFields.value, 10)
-        //     if (maxValue < minValue) {
-        //       errMsgs.push(
-        //         "Maximum number of fields for list activity must be >= minimum number fields"
-        //       )
-        //     }
-        //     if (maxValue > 100) {
-        //       errMsgs.push("Maximum number of fields must be <= 100")
-        //     }
-        //   }
-        // }
+        if (
+          this.node.typeData.activity.questions[0].answerTypes.text.allowMultiple
+        ) {
+          let listQuestion = this.node.typeData.activity.questions[0].answerTypes
+            .text.list
+          let minValue = parseInt(listQuestion.minFields, 10)
+          if (minValue < 1) {
+            errMsgs.push("Minimum number of fields for list activity must be >= 1")
+          }
+          if (listQuestion.maxFields.enabled) {
+            let maxValue = parseInt(listQuestion.maxFields.value, 10)
+            if (maxValue < minValue) {
+              errMsgs.push(
+                "Maximum number of fields for list activity must be >= minimum number fields"
+              )
+            }
+            if (maxValue > 100) {
+              errMsgs.push("Maximum number of fields must be <= 100")
+            }
+          }
+        }
       } else if (this.node.mediaType === "answer") {
         const hasActivityId = this.node.typeData.activityId
         if (!hasActivityId) {
           errMsgs.push("Please select an activity")
         }
+
         const hasQuestionId = this.node.typeData.questionId
         if (!hasQuestionId) {
           errMsgs.push("Please select a question")
         }
       }
+
       return errMsgs
     },
     isValidVideo(typeData) {
