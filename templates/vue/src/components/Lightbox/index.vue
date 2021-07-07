@@ -3,17 +3,17 @@
     id="lightbox"
     data-qa="lightbox"
     :class="{
-      'full-screen': node.fullscreen || displayTydeMode,
+      'full-screen': node.fullscreen || tydeModeEnabled,
       'content-text': node.mediaType === 'text' || node.mediaType === 'wp-post',
     }"
     :node-id="nodeId"
     :content-container-style="lightboxContentStyles"
-    :allow-close="canSkip && !displayTydeMode"
-    :show-fav="!displayTydeMode"
+    :allow-close="canSkip && !tydeModeEnabled"
+    :show-fav="!tydeModeEnabled"
     @close="handleUserClose"
   >
     <navbar
-      v-if="displayTydeMode"
+      v-if="tydeModeEnabled"
       :selectedTab="selectedTab"
       @change-tab="handleTabChange"
     ></navbar>
@@ -39,7 +39,7 @@
         :node-id="nodeId"
         :dimensions="dimensions"
         context="lightbox"
-        :class="{ 'tyde-mode': displayTydeMode }"
+        :class="{ 'tyde-mode': tydeModeEnabled }"
         @load="handleLoad"
         @close="handleAutoClose"
         @complete="complete"
@@ -62,6 +62,7 @@ import { sizes } from "@/utils/constants"
 import DragSelectModular from "@/utils/dragSelectModular"
 import Navbar from "@/components/tyde/Navbar"
 import CircleOfSupport from "@/components/tyde/activities/CircleOfSupport"
+import { canEditTapestry } from "@/services/wp"
 
 export default {
   name: "lightbox",
@@ -97,11 +98,11 @@ export default {
       },
       showCompletionScreen: false,
       rowRefs: [],
-      selectedTab: "tyde",
+      selectedTab: "",
     }
   },
   computed: {
-    ...mapState(["h5pSettings", "rootId", "displayTydeMode"]),
+    ...mapState(["h5pSettings", "rootId", "settings"]),
     ...mapGetters(["getNode", "isMultiContent", "isMultiContentRow"]),
     node() {
       const node = this.getNode(this.nodeId)
@@ -113,6 +114,9 @@ export default {
     isNodeView() {
       return this.selectedTab === "tyde" ? true : false
     },
+    tydeModeEnabled() {
+      return !canEditTapestry() && this.settings.tydeModeEnabled
+    },
     lightboxContentStyles() {
       const styles = {
         top: this.dimensions.top + "px",
@@ -121,7 +125,7 @@ export default {
         height: this.dimensions.height + "px",
       }
 
-      if (this.node.fullscreen || this.displayTydeMode) {
+      if (this.node.fullscreen || this.tydeModeEnabled) {
         styles.top = "auto"
         styles.left = "auto"
         styles.width = "100vw"
