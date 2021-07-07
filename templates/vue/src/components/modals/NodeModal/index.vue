@@ -958,9 +958,8 @@ export default {
         if (!hasQuestionId) {
           errMsgs.push("Please select a question")
         }
-
-        return errMsgs
       }
+      return errMsgs
     },
     isValidVideo(typeData) {
       return (
