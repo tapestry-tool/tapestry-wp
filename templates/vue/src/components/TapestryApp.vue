@@ -18,7 +18,7 @@ import TapestryMain from "./TapestryMain"
 import { mapMutations, mapState } from "vuex"
 import TapestryMap from "./TapestryMap"
 import Helpers from "@/utils/Helpers"
-import { getCurrentUser } from "@/services/wp"
+import { getCurrentUser, canEditTapestry } from "@/services/wp"
 
 export default {
   components: {
@@ -42,16 +42,7 @@ export default {
       return this.settings.analyticsEnabled
     },
     isTydeView() {
-      const roles = getCurrentUser().roles
-      const isAdmin = roles.some(role => role === "administrator")
-      if (!isAdmin && this.settings.tydeModeEnabled) {
-        const rootNode = this.nodes[this.rootId]
-        const hasEditPermissions = roles.some(role => {
-          return rootNode.permissions[role].some(premission => premission === "edit")
-        })
-        return !hasEditPermissions
-      }
-      return false
+      return !canEditTapestry()
     },
   },
   watch: {
