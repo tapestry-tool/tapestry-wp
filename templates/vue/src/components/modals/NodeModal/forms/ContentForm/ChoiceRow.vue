@@ -34,42 +34,6 @@
       Remove
     </b-button>
   </div>
-
-  <!-- <div v-else class="container">
-    <span v-handle class="fas fa-bars fa-s" style="margin-right: 5px;"></span>
-    <b-form-checkbox
-      :value="item.id"
-      :disabled="isDisabled && selectedRadioChoice != item.id"
-    />
-    <b-form-group v-if="useImages">
-      <file-upload
-        v-model="item.imageUrl"
-        input-test-id="node-choiceRow-thumbnail-url"
-        :data-qa="`choicerow-radio-thumbnail-${item.id}`"
-        :show-url-upload="false"
-        :show-image-preview="true"
-        :compact-mode="true"
-        file-types="image/*"
-        @isUploading="handleUploadChange"
-      />
-    </b-form-group>
-    <div :class="useImages ? 'input-container-image' : 'input-container'">
-      <b-form-input
-        v-model="item.value"
-        class="form-input"
-        :placeholder="placeholder"
-        :data-qa="`choicerow-radio-input-${item.id}`"
-      ></b-form-input>
-    </div>
-    <b-button
-      :disabled="removeButtonDisabled"
-      squared
-      variant="outline-danger"
-      @click="$emit('remove')"
-    >
-      Remove
-    </b-button>
-  </div> -->
 </template>
 
 <script>
