@@ -12,7 +12,7 @@
           :index="index"
           :isCheckBox="allowSelectMultiple"
           :hasImage="question.answerTypes.multipleChoice.useImages"
-          :data-qa="`multiple-choice-question-${choice.id}`"
+          :data-qa="`multiple-choice-question-${index}`"
         ></multiple-choice-question-item>
       </component>
     </b-form-group>
