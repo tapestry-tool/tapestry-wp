@@ -8,7 +8,7 @@
       <b-img
         v-if="hasImage && item.imageUrl !== null"
         :src="item.imageUrl"
-        class="imageChoice"
+        class="choice-image"
         :data-qa="`multiple-choice-question-item-${item.id}-thumbnail`"
       ></b-img>
       {{ item.value }}
@@ -51,7 +51,7 @@ export default {
   clear: both;
 }
 
-.imageChoice {
+.choice-image {
   width: 200px;
 }
 </style>
