@@ -135,6 +135,7 @@
                 <b-form-checkbox
                   v-if="!question.answerTypes.text.isMultiLine"
                   v-model="question.answerTypes.text.allowMultiple"
+                  data-qa="enable-list-checkbox"
                 >
                   Allow entering multiple values
                 </b-form-checkbox>

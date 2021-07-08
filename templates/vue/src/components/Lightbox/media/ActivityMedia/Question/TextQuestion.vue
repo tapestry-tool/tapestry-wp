@@ -1,7 +1,12 @@
 <template>
   <b-form class="grid-container">
     <ul v-if="question.answerTypes.text.allowMultiple" class="list">
-      <li v-for="(answerItem, index) in textAnswers" :key="index" class="answerItem">
+      <li
+        v-for="(answerItem, index) in textAnswers"
+        :key="index"
+        class="answerItem"
+        data-qa="list-input-list"
+      >
         <b-form-input
           v-model="textAnswers[index]"
           :data-qa="`list-input-${index}`"
