@@ -141,7 +141,7 @@ class TapestryUserProgress implements ITapestryUserProgress
     {
         return $this->_getAvatar();
     }
-        
+
     public function isCompleted($nodeId, $userId)
     {
         $nodeMetadata = get_metadata_by_mid('post', $nodeId)->meta_value;

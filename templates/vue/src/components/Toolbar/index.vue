@@ -6,7 +6,7 @@
         v-if="avatarsEnabled"
         data-qa="user-settings-button"
       ></user-settings-button>
-      <div v-show="canEdit || (!showMap && hasDepth)" class="canEdit">
+      <div v-show="canEdit || (!showMap && hasDepth)" class="can-edit">
         <review-notifications v-if="canEdit && settings.submitNodesEnabled" />
         <settings-modal-button
           v-if="canEdit"
@@ -95,7 +95,7 @@ export default {
   position: relative;
 }
 
-.canEdit {
+.can-edit {
   display: flex;
 }
 </style>
