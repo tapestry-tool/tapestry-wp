@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <component
-      :is="multipleChoiceItemForm"
+      :is="isCheckBox ? 'b-form-checkbox' : 'b-form-radio'"
       :value="item.id"
       :data-qa="`multiple-choice-question-item-${item.id}-checked`"
     >
@@ -31,15 +31,6 @@ export default {
     item: {
       type: Object,
       required: true,
-    },
-  },
-  computed: {
-    multipleChoiceItemForm() {
-      if (this.isCheckBox) {
-        return "b-form-checkbox"
-      } else {
-        return "b-form-radio"
-      }
     },
   },
 }

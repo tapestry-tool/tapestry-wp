@@ -1,23 +1,26 @@
 <template>
   <b-form class="container" @submit="handleMultipleChoiceSubmit">
     <b-form-group>
-      <component :is="multipleChoiceGroup" v-model="userSelectedOption">
+      <component
+        :is="allowSelectMultiple ? 'b-form-checkbox-group' : 'b-form-radio-group'"
+        v-model="userSelection"
+      >
         <multiple-choice-question-item
-          v-for="userChoiceRow in question.answerTypes.multipleChoice.choices"
-          :key="userChoiceRow.id"
-          :item="userChoiceRow"
-          :isCheckBox="multipleAnswerSelected"
+          v-for="choice in question.answerTypes.multipleChoice.choices"
+          :key="choice.id"
+          :item="choice"
+          :isCheckBox="allowSelectMultiple"
           :hasImage="question.answerTypes.multipleChoice.useImages"
-          :data-qa="`multiple-choice-question-${userChoiceRow.id}`"
+          :data-qa="`multiple-choice-question-${choice.id}`"
         ></multiple-choice-question-item>
       </component>
     </b-form-group>
     <b-form-invalid-feedback
-      :state="isAnswerValid"
+      :state="!submitPressed || answerValid"
       class="clearfix"
       data-qa="invalid-feedback"
     >
-      Please select a choice.
+      Please select {{ allowSelectMultiple ? "one or more choices" : "a choice" }}.
     </b-form-invalid-feedback>
     <b-button class="float-left mt-3" variant="primary" type="submit">
       Submit
@@ -48,79 +51,53 @@ export default {
   },
   data() {
     return {
-      isAnswerValid: true,
-      userSelectedOption: this.userSelectedOptionInitialValue,
-      multipleChoiceAnswer: [],
+      userSelection: this.allowSelectMultiple ? [] : null,
+      submitPressed: false,
     }
   },
   computed: {
-    multipleAnswerSelected() {
-      return this.question.answerTypes.multipleChoice.hasMultipleAnswers
+    allowSelectMultiple() {
+      return this.question.answerTypes.multipleChoice.allowSelectMultiple
     },
-    userSelectedOptionInitialValue() {
-      if (this.multipleAnswerSelected) {
-        return []
+    answerValid() {
+      if (this.allowSelectMultiple) {
+        return this.userSelection.length > 0
       } else {
-        return null
+        return this.userSelection !== null
       }
     },
-    multipleChoiceGroup() {
-      if (this.multipleAnswerSelected) {
-        return "b-form-checkbox-group"
+    preSelectedValue() {
+      if (this.allowSelectMultiple) {
+        return this.question.answerTypes.multipleChoice.preSelectedOptions
       } else {
-        return "b-form-radio-group"
-      }
-    },
-    validUserSelectedOption() {
-      if (this.multipleAnswerSelected) {
-        return this.userSelectedOption.length > 0
-      } else {
-        return Boolean(this.userSelectedOption)
+        return this.question.answerTypes.multipleChoice.preSelectedOptions[0]
       }
     },
   },
   watch: {
     question() {
-      if (this.answer === "") {
-        this.userSelectedOption = this.preSelectedValue()
-      } else {
-        if (this.multipleAnswerSelected) {
-          this.userSelectedOption = this.answer
-        } else {
-          this.userSelectedOption = this.answer[0]
-        }
-      }
+      this.setUserSelection()
     },
   },
   created() {
-    if (this.answer === "") {
-      this.userSelectedOption = this.preSelectedValue()
-    } else {
-      if (this.multipleAnswerSelected) {
-        this.userSelectedOption = this.answer
-      } else {
-        this.userSelectedOption = this.answer[0]
-      }
-    }
+    this.setUserSelection()
   },
   methods: {
-    handleMultipleChoiceSubmit(event) {
-      event.preventDefault()
-      this.isAnswerValid = this.validUserSelectedOption
-      if (this.multipleAnswerSelected) {
-        this.multipleChoiceAnswer = this.userSelectedOption
+    setUserSelection() {
+      if (this.answer === "") {
+        this.userSelection = this.preSelectedValue
       } else {
-        this.multipleChoiceAnswer.push(this.userSelectedOption)
-      }
-      if (this.isAnswerValid) {
-        this.$emit("submit", this.multipleChoiceAnswer)
+        this.userSelection = this.allowSelectMultiple ? this.answer : this.answer[0]
       }
     },
-    preSelectedValue() {
-      if (this.multipleAnswerSelected) {
-        return this.question.answerTypes.multipleChoice.preSelectedOptions
-      } else {
-        return this.question.answerTypes.multipleChoice.preSelectedOptions[0]
+    handleMultipleChoiceSubmit(event) {
+      event.preventDefault()
+      this.submitPressed = true
+      if (this.answerValid) {
+        this.$emit(
+          "submit",
+          this.allowSelectMultiple ? this.userSelection : [this.userSelection]
+        )
       }
     },
   },

@@ -67,7 +67,7 @@
           <div class="button-container">
             <answer-button
               v-if="question.answerTypes.text.enabled"
-              :completed="textFormCompleted"
+              :completed="formIsCompleted('text')"
               data-qa="answer-button-text"
               @click="openForm('text')"
             >
@@ -75,7 +75,7 @@
             </answer-button>
             <answer-button
               v-if="question.answerTypes.audio.enabled"
-              :completed="audioFormCompleted"
+              :completed="formIsCompleted('audio')"
               icon="microphone"
               data-qa="answer-button-audio"
               @click="openForm('audio')"
@@ -84,7 +84,7 @@
             </answer-button>
             <answer-button
               v-if="question.answerTypes.multipleChoice.enabled"
-              :completed="multipleChoiceFormCompleted"
+              :completed="formIsCompleted('multipleChoice')"
               data-qa="answer-button-multiple-choice"
               icon="tasks"
               @click="openForm('multipleChoice')"
@@ -174,32 +174,6 @@ export default {
       }
       return ""
     },
-    textFormCompleted() {
-      if (
-        this.userAnswers?.[this.node.id]?.activity?.[this.question.id]?.answers?.text
-      ) {
-        return true
-      }
-      return false
-    },
-    audioFormCompleted() {
-      if (
-        this.userAnswers?.[this.node.id]?.activity?.[this.question.id]?.answers
-          ?.audio
-      ) {
-        return true
-      }
-      return false
-    },
-    multipleChoiceFormCompleted() {
-      if (
-        this.userAnswers?.[this.node.id]?.activity?.[this.question.id]?.answers
-          ?.multipleChoice
-      ) {
-        return true
-      }
-      return false
-    },
   },
   watch: {
     question() {
@@ -278,6 +252,10 @@ export default {
         type: this.formType,
       })
       this.$emit("submit")
+    },
+    formIsCompleted(type) {
+      return !!this.userAnswers?.[this.node.id]?.activity?.[this.question.id]
+        ?.answers?.[type]
     },
   },
 }

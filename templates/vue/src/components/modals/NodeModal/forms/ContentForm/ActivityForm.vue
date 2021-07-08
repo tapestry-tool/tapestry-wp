@@ -152,30 +152,10 @@
                 v-if="question.answerTypes.multipleChoice.enabled"
                 class="mt-2 pl-4 ml-2"
               >
-                <b-form-radio-group
-                  v-model="question.answerTypes.multipleChoice.hasMultipleAnswers"
-                >
-                  <b-form-radio
-                    data-qa="question-answer-multipleChoice-multipleAnswer"
-                    name="multiple-answer"
-                    :value="true"
-                  >
-                    Select Multiple Answers
-                  </b-form-radio>
-                  <b-form-radio
-                    data-qa="question-answer-multipleChoice-singleAnswer"
-                    name="single-answer"
-                    :value="false"
-                  >
-                    Select Single Answer
-                  </b-form-radio>
-                </b-form-radio-group>
-                <div v-if="question.answerTypes.multipleChoice.enabled">
-                  <multiple-choice-form
-                    :multipleChoice="question.answerTypes.multipleChoice"
-                    data-qa="authoring-multiple-choice-form"
-                  />
-                </div>
+                <multiple-choice-form
+                  :multipleChoice="question.answerTypes.multipleChoice"
+                  data-qa="authoring-multiple-choice-form"
+                />
               </div>
             </b-form-group>
           </b-card>
@@ -235,7 +215,10 @@ const defaultQuestion = {
     },
     multipleChoice: {
       enabled: false,
-      hasMultipleAnswers: false,
+      allowSelectMultiple: false,
+      useImages: false,
+      preSelectedOptions: [],
+      choiceRows: [],
     },
   },
   confirmation: {
@@ -246,6 +229,7 @@ const defaultQuestion = {
 }
 
 export default {
+  name: "activity-form",
   components: {
     Combobox,
     RichTextForm,

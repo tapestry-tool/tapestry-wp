@@ -1,39 +1,45 @@
 <template>
-  <div class="container">
-    <span v-handle class="fas fa-bars fa-s" style="margin-right: 5px;"></span>
-    <b-form-checkbox
-      :value="item.id"
-      :disabled="isDisabled && selectedRadioChoice != item.id"
-    />
-    <b-form-group v-if="useImages">
-      <file-upload
-        v-model="item.imageUrl"
-        input-test-id="node-choiceRow-thumbnail-url"
-        :data-qa="`choice-row-thumbnail-${item.id}`"
-        :show-url-upload="false"
-        :show-image-preview="true"
-        :compact-mode="true"
-        file-types="image/*"
-        @isUploading="handleUploadChange"
-      />
-    </b-form-group>
-    <div :class="useImages ? 'input-container-image' : 'input-container'">
-      <b-form-input
-        v-model="item.value"
-        class="form-input"
-        :placeholder="placeholder"
-        :data-qa="`choice-row-input-${item.id}`"
-      ></b-form-input>
+  <b-row class="choice-container">
+    <span v-handle class="fas fa-bars fa-s" style="margin-right: 1em;"></span>
+    <div class="input-container">
+      <b-input-group :class="{ 'use-images': useImages }">
+        <b-input-group-prepend is-text>
+          <b-form-checkbox
+            :value="item.id"
+            :disabled="isDisabled && selectedRadioChoice != item.id"
+          />
+          <file-upload
+            v-if="useImages"
+            v-model="item.imageUrl"
+            input-test-id="node-choiceRow-thumbnail-url"
+            :data-qa="`choice-row-thumbnail-${item.id}`"
+            :show-url-upload="false"
+            :show-image-preview="true"
+            :compact-mode="true"
+            file-types="image/*"
+            @isUploading="handleUploadChange"
+          />
+        </b-input-group-prepend>
+        <b-form-input
+          v-model="item.value"
+          class="form-input"
+          :class="{ 'm-2': useImages }"
+          :placeholder="placeholder"
+          :data-qa="`choice-row-input-${item.id}`"
+          @keyup.enter="$emit('add')"
+        ></b-form-input>
+        <b-input-group-append>
+          <b-button
+            :disabled="removeButtonDisabled"
+            variant="danger"
+            @click="$emit('remove')"
+          >
+            X
+          </b-button>
+        </b-input-group-append>
+      </b-input-group>
     </div>
-    <b-button
-      :disabled="removeButtonDisabled"
-      squared
-      variant="outline-danger"
-      @click="$emit('remove')"
-    >
-      Remove
-    </b-button>
-  </div>
+  </b-row>
 </template>
 
 <script>
@@ -50,7 +56,7 @@ export default {
       type: Object,
       required: true,
     },
-    multipleAnswerSelected: {
+    allowSelectMultiple: {
       type: Boolean,
       required: true,
     },
@@ -97,17 +103,21 @@ export default {
 
 <style lang="scss">
 .input-container {
-  margin-right: -20px;
-  width: 500px;
+  width: calc(100% - 30px);
 }
-.input-container-image {
-  margin-right: -20px;
-  width: 100px;
+.input-group {
+  background: #eceef1;
+
+  &.use-images {
+    border: solid 1px #ccc;
+    border-radius: 5px;
+    border-color: #9c7e81;
+  }
+  .form-input {
+    align-self: center;
+  }
 }
-.form-input {
-  margin-left: -20px;
-}
-.container {
+.choice-container {
   display: flex;
   align-items: center;
   z-index: 9999 !important;

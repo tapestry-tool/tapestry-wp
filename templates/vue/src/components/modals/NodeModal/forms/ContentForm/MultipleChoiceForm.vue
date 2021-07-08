@@ -1,50 +1,55 @@
 <template>
   <div>
-    <b-form-group
-      :label="
-        multipleAnswerSelected ? 'Multiple Answers Form' : 'Single Answer Form'
-      "
-    >
-      <b-form-group>
-        <b-form-checkbox v-model="useImages" data-qa="multiple-choice-thumbnail">
-          Use Images
-        </b-form-checkbox>
-      </b-form-group>
-      <b-form-group>
-        <sortable-list
-          v-model="choiceRows"
-          lockAxis="y"
-          :useDragHandle="true"
-          @input="updateChoicesOrdering"
-        >
-          <b-form-checkbox-group
-            v-model="preSelectedOptions"
-            :style="{ height: choicesGroupHeight }"
-          >
-            <choice-row
-              v-for="(choiceRow, index) in choiceRows"
-              :key="choiceRow.id"
-              :data-qa="`choice-row-${choiceRow.id}`"
-              :item="choiceRow"
-              placeholder="answer option text"
-              :index="index"
-              :multipleChoice="multipleChoice"
-              :multipleAnswerSelected="multipleAnswerSelected"
-              :useImages="useImages"
-              :isDisabled="!multipleAnswerSelected && preSelectedOptions.length > 0"
-              :selectedRadioChoice="preSelectedOptions[0]"
-              :removeButtonDisabled="isRemoveButtonDisabled"
-              @remove="removeChoiceRow(index, choiceRow)"
-            ></choice-row>
-          </b-form-checkbox-group>
-        </sortable-list>
-        <b-button class="add-button" variant="primary" squared @click="addNewChoice">
-          Add a choice
+    <b-form-group>
+      <b-form-checkbox
+        v-model="allowSelectMultiple"
+        data-qa="question-answer-multipleChoice-multipleAnswer"
+      >
+        Allow selecting multiple answers
+      </b-form-checkbox>
+    </b-form-group>
+    <b-form-group class="mt-2">
+      <b-form-checkbox v-model="useImages" data-qa="multiple-choice-thumbnail">
+        Use Images
+      </b-form-checkbox>
+    </b-form-group>
+    <b-form-group>
+      <sortable-list
+        v-model="choiceRows"
+        lock-axis="y"
+        :use-drag-handle="true"
+        @input="updateChoicesOrdering"
+      >
+        <b-form-checkbox-group v-model="preSelectedOptions">
+          <choice-row
+            v-for="(choiceRow, index) in choiceRows"
+            :key="choiceRow.id"
+            :ref="`choice-row-${choiceRow.id}`"
+            :data-qa="`choice-row-${choiceRow.id}`"
+            class="choice-row mt-2"
+            :item="choiceRow"
+            placeholder="Enter choice text"
+            :index="index"
+            :multiple-choice="multipleChoice"
+            :allow-select-multiple="allowSelectMultiple"
+            :use-images="useImages"
+            :is-disabled="!allowSelectMultiple && preSelectedOptions.length > 0"
+            :selected-radio-choice="preSelectedOptions[0]"
+            :remove-button-disabled="choiceRows.length <= 2"
+            @remove="removeChoice(index, choiceRow)"
+            @add="addChoice"
+          ></choice-row>
+        </b-form-checkbox-group>
+      </sortable-list>
+      <b-container class="after-choices mt-2">
+        <b-button class="add-button" variant="primary" @click="addChoice">
+          + Add choice
         </b-button>
-        <p class="message">
-          Tick any options that should be selected by default in the question
+        <p class="tick-instructions text-muted">
+          &nbsp;Select choices that should be selected by default when posing this
+          question
         </p>
-      </b-form-group>
+      </b-container>
     </b-form-group>
   </div>
 </template>
@@ -52,14 +57,22 @@
 <script>
 import ChoiceRow from "./ChoiceRow"
 import { ContainerMixin } from "vue-slicksort"
+import Helpers from "@/utils/Helpers"
+
+const defaultChoice = {
+  imageUrl: "",
+  value: "",
+}
+
 const SortableList = {
   mixins: [ContainerMixin],
   template: `
-    <ul class="list">
+    <b-container>
       <slot />
-    </ul>
+    </b-container>
   `,
 }
+
 export default {
   components: {
     ChoiceRow,
@@ -74,45 +87,17 @@ export default {
   data() {
     return {
       preSelectedOptions: [],
+      allowSelectMultiple: false,
       useImages: false,
-      choiceRows: [
-        {
-          id: 1,
-          imageUrl: "",
-          value: "",
-        },
-        {
-          id: 2,
-          imageUrl: "",
-          value: "",
-        },
-        {
-          id: 3,
-          imageUrl: "",
-          value: "",
-        },
-      ],
-      nextChoiceRowId: 4,
+      choiceRows: [],
     }
   },
-  computed: {
-    multipleAnswerSelected() {
-      return this.multipleChoice.hasMultipleAnswers
-    },
-    isRemoveButtonDisabled() {
-      return this.choiceRows.length === 1
-    },
-    choicesGroupHeight() {
-      if (this.useImages) {
-        return 150 * this.choiceRows.length + "px"
-      } else {
-        return 40 * this.choiceRows.length + "px"
-      }
-    },
-  },
   watch: {
-    multipleAnswerSelected() {
-      this.preSelectedOptions = []
+    allowSelectMultiple(newAllowSelectMultiple) {
+      this.multipleChoice.allowSelectMultiple = newAllowSelectMultiple
+      if (!newAllowSelectMultiple && this.preSelectedOptions.length > 1) {
+        this.preSelectedOptions = [this.preSelectedOptions[0]]
+      }
     },
     choiceRows(newChoiceRows) {
       this.multipleChoice.choices = newChoiceRows
@@ -123,35 +108,24 @@ export default {
     preSelectedOptions(newPreSelectedOptions) {
       this.multipleChoice.preSelectedOptions = newPreSelectedOptions
     },
-    nextChoiceRowId(newNextChoiceRowId) {
-      this.multipleChoice.nextChoiceRowId = newNextChoiceRowId
-    },
   },
   created() {
-    if (
-      !this.multipleChoice.hasOwnProperty("choices") ||
-      !this.multipleChoice.hasOwnProperty("useImages")
-    ) {
-      this.multipleChoice.choices = this.choiceRows
-      this.multipleChoice.nextChoiceRowId = this.nextChoiceRowId
-      this.multipleChoice.useImages = this.useImages
-      this.multipleChoice.preSelectedOptions = this.preSelectedOptions
-    } else {
-      this.choiceRows = this.multipleChoice.choices
-      this.nextChoiceRowId = this.multipleChoice.nextChoiceRowId
-      this.useImages = this.multipleChoice.useImages
-      this.preSelectedOptions = this.multipleChoice.preSelectedOptions
-    }
+    this.allowSelectMultiple = this.multipleChoice.allowSelectMultiple
+    this.choiceRows = this.multipleChoice.choices
+    this.useImages = this.multipleChoice.useImages
+    this.preSelectedOptions = this.multipleChoice.preSelectedOptions
   },
   methods: {
-    addNewChoice: function() {
+    addChoice: function() {
+      const choiceRowId = Helpers.createUUID()
       this.choiceRows.push({
-        id: this.nextChoiceRowId++,
-        imageUrl: "",
-        value: "",
+        ...Helpers.deepCopy(defaultChoice),
+        id: choiceRowId,
       })
+      // TODO: Fix this as this line doesn't seem to work
+      this.$nextTick(() => this.$refs["choice-row-" + choiceRowId][0].$el.focus())
     },
-    removeChoiceRow: function(index, item) {
+    removeChoice: function(index, item) {
       this.multipleChoice.choices.splice(index, 1)
       for (let i = 0; i < this.preSelectedOptions.length; i++) {
         if (item.id === this.preSelectedOptions[i]) {
@@ -167,13 +141,25 @@ export default {
 </script>
 
 <style lang="scss">
-.add-button {
-  margin-top: 10px;
-  margin-left: 30px;
+ul.list {
+  margin-bottom: 0;
 }
-.message {
-  font-size: 15px;
-  color: #6c757d;
-  margin-top: 10px;
+</style>
+<style lang="scss" scoped>
+.after-choices {
+  padding-left: 30px;
+  padding-right: 0;
+
+  .add-button {
+    float: right;
+  }
+  .tick-instructions {
+    margin-left: 17px;
+
+    &::before {
+      font-weight: bold;
+      content: "↑ ";
+    }
+  }
 }
 </style>
