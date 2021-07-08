@@ -24,6 +24,7 @@
         v-if="node.mediaType === 'multi-content'"
         :node="node"
         :row-id="rowId"
+        :class="{ 'tyde-mode': tydeModeEnabled }"
         :sub-row-id="subRowId"
         @close="handleAutoClose"
         @complete="complete"
@@ -349,6 +350,6 @@ body.tapestry-lightbox-open {
 }
 
 .tyde-mode {
-  padding-top: 3rem;
+  padding-top: 6rem;
 }
 </style>

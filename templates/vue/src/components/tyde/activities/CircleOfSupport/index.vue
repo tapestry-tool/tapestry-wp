@@ -127,9 +127,11 @@ export default {
   --cos-border: 3px solid var(--cos-color-secondary);
 
   border: var(--cos-border);
-  height: 700px;
+  height: 75vh;
+  width: 90vw;
   position: relative;
-  top: 50%;
+  margin: 0 auto;
+  top: 55%;
   -ms-transform: translateY(-50%);
   transform: translateY(-50%);
   overflow: hidden;
