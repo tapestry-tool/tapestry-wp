@@ -55,7 +55,7 @@ export default {
   width: 100%;
   z-index: 9999;
   position: fixed !important;
-  top: 20px;
+  top: 40px;
   left: auto;
 }
 .navbar {
