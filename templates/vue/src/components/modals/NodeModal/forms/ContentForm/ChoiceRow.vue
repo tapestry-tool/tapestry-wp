@@ -2,14 +2,11 @@
   <b-row class="choice-container">
     <span v-handle class="fas fa-bars fa-s" style="margin-right: 1em;"></span>
     <div class="input-container">
-      <b-input-group :class="{ 'use-images': useImages }">
+      <b-input-group :class="{ 'use-image': useImage }">
         <b-input-group-prepend is-text>
-          <b-form-checkbox
-            :value="item.id"
-            :disabled="isDisabled && selectedRadioChoice != item.id"
-          />
+          <b-form-checkbox :value="item.id" :disabled="isDisabled" />
           <file-upload
-            v-if="useImages"
+            v-if="useImage"
             v-model="item.imageUrl"
             input-test-id="node-choiceRow-thumbnail-url"
             :data-qa="`choice-row-thumbnail-${item.id}`"
@@ -22,15 +19,15 @@
         </b-input-group-prepend>
         <b-form-input
           v-model="item.value"
+          placeholder="Enter choice text"
           class="form-input"
-          :class="{ 'm-2': useImages }"
-          :placeholder="placeholder"
+          :class="{ 'm-2': useImage }"
           :data-qa="`choice-row-input-${item.id}`"
           @keyup.enter="$emit('add')"
         ></b-form-input>
         <b-input-group-append>
           <b-button
-            :disabled="removeButtonDisabled"
+            :disabled="!isRemovable"
             variant="danger"
             @click="$emit('remove')"
           >
@@ -52,29 +49,12 @@ export default {
   directives: { handle: HandleDirective },
   mixins: [ElementMixin],
   props: {
-    multipleChoice: {
-      type: Object,
-      required: true,
-    },
-    allowSelectMultiple: {
-      type: Boolean,
-      required: true,
-    },
-    index: {
-      type: Number,
-      required: true,
-    },
-    placeholder: {
-      type: String,
-      required: false,
-      default: "",
-    },
-    useImages: {
-      type: Boolean,
-      required: true,
-    },
     item: {
       type: Object,
+      required: true,
+    },
+    useImage: {
+      type: Boolean,
       required: true,
     },
     isDisabled: {
@@ -82,15 +62,10 @@ export default {
       required: false,
       default: false,
     },
-    selectedRadioChoice: {
-      type: Number,
-      required: false,
-      default: 0,
-    },
-    removeButtonDisabled: {
+    isRemovable: {
       type: Boolean,
       required: false,
-      default: false,
+      default: true,
     },
   },
   methods: {
@@ -108,7 +83,7 @@ export default {
 .input-group {
   background: #eceef1;
 
-  &.use-images {
+  &.use-image {
     border: solid 1px #ccc;
     border-radius: 5px;
     border-color: #9c7e81;

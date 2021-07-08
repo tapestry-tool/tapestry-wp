@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-form-group>
+    <b-form-group class="mt-3">
       <b-form-checkbox
         v-model="allowSelectMultiple"
         data-qa="question-answer-multipleChoice-multipleAnswer"
@@ -27,15 +27,15 @@
             :ref="`choice-row-${choiceRow.id}`"
             :data-qa="`choice-row-${choiceRow.id}`"
             class="choice-row mt-2"
-            :item="choiceRow"
-            placeholder="Enter choice text"
             :index="index"
-            :multiple-choice="multipleChoice"
-            :allow-select-multiple="allowSelectMultiple"
-            :use-images="useImages"
-            :is-disabled="!allowSelectMultiple && preSelectedOptions.length > 0"
-            :selected-radio-choice="preSelectedOptions[0]"
-            :remove-button-disabled="choiceRows.length <= 2"
+            :item="choiceRow"
+            :use-image="useImages"
+            :is-disabled="
+              !allowSelectMultiple &&
+                preSelectedOptions.length > 0 &&
+                preSelectedOptions[0] != choiceRow.id
+            "
+            :is-removable="choiceRows.length > 2"
             @remove="removeChoice(index, choiceRow)"
             @add="addChoice"
           ></choice-row>
@@ -47,7 +47,7 @@
         </b-button>
         <p class="tick-instructions text-muted">
           &nbsp;Select choices that should be selected by default when posing this
-          question
+          question.
         </p>
       </b-container>
     </b-form-group>

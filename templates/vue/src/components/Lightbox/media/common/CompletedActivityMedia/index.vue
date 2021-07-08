@@ -13,7 +13,7 @@
         <ul>
           <li v-for="answer in answerData" :key="answer.index">
             <completed-multiple-choice-item
-              :item="getMultipleChoiceOptionObject(answer)"
+              :item="getMultipleChoiceAnswerItem(answer)"
               :useImages="question.answerTypes.multipleChoice.useImages"
             />
           </li>
@@ -56,7 +56,7 @@ export default {
     },
   },
   methods: {
-    getMultipleChoiceOptionObject(id) {
+    getMultipleChoiceAnswerItem(id) {
       return this.question.answerTypes.multipleChoice.choices.find(
         option => option.id === id
       )
