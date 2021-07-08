@@ -141,29 +141,7 @@ class TapestryUserProgress implements ITapestryUserProgress
     {
         return $this->_getAvatar();
     }
-
-    /**
-     * Get all gravity form entries submitted by this user.
-     *
-     * @return string user entries in json format
-     */
-    public function getUserEntries($userId = 0, $formId = 0)
-    {
-        if (!class_exists('GFAPI')) {
-            return [];
-        }
-        if (!$userId) {
-            $userId = $this->_userId;
-        }
-        $search_criteria['field_filters'][] = [
-            'key' => 'created_by',
-            'value' => $userId,
-        ];
-        $entries = GFAPI::get_entries($formId, $search_criteria);
-
-        return $this->_formatEntries($entries);
-    }
-
+        
     public function isCompleted($nodeId, $userId)
     {
         $nodeMetadata = get_metadata_by_mid('post', $nodeId)->meta_value;

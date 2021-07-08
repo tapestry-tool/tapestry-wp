@@ -220,13 +220,6 @@ $REST_API_ENDPOINTS = [
             'callback' => 'updateUserAvatar',
         ],
     ],
-    'GET_USER_AUDIO' => (object) [
-        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/audio/(?P<questionId>[\d]+)',
-        'ARGUMENTS' => [
-            'methods' => $REST_API_GET_METHOD,
-            'callback' => 'getUserAudio',
-        ],
-    ],
     'POST_USER_AUDIO' => (object) [
         'ROUTE' => 'users/activity/audio/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)',
         'ARGUMENTS' => [
