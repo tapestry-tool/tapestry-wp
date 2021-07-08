@@ -99,9 +99,6 @@ export default {
     hasPrev() {
       return this.activeQuestionIndex !== 0
     },
-    performDyadNodeCheck() {
-      return wp.getCurrentUser().roles.includes("youth") || !this.node.isDyad
-    },
   },
   mounted() {
     this.$emit("change:dimensions", {
@@ -161,6 +158,9 @@ export default {
     close() {
       client.recordAnalyticsEvent("user", "close", "activity", this.node.id)
       this.$emit("close")
+    },
+    performDyadNodeCheck() {
+      return wp.getCurrentUser().roles.includes("youth") || !this.node.isDyad
     },
   },
 }
