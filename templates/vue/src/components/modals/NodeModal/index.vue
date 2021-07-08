@@ -936,11 +936,17 @@ export default {
           let listQuestion = this.node.typeData.activity.questions[0].answerTypes
             .text.list
           let minValue = parseInt(listQuestion.minFields, 10)
+          if (!Number.isInteger(minValue)) {
+            errMsgs.push("Minimum number of fields must be an integer value")
+          }
           if (minValue < 1) {
             errMsgs.push("Minimum number of fields for list activity must be >= 1")
           }
           if (listQuestion.maxFields.enabled) {
             let maxValue = parseInt(listQuestion.maxFields.value, 10)
+            if (!Number.isInteger(maxValue)) {
+              errMsgs.push("Maximum number of fields must be an integer value")
+            }
             if (maxValue < minValue) {
               errMsgs.push(
                 "Maximum number of fields for list activity must be >= minimum number fields"

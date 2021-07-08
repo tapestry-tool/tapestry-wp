@@ -42,7 +42,7 @@
       :placeholder="question.answerTypes.text.placeholder"
     ></b-form-input>
     <b-form-invalid-feedback :state="isAnswerValid">
-      Please enter a response.
+      Please enter a response for all inputs.
     </b-form-invalid-feedback>
     <div>
       <b-button class="submit-btn" variant="primary" @click="handleTextSubmit">
@@ -99,7 +99,7 @@ export default {
   methods: {
     handleTextSubmit(event) {
       event.preventDefault()
-      this.isAnswerValid = this.textAnswers[0] !== ""
+      this.isAnswerValid = this.textAnswers.every(answer => answer !== "")
       if (this.isAnswerValid) {
         this.$emit("submit", this.textAnswers)
       }
