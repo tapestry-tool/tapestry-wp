@@ -197,7 +197,7 @@ export default {
 </script>
 
 <style scoped>
-.addButton {
+.add-button {
   margin-top: 20px;
 }
 </style>

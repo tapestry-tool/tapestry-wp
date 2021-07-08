@@ -1,6 +1,6 @@
 <template>
-  <div class="fromBucketContainer" :data-qa="`user-from-bucket-${bucket.id}`">
-    <b class="bucketLabel">{{ bucket.value }}</b>
+  <div class="from-bucket-container" :data-qa="`user-from-bucket-${bucket.id}`">
+    <b class="bucket-label">{{ bucket.value }}</b>
     <completed-activity-drag-drop-bucket-item
       v-for="item in bucket.itemArray"
       :key="item.id"
@@ -17,20 +17,20 @@ export default {
     CompletedActivityDragDropBucketItem,
   },
   props: {
-    bucket: {
-      type: Object,
-      required: true,
-    },
     question: {
       type: Object,
       required: false,
       default: () => ({}),
     },
+    bucket: {
+      type: Object,
+      required: true,
+    },
   },
 }
 </script>
 <style scoped>
-.fromBucketContainer {
+.from-bucket-container {
   background-color: #009688;
   margin-bottom: 15px;
   width: 80px;
@@ -38,7 +38,7 @@ export default {
   border-radius: 25px;
   overflow-wrap: break-word;
 }
-.bucketLabel {
+.bucket-label {
   font-size: 23px;
 }
 </style>

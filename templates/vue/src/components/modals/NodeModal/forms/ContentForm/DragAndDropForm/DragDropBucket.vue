@@ -17,13 +17,13 @@
       </b-form-group>
       <b-button
         v-if="isFromBucket"
-        class="addButton"
+        class="add-button"
         variant="primary"
         squared
         :data-qa="`add-bucket-item-button-${bucket.id}`"
         @click="$emit('add')"
       >
-        Add a item
+        Add item
       </b-button>
     </b-form-group>
     <b-form-group>
@@ -107,11 +107,7 @@ export default {
   },
   computed: {
     bucketClass() {
-      if (this.isFromBucket) {
-        return "fromBucketContainer"
-      } else {
-        return "toBucketContainer"
-      }
+      return this.isFromBucket ? "from-bucket-container" : "to-bucket-container"
     },
     removeButtonItemPresent() {
       return this.bucket.itemArray.length > 1
@@ -131,14 +127,14 @@ export default {
   display: flex;
   align-items: center;
 }
-.fromBucketContainer {
+.from-bucket-container {
   background-color: #e0f2f1;
   margin-bottom: 15px;
   border-radius: 15px;
   margin-left: -15px;
   min-height: 200px;
 }
-.toBucketContainer {
+.to-bucket-container {
   background-color: #e8eaf6;
   min-height: 200px;
   margin-bottom: 15px;

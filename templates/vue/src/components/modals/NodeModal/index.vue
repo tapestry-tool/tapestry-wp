@@ -971,8 +971,7 @@ export default {
         }
         const validFromBucketItemImage = questionsWithDragDropEnabled.every(
           question => {
-            const dragDropUseImages = question.answerTypes.dragDrop.useImages
-            if (dragDropUseImages) {
+            if (question.answerTypes.dragDrop.useImages) {
               return question.answerTypes.dragDrop.fromBucketArray.every(
                 fromBucket => {
                   return fromBucket.itemArray.every(fromBucketItem => {

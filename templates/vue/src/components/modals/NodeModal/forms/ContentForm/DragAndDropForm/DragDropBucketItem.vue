@@ -80,15 +80,6 @@ export default {
       nextFromBucketId: 2,
     }
   },
-  computed: {
-    bucketClass() {
-      if (this.isFromBucket) {
-        return "fromBucketContainer"
-      } else {
-        return "toBucketContainer"
-      }
-    },
-  },
   methods: {
     handleUploadChange(state) {
       this.$root.$emit("node-modal::uploading", state)

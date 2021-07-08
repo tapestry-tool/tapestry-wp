@@ -9,8 +9,6 @@
           :node="node"
           :question="question"
           :bucket="bucket"
-          :fromBucketArray="question.answerTypes.dragDrop.fromBucketArray"
-          :toBucketArray="question.answerTypes.dragDrop.toBucketArray"
           :isFromBucket="true"
         />
       </b-col>
@@ -22,15 +20,13 @@
           :node="node"
           :question="question"
           :bucket="bucket"
-          :fromBucketArray="question.answerTypes.dragDrop.fromBucketArray"
-          :toBucketArray="question.answerTypes.dragDrop.toBucketArray"
           :isFromBucket="false"
         />
       </b-col>
     </b-row>
 
     <b-form-invalid-feedback :state="isAnswerValid">
-      Please drag a item to a "to bucket"
+      Please complete this question to continue
     </b-form-invalid-feedback>
     <p>
       <b-button
@@ -52,11 +48,11 @@ export default {
     DragDropQuestionBucket,
   },
   props: {
-    question: {
+    node: {
       type: Object,
       required: true,
     },
-    node: {
+    question: {
       type: Object,
       required: true,
     },
@@ -75,12 +71,7 @@ export default {
   },
   computed: {
     toBucketValidAnswerState() {
-      for (let i = 0; i < this.toBucketArray.length; i++) {
-        if (this.toBucketArray[i].itemArray.length > 0) {
-          return true
-        }
-      }
-      return false
+      return this.toBucketArray.some(bucket => bucket.itemArray.length > 0)
     },
   },
   watch: {

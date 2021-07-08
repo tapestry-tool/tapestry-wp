@@ -40,13 +40,6 @@ export default {
     },
   },
   computed: {
-    bucketClass() {
-      if (this.isFromBucket) {
-        return "fromBucketContainer"
-      } else {
-        return "toBucketContainer"
-      }
-    },
     hasImage() {
       return this.question.answerTypes.dragDrop.useImages
     },
