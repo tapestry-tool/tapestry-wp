@@ -28,7 +28,7 @@
         <b-input-group-append>
           <b-button
             :disabled="!isRemovable"
-            variant="danger"
+            :variant="isRemovable ? 'danger' : 'secondary'"
             @click="$emit('remove')"
           >
             X

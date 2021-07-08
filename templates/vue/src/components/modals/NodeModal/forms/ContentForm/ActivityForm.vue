@@ -217,8 +217,8 @@ const defaultQuestion = {
       enabled: false,
       allowSelectMultiple: false,
       useImages: false,
+      choices: [],
       preSelectedOptions: [],
-      choiceRows: [],
     },
   },
   confirmation: {
@@ -259,6 +259,9 @@ export default {
       this.node.typeData.activity = {
         questions: [],
       }
+    }
+    if (!this.node.typeData.activity.questions.length) {
+      this.addQuestion()
     }
   },
   methods: {

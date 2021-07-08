@@ -15,28 +15,28 @@
     </b-form-group>
     <b-form-group>
       <sortable-list
-        v-model="choiceRows"
+        v-model="choices"
         lock-axis="y"
         :use-drag-handle="true"
         @input="updateChoicesOrdering"
       >
         <b-form-checkbox-group v-model="preSelectedOptions">
           <choice-row
-            v-for="(choiceRow, index) in choiceRows"
-            :key="choiceRow.id"
-            :ref="`choice-row-${choiceRow.id}`"
-            :data-qa="`choice-row-${choiceRow.id}`"
+            v-for="(choice, index) in choices"
+            :key="choice.id"
+            :ref="`choice-row-${choice.id}`"
+            :data-qa="`choice-row-${choice.id}`"
             class="choice-row mt-2"
             :index="index"
-            :item="choiceRow"
+            :item="choice"
             :use-image="useImages"
             :is-disabled="
               !allowSelectMultiple &&
                 preSelectedOptions.length > 0 &&
-                preSelectedOptions[0] != choiceRow.id
+                preSelectedOptions[0] != choice.id
             "
-            :is-removable="choiceRows.length > 2"
-            @remove="removeChoice(index, choiceRow)"
+            :is-removable="choices.length > 2"
+            @remove="removeChoice(index, choice)"
             @add="addChoice"
           ></choice-row>
         </b-form-checkbox-group>
@@ -64,6 +64,8 @@ const defaultChoice = {
   value: "",
 }
 
+const minNumOfChoices = 2
+
 const SortableList = {
   mixins: [ContainerMixin],
   template: `
@@ -86,10 +88,10 @@ export default {
   },
   data() {
     return {
-      preSelectedOptions: [],
       allowSelectMultiple: false,
       useImages: false,
-      choiceRows: [],
+      choices: [],
+      preSelectedOptions: [],
     }
   },
   watch: {
@@ -99,8 +101,8 @@ export default {
         this.preSelectedOptions = [this.preSelectedOptions[0]]
       }
     },
-    choiceRows(newChoiceRows) {
-      this.multipleChoice.choices = newChoiceRows
+    choices(newChoices) {
+      this.multipleChoice.choices = newChoices
     },
     useImages(newUseImages) {
       this.multipleChoice.useImages = newUseImages
@@ -111,19 +113,22 @@ export default {
   },
   created() {
     this.allowSelectMultiple = this.multipleChoice.allowSelectMultiple
-    this.choiceRows = this.multipleChoice.choices
+    this.choices = this.multipleChoice.choices
+    while (this.choices.length < minNumOfChoices) {
+      this.addChoice()
+    }
     this.useImages = this.multipleChoice.useImages
     this.preSelectedOptions = this.multipleChoice.preSelectedOptions
   },
   methods: {
     addChoice: function() {
-      const choiceRowId = Helpers.createUUID()
-      this.choiceRows.push({
+      const choiceId = Helpers.createUUID()
+      this.choices.push({
         ...Helpers.deepCopy(defaultChoice),
-        id: choiceRowId,
+        id: choiceId,
       })
       // TODO: Fix this as this line doesn't seem to work
-      this.$nextTick(() => this.$refs["choice-row-" + choiceRowId][0].$el.focus())
+      this.$nextTick(() => this.$refs["choice-row-" + choiceId][0].$el.focus())
     },
     removeChoice: function(index, item) {
       this.multipleChoice.choices.splice(index, 1)
