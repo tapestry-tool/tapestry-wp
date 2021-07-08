@@ -16,7 +16,7 @@
           :active="tab === 'avatar'"
           @click="$emit('change:tab', 'avatar')"
         ></b-tab>
-        <avatar-form ref="AvatarForm"></avatar-form>
+        <avatar-form ref="AvatarForm" :preferences="avatar"></avatar-form>
       </b-tabs>
     </b-container>
     <template slot="modal-footer">
@@ -39,6 +39,7 @@
 <script>
 import DragSelectModular from "@/utils/dragSelectModular"
 import AvatarForm from "./AvatarForm"
+import { mapState } from "vuex"
 
 export default {
   name: "user-settings-modal",
@@ -55,6 +56,9 @@ export default {
       required: false,
       default: "",
     },
+  },
+  computed: {
+    ...mapState(["avatar"]),
   },
   mounted() {
     this.$root.$on("bv::modal::show", (_, modalId) => {

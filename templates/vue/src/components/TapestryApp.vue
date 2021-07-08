@@ -3,7 +3,7 @@
     <toolbar style="margin-bottom: 100px;" />
     <b-modal id="avatar-modal" size="xl" :visible="!hasAvatar && avatarsEnabled">
       <b-container class="avatar-container">
-        <avatar-form ref="AvatarForm" />
+        <avatar-form ref="AvatarForm" :preferences="avatar" />
       </b-container>
       <template slot="modal-footer">
         <b-button size="sm" variant="secondary" @click="cancel">

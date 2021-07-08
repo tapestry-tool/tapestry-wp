@@ -7,21 +7,22 @@
         </div>
         <div class="avatar">
           <avataaars
-            :isCircle="isCircle"
-            :circleColor="circleColor"
-            :accessoriesType="accessoriesType"
-            :clotheType="clotheType"
-            :clotheColor="clotheColor"
-            :eyebrowType="eyebrowType"
-            :eyeType="eyeType"
-            :facialHairColor="facialHairColor"
-            :facialHairType="facialHairType"
-            :graphicType="graphicType"
-            :hairColor="hairColor"
-            :mouthType="mouthType"
-            :skinColor="skinColor"
-            :topType="topType"
-            :topColor="topColor"
+            v-if="hasAvatar"
+            :isCircle="userAvatar.isCircle"
+            :circleColor="userAvatar.circleColor"
+            :accessoriesType="userAvatar.accessoriesType"
+            :clotheType="userAvatar.clotheType"
+            :clotheColor="userAvatar.clotheColor"
+            :eyebrowType="userAvatar.eyebrowType"
+            :eyeType="userAvatar.eyeType"
+            :facialHairColor="userAvatar.facialHairColor"
+            :facialHairType="userAvatar.facialHairType"
+            :graphicType="userAvatar.graphicType"
+            :hairColor="userAvatar.hairColor"
+            :mouthType="userAvatar.mouthType"
+            :skinColor="userAvatar.skinColor"
+            :topType="userAvatar.topType"
+            :topColor="userAvatar.topColor"
           ></avataaars>
         </div>
       </div>
@@ -32,18 +33,18 @@
               <b-card-text>
                 <b-form-group label="Background Shape" label-for="input-horizontal">
                   <b-form-select
-                    v-model="isCircle"
+                    v-model="userAvatar.isCircle"
                     :options="isCircleOptions"
                     data-qa="avatar-background-select"
                   ></b-form-select>
                 </b-form-group>
                 <b-form-group
-                  v-if="isCircle"
+                  v-if="userAvatar.isCircle"
                   label="Circle Colour"
                   label-for="input-horizontal"
                 >
                   <b-form-select
-                    v-model="circleColor"
+                    v-model="userAvatar.circleColor"
                     :options="circleColorOptions"
                   ></b-form-select>
                 </b-form-group>
@@ -53,26 +54,26 @@
               <b-card-text>
                 <b-form-group label="Skin Colour" label-for="input-horizontal">
                   <b-form-select
-                    v-model="skinColor"
+                    v-model="userAvatar.skinColor"
                     :options="skinColorOptions"
                   ></b-form-select>
                 </b-form-group>
                 <b-form-group label="Eyebrow Type" label-for="input-horizontal">
                   <b-form-select
-                    v-model="eyebrowType"
+                    v-model="userAvatar.eyebrowType"
                     :options="eyebrowTypeOptions"
                     data-qa="avatar-eyebrow-select"
                   ></b-form-select>
                 </b-form-group>
                 <b-form-group label="Eye Type" label-for="input-horizontal">
                   <b-form-select
-                    v-model="eyeType"
+                    v-model="userAvatar.eyeType"
                     :options="eyeTypeOptions"
                   ></b-form-select>
                 </b-form-group>
                 <b-form-group label="Mouth Type" label-for="input-horizontal">
                   <b-form-select
-                    v-model="mouthType"
+                    v-model="userAvatar.mouthType"
                     :options="mouthTypeOptions"
                   ></b-form-select>
                 </b-form-group>
@@ -82,26 +83,26 @@
               <b-card-text>
                 <b-form-group label="Hair Type" label-for="input-horizontal">
                   <b-form-select
-                    v-model="topType"
+                    v-model="userAvatar.topType"
                     :options="topTypeOptions"
                     data-qa="avatar-hair-select"
                   ></b-form-select>
                 </b-form-group>
                 <b-form-group label="Hair Colour" label-for="input-horizontal">
                   <b-form-select
-                    v-model="hairColor"
+                    v-model="userAvatar.hairColor"
                     :options="hairColorOptions"
                   ></b-form-select>
                 </b-form-group>
                 <b-form-group label="Hat Colour" label-for="input-horizontal">
                   <b-form-select
-                    v-model="topColor"
+                    v-model="userAvatar.topColor"
                     :options="topColorOptions"
                   ></b-form-select>
                 </b-form-group>
                 <b-form-group label="Facial Hair Type" label-for="input-horizontal">
                   <b-form-select
-                    v-model="facialHairType"
+                    v-model="userAvatar.facialHairType"
                     :options="facialHairTypeOptions"
                   ></b-form-select>
                 </b-form-group>
@@ -110,7 +111,7 @@
                   label-for="input-horizontal"
                 >
                   <b-form-select
-                    v-model="facialHairColor"
+                    v-model="userAvatar.facialHairColor"
                     :options="facialHairColorOptions"
                   ></b-form-select>
                 </b-form-group>
@@ -120,30 +121,30 @@
               <b-card-text>
                 <b-form-group label="Glasses" label-for="input-horizontal">
                   <b-form-select
-                    v-model="accessoriesType"
+                    v-model="userAvatar.accessoriesType"
                     :options="accessoriesTypeOptions"
                     data-qa="avatar-glasses-select"
                   ></b-form-select>
                 </b-form-group>
                 <b-form-group label="Clothing Type" label-for="input-horizontal">
                   <b-form-select
-                    v-model="clotheType"
+                    v-model="userAvatar.clotheType"
                     :options="clotheTypeOptions"
                   ></b-form-select>
                 </b-form-group>
                 <b-form-group
-                  v-if="clotheType == 'GraphicShirt'"
+                  v-if="userAvatar.clotheType == 'GraphicShirt'"
                   label="T-Shirt Graphics"
                   label-for="input-horizontal"
                 >
                   <b-form-select
-                    v-model="graphicType"
+                    v-model="userAvatar.graphicType"
                     :options="graphicTypeOptions"
                   ></b-form-select>
                 </b-form-group>
                 <b-form-group label="Clothing Colour" label-for="input-horizontal">
                   <b-form-select
-                    v-model="clotheColor"
+                    v-model="userAvatar.clotheColor"
                     :options="clotheColorOptions"
                   ></b-form-select>
                 </b-form-group>
@@ -159,7 +160,7 @@
 <script>
 import Avataaars from "vuejs-avataaars"
 import avatarOptions from "./avatarOptions"
-import { mapActions, mapState } from "vuex"
+import { mapActions } from "vuex"
 
 export default {
   name: "avatar-form",
@@ -167,7 +168,7 @@ export default {
     Avataaars,
   },
   props: {
-    avatarPreferences: {
+    preferences: {
       type: Object,
       required: false,
       default: () => {},
@@ -175,21 +176,7 @@ export default {
   },
   data() {
     return {
-      isCircle: true,
-      circleColor: "#6fb8e0",
-      topType: "NoHair",
-      accessoriesType: "Blank",
-      facialHairType: "Blank",
-      clotheType: "ShirtCrewNeck",
-      eyeType: "Default",
-      eyebrowType: "Default",
-      mouthType: "Default",
-      skinColor: "Tanned",
-      graphicType: "Bat",
-      hairColor: "Black",
-      facialHairColor: "Black",
-      clotheColor: "Black",
-      topColor: "Black",
+      userAvatar: {},
       isCircleOptions: avatarOptions.isCircleOptions,
       circleColorOptions: avatarOptions.circleColorOptions,
       accessoriesTypeOptions: avatarOptions.accessoriesTypeOptions,
@@ -208,49 +195,37 @@ export default {
     }
   },
   computed: {
-    ...mapState(["avatar"]),
+    hasAvatar() {
+      return !(!this.userAvatar || Object.keys(this.userAvatar).length === 0)
+    },
   },
-  mounted() {
-    this.setExistingAvatar()
+  created() {
+    if (!this.preferences || Object.keys(this.preferences).length === 0) {
+      this.userAvatar = {
+        isCircle: true,
+        circleColor: "#6fb8e0",
+        topType: "NoHair",
+        accessoriesType: "Blank",
+        facialHairType: "Blank",
+        clotheType: "ShirtCrewNeck",
+        eyeType: "Default",
+        eyebrowType: "Default",
+        mouthType: "Default",
+        skinColor: "Tanned",
+        graphicType: "Bat",
+        hairColor: "Black",
+        facialHairColor: "Black",
+        clotheColor: "Black",
+        topColor: "Black",
+      }
+    } else {
+      this.userAvatar = { ...this.preferences }
+    }
   },
   methods: {
     ...mapActions(["updateAvatar"]),
-    setExistingAvatar() {
-      if (!this.avatar || Object.keys(this.avatar).length === 0) return
-      this.isCircle = this.avatar.isCircle
-      this.circleColor = this.avatar.circleColor
-      this.accessoriesType = this.avatar.accessoriesType
-      this.clotheType = this.avatar.clotheType
-      this.clotheColor = this.avatar.clotheColor
-      this.eyebrowType = this.avatar.eyebrowType
-      this.eyeType = this.avatar.eyeType
-      this.facialHairColor = this.avatar.facialHairColor
-      this.facialHairType = this.avatar.facialHairType
-      this.graphicType = this.avatar.graphicType
-      this.hairColor = this.avatar.hairColor
-      this.mouthType = this.avatar.mouthType
-      this.skinColor = this.avatar.skinColor
-      this.topType = this.avatar.topType
-      this.topColor = this.avatar.topColor
-    },
     saveAvatar() {
-      const newAvatar = {}
-      newAvatar.isCircle = this.isCircle
-      newAvatar.circleColor = this.circleColor
-      newAvatar.accessoriesType = this.accessoriesType
-      newAvatar.clotheType = this.clotheType
-      newAvatar.clotheColor = this.clotheColor
-      newAvatar.eyebrowType = this.eyebrowType
-      newAvatar.eyeType = this.eyeType
-      newAvatar.facialHairColor = this.facialHairColor
-      newAvatar.facialHairType = this.facialHairType
-      newAvatar.graphicType = this.graphicType
-      newAvatar.hairColor = this.hairColor
-      newAvatar.mouthType = this.mouthType
-      newAvatar.skinColor = this.skinColor
-      newAvatar.topType = this.topType
-      newAvatar.topColor = this.topColor
-      this.updateAvatar(newAvatar)
+      this.updateAvatar(this.userAvatar)
     },
   },
 }
