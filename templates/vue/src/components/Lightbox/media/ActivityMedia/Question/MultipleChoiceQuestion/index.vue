@@ -6,9 +6,10 @@
         v-model="userSelection"
       >
         <multiple-choice-question-item
-          v-for="choice in question.answerTypes.multipleChoice.choices"
+          v-for="(choice, index) in question.answerTypes.multipleChoice.choices"
           :key="choice.id"
           :item="choice"
+          :index="index"
           :isCheckBox="allowSelectMultiple"
           :hasImage="question.answerTypes.multipleChoice.useImages"
           :data-qa="`multiple-choice-question-${choice.id}`"

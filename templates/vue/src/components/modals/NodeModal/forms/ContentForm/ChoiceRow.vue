@@ -22,7 +22,7 @@
           placeholder="Enter choice text"
           class="form-input"
           :class="{ 'm-2': useImage }"
-          :data-qa="`choice-row-input-${item.id}`"
+          :data-qa="`choice-row-input-${index}`"
           @keyup.enter="$emit('add')"
         ></b-form-input>
         <b-input-group-append>
@@ -51,6 +51,10 @@ export default {
   props: {
     item: {
       type: Object,
+      required: true,
+    },
+    index: {
+      type: Number,
       required: true,
     },
     useImage: {

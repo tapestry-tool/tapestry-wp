@@ -7,7 +7,7 @@ describe("Activity", () => {
       cy.openModal("edit", node.id)
       cy.changeMediaType("activity")
       cy.contains(/add question/i).click()
-      const question = `Select all numbers less than 3?`
+      const question = `Select all numbers less than 3`
 
       cy.contains(/question text/i).click()
       cy.focused().type(question)
@@ -24,6 +24,7 @@ describe("Activity", () => {
         .getByTestId(`choice-row-input-2`)
         .click()
         .type("2")
+      cy.getByTestId(`add-choice-button`).click()
       cy.getByTestId(`choice-row-3`)
         .getByTestId(`choice-row-input-3`)
         .click()
@@ -32,7 +33,7 @@ describe("Activity", () => {
       cy.submitModal()
       cy.openLightbox(node.id)
 
-      cy.route("POST", "**/quiz*").as("submit")
+      cy.route("POST", "/users/activity/**").as("submit")
 
       cy.lightbox().within(() => {
         cy.getByTestId(`multiple-choice-question-1`)
@@ -63,9 +64,6 @@ describe("Activity", () => {
       cy.contains(/question text/i).click()
       cy.focused().type(question)
       cy.getByTestId("question-answer-multipleChoice-0").click({ force: true })
-      cy.getByTestId("question-answer-multipleChoice-singleAnswer").click({
-        force: true,
-      })
       cy.getByTestId(`choice-row-1`)
         .getByTestId(`choice-row-input-1`)
         .click()
@@ -74,6 +72,7 @@ describe("Activity", () => {
         .getByTestId(`choice-row-input-2`)
         .click()
         .type("90")
+      cy.getByTestId(`add-choice-button`).click()
       cy.getByTestId(`choice-row-3`)
         .getByTestId(`choice-row-input-3`)
         .click()
@@ -82,7 +81,7 @@ describe("Activity", () => {
       cy.submitModal()
       cy.openLightbox(node.id)
 
-      cy.route("POST", "**/quiz*").as("submit")
+      cy.route("POST", "/users/activity/**").as("submit")
 
       cy.lightbox().within(() => {
         cy.getByTestId(`multiple-choice-question-3`)

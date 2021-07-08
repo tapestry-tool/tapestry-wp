@@ -25,7 +25,7 @@
             v-for="(choice, index) in choices"
             :key="choice.id"
             :ref="`choice-row-${choice.id}`"
-            :data-qa="`choice-row-${choice.id}`"
+            :data-qa="`choice-row-${index}`"
             class="choice-row mt-2"
             :index="index"
             :item="choice"
@@ -42,7 +42,12 @@
         </b-form-checkbox-group>
       </sortable-list>
       <b-container class="after-choices mt-2">
-        <b-button class="add-button" variant="primary" @click="addChoice">
+        <b-button
+          class="add-button"
+          data-qa="add-choice-button"
+          variant="primary"
+          @click="addChoice"
+        >
           + Add choice
         </b-button>
         <p class="tick-instructions text-muted">
