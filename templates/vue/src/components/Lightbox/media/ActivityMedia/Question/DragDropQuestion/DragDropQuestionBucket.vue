@@ -29,21 +29,21 @@ export default {
     DragDropQuestionBucketItem,
   },
   props: {
+    node: {
+      type: Object,
+      required: true,
+    },
     question: {
       type: Object,
       required: true,
     },
-    node: {
+    bucket: {
       type: Object,
       required: true,
     },
     isFromBucket: {
       type: Boolean,
       required: false,
-    },
-    bucket: {
-      type: Object,
-      required: true,
     },
   },
   computed: {
