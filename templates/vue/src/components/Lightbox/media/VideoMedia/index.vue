@@ -178,7 +178,11 @@ export default {
       const popups = this.getDirectChildren(this.node.id)
         .map(this.getNode)
         .filter(child => child.popup != null)
-        .map(child => ({ time: child.popup.time, id: child.id, progress: child.progress }))
+        .map(child => ({
+          time: child.popup.time,
+          id: child.id,
+          progress: child.progress,
+        }))
       popups.sort((a, b) => a.time - b.time)
       return popups
     },
@@ -347,11 +351,11 @@ export default {
       }
       this.completeNode(this.activePopupId)
     },
-    handleVideoComplete(nodeId){
-      if(this.popups.every( popUpNode => popUpNode.progress)) {
-        this.$emit('complete', nodeId)
+    handleVideoComplete(nodeId) {
+      if (this.popups.every(popUpNode => popUpNode.progress)) {
+        this.$emit("complete", nodeId)
       }
-    }
+    },
   },
 }
 </script>

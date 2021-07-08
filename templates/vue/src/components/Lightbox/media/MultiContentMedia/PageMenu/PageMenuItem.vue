@@ -69,13 +69,16 @@ export default {
   computed: {
     ...mapGetters(["getDirectChildren", "getNode", "isMultiContent"]),
     rows() {
-      return this.node.childOrdering.map(id => {
-        const node = this.getNode(id)
-        const children = this.isMultiContent(node.id)
-          ? node.childOrdering.map(this.getNode)
-          : this.getDirectChildren(id).map(this.getNode)
-        return { node, children }
-      })
+      return this.node.childOrdering
+        .map(id => {
+          const node = this.getNode(id)
+          let children = this.isMultiContent(node.id)
+            ? node.childOrdering.map(this.getNode)
+            : this.getDirectChildren(id).map(this.getNode)
+          children = children.filter(node => node.popup === null)
+          return { node, children }
+        })
+        .filter(row => row.node.popup === null)
     },
     contentHovered() {
       return this.node.id === this.$route.query.row
