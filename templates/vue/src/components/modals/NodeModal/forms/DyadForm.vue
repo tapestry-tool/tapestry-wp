@@ -14,7 +14,7 @@
 
 <script>
 export default {
-  name: "conditions-form",
+  name: "dyad-form",
   props: {
     node: {
       type: Object,
