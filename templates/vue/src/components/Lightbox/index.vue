@@ -19,7 +19,7 @@
     ></navbar>
     <circle-of-support v-if="selectedTab === 'cos'" />
 
-    <span v-if="isNodeView">
+    <template v-if="isNodeView">
       <multi-content-media
         v-if="node.mediaType === 'multi-content'"
         :node="node"
@@ -33,6 +33,7 @@
         :node="node"
         :rowRefs="rowRefs"
         :dimensions="dimensions"
+        :full-screen="tydeModeEnabled"
       />
       <tapestry-media
         v-if="node.mediaType !== 'multi-content'"
@@ -45,7 +46,7 @@
         @complete="complete"
         @change:dimensions="updateDimensions"
       />
-    </span>
+    </template>
   </tapestry-modal>
 </template>
 
@@ -338,7 +339,6 @@ body.tapestry-lightbox-open {
 #lightbox {
   &.full-screen {
     background: #000;
-
     .close-btn {
       position: fixed;
       top: 50px;
