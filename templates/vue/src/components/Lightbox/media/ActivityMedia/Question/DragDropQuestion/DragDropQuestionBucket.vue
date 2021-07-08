@@ -1,14 +1,13 @@
 <template>
   <div>
     <div
-      v-if="isFromBucket"
-      class="fromBucketContainer"
-      :data-qa="`user-from-bucket-${bucket.id}`"
+      :class="bucketClass"
+      :data-qa="bucketTestId"
       @dragover.prevent
       @dragenter.prevent
       @drop.prevent="drop($event, bucket)"
     >
-      <b class="bucketLabel">{{ bucket.value }}</b>
+      <b class="bucket-label">{{ bucket.value }}</b>
       <drag-drop-question-bucket-item
         v-for="item in bucket.itemArray"
         :key="item.id"
@@ -16,27 +15,7 @@
         :question="question"
         :bucketItem="item"
         :parentBucket="bucket"
-        :isFromBucketItem="true"
-        :data-qa="`user-bucket-item-${item.id}`"
-      />
-    </div>
-    <div
-      v-else
-      class="toBucketContainer"
-      :data-qa="`user-to-bucket-${bucket.id}`"
-      @dragover.prevent
-      @dragenter.prevent
-      @drop.prevent="drop($event, bucket)"
-    >
-      <b class="bucketLabel">{{ bucket.value }}</b>
-      <drag-drop-question-bucket-item
-        v-for="item in bucket.itemArray"
-        :key="item.id"
-        :node="node"
-        :question="question"
-        :bucketItem="item"
-        :parentBucket="bucket"
-        :isFromBucketItem="false"
+        :isFromBucketItem="isFromBucket"
         :data-qa="`user-bucket-item-${item.id}`"
       />
     </div>
@@ -66,22 +45,19 @@ export default {
       type: Object,
       required: true,
     },
-    fromBucketArray: {
-      type: Array,
-      required: true,
-    },
-    toBucketArray: {
-      type: Array,
-      required: true,
-    },
   },
   computed: {
     bucketClass() {
-      if (this.isFromBucket) {
-        return "fromBucketContainer"
-      } else {
-        return "toBucketContainer"
-      }
+      return this.isFromBucket ? "from-bucket-container" : "to-bucket-container"
+    },
+    bucketTestId() {
+      return `user-${this.isFromBucket ? "from" : "to"}-bucket-${this.bucket.id}`
+    },
+    fromBucketArray() {
+      return this.question.answerTypes.dragDrop.fromBucketArray
+    },
+    toBucketArray() {
+      return this.question.answerTypes.dragDrop.toBucketArray
     },
   },
   created() {
@@ -113,13 +89,9 @@ export default {
       }
     },
     findBucketInFromBucketArray: function(parentBucketId) {
-      let foundBucket = ""
-      for (let i = 0; i < this.fromBucketArray.length; i++) {
-        if (this.fromBucketArray[i].id === Number(parentBucketId)) {
-          foundBucket = this.fromBucketArray[i]
-        }
-      }
-      return foundBucket
+      return this.fromBucketArray.find(
+        bucket => bucket.id === Number(parentBucketId)
+      )
     },
     findItemInParentBucketArray: function(parentBucket, itemId) {
       let foundItem = ""
@@ -132,20 +104,14 @@ export default {
       return foundItem
     },
     findBucketInToBucketArray: function(parentBucketId) {
-      let foundBucket = ""
-      for (let i = 0; i < this.toBucketArray.length; i++) {
-        if (this.toBucketArray[i].id === Number(parentBucketId)) {
-          foundBucket = this.toBucketArray[i]
-        }
-      }
-      return foundBucket
+      return this.toBucketArray.find(bucket => bucket.id === Number(parentBucketId))
     },
   },
 }
 </script>
 
 <style scoped>
-.fromBucketContainer {
+.from-bucket-container {
   background-color: #009688;
   margin-bottom: 15px;
   min-height: 350px;
@@ -153,7 +119,7 @@ export default {
   border-radius: 25px;
   overflow-wrap: break-word;
 }
-.toBucketContainer {
+.to-bucket-container {
   background-color: #3f51b5;
   margin-bottom: 15px;
   min-height: 250px;
@@ -161,7 +127,7 @@ export default {
   border-radius: 25px;
   overflow-wrap: break-word;
 }
-.bucketLabel {
+.bucket-label {
   font-size: 28px;
 }
 </style>
