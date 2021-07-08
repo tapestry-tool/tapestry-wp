@@ -6,7 +6,6 @@ describe("Activity", () => {
     cy.getSelectedNode().then(node => {
       cy.openModal("edit", node.id)
       cy.changeMediaType("activity")
-      cy.contains(/add question/i).click()
       const question = `Select all numbers less than 3`
 
       cy.contains(/question text/i).click()
@@ -58,7 +57,6 @@ describe("Activity", () => {
     cy.getSelectedNode().then(node => {
       cy.openModal("edit", node.id)
       cy.changeMediaType("activity")
-      cy.contains(/add question/i).click()
       const question = `What is 5 + 5?`
 
       cy.contains(/question text/i).click()
@@ -84,8 +82,8 @@ describe("Activity", () => {
       cy.route("POST", "/users/activity/**").as("submit")
 
       cy.lightbox().within(() => {
-        cy.getByTestId(`multiple-choice-question-3`)
-          .getByTestId(`multiple-choice-question-item-3-checked`)
+        cy.getByTestId(`multiple-choice-question-2`)
+          .getByTestId(`multiple-choice-question-item-2-checked`)
           .click({ force: true })
 
         cy.contains(/submit/i).click()
@@ -114,7 +112,6 @@ describe("Activity", () => {
       cy.getByTestId("question-answer-text-single-0").click({ force: true })
       cy.getByTestId("question-answer-text-single-placeholder-0").type(placeholder)
 
-      cy.contains(/add question/i).click()
       const question2 = `What's your favorite pet?`
       const placeholder2 = "placeholder 2"
       const answer2 = "Dog"
@@ -152,7 +149,6 @@ describe("Activity", () => {
       const question = `What's your name?`
       const placeholder = "placeholder"
       const answer = "Tapestry"
-      cy.contains(/add question/i).click()
 
       cy.contains(/question text/i).click()
       cy.focused().type(question)
@@ -202,7 +198,6 @@ describe("Activity", () => {
       const question = `What's your name?`
       const placeholder = "placeholder"
       const answer = "Tapestry"
-      cy.contains(/add question/i).click()
 
       cy.contains(/question text/i).click()
       cy.focused().type(question)
@@ -232,8 +227,6 @@ describe("Activity", () => {
       cy.changeMediaType("activity")
 
       const question = `What's your name?`
-
-      cy.contains(/add question/i).click()
 
       cy.contains(/question text/i).click()
       cy.focused().type(question)
