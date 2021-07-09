@@ -246,8 +246,9 @@ class TapestryUserProgress implements ITapestryUserProgress
     private function _getAvatar()
     {
         $userSettings = get_user_meta($this->_userId, 'user_settings', true);
-                
+
         $storedAvatar = $userSettings->avatar;
+
         return $storedAvatar ? json_decode($storedAvatar) : (object) [];
     }
 
