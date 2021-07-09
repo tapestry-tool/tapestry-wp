@@ -1,7 +1,7 @@
 <template>
   <div id="app-container" :class="{ 'sidebar-open': isSidebarOpen }">
     <toolbar style="margin-bottom: 100px;" />
-    <b-modal id="avatar-modal" size="xl" :visible="!hasAvatar && avatarsEnabled">
+    <!-- <b-modal id="avatar-modal" size="xl" :visible="!hasAvatar && avatarsEnabled">
       <b-container class="avatar-container">
         <avatar-form ref="AvatarForm" :preferences="avatar" />
       </b-container>
@@ -13,7 +13,7 @@
           Save Avatar
         </b-button>
       </template>
-    </b-modal>
+    </b-modal> -->
     <tapestry-map
       v-if="settings.renderMap"
       :is-sidebar-open="isSidebarOpen"
@@ -30,7 +30,7 @@ import Toolbar from "./Toolbar"
 import TapestryMain from "./TapestryMain"
 import { mapMutations, mapState } from "vuex"
 import TapestryMap from "./TapestryMap"
-import AvatarForm from "@/components/modals/UserSettingsModal/AvatarForm.vue"
+// import AvatarForm from "@/components/modals/UserSettingsModal/AvatarForm.vue"
 import Helpers from "@/utils/Helpers"
 import { isLoggedIn } from "@/services/wp"
 
@@ -39,7 +39,7 @@ export default {
     TapestryMap,
     Toolbar,
     TapestryMain,
-    AvatarForm,
+    // AvatarForm,
   },
   data() {
     return {
@@ -71,6 +71,11 @@ export default {
     },
   },
   mounted() {
+    this.$router.push({
+      name: open ? names.USERSETTINGS : names.APP,
+      params: { nodeId: this.$route.params.nodeId, tab: "avatar" },
+      query: this.$route.query,
+    })
     this.$root.$on("open-node", id => {
       this.openNode(id)
     })

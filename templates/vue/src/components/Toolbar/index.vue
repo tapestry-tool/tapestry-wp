@@ -1,26 +1,24 @@
 <template>
   <div class="toolbar">
     <tapestry-filter v-if="!showMap" style="z-index: 10;" />
-    <div
-      v-show="isLoggedIn && numOfToolbarItems > 0"
-      id="slider-wrapper"
-      class="slider-wrapper"
-    >
-      <user-settings-button
-        v-if="avatarsEnabled"
-        data-qa="user-settings-button"
-      ></user-settings-button>
-      <div v-show="canEdit || (!showMap && hasDepth)" class="can-edit">
-        <review-notifications v-if="canEdit && settings.submitNodesEnabled" />
-        <settings-modal-button
-          v-if="canEdit"
-          :max-depth="maxDepth"
-        ></settings-modal-button>
-        <tapestry-depth-slider
-          v-show="!showMap && hasDepth"
-          @change="updateViewBox"
-          @change:max-depth="maxDepth = $event"
-        ></tapestry-depth-slider>
+    <div v-show="toolbarLength > 0" class="right-toolbar">
+      <div v-show="isLoggedIn" id="slider-wrapper" class="slider-wrapper">
+        <user-settings-button
+          v-if="avatarsEnabled"
+          data-qa="user-settings-button"
+        ></user-settings-button>
+        <div v-show="canEdit || (!showMap && hasDepth)" class="can-edit">
+          <review-notifications v-if="canEdit && settings.submitNodesEnabled" />
+          <settings-modal-button
+            v-if="canEdit"
+            :max-depth="maxDepth"
+          ></settings-modal-button>
+          <tapestry-depth-slider
+            v-show="!showMap && hasDepth"
+            @change="updateViewBox"
+            @change:max-depth="maxDepth = $event"
+          ></tapestry-depth-slider>
+        </div>
       </div>
     </div>
   </div>
@@ -65,8 +63,11 @@ export default {
     avatarsEnabled() {
       return this.isLoggedIn && process.env.VUE_APP_AVATARS === "TRUE"
     },
-    numOfToolbarItems() {
-      return document.getElementById("slider-wrapper").childNodes.length
+    toolbarLength() {
+      if (document.getElementById("slider-wrapper")) {
+        return document.getElementById("slider-wrapper").childNodes.length
+      }
+      return 0
     },
   },
   methods: {
@@ -104,5 +105,9 @@ export default {
 
 .can-edit {
   display: flex;
+}
+
+.hide {
+  visibility: hidden;
 }
 </style>
