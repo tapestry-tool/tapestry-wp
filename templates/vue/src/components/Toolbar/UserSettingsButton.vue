@@ -1,6 +1,6 @@
 <template>
   <button class="user-settings-button" @click="open">
-    <tapestry-icon icon="user"></tapestry-icon>
+    <span class="fas fa-user fa-s"></span>
     <user-settings-modal
       :show="avatarFormOpen"
       :tab="tab"
@@ -11,7 +11,6 @@
 </template>
 
 <script>
-import TapestryIcon from "@/components/common/TapestryIcon"
 import client from "@/services/TapestryAPI"
 import { names } from "@/config/routes"
 import UserSettingsModal from "../modals/UserSettingsModal"
@@ -19,7 +18,6 @@ import UserSettingsModal from "../modals/UserSettingsModal"
 export default {
   components: {
     UserSettingsModal,
-    TapestryIcon,
   },
   computed: {
     avatarFormOpen: {

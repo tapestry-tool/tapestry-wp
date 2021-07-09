@@ -1,7 +1,11 @@
 <template>
   <div class="toolbar">
     <tapestry-filter v-if="!showMap" style="z-index: 10;" />
-    <div v-show="isLoggedIn" class="slider-wrapper">
+    <div
+      v-show="isLoggedIn && numOfToolbarItems > 0"
+      id="slider-wrapper"
+      class="slider-wrapper"
+    >
       <user-settings-button
         v-if="avatarsEnabled"
         data-qa="user-settings-button"
@@ -60,6 +64,9 @@ export default {
     },
     avatarsEnabled() {
       return this.isLoggedIn && process.env.VUE_APP_AVATARS === "TRUE"
+    },
+    numOfToolbarItems() {
+      return document.getElementById("slider-wrapper").childNodes.length
     },
   },
   methods: {
