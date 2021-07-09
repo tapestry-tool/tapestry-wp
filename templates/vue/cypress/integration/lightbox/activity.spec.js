@@ -265,7 +265,6 @@ describe("Activity", () => {
     cy.getSelectedNode().then(node => {
       cy.openModal("edit", node.id)
       cy.changeMediaType("Activity")
-      cy.contains(/add question/i).click()
 
       const listQuestion = `Name 3 provinces of Canada.`
       const listPlaceholder = "Enter answer here"
@@ -318,7 +317,6 @@ describe("Activity", () => {
     cy.getSelectedNode().then(node => {
       cy.openModal("edit", node.id)
       cy.changeMediaType("Activity")
-      cy.contains(/add question/i).click()
 
       const listQuestion = `Name 100 things.`
       const listPlaceholder = "Thing:"
