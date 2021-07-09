@@ -170,7 +170,7 @@ export default {
     isPopupCandidate() {
       // NOTE: Currently we do not want to allow a multi-content popup
       if (this.parent && this.node.mediaType !== "multi-content") {
-        if (this.parent.popup || this.parent.isMultiContentChild) {
+        if (this.parent.popup) {
           return false
         }
         if (this.parent.mediaType === "h5p") {
