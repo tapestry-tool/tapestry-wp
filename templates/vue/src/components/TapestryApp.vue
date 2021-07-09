@@ -1,19 +1,6 @@
 <template>
   <div id="app-container" :class="{ 'sidebar-open': isSidebarOpen }">
     <toolbar style="margin-bottom: 100px;" />
-    <!-- <b-modal id="avatar-modal" size="xl" :visible="!hasAvatar && avatarsEnabled">
-      <b-container class="avatar-container">
-        <avatar-form ref="AvatarForm" :preferences="avatar" />
-      </b-container>
-      <template slot="modal-footer">
-        <b-button size="sm" variant="secondary" @click="cancel">
-          Cancel
-        </b-button>
-        <b-button size="sm" variant="primary" @click="saveAvatar">
-          Save Avatar
-        </b-button>
-      </template>
-    </b-modal> -->
     <tapestry-map
       v-if="settings.renderMap"
       :is-sidebar-open="isSidebarOpen"
@@ -30,7 +17,6 @@ import Toolbar from "./Toolbar"
 import TapestryMain from "./TapestryMain"
 import { mapMutations, mapState } from "vuex"
 import TapestryMap from "./TapestryMap"
-// import AvatarForm from "@/components/modals/UserSettingsModal/AvatarForm.vue"
 import Helpers from "@/utils/Helpers"
 import { isLoggedIn } from "@/services/wp"
 
@@ -39,7 +25,6 @@ export default {
     TapestryMap,
     Toolbar,
     TapestryMain,
-    // AvatarForm,
   },
   data() {
     return {
@@ -71,11 +56,13 @@ export default {
     },
   },
   mounted() {
-    this.$router.push({
-      name: open ? names.USERSETTINGS : names.APP,
-      params: { nodeId: this.$route.params.nodeId, tab: "avatar" },
-      query: this.$route.query,
-    })
+    if (!this.hasAvatar && this.avatarsEnabled) {
+      this.$router.push({
+        name: open ? names.USERSETTINGS : names.APP,
+        params: { nodeId: this.$route.params.nodeId, tab: "avatar" },
+        query: this.$route.query,
+      })
+    }
     this.$root.$on("open-node", id => {
       this.openNode(id)
     })
@@ -85,7 +72,7 @@ export default {
     client.recordAnalyticsEvent("app", "load", "tapestry")
   },
   methods: {
-    ...mapMutations(["select", "unselect", "clearSelection", "addAvatar"]),
+    ...mapMutations(["select", "unselect", "clearSelection"]),
     updateViewBox() {
       const MAX_RADIUS = 240
       const MIN_TAPESTRY_WIDTH_FACTOR = 1.5
@@ -174,13 +161,6 @@ export default {
         params: { nodeId: id, type: "edit", tab: "content" },
         query: this.$route.query,
       })
-    },
-    cancel() {
-      this.$bvModal.hide("avatar-modal")
-    },
-    saveAvatar() {
-      this.$refs.AvatarForm.saveAvatar()
-      this.$bvModal.hide("avatar-modal")
     },
   },
 }

@@ -1,24 +1,28 @@
 <template>
   <div class="toolbar">
     <tapestry-filter v-if="!showMap" style="z-index: 10;" />
-    <div v-show="toolbarLength > 0" class="right-toolbar">
-      <div v-show="isLoggedIn" id="slider-wrapper" class="slider-wrapper">
-        <user-settings-button
-          v-if="avatarsEnabled"
-          data-qa="user-settings-button"
-        ></user-settings-button>
-        <div v-show="canEdit || (!showMap && hasDepth)" class="can-edit">
-          <review-notifications v-if="canEdit && settings.submitNodesEnabled" />
-          <settings-modal-button
-            v-if="canEdit"
-            :max-depth="maxDepth"
-          ></settings-modal-button>
-          <tapestry-depth-slider
-            v-show="!showMap && hasDepth"
-            @change="updateViewBox"
-            @change:max-depth="maxDepth = $event"
-          ></tapestry-depth-slider>
-        </div>
+    <div v-show="isLoggedIn && toolbarLength > 0" class="slider-wrapper">
+      <user-settings-button
+        v-if="avatarsEnabled"
+        data-qa="user-settings-button"
+        class="toolbar-item"
+      ></user-settings-button>
+      <div v-show="canEdit || (!showMap && hasDepth)" class="can-edit">
+        <review-notifications
+          v-if="canEdit && settings.submitNodesEnabled"
+          class="toolbar-item"
+        />
+        <settings-modal-button
+          v-if="canEdit"
+          :max-depth="maxDepth"
+          class="toolbar-item"
+        ></settings-modal-button>
+        <tapestry-depth-slider
+          v-show="!showMap && hasDepth"
+          class="toolbar-item"
+          @change="updateViewBox"
+          @change:max-depth="maxDepth = $event"
+        ></tapestry-depth-slider>
       </div>
     </div>
   </div>
@@ -64,10 +68,7 @@ export default {
       return this.isLoggedIn && process.env.VUE_APP_AVATARS === "TRUE"
     },
     toolbarLength() {
-      if (document.getElementById("slider-wrapper")) {
-        return document.getElementById("slider-wrapper").childNodes.length
-      }
-      return 0
+      return document.getElementsByClassName("toolbar-item").length
     },
   },
   methods: {
