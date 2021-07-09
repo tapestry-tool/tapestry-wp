@@ -138,7 +138,6 @@ export default {
   display: grid;
   align-content: center;
 }
-
 .answerItem {
   display: flex;
   border-style: solid;
@@ -146,7 +145,6 @@ export default {
   padding: 10px 20px;
   margin-top: 5px;
 }
-
 .list li button {
   float: right;
   position: relative;
@@ -162,7 +160,6 @@ export default {
   margin-left: 3px;
   margin-right: 3px;
 }
-
 .submit-btn {
   float: right;
   margin-top: 30px;

@@ -432,6 +432,41 @@ export default {
     isMultiContentNodeChild() {
       return this.parent && this.parent.mediaType == "multi-content"
     },
+    isMultipleChoiceValueValid() {
+      const questionsWithMultipleChoiceEnabled = this.node.typeData.activity.questions.filter(
+        question => {
+          return question.answerTypes.multipleChoice.enabled
+        }
+      )
+      const validMultipleChoiceValues = questionsWithMultipleChoiceEnabled.every(
+        question => {
+          return question.answerTypes.multipleChoice.choices.every(option => {
+            return option.value != ""
+          })
+        }
+      )
+      return validMultipleChoiceValues
+    },
+    isMultipleChoiceImageValid() {
+      const questionsWithMultipleChoiceEnabled = this.node.typeData.activity.questions.filter(
+        question => {
+          return question.answerTypes.multipleChoice.enabled
+        }
+      )
+      const validMultipleChoiceImages = questionsWithMultipleChoiceEnabled.every(
+        question => {
+          const useImages = question.answerTypes.multipleChoice.useImages
+          if (useImages) {
+            return question.answerTypes.multipleChoice.choices.every(option => {
+              return option.imageUrl != "" && option.imageUrl != null
+            })
+          } else if (!useImages) {
+            return true
+          }
+        }
+      )
+      return validMultipleChoiceImages
+    },
   },
   watch: {
     nodeId: {
@@ -956,6 +991,14 @@ export default {
               errMsgs.push("Maximum number of fields must be <= 100")
             }
           }
+        }
+        const validMultipleChoiceValues = this.isMultipleChoiceValueValid
+        if (!validMultipleChoiceValues) {
+          errMsgs.push("Please enter a text for all multiple choice options")
+        }
+        const validMultipleChoiceImages = this.isMultipleChoiceImageValid
+        if (!validMultipleChoiceImages) {
+          errMsgs.push("Please upload an image for all multiple choice options")
         }
       } else if (this.node.mediaType === "answer") {
         const hasActivityId = this.node.typeData.activityId

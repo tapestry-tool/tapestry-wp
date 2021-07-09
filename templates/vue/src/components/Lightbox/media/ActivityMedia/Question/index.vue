@@ -22,8 +22,7 @@
             :key="previousAnswer[0]"
             :type="previousAnswer[0]"
             :answerData="previousAnswer[1]"
-            :node="node"
-            :prevQuestionId="prevQuestionId"
+            :question="getQuestion(question.followUp.questionId)"
           ></completed-activity-media>
         </div>
         <div v-else>
@@ -55,13 +54,20 @@
             :node="node"
             @submit="handleSubmit"
           />
+          <multiple-choice-question
+            v-else-if="formType === 'multipleChoice'"
+            :node="node"
+            :question="question"
+            :answer="answer"
+            @submit="handleSubmit"
+          ></multiple-choice-question>
         </div>
         <div v-else class="question-answer-types">
           <p class="question-answer-text">I want to answer with...</p>
           <div class="button-container">
             <answer-button
               v-if="question.answerTypes.text.enabled"
-              :completed="formCompleted('text')"
+              :completed="formIsCompleted('text')"
               data-qa="answer-button-text"
               @click="openForm('text')"
             >
@@ -69,12 +75,21 @@
             </answer-button>
             <answer-button
               v-if="question.answerTypes.audio.enabled"
-              :completed="formCompleted('audio')"
+              :completed="formIsCompleted('audio')"
               icon="microphone"
               data-qa="answer-button-audio"
               @click="openForm('audio')"
             >
               audio
+            </answer-button>
+            <answer-button
+              v-if="question.answerTypes.multipleChoice.enabled"
+              :completed="formIsCompleted('multipleChoice')"
+              data-qa="answer-button-multiple-choice"
+              icon="tasks"
+              @click="openForm('multipleChoice')"
+            >
+              multiple choice
             </answer-button>
           </div>
         </div>
@@ -89,6 +104,7 @@ import client from "@/services/TapestryAPI"
 import AnswerButton from "./AnswerButton"
 import AudioRecorder from "./AudioRecorder"
 import TextQuestion from "./TextQuestion"
+import MultipleChoiceQuestion from "./MultipleChoiceQuestion"
 import Loading from "@/components/common/Loading"
 import CompletedActivityMedia from "../../common/CompletedActivityMedia"
 import * as wp from "@/services/wp"
@@ -99,6 +115,7 @@ export default {
     AnswerButton,
     AudioRecorder,
     TextQuestion,
+    MultipleChoiceQuestion,
     Loading,
     CompletedActivityMedia,
   },
@@ -122,7 +139,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getAnswers"]),
+    ...mapGetters(["getAnswers", "getQuestion"]),
     ...mapState(["userAnswers"]),
     isLoggedIn() {
       return wp.isLoggedIn()
@@ -147,7 +164,6 @@ export default {
         this.question.followUp.nodeId,
         this.question.followUp.questionId
       )
-
       return answerObject ? Object.entries(answerObject) : null
     },
     enabledAnswerTypes() {
@@ -240,15 +256,9 @@ export default {
       })
       this.$emit("submit")
     },
-    formCompleted(answerType) {
-      if (
-        this.userAnswers?.[this.node.id]?.activity?.[this.question.id]?.answers?.[
-          answerType
-        ]
-      ) {
-        return true
-      }
-      return false
+    formIsCompleted(type) {
+      return !!this.userAnswers?.[this.node.id]?.activity?.[this.question.id]
+        ?.answers?.[type]
     },
   },
 }
