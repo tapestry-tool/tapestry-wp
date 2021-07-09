@@ -314,6 +314,10 @@ button[disabled] {
   margin-bottom: 1em;
 }
 
+.tyde-mode .title {
+  text-align: left;
+}
+
 .media-container {
   height: 100%;
   width: 100%;

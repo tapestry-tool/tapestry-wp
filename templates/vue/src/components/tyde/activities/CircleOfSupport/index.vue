@@ -127,8 +127,10 @@ export default {
   --cos-border: 3px solid var(--cos-color-secondary);
 
   border: var(--cos-border);
-  height: 75vh;
+  height: 80vh;
   width: 90vw;
+  min-height: 250px;
+  min-width: 320px;
   position: relative;
   margin: 0 auto;
   top: 55%;

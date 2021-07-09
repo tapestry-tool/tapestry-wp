@@ -168,6 +168,10 @@ export default {
 </script>
 
 <style lang="scss">
+.tyde-mode ~ .page-nav-wrapper > .page-nav {
+  padding-top: 8rem !important;
+}
+
 .page-nav-wrapper {
   .page-nav {
     position: relative;
