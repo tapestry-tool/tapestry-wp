@@ -93,10 +93,10 @@ export default {
           let children = this.isMultiContent(node.id)
             ? node.childOrdering.map(this.getNode)
             : this.getDirectChildren(id).map(this.getNode)
-          children = children.filter(node => node.popup === null)
+          children = children.filter(node => !node.popup)
           return { node, children }
         })
-        .filter(row => row.node.popup === null)
+        .filter(row => !row.node.popup)
     },
     lockRows() {
       return this.node.typeData.lockRows
