@@ -58,14 +58,14 @@ interface ITapestryUserProgress
 
     /**
 
-     * Update the user's avatar.
+     * Update the user's user settings.
      *
-     * @param string $avatarData stores avatar style choices
+     * @param string $userSettings stores avatar
      *
      *
      * @return null
      */
-    public function updateAvatar($avatarData);
+    public function updateUserSettings($userSettings);
 
     /**
      * Get the user's avatar.

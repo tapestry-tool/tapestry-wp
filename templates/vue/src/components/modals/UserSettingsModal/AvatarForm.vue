@@ -223,9 +223,9 @@ export default {
     }
   },
   methods: {
-    ...mapActions(["updateAvatar"]),
+    ...mapActions(["updateUserSettings"]),
     saveAvatar() {
-      this.updateAvatar(this.userAvatar)
+      this.updateUserSettings({ avatar: this.userAvatar })
     },
   },
 }

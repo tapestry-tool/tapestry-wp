@@ -213,11 +213,11 @@ $REST_API_ENDPOINTS = [
             'callback' => 'getUserAvatar',
         ],
     ],
-    'UPDATE_USER_AVATAR' => (object) [
-        'ROUTE' => '/users/avatar',
+    'UPDATE_USER_SETTINGS' => (object) [
+        'ROUTE' => '/users/userSettings',
         'ARGUMENTS' => [
             'methods' => $REST_API_PUT_METHOD,
-            'callback' => 'updateUserAvatar',
+            'callback' => 'updateUserSettings',
         ],
     ],
     'POST_USER_AUDIO' => (object) [
@@ -1242,12 +1242,12 @@ function getUserH5PSettingsByPostId($request)
     }
 }
 
-function updateUserAvatar($request)
+function updateUserSettings($request)
 {
-    $avatarData = $request->get_body();
+    $userSettings = $request->get_body();
     try {
         $userProgress = new TapestryUserProgress();
-        $userProgress->updateAvatar($avatarData);
+        $userProgress->updateUserSettings($userSettings);
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }

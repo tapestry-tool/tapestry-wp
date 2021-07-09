@@ -23,6 +23,17 @@ export async function updateH5pSettings({ commit, dispatch }, newSettings) {
   }
 }
 
+// userSettings
+
+export async function updateUserSettings({ commit, dispatch }, userSettings) {
+  try {
+    await client.updateUserSettings(JSON.stringify(userSettings))
+    commit("addAvatar", userSettings.avatar)
+  } catch (error) {
+    dispatch("addApiError", error)
+  }
+}
+
 // nodes
 export async function addNode({ commit, dispatch, getters, state }, newNode) {
   try {
@@ -298,17 +309,6 @@ export async function updateUserFavourites({ commit, dispatch }, favourites) {
   try {
     await client.updateUserFavourites(JSON.stringify(favourites))
     commit("updateFavourites", { favourites })
-  } catch (error) {
-    dispatch("addApiError", error)
-  }
-}
-
-// avatars
-
-export async function updateAvatar({ commit, dispatch }, newAvatar) {
-  try {
-    await client.updateAvatar(JSON.stringify(newAvatar))
-    commit("addAvatar", newAvatar)
   } catch (error) {
     dispatch("addApiError", error)
   }

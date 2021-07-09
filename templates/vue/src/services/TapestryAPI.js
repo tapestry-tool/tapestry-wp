@@ -216,9 +216,9 @@ class TapestryApi {
     return response
   }
 
-  async updateAvatar(avatar) {
-    const url = `/users/avatar`
-    const response = await this.client.put(url, avatar)
+  async updateUserSettings(userSettings) {
+    const url = `/users/userSettings`
+    const response = await this.client.put(url, userSettings)
     return response
   }
 

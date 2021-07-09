@@ -123,13 +123,13 @@ class TapestryUserProgress implements ITapestryUserProgress
     /**
      * Update the user's avatar.
      *
-     * @param string $avatarData stores avatar style choices
+     * @param string $userSettings stores avatar
      *
      * @return null
      */
-    public function updateAvatar($avatarData)
+    public function updateUserSettings($userSettings)
     {
-        $this->_updateAvatar($avatarData);
+        $this->_updateUserSettings($userSettings);
     }
 
     /**
@@ -238,15 +238,16 @@ class TapestryUserProgress implements ITapestryUserProgress
         return $settings ? json_decode($settings) : (object) [];
     }
 
-    private function _updateAvatar($avatarData)
+    private function _updateUserSettings($userSettings)
     {
-        update_user_meta($this->_userId, 'avatar_'.$this->_userId, $avatarData);
+        update_user_meta($this->_userId, 'user_settings', $userSettings);
     }
 
     private function _getAvatar()
     {
-        $storedAvatar = get_user_meta($this->_userId, 'avatar_'.$this->_userId, true);
-
+        $userSettings = get_user_meta($this->_userId, 'user_settings', true);
+                
+        $storedAvatar = $userSettings->avatar;
         return $storedAvatar ? json_decode($storedAvatar) : (object) [];
     }
 
