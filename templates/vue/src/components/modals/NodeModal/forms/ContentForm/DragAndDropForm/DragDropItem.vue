@@ -1,18 +1,22 @@
 <template>
   <div class="container">
     <div>
-      <b>New bucket item</b>
+      <b-form-input
+        v-model="item.text"
+        placeholder="New Item"
+        :data-qa="`bucket-item-text-${item.bucketId}`"
+      ></b-form-input>
       <color-picker
         label="Background color"
-        :currentColor="bucketItem.color"
-        :data-qa="`bucket-item-backgroundcolor-${bucketItem.id}`"
+        :currentColor="item.color"
+        :data-qa="`bucket-item-backgroundcolor-${item.bucketId}`"
         @change="handleItemColorChange"
       />
       <b-form-group v-if="useImages">
         <file-upload
-          v-model="bucketItem.imageurl"
+          v-model="item.imageurl"
           input-test-id="node-bucketitem-thumbnail-url"
-          :data-qa="`bucket-item-thumbnail-${bucketItem.id}`"
+          :data-qa="`bucket-item-thumbnail-${item.bucketId}`"
           :show-url-upload="false"
           :show-image-preview="true"
           :compact-mode="true"
@@ -20,13 +24,9 @@
           @isUploading="handleUploadChange"
         />
       </b-form-group>
-      <b-form-input
-        v-model="bucketItem.text"
-        placeholder="Enter Item Text"
-        :data-qa="`bucket-item-text-${bucketItem.id}`"
-      ></b-form-input>
+
       <b-button
-        v-if="removeItemPresent"
+        v-if="itemRemovalAllowed"
         squared
         variant="outline-danger"
         @click="$emit('remove')"
@@ -46,19 +46,11 @@ export default {
     ColorPicker,
   },
   props: {
-    node: {
+    item: {
       type: Object,
       required: true,
     },
-    question: {
-      type: Object,
-      required: true,
-    },
-    bucketItem: {
-      type: Object,
-      required: true,
-    },
-    removeItemPresent: {
+    itemRemovalAllowed: {
       type: Boolean,
       required: true,
     },
@@ -67,25 +59,12 @@ export default {
       required: true,
     },
   },
-  data() {
-    return {
-      fromBucketItem: [
-        {
-          id: 1,
-          color: "#808080",
-          imageurl: "",
-          text: "",
-        },
-      ],
-      nextFromBucketId: 2,
-    }
-  },
   methods: {
     handleUploadChange(state) {
       this.$root.$emit("node-modal::uploading", state)
     },
     handleItemColorChange(color) {
-      this.bucketItem.color = color
+      this.item.color = color
     },
   },
 }
@@ -95,8 +74,9 @@ export default {
 .container {
   border: solid;
   background-color: #add8e6;
-  margin-bottom: 15px;
+  margin: 10px 0;
   border-radius: 15px;
   margin-left: 0px;
+  padding: 1rem;
 }
 </style>

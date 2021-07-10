@@ -13,54 +13,46 @@
         Hide Text
       </b-form-checkbox>
       <drag-drop-bucket
-        v-for="(bucket, bucketIndex) in fromBuckets"
+        v-for="bucket in fromBuckets"
         :key="bucket.id"
-        :node="node"
-        :question="question"
-        :index="bucketIndex"
         :bucket="bucket"
-        :isFromBucket="true"
-        :fromBucketArray="fromBuckets"
-        :toBucketArray="toBuckets"
+        :items="getBucketsItems(bucket.id)"
+        :bucketRemovalAllowed="fromBuckets.length > 1"
         :useImages="useImages"
         :data-qa="`from-bucket-${bucket.id}`"
         @remove="fromBuckets.splice(bucketIndex, 1)"
-        @add="addNewFromBucketItem(bucketIndex)"
+        @add="addItem(bucket.id)"
       />
       <b-button
-        class="addButton"
+        class="add-btn"
         variant="primary"
         squared
         data-qa="add-from-bucket-button"
-        @click="addNewFromBucket"
+        @click="addBucket('from')"
       >
-        Add a bucket
+        Add bucket
       </b-button>
     </b-form-group>
     <b-form-group>
       <b>To buckets</b>
       <drag-drop-bucket
-        v-for="(bucket, index) in toBuckets"
+        v-for="bucket in toBuckets"
         :key="bucket.id"
-        :node="node"
-        :question="question"
-        :index="index"
         :bucket="bucket"
-        :isFromBucket="false"
-        :fromBucketArray="fromBuckets"
-        :toBucketArray="toBuckets"
+        :bucketRemovalAllowed="toBuckets.length > 1"
+        :items="getBucketsItems(bucket.id)"
         :useImages="useImages"
         :data-qa="`to-bucket-${bucket.id}`"
         @remove="toBuckets.splice(index, 1)"
       />
       <b-button
-        class="addButton"
+        class="add-btn"
         variant="primary"
         squared
         data-qa="add-to-bucket-button"
-        @click="addNewToBucket"
+        @click="addBucket('to')"
       >
-        Add a bucket
+        Add bucket
       </b-button>
     </b-form-group>
   </div>
@@ -68,6 +60,7 @@
 
 <script>
 import DragDropBucket from "./DragDropBucket"
+import Helpers from "@/utils/Helpers"
 export default {
   components: {
     DragDropBucket,
@@ -84,65 +77,39 @@ export default {
   },
   data() {
     return {
-      fromBuckets: [
-        {
-          id: 1,
-          value: "",
-          itemArray: [
-            {
-              id: 1,
-              color: "#808080",
-              imageurl: "",
-              text: "",
-            },
-          ],
-        },
-      ],
+      enabled: true,
       useImages: false,
       hideText: false,
-      nextFromBucketId: 2,
-      nextFromBucketItemId: 2,
-      nextFromBucketValue: "",
-      toBuckets: [
+      buckets: [
         {
-          id: 200,
-          value: "",
-          itemArray: [],
+          id: Helpers.createUUID(),
+          type: "from",
+          text: "",
+        },
+        {
+          id: Helpers.createUUID(),
+          type: "to",
+          text: "",
         },
       ],
-      nextToBucketId: 201,
-      nextToBucketValue: "",
     }
   },
   computed: {
-    removeButtonFromDisabled() {
-      return this.fromBuckets.length === 1
+    items() {
+      return [
+        {
+          color: "#808080",
+          text: "",
+          imageUrl: "",
+          bucketId: this.buckets[0].id,
+        },
+      ]
     },
-    removeButtonToDisabled() {
-      return this.toBuckets.length === 1
+    fromBuckets() {
+      return this.buckets.filter(bucket => bucket.type === "from")
     },
-  },
-  watch: {
-    fromBuckets(newFromBuckets) {
-      this.question.answerTypes.dragDrop.fromBucketArray = newFromBuckets
-    },
-    toBuckets(newToBuckets) {
-      this.question.answerTypes.dragDrop.toBucketArray = newToBuckets
-    },
-    nextFromBucketItemId(newNextFromBucketItemId) {
-      this.question.answerTypes.dragDrop.nextFromBucketItemId = newNextFromBucketItemId
-    },
-    nextFromBucketId(newNextFromBucketId) {
-      this.question.answerTypes.dragDrop.nextFromBucketId = newNextFromBucketId
-    },
-    nextToBucketId(newNextToBucketId) {
-      this.question.answerTypes.dragDrop.nextToBucketId = newNextToBucketId
-    },
-    useImages(newUseImages) {
-      this.question.answerTypes.dragDrop.useImages = newUseImages
-    },
-    hideText(newHideText) {
-      this.question.answerTypes.dragDrop.hideText = newHideText
+    toBuckets() {
+      return this.buckets.filter(bucket => bucket.type === "to")
     },
   },
   created() {
@@ -168,36 +135,38 @@ export default {
     }
   },
   methods: {
-    addNewFromBucket: function() {
-      this.fromBuckets.push({
-        id: this.nextFromBucketId++,
-        value: this.nextFromBucketValue,
-        itemArray: [],
-      })
-      this.nextFromBucketValue = ""
-    },
-    addNewFromBucketItem: function(bucketIndex) {
-      this.fromBuckets[bucketIndex].itemArray.push({
-        id: this.nextFromBucketItemId++,
-        color: "#808080",
-        imageurl: "",
+    addBucket(type) {
+      this.buckets.push({
+        id: Helpers.createUUID(),
+        type: type,
         text: "",
       })
     },
-    addNewToBucket: function() {
-      this.toBuckets.push({
-        id: this.nextToBucketId++,
-        value: this.nextToBucketValue,
-        itemArray: [],
+    addItem(bucketId) {
+      this.items.push({
+        color: "#808080",
+        text: "",
+        imageUrl: "",
+        bucketId: bucketId,
       })
-      this.nextToBucketValue = ""
+
+      /* NOTE: we have to force update because we relay on
+               relay on computed properties that do not 
+               cause the components to re-render upon change
+       */
+
+      this.$forceUpdate()
+      console.log(this.items)
+    },
+    getBucketsItems(bucketId) {
+      return this.items.filter(item => item.bucketId === bucketId)
     },
   },
 }
 </script>
 
 <style scoped>
-.add-button {
+.add-btn {
   margin-top: 20px;
 }
 </style>
