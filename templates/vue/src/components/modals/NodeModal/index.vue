@@ -930,78 +930,37 @@ export default {
         if (!validPreviousAnswers) {
           errMsgs.push("Please select a previous activity to display")
         }
-        const questionsWithDragDropEnabled = this.node.typeData.activity.questions.filter(
-          question => {
-            return question.answerTypes.dragDrop.enabled
-          }
+
+        // Drag and Drop form validation
+        const dragDropQuestions = this.node.typeData.activity.questions.filter(
+          question => question.answerTypes.dragDrop.enabled
         )
-        const validFromBucketValues = questionsWithDragDropEnabled.every(
-          question => {
-            return question.answerTypes.dragDrop.fromBucketArray.every(
-              fromBucket => {
-                return fromBucket.value != ""
-              }
-            )
-          }
-        )
-        if (!validFromBucketValues) {
-          errMsgs.push("Please provide a text for all From Bucket label")
-        }
-        const validToBucketValues = questionsWithDragDropEnabled.every(question => {
-          return question.answerTypes.dragDrop.toBucketArray.every(toBucket => {
-            return toBucket.value != ""
-          })
+
+        const validBucketsText = dragDropQuestions.every(question => {
+          return question.answerTypes.dragDrop.buckets.every(bucket => bucket.text)
         })
-        if (!validToBucketValues) {
-          errMsgs.push("Please provide a text for all To Bucket label")
-        }
-        const validFromBucketItemValue = questionsWithDragDropEnabled.every(
-          question => {
-            return question.answerTypes.dragDrop.fromBucketArray.every(
-              fromBucket => {
-                return fromBucket.itemArray.every(fromBucketItem => {
-                  return fromBucketItem.text != ""
-                })
-              }
-            )
-          }
-        )
-        if (!validFromBucketItemValue) {
-          errMsgs.push("Please provide a text for all from bucket item(s) label")
-        }
-        const validFromBucketItemImage = questionsWithDragDropEnabled.every(
-          question => {
-            if (question.answerTypes.dragDrop.useImages) {
-              return question.answerTypes.dragDrop.fromBucketArray.every(
-                fromBucket => {
-                  return fromBucket.itemArray.every(fromBucketItem => {
-                    return (
-                      fromBucketItem.imageurl != "" &&
-                      fromBucketItem.imageurl != null
-                    )
-                  })
-                }
-              )
-            } else {
-              return true
-            }
-          }
-        )
-        if (!validFromBucketItemImage) {
-          errMsgs.push("Please provide an image for all from bucket item(s)")
-        }
-      } else if (this.node.mediaType === "answer") {
-        const hasActivityId = this.node.typeData.activityId
-        if (!hasActivityId) {
-          errMsgs.push("Please select an activity")
+        if (!validBucketsText) {
+          errMsgs.push("Please enter a name for all buckets")
         }
 
-        const hasQuestionId = this.node.typeData.questionId
-        if (!hasQuestionId) {
-          errMsgs.push("Please select a question")
+        const validItemsText = dragDropQuestions.every(question => {
+          return question.answerTypes.dragDrop.items.every(item => item.text)
+        })
+        if (!validItemsText) {
+          errMsgs.push("Please enter a name for all items")
+        }
+
+        const validItemsImages = dragDropQuestions
+          .filter(question => question.answerTypes.dragDrop.useImages)
+          .every(question => {
+            return question.answerTypes.dragDrop.items.every(item => item.imageUrl)
+          })
+        if (!validItemsImages) {
+          errMsgs.push(
+            "Images must be uploaded for all drag and drop questions that have 'Use Images' enabled"
+          )
         }
       }
-
       return errMsgs
     },
     isValidVideo(typeData) {

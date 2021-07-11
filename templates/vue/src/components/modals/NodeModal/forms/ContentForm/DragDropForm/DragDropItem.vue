@@ -8,13 +8,13 @@
       ></b-form-input>
       <color-picker
         label="Background color"
-        :currentColor="item.color"
         :data-qa="`bucket-item-backgroundcolor-${item.bucketId}`"
-        @change="handleItemColorChange"
+        :currentColor="item.color"
+        @change="item.color = $event"
       />
       <b-form-group v-if="useImages">
         <file-upload
-          v-model="item.imageurl"
+          v-model="item.imageUrl"
           input-test-id="node-bucketitem-thumbnail-url"
           :data-qa="`bucket-item-thumbnail-${item.bucketId}`"
           :show-url-upload="false"
@@ -29,7 +29,7 @@
         v-if="itemRemovalAllowed"
         squared
         variant="outline-danger"
-        @click="$emit('remove')"
+        @click="$emit('remove-item')"
       >
         Remove item
       </b-button>
@@ -62,9 +62,6 @@ export default {
   methods: {
     handleUploadChange(state) {
       this.$root.$emit("node-modal::uploading", state)
-    },
-    handleItemColorChange(color) {
-      this.item.color = color
     },
   },
 }

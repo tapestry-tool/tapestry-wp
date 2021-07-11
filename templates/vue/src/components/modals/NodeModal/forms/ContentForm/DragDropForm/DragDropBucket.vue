@@ -1,23 +1,23 @@
 <template>
-  <div class="container">
-    <b-form-group :class="bucketClass">
-      <b-form-group>
-        <b-form-input
-          v-model="bucket.text"
-          placeholder="New Bucket"
-          class="side"
-          :data-qa="`from-bucket-label-${bucket.id}`"
-        ></b-form-input>
-        <b-button
-          v-if="bucketRemovalAllowed"
-          class="side"
-          variant="outline-danger"
-          @click="$emit('remove')"
-        >
-          Remove bucket
-        </b-button>
-      </b-form-group>
-      <b-form-group>
+  <div>
+    <b-form-group>
+      <b-form-input
+        v-model="bucket.text"
+        placeholder="New Bucket"
+        class=" side"
+        :data-qa="`from-bucket-label-${bucket.id}`"
+      ></b-form-input>
+      <b-button
+        v-if="bucketRemovalAllowed"
+        class="side"
+        variant="outline-danger"
+        @click="$emit('remove')"
+      >
+        Remove bucket
+      </b-button>
+    </b-form-group>
+    <b-form-group class="bucket-container">
+      <b-form-group v-if="items">
         <drag-drop-item
           v-for="(item, index) in items"
           :key="item.id"
@@ -25,7 +25,7 @@
           :useImages="useImages"
           :data-qa="`bucket-item-${bucket.id}-${item.id}`"
           :itemRemovalAllowed="itemRemovalAllowed"
-          @remove="items.splice(index, 1)"
+          @remove-item="$emit('remove-item', index)"
         />
       </b-form-group>
       <b-button
@@ -53,49 +53,37 @@ export default {
     },
     items: {
       type: Array,
-      required: true,
+      required: false,
+      default: null,
     },
     useImages: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    bucketRemovalAllowed: {
       type: Boolean,
       required: true,
     },
   },
   computed: {
-    bucketClass() {
-      return this.bucket.type === "from"
-        ? "from-bucket-container"
-        : "to-bucket-container"
-    },
     itemRemovalAllowed() {
       return this.items.length > 1
     },
-  },
-  created() {
-    console.log(this.items)
   },
 }
 </script>
 
 <style scoped>
-.container {
-  display: flex;
-  align-items: center;
-}
-.side {
-  width: 47%;
-  display: inline;
-}
-.from-bucket-container {
+.bucket-container {
   background-color: #e0f2f1;
-  margin-bottom: 15px;
   border-radius: 15px;
-  margin-left: -15px;
-  min-height: 200px;
+  max-width: 300px;
   text-align: center;
 }
 .to-bucket-container {
   background-color: #e8eaf6;
-  min-height: 200px;
+  min-height: 50px;
   margin-bottom: 15px;
   margin-left: -15px;
   border-radius: 15px;
