@@ -59,5 +59,5 @@ To enable Avatars throughout the application, follow these steps:
     ```
 Save the file and restart the server with `npm start` for the changes to take place. 
 
-3. To disable Avatars, simply set `VUE_APP_AVATARS=FALSE`
+3. To disable Avatars, set `VUE_APP_AVATARS=FALSE`
 
