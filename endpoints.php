@@ -207,7 +207,7 @@ $REST_API_ENDPOINTS = [
         ],
     ],
     'GET_USER_AVATAR' => (object) [
-        'ROUTE' => '/users/avatar',
+        'ROUTE' => '/users/userSettings/avatar',
         'ARGUMENTS' => [
             'methods' => $REST_API_GET_METHOD,
             'callback' => 'getUserAvatar',
