@@ -4,7 +4,7 @@
       <headless-multi-content
         v-show="groupIndex === 0"
         :rows="nodeGroup.map(row => row.node.id)"
-        :value="getRowValue(nodeGroup)"
+        :value="rowId"
         @input="changeRow"
       >
         <template v-slot="{ isVisible, hasNext, next }">

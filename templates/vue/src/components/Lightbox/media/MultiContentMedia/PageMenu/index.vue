@@ -197,8 +197,9 @@ export default {
         return this.menuGroups[index][0].node.title
       }
     },
-    changeView(row) {
-      console.log("I was clicked!" + row)
+    changeView(rowNode) {
+      this.$root.$emit("change-menuGroup", rowNode)
+      console.log("changeView emitted")
     },
   },
 }
