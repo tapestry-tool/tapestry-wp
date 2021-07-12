@@ -52,7 +52,7 @@ If you complete these steps before running `npm run build`, you will have link p
 To enable Avatars throughout the application, follow these steps: 
 
 1. If not done already, in the `templates/vue` directory, create a `.env` file.
-2. Add the following line to the `.env` file to enable Avatars:
+2. Add the following line to enable Avatars:
     ```
    	VUE_APP_AVATARS=TRUE
 
