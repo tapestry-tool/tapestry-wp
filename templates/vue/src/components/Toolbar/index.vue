@@ -100,7 +100,7 @@ export default {
   border-radius: 4px;
   border-bottom-right-radius: 0;
   border-bottom-left-radius: 0;
-  padding: 8px 6px 8px 12px;
+  padding: 8px 6px 8px 6px;
   margin-left: auto;
   position: relative;
 }
