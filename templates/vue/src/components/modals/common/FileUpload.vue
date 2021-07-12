@@ -387,6 +387,7 @@ export default {
     color: #fff;
     background: #393c3ebd;
     border: none;
+    white-space: pre-wrap;
 
     &::after {
       display: none;
