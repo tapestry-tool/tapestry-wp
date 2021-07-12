@@ -47,7 +47,7 @@
             </div>
             <b-collapse
               :id="`collapse-${index}`"
-              :visible="index === 0 ? true : false"
+              :visible="index === 0"
               class="mt-2"
             >
               <ul class="page-menu-item fa-ul">
@@ -58,6 +58,7 @@
                   :lockRows="lockRows"
                   :disabled="disabledRow(row.node)"
                   style="z-index: 10"
+                  :click="changeView(row.node)"
                   @scroll-to="scrollToRef"
                 />
               </ul>
@@ -195,6 +196,9 @@ export default {
       } else {
         return this.menuGroups[index][0].node.title
       }
+    },
+    changeView(row) {
+      console.log("I was clicked!" + row)
     },
   },
 }

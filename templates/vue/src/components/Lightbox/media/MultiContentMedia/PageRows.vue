@@ -1,88 +1,93 @@
 <template>
-  <headless-multi-content
-    :rows="rows.map(row => row.node.id)"
-    :value="rowId"
-    @input="changeRow"
-  >
-    <template v-slot="{ isVisible, hasNext, next }">
-      <div data-qa="page-rows">
-        <div
-          v-for="(row, index) in rows"
-          :id="`row-${row.node.id}`"
-          :key="row.node.id"
-          ref="rowRefs"
-          class="page-row"
-          :style="rowBackground"
-        >
-          <div class="title-row-icon">
-            <i
-              v-if="disableRow(index, row.node)"
-              class="fas fa-lock fa-sm"
-              style="color:white;"
-            ></i>
-            <a v-else>
-              <i
-                class="fas fa-heart fa-sm"
-                :style="{
-                  color: isFavourite(row.node.id) ? 'red' : 'white',
-                  cursor: 'pointer',
-                }"
-                @click="toggleFavourite(row.node.id)"
-              ></i>
-            </a>
-          </div>
-          <div v-if="disableRow(index, row.node)">
-            <h1 class="title">
-              {{ row.node.title }}
-            </h1>
-            <locked-content :node="row.node"></locked-content>
-          </div>
-          <div v-else :data-qa="`row-content-${row.node.id}`">
-            <div v-if="row.node.mediaType !== 'multi-content'">
-              <tapestry-media
-                :node-id="row.node.id"
-                :dimensions="dimensions"
-                context="page"
-                style="color: white; margin-bottom: 24px;"
-                @complete="updateProgress(row.node.id)"
-                @load="handleLoad($refs.rowRefs[index])"
-              />
-              <p v-if="row.children.length > 0" style="color: white;">
-                {{ row.node.typeData.subAccordionText }}
-              </p>
-              <accordion-rows
-                v-if="row.children.length > 0"
-                :dimensions="dimensions"
-                :node="row.node"
-                :rowId="subRowId"
-                context="page"
-                :level="level + 1"
-                @changeRow="changeRow"
-                @load="handleLoad"
-                @updateProgress="updateProgress"
-              ></accordion-rows>
+  <div>
+    <div v-for="(nodeGroup, groupIndex) in menuGroups" :key="groupIndex">
+      <headless-multi-content
+        v-show="groupIndex === 0"
+        :rows="nodeGroup.map(row => row.node.id)"
+        :value="getRowValue(nodeGroup)"
+        @input="changeRow"
+      >
+        <template v-slot="{ isVisible, hasNext, next }">
+          <div data-qa="page-rows">
+            <div
+              v-for="(row, index) in nodeGroup"
+              :id="`row-${row.node.id}`"
+              :key="row.node.id"
+              ref="rowRefs"
+              class="page-row"
+              :style="rowBackground"
+            >
+              <div class="title-row-icon">
+                <i
+                  v-if="disableRow(index, row.node)"
+                  class="fas fa-lock fa-sm"
+                  style="color:white;"
+                ></i>
+                <a v-else>
+                  <i
+                    class="fas fa-heart fa-sm"
+                    :style="{
+                      color: isFavourite(row.node.id) ? 'red' : 'white',
+                      cursor: 'pointer',
+                    }"
+                    @click="toggleFavourite(row.node.id)"
+                  ></i>
+                </a>
+              </div>
+              <div v-if="disableRow(index, row.node)">
+                <h1 class="title">
+                  {{ row.node.title }}
+                </h1>
+                <locked-content :node="row.node"></locked-content>
+              </div>
+              <div v-else :data-qa="`row-content-${row.node.id}`">
+                <div v-if="row.node.mediaType !== 'multi-content'">
+                  <tapestry-media
+                    :node-id="row.node.id"
+                    :dimensions="dimensions"
+                    context="page"
+                    style="color: white; margin-bottom: 24px;"
+                    @complete="updateProgress(row.node.id)"
+                    @load="handleLoad($refs.rowRefs[index])"
+                  />
+                  <p v-if="row.children.length > 0" style="color: white;">
+                    {{ row.node.typeData.subAccordionText }}
+                  </p>
+                  <accordion-rows
+                    v-if="row.children.length > 0"
+                    :dimensions="dimensions"
+                    :node="row.node"
+                    :rowId="subRowId"
+                    context="page"
+                    :level="level + 1"
+                    @changeRow="changeRow"
+                    @load="handleLoad"
+                    @updateProgress="updateProgress"
+                  ></accordion-rows>
+                </div>
+                <multi-content-media
+                  v-else-if="row.children.length > 0"
+                  :node="getNode(row.node.id)"
+                  :row-id="subRowId"
+                  context="page"
+                  :level="level + 1"
+                  @close="handleAutoClose"
+                  @complete="updateProgress"
+                />
+              </div>
+              <button
+                v-if="row.node.completed && isVisible(row)"
+                class="mt-2"
+                @click="hasNext ? next() : (showCompletion = true)"
+              >
+                {{ node.typeData.finishButtonText }}
+              </button>
             </div>
-            <multi-content-media
-              v-else-if="row.children.length > 0"
-              :node="getNode(row.node.id)"
-              :row-id="subRowId"
-              context="page"
-              :level="level + 1"
-              @close="handleAutoClose"
-              @complete="updateProgress"
-            />
           </div>
-          <button
-            v-if="row.node.completed && isVisible(row)"
-            class="mt-2"
-            @click="hasNext ? next() : (showCompletion = true)"
-          >
-            {{ node.typeData.finishButtonText }}
-          </button>
-        </div>
-      </div>
-    </template>
-  </headless-multi-content>
+        </template>
+      </headless-multi-content>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -147,6 +152,21 @@ export default {
         return { node, children }
       })
     },
+    menuGroups() {
+      const menu = []
+      const mainMenu = []
+      this.rows.forEach(row => {
+        if (row.node.typeData.isSecondaryNode) {
+          let subMenu = []
+          subMenu.push(row)
+          menu.push(subMenu)
+        } else {
+          mainMenu.push(row)
+        }
+      })
+      menu.unshift(mainMenu)
+      return menu
+    },
     lockRows() {
       return this.node.typeData.lockRows
     },
@@ -196,6 +216,14 @@ export default {
     },
     handleAutoClose() {
       this.$emit("close")
+    },
+    getRowValue(nodeGroup) {
+      let firstNodeId = nodeGroup[0].node.id
+      this.rows.forEach((row, index) => {
+        if (row.node.id === firstNodeId) {
+          return index
+        }
+      })
     },
   },
 }
