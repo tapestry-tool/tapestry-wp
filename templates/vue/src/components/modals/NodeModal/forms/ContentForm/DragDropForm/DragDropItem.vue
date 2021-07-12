@@ -7,6 +7,7 @@
         :data-qa="`bucket-item-text-${item.bucketId}`"
       ></b-form-input>
       <color-picker
+        v-if="!useImages"
         label="Background color"
         :data-qa="`bucket-item-backgroundcolor-${item.bucketId}`"
         :currentColor="item.color"

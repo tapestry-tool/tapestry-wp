@@ -26,17 +26,9 @@ export default {
       type: Object,
       required: true,
     },
-    bucketItem: {
+    item: {
       type: Object,
       required: true,
-    },
-    parentBucket: {
-      type: Object,
-      required: true,
-    },
-    isFromBucketItem: {
-      type: Boolean,
-      required: false,
     },
   },
   computed: {

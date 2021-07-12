@@ -13,9 +13,7 @@
         :key="item.id"
         :node="node"
         :question="question"
-        :bucketItem="item"
-        :parentBucket="bucket"
-        :isFromBucketItem="isFromBucket"
+        :item="item"
         :data-qa="`user-bucket-item-${item.id}`"
       />
     </div>
@@ -41,23 +39,15 @@ export default {
       type: Object,
       required: true,
     },
-    isFromBucket: {
-      type: Boolean,
-      required: false,
-    },
   },
   computed: {
     bucketClass() {
-      return this.isFromBucket ? "from-bucket-container" : "to-bucket-container"
+      return this.bucket.type === "from"
+        ? "from-bucket-container"
+        : "to-bucket-container"
     },
     bucketTestId() {
-      return `user-${this.isFromBucket ? "from" : "to"}-bucket-${this.bucket.id}`
-    },
-    fromBucketArray() {
-      return this.question.answerTypes.dragDrop.fromBucketArray
-    },
-    toBucketArray() {
-      return this.question.answerTypes.dragDrop.toBucketArray
+      return `user-${this.bucket.type}-bucket-${this.bucket.id}`
     },
   },
   created() {
