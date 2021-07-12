@@ -1,25 +1,22 @@
 <template>
   <div class="toolbar">
     <tapestry-filter v-if="!showMap" style="z-index: 10;" />
-    <div v-show="isLoggedIn && toolbarLength > 0" class="slider-wrapper">
+    <div
+      v-show="isLoggedIn"
+      :class="[{ 'hide-toolbar': hideToolbar }, 'slider-wrapper']"
+    >
       <user-settings-button
         v-if="avatarsEnabled"
         data-qa="user-settings-button"
-        class="toolbar-item"
       ></user-settings-button>
       <div v-show="canEdit || (!showMap && hasDepth)" class="can-edit">
-        <review-notifications
-          v-if="canEdit && settings.submitNodesEnabled"
-          class="toolbar-item"
-        />
+        <review-notifications v-if="canEdit && settings.submitNodesEnabled" />
         <settings-modal-button
           v-if="canEdit"
           :max-depth="maxDepth"
-          class="toolbar-item"
         ></settings-modal-button>
         <tapestry-depth-slider
           v-show="!showMap && hasDepth"
-          class="toolbar-item"
           @change="updateViewBox"
           @change:max-depth="maxDepth = $event"
         ></tapestry-depth-slider>
@@ -67,8 +64,12 @@ export default {
     avatarsEnabled() {
       return this.isLoggedIn && process.env.VUE_APP_AVATARS === "TRUE"
     },
-    toolbarLength() {
-      return document.getElementsByClassName("toolbar-item").length
+    hideToolbar() {
+      return !(
+        this.avatarsEnabled ||
+        this.canEdit ||
+        (!this.showMap && this.hasDepth)
+      )
     },
   },
   methods: {
@@ -108,7 +109,7 @@ export default {
   display: flex;
 }
 
-.hide {
-  visibility: hidden;
+.hide-toolbar {
+  display: none;
 }
 </style>
