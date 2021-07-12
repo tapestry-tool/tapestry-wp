@@ -239,7 +239,7 @@ export default {
 .avatar {
   display: flex;
   justify-content: center;
-  max-width: 300px;
+  width: 300px;
   margin: 0 auto;
 }
 
