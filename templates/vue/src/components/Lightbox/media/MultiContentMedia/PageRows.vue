@@ -225,6 +225,9 @@ export default {
         }
       })
     },
+    areAllPopup(nodes) {
+      return nodes.every(node => node.popup !== null)
+    },
   },
 }
 </script>
