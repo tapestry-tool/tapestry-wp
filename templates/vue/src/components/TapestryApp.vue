@@ -1,6 +1,6 @@
 <template>
   <div id="app-container" :class="{ 'sidebar-open': isSidebarOpen }">
-    <toolbar style="margin-bottom: 100px;" />
+    <toolbar />
     <tapestry-map
       v-if="settings.renderMap"
       :is-sidebar-open="isSidebarOpen"
