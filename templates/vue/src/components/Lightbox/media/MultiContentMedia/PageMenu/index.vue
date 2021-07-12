@@ -37,10 +37,19 @@
       >
         <div v-for="(menu, index) in menuGroups" :key="index" class="menu-wrapper">
           <b-card class="menu">
-            <b-card-text v-b-toggle="`collapse-${index}`">
-              {{ getMenuName(index) }}
-            </b-card-text>
-            <b-collapse :id="`collapse-${index}`" class="mt-2">
+            <div>
+              <b-card-text v-if="index === 0">
+                {{ getMenuName(index) }}
+              </b-card-text>
+              <b-card-text v-else v-b-toggle="`collapse-${index}`">
+                {{ getMenuName(index) }}
+              </b-card-text>
+            </div>
+            <b-collapse
+              :id="`collapse-${index}`"
+              :visible="index === 0 ? true : false"
+              class="mt-2"
+            >
               <ul class="page-menu-item fa-ul">
                 <page-menu-item
                   v-for="row in menu"
