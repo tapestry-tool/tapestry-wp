@@ -1,16 +1,16 @@
 <template>
   <div>
-    <div v-for="(nodeGroup, groupIndex) in menuGroups" :key="groupIndex">
+    <div v-for="(menuGroup, groupIndex) in menuGroups" :key="groupIndex">
       <headless-multi-content
-        v-show="groupIndex === 0"
-        :rows="nodeGroup.map(row => row.node.id)"
+        v-show="groupIndex === activeMenuNode"
+        :rows="menuGroup.map(row => row.node.id)"
         :value="rowId"
         @input="changeRow"
       >
         <template v-slot="{ isVisible, hasNext, next }">
           <div data-qa="page-rows">
             <div
-              v-for="(row, index) in nodeGroup"
+              v-for="(row, index) in menuGroup"
               :id="`row-${row.node.id}`"
               :key="row.node.id"
               ref="rowRefs"
@@ -134,6 +134,11 @@ export default {
       required: false,
       default: 0,
     },
+    activeMenuNode: {
+      type: Number,
+      required: false,
+      default: 0,
+    },
   },
   data() {
     return {
@@ -217,8 +222,8 @@ export default {
     handleAutoClose() {
       this.$emit("close")
     },
-    getRowValue(nodeGroup) {
-      let firstNodeId = nodeGroup[0].node.id
+    getRowValue(menuGroup) {
+      let firstNodeId = menuGroup[0].node.id
       this.rows.forEach((row, index) => {
         if (row.node.id === firstNodeId) {
           return index
@@ -227,6 +232,9 @@ export default {
     },
     areAllPopup(nodes) {
       return nodes.every(node => node.popup !== null)
+    },
+    getActiveMenuIndex() {
+      return 0
     },
   },
 }

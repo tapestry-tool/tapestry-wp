@@ -50,7 +50,7 @@
               :visible="index === 0"
               class="mt-2"
             >
-              <ul class="page-menu-item fa-ul">
+              <ul class="page-menu-item fa-ul" @click="changeView(menu[0].node.id)">
                 <page-menu-item
                   v-for="row in menu"
                   :key="row.node.id"
@@ -58,7 +58,6 @@
                   :lockRows="lockRows"
                   :disabled="disabledRow(row.node)"
                   style="z-index: 10"
-                  :click="changeView(row.node)"
                   @scroll-to="scrollToRef"
                 />
               </ul>
@@ -200,9 +199,8 @@ export default {
         return this.menuGroups[index][0].node.title
       }
     },
-    changeView(rowNode) {
-      this.$root.$emit("change-menuGroup", rowNode)
-      console.log("changeView emitted")
+    changeView(nodeId) {
+      this.$emit("changeActiveMenu", nodeId)
     },
   },
 }
