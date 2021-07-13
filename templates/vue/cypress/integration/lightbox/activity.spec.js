@@ -279,7 +279,7 @@ describe("Activity", () => {
       cy.submitModal()
       cy.openLightbox(node.id)
 
-      cy.route("POST", "**/quiz*").as("submit")
+      cy.route("POST", "/users/activity/**").as("submit")
 
       cy.lightbox().within(() => {
         cy.get(`[placeholder="${listPlaceholder}"]`).should("be.visible")
@@ -290,7 +290,6 @@ describe("Activity", () => {
         cy.getByTestId("list-input-2").type("Nova Scotia")
         cy.getByTestId("list-add-2").click()
         cy.getByTestId("list-input-3").type("Manitoba")
-        cy.get(`[class="media-wrapper"]`).scrollTo("bottom")
 
         cy.contains(/submit/i).click()
 
@@ -335,7 +334,7 @@ describe("Activity", () => {
       cy.submitModal()
       cy.openLightbox(node.id)
 
-      cy.route("POST", "**/quiz*").as("submit")
+      cy.route("POST", "/users/activity/**").as("submit")
 
       cy.lightbox().within(() => {
         cy.get(`[placeholder="${listPlaceholder}"]`).should("be.visible")
@@ -345,7 +344,7 @@ describe("Activity", () => {
         cy.getByTestId("list-add-96").click()
         cy.getByTestId("list-add-97").click()
         cy.getByTestId("list-add-98").click()
-        cy.getByTestId("list-add-98").should("not.be.visible")
+        cy.getByTestId("list-add-98").should("be.disabled")
         cy.getByTestId("list-input-list").each((input, index) => {
           cy.getByTestId(`list-input-${index}`).type(`Thing ${index}`)
           console.log(index)
