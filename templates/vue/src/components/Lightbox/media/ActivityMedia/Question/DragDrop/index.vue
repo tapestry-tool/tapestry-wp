@@ -27,12 +27,12 @@
       </b-col>
     </b-row>
 
-    <b-form-invalid-feedback :state="false">
+    <b-form-invalid-feedback :state="canSubmit">
       Please complete this question to continue
     </b-form-invalid-feedback>
     <p>
       <b-button
-        v-if="node.mediaType === 'activity'"
+        v-if="canSubmit"
         class="submit-btn mt-3"
         variant="primary"
         type="submit"
@@ -61,13 +61,24 @@ export default {
     },
     answer: {
       required: true,
-      validator: prop => typeof prop === Array || prop === null,
+      validator: prop => Array.isArray(prop) || prop === null,
     },
   },
   data() {
     return {
       answerData: null,
     }
+  },
+  computed: {
+    canSubmit() {
+      const toBuckets = this.getBuckets("to")
+      return this.answerData.some(dataEntry => {
+        return (
+          toBuckets.some(bucket => bucket.id === dataEntry.bucketId) &&
+          dataEntry.items.length >= 1
+        )
+      })
+    },
   },
   created() {
     if (!this.answer) {
