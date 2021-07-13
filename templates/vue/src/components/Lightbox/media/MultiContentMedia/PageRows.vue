@@ -2,7 +2,7 @@
   <div>
     <div v-for="(menuGroup, groupIndex) in menuGroups" :key="groupIndex">
       <headless-multi-content
-        v-show="groupIndex === activeMenuNode"
+        v-if="menuGroup[0].node.id === activeMenuNode"
         :rows="menuGroup.map(row => row.node.id)"
         :value="rowId"
         @input="changeRow"
@@ -143,6 +143,7 @@ export default {
   data() {
     return {
       showCompletion: false,
+      activeMenuIndex: 0,
     }
   },
   computed: {
@@ -232,9 +233,6 @@ export default {
     },
     areAllPopup(nodes) {
       return nodes.every(node => node.popup !== null)
-    },
-    getActiveMenuIndex() {
-      return 0
     },
   },
 }
