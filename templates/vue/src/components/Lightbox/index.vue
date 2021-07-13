@@ -84,7 +84,7 @@ export default {
       },
       showCompletionScreen: false,
       rowRefs: [],
-      activeMenuNode: 0,
+      activeMenuNode: this.nodeId,
     }
   },
   computed: {

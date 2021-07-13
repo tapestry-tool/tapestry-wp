@@ -143,7 +143,6 @@ export default {
   data() {
     return {
       showCompletion: false,
-      activeMenuIndex: 0,
     }
   },
   computed: {

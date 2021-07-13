@@ -50,7 +50,10 @@
               :visible="index === 0"
               class="mt-2"
             >
-              <ul class="page-menu-item fa-ul" @click="changeView(menu[0].node.id)">
+              <ul
+                class="page-menu-item fa-ul"
+                @click="changeActiveMenu(menu[0].node.id)"
+              >
                 <page-menu-item
                   v-for="row in menu"
                   :key="row.node.id"
@@ -155,6 +158,7 @@ export default {
         },
       })
     }
+    this.$emit("changeActiveMenu", this.menuGroups[0][0].node.id)
   },
   methods: {
     disabledRow(node) {
@@ -199,7 +203,7 @@ export default {
         return this.menuGroups[index][0].node.title
       }
     },
-    changeView(nodeId) {
+    changeActiveMenu(nodeId) {
       this.$emit("changeActiveMenu", nodeId)
     },
   },
