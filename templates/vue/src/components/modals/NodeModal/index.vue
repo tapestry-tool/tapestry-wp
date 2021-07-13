@@ -969,27 +969,26 @@ export default {
           this.node.typeData.activity.questions[0].answerTypes.text.allowMultiple
         ) {
           let listQuestion = this.node.typeData.activity.questions[0].answerTypes
-            .text.list
+            .text
           let minValue = parseInt(listQuestion.minFields, 10)
+          let maxValue = parseInt(listQuestion.maxFields, 10)
           if (!Number.isInteger(minValue)) {
-            errMsgs.push("Minimum number of fields must be an integer value")
+            errMsgs.push(
+              "Please enter a valid number as the minimum number of fields"
+            )
+          } else if (minValue < 1) {
+            errMsgs.push("Minimum number of fields must be >= 1")
           }
-          if (minValue < 1) {
-            errMsgs.push("Minimum number of fields for list activity must be >= 1")
-          }
-          if (listQuestion.maxFields.enabled) {
-            let maxValue = parseInt(listQuestion.maxFields.value, 10)
-            if (!Number.isInteger(maxValue)) {
-              errMsgs.push("Maximum number of fields must be an integer value")
-            }
-            if (maxValue < minValue) {
-              errMsgs.push(
-                "Maximum number of fields for list activity must be >= minimum number fields"
-              )
-            }
-            if (maxValue > 100) {
-              errMsgs.push("Maximum number of fields must be <= 100")
-            }
+          if (!Number.isInteger(maxValue)) {
+            errMsgs.push(
+              "Please enter a valid number as the maximum number of fields"
+            )
+          } else if (maxValue < minValue) {
+            errMsgs.push(
+              "Please ensure minimum number of fields is less than or equal to the maximum number of fields"
+            )
+          } else if (maxValue > 100) {
+            errMsgs.push("Maximum number of fields must be less than 100")
           }
         }
         const validMultipleChoiceValues = this.isMultipleChoiceValueValid

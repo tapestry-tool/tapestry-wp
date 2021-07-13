@@ -131,58 +131,48 @@
                     v-model="question.answerTypes.text.placeholder"
                     :data-qa="`question-answer-text-single-placeholder-${index}`"
                   ></b-form-input>
-                </div>
-                <b-form-checkbox
-                  v-if="!question.answerTypes.text.isMultiLine"
-                  v-model="question.answerTypes.text.allowMultiple"
-                  data-qa="enable-list-checkbox"
-                >
-                  Allow entering multiple values
-                </b-form-checkbox>
-                <div
-                  v-if="
-                    !question.answerTypes.text.isMultiLine &&
-                      question.answerTypes.text.allowMultiple
-                  "
-                  class="mt-2 pl-4"
-                >
-                  <div class="list-options">
-                    <div class="list-field-options">
-                      <b-form-checkbox
-                        v-model="question.answerTypes.text.list.maxFields.enabled"
-                        data-qa="list-max-checkbox"
-                        class="list-max-checkbox"
-                      ></b-form-checkbox>
-                      <div class="list-row-container">
-                        <div class="list-option-row">
-                          <label for="min-field">
-                            Minimum answer fields
-                          </label>
-                          <b-form-input
-                            id="min-field"
-                            v-model="question.answerTypes.text.list.minFields"
-                            data-qa="min-list-fields-input"
-                            type="number"
-                            class="list-input"
-                          ></b-form-input>
-                        </div>
-                        <div class="list-option-row">
-                          <label for="max-field">
-                            Maximum answer fields
-                          </label>
-                          <b-form-input
-                            id="max-field"
-                            v-model="question.answerTypes.text.list.maxFields.value"
-                            :disabled="
-                              !question.answerTypes.text.list.maxFields.enabled
-                            "
-                            data-qa="max-list-fields-input"
-                            type="number"
-                            class="list-input"
-                          ></b-form-input>
-                        </div>
-                      </div>
-                    </div>
+                  <b-form-checkbox
+                    v-model="question.answerTypes.text.allowMultiple"
+                    class="mt-2"
+                    data-qa="enable-list-checkbox"
+                  >
+                    Allow entering multiple values
+                  </b-form-checkbox>
+                  <div
+                    v-if="question.answerTypes.text.allowMultiple"
+                    class="mt-2 pl-4 list-options"
+                  >
+                    <b-row>
+                      <b-col>
+                        <b-form-group
+                          label-cols-sm="12"
+                          label-cols-lg="4"
+                          content-cols-sm
+                          content-cols-lg="6"
+                          description="How many answers would you like users to provide?"
+                          label="Number of answers"
+                          label-for="input-horizontal"
+                        >
+                          <b-input-group prepend="Min:">
+                            <b-form-input
+                              id="min-field"
+                              v-model="question.answerTypes.text.minFields"
+                              data-qa="min-list-fields-input"
+                              type="number"
+                            ></b-form-input>
+                            <b-input-group-prepend is-text>
+                              Max:
+                            </b-input-group-prepend>
+                            <b-form-input
+                              id="max-field"
+                              v-model="question.answerTypes.text.maxFields"
+                              data-qa="max-list-fields-input"
+                              type="number"
+                            ></b-form-input>
+                          </b-input-group>
+                        </b-form-group>
+                      </b-col>
+                    </b-row>
                   </div>
                 </div>
               </div>
@@ -266,10 +256,8 @@ const defaultQuestion = {
       placeholder: "",
       isMultiLine: false,
       allowMultiple: false,
-      list: {
-        minFields: 1,
-        maxFields: { enabled: false, value: 100 },
-      },
+      minFields: 1,
+      maxFields: 100,
     },
     audio: {
       enabled: false,
@@ -376,35 +364,5 @@ export default {
   .not-collapsed .when-closed {
     display: none;
   }
-}
-
-.list-options {
-  display: flex;
-  flex-direction: column;
-}
-
-.list-field-options {
-  display: flex;
-}
-
-.list-row-container {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-}
-
-.list-option-row {
-  display: flex;
-  justify-content: space-between;
-}
-
-.list-max-checkbox {
-  position: relative;
-  top: 60px;
-  right: 10px;
-}
-
-.list-input {
-  width: 60%;
 }
 </style>

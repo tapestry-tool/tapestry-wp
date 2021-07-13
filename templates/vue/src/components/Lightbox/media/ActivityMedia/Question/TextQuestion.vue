@@ -1,41 +1,41 @@
 <template>
   <b-form class="grid-container">
-    <ul v-if="question.answerTypes.text.allowMultiple" class="list">
-      <li
+    <div v-if="question.answerTypes.text.allowMultiple" class="list">
+      <b-input-group
         v-for="(answerItem, index) in textAnswers"
         :key="index"
-        class="answerItem"
         data-qa="list-input-list"
+        class="mt-2 list-input-list"
       >
         <b-form-input
           v-model="textAnswers[index]"
           :data-qa="`list-input-${index}`"
-          :placeholder="
-            question.answerTypes.text.placeholder
-              ? question.answerTypes.text.placeholder
-              : 'Type an answer and press Enter'
-          "
+          :placeholder="getListPlaceholder(index)"
           autofocus
           @keydown.enter="addAnswer"
         ></b-form-input>
-        <b-button
-          v-show="numOfAnswers < maxFields"
-          variant="primary"
-          :data-qa="`list-add-${index}`"
-          @click="addAnswer"
-        >
-          +
-        </b-button>
-        <b-button
-          v-show="numOfAnswers > minFields"
-          variant="danger"
-          :data-qa="`list-del-${index}`"
-          @click="deleteAnswer(index)"
-        >
-          -
-        </b-button>
-      </li>
-    </ul>
+        <b-input-group-append v-if="minFields !== maxFields">
+          <b-button
+            :variant="numOfAnswers <= minFields ? 'secondary' : 'danger'"
+            :data-qa="`list-del-${index}`"
+            :disabled="numOfAnswers <= minFields"
+            @click="deleteAnswer(index)"
+          >
+            -
+          </b-button>
+        </b-input-group-append>
+        <b-input-group-append v-if="minFields != maxFields">
+          <b-button
+            :variant="numOfAnswers >= maxFields ? 'secondary' : 'primary'"
+            :data-qa="`list-add-${index}`"
+            :disabled="numOfAnswers >= maxFields"
+            @click="addAnswer"
+          >
+            +
+          </b-button>
+        </b-input-group-append>
+      </b-input-group>
+    </div>
     <b-form-textarea
       v-else-if="question.answerTypes.text.isMultiLine"
       v-model="textAnswers[0]"
@@ -58,7 +58,6 @@
 </template>
 
 <script>
-const MAX_FIELDS_ALLOWED = 100
 export default {
   name: "text-question",
   props: {
@@ -79,12 +78,10 @@ export default {
   },
   computed: {
     minFields() {
-      return parseInt(this.question.answerTypes.text.list.minFields, 10)
+      return parseInt(this.question.answerTypes.text.minFields, 10)
     },
     maxFields() {
-      return this.question.answerTypes.text.list.maxFields.enabled
-        ? parseInt(this.question.answerTypes.text.list.maxFields.value, 10)
-        : MAX_FIELDS_ALLOWED
+      return parseInt(this.question.answerTypes.text.maxFields, 10)
     },
     numOfAnswers() {
       return this.textAnswers.length
@@ -110,23 +107,48 @@ export default {
       }
     },
     deleteAnswer(index) {
-      this.$bvModal
-        .msgBoxConfirm("This answer will be removed.", {
-          modalClass: "node-modal-confirmation",
-          title: "Are you sure you want to delete this answer from the list?",
-          okTitle: "Yes, delete!",
-          okVariant: "danger",
-        })
-        .then(close => {
-          if (close) {
-            this.textAnswers.splice(index, 1)
-          }
-        })
-        .catch(err => console.log(err))
+      if (this.textAnswers[index]?.length) {
+        this.$bvModal
+          .msgBoxConfirm("This answer will be removed.", {
+            modalClass: "node-modal-confirmation",
+            title: "Are you sure you want to delete this answer from the list?",
+            okTitle: "Yes, delete!",
+            okVariant: "danger",
+          })
+          .then(close => {
+            if (close) {
+              this.textAnswers.splice(index, 1)
+            }
+          })
+          .catch(err => console.log(err))
+      } else {
+        this.textAnswers.splice(index, 1)
+      }
     },
     addAnswer() {
       if (this.numOfAnswers < this.maxFields) {
         this.textAnswers.push("")
+      }
+    },
+    getListPlaceholder(i) {
+      if (this.question.answerTypes.text.placeholder) {
+        return this.question.answerTypes.text.placeholder
+      } else {
+        i++
+        const nth = function(d) {
+          if (d > 3 && d < 21) return "th"
+          switch (d % 10) {
+            case 1:
+              return "st"
+            case 2:
+              return "nd"
+            case 3:
+              return "rd"
+            default:
+              return "th"
+          }
+        }
+        return "Type your " + i + nth(i) + " answer"
       }
     },
   },
@@ -134,31 +156,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.grid-container {
-  display: grid;
-  align-content: center;
-}
-.answerItem {
-  display: flex;
-  border-style: solid;
-  border-radius: 6px;
-  padding: 10px 20px;
-  margin-top: 5px;
-}
-.list li button {
-  float: right;
-  position: relative;
-  padding: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 20px;
-  width: 50px;
-  float: right;
-  font-size: 30px;
-  font-weight: bold;
-  margin-left: 3px;
-  margin-right: 3px;
+.list-input-list {
+  border-radius: 5px;
+  overflow: hidden;
+  .input-group-append button {
+    min-width: 45px;
+  }
 }
 .submit-btn {
   float: right;
