@@ -16,8 +16,8 @@
         Remove bucket
       </b-button>
     </b-form-group>
-    <b-form-group class="bucket-container">
-      <b-form-group v-if="items">
+    <b-form-group v-if="items" class="bucket-container p-2">
+      <b-form-group>
         <item
           v-for="item in items"
           :key="item.id"
