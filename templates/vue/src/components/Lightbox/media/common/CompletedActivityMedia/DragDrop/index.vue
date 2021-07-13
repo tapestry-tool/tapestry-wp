@@ -1,6 +1,6 @@
 <template>
-  <ul class="flexContainer">
-    <li v-for="bucket in buckets" :key="bucket.id" class="flexItem">
+  <ul class="ml-1">
+    <li v-for="bucket in buckets" :key="bucket.id" class="mr-2">
       <bucket :bucket="bucket" :items="getItems(bucket.id)" :hide-text="hideText" />
     </li>
   </ul>
@@ -56,11 +56,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.flexContainer {
+ul {
   display: flex;
-  margin-left: 30px;
-}
-.flexItem {
-  margin-right: 20px;
+  list-style-type: none;
 }
 </style>

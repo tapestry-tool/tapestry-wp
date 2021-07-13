@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="mt-1 mb-1">
     <div
       class="circle"
       :style="{
@@ -29,17 +29,13 @@ export default {
 <style scoped>
 .circle {
   border-radius: 100%;
-  min-height: 50px;
+  width: 40px;
+  height: 40px;
   border: solid;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   text-align: center;
   margin: auto;
-}
-.container {
-  margin-top: 30px;
-  margin-bottom: 30px;
-  cursor: pointer;
 }
 </style>

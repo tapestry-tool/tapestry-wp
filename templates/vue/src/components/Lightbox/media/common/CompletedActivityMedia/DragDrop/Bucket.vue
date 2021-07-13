@@ -1,6 +1,6 @@
 <template>
   <div class="from-bucket-container" :data-qa="`user-from-bucket-${bucket.id}`">
-    <b class="bucket-label">{{ bucket.text }}</b>
+    <b style="font-size: 1rem">{{ bucket.text }}</b>
     <item
       v-for="item in items"
       :key="item.id"
@@ -36,13 +36,10 @@ export default {
 <style scoped>
 .from-bucket-container {
   background-color: #009688;
-  margin-bottom: 15px;
+  padding: 5px 0;
   width: 80px;
   min-height: 80px;
-  border-radius: 25px;
+  border-radius: 15px;
   overflow-wrap: break-word;
-}
-.bucket-label {
-  font-size: 23px;
 }
 </style>
