@@ -2,7 +2,7 @@
   <article
     :class="{
       article: true,
-      multiContentArticle: isContentInMultiContent,
+      multiContentArticle: context === 'multi-content',
       'page-style': context == 'page',
     }"
   >
@@ -23,11 +23,6 @@ export default {
       type: String,
       required: false,
       default: "",
-    },
-    isContentInMultiContent: {
-      type: Boolean,
-      required: false,
-      default: false,
     },
   },
   computed: {

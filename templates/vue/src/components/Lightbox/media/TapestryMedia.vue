@@ -16,7 +16,6 @@
       v-if="node.mediaType === 'text'"
       :node="node"
       :context="context"
-      :isContentInMultiContent="isMultiContentRow(node.id)"
       @complete="complete"
       @load="handleLoad"
     />
@@ -110,7 +109,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getNode", "isMultiContentRow"]),
+    ...mapGetters(["getNode"]),
     node() {
       return this.getNode(this.nodeId)
     },
