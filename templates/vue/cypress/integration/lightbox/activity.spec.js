@@ -331,7 +331,6 @@ describe("Activity", () => {
       cy.getByTestId("enable-list-checkbox").click({ force: true })
       cy.getByTestId("min-list-fields-input").clear()
       cy.getByTestId("min-list-fields-input").type(minFieldsValue)
-      cy.getByTestId("list-max-checkbox").click({ force: true })
 
       cy.submitModal()
       cy.openLightbox(node.id)
