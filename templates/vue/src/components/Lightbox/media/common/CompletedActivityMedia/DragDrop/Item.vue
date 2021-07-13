@@ -29,8 +29,8 @@ export default {
 <style scoped>
 .circle {
   border-radius: 100%;
-  width: 40px;
-  height: 40px;
+  width: 75px;
+  height: 75px;
   border: solid;
   background-size: cover;
   background-position: center;
