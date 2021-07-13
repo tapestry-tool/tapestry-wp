@@ -1,9 +1,9 @@
 <template>
-  <div class="container" draggable="true" @dragstart="dragStart($event, item)">
+  <div class="container my-1" draggable="true" @dragstart="dragStart($event, item)">
     <div
       class="circle"
       :style="{
-        'background-image': hasImage ? 'url(' + itemData.imageurl + ')' : 'none',
+        'background-image': hasImage ? 'url(' + itemData.imageUrl + ')' : 'none',
         'background-color': itemData.color,
       }"
     ></div>
@@ -51,7 +51,8 @@ export default {
 <style scoped>
 .circle {
   border-radius: 100%;
-  min-height: 140px;
+  height: 100px;
+  width: 100px;
   border: solid;
   background-size: cover;
   background-position: center;
@@ -60,8 +61,6 @@ export default {
   margin: auto;
 }
 .container {
-  margin-top: 30px;
-  margin-bottom: 30px;
   cursor: pointer;
 }
 </style>

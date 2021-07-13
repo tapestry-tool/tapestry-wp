@@ -2,6 +2,7 @@
   <div>
     <div
       :class="bucketClass"
+      class="bucket-container py-1 mb-3"
       :data-qa="bucketTestId"
       @dragover.prevent
       @dragenter.prevent
@@ -65,21 +66,17 @@ export default {
 </script>
 
 <style scoped>
-.from-bucket-container {
-  background-color: #009688;
-  margin-bottom: 15px;
-  min-height: 350px;
-  padding-bottom: 100px;
+.bucket-container {
+  min-height: 250px;
   border-radius: 25px;
   overflow-wrap: break-word;
 }
+
+.from-bucket-container {
+  background-color: #009688;
+}
 .to-bucket-container {
   background-color: #3f51b5;
-  margin-bottom: 15px;
-  min-height: 250px;
-  padding-bottom: 100px;
-  border-radius: 25px;
-  overflow-wrap: break-word;
 }
 .bucket-label {
   font-size: 28px;

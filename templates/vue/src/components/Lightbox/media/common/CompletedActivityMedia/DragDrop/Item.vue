@@ -3,7 +3,7 @@
     <div
       class="circle"
       :style="{
-        'background-image': item.imageUrl ? 'url(' + item.imageurl + ')' : 'none',
+        'background-image': item.imageUrl ? 'url(' + item.imageUrl + ')' : 'none',
         'background-color': item.color,
       }"
     ></div>

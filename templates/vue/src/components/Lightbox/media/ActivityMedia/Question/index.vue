@@ -139,11 +139,6 @@ export default {
       return answerObject ? Object.entries(answerObject) : null
     },
     enabledAnswerTypes() {
-      console.log(
-        Object.entries(this.question.answerTypes).filter(([, value]) => {
-          return value.enabled
-        })
-      )
       return Object.entries(this.question.answerTypes).filter(([, value]) => {
         return value.enabled
       })
