@@ -222,14 +222,6 @@ export default {
     handleAutoClose() {
       this.$emit("close")
     },
-    getRowValue(menuGroup) {
-      let firstNodeId = menuGroup[0].node.id
-      this.rows.forEach((row, index) => {
-        if (row.node.id === firstNodeId) {
-          return index
-        }
-      })
-    },
     areAllPopup(nodes) {
       return nodes.every(node => node.popup !== null)
     },
