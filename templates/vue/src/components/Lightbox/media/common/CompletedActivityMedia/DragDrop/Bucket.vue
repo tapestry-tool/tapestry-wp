@@ -1,29 +1,33 @@
 <template>
   <div class="from-bucket-container" :data-qa="`user-from-bucket-${bucket.id}`">
-    <b class="bucket-label">{{ bucket.value }}</b>
-    <completed-activity-drag-drop-bucket-item
-      v-for="item in bucket.itemArray"
+    <b class="bucket-label">{{ bucket.text }}</b>
+    <item
+      v-for="item in items"
       :key="item.id"
-      :bucketItem="item"
-      :question="question"
+      :item="item"
+      :hideText="hideText"
       :data-qa="`user-bucket-item-${item.id}`"
     />
   </div>
 </template>
 <script>
-import CompletedActivityDragDropBucketItem from "./CompletedActivityDragDropBucketItem"
+import Item from "./Item"
 export default {
+  name: "bucket",
   components: {
-    CompletedActivityDragDropBucketItem,
+    Item,
   },
   props: {
-    question: {
-      type: Object,
-      required: false,
-      default: () => ({}),
+    hideText: {
+      type: Boolean,
+      required: true,
     },
     bucket: {
       type: Object,
+      required: true,
+    },
+    items: {
+      type: Array,
       required: true,
     },
   },

@@ -3,29 +3,24 @@
     <div
       class="circle"
       :style="{
-        'background-image': hasImage ? 'url(' + bucketItem.imageurl + ')' : 'none',
-        'background-color': bucketItem.color,
+        'background-image': item.imageUrl ? 'url(' + item.imageurl + ')' : 'none',
+        'background-color': item.color,
       }"
     ></div>
-    <b v-if="!question.answerTypes.dragDrop.hideText">{{ bucketItem.text }}</b>
+    <b v-if="!hideText">{{ item.text }}</b>
   </div>
 </template>
 <script>
 export default {
+  name: "item",
   props: {
-    bucketItem: {
+    item: {
       type: Object,
       required: true,
     },
-    question: {
-      type: Object,
-      required: false,
-      default: () => ({}),
-    },
-  },
-  computed: {
-    hasImage() {
-      return this.question.answerTypes.dragDrop.useImages
+    hideText: {
+      type: Boolean,
+      required: true,
     },
   },
 }

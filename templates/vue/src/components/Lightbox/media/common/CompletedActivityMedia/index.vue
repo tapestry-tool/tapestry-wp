@@ -16,25 +16,14 @@
         <audio controls :src="urlAnswer"></audio>
       </b-col>
       <b-col v-if="type === 'dragDrop'" align-self="center">
-        <ul class="flexContainer">
-          <li
-            v-for="answer in getDragDropBuckets"
-            :key="answer.index"
-            class="flexItem"
-          >
-            <completed-activity-drag-drop-bucket
-              :bucket="answer"
-              :question="question"
-            />
-          </li>
-        </ul>
+        <drag-drop :answerData="answerData" :question="question" />
       </b-col>
     </b-row>
   </b-container>
 </template>
 
 <script>
-import CompletedActivityDragDropBucket from "./CompletedActivityDragDropBucket"
+import DragDrop from "./DragDrop"
 import TapestryIcon from "@/components/common/TapestryIcon"
 import DragDropIcon from "@/assets/icons/drag_drop.svg"
 import { data as wpData } from "@/services/wp"
@@ -43,7 +32,7 @@ export default {
   name: "completed-activity-media",
   components: {
     TapestryIcon,
-    CompletedActivityDragDropBucket,
+    DragDrop,
   },
   props: {
     type: {
@@ -70,11 +59,6 @@ export default {
     dragDropIcon() {
       return `${wpData.vue_uri}/${DragDropIcon.split("dist")[1]}`
     },
-    getDragDropBuckets() {
-      return this.answerData.toBucketArray.filter(
-        toBucket => toBucket.itemArray.length > 0
-      )
-    },
     urlAnswer() {
       return (
         wpData.uploadDirArray.baseurl + "/" + this.answerData.url + "?" + Date.now()
@@ -95,14 +79,6 @@ export default {
     padding-left: 1em;
     border-left: solid 1px #666;
   }
-}
-
-.flexContainer {
-  display: flex;
-  margin-left: 30px;
-}
-.flexItem {
-  margin-right: 20px;
 }
 
 .dragdropicon {
