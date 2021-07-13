@@ -19,13 +19,13 @@
     <b-form-group class="bucket-container">
       <b-form-group v-if="items">
         <drag-drop-item
-          v-for="(item, index) in items"
+          v-for="item in items"
           :key="item.id"
           :item="item"
           :useImages="useImages"
           :data-qa="`bucket-item-${bucket.id}-${item.id}`"
           :itemRemovalAllowed="itemRemovalAllowed"
-          @remove-item="$emit('remove-item', index)"
+          @remove-item="$emit('remove-item', item.id)"
         />
       </b-form-group>
       <b-button

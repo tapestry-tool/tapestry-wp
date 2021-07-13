@@ -1,17 +1,13 @@
 <template>
-  <div
-    class="container"
-    draggable="true"
-    @dragstart="dragStart($event, bucketItem, parentBucket, isFromBucketItem)"
-  >
+  <div class="container" draggable="true" @dragstart="dragStart($event, item)">
     <div
       class="circle"
       :style="{
-        'background-image': hasImage ? 'url(' + bucketItem.imageurl + ')' : 'none',
-        'background-color': bucketItem.color,
+        'background-image': hasImage ? 'url(' + itemData.imageurl + ')' : 'none',
+        'background-color': itemData.color,
       }"
     ></div>
-    <b v-if="!question.answerTypes.dragDrop.hideText">{{ bucketItem.text }}</b>
+    <b v-if="!question.answerTypes.dragDrop.hideText">{{ itemData.text }}</b>
   </div>
 </template>
 
@@ -27,7 +23,7 @@ export default {
       required: true,
     },
     item: {
-      type: Object,
+      type: String,
       required: true,
     },
   },
@@ -35,14 +31,17 @@ export default {
     hasImage() {
       return this.question.answerTypes.dragDrop.useImages
     },
+    itemData() {
+      return this.question.answerTypes.dragDrop.items.find(item => {
+        return item.id === this.item
+      })
+    },
   },
   methods: {
-    dragStart: function(e, item, parentBucket, isFromBucketItem) {
+    dragStart(e, itemId) {
       e.dataTransfer.dropEffect = "move"
       e.dataTransfer.effectAllowed = "move"
-      e.dataTransfer.setData("itemId", item.id)
-      e.dataTransfer.setData("parentBucketId", parentBucket.id)
-      e.dataTransfer.setData("isFromBucketItem", isFromBucketItem)
+      e.dataTransfer.setData("itemId", itemId)
     },
   },
 }

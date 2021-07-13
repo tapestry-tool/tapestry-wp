@@ -16,11 +16,11 @@
       </b-form-checkbox>
       <b>From buckets</b>
       <drag-drop-bucket
-        v-for="bucket in fromBuckets"
+        v-for="bucket in getBuckets('from')"
         :key="bucket.id"
         :bucket="bucket"
         :items="getBucketsItems(bucket.id)"
-        :bucketRemovalAllowed="fromBuckets.length > 1"
+        :bucketRemovalAllowed="true"
         :useImages="question.answerTypes.dragDrop.useImages"
         :data-qa="`from-bucket-${bucket.id}`"
         @remove-item="handleRemoveItem"
@@ -39,10 +39,10 @@
     <b-form-group>
       <b>To buckets</b>
       <drag-drop-bucket
-        v-for="bucket in toBuckets"
+        v-for="bucket in getBuckets('to')"
         :key="bucket.id"
         :bucket="bucket"
-        :bucketRemovalAllowed="toBuckets.length > 1"
+        :bucketRemovalAllowed="true"
         :data-qa="`to-bucket-${bucket.id}`"
       />
       <b-button
@@ -76,18 +76,7 @@ export default {
       required: true,
     },
   },
-  computed: {
-    fromBuckets() {
-      return this.question.answerTypes.dragDrop.buckets.filter(
-        bucket => bucket.type === "from"
-      )
-    },
-    toBuckets() {
-      return this.question.answerTypes.dragDrop.buckets.filter(
-        bucket => bucket.type === "to"
-      )
-    },
-  },
+  computed: {},
   created() {
     if (!this.question.answerTypes.dragDrop?.buckets) {
       this.question.answerTypes.dragDrop.buckets = [
@@ -107,6 +96,7 @@ export default {
     if (!this.question.answerTypes.dragDrop?.items) {
       this.question.answerTypes.dragDrop.items = [
         {
+          id: Helpers.createUUID(),
           color: "#808080",
           text: "",
           imageUrl: "",
@@ -116,23 +106,37 @@ export default {
     }
   },
   methods: {
+    getBuckets(type) {
+      return this.question.answerTypes.dragDrop.buckets.filter(
+        bucket => bucket.type === type
+      )
+    },
     addBucket(type) {
       this.question.answerTypes.dragDrop.buckets.push({
         id: Helpers.createUUID(),
         type: type,
         text: "",
       })
+      this.$forceUpdate()
     },
     addItem(bucketId) {
       this.question.answerTypes.dragDrop.items.push({
+        id: Helpers.createUUID(),
         color: "#808080",
         text: "",
         imageUrl: "",
         bucketId: bucketId,
       })
+      this.$forceUpdate()
     },
     handleRemoveItem($event) {
-      this.question.answerTypes.dragDrop.items.splice($event, 1)
+      this.question.answerTypes.dragDrop.items.splice(
+        this.question.answerTypes.dragDrop.items.findIndex(
+          item => item.id === $event
+        ),
+        1
+      )
+      this.$forceUpdate()
     },
     getBucketsItems(bucketId) {
       return this.question.answerTypes.dragDrop.items.filter(

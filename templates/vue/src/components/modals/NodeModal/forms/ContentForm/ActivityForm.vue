@@ -192,7 +192,7 @@ import { mapState } from "vuex"
 import Combobox from "@/components/modals/common/Combobox"
 import Helpers from "@/utils/Helpers"
 import RichTextForm from "./RichTextForm"
-import DragDropForm from "./DragDropForm"
+import DragDropForm from "./DragDrop"
 
 const defaultQuestion = {
   text: "",

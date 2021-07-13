@@ -67,7 +67,7 @@
           <div class="button-container">
             <answer-button
               v-if="question.answerTypes.text.enabled"
-              :completed="textFormCompleted"
+              :completed="isFormCompleted('text')"
               data-qa="answer-button-text"
               @click="openForm('text')"
             >
@@ -75,7 +75,7 @@
             </answer-button>
             <answer-button
               v-if="question.answerTypes.audio.enabled"
-              :completed="audioFormCompleted"
+              :completed="isFormCompleted('audio')"
               icon="microphone"
               data-qa="answer-button-audio"
               @click="openForm('audio')"
@@ -84,7 +84,7 @@
             </answer-button>
             <answer-button
               v-if="question.answerTypes.dragDrop.enabled"
-              :completed="dragDropFormCompleted"
+              :completed="isFormCompleted('dragDrop')"
               icon="drag-drop"
               @click="openForm('dragDrop')"
             >
@@ -174,32 +174,6 @@ export default {
       }
       return ""
     },
-    textFormCompleted() {
-      if (
-        this.userAnswers?.[this.node.id]?.activity?.[this.question.id]?.answers?.text
-      ) {
-        return true
-      }
-      return false
-    },
-    audioFormCompleted() {
-      if (
-        this.userAnswers?.[this.node.id]?.activity?.[this.question.id]?.answers
-          ?.audio
-      ) {
-        return true
-      }
-      return false
-    },
-    dragDropFormCompleted() {
-      if (
-        this.userAnswers?.[this.node.id]?.activity?.[this.question.id]?.answers
-          ?.dragDrop
-      ) {
-        return true
-      }
-      return false
-    },
   },
   watch: {
     question() {
@@ -226,6 +200,14 @@ export default {
       } else {
         this.formOpened = false
       }
+    },
+    isFormCompleted(type) {
+      if (
+        this.userAnswers?.[this.node.id]?.activity?.[this.question.id]?.answers[type]
+      ) {
+        return true
+      }
+      return false
     },
     openForm(answerType) {
       client.recordAnalyticsEvent(
