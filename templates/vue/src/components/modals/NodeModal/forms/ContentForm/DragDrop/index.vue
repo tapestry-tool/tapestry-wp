@@ -20,10 +20,11 @@
         :key="bucket.id"
         :bucket="bucket"
         :items="getBucketsItems(bucket.id)"
-        :bucketRemovalAllowed="true"
+        :bucketRemovalAllowed="bucketRemovalEnabled.from"
         :useImages="question.answerTypes.dragDrop.useImages"
         :data-qa="`from-bucket-${bucket.id}`"
         @remove-item="handleRemoveItem"
+        @remove-bucket="handleRemoveBucket"
         @add="addItem(bucket.id)"
       />
       <b-button
@@ -42,8 +43,9 @@
         v-for="bucket in getBuckets('to')"
         :key="bucket.id"
         :bucket="bucket"
-        :bucketRemovalAllowed="true"
+        :bucketRemovalAllowed="bucketRemovalEnabled.to"
         :data-qa="`to-bucket-${bucket.id}`"
+        @remove-bucket="handleRemoveBucket"
       />
       <b-button
         class="add-btn"
@@ -76,7 +78,9 @@ export default {
       required: true,
     },
   },
-  computed: {},
+  data() {
+    return { bucketRemovalEnabled: { to: false, from: false } }
+  },
   created() {
     if (!this.question.answerTypes.dragDrop?.buckets) {
       this.question.answerTypes.dragDrop.buckets = [
@@ -91,6 +95,10 @@ export default {
           text: "",
         },
       ]
+    } else {
+      Object.keys(this.bucketRemovalEnabled).forEach(type => {
+        if (this.getBuckets(type).length > 1) this.bucketRemovalEnabled[type] = true
+      })
     }
 
     if (!this.question.answerTypes.dragDrop?.items) {
@@ -117,7 +125,7 @@ export default {
         type: type,
         text: "",
       })
-      this.$forceUpdate()
+      this.bucketRemovalEnabled[type] = true
     },
     addItem(bucketId) {
       this.question.answerTypes.dragDrop.items.push({
@@ -129,10 +137,10 @@ export default {
       })
       this.$forceUpdate()
     },
-    handleRemoveItem($event) {
+    handleRemoveItem(itemId) {
       this.question.answerTypes.dragDrop.items.splice(
         this.question.answerTypes.dragDrop.items.findIndex(
-          item => item.id === $event
+          item => item.id === itemId
         ),
         1
       )
@@ -142,6 +150,20 @@ export default {
       return this.question.answerTypes.dragDrop.items.filter(
         item => item.bucketId === bucketId
       )
+    },
+    handleRemoveBucket(bucketId) {
+      const itemsInBucket = this.getBucketsItems(bucketId)
+      itemsInBucket.forEach(item => this.handleRemoveItem(item.id))
+
+      const bucketIndex = this.question.answerTypes.dragDrop.buckets.findIndex(
+        bucket => bucket.id === bucketId
+      )
+
+      const bucketType = this.question.answerTypes.dragDrop.buckets[bucketIndex].type
+      if (this.getBuckets(bucketType).length - 1 == 1)
+        this.bucketRemovalEnabled[bucketType] = false
+
+      this.question.answerTypes.dragDrop.buckets.splice(bucketIndex, 1)
     },
   },
 }

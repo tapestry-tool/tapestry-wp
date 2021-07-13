@@ -72,7 +72,6 @@ export default {
 .completed-activity-media {
   background: #262626;
   border-radius: 8px;
-  margin-bottom: 8px;
   padding: 8px 16px 8px 16px;
   .text {
     text-align: left;

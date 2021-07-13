@@ -11,7 +11,7 @@
         v-if="bucketRemovalAllowed"
         class="side"
         variant="outline-danger"
-        @click="$emit('remove')"
+        @click="$emit('remove-bucket', bucket.id)"
       >
         Remove bucket
       </b-button>
