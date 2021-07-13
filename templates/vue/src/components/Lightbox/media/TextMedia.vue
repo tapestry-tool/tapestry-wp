@@ -2,7 +2,7 @@
   <article
     :class="{
       article: true,
-      multiContentArticle: context === 'multi-content',
+      multiContentArticle: context === 'multi-content' || context === 'page',
       'page-style': context == 'page',
     }"
   >
