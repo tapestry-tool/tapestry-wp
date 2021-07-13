@@ -39,7 +39,6 @@
 
 <script>
 import CosModal from "../CosModal"
-
 export default {
   components: {
     CosModal,

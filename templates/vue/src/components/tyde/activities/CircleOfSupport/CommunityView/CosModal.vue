@@ -32,7 +32,6 @@ export default {
   display: flex;
   align-items: flex-start;
 }
-
 .overlay {
   position: absolute;
   top: 0;
@@ -42,7 +41,6 @@ export default {
   background: black;
   opacity: 0.4;
 }
-
 .content {
   position: relative;
   padding: 2rem;

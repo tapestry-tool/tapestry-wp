@@ -41,7 +41,7 @@
             class="secondary"
             @click="$emit('ob-finish')"
           >
-            Connection &#8594;
+            Continue &#8594;
           </b-button>
         </b-col>
         <b-col v-if="visibleConnections.length == 5" class="ob-connection-box">
@@ -60,7 +60,6 @@
 
 <script>
 import CosModal from "../CosModal"
-
 export default {
   components: {
     CosModal,
@@ -90,11 +89,7 @@ export default {
   min-width: 300px;
   max-width: 650px;
 }
-
 .row {
   padding: 10px 0;
-}
-
-p {
 }
 </style>

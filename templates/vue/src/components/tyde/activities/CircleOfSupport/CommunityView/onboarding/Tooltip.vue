@@ -39,7 +39,6 @@ export default {
   right: 22px;
   bottom: 95px;
 }
-
 .left {
   left: 22px;
   bottom: 95px;
@@ -52,7 +51,6 @@ export default {
   border-radius: 1rem;
   z-index: 100;
 }
-
 .tooltip-container::before {
   content: "";
   position: absolute;
@@ -64,7 +62,6 @@ export default {
   bottom: -23px;
   z-index: 5;
 }
-
 .tooltip-container::after {
   content: "";
   display: block;
@@ -76,12 +73,10 @@ export default {
   border-top: 24px solid #bbb;
   bottom: -24px;
 }
-
 .right::before,
 .right::after {
   right: 25px;
 }
-
 .left::before,
 .left::after {
   left: 25px;

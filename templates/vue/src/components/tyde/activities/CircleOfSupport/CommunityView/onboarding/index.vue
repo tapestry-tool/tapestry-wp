@@ -3,7 +3,6 @@
     style="height: 100%; width: 100%;"
     @connection-closed="handleConnectionClosed"
     @connection-submitted="handleConnectionSubmitted"
-    @add-community="HandleCommunityAdded"
   >
     <welcome-communities
       v-if="isState('Communities.Welcome')"
@@ -71,14 +70,20 @@
 
 <script>
 import { interpret } from "xstate"
-import OnboardingEvents from "./onboardingMachine"
-import onboardingMachine from "./onboardingMachine"
+import onboardingMachine, { OnboardingEvents } from "./onboardingMachine"
 import WelcomeCommunities from "./WelcomeCommunities"
 import AddConfirmation from "./AddConfirmation"
 import WelcomeConnections from "./WelcomeConnections"
 import ObFinishView from "./ObFinishView"
 import Tooltip from "./Tooltip"
-
+const States = {
+  Home: 0,
+  AddCommunity: 1,
+  EditCommunity: 2,
+  EditConnection: 3,
+  ConnectionClosed: 4,
+  AddConnection: 5,
+}
 export default {
   components: {
     WelcomeCommunities,
@@ -96,6 +101,10 @@ export default {
       type: Object,
       required: true,
     },
+    parentState: {
+      type: Number,
+      required: true,
+    },
   },
   data() {
     return {
@@ -107,7 +116,18 @@ export default {
     }
   },
   watch: {
-    created() {},
+    communities() {
+      this.HandleCommunityAdded()
+    },
+    connections() {
+      this.handleConnectionSubmitted()
+    },
+    parentState() {
+      if (this.parentState === States.ConnectionClosed) {
+        this.handleConnectionClosed()
+        this.$emit("connection-closed")
+      }
+    },
   },
   mounted() {
     this.onboarding.service
@@ -141,7 +161,6 @@ export default {
       if (this.onboarding.current.matches("Communities.Welcome")) {
         communities.forEach(community => this.$emit("add-community", community))
       }
-
       this.send(OnboardingEvents.Continue)
     },
     initializeOnboarding() {
@@ -149,7 +168,6 @@ export default {
       // For now, always initialize the onboarding process at the start
       if (Object.values(this.communities).length > 0) {
         startingEvent = OnboardingEvents.Continue
-
         if (Object.values(this.connections).length > 0) {
           startingEvent = OnboardingEvents.Done
         }

@@ -9,7 +9,7 @@
     <connections-tab
       ref="connections"
       class="tab"
-      :toolTipPositioned="this.toolTipPositioned"
+      :toolTipPositioned="toolTipPositioned"
       :connections="connections"
       :communities="communities"
       @back="handleBack"
@@ -17,7 +17,7 @@
       @edit-connection="handleEditConnection"
       @add-community="$emit('add-community', $event)"
       @connection-submitted="$emit('connection-submitted')"
-      @connection-closed="$emit('connection-closed')"
+      @connection-closed="handleConnectionClosed"
     />
     <add-community-tab
       v-model="community"
@@ -29,8 +29,10 @@
     />
 
     <onboarding
+      v-if="initiateOnboarding"
       :communities="communities"
       :connections="connections"
+      :parent-state="state"
       @tooltip-positioned="handleToolTipPositioned"
       @tooltip-removed="handleTooltipRemoved"
       @add-community="$emit('add-community', $event)"
@@ -44,15 +46,14 @@ import AddCommunityTab from "./AddCommunityTab"
 import ConnectionsTab from "../ConnectionsTab"
 import CommunitiesList from "./CommunitiesList"
 import { MAX_COMMUNITIES } from "../cos.config"
-
 const States = {
   Home: 0,
   AddCommunity: 1,
   EditCommunity: 2,
   EditConnection: 3,
-  AddConnection: 4,
+  ConnectionClosed: 4,
+  AddConnection: 5,
 }
-
 export default {
   components: {
     AddCommunityTab,
@@ -80,6 +81,7 @@ export default {
         color: "",
       },
       toolTipPositioned: false,
+      initiateOnboarding: true,
     }
   },
   computed: {
@@ -98,7 +100,11 @@ export default {
       this.lastState = lastState
     },
   },
-
+  mounted() {
+    if (this.communities.length >= 1 && this.connections.length >= 1) {
+      this.initiateOnboarding = false
+    }
+  },
   methods: {
     toggleCommunityTab() {
       // FIX : Disable attribute for community-list does not work as it is a self-made component
@@ -132,6 +138,13 @@ export default {
         this.$refs.connections.close()
       }
     },
+    handleConnectionClosed() {
+      if (this.state === States.ConnectionClosed) {
+        this.state === States.Home
+      } else {
+        this.state = States.ConnectionClosed
+      }
+    },
     handleEditConnection(event) {
       this.handleBack()
       this.$emit("edit-connection", event)
@@ -150,7 +163,6 @@ export default {
 * {
   font-family: "Avenir", Helvetica, Arial, sans-serif;
 }
-
 .welcome-communities {
   position: absolute;
   top: 0;
@@ -158,7 +170,6 @@ export default {
   width: 100%;
   height: 100%;
 }
-
 .tab {
   width: 100%;
   position: absolute;

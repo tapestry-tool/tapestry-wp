@@ -8,13 +8,15 @@
       </b-row>
 
       <b-row align-h="center">
-        <h4 class="ob-secondary">
+        <p class="ob-secondary" style="font-size:1.33em">
           Let's start with you — what communities are you a part of?
-        </h4>
+        </p>
       </b-row>
 
       <b-row align-h="center">
-        <h5 class="ob-secondary">Here are a few ideas to get you started.</h5>
+        <p class="ob-secondary" style="font-size:0.83em">
+          Here are a few ideas to get you started.
+        </p>
       </b-row>
 
       <b-row align-h="center" class="mt-2 mb-2">
@@ -54,7 +56,6 @@
 <script>
 import { STARTER_COMMUNITIES } from "./onboarding.config"
 import client from "@/services/TapestryAPI"
-
 export default {
   data() {
     return {
@@ -105,17 +106,14 @@ export default {
 .btn:disabled {
   opacity: 0.15;
 }
-
 button {
   letter-spacing: 1px;
   padding: 1px 25px;
 }
-
 h1,
 h3 {
   color: $onbording-title-color;
 }
-
 .modal {
   position: absolute;
   top: 0;
@@ -123,10 +121,8 @@ h3 {
   display: flex;
   justify-content: center;
   align-items: flex-start;
-
   z-index: 999;
   background-color: white;
-
   border: $onbording-border-color solid;
   border-radius: 15px;
 }

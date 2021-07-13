@@ -39,7 +39,6 @@
 <script>
 import CosModal from "../CosModal"
 import { STARTER_CONNECTIONS } from "./onboarding.config"
-
 export default {
   components: {
     CosModal,
