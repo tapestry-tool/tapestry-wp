@@ -13,6 +13,7 @@
 
 <script>
 export default {
+  name: "item",
   props: {
     node: {
       type: Object,

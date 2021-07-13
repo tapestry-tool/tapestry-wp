@@ -2,7 +2,7 @@
   <button class="button" :disabled="disabled" @click="$emit('click')">
     <i class="fas fa-check-circle" :class="completed ? 'visible' : 'invisible'"></i>
     <div v-if="isFaIcon" class="icon">
-      <i :class="`fas fa-${icon} icon-fa`"></i>
+      <i :class="`fas fa-${icon === 'audio' ? 'microphone' : icon} icon-fa`"></i>
     </div>
     <div v-else-if="isDragAndDropIcon" class="drag-drop-icon">
       <img :src="dragDropIcon" />
@@ -40,13 +40,13 @@ export default {
   },
   computed: {
     isFaIcon() {
-      return this.icon === "tasks" || this.icon === "microphone"
+      return this.icon === "tasks" || this.icon === "audio"
     },
     textIcon() {
       return `${data.vue_uri}/${TextIcon.split("dist")[1]}`
     },
     isDragAndDropIcon() {
-      return this.icon === "drag-drop"
+      return this.icon === "dragDrop"
     },
     dragDropIcon() {
       return `${data.vue_uri}/${DragDropIcon.split("dist")[1]}`

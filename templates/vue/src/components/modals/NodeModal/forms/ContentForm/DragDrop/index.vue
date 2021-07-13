@@ -15,7 +15,7 @@
         Hide Text
       </b-form-checkbox>
       <b>From buckets</b>
-      <drag-drop-bucket
+      <bucket
         v-for="bucket in getBuckets('from')"
         :key="bucket.id"
         :bucket="bucket"
@@ -38,7 +38,7 @@
     </b-form-group>
     <b-form-group>
       <b>To buckets</b>
-      <drag-drop-bucket
+      <bucket
         v-for="bucket in getBuckets('to')"
         :key="bucket.id"
         :bucket="bucket"
@@ -59,12 +59,12 @@
 </template>
 
 <script>
-import DragDropBucket from "./DragDropBucket"
+import Bucket from "./Bucket"
 import Helpers from "@/utils/Helpers"
 
 export default {
   components: {
-    DragDropBucket,
+    Bucket,
   },
   props: {
     node: {

@@ -42,6 +42,7 @@
 import FileUpload from "@/components/modals/common/FileUpload"
 import ColorPicker from "@/components/modals/common/ColorPicker"
 export default {
+  name: "item",
   components: {
     FileUpload,
     ColorPicker,

@@ -42,53 +42,28 @@
       </b-alert>
       <div class="question-body">
         <div v-if="formOpened">
-          <text-question
-            v-if="formType === 'text'"
-            :question="question"
-            :answer="answer"
-            @submit="handleSubmit"
-          ></text-question>
-          <audio-recorder
-            v-else-if="formType === 'audio'"
+          <component
+            :is="formType + '-question'"
             :id="question.id"
             :node="node"
-            @submit="handleSubmit"
-          />
-          <drag-drop-question
-            v-else-if="formType === 'dragDrop'"
             :question="question"
-            :node="node"
             :answer="answer"
             @submit="handleSubmit"
-          />
+          ></component>
         </div>
         <div v-else class="question-answer-types">
           <p class="question-answer-text">I want to answer with...</p>
           <div class="button-container">
             <answer-button
-              v-if="question.answerTypes.text.enabled"
-              :completed="isFormCompleted('text')"
-              data-qa="answer-button-text"
-              @click="openForm('text')"
+              v-for="enabledAnswer in enabledAnswerTypes"
+              :key="enabledAnswer[0]"
+              class="text-capitalize"
+              :completed="isFormCompleted(enabledAnswer[0])"
+              :icon="enabledAnswer[0]"
+              :data-qa="`answer-button-${enabledAnswer[0]}`"
+              @click="openForm(enabledAnswer[0])"
             >
-              text
-            </answer-button>
-            <answer-button
-              v-if="question.answerTypes.audio.enabled"
-              :completed="isFormCompleted('audio')"
-              icon="microphone"
-              data-qa="answer-button-audio"
-              @click="openForm('audio')"
-            >
-              audio
-            </answer-button>
-            <answer-button
-              v-if="question.answerTypes.dragDrop.enabled"
-              :completed="isFormCompleted('dragDrop')"
-              icon="drag-drop"
-              @click="openForm('dragDrop')"
-            >
-              drag/drop
+              {{ enabledAnswer[0] }}
             </answer-button>
           </div>
         </div>
@@ -101,7 +76,7 @@
 import { mapActions, mapGetters, mapState } from "vuex"
 import client from "@/services/TapestryAPI"
 import AnswerButton from "./AnswerButton"
-import AudioRecorder from "./AudioRecorder"
+import AudioQuestion from "./AudioQuestion"
 import TextQuestion from "./TextQuestion"
 import DragDropQuestion from "./DragDrop"
 import Loading from "@/components/common/Loading"
@@ -112,7 +87,7 @@ export default {
   name: "question",
   components: {
     AnswerButton,
-    AudioRecorder,
+    AudioQuestion,
     TextQuestion,
     DragDropQuestion,
     Loading,
@@ -164,6 +139,11 @@ export default {
       return answerObject ? Object.entries(answerObject) : null
     },
     enabledAnswerTypes() {
+      console.log(
+        Object.entries(this.question.answerTypes).filter(([, value]) => {
+          return value.enabled
+        })
+      )
       return Object.entries(this.question.answerTypes).filter(([, value]) => {
         return value.enabled
       })
@@ -172,7 +152,7 @@ export default {
       if (this.formOpened && this.answers?.[this.formType]) {
         return this.answers[this.formType]
       }
-      return ""
+      return null
     },
   },
   watch: {

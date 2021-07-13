@@ -60,7 +60,7 @@ export default {
       required: true,
     },
     answer: {
-      type: [Array, String],
+      type: Array,
       required: true,
     },
   },
@@ -89,6 +89,7 @@ export default {
     },
     handleDragDropSubmit(event) {
       event.preventDefault()
+      this.$emit("submit", this.answer)
     },
     handleDrop(event) {
       this.answer.forEach(answerEntry => {

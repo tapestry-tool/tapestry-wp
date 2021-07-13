@@ -18,7 +18,7 @@
     </b-form-group>
     <b-form-group class="bucket-container">
       <b-form-group v-if="items">
-        <drag-drop-item
+        <item
           v-for="item in items"
           :key="item.id"
           :item="item"
@@ -41,10 +41,11 @@
 </template>
 
 <script>
-import DragDropItem from "./DragDropItem"
+import Item from "./Item"
 export default {
+  name: "bucket",
   components: {
-    DragDropItem,
+    Item,
   },
   props: {
     bucket: {
