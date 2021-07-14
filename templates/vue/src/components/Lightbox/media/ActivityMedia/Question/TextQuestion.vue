@@ -46,8 +46,8 @@
       v-model="textAnswers[0]"
       :placeholder="question.answerTypes.text.placeholder"
     ></b-form-input>
-    <b-form-invalid-feedback :state="isAnswerValid">
-      Please enter a response for all inputs.
+    <b-form-invalid-feedback class="mt-3" :state="isAnswerValid">
+      Please enter at least {{ minFields }} entries
     </b-form-invalid-feedback>
     <div>
       <b-button class="submit-btn" variant="primary" @click="handleTextSubmit">
@@ -101,9 +101,10 @@ export default {
   methods: {
     handleTextSubmit(event) {
       event.preventDefault()
-      this.isAnswerValid = this.textAnswers.every(answer => answer !== "")
+      const nonEmptyAnswers = this.textAnswers.filter(answer => answer !== "")
+      this.isAnswerValid = nonEmptyAnswers.length >= this.minFields
       if (this.isAnswerValid) {
-        this.$emit("submit", this.textAnswers)
+        this.$emit("submit", nonEmptyAnswers)
       }
     },
     deleteAnswer(index) {
