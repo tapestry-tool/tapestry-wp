@@ -977,7 +977,7 @@ export default {
               "Please enter a valid number as the minimum number of fields"
             )
           } else if (minValue < 1) {
-            errMsgs.push("Minimum number of fields must be >= 1")
+            errMsgs.push("Minimum number of fields cannot be less than 1")
           }
           if (!Number.isInteger(maxValue)) {
             errMsgs.push(
@@ -987,8 +987,6 @@ export default {
             errMsgs.push(
               "Please ensure minimum number of fields is less than or equal to the maximum number of fields"
             )
-          } else if (maxValue > 100) {
-            errMsgs.push("Maximum number of fields must be less than 100")
           }
         }
         const validMultipleChoiceValues = this.isMultipleChoiceValueValid

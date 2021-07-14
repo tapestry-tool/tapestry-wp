@@ -159,6 +159,7 @@
                               v-model="question.answerTypes.text.minFields"
                               data-qa="min-list-fields-input"
                               type="number"
+                              :min="1"
                             ></b-form-input>
                             <b-input-group-prepend is-text>
                               Max:
@@ -168,6 +169,7 @@
                               v-model="question.answerTypes.text.maxFields"
                               data-qa="max-list-fields-input"
                               type="number"
+                              :min="1"
                             ></b-form-input>
                           </b-input-group>
                         </b-form-group>
