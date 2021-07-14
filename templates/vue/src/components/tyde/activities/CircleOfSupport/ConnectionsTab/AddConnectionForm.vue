@@ -21,13 +21,18 @@
             {{ errorMessages[validationState.type] }}
           </b-form-invalid-feedback>
         </div>
-        <div id="emoji-picker" style="position: relative">
+        <div id="emoji-picker">
           <twemoji-picker
             :emojiData="emojiDataAll"
             :emojiGroups="emojiGroups"
+            :skinsSelection="true"
+            :pickerPaddingOffset="0"
+            pickerPlacement="top"
+            @emojiUnicodeAdded="handleEmojiSelect"
+            id="twemoji-picker"
           >
             <template v-slot:twemoji-picker-button>
-              <button class="preview" @click="showPicker = !showPicker">
+              <button class="preview" :key="connection.avatar">
                 {{ connection.avatar }}
               </button>
             </template>
@@ -186,7 +191,6 @@ export default {
     this.$once("hook:destroyed", () => {
       document.removeEventListener("click", handleClick)
     })
-    console.log(this.connection.avatar)
   },
   methods: {
     toggleCommunity(communityId) {
@@ -198,9 +202,8 @@ export default {
         this.connection.communities.push(communityId)
       }
     },
-    handleEmojiSelect(event) {
-      this.connection.avatar = event.data
-      this.showPicker = false
+    handleEmojiSelect(emoji) {
+      this.connection.avatar = emoji
     },
     submitConnection() {
       this.isInputTouched = true
@@ -222,6 +225,10 @@ export default {
 </script>
 
 <style scoped lang="scss">
+
+#twemoji-picker {
+  transform: scale(1.5);
+}
 
 form {
   display: flex;
@@ -339,7 +346,7 @@ button {
 }
 
 .preview {
-  font-size: clamp(7rem, 10vw, 10rem);
+  font-size: clamp(7rem, 7vw, 7rem);
   line-height: 1;
 }
 
