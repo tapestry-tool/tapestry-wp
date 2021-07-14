@@ -2,7 +2,7 @@
   <b-container class="completed-activity-media">
     <b-row align-v="center" style="min-height:150px;">
       <b-col v-if="showIcon" align-self="center" cols="2">
-        <div v-if="type === 'dragDrop'" class="dragdropicon">
+        <div v-if="type === 'dragDrop'">
           <img :src="dragDropIcon" />
         </div>
         <tapestry-icon :icon="type" />

@@ -134,6 +134,7 @@ export default {
         text: "",
       })
       this.bucketRemovalEnabled[type] = true
+      this.$forceUpdate()
     },
     addItem(bucketId) {
       this.question.answerTypes.dragDrop.items.push({
@@ -172,6 +173,7 @@ export default {
         this.bucketRemovalEnabled[bucketType] = false
 
       this.question.answerTypes.dragDrop.buckets.splice(bucketIndex, 1)
+      this.$forceUpdate()
     },
   },
 }
