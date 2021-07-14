@@ -101,7 +101,9 @@ export default {
     selectedId: {
       immediate: true,
       handler(nodeId) {
-        client.updateUserLastSelectedNode(nodeId)
+        setTimeout(() => {
+          client.updateUserLastSelectedNode(nodeId)
+        }, 3000)
         if (this.$route.name === names.APP && !this.nodes.hasOwnProperty(nodeId)) {
           this.$router.replace(
             Object.keys(this.nodes).length === 0

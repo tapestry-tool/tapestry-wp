@@ -498,7 +498,9 @@ export default {
           ? this.openNode(this.node.id)
           : this.updateRootNode()
       }
-      client.updateUserLastSelectedNode(this.node.id)
+      setTimeout(() => {
+        client.updateUserLastSelectedNode(this.node.id)
+      }, 3000)
       client.recordAnalyticsEvent("user", "click", "node", this.node.id)
     },
     hasPermission(action) {
