@@ -202,6 +202,7 @@ class TapestryUserProgress implements ITapestryUserProgress
         }
 
         $progress->lastSelectedNode = $this->getLastSelectedNode();
+
         return $progress;
     }
 
@@ -259,6 +260,7 @@ class TapestryUserProgress implements ITapestryUserProgress
         $this->_checkPostId();
 
         $lastSelectedNode = get_user_meta($this->_userId, 'tapestry_last_selected_node'.$this->postId, true);
+
         return $lastSelectedNode;
     }
 
