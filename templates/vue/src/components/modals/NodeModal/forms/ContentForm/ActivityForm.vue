@@ -104,18 +104,18 @@
                   @change="disableList(question)"
                 >
                   <b-form-radio
-                    :data-qa="`question-answer-text-multi-${index}`"
-                    name="multi-line"
-                    :value="true"
-                  >
-                    Multi-line
-                  </b-form-radio>
-                  <b-form-radio
                     :data-qa="`question-answer-text-single-${index}`"
                     name="single-line"
                     :value="false"
                   >
                     Single Line
+                  </b-form-radio>
+                  <b-form-radio
+                    :data-qa="`question-answer-text-multi-${index}`"
+                    name="multi-line"
+                    :value="true"
+                  >
+                    Multi-line
                   </b-form-radio>
                 </b-form-radio-group>
                 <div
@@ -136,7 +136,7 @@
                     class="mt-2"
                     data-qa="enable-list-checkbox"
                   >
-                    Allow entering multiple values
+                    Allow entering multiple entries
                   </b-form-checkbox>
                   <div
                     v-if="question.answerTypes.text.allowMultiple"
@@ -149,8 +149,8 @@
                           label-cols-lg="4"
                           content-cols-sm
                           content-cols-lg="6"
-                          description="How many answers would you like users to provide?"
-                          label="Number of answers"
+                          description="How many entries would you like users to enter?"
+                          label="Number of entries"
                           label-for="input-horizontal"
                         >
                           <b-input-group prepend="Min:">
