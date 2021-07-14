@@ -22,12 +22,16 @@
           </b-form-invalid-feedback>
         </div>
         <div id="emoji-picker" style="position: relative">
-          <button class="preview" @click="showPicker = !showPicker">
-            {{ connection.avatar }}
-          </button>
-          <div v-show="showPicker" class="picker" data-qa="emoji-picker">
-            <v-emoji-picker @select="handleEmojiSelect" />
-          </div>
+          <twemoji-picker
+            :emojiData="emojiDataAll"
+            :emojiGroups="emojiGroups"
+          >
+            <template v-slot:twemoji-picker-button>
+              <button class="preview" @click="showPicker = !showPicker">
+                {{ connection.avatar }}
+              </button>
+            </template>
+          </twemoji-picker>
         </div>
         <div class="controls">
           <button @click="$emit('back')">Cancel</button>
@@ -77,16 +81,23 @@
 </template>
 
 <script>
-import { VEmojiPicker } from "v-emoji-picker"
 import TapestryIcon from "@/components/common/TapestryIcon"
 import AddCommunityForm from "../CommunityView/AddCommunityForm"
 import { MAX_COMMUNITIES, MAX_CONNECTION_NAME_LENGTH } from "../cos.config"
+import {
+    TwemojiPicker
+  } from '@kevinfaguiar/vue-twemoji-picker';
+  import EmojiAllData from '@kevinfaguiar/vue-twemoji-picker/emoji-data/en/emoji-all-groups.json';
+  import EmojiDataAnimalsNature from '@kevinfaguiar/vue-twemoji-picker/emoji-data/en/emoji-group-animals-nature.json';
+  import EmojiDataFoodDrink from '@kevinfaguiar/vue-twemoji-picker/emoji-data/en/emoji-group-food-drink.json';
+  import EmojiGroups from '@kevinfaguiar/vue-twemoji-picker/emoji-data/emoji-groups.json';
+
 
 export default {
   components: {
     AddCommunityForm,
     TapestryIcon,
-    VEmojiPicker,
+    'twemoji-picker': TwemojiPicker
   },
   model: {
     prop: "connection",
@@ -115,6 +126,12 @@ export default {
     }
   },
   computed: {
+    emojiDataAll() {
+      return EmojiAllData
+    },
+    emojiGroups() {
+      return EmojiGroups
+    },
     submitLabel() {
       return this.connection.id ? "Save connection" : "Add connection"
     },
@@ -169,6 +186,7 @@ export default {
     this.$once("hook:destroyed", () => {
       document.removeEventListener("click", handleClick)
     })
+    console.log(this.connection.avatar)
   },
   methods: {
     toggleCommunity(communityId) {
@@ -204,6 +222,7 @@ export default {
 </script>
 
 <style scoped lang="scss">
+
 form {
   display: flex;
   column-gap: 3rem;

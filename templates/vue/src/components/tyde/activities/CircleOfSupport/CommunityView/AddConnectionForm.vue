@@ -26,7 +26,7 @@
             {{ connection.avatar }}
           </button>
           <div v-show="showPicker" class="picker" data-qa="emoji-picker">
-            <v-emoji-picker @select="handleEmojiSelect" />
+            <picker :data="emojiIndex" title="Pick your emoji…" emoji="point_up" />
           </div>
         </div>
         <div class="controls">
@@ -77,16 +77,17 @@
 </template>
 
 <script>
-import { VEmojiPicker } from "v-emoji-picker"
 import TapestryIcon from "@/components/common/TapestryIcon"
 import AddCommunityForm from "./AddCommunityForm"
 import { MAX_COMMUNITIES, MAX_CONNECTION_NAME_LENGTH } from "../cos.config"
+import data from "emoji-mart-vue-fast/data/all.json"
+import { Picker, EmojiIndex } from "emoji-mart-vue-fast"
+let emojiIndex = new EmojiIndex(data)
 
 export default {
   components: {
     AddCommunityForm,
     TapestryIcon,
-    VEmojiPicker,
   },
   model: {
     prop: "connection",
