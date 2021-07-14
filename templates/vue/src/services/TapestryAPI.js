@@ -225,6 +225,15 @@ class TapestryApi {
     return response
   }
 
+  async updateUserLastSelectedNode(nodeId) {
+    const url = `/users/lastSelectedNode?post_id=${this.postId}`
+    const response = await this.client.post(url, {
+      post_id: this.postId,
+      lastSelectedNodeId: nodeId,
+    })
+    return response
+  }
+
   async getAllContributors() {
     const url = `/tapestries/${this.postId}/contributors`
     const response = await this.client.get(url)

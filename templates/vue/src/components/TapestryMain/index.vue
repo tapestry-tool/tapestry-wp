@@ -47,6 +47,7 @@ import LockedTooltip from "./LockedTooltip"
 import Helpers from "@/utils/Helpers"
 import { names } from "@/config/routes"
 import * as wp from "@/services/wp"
+import client from "@/services/TapestryAPI"
 
 export default {
   components: {
@@ -100,6 +101,7 @@ export default {
     selectedId: {
       immediate: true,
       handler(nodeId) {
+        client.updateUserLastSelectedNode(nodeId)
         if (this.$route.name === names.APP && !this.nodes.hasOwnProperty(nodeId)) {
           this.$router.replace(
             Object.keys(this.nodes).length === 0

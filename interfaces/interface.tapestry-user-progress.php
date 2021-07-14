@@ -71,4 +71,20 @@ interface ITapestryUserProgress
      * @return null
      */
     public function updateFavourites($favourites);
+
+    /**
+     * Get User's last selected node for a tapestry post.
+     *
+     * @return int $nodeId  node id of the last selected node in the tapestry
+     */
+    public function getLastSelectedNode();
+
+    /**
+     * Update User's last selected node for a tapestry post.
+     *
+     * @param int $nodeId node id of the last selected node in the tapestry
+     *
+     * @return null
+     */
+    public function updateLastSelectedNode($nodeId);
 }

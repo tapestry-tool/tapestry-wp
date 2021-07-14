@@ -234,6 +234,13 @@ $REST_API_ENDPOINTS = [
             'callback' => 'updateUserFavourites',
         ],
     ],
+    'UPDATE_TAPESTRY_USER_LAST_SELECTED_NODE' => (object) [
+        'ROUTE' => 'users/lastSelectedNode',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_POST_METHOD,
+            'callback' => 'updateLastSelectedNode',
+        ],
+    ],
     'LOGIN' => (object) [
         'ROUTE' => '/login',
         'ARGUMENTS' => [
@@ -1346,6 +1353,24 @@ function updateUserFavourites($request)
         $userProgress = new TapestryUserProgress($postId);
 
         return $userProgress->updateFavourites($favourites);
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+/**
+ * Update last selected node for the current user by passing in post id and node id
+ *
+ * @param object $request HTTP request
+ */
+function updateLastSelectedNode($request)
+{
+    $postId = $request['post_id'];
+    $nodeId = json_decode($request->get_body())->lastSelectedNodeId;
+    try {
+        $userProgress = new TapestryUserProgress($postId);
+
+        return $userProgress->updateLastSelectedNode($nodeId);
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
