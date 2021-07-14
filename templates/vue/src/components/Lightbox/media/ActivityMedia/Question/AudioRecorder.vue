@@ -2,11 +2,15 @@
   <div v-if="state === states.NOT_SUPPORTED">
     Oops, your browser doesn't support audio recording.
   </div>
-  <div v-else-if="state === states.WAIT">
+  <div v-else-if="state === states.LOADING">
     Please provide microphone access to record your answer.
   </div>
   <div v-else class="recorder">
-    <audio v-if="state === states.DONE" controls :src="audio"></audio>
+    <audio
+      v-if="state === states.SAVED || state === states.UNSAVED"
+      controls
+      :src="state === states.SAVED ? uncachedAudioUrl : audio"
+    ></audio>
     <button
       v-else
       class="main-button my-2"
@@ -18,12 +22,12 @@
       ></i>
     </button>
     <div class="w-100">
-      <code v-if="state !== states.DONE" style="color: white;">
+      <code v-if="state !== states.SAVED" style="color: white;">
         {{ durationText }}
       </code>
     </div>
     <button
-      :disabled="duration === 0 && state !== states.DONE"
+      :disabled="duration === 0 && state !== states.SAVED"
       class="my-3"
       @click="resetRecording"
     >
@@ -31,15 +35,21 @@
       Re-record
     </button>
     <button
-      v-if="state !== states.DONE"
+      v-if="state === states.PAUSED || state === states.RECORDING"
       :disabled="duration === 0"
       class="my-3"
+      data-qa="done-button-audio"
       @click="stopRecording"
     >
       <i class="fas fa-check"></i>
       Done
     </button>
-    <button v-if="state === states.DONE" class="my-3" @click="handleSubmit">
+    <button
+      v-if="state === states.UNSAVED"
+      class="my-3"
+      data-qa="submit-button-audio"
+      @click="handleSubmit"
+    >
       <i class="fas fa-check"></i>
       Submit
     </button>
@@ -50,6 +60,7 @@
 import AudioRecoder from "audio-recorder-polyfill"
 import client from "@/services/TapestryAPI"
 import { mapGetters } from "vuex"
+import { data as wpData } from "@/services/wp"
 
 // Polyfill for Safari and Edge
 if (!window.MediaRecorder) {
@@ -61,6 +72,10 @@ export default {
   props: {
     id: {
       type: String,
+      required: true,
+    },
+    node: {
+      type: Object,
       required: true,
     },
   },
@@ -75,7 +90,10 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getQuestion"]),
+    ...mapGetters(["getQuestion", "getAnswers"]),
+    uncachedAudioUrl() {
+      return this.audio + "?" + Date.now()
+    },
     question() {
       return this.getQuestion(this.id)
     },
@@ -95,31 +113,43 @@ export default {
       return `${hours}:${minutes}:${sec}`
     },
     hasPrevious() {
-      return (
-        this.question.entries &&
-        this.question.entries.audioId &&
-        this.question.entries.audioId.length > 0
-      )
+      let answers = this.getAnswers(this.node.id, this.question.id)
+      if (answers !== undefined) {
+        return answers.audio && answers.audio.url
+      } else {
+        return false
+      }
     },
     states() {
       return {
-        WAIT: "wait",
-        DONE: "done",
         NOT_SUPPORTED: "not-supported",
-        PAUSED: "paused",
+        LOADING: "loading",
         READY: "ready",
         RECORDING: "recording",
+        PAUSED: "paused",
+        UNSAVED: "unsaved",
+        SAVED: "saved",
+      }
+    },
+  },
+  watch: {
+    id() {
+      let answersObject = this.getAnswers(this.node.id, this.question.id)
+      if (answersObject?.audio?.url) {
+        this.state = this.states.SAVED
+        this.audio = wpData.uploadDirArray.baseurl + "/" + answersObject.audio.url
+      } else {
+        this.initialize()
       }
     },
   },
   created() {
     if (this.hasPrevious) {
-      this.state = this.states.DONE
-      this.audio =
-        "data:audio/ogg; codecs=opus;base64," +
-        this.getQuestion(this.id).entries.audioId
+      this.state = this.states.SAVED
+      let answersObject = this.getAnswers(this.node.id, this.question.id)
+      this.audio = wpData.uploadDirArray.baseurl + "/" + answersObject.audio.url
     } else {
-      this.state = this.states.WAIT
+      this.state = this.states.LOADING
       this.initialize()
     }
   },
@@ -146,7 +176,7 @@ export default {
           reader.onload = () => {
             const data = reader.result
             this.audio = data
-            this.state = this.states.DONE
+            this.state = this.states.UNSAVED
           }
         })
 
@@ -205,6 +235,7 @@ export default {
     },
     handleSubmit() {
       client.recordAnalyticsEvent("user", "submit", "audio-recorder", this.id)
+      this.state = this.states.SAVED
       this.$emit("submit", this.audio)
     },
   },

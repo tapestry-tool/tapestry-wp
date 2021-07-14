@@ -43,12 +43,14 @@
                 :node-id="row.node.id"
                 :dimensions="dimensions"
                 context="page"
-                :autoplay="false"
                 style="color: white; margin-bottom: 24px;"
                 @complete="updateProgress(row.node.id)"
                 @load="handleLoad($refs.rowRefs[index])"
               />
-              <p v-if="row.children.length > 0" style="color: white;">
+              <p
+                v-if="row.children.length > 0 && !areAllPopup(row.children)"
+                style="color: white;"
+              >
                 {{ row.node.typeData.subAccordionText }}
               </p>
               <accordion-rows
@@ -179,7 +181,7 @@ export default {
   },
   methods: {
     ...mapMutations(["updateNode"]),
-    ...mapActions(["completeNode", "updateNodeProgress", "toggleFavourite"]),
+    ...mapActions(["completeNode", "toggleFavourite"]),
     handleLoad(el) {
       this.$emit("load", el)
     },
@@ -197,6 +199,9 @@ export default {
     },
     handleAutoClose() {
       this.$emit("close")
+    },
+    areAllPopup(nodes) {
+      return nodes.every(node => node.popup !== null)
     },
   },
 }
