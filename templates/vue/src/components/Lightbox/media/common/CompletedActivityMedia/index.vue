@@ -3,7 +3,7 @@
     <b-row align-v="center" style="min-height:150px;">
       <b-col v-if="type === 'text' && !isListTextType" align-self="center">
         <div class="text">
-          {{ answerData }}
+          {{ Array.isArray(answerData) ? answerData[0] : answerData }}
         </div>
       </b-col>
       <b-col v-if="type === 'text' && isListTextType">

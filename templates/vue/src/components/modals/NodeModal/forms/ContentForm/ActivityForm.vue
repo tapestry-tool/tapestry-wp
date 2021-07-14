@@ -314,6 +314,10 @@ export default {
     if (!this.node.typeData.activity.questions.length) {
       this.addQuestion()
     }
+    // This is needed for backwards compatibility as we add new question types
+    this.node.typeData.activity.questions.every(q => {
+      q.answerTypes = { ...defaultQuestion.answerTypes, ...q.answerTypes }
+    })
   },
   methods: {
     getPreviousQuestions(currentQuestion) {
