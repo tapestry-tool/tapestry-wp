@@ -97,11 +97,11 @@
             </b-form-group>
             <b-form-group>
               <b-form-checkbox
-                v-show="hasPageMultiContentParent"
+                v-if="hasPageMultiContentParent"
                 v-model="node.typeData.isSecondaryNode"
                 data-qa="node-appearance-secondary-node"
               >
-                Is secondary node
+                Show this node and its children in a secondary menu
               </b-form-checkbox>
             </b-form-group>
           </b-col>

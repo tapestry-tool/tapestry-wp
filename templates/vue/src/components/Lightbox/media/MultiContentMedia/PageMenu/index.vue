@@ -37,14 +37,9 @@
       >
         <div v-for="(menu, index) in menuGroups" :key="index" class="menu-wrapper">
           <b-card class="menu">
-            <div>
-              <b-card-text v-if="index === 0">
-                {{ getMenuName(index) }}
-              </b-card-text>
-              <b-card-text v-else v-b-toggle="`collapse-${index}`">
-                {{ getMenuName(index) }}
-              </b-card-text>
-            </div>
+            <b-card-text v-b-toggle="index === 0 ? `` : `collapse-${index}`">
+              {{ getMenuName(index) }}
+            </b-card-text>
             <b-collapse
               :id="`collapse-${index}`"
               :visible="index === 0"
