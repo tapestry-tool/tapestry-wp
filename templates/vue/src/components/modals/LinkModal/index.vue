@@ -6,7 +6,7 @@
     size="lg"
     title="Edit Link"
     body-class="p-0"
-    @close="close"
+    @hidden="close"
   >
     <b-container class="mb-2">
       <b-row style="text-align:center">
