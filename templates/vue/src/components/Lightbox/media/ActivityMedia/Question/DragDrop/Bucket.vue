@@ -13,7 +13,7 @@
         v-for="item in items"
         :key="item"
         :node="node"
-        :dragDrop="dragDrop"
+        :drag-drop="dragDrop"
         :item="item"
         :data-qa="`user-bucket-item-${item}`"
       />

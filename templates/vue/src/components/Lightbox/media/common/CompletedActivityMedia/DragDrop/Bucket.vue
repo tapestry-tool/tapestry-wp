@@ -5,7 +5,7 @@
       v-for="item in items"
       :key="item.id"
       :item="item"
-      :hideText="hideText"
+      :hide-text="hideText"
       :data-qa="`user-bucket-item-${item.id}`"
     />
   </div>
@@ -35,7 +35,7 @@ export default {
 </script>
 <style scoped>
 .from-bucket-container {
-  background-color: #009688;
+  background-color: #3f51b5;
   padding: 5px 0;
   width: 80px;
   min-height: 80px;

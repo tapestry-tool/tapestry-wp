@@ -14,7 +14,7 @@
       </b-col>
       <b-col v-if="type === 'dragDrop'" align-self="center">
         <drag-drop
-          :answerData="answerData"
+          :answer-data="answerData"
           :drag-drop="question.answerTypes.dragDrop"
         />
       </b-col>
