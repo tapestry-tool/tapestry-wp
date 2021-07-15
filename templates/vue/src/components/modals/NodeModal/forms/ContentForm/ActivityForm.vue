@@ -152,7 +152,7 @@
                 <drag-drop-form
                   v-if="question.answerTypes.dragDrop.enabled"
                   :node="node"
-                  :question="question"
+                  :dragDrop="question.answerTypes.dragDrop"
                 />
               </div>
             </b-form-group>

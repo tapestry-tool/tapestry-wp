@@ -19,14 +19,14 @@ export default {
       type: Array,
       required: true,
     },
-    question: {
+    dragDrop: {
       type: Object,
       required: true,
     },
   },
   computed: {
     buckets() {
-      const toBuckets = this.question.answerTypes.dragDrop.buckets.filter(bucket => {
+      const toBuckets = this.buckets.filter(bucket => {
         const bucketHasItems = this.answerData.find(
           answerEntry => answerEntry.bucketId === bucket.id
         ).items.length
@@ -36,7 +36,7 @@ export default {
       return toBuckets
     },
     hideText() {
-      return !!this.question.answerTypes.dragDrop.hideText
+      return !!this.dragDrop.hideText
     },
   },
   methods: {
@@ -44,7 +44,7 @@ export default {
       const answerItems = this.answerData.find(
         answerEntry => answerEntry.bucketId === bucketId
       ).items
-      const items = this.question.answerTypes.dragDrop.items.filter(item => {
+      const items = this.dragDrop.items.filter(item => {
         return answerItems.some(answerItem => {
           return answerItem === item.id
         })

@@ -13,7 +13,10 @@
         <audio controls :src="urlAnswer"></audio>
       </b-col>
       <b-col v-if="type === 'dragDrop'" align-self="center">
-        <drag-drop :answerData="answerData" :question="question" />
+        <drag-drop
+          :answerData="answerData"
+          :question="question.answerTypes.dragDrop"
+        />
       </b-col>
     </b-row>
   </b-container>

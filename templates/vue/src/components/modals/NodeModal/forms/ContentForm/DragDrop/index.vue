@@ -1,15 +1,12 @@
 <template>
   <div>
     <b-form-group>
-      <b-form-checkbox
-        v-model="question.answerTypes.dragDrop.useImages"
-        data-qa="dragdrop-useImages"
-      >
+      <b-form-checkbox v-model="dragDrop.useImages" data-qa="dragdrop-useImages">
         Use Images
       </b-form-checkbox>
       <b-form-checkbox
-        v-if="question.answerTypes.dragDrop.useImages"
-        v-model="question.answerTypes.dragDrop.hideText"
+        v-if="dragDrop.useImages"
+        v-model="dragDrop.hideText"
         data-qa="dragdrop-useImages"
       >
         Hide Text
@@ -21,7 +18,7 @@
             :bucket="bucket"
             :items="getBucketsItems(bucket.id)"
             :bucketRemovalAllowed="bucketRemovalEnabled.from"
-            :useImages="question.answerTypes.dragDrop.useImages"
+            :useImages="dragDrop.useImages"
             :data-qa="`from-bucket-${bucket.id}`"
             @remove-item="handleRemoveItem"
             @remove-bucket="handleRemoveBucket"
@@ -81,7 +78,7 @@ export default {
       type: Object,
       required: true,
     },
-    question: {
+    dragDrop: {
       type: Object,
       required: true,
     },
@@ -90,8 +87,8 @@ export default {
     return { bucketRemovalEnabled: { to: false, from: false } }
   },
   created() {
-    if (!this.question.answerTypes.dragDrop?.buckets) {
-      this.question.answerTypes.dragDrop.buckets = [
+    if (!this.dragDrop?.buckets) {
+      this.dragDrop.buckets = [
         {
           id: Helpers.createUUID(),
           type: "from",
@@ -109,26 +106,24 @@ export default {
       })
     }
 
-    if (!this.question.answerTypes.dragDrop?.items) {
-      this.question.answerTypes.dragDrop.items = [
+    if (!this.dragDrop?.items) {
+      this.dragDrop.items = [
         {
           id: Helpers.createUUID(),
           color: "#808080",
           text: "",
           imageUrl: "",
-          bucketId: this.question.answerTypes.dragDrop.buckets[0].id,
+          bucketId: this.dragDrop.buckets[0].id,
         },
       ]
     }
   },
   methods: {
     getBuckets(type) {
-      return this.question.answerTypes.dragDrop.buckets.filter(
-        bucket => bucket.type === type
-      )
+      return this.dragDrop.buckets.filter(bucket => bucket.type === type)
     },
     addBucket(type) {
-      this.question.answerTypes.dragDrop.buckets.push({
+      this.dragDrop.buckets.push({
         id: Helpers.createUUID(),
         type: type,
         text: "",
@@ -137,7 +132,7 @@ export default {
       this.$forceUpdate()
     },
     addItem(bucketId) {
-      this.question.answerTypes.dragDrop.items.push({
+      this.dragDrop.items.push({
         id: Helpers.createUUID(),
         color: "#808080",
         text: "",
@@ -147,32 +142,28 @@ export default {
       this.$forceUpdate()
     },
     handleRemoveItem(itemId) {
-      this.question.answerTypes.dragDrop.items.splice(
-        this.question.answerTypes.dragDrop.items.findIndex(
-          item => item.id === itemId
-        ),
+      this.dragDrop.items.splice(
+        this.dragDrop.items.findIndex(item => item.id === itemId),
         1
       )
       this.$forceUpdate()
     },
     getBucketsItems(bucketId) {
-      return this.question.answerTypes.dragDrop.items.filter(
-        item => item.bucketId === bucketId
-      )
+      return this.dragDrop.items.filter(item => item.bucketId === bucketId)
     },
     handleRemoveBucket(bucketId) {
       const itemsInBucket = this.getBucketsItems(bucketId)
       itemsInBucket.forEach(item => this.handleRemoveItem(item.id))
 
-      const bucketIndex = this.question.answerTypes.dragDrop.buckets.findIndex(
+      const bucketIndex = this.dragDrop.buckets.findIndex(
         bucket => bucket.id === bucketId
       )
 
-      const bucketType = this.question.answerTypes.dragDrop.buckets[bucketIndex].type
+      const bucketType = this.dragDrop.buckets[bucketIndex].type
       if (this.getBuckets(bucketType).length - 1 == 1)
         this.bucketRemovalEnabled[bucketType] = false
 
-      this.question.answerTypes.dragDrop.buckets.splice(bucketIndex, 1)
+      this.dragDrop.buckets.splice(bucketIndex, 1)
       this.$forceUpdate()
     },
   },

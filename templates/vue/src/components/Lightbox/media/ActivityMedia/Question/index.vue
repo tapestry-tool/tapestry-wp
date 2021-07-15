@@ -47,6 +47,7 @@
             :id="question.id"
             :node="node"
             :question="question"
+            :dragDrop="question.answerTypes.dragDrop"
             :answer="answer"
             @submit="handleSubmit"
           ></component>

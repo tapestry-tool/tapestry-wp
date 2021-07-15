@@ -7,7 +7,7 @@
           v-for="bucket in getBuckets('from')"
           :key="bucket.id"
           :node="node"
-          :question="question"
+          :dragDrop="dragDrop"
           :bucket="bucket"
           :items="getBucketsItems(bucket.id)"
           @item-drop="handleDrop"
@@ -19,7 +19,7 @@
           v-for="bucket in getBuckets('to')"
           :key="bucket.id"
           :node="node"
-          :question="question"
+          :dragDrop="dragDrop"
           :bucket="bucket"
           :items="getBucketsItems(bucket.id)"
           @item-drop="handleDrop"
@@ -55,7 +55,7 @@ export default {
       type: Object,
       required: true,
     },
-    question: {
+    dragDrop: {
       type: Object,
       required: true,
     },
@@ -82,8 +82,8 @@ export default {
   },
   created() {
     if (!this.answer) {
-      this.answerData = this.question.answerTypes.dragDrop.buckets.map(bucket => {
-        const items = this.question.answerTypes.dragDrop.items
+      this.answerData = this.dragDrop.buckets.map(bucket => {
+        const items = this.dragDrop.items
           .filter(item => {
             return item.bucketId === bucket.id
           })
@@ -96,9 +96,7 @@ export default {
   },
   methods: {
     getBuckets(type) {
-      return this.question.answerTypes.dragDrop.buckets.filter(
-        bucket => bucket.type === type
-      )
+      return this.dragDrop.buckets.filter(bucket => bucket.type === type)
     },
     getBucketsItems(bucketId) {
       return this.answerData.find(item => {

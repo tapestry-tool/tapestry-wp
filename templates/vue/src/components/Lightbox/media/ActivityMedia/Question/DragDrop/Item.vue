@@ -7,7 +7,7 @@
         'background-color': itemData.color,
       }"
     ></div>
-    <b v-if="!question.answerTypes.dragDrop.hideText">{{ itemData.text }}</b>
+    <b v-if="!dragDrop.hideText">{{ itemData.text }}</b>
   </div>
 </template>
 
@@ -19,7 +19,7 @@ export default {
       type: Object,
       required: true,
     },
-    question: {
+    dragDrop: {
       type: Object,
       required: true,
     },
@@ -30,10 +30,10 @@ export default {
   },
   computed: {
     hasImage() {
-      return this.question.answerTypes.dragDrop.useImages
+      return this.dragDrop.useImages
     },
     itemData() {
-      return this.question.answerTypes.dragDrop.items.find(item => {
+      return this.dragDrop.items.find(item => {
         return item.id === this.item
       })
     },

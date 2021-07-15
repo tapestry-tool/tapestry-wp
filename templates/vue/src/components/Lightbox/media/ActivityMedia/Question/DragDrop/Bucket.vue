@@ -13,7 +13,7 @@
         v-for="item in items"
         :key="item"
         :node="node"
-        :question="question"
+        :dragDrop="dragDrop"
         :item="item"
         :data-qa="`user-bucket-item-${item}`"
       />
@@ -33,7 +33,7 @@ export default {
       type: Object,
       required: true,
     },
-    question: {
+    dragDrop: {
       type: Object,
       required: true,
     },
