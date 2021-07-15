@@ -26,7 +26,7 @@ export default {
   },
   computed: {
     buckets() {
-      const toBuckets = this.buckets.filter(bucket => {
+      const toBuckets = this.dragDrop.buckets.filter(bucket => {
         const bucketHasItems = this.answerData.find(
           answerEntry => answerEntry.bucketId === bucket.id
         ).items.length
