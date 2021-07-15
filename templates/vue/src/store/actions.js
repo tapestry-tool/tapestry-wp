@@ -276,11 +276,10 @@ export async function addLink({ commit, dispatch, getters }, newLink) {
 export async function reverseLink({ commit, dispatch, getters }, link) {
   try {
     const parent = getters.getNode(link.source)
-    const targetIndex = parent.childOrdering.indexOf(link.target)
-    commit("updateNode", {
+    await commit("updateNode", {
       id: link.source,
       newNode: {
-        childOrdering: [...parent.childOrdering.slice(targetIndex, 1)],
+        childOrdering: parent.childOrdering.filter(item => item !== link.target),
       },
     })
 
