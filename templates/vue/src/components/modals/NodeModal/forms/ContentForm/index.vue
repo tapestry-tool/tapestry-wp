@@ -97,6 +97,7 @@ import RichTextForm from "./RichTextForm"
 import UrlEmbedForm from "./UrlEmbedForm"
 import VideoForm from "./VideoForm"
 import WpPostForm from "./WpPostForm"
+import AnswerForm from "./AnswerForm"
 
 export default {
   components: {
@@ -109,6 +110,7 @@ export default {
     UrlEmbedForm,
     VideoForm,
     WpPostForm,
+    AnswerForm,
   },
   props: {
     node: {
@@ -135,13 +137,22 @@ export default {
       addDesc: false,
       mediaTypes: [
         { value: "", text: "Select content type" },
-        { value: "text", text: "Text" },
-        { value: "video", text: "Video" },
-        { value: "h5p", text: "H5P" },
-        { value: "url-embed", text: "External Link" },
-        { value: "wp-post", text: "Wordpress Post" },
-        { value: "activity", text: "Activity" },
-        { value: "multi-content", text: "Multi-Content" }, // must be last item
+        {
+          label: "Basic",
+          options: [
+            { value: "text", text: "Text" },
+            { value: "video", text: "Video" },
+            { value: "h5p", text: "H5P" },
+            { value: "url-embed", text: "External Link" },
+            { value: "wp-post", text: "Wordpress Post" },
+            { value: "activity", text: "Activity" },
+            { value: "multi-content", text: "Multi-Content" },
+          ],
+        },
+        {
+          label: "Advanced",
+          options: [{ value: "answer", text: "Answer" }],
+        },
       ],
       shouldShowTitle: this.node.typeData.showTitle !== false,
       addMenuTitle: false,
@@ -159,7 +170,7 @@ export default {
     isPopupCandidate() {
       // NOTE: Currently we do not want to allow a multi-content popup
       if (this.parent && this.node.mediaType !== "multi-content") {
-        if (this.parent.popup || this.parent.isMultiContentChild) {
+        if (this.parent.popup) {
           return false
         }
         if (this.parent.mediaType === "h5p") {
