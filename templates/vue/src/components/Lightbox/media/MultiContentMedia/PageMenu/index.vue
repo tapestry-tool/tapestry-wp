@@ -35,32 +35,34 @@
           },
         ]"
       >
-        <div v-for="(menu, index) in menuGroups" :key="index" class="menu-wrapper">
-          <b-card class="menu">
-            <b-card-text v-b-toggle="index === 0 ? `` : `collapse-${index}`">
-              {{ getMenuName(index) }}
-            </b-card-text>
-            <b-collapse
-              :id="`collapse-${index}`"
-              :visible="index === 0"
-              class="mt-2"
-            >
-              <ul
-                class="page-menu-item fa-ul"
-                @click="changeActiveMenu(menu[0].node.id)"
+        <div v-for="(menu, index) in menuGroups" :key="index">
+          <b-nav vertical style="padding-top: 4px; padding-bottom: 4px;">
+            <b-card>
+              <b-card-text v-b-toggle="index === 0 ? `` : `collapse-${index}`">
+                {{ getMenuName(index) }}
+              </b-card-text>
+              <b-collapse
+                :id="`collapse-${index}`"
+                :visible="index === 0"
+                class="mt-2"
               >
-                <page-menu-item
-                  v-for="row in menu"
-                  :key="row.node.id"
-                  :node="row.node"
-                  :lockRows="lockRows"
-                  :disabled="disabledRow(row.node)"
-                  style="z-index: 10"
-                  @scroll-to="scrollToRef"
-                />
-              </ul>
-            </b-collapse>
-          </b-card>
+                <ul
+                  class="page-menu-item fa-ul"
+                  @click="changeActiveMenu(menu[0].node.id)"
+                >
+                  <page-menu-item
+                    v-for="row in menu"
+                    :key="row.node.id"
+                    :node="row.node"
+                    :lockRows="lockRows"
+                    :disabled="disabledRow(row.node)"
+                    style="z-index: 10"
+                    @scroll-to="scrollToRef"
+                  />
+                </ul>
+              </b-collapse>
+            </b-card>
+          </b-nav>
         </div>
       </div>
     </aside>
@@ -292,20 +294,6 @@ export default {
         display: none;
       }
     }
-  }
-
-  .menu-wrapper {
-    display: flex;
-    flex-direction: column;
-    margin-top: 8px;
-    margin-bottom: 8px;
-  }
-
-  .menu {
-    z-index: 100;
-    position: relative;
-    float: none;
-    background: white;
   }
 }
 </style>

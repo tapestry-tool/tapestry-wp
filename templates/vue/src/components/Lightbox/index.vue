@@ -16,7 +16,7 @@
       :node="node"
       :row-id="rowId"
       :sub-row-id="subRowId"
-      :activeMenuNode="activeMenuNode"
+      :activeMenuNodeId="activeMenuNodeId"
       @close="handleAutoClose"
       @complete="complete"
     />
@@ -84,7 +84,7 @@ export default {
       },
       showCompletionScreen: false,
       rowRefs: [],
-      activeMenuNode: this.nodeId,
+      activeMenuNodeId: this.nodeId,
     }
   },
   computed: {
@@ -296,7 +296,7 @@ export default {
       }
     },
     setActiveMenuNode(nodeId) {
-      this.activeMenuNode = nodeId
+      this.activeMenuNodeId = nodeId
     },
   },
 }

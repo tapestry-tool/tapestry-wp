@@ -2,7 +2,7 @@
   <div>
     <div v-for="(menuGroup, groupIndex) in menuGroups" :key="groupIndex">
       <headless-multi-content
-        v-if="menuGroup[0].node.id === activeMenuNode"
+        v-if="menuGroup[0].node.id === activeMenuNodeId"
         :rows="menuGroup.map(row => row.node.id)"
         :value="rowId"
         @input="changeRow"
@@ -134,7 +134,7 @@ export default {
       required: false,
       default: 0,
     },
-    activeMenuNode: {
+    activeMenuNodeId: {
       type: Number,
       required: false,
       default: 0,
