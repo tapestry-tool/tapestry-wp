@@ -96,7 +96,7 @@ line {
 
   &:hover {
     cursor: pointer;
-    stroke: red;
+    stroke: #3498db;
     stroke-width: 11;
   }
 }
