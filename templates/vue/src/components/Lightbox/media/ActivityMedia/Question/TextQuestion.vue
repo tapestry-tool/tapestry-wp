@@ -1,7 +1,15 @@
 <template>
   <b-form class="grid-container">
+    <b-form-input
+      v-if="
+        !question.answerTypes.text.isMultiLine &&
+          !question.answerTypes.text.allowMultiple
+      "
+      v-model="textAnswers[0]"
+      :placeholder="question.answerTypes.text.placeholder"
+    ></b-form-input>
     <b-form-textarea
-      v-if="question.answerTypes.text.isMultiLine"
+      v-else-if="question.answerTypes.text.isMultiLine"
       v-model="textAnswers[0]"
       rows="5"
     ></b-form-textarea>

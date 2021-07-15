@@ -360,7 +360,7 @@ describe("Activity", () => {
       })
       cy.openLightbox(node.id)
       cy.lightbox().within(() => {
-        cy.get(`[class="list"]`)
+        cy.get(`[class="mt-2 list-input-list"]`)
           .children()
           .should("have.length", 10)
         cy.getByTestId("close-lightbox").click()
