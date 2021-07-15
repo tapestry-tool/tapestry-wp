@@ -2,9 +2,6 @@
   <b-container class="completed-activity-media">
     <b-row align-v="center" style="min-height:150px;">
       <b-col v-if="showIcon" align-self="center" cols="2">
-        <div v-if="type === 'dragDrop'">
-          <img :src="dragDropIcon" />
-        </div>
         <tapestry-icon :icon="type" />
       </b-col>
       <b-col v-if="type === 'text'" align-self="center">
@@ -25,7 +22,6 @@
 <script>
 import DragDrop from "./DragDrop"
 import TapestryIcon from "@/components/common/TapestryIcon"
-import DragDropIcon from "@/assets/icons/drag_drop.svg"
 import { data as wpData } from "@/services/wp"
 
 export default {
@@ -56,9 +52,6 @@ export default {
     },
   },
   computed: {
-    dragDropIcon() {
-      return `${wpData.vue_uri}/${DragDropIcon.split("dist")[1]}`
-    },
     urlAnswer() {
       return (
         wpData.uploadDirArray.baseurl + "/" + this.answerData.url + "?" + Date.now()
