@@ -65,6 +65,13 @@
       @close="$emit('close')"
       @load="handleLoad"
     />
+    <answer-media
+      v-if="node.mediaType === 'answer'"
+      :node="node"
+      @complete="complete"
+      @close="$emit('close')"
+      @load="handleLoad"
+    />
   </div>
 </template>
 
@@ -75,6 +82,7 @@ import VideoMedia from "./VideoMedia"
 import H5PMedia from "./H5PMedia"
 import ExternalMedia from "./ExternalMedia"
 import ActivityMedia from "./ActivityMedia"
+import AnswerMedia from "./AnswerMedia"
 import WpPostMedia from "./WpPostMedia"
 
 export default {
@@ -86,6 +94,7 @@ export default {
     ExternalMedia,
     WpPostMedia,
     ActivityMedia,
+    AnswerMedia,
   },
   props: {
     nodeId: {

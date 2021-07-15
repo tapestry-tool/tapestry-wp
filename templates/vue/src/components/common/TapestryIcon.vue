@@ -30,6 +30,7 @@ const textContent = {
   plus: "\uf067",
   play: "\uf04b",
   text: "Aa",
+  answer: "\uf02e",
   "comment-dots": "\uf4ad",
 }
 

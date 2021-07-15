@@ -34,7 +34,7 @@
           {{ title }}
         </h4>
         <div v-if="hasSubmissionError" class="error-wrapper">
-          <h5>Node cannot be saved due to the following error(s):</h5>
+          <h5>Operation failed due to the following error(s):</h5>
           <ul>
             <li v-for="error in errors" :key="error">{{ error }}</li>
           </ul>
@@ -205,6 +205,12 @@
             {{ warningText }}
             <br v-if="warningText" />
             {{ deleteWarningText }}
+          </b-form-invalid-feedback>
+          <b-form-invalid-feedback
+            :state="!hasUnsavedChanges"
+            class="text-right font-weight-bold"
+          >
+            You have unsaved changes
           </b-form-invalid-feedback>
         </template>
         <template #overlay>
@@ -419,8 +425,47 @@ export default {
     hasSubmissionError() {
       return this.errors.length
     },
+    hasUnsavedChanges() {
+      const oldNode = this.getNode(this.nodeId)
+      return this.type === "add" || !Helpers.nodeEqual(oldNode, this.node)
+    },
     isMultiContentNodeChild() {
       return this.parent && this.parent.mediaType == "multi-content"
+    },
+    isMultipleChoiceValueValid() {
+      const questionsWithMultipleChoiceEnabled = this.node.typeData.activity.questions.filter(
+        question => {
+          return question.answerTypes.multipleChoice.enabled
+        }
+      )
+      const validMultipleChoiceValues = questionsWithMultipleChoiceEnabled.every(
+        question => {
+          return question.answerTypes.multipleChoice.choices.every(option => {
+            return option.value != ""
+          })
+        }
+      )
+      return validMultipleChoiceValues
+    },
+    isMultipleChoiceImageValid() {
+      const questionsWithMultipleChoiceEnabled = this.node.typeData.activity.questions.filter(
+        question => {
+          return question.answerTypes.multipleChoice.enabled
+        }
+      )
+      const validMultipleChoiceImages = questionsWithMultipleChoiceEnabled.every(
+        question => {
+          const useImages = question.answerTypes.multipleChoice.useImages
+          if (useImages) {
+            return question.answerTypes.multipleChoice.choices.every(option => {
+              return option.imageUrl != "" && option.imageUrl != null
+            })
+          } else if (!useImages) {
+            return true
+          }
+        }
+      )
+      return validMultipleChoiceImages
     },
   },
   watch: {
@@ -616,9 +661,8 @@ export default {
       }
     },
     handleClose(event) {
-      const oldNode = this.getNode(this.nodeId)
       if (
-        (this.type === "add" || !Helpers.nodeEqual(oldNode, this.node)) &&
+        this.hasUnsavedChanges &&
         (event.trigger == "backdrop" ||
           event.trigger == "headerclose" ||
           event.trigger == "esc" ||
@@ -920,6 +964,25 @@ export default {
         )
         if (!validPreviousAnswers) {
           errMsgs.push("Please select a previous activity to display")
+        }
+
+        const validMultipleChoiceValues = this.isMultipleChoiceValueValid
+        if (!validMultipleChoiceValues) {
+          errMsgs.push("Please enter a text for all multiple choice options")
+        }
+        const validMultipleChoiceImages = this.isMultipleChoiceImageValid
+        if (!validMultipleChoiceImages) {
+          errMsgs.push("Please upload an image for all multiple choice options")
+        }
+      } else if (this.node.mediaType === "answer") {
+        const hasActivityId = this.node.typeData.activityId
+        if (!hasActivityId) {
+          errMsgs.push("Please select an activity")
+        }
+
+        const hasQuestionId = this.node.typeData.questionId
+        if (!hasQuestionId) {
+          errMsgs.push("Please select a question")
         }
       }
 
