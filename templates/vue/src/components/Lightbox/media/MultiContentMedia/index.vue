@@ -310,11 +310,13 @@ button[disabled] {
 }
 
 .title {
-  color: #fff;
+  color: #111;
   margin-bottom: 1em;
 }
 
 .media-container {
+  background-color: #eeeeee;
+  color: #111;
   height: 100%;
   width: 100%;
   max-width: 150vh;

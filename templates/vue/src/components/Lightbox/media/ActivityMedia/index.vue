@@ -168,8 +168,8 @@ export default {
   justify-content: space-between;
   width: 100%;
   min-height: 100%;
-  background: #111;
-  color: #eee;
+  background: #eeeeee;
+  color: #111;
   z-index: 10;
   padding: 24px;
 

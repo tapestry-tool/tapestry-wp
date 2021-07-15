@@ -87,7 +87,7 @@ export default {
 .media-wrapper {
   position: relative;
   align-items: center;
-  background: #262626;
+  background: #eeeeee;
   border-radius: 8px;
   display: flex;
   margin-bottom: 8px;

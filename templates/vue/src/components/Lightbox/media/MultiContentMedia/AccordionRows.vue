@@ -255,7 +255,7 @@ button[disabled] {
 }
 
 .accordion-row {
-  background: #262626;
+  background: #eeeeee;
   border-radius: 4px;
   padding: 8px 16px;
   margin-bottom: 8px;
