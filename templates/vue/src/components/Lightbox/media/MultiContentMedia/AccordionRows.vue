@@ -58,7 +58,7 @@
                 @load="handleLoad($refs.rowRefs[index])"
               />
               <p
-                v-if="row.children.length > 0 && !areAllPopup(row)"
+                v-if="row.children.length > 0 && !areAllPopup(row.children)"
                 style="color: white;"
               >
                 {{ row.node.typeData.subAccordionText }}
@@ -219,18 +219,8 @@ export default {
     handleAutoClose() {
       this.$emit("close")
     },
-    areAllPopup(row) {
-      let popCount = 0
-      row.children.forEach(child => {
-        if (child.popup !== null) {
-          popCount++
-        }
-      })
-
-      if (popCount === row.children.length) {
-        return true
-      }
-      return false
+    areAllPopup(nodes) {
+      return nodes.every(node => node.popup !== null)
     },
   },
 }
