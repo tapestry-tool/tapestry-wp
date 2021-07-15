@@ -47,7 +47,10 @@
                 @complete="updateProgress(row.node.id)"
                 @load="handleLoad($refs.rowRefs[index])"
               />
-              <p v-if="row.children.length > 0" style="color: white;">
+              <p
+                v-if="row.children.length > 0 && !areAllPopup(row.children)"
+                style="color: white;"
+              >
                 {{ row.node.typeData.subAccordionText }}
               </p>
               <accordion-rows
@@ -196,6 +199,9 @@ export default {
     },
     handleAutoClose() {
       this.$emit("close")
+    },
+    areAllPopup(nodes) {
+      return nodes.every(node => node.popup !== null)
     },
   },
 }

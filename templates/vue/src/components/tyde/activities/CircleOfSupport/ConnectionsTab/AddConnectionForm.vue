@@ -86,23 +86,16 @@
 </template>
 
 <script>
+import { VEmojiPicker } from "v-emoji-picker"
 import TapestryIcon from "@/components/common/TapestryIcon"
 import AddCommunityForm from "../CommunityView/AddCommunityForm"
 import { MAX_COMMUNITIES, MAX_CONNECTION_NAME_LENGTH } from "../cos.config"
-import {
-    TwemojiPicker
-  } from '@kevinfaguiar/vue-twemoji-picker';
-  import EmojiAllData from '@kevinfaguiar/vue-twemoji-picker/emoji-data/en/emoji-all-groups.json';
-  import EmojiDataAnimalsNature from '@kevinfaguiar/vue-twemoji-picker/emoji-data/en/emoji-group-animals-nature.json';
-  import EmojiDataFoodDrink from '@kevinfaguiar/vue-twemoji-picker/emoji-data/en/emoji-group-food-drink.json';
-  import EmojiGroups from '@kevinfaguiar/vue-twemoji-picker/emoji-data/emoji-groups.json';
-
 
 export default {
   components: {
     AddCommunityForm,
     TapestryIcon,
-    'twemoji-picker': TwemojiPicker
+    VEmojiPicker,
   },
   model: {
     prop: "connection",
@@ -131,12 +124,6 @@ export default {
     }
   },
   computed: {
-    emojiDataAll() {
-      return EmojiAllData
-    },
-    emojiGroups() {
-      return EmojiGroups
-    },
     submitLabel() {
       return this.connection.id ? "Save connection" : "Add connection"
     },
@@ -225,11 +212,9 @@ export default {
 </script>
 
 <style scoped lang="scss">
-
 #twemoji-picker {
   transform: scale(1.5);
 }
-
 form {
   display: flex;
   column-gap: 3rem;
