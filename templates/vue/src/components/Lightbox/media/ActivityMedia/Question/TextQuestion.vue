@@ -1,6 +1,11 @@
 <template>
   <b-form class="grid-container">
-    <div v-if="question.answerTypes.text.allowMultiple" class="list">
+    <b-form-textarea
+      v-if="question.answerTypes.text.isMultiLine"
+      v-model="textAnswers[0]"
+      rows="5"
+    ></b-form-textarea>
+    <div v-else class="list">
       <b-input-group
         v-for="(answerItem, index) in textAnswers"
         :key="index"
@@ -36,16 +41,6 @@
         </b-input-group-append>
       </b-input-group>
     </div>
-    <b-form-textarea
-      v-else-if="question.answerTypes.text.isMultiLine"
-      v-model="textAnswers[0]"
-      rows="5"
-    ></b-form-textarea>
-    <b-form-input
-      v-else
-      v-model="textAnswers[0]"
-      :placeholder="question.answerTypes.text.placeholder"
-    ></b-form-input>
     <b-form-invalid-feedback class="mt-3" :state="isAnswerValid">
       Please enter at least {{ minFields }} entries
     </b-form-invalid-feedback>
