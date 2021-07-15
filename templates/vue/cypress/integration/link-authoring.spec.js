@@ -12,8 +12,9 @@ describe("Link Authoring", () => {
         cy.addLink(child1.id, child2.id)
 
         cy.link(child1.id, child2.id).click()
-        cy.get("links-modal").should("visible")
-        cy.contains("/Delete Link/i").click()
+        cy.getByTestId("links-modal").should("be.visible")
+        cy.getByTestId("delete-link-btn").should("not.be.disabled")
+        cy.getByTestId("delete-link-btn").click()
 
         cy.link(child1.id, child2.id).should("not.exist")
       })
@@ -25,19 +26,10 @@ describe("Link Authoring", () => {
       .then(nodes => {
         const [root, child] = Object.values(nodes)
 
-        const confirm = cy.stub()
-        confirm.onFirstCall().returns(true)
+        cy.link(root.id, child.id).click()
+        cy.getByTestId("delete-link-btn").should("be.disabled")
+        cy.contains(/Save/i).click()
 
-        const alert = cy.stub()
-        cy.on("window:confirm", confirm)
-        cy.on("window:alert", alert)
-
-        cy.link(root.id, child.id)
-          .click()
-          .then(() => {
-            expect(alert).to.be.called
-            expect(alert.getCall(0).lastArg).to.match(/cannot delete this link/i)
-          })
         cy.link(root.id, child.id).should("exist")
       })
   })
@@ -52,6 +44,9 @@ describe("Link Authoring", () => {
         cy.logout().visitTapestry()
 
         cy.link(child1.id, child2.id).click()
+        cy.getByTestId("links-modal").should("be.visible")
+        cy.getByTestId("delete-link-btn").should("not.be.disabled")
+        cy.getByTestId("delete-link-btn").click()
         cy.link(child1.id, child2.id).should("exist")
       })
   })
@@ -81,9 +76,11 @@ describe("Link Authoring", () => {
         })
         cy.closeLightbox()
 
-        cy.link(root.id, child1.id)
-          .click()
-          .should("not.exist")
+        cy.link(root.id, child1.id).click()
+
+        cy.getByTestId("links-modal").should("be.visible")
+        cy.getByTestId("delete-link-btn").should("not.be.disabled")
+        cy.getByTestId("delete-link-btn").click()
         cy.openLightbox(root.id)
         cy.lightbox().within(() => {
           cy.contains(child1.title).should("not.exist")

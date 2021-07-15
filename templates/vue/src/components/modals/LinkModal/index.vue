@@ -2,14 +2,13 @@
   <b-modal
     v-if="target && source"
     id="links-modal"
-    data-qa="links-modal"
     visible
     size="lg"
     title="Edit Link"
     body-class="p-0"
     @hidden="close"
   >
-    <b-container class="mb-2">
+    <b-container class="mb-2" data-qa="links-modal">
       <b-row style="text-align:center">
         <b-col class="node">{{ source.title }}</b-col>
         <b-col>
@@ -30,9 +29,10 @@
         <b-button
           size="md"
           variant="danger"
-          :disabled="!canDeleteLink"
           style="margin-right:auto"
-          @click="$emit('delet-link')"
+          data-qa="delete-link-btn"
+          :disabled="!canDeleteLink"
+          @click="remove"
         >
           Delete Link
         </b-button>
@@ -110,6 +110,7 @@ export default {
           id => id !== this.target.id
         )
       }
+      this.close()
     },
   },
 }
