@@ -17,7 +17,7 @@
       :selectedTab="selectedTab"
       @change-tab="handleTabChange"
     ></navbar>
-    <template v-if="selectedTab === 'default'">
+    <div v-show="selectedTab === 'default'" class="page-contianer">
       <multi-content-media
         v-if="node.mediaType === 'multi-content'"
         :node="node"
@@ -45,8 +45,8 @@
         @complete="complete"
         @change:dimensions="updateDimensions"
       />
-    </template>
-    <circle-of-support v-else-if="selectedTab === 'cos'" />
+    </div>
+    <circle-of-support v-show="selectedTab === 'cos'" />
   </tapestry-modal>
 </template>
 
@@ -347,5 +347,12 @@ body.tapestry-lightbox-open {
 
 .has-navbar {
   padding-top: 6rem;
+}
+
+.page-contianer {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: row-reverse;
 }
 </style>
