@@ -17,12 +17,13 @@
           <h3 class="mb-4">
             {{ question.followUp.text || "Previously, you said:" }}
           </h3>
-          <tapestry-activity
-            v-for="answer in previousQuestionAnswers"
-            :key="answer.type"
-            :type="answer.type"
-            :answerData="answer.answerData"
-          ></tapestry-activity>
+          <completed-activity-media
+            v-for="previousAnswer in previousQuestionAnswers"
+            :key="previousAnswer[0]"
+            :type="previousAnswer[0]"
+            :answerData="previousAnswer[1]"
+            :question="getQuestion(question.followUp.questionId)"
+          ></completed-activity-media>
         </div>
         <div v-else>
           <p>You haven't done the previous activity yet.</p>
@@ -53,13 +54,20 @@
             :node="node"
             @submit="handleSubmit"
           />
+          <multiple-choice-question
+            v-else-if="formType === 'multipleChoice'"
+            :node="node"
+            :question="question"
+            :answer="answer"
+            @submit="handleSubmit"
+          ></multiple-choice-question>
         </div>
         <div v-else class="question-answer-types">
           <p class="question-answer-text">I want to answer with...</p>
           <div class="button-container">
             <answer-button
               v-if="question.answerTypes.text.enabled"
-              :completed="textFormCompleted"
+              :completed="formIsCompleted('text')"
               data-qa="answer-button-text"
               @click="openForm('text')"
             >
@@ -67,12 +75,21 @@
             </answer-button>
             <answer-button
               v-if="question.answerTypes.audio.enabled"
-              :completed="audioFormCompleted"
+              :completed="formIsCompleted('audio')"
               icon="microphone"
               data-qa="answer-button-audio"
               @click="openForm('audio')"
             >
               audio
+            </answer-button>
+            <answer-button
+              v-if="question.answerTypes.multipleChoice.enabled"
+              :completed="formIsCompleted('multipleChoice')"
+              data-qa="answer-button-multiple-choice"
+              icon="tasks"
+              @click="openForm('multipleChoice')"
+            >
+              multiple choice
             </answer-button>
           </div>
         </div>
@@ -87,10 +104,10 @@ import client from "@/services/TapestryAPI"
 import AnswerButton from "./AnswerButton"
 import AudioRecorder from "./AudioRecorder"
 import TextQuestion from "./TextQuestion"
+import MultipleChoiceQuestion from "./MultipleChoiceQuestion"
 import Loading from "@/components/common/Loading"
-import TapestryActivity from "./TapestryActivity"
+import CompletedActivityMedia from "../../common/CompletedActivityMedia"
 import * as wp from "@/services/wp"
-import { data as wpData } from "@/services/wp"
 
 export default {
   name: "question",
@@ -98,8 +115,9 @@ export default {
     AnswerButton,
     AudioRecorder,
     TextQuestion,
+    MultipleChoiceQuestion,
     Loading,
-    TapestryActivity,
+    CompletedActivityMedia,
   },
   props: {
     question: {
@@ -120,7 +138,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getAnswers"]),
+    ...mapGetters(["getAnswers", "getQuestion"]),
     ...mapState(["userAnswers"]),
     isLoggedIn() {
       return wp.isLoggedIn()
@@ -143,26 +161,7 @@ export default {
         this.question.followUp.nodeId,
         this.question.followUp.questionId
       )
-      let previousAnswers = []
-      if (answerObject !== undefined) {
-        if (this.question.followUp.questionId !== null) {
-          for (const [key, value] of Object.entries(answerObject)) {
-            if (key === "text") {
-              var tempObj = { type: key, answerData: value }
-              previousAnswers.push(tempObj)
-            } else {
-              var tempAudioObj = {
-                type: key,
-                answerData:
-                  wpData.uploadDirArray.baseurl + "/" + value.url + "?" + Date.now(),
-              }
-              previousAnswers.push(tempAudioObj)
-            }
-          }
-          return previousAnswers
-        }
-      }
-      return []
+      return answerObject ? Object.entries(answerObject) : null
     },
     enabledAnswerTypes() {
       return Object.entries(this.question.answerTypes).filter(([, value]) => {
@@ -174,23 +173,6 @@ export default {
         return this.answers[this.formType]
       }
       return ""
-    },
-    textFormCompleted() {
-      if (
-        this.userAnswers?.[this.node.id]?.activity?.[this.question.id]?.answers?.text
-      ) {
-        return true
-      }
-      return false
-    },
-    audioFormCompleted() {
-      if (
-        this.userAnswers?.[this.node.id]?.activity?.[this.question.id]?.answers
-          ?.audio
-      ) {
-        return true
-      }
-      return false
     },
   },
   watch: {
@@ -270,6 +252,10 @@ export default {
         type: this.formType,
       })
       this.$emit("submit")
+    },
+    formIsCompleted(type) {
+      return !!this.userAnswers?.[this.node.id]?.activity?.[this.question.id]
+        ?.answers?.[type]
     },
   },
 }
