@@ -11,19 +11,10 @@ describe("Link Authoring", () => {
         const [, child1, child2] = Object.values(nodes)
         cy.addLink(child1.id, child2.id)
 
-        const stub = cy.stub()
-        stub.onFirstCall().returns(true)
+        cy.link(child1.id, child2.id).click()
+        cy.get("links-modal").should("visible")
+        cy.contains("/Delete Link/i").click()
 
-        cy.on("window:confirm", stub)
-
-        cy.link(child1.id, child2.id)
-          .click()
-          .then(() => {
-            expect(stub).to.be.called
-            expect(stub.getCall(0).lastArg).to.match(
-              /are you sure you want to delete the link/i
-            )
-          })
         cy.link(child1.id, child2.id).should("not.exist")
       })
   })

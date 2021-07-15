@@ -25,21 +25,23 @@
       </b-row>
     </b-container>
     <template slot="modal-footer">
-      <b-button
-        size="sm"
-        variant="danger"
-        :disabled="!canDeleteLink"
-        style="margin-right:auto"
-        @click="$emit('delet-link')"
-      >
-        Delete Link
-      </b-button>
-      <b-button size="sm" variant="secondary" @click="close">
-        Cancle
-      </b-button>
-      <b-button size="sm" variant="primary" @click="save">
-        Save
-      </b-button>
+      <b-overlay :show="isLoading" style="width:100%" class="d-flex flex-row">
+        <b-button
+          size="md"
+          variant="danger"
+          :disabled="!canDeleteLink"
+          style="margin-right:auto"
+          @click="$emit('delet-link')"
+        >
+          Delete Link
+        </b-button>
+        <b-button class="ml-2" size="md" variant="secondary" @click="close">
+          Cancle
+        </b-button>
+        <b-button class="ml-2" size="md" variant="primary" @click="save">
+          Save
+        </b-button>
+      </b-overlay>
       <b-form-invalid-feedback :state="canDeleteLink">
         Link can only be deleted if both connected nodes have another link.
       </b-form-invalid-feedback>
@@ -70,6 +72,7 @@ export default {
   data() {
     return {
       reverse: false,
+      isLoading: false,
     }
   },
   created() {
@@ -85,22 +88,21 @@ export default {
       })
     },
     async save() {
+      this.isLoading = true
       if (this.reverse) {
-        this.reverseLink({ source: this.source.id, target: this.target.id })
+        await this.reverseLink({ source: this.source.id, target: this.target.id })
       }
+      this.isLoading = false
       this.close()
     },
     async remove() {
-      const userConfirmDelete = confirm(
-        `Are you sure you want to delete the link between ${this.source.title} and ${this.target.title}?`
-      )
-      if (userConfirmDelete) {
-        await this.deleteLink({ source: this.source.id, target: this.target.id })
-        if (this.isMultiContent(this.source.id)) {
-          this.source.childOrdering = this.source.childOrdering.filter(
-            id => id !== this.target.id
-          )
-        }
+      this.isLoading = true
+      await this.deleteLink({ source: this.source.id, target: this.target.id })
+      this.isLoading = false
+      if (this.isMultiContent(this.source.id)) {
+        this.source.childOrdering = this.source.childOrdering.filter(
+          id => id !== this.target.id
+        )
       }
     },
   },
