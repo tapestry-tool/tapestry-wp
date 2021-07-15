@@ -8,7 +8,7 @@
       @dragenter.prevent
       @drop.prevent="drop($event, bucket)"
     >
-      <b class="bucket-label">{{ bucket.value }}</b>
+      <b class="bucket-label">{{ bucket.text }}</b>
       <item
         v-for="item in items"
         :key="item"
