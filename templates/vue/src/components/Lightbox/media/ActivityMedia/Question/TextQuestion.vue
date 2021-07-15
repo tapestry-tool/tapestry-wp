@@ -5,44 +5,43 @@
       v-model="textAnswers[0]"
       rows="5"
     ></b-form-textarea>
-    <div v-else class="list">
-      <b-input-group
-        v-for="(answerItem, index) in textAnswers"
-        :key="index"
-        data-qa="list-input-list"
-        class="mt-2 list-input-list"
-      >
-        <b-form-input
-          v-model="textAnswers[index]"
-          :data-qa="`list-input-${index}`"
-          :placeholder="getListPlaceholder(index)"
-          autofocus
-          @keydown.enter="addAnswer"
-        ></b-form-input>
-        <b-input-group-append v-if="minFields !== maxFields">
-          <b-button
-            :variant="numOfAnswers <= minFields ? 'secondary' : 'danger'"
-            :data-qa="`list-del-${index}`"
-            :disabled="numOfAnswers <= minFields"
-            @click="deleteAnswer(index)"
-          >
-            -
-          </b-button>
-        </b-input-group-append>
-        <b-input-group-append v-if="minFields != maxFields">
-          <b-button
-            :variant="numOfAnswers >= maxFields ? 'secondary' : 'primary'"
-            :data-qa="`list-add-${index}`"
-            :disabled="numOfAnswers >= maxFields"
-            @click="addAnswer"
-          >
-            +
-          </b-button>
-        </b-input-group-append>
-      </b-input-group>
-    </div>
+    <b-input-group
+      v-for="(answerItem, index) in textAnswers"
+      v-else
+      :key="index"
+      data-qa="list-input-list"
+      class="mt-2 list-input-list"
+    >
+      <b-form-input
+        v-model="textAnswers[index]"
+        :data-qa="`list-input-${index}`"
+        :placeholder="getListPlaceholder(index)"
+        autofocus
+        @keydown.enter="addAnswer"
+      ></b-form-input>
+      <b-input-group-append v-if="minFields !== maxFields">
+        <b-button
+          :variant="numOfAnswers <= minFields ? 'secondary' : 'danger'"
+          :data-qa="`list-del-${index}`"
+          :disabled="numOfAnswers <= minFields"
+          @click="deleteAnswer(index)"
+        >
+          -
+        </b-button>
+      </b-input-group-append>
+      <b-input-group-append v-if="minFields != maxFields">
+        <b-button
+          :variant="numOfAnswers >= maxFields ? 'secondary' : 'primary'"
+          :data-qa="`list-add-${index}`"
+          :disabled="numOfAnswers >= maxFields"
+          @click="addAnswer"
+        >
+          +
+        </b-button>
+      </b-input-group-append>
+    </b-input-group>
     <b-form-invalid-feedback class="mt-3" :state="isAnswerValid">
-      Please enter at least {{ minFields }} entries
+      Please enter at least {{ minFields }} entr{{ minFields > 1 ? "ies" : "y" }}
     </b-form-invalid-feedback>
     <div>
       <b-button class="submit-btn" variant="primary" @click="handleTextSubmit">
