@@ -29,7 +29,7 @@
         size="sm"
         variant="danger"
         :disabled="!canDeleteLink"
-        class="d-inline-flex align-self-start"
+        style="margin-right:auto"
         @click="$emit('delet-link')"
       >
         Delete Link
