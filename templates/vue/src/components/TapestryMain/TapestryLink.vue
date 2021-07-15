@@ -12,13 +12,14 @@
       :x2="target.coordinates.x"
       :y1="source.coordinates.y"
       :y2="target.coordinates.y"
-      @click="remove"
+      @click="openLinkModal"
     ></line>
   </transition>
 </template>
 
 <script>
-import { mapActions, mapGetters, mapState } from "vuex"
+import { mapGetters, mapState } from "vuex"
+import { names } from "@/config/routes"
 import * as wp from "@/services/wp"
 
 export default {
@@ -35,7 +36,7 @@ export default {
   },
   computed: {
     ...mapState(["visibleNodes", "rootId"]),
-    ...mapGetters(["getNeighbours", "isMultiContent", "isVisible"]),
+    ...mapGetters(["getNeighbours", "isVisible"]),
     show() {
       return this.isVisible(this.source.id) && this.isVisible(this.target.id)
     },
@@ -44,7 +45,6 @@ export default {
     },
   },
   methods: {
-    ...mapActions(["deleteLink"]),
     isConnectedToRoot(source, target) {
       let queue = []
       let visited = new Set()
@@ -74,25 +74,16 @@ export default {
         this.isConnectedToRoot(this.target.id, this.source.id)
       )
     },
-    async remove() {
-      if (event.target.classList.contains("disabled")) {
-        return
-      }
-      const userConfirmDelete = confirm(
-        `Are you sure you want to delete the link between ${this.source.title} and ${this.target.title}?`
-      )
-      if (userConfirmDelete) {
-        if (this.canDelete()) {
-          await this.deleteLink({ source: this.source.id, target: this.target.id })
-          if (this.isMultiContent(this.source.id)) {
-            this.source.childOrdering = this.source.childOrdering.filter(
-              id => id !== this.target.id
-            )
-          }
-        } else {
-          alert("You cannot delete this link")
-        }
-      }
+    openLinkModal() {
+      this.$router.push({
+        name: names.LINKMODAL,
+        params: {
+          canDeleteLink: this.canDelete(),
+          source: this.source,
+          target: this.target,
+        },
+        query: this.$route.query,
+      })
     },
   },
 }
