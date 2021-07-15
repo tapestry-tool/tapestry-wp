@@ -1,0 +1,142 @@
+{
+	"nodes": [		{
+			"id": 7044,
+			"author": {
+				"id": "1",
+				"name": "admin"
+			},
+			"type": "tapestry_node",
+			"size": "",
+			"title": "Question Node",
+			"status": "publish",
+			"imageURL": "",
+			"lockedImageURL": "",
+			"mediaType": "activity",
+			"mediaFormat": "",
+			"mediaDuration": 0,
+			"description": "",
+			"behaviour": "embed",
+			"typeData": {
+				"activity": {
+					"questions": [
+						{
+							"answerTypes": {
+									"audio": {
+										"enabled": false
+									},
+									"text": {
+										"enabled": true,
+										"isMultiLine": false,
+										"placeholder": "Meaning: "
+									}
+							},
+							"completed": true,
+							"confirmation": {
+								"message": "",
+								"title": ""
+							},
+							"followUp": {
+								 "nodeId": null,
+								 "questionId": null,
+								 "text": ""
+							},
+							"id": "40be540c-0788-429a-b276-7cbcc953bb61",
+							"text": "What is the meaning of life?"
+					},
+					{
+						"answerTypes": {
+								"audio": {
+									"enabled": true
+								},
+								"text": {
+									"enabled": false,
+									"isMultiLine": false,
+									"placeholder": ""
+								}
+						},
+						"completed": false,
+						"confirmation": {
+							"message": "",
+							"title": ""
+						},
+						"followUp": {
+							 "nodeId": null,
+							 "questionId": null,
+							 "text": ""
+						},
+						"id": "87d7f591-8c58-433f-8655-e610477d4d7f",
+						"text": "How many birds does it take to change a lightbulb?"
+					}
+					]
+				},
+				"linkMetadata": null,
+				"progress": 0,
+				"mediaURL": "",
+				"mediaWidth": 960,
+				"mediaHeight": 600,
+				"subAccordionText": "More content:",
+				"textContent": ""
+			},
+			"coordinates": {
+				"x": 120.73933792114258,
+				"y": 2835.18701171875
+			},
+			"permissions": {
+				"public": [
+					"read"
+				],
+				"authenticated": [
+					"read"
+				],
+				"contributor": [
+					"read"
+				],
+				"subscriber": [
+					"read"
+				]
+			},
+			"hideTitle": false,
+			"hideProgress": false,
+			"hideMedia": false,
+			"skippable": true,
+			"fullscreen": false,
+			"conditions": [],
+			"childOrdering": [],
+			"fitWindow": true,
+			"fx": 2939.49951171875,
+			"fy": 3116.346923828125,
+			"completed": false,
+			"accordionProgress": [],
+			"mayUnlockNodes": [],
+			"permissionsOrder": [
+				"public",
+				"authenticated",
+				"contributor",
+				"subscriber"
+			],
+			"index": 0,
+			"x": 2939.49951171875,
+			"y": 3116.346923828125,
+			"vy": 0,
+			"vx": 0,
+			"nodeType": "root",
+			"unlocked": true,
+			"depth": 0,
+			"accessible": true,
+			"license": {
+        "name": "CC-BY-SA",
+        "icons": [
+          "fab fa-creative-commons",
+          "fab fa-creative-commons-by",
+          "fab fa-creative-commons-sa"
+        ],
+        "type": "cc",
+        "link": "",
+        "description": ""
+      }
+		}
+	],
+	"links": [],
+  "groups": [],
+  "site-url": "http://localhost:8000"
+} 

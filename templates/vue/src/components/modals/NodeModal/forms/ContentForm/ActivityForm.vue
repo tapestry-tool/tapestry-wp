@@ -140,6 +140,24 @@
                 Audio recorder
               </b-form-checkbox>
             </b-form-group>
+            <b-form-group class="mt-3">
+              <b-form-checkbox
+                v-model="question.answerTypes.multipleChoice.enabled"
+                :data-qa="`question-answer-multipleChoice-${index}`"
+                switch
+              >
+                Multiple choice
+              </b-form-checkbox>
+              <div
+                v-if="question.answerTypes.multipleChoice.enabled"
+                class="mt-2 pl-4 ml-2"
+              >
+                <multiple-choice-form
+                  :multipleChoice="question.answerTypes.multipleChoice"
+                  data-qa="authoring-multiple-choice-form"
+                />
+              </div>
+            </b-form-group>
           </b-card>
           <b-card
             sub-title="Confirmation customization"
@@ -176,6 +194,7 @@ import { mapState } from "vuex"
 import Combobox from "@/components/modals/common/Combobox"
 import Helpers from "@/utils/Helpers"
 import RichTextForm from "./RichTextForm"
+import MultipleChoiceForm from "./MultipleChoiceForm"
 
 const defaultQuestion = {
   text: "",
@@ -194,6 +213,13 @@ const defaultQuestion = {
     audio: {
       enabled: false,
     },
+    multipleChoice: {
+      enabled: false,
+      allowSelectMultiple: false,
+      useImages: false,
+      choices: [],
+      preSelectedOptions: [],
+    },
   },
   confirmation: {
     title: "",
@@ -203,9 +229,11 @@ const defaultQuestion = {
 }
 
 export default {
+  name: "activity-form",
   components: {
     Combobox,
     RichTextForm,
+    MultipleChoiceForm,
   },
   props: {
     node: {
@@ -231,6 +259,9 @@ export default {
       this.node.typeData.activity = {
         questions: [],
       }
+    }
+    if (!this.node.typeData.activity.questions.length) {
+      this.addQuestion()
     }
   },
   methods: {
