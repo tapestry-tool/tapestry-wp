@@ -171,7 +171,7 @@ export default {
 </script>
 
 <style lang="scss">
-.tyde-mode ~ .page-nav-wrapper > .page-nav {
+.has-navbar ~ .page-nav-wrapper > .page-nav {
   padding-top: 8rem !important;
 }
 

@@ -17,14 +17,12 @@
       :selectedTab="selectedTab"
       @change-tab="handleTabChange"
     ></navbar>
-    <circle-of-support v-if="selectedTab === 'cos'" />
-
-    <template v-if="isNodeView">
+    <template v-if="selectedTab === 'default'">
       <multi-content-media
         v-if="node.mediaType === 'multi-content'"
         :node="node"
         :row-id="rowId"
-        :class="{ 'tyde-mode': tydeModeEnabled }"
+        :class="{ 'has-navbar': tydeModeEnabled }"
         :sub-row-id="subRowId"
         @close="handleAutoClose"
         @complete="complete"
@@ -41,13 +39,14 @@
         :node-id="nodeId"
         :dimensions="dimensions"
         context="lightbox"
-        :class="{ 'tyde-mode': tydeModeEnabled }"
+        :class="{ 'has-navbar': tydeModeEnabled }"
         @load="handleLoad"
         @close="handleAutoClose"
         @complete="complete"
         @change:dimensions="updateDimensions"
       />
     </template>
+    <circle-of-support v-else-if="selectedTab === 'cos'" />
   </tapestry-modal>
 </template>
 
@@ -112,9 +111,6 @@ export default {
     },
     canSkip() {
       return this.node.completed || this.node.skippable !== false
-    },
-    isNodeView() {
-      return this.selectedTab === "default" ? true : false
     },
     tydeModeEnabled() {
       return !canEditTapestry() && this.settings.tydeModeEnabled
@@ -349,7 +345,7 @@ body.tapestry-lightbox-open {
   height: 100%;
 }
 
-.tyde-mode {
+.has-navbar {
   padding-top: 6rem;
 }
 </style>
