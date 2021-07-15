@@ -72,6 +72,10 @@ const linkmodal = {
     linkmodal: linkParamParser,
   },
 }
+const help = {
+  path: `${ROOT_PATH}/help`,
+  name: "help",
+}
 
 const modal = {
   path: `${ROOT_PATH}/:type/:tab`,
@@ -102,6 +106,7 @@ const routes = {
   linkmodal,
   nestedMultiContent,
   redirects,
+  help,
 }
 
 export const names = Object.fromEntries(
