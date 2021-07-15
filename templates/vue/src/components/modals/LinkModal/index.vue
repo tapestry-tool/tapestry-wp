@@ -1,5 +1,6 @@
 <template>
   <b-modal
+    v-if="target && source"
     id="links-modal"
     data-qa="links-modal"
     visible
@@ -58,15 +59,18 @@ export default {
   props: {
     canDeleteLink: {
       type: Boolean,
-      required: true,
+      required: false,
+      default: false,
     },
     source: {
       type: Object,
-      required: true,
+      required: false,
+      default: null,
     },
     target: {
       type: Object,
-      required: true,
+      required: false,
+      default: null,
     },
   },
   data() {
@@ -75,8 +79,10 @@ export default {
       isLoading: false,
     }
   },
-  created() {
-    if (!this.source) this.close()
+  mounted() {
+    if (!this.source || !this.target) {
+      this.close()
+    }
   },
   methods: {
     ...mapActions(["deleteLink", "reverseLink"]),
