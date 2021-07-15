@@ -43,11 +43,9 @@
     <b-form-invalid-feedback class="mt-3" :state="isAnswerValid">
       Please enter at least {{ minFields }} entr{{ minFields > 1 ? "ies" : "y" }}
     </b-form-invalid-feedback>
-    <div>
-      <b-button class="submit-btn" variant="primary" @click="handleTextSubmit">
-        Submit
-      </b-button>
-    </div>
+    <b-button class="submit-btn" variant="primary" @click="handleTextSubmit">
+      Submit
+    </b-button>
   </b-form>
 </template>
 
