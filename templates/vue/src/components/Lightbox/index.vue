@@ -52,7 +52,7 @@
         @change:dimensions="updateDimensions"
       />
     </div>
-    <circle-of-support v-show="selectedTab === 'cos'" />
+    <circle-of-support v-if="selectedTab === 'cos'" />
   </tapestry-modal>
 </template>
 
