@@ -36,6 +36,7 @@
       :subRowId="subRowId"
       :context="context"
       :level="level"
+      :activeMenuIndex="activeMenuIndex"
       @load="handleLoad"
       @changeRow="changeRow"
       @updateProgress="updateProgress"
@@ -102,10 +103,9 @@ export default {
       required: false,
       default: 0,
     },
-    activeMenuNode: {
-      type: Object,
-      required: false,
-      default: () => {},
+    activeMenuIndex: {
+      type: Number,
+      required: true,
     },
   },
   data() {

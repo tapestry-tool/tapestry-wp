@@ -1,15 +1,13 @@
 <template>
-  <!-- <div>
-    <div v-for="(menuGroup, groupIndex) in menuGroups" :key="groupIndex"> -->
   <headless-multi-content
-    :rows="rows.map(row => row.node.id)"
+    :rows="activeRows.map(row => row.node.id)"
     :value="rowId"
     @input="changeRow"
   >
     <template v-slot="{ isVisible, hasNext, next }">
       <div data-qa="page-rows">
         <div
-          v-for="(row, index) in rows"
+          v-for="(row, index) in activeRows"
           :id="`row-${row.node.id}`"
           :key="row.node.id"
           ref="rowRefs"
@@ -85,8 +83,6 @@
       </div>
     </template>
   </headless-multi-content>
-  <!-- </div>
-  </div> -->
 </template>
 
 <script>
@@ -133,10 +129,9 @@ export default {
       required: false,
       default: 0,
     },
-    activeMenuNode: {
-      type: Object,
-      required: false,
-      default: () => {},
+    activeMenuIndex: {
+      type: Number,
+      required: true,
     },
   },
   data() {
@@ -170,6 +165,11 @@ export default {
       })
       menu.unshift(mainMenu)
       return menu
+    },
+    activeRows() {
+      return this.activeMenuIndex > -1
+        ? this.menuGroups[this.activeMenuIndex]
+        : this.rows
     },
     lockRows() {
       return this.node.typeData.lockRows
