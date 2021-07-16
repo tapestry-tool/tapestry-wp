@@ -22,6 +22,7 @@
       class="node-container"
       :class="{
         'multi-content': node.mediaType === 'multi-content',
+        'video-content': node.mediaType === 'video' || node.mediaType === 'h5p',
       }"
     >
       <multi-content-media
@@ -263,6 +264,7 @@ export default {
     },
   },
   mounted() {
+    console.log(this.node.mediaType)
     document.querySelector("body").classList.add("tapestry-lightbox-open")
     DragSelectModular.removeDragSelectListener()
     if (this.node.mediaType === "multi-content") {
@@ -362,5 +364,8 @@ body.tapestry-lightbox-open {
 }
 .multi-content {
   flex-direction: row-reverse;
+}
+.video-content {
+  display: block !important;
 }
 </style>
