@@ -105,7 +105,8 @@ export default {
     },
     activeMenuIndex: {
       type: Number,
-      required: true,
+      required: false,
+      default: -1,
     },
   },
   data() {
