@@ -6,18 +6,18 @@
       :class="[
         'page-nav',
         {
-          lightbox: !node.fullscreen,
-          fullscreen: node.fullscreen,
+          lightbox: !isFullScreen,
+          fullscreen: isFullScreen,
           closed: !opened,
         },
       ]"
-      :style="{ height: node.fullscreen ? '100vh' : dimensions.height + 'px' }"
+      :style="{ height: isFullScreen ? '100vh' : dimensions.height + 'px' }"
     >
       <button
         :class="[
           'page-nav-toggle',
           {
-            fullscreen: node.fullscreen,
+            fullscreen: isFullScreen,
           },
         ]"
         data-qa="page-nav-toggle"
@@ -30,7 +30,7 @@
         :class="[
           'page-nav-content',
           {
-            fullscreen: node.fullscreen,
+            fullscreen: isFullScreen,
             closed: !opened,
           },
         ]"
@@ -74,6 +74,11 @@ export default {
       required: false,
       default: null,
     },
+    fullScreen: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   data() {
     return {
@@ -87,13 +92,16 @@ export default {
       return parseInt(this.$route.params.nodeId, 10)
     },
     rows() {
-      return this.node.childOrdering.map(id => {
-        const node = this.getNode(id)
-        const children = this.isMultiContent(node.id)
-          ? node.childOrdering.map(this.getNode)
-          : this.getDirectChildren(id).map(this.getNode)
-        return { node, children }
-      })
+      return this.node.childOrdering
+        .map(id => {
+          const node = this.getNode(id)
+          let children = this.isMultiContent(node.id)
+            ? node.childOrdering.map(this.getNode)
+            : this.getDirectChildren(id).map(this.getNode)
+          children = children.filter(node => !node.popup)
+          return { node, children }
+        })
+        .filter(row => !row.node.popup)
     },
     lockRows() {
       return this.node.typeData.lockRows
@@ -103,6 +111,9 @@ export default {
     },
     rowOrder() {
       return this.getRowOrder(this.node)
+    },
+    isFullScreen() {
+      return this.fullScreen || this.node.fullscreen
     },
   },
   mounted() {
@@ -143,7 +154,7 @@ export default {
     scrollToRef(nodeId) {
       this.$nextTick(() => {
         if (this.rowRefs) {
-          let el = this.rowRefs.find(ref => ref.id === `row-${nodeId}`)
+          let el = this.rowRefs.find(ref => ref && ref.id === `row-${nodeId}`)
           if (el && el.hasOwnProperty("$el")) {
             el = el.$el
           }
@@ -160,6 +171,10 @@ export default {
 </script>
 
 <style lang="scss">
+.has-navbar ~ .page-nav-wrapper > .page-nav {
+  padding-top: 8rem !important;
+}
+
 .page-nav-wrapper {
   .page-nav {
     position: relative;

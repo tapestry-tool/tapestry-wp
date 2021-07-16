@@ -34,7 +34,7 @@
           {{ title }}
         </h4>
         <div v-if="hasSubmissionError" class="error-wrapper">
-          <h5>Node cannot be saved due to the following error(s):</h5>
+          <h5>Operation failed due to the following error(s):</h5>
           <ul>
             <li v-for="error in errors" :key="error">{{ error }}</li>
           </ul>
@@ -47,8 +47,8 @@
             @click="changeTab('content')"
           >
             <content-form
-              :parent="parent"
               :node="node"
+              :parent="parent"
               :actionType="type"
               :maxDescriptionLength="maxDescriptionLength"
               @load="videoLoaded = true"
@@ -205,6 +205,12 @@
             {{ warningText }}
             <br v-if="warningText" />
             {{ deleteWarningText }}
+          </b-form-invalid-feedback>
+          <b-form-invalid-feedback
+            :state="!hasUnsavedChanges"
+            class="text-right font-weight-bold"
+          >
+            You have unsaved changes
           </b-form-invalid-feedback>
         </template>
         <template #overlay>
@@ -419,8 +425,47 @@ export default {
     hasSubmissionError() {
       return this.errors.length
     },
+    hasUnsavedChanges() {
+      const oldNode = this.getNode(this.nodeId)
+      return this.type === "add" || !Helpers.nodeEqual(oldNode, this.node)
+    },
     isMultiContentNodeChild() {
       return this.parent && this.parent.mediaType == "multi-content"
+    },
+    isMultipleChoiceValueValid() {
+      const questionsWithMultipleChoiceEnabled = this.node.typeData.activity.questions.filter(
+        question => {
+          return question.answerTypes.multipleChoice.enabled
+        }
+      )
+      const validMultipleChoiceValues = questionsWithMultipleChoiceEnabled.every(
+        question => {
+          return question.answerTypes.multipleChoice.choices.every(option => {
+            return option.value != ""
+          })
+        }
+      )
+      return validMultipleChoiceValues
+    },
+    isMultipleChoiceImageValid() {
+      const questionsWithMultipleChoiceEnabled = this.node.typeData.activity.questions.filter(
+        question => {
+          return question.answerTypes.multipleChoice.enabled
+        }
+      )
+      const validMultipleChoiceImages = questionsWithMultipleChoiceEnabled.every(
+        question => {
+          const useImages = question.answerTypes.multipleChoice.useImages
+          if (useImages) {
+            return question.answerTypes.multipleChoice.choices.every(option => {
+              return option.imageUrl != "" && option.imageUrl != null
+            })
+          } else if (!useImages) {
+            return true
+          }
+        }
+      )
+      return validMultipleChoiceImages
     },
   },
   watch: {
@@ -616,9 +661,8 @@ export default {
       }
     },
     handleClose(event) {
-      const oldNode = this.getNode(this.nodeId)
       if (
-        (this.type === "add" || !Helpers.nodeEqual(oldNode, this.node)) &&
+        this.hasUnsavedChanges &&
         (event.trigger == "backdrop" ||
           event.trigger == "headerclose" ||
           event.trigger == "esc" ||
@@ -758,8 +802,26 @@ export default {
       }
       await this.updateLockedStatus()
       this.loading = false
+
+      /**
+       * Sometimes changes in the parent node causes changes in child nodes. For
+       * example, when a node goes from a video to a non-video, all child popups
+       * should be invalidated.
+       */
+      this.updateChildren()
       if (!this.hasSubmissionError) {
         this.close()
+      }
+    },
+    updateChildren() {
+      if (!["h5p", "video"].includes(this.node.mediaType)) {
+        const children = this.getDirectChildren(this.node.id)
+        children.forEach(childId => {
+          const childNode = this.getNode(childId)
+          if (childNode && childNode.popup) {
+            this.updateNode({ id: childId, newNode: { popup: null } })
+          }
+        })
       }
     },
     getRandomNumber(min, max) {
@@ -840,9 +902,13 @@ export default {
         )
       }
 
-      const quiz = this.node.quiz
-      if (!this.validateQuiz(quiz)) {
-        errMsgs.push("Please enter at least one answer ID for each question")
+      if (this.node.popup) {
+        const { time } = this.node.popup
+        if (time === "") {
+          errMsgs.push(`Please enter a time for your popup.`)
+        } else if (time <= 0) {
+          errMsgs.push(`Please enter a time greater than 0.`)
+        }
       }
 
       if (!this.node.mediaType) {
@@ -865,6 +931,59 @@ export default {
         if (this.node.typeData.mediaURL === "") {
           errMsgs.push("Please enter an Embed URL")
         }
+      } else if (this.node.mediaType === "activity") {
+        const validActivityTitles = this.node.typeData.activity.questions.every(
+          question => {
+            return question.text
+          }
+        )
+        if (!validActivityTitles) {
+          errMsgs.push("Please enter a question text for all questions")
+        }
+
+        const validActivityOptions = this.node.typeData.activity.questions.every(
+          question => {
+            const answerTypes = Object.values(question.answerTypes)
+            return answerTypes.some(answerType => answerType.enabled)
+          }
+        )
+        if (!validActivityOptions) {
+          errMsgs.push("Please enable at least one answer type for each question")
+        }
+
+        const questionsWithPreviousActivity = this.node.typeData.activity.questions.filter(
+          question => {
+            return question.isFollowUp
+          }
+        )
+        const validPreviousAnswers = questionsWithPreviousActivity.every(
+          question => {
+            const previousAnswer = question.followUp.questionId
+            return previousAnswer
+          }
+        )
+        if (!validPreviousAnswers) {
+          errMsgs.push("Please select a previous activity to display")
+        }
+
+        const validMultipleChoiceValues = this.isMultipleChoiceValueValid
+        if (!validMultipleChoiceValues) {
+          errMsgs.push("Please enter a text for all multiple choice options")
+        }
+        const validMultipleChoiceImages = this.isMultipleChoiceImageValid
+        if (!validMultipleChoiceImages) {
+          errMsgs.push("Please upload an image for all multiple choice options")
+        }
+      } else if (this.node.mediaType === "answer") {
+        const hasActivityId = this.node.typeData.activityId
+        if (!hasActivityId) {
+          errMsgs.push("Please select an activity")
+        }
+
+        const hasQuestionId = this.node.typeData.questionId
+        if (!hasQuestionId) {
+          errMsgs.push("Please select a question")
+        }
       }
 
       return errMsgs
@@ -875,20 +994,10 @@ export default {
         (typeData.hasOwnProperty("youtubeID") || typeData.mediaURL.endsWith(".mp4"))
       )
     },
-    validateQuiz(quiz) {
-      return quiz.every(question => {
-        return Object.values(question.answers).some(
-          value => value && value.length > 0
-        )
-      })
-    },
     updateOrderingArray(arr) {
       this.node.childOrdering = arr
     },
     handleTypeChange(evt) {
-      this.node.quiz = this.node.quiz.filter(q =>
-        Object.values(q.answers).reduce((acc, { value }) => acc || value == "")
-      )
       if (evt === "multi-content") this.node.presentationStyle = "accordion"
     },
     async setLinkData() {

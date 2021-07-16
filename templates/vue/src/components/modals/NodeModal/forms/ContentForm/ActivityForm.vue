@@ -1,58 +1,72 @@
 <template>
-  <div>
-    <b-form-group>
-      <b-form-checkbox v-model="canAddQuestion" data-testid="add-question-checkbox">
-        Add Question
-      </b-form-checkbox>
-    </b-form-group>
-    <div v-if="canAddQuestion" class="quiz">
-      <b-card
-        v-for="(question, index) in questions"
-        :key="question.id"
-        bg-variant="secondary"
-        text-variant="light"
-        class="mb-3"
-      >
-        <b-form-group class="mb-0">
-          <b-row align-v="center" class="mb-2 mx-0">
-            <p class="font-weight-bold p-0 m-0 question-text">
-              {{ getGroupTitle(question, index) }}
-            </p>
-            <b-button
-              class="ml-auto del-button"
-              size="sm"
-              variant="danger"
-              text-variant="white"
-              @click="deleteQuestion(question.id)"
-            >
-              Delete
-            </b-button>
-          </b-row>
+  <div class="activity">
+    <b-card
+      v-for="(question, index) in questions"
+      :key="question.id"
+      bg-variant="secondary"
+      text-variant="light"
+      class="mb-3"
+    >
+      <b-form-group class="mb-0">
+        <b-row align-v="center" class="mb-2 mx-0">
+          <p
+            v-b-toggle="`question-${index}-container`"
+            class="font-weight-bold p-0 m-0 question-text"
+          >
+            {{ getGroupTitle(question, index) }}
+            <small>
+              (Click to
+              <span class="when-open">collapse</span>
+              <span class="when-closed">expand</span>
+              )
+            </small>
+          </p>
+          <b-button
+            class="ml-auto del-button"
+            size="sm"
+            variant="danger"
+            text-variant="white"
+            @click="deleteQuestion(question.id)"
+          >
+            Delete
+          </b-button>
+        </b-row>
+        <b-collapse :id="`question-${index}-container`" visible>
           <b-card
-            sub-title="Show Answer to a Previous Activity First"
+            sub-title="Show answer to a previous activity first"
             bg-variant="light"
             text-variant="dark"
             class="mb-3"
           >
             <b-form-group>
-              <b-form-checkbox v-model="question.isFollowUp" switch>
-                {{ question.isFollowUp ? "Yes" : "No" }}
+              <b-form-checkbox
+                v-model="question.followUp.enabled"
+                switch
+                @change="togglingFollowUp(question)"
+              >
+                {{ question.followUp.enabled ? "Yes" : "No" }}
               </b-form-checkbox>
             </b-form-group>
-            <b-form-group v-if="question.isFollowUp" label="Show this text first:">
-              <b-form-input v-model="question.followUpText"></b-form-input>
+            <b-form-group
+              v-if="question.followUp.enabled"
+              label="Show this text first:"
+            >
+              <b-form-input
+                v-model="question.followUp.text"
+                placeholder="Previously, you said:"
+              ></b-form-input>
             </b-form-group>
             <b-form-group
-              v-if="question.isFollowUp"
+              v-if="question.followUp.enabled"
               label="Then show user answer to the following activity:"
             >
               <combobox
-                v-model="question.previousEntry"
+                v-model="question.followUp.questionId"
                 class="mb-0"
-                :options="getPreviousOptions(question)"
+                :options="getPreviousQuestions(question)"
                 item-text="text"
                 item-value="id"
-                empty-message="There are no activities yet."
+                empty-message="There are no questions in this tapestry."
               >
                 <template v-slot="slotProps">
                   <p>
@@ -63,7 +77,7 @@
             </b-form-group>
           </b-card>
           <b-card
-            sub-title="Question Details"
+            sub-title="Question details"
             bg-variant="light"
             text-variant="dark"
             class="mb-3"
@@ -72,102 +86,101 @@
               <b-form-input
                 v-model="question.text"
                 :data-testid="`question-title-${index}`"
+                :data-qa="`question-text-${index}`"
               />
             </b-form-group>
-            <b-form-group label="Answer options" class="mb-0">
-              <b-row>
-                <b-col cols="12" md="4">
-                  <b-form-checkbox
-                    :checked="question.answers.audioId.length > 0"
-                    :data-testid="`question-answer-audio-${index}`"
-                    switch
-                    @input="question.answers.audioId = $event ? '1' : ''"
+            <b-card-sub-title class="mt-2 mb-2">Answer Options</b-card-sub-title>
+            <b-form-group class="mt-3">
+              <b-form-checkbox
+                v-model="question.answerTypes.text.enabled"
+                :data-qa="`question-answer-text-${index}`"
+                switch
+              >
+                Text entry
+              </b-form-checkbox>
+              <div v-if="question.answerTypes.text.enabled" class="mt-2 pl-4 ml-2">
+                <b-form-radio-group v-model="question.answerTypes.text.isMultiLine">
+                  <b-form-radio
+                    :data-qa="`question-answer-text-multi-${index}`"
+                    name="multi-line"
+                    :value="true"
                   >
-                    Audio Recorder
-                  </b-form-checkbox>
-                </b-col>
-                <b-col cols="12" md="4">
-                  <b-form-group label="Textbox Gravity Form" class="mb-0">
-                    <b-form-input
-                      v-if="!gravityFormExists"
-                      :disabled="true"
-                      title="Gravity Forms plugin is not installed. You need to install Gravity Forms before being able to use it here."
-                      value="Not Available"
-                    />
-                    <combobox
-                      v-else
-                      v-model="question.answers.textId"
-                      :data-testid="`question-answer-text-${index}`"
-                      :options="formOptions"
-                      item-text="title"
-                      item-value="id"
-                      empty-message="There are no Gravity Forms available. You need to first create a Gravity Form to use here."
-                      @focus="wasFocused = true"
-                    >
-                      <template v-slot="slotProps">
-                        <p>
-                          <code>{{ slotProps.option.id }}</code>
-                          {{ slotProps.option.title }}
-                        </p>
-                      </template>
-                    </combobox>
-                  </b-form-group>
-                </b-col>
-                <b-col cols="12" md="4">
-                  <b-form-group label="Checklist Gravity Form" class="mb-0">
-                    <b-form-input
-                      v-if="!gravityFormExists"
-                      :disabled="true"
-                      title="Gravity Forms plugin is not installed. You need to install Gravity Forms before being able to use it here."
-                      value="Not Available"
-                    />
-                    <combobox
-                      v-else
-                      v-model="question.answers.checklistId"
-                      :data-testid="`question-answer-checklist-${index}`"
-                      :options="formOptions"
-                      item-text="title"
-                      item-value="id"
-                      empty-message="There are no forms available. Please add one in your WP dashboard."
-                      @focus="wasFocused = true"
-                    >
-                      <template v-slot="slotProps">
-                        <p>
-                          <code>{{ slotProps.option.id }}</code>
-                          {{ slotProps.option.title }}
-                        </p>
-                      </template>
-                    </combobox>
-                  </b-form-group>
-                </b-col>
-              </b-row>
+                    Multi-line
+                  </b-form-radio>
+                  <b-form-radio
+                    :data-qa="`question-answer-text-single-${index}`"
+                    name="single-line"
+                    :value="false"
+                  >
+                    Single Line
+                  </b-form-radio>
+                </b-form-radio-group>
+                <div
+                  v-if="
+                    question.answerTypes.text.enabled &&
+                      !question.answerTypes.text.isMultiLine
+                  "
+                  class="mt-2 pl-4"
+                >
+                  <label for="placeholder">Placeholder (optional):</label>
+                  <b-form-input
+                    id="placeholder"
+                    v-model="question.answerTypes.text.placeholder"
+                    :data-qa="`question-answer-text-single-placeholder-${index}`"
+                  ></b-form-input>
+                </div>
+              </div>
             </b-form-group>
-            <b-form-invalid-feedback :state="isAnswerValid(question)">
-              Please enter an ID in at least one of the answer types.
-            </b-form-invalid-feedback>
+            <b-form-group>
+              <b-form-checkbox
+                v-model="question.answerTypes.audio.enabled"
+                :data-qa="`question-answer-audio-${index}`"
+                switch
+              >
+                Audio recorder
+              </b-form-checkbox>
+            </b-form-group>
+            <b-form-group class="mt-3">
+              <b-form-checkbox
+                v-model="question.answerTypes.multipleChoice.enabled"
+                :data-qa="`question-answer-multipleChoice-${index}`"
+                switch
+              >
+                Multiple choice
+              </b-form-checkbox>
+              <div
+                v-if="question.answerTypes.multipleChoice.enabled"
+                class="mt-2 pl-4 ml-2"
+              >
+                <multiple-choice-form
+                  :multipleChoice="question.answerTypes.multipleChoice"
+                  data-qa="authoring-multiple-choice-form"
+                />
+              </div>
+            </b-form-group>
           </b-card>
           <b-card
-            sub-title="Confirmation Page Customization"
+            sub-title="Confirmation customization"
             bg-variant="light"
             text-variant="dark"
           >
             <b-form-group label="Title">
               <b-form-input
-                v-model="question.confirmationTitle"
+                v-model="question.confirmation.title"
                 :data-testid="`question-confirmation-title-${index}`"
                 placeholder="Thanks!"
               />
             </b-form-group>
             <rich-text-form
-              v-model="question.confirmationMessage"
+              v-model="question.confirmation.message"
               :data-testid="`question-confirmation-message-${index}`"
               placeholder="Your response has been recorded."
             />
           </b-card>
-        </b-form-group>
-      </b-card>
-    </div>
-    <b-row v-if="canAddQuestion" class="mx-0">
+        </b-collapse>
+      </b-form-group>
+    </b-card>
+    <b-row class="mx-0">
       <b-button variant="primary" @click="addQuestion">
         <i class="fas fa-plus icon"></i>
         Add Question
@@ -179,23 +192,48 @@
 <script>
 import { mapState } from "vuex"
 import Combobox from "@/components/modals/common/Combobox"
-import GravityFormsApi from "@/services/GravityFormsApi"
 import Helpers from "@/utils/Helpers"
 import RichTextForm from "./RichTextForm"
+import MultipleChoiceForm from "./MultipleChoiceForm"
 
 const defaultQuestion = {
   text: "",
-  answers: {
-    textId: "",
-    audioId: "",
-    checklistId: "",
+  followUp: {
+    enabled: false,
+    text: "",
+    nodeId: null,
+    questionId: null,
   },
+  answerTypes: {
+    text: {
+      enabled: false,
+      placeholder: "",
+      isMultiLine: false,
+    },
+    audio: {
+      enabled: false,
+    },
+    multipleChoice: {
+      enabled: false,
+      allowSelectMultiple: false,
+      useImages: false,
+      choices: [],
+      preSelectedOptions: [],
+    },
+  },
+  confirmation: {
+    title: "",
+    message: "",
+  },
+  completed: false,
 }
 
 export default {
+  name: "activity-form",
   components: {
     Combobox,
     RichTextForm,
+    MultipleChoiceForm,
   },
   props: {
     node: {
@@ -205,62 +243,38 @@ export default {
   },
   data() {
     return {
-      canAddQuestion: Boolean(this.node.quiz && this.node.quiz.length),
-      gravityFormExists: false,
-      formOptions: [],
-      h5pOptions: [],
-      questions: this.node.quiz,
-      typeOptions: ["H5P Audio Recorder"],
-      icons: ["microphone"],
-      wasFocused: false,
+      questions: this.node.typeData.activity?.questions || [],
     }
   },
   computed: {
     ...mapState(["nodes"]),
-    activities() {
-      const questions = Object.values(this.nodes)
-        .filter(node => Boolean(node.quiz))
-        .flatMap(node => node.quiz)
-      this.questions.forEach(q => {
-        if (!questions.find(qn => qn.id === q.id)) {
-          questions.push(q)
-        }
-      })
-      return questions
-    },
   },
   watch: {
-    canAddQuestion(isAdding) {
-      if (isAdding && !this.questions.length) {
-        this.addQuestion()
-      } else if (!isAdding && this.questions.length) {
-        this.questions = []
-      }
-    },
     questions(newQuestions) {
-      this.$set(this.node, "quiz", newQuestions)
+      this.$set(this.node.typeData.activity, "questions", newQuestions)
     },
   },
-  async mounted() {
-    this.gravityFormExists = await GravityFormsApi.exists()
-    this.formOptions = await GravityFormsApi.getAllForms()
+  created() {
+    if (!this.node.typeData.activity) {
+      this.node.typeData.activity = {
+        questions: [],
+      }
+    }
+    if (!this.node.typeData.activity.questions.length) {
+      this.addQuestion()
+    }
   },
   methods: {
-    getPreviousOptions(currentQuestion) {
-      return this.activities.filter(qn => qn !== currentQuestion)
+    getPreviousQuestions(currentQuestion) {
+      const allQuestions = Object.values(this.nodes)
+        .filter(node => Boolean(node.typeData.activity?.questions))
+        .flatMap(node => node.typeData.activity.questions)
+      return allQuestions.filter(qn => qn.id !== currentQuestion.id)
     },
     addQuestion() {
       this.questions = [
         ...this.questions,
-        {
-          id: Helpers.createUUID(),
-          isFollowUp: false,
-          previousEntry: null,
-          followUpText: "Previously, you said:",
-          text: "",
-          answers: { ...defaultQuestion.answers },
-          completed: false,
-        },
+        { ...Helpers.deepCopy(defaultQuestion), id: Helpers.createUUID() },
       ]
     },
     deleteQuestion(id) {
@@ -269,34 +283,32 @@ export default {
     getGroupTitle(question, index) {
       return `Question #${index + 1}: ${question.text || "Untitled"}`
     },
-    isAnswerValid(question) {
-      if (!this.wasFocused) {
-        return null
-      }
-      return Object.values(question.answers).some(value => value && value.length > 0)
+    togglingFollowUp(question) {
+      question.followUp.text = ""
+      question.followUp.questionId = ""
+      question.followUp.nodeId = ""
     },
   },
 }
 </script>
 
-<style scoped>
-.icon {
-  margin-right: 4px;
-}
+<style lang="scss" scoped>
+.activity {
+  .icon {
+    margin-right: 4px;
+  }
 
-.icon-form {
-  margin-right: 1em;
-}
+  .question-text {
+    flex: 10;
+  }
 
-.quiz {
-  margin-bottom: 1em;
-}
+  .del-button {
+    flex: 1;
+  }
 
-.question-text {
-  flex: 10;
-}
-
-.del-button {
-  flex: 1;
+  .collapsed .when-open,
+  .not-collapsed .when-closed {
+    display: none;
+  }
 }
 </style>

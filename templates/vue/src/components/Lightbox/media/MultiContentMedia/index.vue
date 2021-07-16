@@ -162,7 +162,7 @@ export default {
   },
   methods: {
     ...mapMutations(["updateNode"]),
-    ...mapActions(["completeNode", "updateNodeProgress", "toggleFavourite"]),
+    ...mapActions(["completeNode", "toggleFavourite"]),
     handleLoad(el) {
       this.$nextTick(() => {
         if (this.activeIndex >= 0) {
@@ -310,8 +310,12 @@ button[disabled] {
 }
 
 .title {
-  color: #fff;
+  color: rgb(51, 51, 51);
   margin-bottom: 1em;
+}
+
+.has-navbar .title {
+  text-align: left;
 }
 
 .media-container {
