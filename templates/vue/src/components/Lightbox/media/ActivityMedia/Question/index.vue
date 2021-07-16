@@ -310,7 +310,7 @@ export default {
   }
 
   .loading {
-    background: #111;
+    background: #eee;
     position: absolute;
     top: 0;
     left: 0;
