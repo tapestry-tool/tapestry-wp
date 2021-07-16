@@ -163,6 +163,7 @@ export default {
 
 <style lang="scss" scoped>
 .media-wrapper {
+  color: #111;
   outline: none;
   border-radius: 15px;
   overflow: auto;

@@ -26,7 +26,7 @@
               <i
                 v-else
                 class="fas fa-lock fa-sm title-row-icon"
-                style="color:white;"
+                style="color:black;"
               ></i>
               {{ row.node.title }}
               <locked-content
@@ -43,7 +43,7 @@
                 class="fas fa-heart fa-sm"
                 style="color:red;"
               ></i>
-              <i v-else class="fas fa-heart fa-sm" style="color:white;"></i>
+              <i v-else class="fas fa-heart fa-sm"></i>
             </a>
           </div>
           <div v-if="isVisible(row.node.id)" :data-qa="`row-content-${row.node.id}`">
@@ -52,15 +52,12 @@
                 :node-id="row.node.id"
                 :dimensions="dimensions"
                 context="multi-content"
-                style="color: white; margin-bottom: 24px;"
+                style="margin-bottom: 24px;"
                 @complete="updateProgress(row.node.id)"
                 @close="toggle(row.node.id)"
                 @load="handleLoad($refs.rowRefs[index])"
               />
-              <p
-                v-if="row.children.length > 0 && !areAllPopup(row.children)"
-                style="color: white;"
-              >
+              <p v-if="row.children.length > 0 && !areAllPopup(row.children)">
                 {{ row.node.typeData.subAccordionText }}
               </p>
               <accordion-rows
@@ -233,6 +230,8 @@ button[disabled] {
 }
 
 .button-row {
+  color: #111;
+  background: #00bfff;
   display: flex;
   align-items: center;
   margin: 0;
@@ -241,6 +240,7 @@ button[disabled] {
 
   i {
     margin-right: 8px;
+    color: #111;
   }
 
   a {
@@ -249,12 +249,14 @@ button[disabled] {
 }
 
 .button-row-trigger {
+  color: #111;
   background: none;
   width: 100%;
   text-align: left;
 }
 
 .accordion-row {
+  color: #111;
   background: #eeeeee;
   border-radius: 4px;
   padding: 8px 16px;
