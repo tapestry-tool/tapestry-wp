@@ -2,11 +2,11 @@
   <tapestry-modal
     id="lightbox"
     data-qa="lightbox"
+    :node-id="nodeId"
     :class="{
       'full-screen': node.fullscreen || tydeModeEnabled,
       'content-text': node.mediaType === 'text' || node.mediaType === 'wp-post',
     }"
-    :node-id="nodeId"
     :content-container-style="lightboxContentStyles"
     :allow-close="canSkip && !tydeModeEnabled"
     :show-fav="!tydeModeEnabled"
@@ -17,7 +17,13 @@
       :selectedTab="selectedTab"
       @change-tab="handleTabChange"
     ></navbar>
-    <div v-show="selectedTab === 'default'" class="page-contianer">
+    <div
+      v-show="selectedTab === 'default'"
+      class="node-container"
+      :class="{
+        'multi-content': node.mediaType === 'multi-content',
+      }"
+    >
       <multi-content-media
         v-if="node.mediaType === 'multi-content'"
         :node="node"
@@ -349,10 +355,12 @@ body.tapestry-lightbox-open {
   padding-top: 6rem;
 }
 
-.page-contianer {
+.node-container {
   width: 100%;
   height: 100%;
   display: flex;
+}
+.multi-content {
   flex-direction: row-reverse;
 }
 </style>
