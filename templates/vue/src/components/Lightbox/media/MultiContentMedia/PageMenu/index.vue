@@ -35,34 +35,33 @@
           },
         ]"
       >
-        <div v-for="(menu, index) in menuGroups" :key="index">
-          <b-nav vertical style="padding-top: 4px; padding-bottom: 4px;">
-            <b-card>
-              <b-card-text v-b-toggle="index === 0 ? `` : `collapse-${index}`">
-                {{ getMenuName(index) }}
-              </b-card-text>
-              <b-collapse
-                :id="`collapse-${index}`"
-                :visible="index === 0"
-                class="mt-2"
-              >
-                <ul
-                  class="page-menu-item fa-ul"
-                  @click="changeActiveMenuIndex(index)"
-                >
-                  <page-menu-item
-                    v-for="row in menu"
-                    :key="row.node.id"
-                    :node="row.node"
-                    :lockRows="lockRows"
-                    :disabled="disabledRow(row.node)"
-                    style="z-index: 10"
-                    @scroll-to="scrollToRef"
-                  />
-                </ul>
-              </b-collapse>
-            </b-card>
-          </b-nav>
+        <div
+          v-for="(menu, index) in menuGroups"
+          :key="index"
+          style="padding-top: 4px; padding-bottom: 4px;"
+        >
+          <b-card>
+            <b-card-text v-b-toggle="index === 0 ? `` : `collapse-${index}`">
+              {{ getMenuName(index) }}
+            </b-card-text>
+            <b-collapse
+              :id="`collapse-${index}`"
+              :visible="index === 0"
+              class="mt-2"
+            >
+              <ul class="page-menu-item fa-ul" @click="changeActiveMenuIndex(index)">
+                <page-menu-item
+                  v-for="row in menu"
+                  :key="row.node.id"
+                  :node="row.node"
+                  :lockRows="lockRows"
+                  :disabled="disabledRow(row.node)"
+                  style="z-index: 10"
+                  @scroll-to="scrollToRef"
+                />
+              </ul>
+            </b-collapse>
+          </b-card>
         </div>
       </div>
     </aside>
