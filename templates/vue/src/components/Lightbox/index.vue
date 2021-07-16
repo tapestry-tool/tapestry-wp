@@ -12,11 +12,13 @@
     @close="handleUserClose"
   >
     <multi-content-media
-      v-if="node.mediaType === 'multi-content'"
-      :node="node"
+      v-if="
+        (node.mediaType === 'multi-content' || node.typeData.isSecondaryNode) &&
+          activeMenuNode !== null
+      "
+      :node="activeMenuNode ? activeMenuNode : node"
       :row-id="rowId"
       :sub-row-id="subRowId"
-      :activeMenuNodeId="activeMenuNodeId"
       @close="handleAutoClose"
       @complete="complete"
     />
@@ -84,7 +86,7 @@ export default {
       },
       showCompletionScreen: false,
       rowRefs: [],
-      activeMenuNodeId: this.nodeId,
+      activeMenuNode: this.node,
     }
   },
   computed: {
@@ -296,7 +298,9 @@ export default {
       }
     },
     setActiveMenuNode(nodeId) {
-      this.activeMenuNodeId = nodeId
+      const activeMenuNode = this.getNode(nodeId)
+      console.log("setActiveMenuNode" + activeMenuNode.id)
+      this.activeMenuNode = activeMenuNode
     },
   },
 }
