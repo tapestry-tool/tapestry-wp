@@ -66,6 +66,15 @@
             >
               {{ enabledAnswer[0] }}
             </answer-button>
+            <answer-button
+              v-if="question.answerTypes.multipleChoice.enabled"
+              :completed="formIsCompleted('multipleChoice')"
+              data-qa="answer-button-multiple-choice"
+              icon="tasks"
+              @click="openForm('multipleChoice')"
+            >
+              multiple choice
+            </answer-button>
           </div>
         </div>
       </div>
@@ -80,6 +89,7 @@ import AnswerButton from "./AnswerButton"
 import AudioQuestion from "./AudioQuestion"
 import TextQuestion from "./TextQuestion"
 import DragDropQuestion from "./DragDrop"
+import MultipleChoiceQuestion from "./MultipleChoiceQuestion"
 import Loading from "@/components/common/Loading"
 import CompletedActivityMedia from "../../common/CompletedActivityMedia"
 import * as wp from "@/services/wp"
@@ -91,6 +101,7 @@ export default {
     AudioQuestion,
     TextQuestion,
     DragDropQuestion,
+    MultipleChoiceQuestion,
     Loading,
     CompletedActivityMedia,
   },
@@ -136,7 +147,6 @@ export default {
         this.question.followUp.nodeId,
         this.question.followUp.questionId
       )
-
       return answerObject ? Object.entries(answerObject) : null
     },
     enabledAnswerTypes() {
@@ -236,6 +246,10 @@ export default {
         type: this.formType,
       })
       this.$emit("submit")
+    },
+    formIsCompleted(type) {
+      return !!this.userAnswers?.[this.node.id]?.activity?.[this.question.id]
+        ?.answers?.[type]
     },
   },
 }

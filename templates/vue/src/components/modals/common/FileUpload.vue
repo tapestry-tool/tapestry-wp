@@ -241,6 +241,11 @@ export default {
     }
   },
   created() {
+    // NOTE: compactMode cannot work without showing the image preview
+    if (this.compactMode) {
+      this.showImagePreview = true
+    }
+
     if (this.showImagePreview) {
       this.imagePatternId =
         "thumbnail-preview-" +
@@ -382,6 +387,7 @@ export default {
     color: #fff;
     background: #393c3ebd;
     border: none;
+    white-space: pre-wrap;
 
     &::after {
       display: none;

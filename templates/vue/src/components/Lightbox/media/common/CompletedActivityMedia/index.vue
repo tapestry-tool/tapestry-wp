@@ -1,9 +1,6 @@
 <template>
   <b-container class="completed-activity-media">
     <b-row align-v="center" style="min-height:150px;">
-      <b-col v-if="showIcon" align-self="center" cols="2">
-        <tapestry-icon :icon="type" />
-      </b-col>
       <b-col v-if="type === 'text'" align-self="center">
         <div class="text">
           {{ answerData }}
@@ -18,29 +15,40 @@
           :drag-drop="question.answerTypes.dragDrop"
         />
       </b-col>
+      <b-col v-if="type === 'multipleChoice'" align-self="center">
+        <ul>
+          <li v-for="answer in answerData" :key="answer.index">
+            <completed-multiple-choice-item
+              :item="getMultipleChoiceAnswerItem(answer)"
+              :useImages="question.answerTypes.multipleChoice.useImages"
+            />
+          </li>
+        </ul>
+      </b-col>
     </b-row>
   </b-container>
 </template>
 
 <script>
 import DragDrop from "./DragDrop"
-import TapestryIcon from "@/components/common/TapestryIcon"
+import CompletedMultipleChoiceItem from "./CompletedMultipleChoiceItem"
 import { data as wpData } from "@/services/wp"
 
 export default {
   name: "completed-activity-media",
   components: {
-    TapestryIcon,
     DragDrop,
+    CompletedMultipleChoiceItem,
   },
   props: {
     type: {
       type: String,
       required: true,
-      validator: val => ["text", "audio", "dragDrop"].includes(val),
+      validator: val =>
+        ["text", "audio", "multipleChoice", "dragDrop"].includes(val),
     },
     answerData: {
-      type: [String, Array, Object],
+      type: [Object, String, Array, Number],
       required: true,
     },
     question: {
@@ -48,16 +56,18 @@ export default {
       required: false,
       default: () => ({}),
     },
-    showIcon: {
-      type: Boolean,
-      required: false,
-      default: true,
-    },
   },
   computed: {
     urlAnswer() {
       return (
         wpData.uploadDirArray.baseurl + "/" + this.answerData.url + "?" + Date.now()
+      )
+    },
+  },
+  methods: {
+    getMultipleChoiceAnswerItem(id) {
+      return this.question.answerTypes.multipleChoice.choices.find(
+        option => option.id === id
       )
     },
   },
@@ -68,16 +78,12 @@ export default {
 .completed-activity-media {
   background: #262626;
   border-radius: 8px;
+  margin-bottom: 8px;
   padding: 8px 16px 8px 16px;
   .text {
     text-align: left;
     padding-left: 1em;
     border-left: solid 1px #666;
   }
-}
-
-.dragdropicon {
-  height: 30px;
-  width: 30px;
 }
 </style>
