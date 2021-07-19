@@ -974,16 +974,6 @@ export default {
         if (!validMultipleChoiceImages) {
           errMsgs.push("Please upload an image for all multiple choice options")
         }
-      } else if (this.node.mediaType === "answer") {
-        const hasActivityId = this.node.typeData.activityId
-        if (!hasActivityId) {
-          errMsgs.push("Please select an activity")
-        }
-
-        const hasQuestionId = this.node.typeData.questionId
-        if (!hasQuestionId) {
-          errMsgs.push("Please select a question")
-        }
 
         // Drag and Drop form validation
         const dragDropQuestions = this.node.typeData.activity.questions.filter(
@@ -1013,6 +1003,16 @@ export default {
           errMsgs.push(
             "Images must be uploaded for all drag and drop questions that have 'Use Images' enabled"
           )
+        }
+      } else if (this.node.mediaType === "answer") {
+        const hasActivityId = this.node.typeData.activityId
+        if (!hasActivityId) {
+          errMsgs.push("Please select an activity")
+        }
+
+        const hasQuestionId = this.node.typeData.questionId
+        if (!hasQuestionId) {
+          errMsgs.push("Please select a question")
         }
       }
       return errMsgs

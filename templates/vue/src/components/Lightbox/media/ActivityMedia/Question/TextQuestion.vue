@@ -30,8 +30,8 @@ export default {
       required: true,
     },
     answer: {
-      type: String,
       required: true,
+      validator: prop => typeof prop === "string" || prop === null,
     },
   },
   data() {
