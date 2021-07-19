@@ -6,6 +6,7 @@
         <bucket
           v-for="bucket in getBuckets('from')"
           :key="bucket.id"
+          class="user-from-bucket"
           :node="node"
           :drag-drop="dragDrop"
           :bucket="bucket"
@@ -18,6 +19,7 @@
         <bucket
           v-for="bucket in getBuckets('to')"
           :key="bucket.id"
+          class="user-to-bucket"
           :node="node"
           :drag-drop="dragDrop"
           :bucket="bucket"

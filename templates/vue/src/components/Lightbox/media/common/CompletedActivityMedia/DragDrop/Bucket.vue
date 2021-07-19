@@ -6,7 +6,7 @@
       :key="item.id"
       :item="item"
       :hide-text="hideText"
-      :data-qa="`user-bucket-item-${item.id}`"
+      class="user-item"
     />
   </div>
 </template>

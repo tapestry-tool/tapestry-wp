@@ -15,7 +15,7 @@
         :node="node"
         :drag-drop="dragDrop"
         :item="item"
-        :data-qa="`user-bucket-item-${item}`"
+        class="user-item"
       />
     </div>
   </div>

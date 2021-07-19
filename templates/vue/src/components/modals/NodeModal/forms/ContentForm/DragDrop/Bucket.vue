@@ -4,8 +4,7 @@
       <b-form-input
         v-model="bucket.text"
         placeholder="New Bucket"
-        class=" side"
-        :data-qa="`from-bucket-label-${bucket.id}`"
+        class="side bucket-label"
       ></b-form-input>
       <b-button
         v-if="bucketRemovalAllowed"
@@ -23,7 +22,6 @@
           :key="item.id"
           :item="item"
           :useImages="useImages"
-          :data-qa="`bucket-item-${bucket.id}-${item.id}`"
           :itemRemovalAllowed="itemRemovalAllowed"
           @remove-item="$emit('remove-item', item.id)"
         />
@@ -31,7 +29,7 @@
       <b-button
         v-if="bucket.type === 'from'"
         variant="primary"
-        :data-qa="`add-bucket-item-button-${bucket.id}`"
+        class="add-item"
         @click="$emit('add')"
       >
         Add item

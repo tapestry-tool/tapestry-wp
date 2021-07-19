@@ -4,12 +4,12 @@
       <b-form-input
         v-model="item.text"
         placeholder="New Item"
-        :data-qa="`bucket-item-text-${item.bucketId}`"
+        class="item-text"
       ></b-form-input>
       <color-picker
         v-if="!useImages"
         label="Background color"
-        :data-qa="`bucket-item-backgroundcolor-${item.bucketId}`"
+        class="item-background-color"
         :currentColor="item.color"
         @change="item.color = $event"
       />
@@ -17,7 +17,6 @@
         <file-upload
           v-model="item.imageUrl"
           input-test-id="node-bucketitem-thumbnail-url"
-          :data-qa="`bucket-item-thumbnail-${item.bucketId}`"
           :show-url-upload="false"
           :show-image-preview="true"
           :compact-mode="true"
