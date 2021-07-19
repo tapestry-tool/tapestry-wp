@@ -78,7 +78,9 @@ export default {
   },
   computed: {
     minFields() {
-      return parseInt(this.question.answerTypes.text.minFields, 10)
+      return this.question.answerTypes.text.allowMultiple
+        ? parseInt(this.question.answerTypes.text.minFields, 10)
+        : 1
     },
     maxFields() {
       return parseInt(this.question.answerTypes.text.maxFields, 10)
