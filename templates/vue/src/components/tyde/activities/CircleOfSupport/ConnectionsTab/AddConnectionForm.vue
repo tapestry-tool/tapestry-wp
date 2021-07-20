@@ -86,13 +86,9 @@
 </template>
 
 <script>
-import {
-    TwemojiPicker
-  } from '@kevinfaguiar/vue-twemoji-picker';
-  import EmojiAllData from '@kevinfaguiar/vue-twemoji-picker/emoji-data/en/emoji-all-groups.json';
-  import EmojiDataAnimalsNature from '@kevinfaguiar/vue-twemoji-picker/emoji-data/en/emoji-group-animals-nature.json';
-  import EmojiDataFoodDrink from '@kevinfaguiar/vue-twemoji-picker/emoji-data/en/emoji-group-food-drink.json';
-  import EmojiGroups from '@kevinfaguiar/vue-twemoji-picker/emoji-data/emoji-groups.json';
+import { TwemojiPicker } from "@kevinfaguiar/vue-twemoji-picker"
+import EmojiAllData from "@kevinfaguiar/vue-twemoji-picker/emoji-data/en/emoji-all-groups.json"
+import EmojiGroups from "@kevinfaguiar/vue-twemoji-picker/emoji-data/emoji-groups.json"
 import TapestryIcon from "@/components/common/TapestryIcon"
 import AddCommunityForm from "../CommunityView/AddCommunityForm"
 import { MAX_COMMUNITIES, MAX_CONNECTION_NAME_LENGTH } from "../cos.config"
@@ -101,7 +97,7 @@ export default {
   components: {
     AddCommunityForm,
     TapestryIcon,
-    'twemoji-picker': TwemojiPicker,
+    "twemoji-picker": TwemojiPicker,
   },
   model: {
     prop: "connection",
