@@ -37,7 +37,7 @@
           Delete Link
         </b-button>
         <b-button class="ml-2" size="md" variant="secondary" @click="close">
-          Cancle
+          Cancel
         </b-button>
         <b-button class="ml-2" size="md" variant="primary" @click="save">
           Save
