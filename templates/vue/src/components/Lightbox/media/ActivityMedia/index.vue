@@ -107,6 +107,7 @@ export default {
         this.$refs.activity.clientHeight - (this.context === "lightbox" ? 0 : 100),
     })
     this.$emit("load")
+    this.updateActivityProgress()
   },
   created() {
     this.markQuestionsComplete()
@@ -120,7 +121,10 @@ export default {
           this.node.id,
           currentQuestion.id
         )
-        if (Object.keys(currentQuestionAnswer).length === 0) {
+        if (
+          Object.keys(currentQuestionAnswer).length === 0 &&
+          !currentQuestion.optional
+        ) {
           currentQuestion.completed = false
         } else {
           currentQuestion.completed = true
@@ -129,6 +133,9 @@ export default {
     },
     handleSubmit() {
       this.showCompletionScreen = true
+      this.updateActivityProgress()
+    },
+    updateActivityProgress() {
       const numberCompleted = this.questions.filter(question => question.completed)
         .length
       const progress = numberCompleted / this.node.typeData.activity.questions.length
@@ -139,7 +146,6 @@ export default {
       })
     },
     next() {
-      console.log("Nexting")
       this.showCompletionScreen = false
       client.recordAnalyticsEvent("user", "next", "activity", this.node.id, {
         from: this.activeQuestionIndex,

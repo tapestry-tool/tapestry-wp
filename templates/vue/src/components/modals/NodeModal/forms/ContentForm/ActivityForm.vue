@@ -284,6 +284,7 @@ const defaultQuestion = {
     message: "",
   },
   completed: false,
+  optional: false,
 }
 
 export default {
