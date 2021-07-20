@@ -23,9 +23,18 @@
     >
       Please select {{ allowSelectMultiple ? "one or more choices" : "a choice" }}.
     </b-form-invalid-feedback>
-    <b-button class="float-left mt-3" variant="primary" type="submit">
-      Submit
-    </b-button>
+    <b-button-group class="float-right" style="width: 50%">
+      <b-button
+        v-if="node.typeData.activity.optional"
+        class="mt-3 px-1"
+        variant="primary"
+      >
+        Skip
+      </b-button>
+      <b-button class="mt-3 px-1" variant="primary" type="submit">
+        Submit
+      </b-button>
+    </b-button-group>
   </b-form>
 </template>
 

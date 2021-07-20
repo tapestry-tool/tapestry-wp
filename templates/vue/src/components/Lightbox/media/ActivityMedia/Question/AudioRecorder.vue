@@ -26,6 +26,9 @@
         {{ durationText }}
       </code>
     </div>
+    <button v-if="node.typeData.activity.optional" class="my-3">
+      Skip
+    </button>
     <button
       :disabled="duration === 0 && state !== states.SAVED"
       class="my-3"

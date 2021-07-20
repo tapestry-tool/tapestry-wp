@@ -51,9 +51,18 @@
     <b-form-invalid-feedback class="mt-3" :state="isAnswerValid">
       Please enter at least {{ minFields }} entr{{ minFields > 1 ? "ies" : "y" }}
     </b-form-invalid-feedback>
-    <b-button class="submit-btn" variant="primary" @click="handleTextSubmit">
-      Submit
-    </b-button>
+    <b-button-group class="button-row">
+      <b-button
+        v-if="node.typeData.activity.optional"
+        class="mx-1"
+        variant="primary"
+      >
+        Skip
+      </b-button>
+      <b-button class="mx-1" variant="primary" @click="handleTextSubmit">
+        Submit
+      </b-button>
+    </b-button-group>
   </b-form>
 </template>
 
@@ -61,6 +70,10 @@
 export default {
   name: "text-question",
   props: {
+    node: {
+      type: Object,
+      required: true,
+    },
     question: {
       type: Object,
       required: true,
@@ -166,9 +179,10 @@ export default {
     min-width: 45px;
   }
 }
-.submit-btn {
+
+.button-row {
   float: right;
   margin-top: 30px;
-  width: 15%;
+  width: 30%;
 }
 </style>

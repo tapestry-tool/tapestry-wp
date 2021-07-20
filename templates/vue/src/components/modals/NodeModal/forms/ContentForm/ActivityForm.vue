@@ -88,6 +88,13 @@
                 :data-testid="`question-title-${index}`"
                 :data-qa="`question-text-${index}`"
               />
+              <b-form-checkbox
+                v-model="node.typeData.activity.optional"
+                :data-qa="`question-optional-checkbox`"
+                switch
+              >
+                Optional Question
+              </b-form-checkbox>
             </b-form-group>
             <b-card-sub-title class="mt-2 mb-2">Answer Options</b-card-sub-title>
             <b-form-group class="mt-3">
