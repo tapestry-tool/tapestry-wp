@@ -22,12 +22,21 @@
           </b-form-invalid-feedback>
         </div>
         <div id="emoji-picker" style="position: relative">
-          <button class="preview" @click="showPicker = !showPicker">
-            {{ connection.avatar }}
-          </button>
-          <div v-show="showPicker" class="picker" data-qa="emoji-picker">
-            <v-emoji-picker @select="handleEmojiSelect" />
-          </div>
+          <twemoji-picker
+            :emojiData="emojiDataAll"
+            :emojiGroups="emojiGroups"
+            :skinsSelection="true"
+            :pickerPaddingOffset="0"
+            pickerPlacement="top"
+            @emojiUnicodeAdded="handleEmojiSelect"
+            id="twemoji-picker"
+          >
+            <template v-slot:twemoji-picker-button>
+              <button class="preview" :key="connection.avatar">
+                {{ connection.avatar }}
+              </button>
+            </template>
+          </twemoji-picker>
         </div>
         <div class="controls">
           <button @click="$emit('back')">Cancel</button>
@@ -77,7 +86,9 @@
 </template>
 
 <script>
-import { VEmojiPicker } from "v-emoji-picker"
+import { TwemojiPicker } from "@kevinfaguiar/vue-twemoji-picker"
+import EmojiAllData from "@kevinfaguiar/vue-twemoji-picker/emoji-data/en/emoji-all-groups.json"
+import EmojiGroups from "@kevinfaguiar/vue-twemoji-picker/emoji-data/emoji-groups.json"
 import TapestryIcon from "@/components/common/TapestryIcon"
 import AddCommunityForm from "./AddCommunityForm"
 import { MAX_COMMUNITIES, MAX_CONNECTION_NAME_LENGTH } from "../cos.config"
@@ -86,7 +97,7 @@ export default {
   components: {
     AddCommunityForm,
     TapestryIcon,
-    VEmojiPicker,
+    "twemoji-picker": TwemojiPicker,
   },
   model: {
     prop: "connection",
@@ -115,6 +126,12 @@ export default {
     }
   },
   computed: {
+    emojiDataAll() {
+      return EmojiAllData
+    },
+    emojiGroups() {
+      return EmojiGroups
+    },
     submitLabel() {
       return this.connection.id ? "Save connection" : "Add connection"
     },
@@ -204,6 +221,9 @@ export default {
 </script>
 
 <style scoped lang="scss">
+#twemoji-picker {
+  transform: scale(1.5);
+}
 form {
   display: flex;
   column-gap: 3rem;
@@ -320,7 +340,7 @@ button {
 }
 
 .preview {
-  font-size: clamp(7rem, 10vw, 10rem);
+  font-size: clamp(7rem, 7vw, 7rem);
   line-height: 1;
 }
 
