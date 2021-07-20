@@ -95,7 +95,7 @@ const avatarOptions = {
     { value: "Blank", text: "Blank" },
     { value: "BeardMedium", text: "Beard Medium" },
     { value: "BeardLight", text: "Beard Light" },
-    { value: "BeardMajestic", text: "Beard Majestic" },
+    { value: "BeardMagestic", text: "Beard Magestic" },
     { value: "MoustacheFancy", text: "Moustache Fancy" },
     { value: "MoustacheMagnum", text: "Moustache Magnum" },
   ],

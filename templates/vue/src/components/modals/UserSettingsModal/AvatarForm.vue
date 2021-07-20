@@ -34,7 +34,7 @@
                 <b-form-group label="Background Shape" label-for="input-horizontal">
                   <b-form-select
                     v-model="userAvatar.isCircle"
-                    :options="options.isCircleOptions"
+                    :options="isCircleOptions"
                     data-qa="avatar-background-select"
                   ></b-form-select>
                 </b-form-group>
@@ -45,7 +45,7 @@
                 >
                   <b-form-select
                     v-model="userAvatar.circleColor"
-                    :options="options.circleColorOptions"
+                    :options="circleColorOptions"
                   ></b-form-select>
                 </b-form-group>
               </b-card-text>
@@ -55,26 +55,26 @@
                 <b-form-group label="Skin Colour" label-for="input-horizontal">
                   <b-form-select
                     v-model="userAvatar.skinColor"
-                    :options="options.skinColorOptions"
+                    :options="skinColorOptions"
                   ></b-form-select>
                 </b-form-group>
                 <b-form-group label="Eyebrow Type" label-for="input-horizontal">
                   <b-form-select
                     v-model="userAvatar.eyebrowType"
-                    :options="options.eyebrowTypeOptions"
+                    :options="eyebrowTypeOptions"
                     data-qa="avatar-eyebrow-select"
                   ></b-form-select>
                 </b-form-group>
                 <b-form-group label="Eye Type" label-for="input-horizontal">
                   <b-form-select
                     v-model="userAvatar.eyeType"
-                    :options="options.eyeTypeOptions"
+                    :options="eyeTypeOptions"
                   ></b-form-select>
                 </b-form-group>
                 <b-form-group label="Mouth Type" label-for="input-horizontal">
                   <b-form-select
                     v-model="userAvatar.mouthType"
-                    :options="options.mouthTypeOptions"
+                    :options="mouthTypeOptions"
                   ></b-form-select>
                 </b-form-group>
               </b-card-text>
@@ -84,26 +84,26 @@
                 <b-form-group label="Hair Type" label-for="input-horizontal">
                   <b-form-select
                     v-model="userAvatar.topType"
-                    :options="options.topTypeOptions"
+                    :options="topTypeOptions"
                     data-qa="avatar-hair-select"
                   ></b-form-select>
                 </b-form-group>
                 <b-form-group label="Hair Colour" label-for="input-horizontal">
                   <b-form-select
                     v-model="userAvatar.hairColor"
-                    :options="options.hairColorOptions"
+                    :options="hairColorOptions"
                   ></b-form-select>
                 </b-form-group>
                 <b-form-group label="Hat Colour" label-for="input-horizontal">
                   <b-form-select
                     v-model="userAvatar.topColor"
-                    :options="options.topColorOptions"
+                    :options="topColorOptions"
                   ></b-form-select>
                 </b-form-group>
                 <b-form-group label="Facial Hair Type" label-for="input-horizontal">
                   <b-form-select
                     v-model="userAvatar.facialHairType"
-                    :options="options.facialHairTypeOptions"
+                    :options="facialHairTypeOptions"
                   ></b-form-select>
                 </b-form-group>
                 <b-form-group
@@ -112,7 +112,7 @@
                 >
                   <b-form-select
                     v-model="userAvatar.facialHairColor"
-                    :options="options.facialHairColorOptions"
+                    :options="facialHairColorOptions"
                   ></b-form-select>
                 </b-form-group>
               </b-card-text>
@@ -122,14 +122,14 @@
                 <b-form-group label="Glasses" label-for="input-horizontal">
                   <b-form-select
                     v-model="userAvatar.accessoriesType"
-                    :options="options.accessoriesTypeOptions"
+                    :options="accessoriesTypeOptions"
                     data-qa="avatar-glasses-select"
                   ></b-form-select>
                 </b-form-group>
                 <b-form-group label="Clothing Type" label-for="input-horizontal">
                   <b-form-select
                     v-model="userAvatar.clotheType"
-                    :options="options.clotheTypeOptions"
+                    :options="clotheTypeOptions"
                   ></b-form-select>
                 </b-form-group>
                 <b-form-group
@@ -139,13 +139,13 @@
                 >
                   <b-form-select
                     v-model="userAvatar.graphicType"
-                    :options="options.graphicTypeOptions"
+                    :options="graphicTypeOptions"
                   ></b-form-select>
                 </b-form-group>
                 <b-form-group label="Clothing Colour" label-for="input-horizontal">
                   <b-form-select
                     v-model="userAvatar.clotheColor"
-                    :options="options.clotheColorOptions"
+                    :options="clotheColorOptions"
                   ></b-form-select>
                 </b-form-group>
               </b-card-text>
@@ -177,7 +177,21 @@ export default {
   data() {
     return {
       userAvatar: {},
-      options: { ...avatarOptions },
+      isCircleOptions: avatarOptions.isCircleOptions,
+      circleColorOptions: avatarOptions.circleColorOptions,
+      accessoriesTypeOptions: avatarOptions.accessoriesTypeOptions,
+      clotheTypeOptions: avatarOptions.clotheTypeOptions,
+      clotheColorOptions: avatarOptions.clotheColorOptions,
+      eyebrowTypeOptions: avatarOptions.eyebrowTypeOptions,
+      eyeTypeOptions: avatarOptions.eyeTypeOptions,
+      facialHairColorOptions: avatarOptions.facialHairColorOptions,
+      facialHairTypeOptions: avatarOptions.facialHairTypeOptions,
+      graphicTypeOptions: avatarOptions.graphicTypeOptions,
+      hairColorOptions: avatarOptions.hairColorOptions,
+      mouthTypeOptions: avatarOptions.mouthTypeOptions,
+      skinColorOptions: avatarOptions.skinColorOptions,
+      topTypeOptions: avatarOptions.topTypeOptions,
+      topColorOptions: avatarOptions.topColorOptions,
     }
   },
   computed: {
