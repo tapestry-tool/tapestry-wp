@@ -45,7 +45,6 @@
           <text-question
             v-if="formType === 'text'"
             :question="question"
-            :node="node"
             :answer="answer ? answer : []"
             @submit="handleSubmit"
             @skipQuestion="$emit('skipQuestion')"

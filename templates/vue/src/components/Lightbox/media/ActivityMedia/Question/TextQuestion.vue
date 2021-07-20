@@ -53,7 +53,7 @@
     </b-form-invalid-feedback>
     <b-button-group class="button-row">
       <b-button
-        v-if="node.typeData.activity.optional"
+        v-if="question.optional"
         class="mx-1"
         variant="primary"
         @click="$emit('skipQuestion')"
@@ -71,10 +71,6 @@
 export default {
   name: "text-question",
   props: {
-    node: {
-      type: Object,
-      required: true,
-    },
     question: {
       type: Object,
       required: true,

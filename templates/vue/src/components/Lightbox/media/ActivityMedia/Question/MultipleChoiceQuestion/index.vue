@@ -25,7 +25,7 @@
     </b-form-invalid-feedback>
     <b-button-group class="float-right" style="width: 50%">
       <b-button
-        v-if="node.typeData.activity.optional"
+        v-if="question.optional"
         class="mt-3 px-1"
         variant="primary"
         @click="$emit('skipQuestion')"

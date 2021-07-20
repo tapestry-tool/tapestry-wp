@@ -89,7 +89,7 @@
                 :data-qa="`question-text-${index}`"
               />
               <b-form-checkbox
-                v-model="node.typeData.activity.optional"
+                v-model="question.optional"
                 :data-qa="`question-optional-checkbox`"
                 switch
               >

@@ -26,11 +26,7 @@
         {{ durationText }}
       </code>
     </div>
-    <button
-      v-if="node.typeData.activity.optional"
-      class="my-3"
-      @click="$emit('skipQuestion')"
-    >
+    <button v-if="question.optional" class="my-3" @click="$emit('skipQuestion')">
       Skip
     </button>
     <button
