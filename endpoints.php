@@ -280,6 +280,13 @@ $REST_API_ENDPOINTS = [
             'permission_callback' => 'TapestryPermissions::putTapestrySettings',
         ],
     ],
+    'GET_QUESTION_HAS_ANSWERS' => (object) [
+        'ROUTE' => '/activity/question',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_POST_METHOD,
+            'callback' => 'getQuestionHasAnswers',
+        ],
+    ],
 ];
 
 /*
@@ -1366,4 +1373,28 @@ function getTapestryContributors($request)
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
+}
+
+/**
+ * Checks whether any user has answered a spesific question
+ * inside an acitivity
+ *
+ * @param object $request HTTP request
+ */
+function getQuestionHasAnswers($request)
+{
+    $postId = $request['post_id'];
+    $nodeMetaId = $request['node_id'];
+    $questionId = $request['question_id'];
+    $userIds = get_users(array('fields'=> array('ID')));
+    $hasAnswer = false;
+
+    foreach($userIds as $userId) {
+       $user_answer = get_user_meta($userId->ID, 'tapestry_'.$postId.'_'.$nodeMetaId.'_question_'.$questionId.'_answers', true);
+       if($user_answer != '') {
+           $hasAnswer = true;
+       }
+    }
+    return $hasAnswer;
+    
 }

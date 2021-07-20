@@ -1,5 +1,10 @@
 <template>
-  <div>
+  <b-overlay :show="hasAnswers">
+    <template #overlay>
+      <p class="overlay">
+        Cannot re-edit this question because a user has already answered it
+      </p>
+    </template>
     <b-form-group>
       <b-form-checkbox v-model="dragDrop.useImages" data-qa="dragdrop-use-images">
         Use Images
@@ -60,12 +65,13 @@
         </b-row>
       </b-col>
     </b-form-group>
-  </div>
+  </b-overlay>
 </template>
 
 <script>
 import Bucket from "./Bucket"
 import Helpers from "@/utils/Helpers"
+import client from "@/services/TapestryAPI"
 
 export default {
   components: {
@@ -80,11 +86,19 @@ export default {
       type: Object,
       required: true,
     },
+    questionId: {
+      type: String,
+      required: true,
+    },
   },
   data() {
-    return { bucketRemovalEnabled: { to: false, from: false } }
+    return { bucketRemovalEnabled: { to: false, from: false }, hasAnswers: false }
   },
   created() {
+    client.questionHasAnswer(this.node.id, this.questionId).then(res => {
+      this.hasAnswers = res.data
+    })
+
     if (!this.dragDrop?.buckets) {
       this.dragDrop.buckets = [
         {
@@ -171,5 +185,10 @@ export default {
 <style scoped>
 .add-btn {
   margin-top: 20px;
+}
+.overlay {
+  background-color: #bdc3c7;
+  padding: 7px;
+  border-radius: 10px;
 }
 </style>
