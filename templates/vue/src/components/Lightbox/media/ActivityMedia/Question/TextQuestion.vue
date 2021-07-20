@@ -55,7 +55,7 @@
       <b-button
         v-if="question.optional"
         class="mx-1"
-        variant="primary"
+        variant="outline-primary"
         @click="$emit('skipQuestion')"
       >
         Skip
