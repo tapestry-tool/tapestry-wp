@@ -22,6 +22,7 @@
       :node="node"
       @submit="handleSubmit"
       @back="$emit('close')"
+      @skipQuestion="skip"
     ></question>
     <footer v-if="!showCompletionScreen" class="question-footer">
       <p class="question-step">{{ currentQuestionText }}</p>
@@ -138,6 +139,7 @@ export default {
       })
     },
     next() {
+      console.log("Nexting")
       this.showCompletionScreen = false
       client.recordAnalyticsEvent("user", "next", "activity", this.node.id, {
         from: this.activeQuestionIndex,
@@ -156,6 +158,9 @@ export default {
     close() {
       client.recordAnalyticsEvent("user", "close", "activity", this.node.id)
       this.$emit("close")
+    },
+    skip() {
+      this.hasNext ? this.next() : (this.showCompletionScreen = true)
     },
   },
 }

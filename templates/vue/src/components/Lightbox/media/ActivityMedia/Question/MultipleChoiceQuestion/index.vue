@@ -28,6 +28,7 @@
         v-if="node.typeData.activity.optional"
         class="mt-3 px-1"
         variant="primary"
+        @click="$emit('skipQuestion')"
       >
         Skip
       </b-button>

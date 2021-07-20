@@ -48,12 +48,14 @@
             :node="node"
             :answer="answer ? answer : []"
             @submit="handleSubmit"
+            @skipQuestion="$emit('skipQuestion')"
           ></text-question>
           <audio-recorder
             v-else-if="formType === 'audio'"
             :id="question.id"
             :node="node"
             @submit="handleSubmit"
+            @skipQuestion="$emit('skipQuestion')"
           />
           <multiple-choice-question
             v-else-if="formType === 'multipleChoice'"
@@ -61,6 +63,7 @@
             :question="question"
             :answer="answer"
             @submit="handleSubmit"
+            @skipQuestion="$emit('skipQuestion')"
           ></multiple-choice-question>
         </div>
         <div v-else class="question-answer-types">
