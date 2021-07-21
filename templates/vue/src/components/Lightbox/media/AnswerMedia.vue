@@ -77,9 +77,9 @@ export default {
 </script>
 <style lang="scss">
 .nav-tablist a {
-  color: #777;
+  color: #111;
   &.active {
-    color: #fff;
+    color: #111;
   }
 }
 </style>
@@ -96,7 +96,7 @@ export default {
   justify-content: center;
 }
 .answers {
-  color: #fff;
+  color: #111;
   margin-top: 15px;
 }
 .answer-container {
