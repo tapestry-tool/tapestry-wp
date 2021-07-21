@@ -57,6 +57,9 @@ const settings = {
 const userSettings = {
   path: `${ROOT_PATH}/user-settings/:tab`,
   name: "userSettings",
+const help = {
+  path: `${ROOT_PATH}/help`,
+  name: "help",
 }
 
 const modal = {
@@ -92,6 +95,7 @@ const routes = {
   nestedMultiContent,
   redirects,
   userSettings,
+  help,
 }
 
 export const names = Object.fromEntries(

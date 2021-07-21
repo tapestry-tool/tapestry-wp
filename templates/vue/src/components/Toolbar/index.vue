@@ -32,6 +32,7 @@ import SettingsModalButton from "./SettingsModalButton"
 import UserSettingsButton from "./UserSettingsButton"
 import TapestryFilter from "./TapestryFilter"
 import ReviewNotifications from "./ReviewNotifications"
+import HelpButton from "./HelpButton"
 import * as wp from "@/services/wp"
 
 export default {
@@ -41,6 +42,7 @@ export default {
     SettingsModalButton,
     ReviewNotifications,
     UserSettingsButton,
+    HelpButton,
   },
   data() {
     return {
