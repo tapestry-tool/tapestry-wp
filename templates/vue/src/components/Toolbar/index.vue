@@ -1,6 +1,6 @@
 <template>
   <div class="toolbar">
-    <tapestry-filter v-if="!showMap" style="z-index: 10;" />
+    <tapestry-filter v-if="!showMap" style="z-index: 10" />
     <div
       v-show="isLoggedIn"
       :class="[{ 'hide-toolbar': hideToolbar }, 'slider-wrapper']"
@@ -10,6 +10,7 @@
         data-qa="user-settings-button"
       ></user-settings-button>
       <div v-show="canEdit || (!showMap && hasDepth)" class="can-edit">
+        <help-button v-if="canEdit" />
         <review-notifications v-if="canEdit && settings.submitNodesEnabled" />
         <settings-modal-button
           v-if="canEdit"
