@@ -1386,15 +1386,7 @@ function getQuestionHasAnswers($request)
     $postId = $request['post_id'];
     $nodeMetaId = $request['node_id'];
     $questionId = $request['question_id'];
-    $userIds = get_users(array('fields'=> array('ID')));
-    $hasAnswer = false;
 
-    foreach($userIds as $userId) {
-       $user_answer = get_user_meta($userId->ID, 'tapestry_'.$postId.'_'.$nodeMetaId.'_question_'.$questionId.'_answers', true);
-       if($user_answer != '') {
-           $hasAnswer = true;
-       }
-    }
-    return $hasAnswer;
+    return TapestryUserProgress::questionsHasAnyAnswer($postId, $nodeMetaId, $questionId);
     
 }
