@@ -261,7 +261,7 @@ describe("Node Authoring", () => {
         const someApiErrorContents = "log in to edit"
 
         cy.getByTestId("submit-node-modal").click()
-        cy.contains(someApiErrorContents, { timeout: 10000 }).should("exist")
+        cy.contains(someApiErrorContents, { timeout: 50000 }).should("exist")
 
         // check that error persists
         cy.getByTestId("submit-node-modal").click()
