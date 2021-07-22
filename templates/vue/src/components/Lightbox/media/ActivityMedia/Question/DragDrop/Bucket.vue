@@ -67,6 +67,8 @@ export default {
 
 <style scoped>
 .bucket-container {
+  display: flex;
+  flex-direction: column;
   min-height: 250px;
   border-radius: 25px;
   overflow-wrap: break-word;
