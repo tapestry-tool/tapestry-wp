@@ -20,13 +20,18 @@
       <div v-show="!hasAnswer" class="media-wrapper">
         You have not completed this question yet.
       </div>
+      <footer>
+        <b-button variant="primary" @click="$emit('edit-question')">
+          Edit Question
+        </b-button>
+      </footer>
     </div>
   </div>
 </template>
 
 <script>
 import { mapGetters, mapState } from "vuex"
-import CompletedActivityMedia from "./common/CompletedActivityMedia"
+import CompletedActivityMedia from "@/components/Lightbox/media/common/CompletedActivityMedia"
 import TapestryIcon from "@/components/common/TapestryIcon"
 
 export default {
@@ -40,12 +45,18 @@ export default {
       type: Object,
       required: true,
     },
+    typeData: {
+      type: Object,
+      required: true,
+    },
   },
   computed: {
     ...mapState(["userAnswers"]),
     ...mapGetters(["getQuestion", "getAnswers"]),
     answersTypeData() {
-      return this.node.typeData
+      return Object.entries(this.typeData).length
+        ? this.typeData
+        : this.node.typeData
     },
     question() {
       return this.getQuestion(this.answersTypeData.questionId)
@@ -98,6 +109,7 @@ export default {
 .answers {
   color: #fff;
   margin-top: 15px;
+  width: 100%;
 }
 .answer-container {
   width: 75%;
