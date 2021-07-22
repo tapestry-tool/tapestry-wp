@@ -61,6 +61,7 @@ export default {
   text-align: left;
 
   &-title {
+    color: #111;
     font-size: 1.75rem;
     font-weight: bold;
     margin: 1em 0;
@@ -71,13 +72,14 @@ export default {
   }
 
   article {
-    color: #47425d;
+    color: #111;
     font-family: "Source Sans Pro", sans-serif;
     font-size: 16px;
   }
 }
 
 .wp-media-title {
+  color: #111;
   text-align: left;
   margin-bottom: 0.9em;
   font-weight: 500;
