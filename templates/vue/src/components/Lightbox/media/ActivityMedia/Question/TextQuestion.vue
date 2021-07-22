@@ -66,8 +66,8 @@ export default {
       required: true,
     },
     answer: {
+      type: Array,
       required: true,
-      validator: prop => typeof prop === "string" || prop === null,
     },
   },
   data() {
@@ -95,7 +95,7 @@ export default {
         this.addAnswer()
       }
     }
-    if (this.answer.length > 1 && !this.question.answerTypes.text.allowMultiple) {
+    if (this?.answer?.length > 1 && !this.question.answerTypes.text.allowMultiple) {
       this.textAnswers = []
       this.textAnswers.push(this.answer.join())
     }

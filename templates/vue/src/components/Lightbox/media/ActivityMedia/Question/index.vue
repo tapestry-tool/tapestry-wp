@@ -152,7 +152,12 @@ export default {
       if (this.formOpened && this.answers?.[this.formType]) {
         return this.answers[this.formType]
       }
-      return null
+      switch (this.formType) {
+        case "text":
+          return []
+        default:
+          return null
+      }
     },
   },
   watch: {
@@ -162,7 +167,6 @@ export default {
     },
   },
   created() {
-    console.log(this.enabledAnswerTypes)
     this.answers = this.getAnswers(this.node.id, this.question.id)
   },
   mounted() {
