@@ -64,9 +64,6 @@ export default {
       return `${data.vue_uri}/${DragDropIcon.split("dist")[1]}`
     },
   },
-  mounted() {
-    console.log(this.faIcon)
-  },
 }
 </script>
 
