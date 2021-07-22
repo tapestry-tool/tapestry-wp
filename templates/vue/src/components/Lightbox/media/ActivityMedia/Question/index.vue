@@ -64,16 +64,7 @@
               :data-qa="`answer-button-${enabledAnswer[0]}`"
               @click="openForm(enabledAnswer[0])"
             >
-              {{ enabledAnswer[0] }}
-            </answer-button>
-            <answer-button
-              v-if="question.answerTypes.multipleChoice.enabled"
-              :completed="formIsCompleted('multipleChoice')"
-              data-qa="answer-button-multiple-choice"
-              icon="tasks"
-              @click="openForm('multipleChoice')"
-            >
-              multiple choice
+              {{ enabledAnswer[0].replace(/([A-Z])/g, " $1").trim() }}
             </answer-button>
           </div>
         </div>
@@ -171,6 +162,7 @@ export default {
     },
   },
   created() {
+    console.log(this.enabledAnswerTypes)
     this.answers = this.getAnswers(this.node.id, this.question.id)
   },
   mounted() {
