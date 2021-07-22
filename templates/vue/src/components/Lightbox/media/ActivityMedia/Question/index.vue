@@ -121,6 +121,7 @@ export default {
       formOpened: false,
       formType: "",
       answers: {},
+      prevQuestionId: null,
     }
   },
   computed: {
@@ -140,6 +141,8 @@ export default {
           ) {
             // eslint-disable-next-line vue/no-side-effects-in-computed-properties
             this.question.followUp.nodeId = tempNodeId
+            // eslint-disable-next-line vue/no-side-effects-in-computed-properties
+            this.prevQuestionId = this.question.followUp.questionId
           }
         }
       }

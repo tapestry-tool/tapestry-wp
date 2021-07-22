@@ -241,8 +241,7 @@ describe("Activity", () => {
 
     cy.getSelectedNode().then(node => {
       cy.openModal("edit", node.id)
-      cy.changeMediaType("activity")
-      const question = `Select all numbers less than 3`
+      cy.changeMediaType("Activity")
 
       cy.contains(/question text/i).click()
       cy.focused().type(question)
@@ -339,7 +338,7 @@ describe("Activity", () => {
       const answer = "Tapestry"
       cy.contains(/add question/i).click()
       cy.contains(/question text/i).click()
-      cy.focused().type(question)
+      cy.focused().type(listQuestion)
       cy.getByTestId("question-answer-text-0").click({ force: true })
       cy.getByTestId("question-answer-text-single-0").click({ force: true })
       cy.getByTestId("question-answer-text-single-placeholder-0").type(placeholder)
@@ -405,10 +404,23 @@ describe("Activity", () => {
       cy.openLightbox(node.id)
       cy.route("POST", "/users/activity/**").as("submit")
       cy.lightbox().within(() => {
-        cy.get("textarea").type(answer2)
-        cy.contains(/submit/i).click()
-        cy.contains("Thanks!").should("be.visible")
-        cy.contains(/done/i).click()
+        cy.get(`[placeholder="${listPlaceholder}"]`).should("be.visible")
+        cy.get(`[class="media-wrapper"]`).scrollTo("bottom")
+        cy.getByTestId("list-add-4").click()
+        cy.getByTestId("list-add-5").click()
+        cy.getByTestId("list-add-6").click()
+        cy.getByTestId("list-add-7").click()
+        cy.getByTestId("list-add-8").click()
+        cy.getByTestId("list-add-8").should("be.disabled")
+        cy.getByTestId("list-input-list").each((input, index) => {
+          cy.getByTestId(`list-input-${index}`).type(`Thing ${index}`)
+          if (index === 9) {
+            cy.contains(/submit/i).click()
+            cy.contains(/thanks/i).should("be.visible")
+            cy.contains(/done/i).click()
+            return false
+          }
+        })
       })
       cy.lightbox().should("not.exist")
     })
@@ -429,13 +441,12 @@ describe("Activity", () => {
       cy.getByTestId("question-answer-text-single-placeholder-0").type(placeholder)
       cy.submitModal()
       cy.openLightbox(node.id)
-      cy.route("POST", "/users/activity/**").as("submit")
       cy.lightbox().within(() => {
-        cy.get(`[placeholder="${placeholder}"]`).should("be.visible")
-        cy.get("input").type(answer)
-        cy.contains(/submit/i).click()
-        cy.contains("Thanks!").should("be.visible")
-        cy.contains(/done/i).click()
+        console.log(cy.get(`[class="grid-container"]`))
+        cy.get(`[class="grid-container"]`)
+          .children(".input-group")
+          .should("have.length", 10)
+        cy.getByTestId("close-lightbox").click()
       })
       cy.lightbox().should("not.exist")
     })

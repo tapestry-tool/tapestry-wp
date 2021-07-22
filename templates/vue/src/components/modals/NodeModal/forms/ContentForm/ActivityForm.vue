@@ -99,20 +99,23 @@
                 Text entry
               </b-form-checkbox>
               <div v-if="question.answerTypes.text.enabled" class="mt-2 pl-4 ml-2">
-                <b-form-radio-group v-model="question.answerTypes.text.isMultiLine">
-                  <b-form-radio
-                    :data-qa="`question-answer-text-multi-${index}`"
-                    name="multi-line"
-                    :value="true"
-                  >
-                    Multi-line
-                  </b-form-radio>
+                <b-form-radio-group
+                  v-model="question.answerTypes.text.isMultiLine"
+                  @change="disableList(question)"
+                >
                   <b-form-radio
                     :data-qa="`question-answer-text-single-${index}`"
                     name="single-line"
                     :value="false"
                   >
                     Single Line
+                  </b-form-radio>
+                  <b-form-radio
+                    :data-qa="`question-answer-text-multi-${index}`"
+                    name="multi-line"
+                    :value="true"
+                  >
+                    Multi-line
                   </b-form-radio>
                 </b-form-radio-group>
                 <div
@@ -128,6 +131,51 @@
                     v-model="question.answerTypes.text.placeholder"
                     :data-qa="`question-answer-text-single-placeholder-${index}`"
                   ></b-form-input>
+                  <b-form-checkbox
+                    v-model="question.answerTypes.text.allowMultiple"
+                    class="mt-2"
+                    data-qa="enable-list-checkbox"
+                  >
+                    Allow entering multiple entries
+                  </b-form-checkbox>
+                  <div
+                    v-if="question.answerTypes.text.allowMultiple"
+                    class="mt-2 pl-4 list-options"
+                  >
+                    <b-row>
+                      <b-col>
+                        <b-form-group
+                          label-cols-sm="12"
+                          label-cols-lg="4"
+                          content-cols-sm
+                          content-cols-lg="6"
+                          description="How many entries would you like users to enter?"
+                          label="Number of entries"
+                          label-for="input-horizontal"
+                        >
+                          <b-input-group prepend="Min:">
+                            <b-form-input
+                              id="min-field"
+                              v-model="question.answerTypes.text.minFields"
+                              data-qa="min-list-fields-input"
+                              type="number"
+                              :min="1"
+                            ></b-form-input>
+                            <b-input-group-prepend is-text>
+                              Max:
+                            </b-input-group-prepend>
+                            <b-form-input
+                              id="max-field"
+                              v-model="question.answerTypes.text.maxFields"
+                              data-qa="max-list-fields-input"
+                              type="number"
+                              :min="1"
+                            ></b-form-input>
+                          </b-input-group>
+                        </b-form-group>
+                      </b-col>
+                    </b-row>
+                  </div>
                 </div>
               </div>
             </b-form-group>
@@ -227,6 +275,9 @@ const defaultQuestion = {
       enabled: false,
       placeholder: "",
       isMultiLine: false,
+      allowMultiple: false,
+      minFields: 1,
+      maxFields: 100,
     },
     audio: {
       enabled: false,
@@ -285,6 +336,10 @@ export default {
     if (!this.node.typeData.activity.questions.length) {
       this.addQuestion()
     }
+    // This is needed for backwards compatibility as we add new question types
+    this.node.typeData.activity.questions.every(q => {
+      q.answerTypes = { ...defaultQuestion.answerTypes, ...q.answerTypes }
+    })
   },
   methods: {
     getPreviousQuestions(currentQuestion) {
@@ -309,6 +364,11 @@ export default {
       question.followUp.text = ""
       question.followUp.questionId = ""
       question.followUp.nodeId = ""
+    },
+    disableList(question) {
+      if (!question.answerTypes.text.isMultiLine) {
+        question.answerTypes.text.allowMultiple = false
+      }
     },
   },
 }
