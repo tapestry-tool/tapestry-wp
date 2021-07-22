@@ -5,7 +5,7 @@
       <i :class="`fas fa-${icon === 'audio' ? 'microphone' : icon} icon-fa`"></i>
     </div>
     <div v-else-if="isDragAndDropIcon" class="drag-drop-icon">
-      <img :src="dragDropIcon" height="56" />
+      <img :src="dragDropIcon" style="height:56px;" />
     </div>
     <img v-else :src="textIcon" class="icon" />
     <div>
