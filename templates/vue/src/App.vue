@@ -44,6 +44,7 @@ export default {
     return {
       loading: true,
       loggedIn: true,
+      lastSelectedNode: false,
     }
   },
   computed: {
@@ -69,6 +70,9 @@ export default {
           that.loggedIn = data["wp-auth-check"]
         })
       })
+      Promise.resolve(client.getLastSelectedNode()).then(savedNode => {
+        this.lastSelectedNode = savedNode
+      })
     }
 
     window.addEventListener("click", this.recordAnalytics)
@@ -77,8 +81,11 @@ export default {
       this.init({ dataset, progress })
       this.loading = false
       if (!this.$route.params.nodeId && dataset.nodes.length > 0) {
+        if (!this.lastSelectedNode) {
+          this.lastSelectedNode = dataset.rootId
+        }
         this.$router.replace({
-          path: `/nodes/${progress.lastSelectedNode}`,
+          path: `/nodes/${this.lastSelectedNode}`,
           query: this.$route.query,
         })
       }
