@@ -165,6 +165,7 @@ export default {
 .media-wrapper {
   color: #111;
   outline: none;
+  background: #bbb;
   border-radius: 15px;
   overflow: auto;
   height: 100%;
