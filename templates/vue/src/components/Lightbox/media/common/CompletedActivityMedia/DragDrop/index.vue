@@ -36,7 +36,7 @@ export default {
       return toBuckets
     },
     hideText() {
-      return !!this.dragDrop.hideText
+      return this.dragDrop?.hideText
     },
   },
   methods: {

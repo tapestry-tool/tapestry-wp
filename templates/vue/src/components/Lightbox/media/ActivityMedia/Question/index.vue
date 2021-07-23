@@ -187,12 +187,8 @@ export default {
       }
     },
     isFormCompleted(type) {
-      if (
-        this.userAnswers?.[this.node.id]?.activity?.[this.question.id]?.answers[type]
-      ) {
-        return true
-      }
-      return false
+      return !!this.userAnswers?.[this.node.id]?.activity?.[this.question.id]
+        ?.answers[type]
     },
     openForm(answerType) {
       client.recordAnalyticsEvent(
