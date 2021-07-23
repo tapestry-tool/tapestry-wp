@@ -36,16 +36,18 @@
         ]"
       >
         <div
-          v-for="(menu, index) in menuGroups"
+          v-for="(menu, index) in filteredMenuGroups"
           :key="index"
           style="padding-top: 4px; padding-bottom: 4px;"
         >
           <b-card>
             <b-card-text
-              v-b-toggle="index === 0 ? `` : `collapse-${index}`"
+              v-b-toggle="
+                index === 0 || menu.length === 0 ? `` : `collapse-${index}`
+              "
               @click="changeActiveMenuIndex(index)"
             >
-              Menu {{ index }}
+              {{ getMenuName(index) }}
             </b-card-text>
             <b-collapse
               :id="`collapse-${index}`"
@@ -59,7 +61,6 @@
                   :node="row.node"
                   :lockRows="lockRows"
                   :disabled="disabledRow(row.node)"
-                  style="z-index: 10"
                   @scroll-to="scrollToRef"
                 />
               </ul>
@@ -134,19 +135,27 @@ export default {
       menu.unshift(mainMenu)
       return menu
     },
-    // filteredMenuGroups() {
-    //   const filteredMenu = []
-    //   this.menuGroups.forEach((menuArray, menuIndex) => {
-    //     console.log(menuArray)
-    //     if (menuIndex === 0) {
-    //       filteredMenu.push(menuArray)
-    //     } else {
-    //       menuArray.shift()
-    //       filteredMenu.push(menuArray)
-    //     }
-    //   })
-    //   return filteredMenu
-    // },
+    filteredMenuGroups() {
+      const filteredMenu = []
+      const menuGroupsCopy = this.menuGroups
+      for (let i = 0; i < menuGroupsCopy.length; i++) {
+        if (i === 0) {
+          filteredMenu.push(menuGroupsCopy[i])
+        } else {
+          let childrenNodes = menuGroupsCopy[i][0].children
+          const newMenu = []
+          childrenNodes.forEach(childNode => {
+            let newRow = {
+              children: [],
+              node: childNode,
+            }
+            newMenu.push(newRow)
+          })
+          filteredMenu.push(newMenu)
+        }
+      }
+      return filteredMenu
+    },
     lockRows() {
       return this.node.typeData.lockRows
     },
@@ -216,8 +225,7 @@ export default {
       }
     },
     changeActiveMenuIndex(menuIndex) {
-      // this.$emit("changeActiveMenuIndex", menuIndex)
-      return menuIndex
+      this.$emit("changeActiveMenuIndex", menuIndex)
     },
   },
 }
