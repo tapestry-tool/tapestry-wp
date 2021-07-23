@@ -22,7 +22,7 @@
     <question
       v-else-if="state === 'activity'"
       :question="activeQuestion"
-      :node="initialType === 'answer' ? questionNode : node"
+      :node="questionNode"
       @submit="handleComplete('activity')"
       @back="$emit('close')"
     ></question>
@@ -125,6 +125,10 @@ export default {
       return this.context === "page" && this.node.typeData.showTitle !== false
     },
     questions() {
+      /* NOTE: If this is an answer node we retreive the single question
+       *       that is stored in the answer node.
+       */
+
       return this.initialType === states.ACTIVITY
         ? this.node.typeData.activity.questions
         : [this.getQuestion(this.node.typeData.questionId)]
