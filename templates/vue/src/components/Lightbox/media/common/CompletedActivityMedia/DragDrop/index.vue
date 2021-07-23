@@ -1,9 +1,9 @@
 <template>
-  <ul class="ml-1">
-    <li v-for="bucket in buckets" :key="bucket.id" class="mr-2">
+  <b-row>
+    <b-col v-for="bucket in buckets" :key="bucket.id" cols="4">
       <bucket :bucket="bucket" :items="getItems(bucket.id)" :hide-text="hideText" />
-    </li>
-  </ul>
+    </b-col>
+  </b-row>
 </template>
 
 <script>
