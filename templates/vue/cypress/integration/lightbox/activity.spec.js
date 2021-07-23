@@ -260,9 +260,12 @@ describe("Activity", () => {
         .getByTestId(`choice-row-input-2`)
         .click()
         .type("3")
+
       cy.submitModal()
       cy.openLightbox(node.id)
+
       cy.route("POST", "/users/activity/**").as("submit")
+
       cy.lightbox().within(() => {
         cy.getByTestId(`multiple-choice-question-0`)
           .getByTestId(`multiple-choice-question-item-0-checked`)
@@ -300,9 +303,12 @@ describe("Activity", () => {
         .getByTestId(`choice-row-input-2`)
         .click()
         .type("10")
+
       cy.submitModal()
       cy.openLightbox(node.id)
+
       cy.route("POST", "/users/activity/**").as("submit")
+
       cy.lightbox().within(() => {
         cy.getByTestId(`multiple-choice-question-2`)
           .getByTestId(`multiple-choice-question-item-2-checked`)
@@ -354,9 +360,11 @@ describe("Activity", () => {
       cy.lightbox().should("not.exist")
     })
   })
+
   it("should be able to edit single-line text already answered question", () => {
     cy.fixture("one-node.json").as("oneNode")
     cy.setup("@oneNode")
+
     cy.getSelectedNode().then(node => {
       cy.openModal("edit", node.id)
       cy.changeMediaType("activity")
@@ -399,9 +407,11 @@ describe("Activity", () => {
       cy.lightbox().should("not.exist")
     })
   })
+
   it("should be able to complete an activity with a text-based answer", () => {
     cy.fixture("one-node.json").as("oneNode")
     cy.setup("@oneNode")
+
     cy.getSelectedNode().then(node => {
       cy.openModal("edit", node.id)
       cy.changeMediaType("activity")
@@ -426,27 +436,38 @@ describe("Activity", () => {
       cy.lightbox().should("not.exist")
     })
   })
+
   it("should be able to complete an activity with an audio-based answer", () => {
     cy.fixture("one-node.json").as("oneNode")
     cy.setup("@oneNode")
+
     cy.getSelectedNode().then(node => {
       cy.openModal("edit", node.id)
       cy.changeMediaType("activity")
+
       const question = `What's your name?`
+
       cy.contains(/question text/i).click()
       cy.focused().type(question)
       cy.getByTestId("question-answer-audio-0").click({ force: true })
+
       cy.submitModal()
       cy.openLightbox(node.id)
+
       cy.contains(/microphone access/i, { timeout: 10000 }).should("not.exist")
       cy.clock()
+
       cy.getByTestId("record").click()
+
       cy.tick(5 * 1000) // move forward by 5 seconds
       cy.contains("0:05").should("be.visible")
+
       cy.getByTestId("record").click() // pause
       cy.tick(5 * 1000)
       cy.contains("0:05").should("be.visible")
+
       cy.getByTestId("record").click() // resume
+
       cy.tick(3600 * 1000) // move forward by 1 hour
       cy.contains("1:00:05").should("be.visible")
       cy.getByTestId("done-button-audio").click()
@@ -455,14 +476,18 @@ describe("Activity", () => {
       cy.contains(/done/i).click()
     })
   })
+
   it("should be able to complete with a list-based answer", () => {
     cy.fixture("one-node.json").as("oneNode")
     cy.setup("@oneNode")
+
     cy.getSelectedNode().then(node => {
       cy.openModal("edit", node.id)
       cy.changeMediaType("Activity")
+
       const listQuestion = `Name 3 provinces of Canada.`
       const listPlaceholder = "Enter answer here"
+
       cy.contains(/question text/i).click()
       cy.focused().type(listQuestion)
       cy.getByTestId("question-answer-text-0").click({ force: true })
@@ -472,7 +497,9 @@ describe("Activity", () => {
       cy.getByTestId("enable-list-checkbox").click({ force: true })
       cy.submitModal()
       cy.openLightbox(node.id)
+
       cy.route("POST", "/users/activity/**").as("submit")
+
       cy.lightbox().within(() => {
         cy.get(`[placeholder="${listPlaceholder}"]`).should("be.visible")
         cy.getByTestId("list-input-0").type("British Columbia")
@@ -482,10 +509,13 @@ describe("Activity", () => {
         cy.getByTestId("list-input-2").type("Nova Scotia")
         cy.getByTestId("list-add-2").click()
         cy.getByTestId("list-input-3").type("Manitoba")
+
         cy.contains(/submit/i).click()
+
         cy.contains(/thanks/i).should("be.visible")
         cy.contains(/done/i).click()
       })
+
       cy.openLightbox(node.id)
       cy.lightbox().within(() => {
         cy.getByTestId("list-input-0").should("be.visible")
