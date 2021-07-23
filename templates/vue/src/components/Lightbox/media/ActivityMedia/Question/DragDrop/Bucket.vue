@@ -1,23 +1,21 @@
 <template>
-  <div>
-    <div
-      :class="bucketClass"
-      class="bucket-container py-1 mb-3"
-      :data-qa="bucketTestId"
-      @dragover.prevent
-      @dragenter.prevent
-      @drop.prevent="drop($event, bucket)"
-    >
-      <b class="bucket-label">{{ bucket.text }}</b>
-      <item
-        v-for="item in items"
-        :key="item"
-        :node="node"
-        :drag-drop="dragDrop"
-        :item="item"
-        class="user-item"
-      />
-    </div>
+  <div
+    :class="bucketClass"
+    class="bucket-container pt-2 pb-4 mb-3"
+    :data-qa="bucketTestId"
+    @dragover.prevent
+    @dragenter.prevent
+    @drop.prevent="drop($event, bucket)"
+  >
+    <b class="bucket-label">{{ bucket.text }}</b>
+    <item
+      v-for="item in items"
+      :key="item"
+      :node="node"
+      :drag-drop="dragDrop"
+      :item="item"
+      class="user-item"
+    />
   </div>
 </template>
 
@@ -70,15 +68,17 @@ export default {
   display: flex;
   flex-direction: column;
   min-height: 250px;
-  border-radius: 25px;
+  border-radius: 15px;
   overflow-wrap: break-word;
 }
 
 .from-bucket-container {
-  background-color: #009688;
+  color: #333;
+  background-color: #bbb;
 }
 .to-bucket-container {
-  background-color: #3f51b5;
+  color: #555;
+  background-color: #eee;
 }
 .bucket-label {
   font-size: 28px;

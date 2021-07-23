@@ -123,7 +123,7 @@ export default {
 .h5p-media-iframe-container {
   margin: auto;
   overflow: hidden;
-  border-radius: 15px;
+  border-radius: 5px;
   &:not(.context-multi-content) {
     position: absolute;
     top: 0;

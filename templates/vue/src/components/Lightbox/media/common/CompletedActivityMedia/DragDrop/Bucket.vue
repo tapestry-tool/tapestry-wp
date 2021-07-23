@@ -39,7 +39,7 @@ export default {
   padding: 5px 0;
   width: 80px;
   min-height: 80px;
-  border-radius: 15px;
+  border-radius: 5px;
   overflow-wrap: break-word;
 }
 </style>

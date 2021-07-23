@@ -5,7 +5,7 @@
         Cannot re-edit this question because a user has already answered it
       </p>
     </template>
-    <b-form-group>
+    <b-form-group class="mt-2">
       <b-form-checkbox v-model="dragDrop.useImages" data-qa="dragdrop-use-images">
         Use Images
       </b-form-checkbox>
@@ -16,54 +16,52 @@
       >
         Hide Text
       </b-form-checkbox>
-      <b-col>
-        <b-row><b>From buckets</b></b-row>
-        <b-row v-for="bucket in getBuckets('from')" :key="bucket.id">
-          <bucket
-            :bucket="bucket"
-            :items="getBucketsItems(bucket.id)"
-            :bucketRemovalAllowed="bucketRemovalEnabled.from"
-            :useImages="dragDrop.useImages"
-            @remove-item="handleRemoveItem"
-            @remove-bucket="handleRemoveBucket"
-            @add="addItem(bucket.id)"
-          />
-        </b-row>
-        <b-row>
-          <b-button
-            class="add-btn"
-            variant="primary"
-            squared
-            data-qa="add-from-bucket-button"
-            @click="addBucket('from')"
-          >
-            Add bucket
-          </b-button>
-        </b-row>
-      </b-col>
-    </b-form-group>
-    <b-form-group>
-      <b-col>
-        <b-row><b>To buckets</b></b-row>
-        <b-row v-for="bucket in getBuckets('to')" :key="bucket.id">
-          <bucket
-            :bucket="bucket"
-            :bucketRemovalAllowed="bucketRemovalEnabled.to"
-            @remove-bucket="handleRemoveBucket"
-          />
-        </b-row>
-        <b-row>
-          <b-button
-            class="add-btn"
-            variant="primary"
-            squared
-            data-qa="add-to-bucket-button"
-            @click="addBucket('to')"
-          >
-            Add bucket
-          </b-button>
-        </b-row>
-      </b-col>
+      <b-row class="ml-1 mt-2">
+        <b-col class="mr-2">
+          <b-row>Drag from:</b-row>
+          <b-row v-for="bucket in getBuckets('from')" :key="bucket.id">
+            <bucket
+              :bucket="bucket"
+              :items="getBucketsItems(bucket.id)"
+              :bucketRemovalAllowed="bucketRemovalEnabled.from"
+              :useImages="dragDrop.useImages"
+              @remove-item="handleRemoveItem"
+              @remove-bucket="handleRemoveBucket"
+              @add="addItem(bucket.id)"
+            />
+          </b-row>
+          <b-row>
+            <b-button
+              class="add-btn"
+              variant="primary"
+              data-qa="add-from-bucket-button"
+              @click="addBucket('from')"
+            >
+              Add bucket
+            </b-button>
+          </b-row>
+        </b-col>
+        <b-col>
+          <b-row>Drag to:</b-row>
+          <b-row v-for="bucket in getBuckets('to')" :key="bucket.id">
+            <bucket
+              :bucket="bucket"
+              :bucketRemovalAllowed="bucketRemovalEnabled.to"
+              @remove-bucket="handleRemoveBucket"
+            />
+          </b-row>
+          <b-row>
+            <b-button
+              class="add-btn"
+              variant="primary"
+              data-qa="add-to-bucket-button"
+              @click="addBucket('to')"
+            >
+              Add bucket
+            </b-button>
+          </b-row>
+        </b-col>
+      </b-row>
     </b-form-group>
   </b-overlay>
 </template>

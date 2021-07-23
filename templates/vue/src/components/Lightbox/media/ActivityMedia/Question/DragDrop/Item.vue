@@ -1,17 +1,21 @@
 <template>
-  <div class="container my-1" draggable="true" @dragstart="dragStart($event, item)">
-    <div
-      class="circle"
-      :style="{
-        'background-image': hasImage ? 'url(' + itemData.imageUrl + ')' : 'none',
-        'background-color': itemData.color,
-      }"
-    ></div>
+  <div
+    class="container my-1"
+    draggable="true"
+    :style="{
+      'background-image': hasImage ? 'url(' + itemData.imageUrl + ')' : 'none',
+      'background-color': itemData.color,
+      'border-color': borderColor,
+    }"
+    @dragstart="dragStart($event, item)"
+  >
     <b v-if="!dragDrop.hideText">{{ itemData.text }}</b>
   </div>
 </template>
 
 <script>
+import TinyColor from "tinycolor2"
+
 export default {
   name: "item",
   props: {
@@ -37,6 +41,11 @@ export default {
         return item.id === this.item
       })
     },
+    borderColor() {
+      return TinyColor(this.itemData.color)
+        .darken()
+        .toString()
+    },
   },
   methods: {
     dragStart(e, itemId) {
@@ -49,18 +58,16 @@ export default {
 </script>
 
 <style scoped>
-.circle {
-  border-radius: 100%;
-  height: 100px;
-  width: 100px;
-  border: solid;
+.container {
+  cursor: move;
+  border-radius: 15px;
+  width: 75%;
+  border: solid 1px;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   text-align: center;
+  padding: 40px 0;
   margin: auto;
-}
-.container {
-  cursor: pointer;
 }
 </style>

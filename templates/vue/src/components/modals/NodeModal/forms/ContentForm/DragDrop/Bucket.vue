@@ -1,41 +1,47 @@
 <template>
-  <div>
-    <b-form-group>
+  <b-card
+    :no-body="!items"
+    header-tag="header"
+    footer-tag="footer"
+    body-class="pb-1 pt-2"
+    class="mt-3 w-100"
+  >
+    <template #header>
       <b-form-input
         v-model="bucket.text"
-        placeholder="New Bucket"
+        placeholder="Enter bucket name"
         class="side bucket-label"
       ></b-form-input>
-      <b-button
-        v-if="bucketRemovalAllowed"
-        class="side"
-        variant="outline-danger"
-        @click="$emit('remove-bucket', bucket.id)"
-      >
-        Remove bucket
-      </b-button>
-    </b-form-group>
-    <b-form-group v-if="items" class="bucket-container p-2">
-      <b-form-group>
-        <item
-          v-for="item in items"
-          :key="item.id"
-          :item="item"
-          :useImages="useImages"
-          :itemRemovalAllowed="itemRemovalAllowed"
-          @remove-item="$emit('remove-item', item.id)"
-        />
-      </b-form-group>
+    </template>
+    <b-form-group v-if="items">
+      <item
+        v-for="item in items"
+        :key="item.id"
+        :item="item"
+        :useImages="useImages"
+        :itemRemovalAllowed="itemRemovalAllowed"
+        @remove-item="$emit('remove-item', item.id)"
+      />
       <b-button
         v-if="bucket.type === 'from'"
         variant="primary"
-        class="add-item"
+        class="add-item mt-1"
         @click="$emit('add')"
       >
         Add item
       </b-button>
     </b-form-group>
-  </div>
+    <template v-if="bucketRemovalAllowed" #footer>
+      <b-button
+        class="side"
+        size="sm"
+        variant="danger"
+        @click="$emit('remove-bucket', bucket.id)"
+      >
+        Delete bucket
+      </b-button>
+    </template>
+  </b-card>
 </template>
 
 <script>
@@ -72,19 +78,3 @@ export default {
   },
 }
 </script>
-
-<style scoped>
-.bucket-container {
-  background-color: #e0f2f1;
-  border-radius: 15px;
-  max-width: 300px;
-  text-align: center;
-}
-.to-bucket-container {
-  background-color: #e8eaf6;
-  min-height: 50px;
-  margin-bottom: 15px;
-  margin-left: -15px;
-  border-radius: 15px;
-}
-</style>
