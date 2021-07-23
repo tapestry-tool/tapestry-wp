@@ -41,8 +41,11 @@
           style="padding-top: 4px; padding-bottom: 4px;"
         >
           <b-card>
-            <b-card-text v-b-toggle="index === 0 ? `` : `collapse-${index}`">
-              {{ getMenuName(index) }}
+            <b-card-text
+              v-b-toggle="index === 0 ? `` : `collapse-${index}`"
+              @click="changeActiveMenuIndex(index)"
+            >
+              Menu {{ index }}
             </b-card-text>
             <b-collapse
               :id="`collapse-${index}`"
@@ -131,6 +134,19 @@ export default {
       menu.unshift(mainMenu)
       return menu
     },
+    // filteredMenuGroups() {
+    //   const filteredMenu = []
+    //   this.menuGroups.forEach((menuArray, menuIndex) => {
+    //     console.log(menuArray)
+    //     if (menuIndex === 0) {
+    //       filteredMenu.push(menuArray)
+    //     } else {
+    //       menuArray.shift()
+    //       filteredMenu.push(menuArray)
+    //     }
+    //   })
+    //   return filteredMenu
+    // },
     lockRows() {
       return this.node.typeData.lockRows
     },
@@ -200,7 +216,8 @@ export default {
       }
     },
     changeActiveMenuIndex(menuIndex) {
-      this.$emit("changeActiveMenuIndex", menuIndex)
+      // this.$emit("changeActiveMenuIndex", menuIndex)
+      return menuIndex
     },
   },
 }
