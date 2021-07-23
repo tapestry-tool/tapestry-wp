@@ -42,54 +42,29 @@
       </b-alert>
       <div class="question-body">
         <div v-if="formOpened">
-          <text-question
-            v-if="formType === 'text'"
-            :question="question"
-            :answer="answer ? answer : []"
-            @submit="handleSubmit"
-          ></text-question>
-          <audio-recorder
-            v-else-if="formType === 'audio'"
+          <component
+            :is="formType + '-question'"
             :id="question.id"
             :node="node"
-            @submit="handleSubmit"
-          />
-          <multiple-choice-question
-            v-else-if="formType === 'multipleChoice'"
-            :node="node"
             :question="question"
+            :drag-drop="question.answerTypes.dragDrop"
             :answer="answer"
             @submit="handleSubmit"
-          ></multiple-choice-question>
+          ></component>
         </div>
         <div v-else class="question-answer-types">
           <p class="question-answer-text">I want to answer with...</p>
           <div class="button-container">
             <answer-button
-              v-if="question.answerTypes.text.enabled"
-              :completed="formIsCompleted('text')"
-              data-qa="answer-button-text"
-              @click="openForm('text')"
+              v-for="enabledAnswer in enabledAnswerTypes"
+              :key="enabledAnswer[0]"
+              class="text-capitalize"
+              :completed="isFormCompleted(enabledAnswer[0])"
+              :icon="enabledAnswer[0]"
+              :data-qa="`answer-button-${enabledAnswer[0]}`"
+              @click="openForm(enabledAnswer[0])"
             >
-              text
-            </answer-button>
-            <answer-button
-              v-if="question.answerTypes.audio.enabled"
-              :completed="formIsCompleted('audio')"
-              icon="microphone"
-              data-qa="answer-button-audio"
-              @click="openForm('audio')"
-            >
-              audio
-            </answer-button>
-            <answer-button
-              v-if="question.answerTypes.multipleChoice.enabled"
-              :completed="formIsCompleted('multipleChoice')"
-              data-qa="answer-button-multiple-choice"
-              icon="tasks"
-              @click="openForm('multipleChoice')"
-            >
-              multiple choice
+              {{ enabledAnswer[0].replace(/([A-Z])/g, " $1").trim() }}
             </answer-button>
           </div>
         </div>
@@ -102,8 +77,9 @@
 import { mapActions, mapGetters, mapState } from "vuex"
 import client from "@/services/TapestryAPI"
 import AnswerButton from "./AnswerButton"
-import AudioRecorder from "./AudioRecorder"
+import AudioQuestion from "./AudioQuestion"
 import TextQuestion from "./TextQuestion"
+import DragDropQuestion from "./DragDrop"
 import MultipleChoiceQuestion from "./MultipleChoiceQuestion"
 import Loading from "@/components/common/Loading"
 import CompletedActivityMedia from "../../common/CompletedActivityMedia"
@@ -113,8 +89,9 @@ export default {
   name: "question",
   components: {
     AnswerButton,
-    AudioRecorder,
+    AudioQuestion,
     TextQuestion,
+    DragDropQuestion,
     MultipleChoiceQuestion,
     Loading,
     CompletedActivityMedia,
@@ -175,7 +152,12 @@ export default {
       if (this.formOpened && this.answers?.[this.formType]) {
         return this.answers[this.formType]
       }
-      return ""
+      switch (this.formType) {
+        case "text":
+          return []
+        default:
+          return null
+      }
     },
   },
   watch: {
@@ -203,6 +185,10 @@ export default {
       } else {
         this.formOpened = false
       }
+    },
+    isFormCompleted(type) {
+      return !!this.userAnswers?.[this.node.id]?.activity?.[this.question.id]
+        ?.answers[type]
     },
     openForm(answerType) {
       client.recordAnalyticsEvent(

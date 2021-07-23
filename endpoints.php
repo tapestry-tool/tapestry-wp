@@ -280,6 +280,13 @@ $REST_API_ENDPOINTS = [
             'permission_callback' => 'TapestryPermissions::putTapestrySettings',
         ],
     ],
+    'GET_QUESTION_HAS_ANSWERS' => (object) [
+        'ROUTE' => '/activity/question',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_POST_METHOD,
+            'callback' => 'getQuestionHasAnswers',
+        ],
+    ],
 ];
 
 /*
@@ -1366,4 +1373,34 @@ function getTapestryContributors($request)
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
+}
+
+/**
+ * Checks whether any user has answered a spesific question
+ * inside an acitivity
+ *
+ * @param object $request HTTP request
+ */
+function getQuestionHasAnswers($request)
+{
+    $postId = $request['post_id'];
+    $nodeMetaId = $request['node_id'];
+    $questionId = $request['question_id'];
+    
+    try {
+        if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+        if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
+            throw new TapestryError('INVALID_NODE_META_ID');
+        }
+        if (!TapestryHelpers::userIsAllowed('EDIT', $nodeMetaId, $postId)) {
+            throw new TapestryError('EDIT_NODE_PERMISSION_DENIED');
+        }
+
+        return TapestryUserProgress::questionsHasAnyAnswer($postId, $nodeMetaId, $questionId);
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+    
 }
