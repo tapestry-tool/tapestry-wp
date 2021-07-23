@@ -23,16 +23,16 @@
         </div>
         <div id="emoji-picker">
           <twemoji-picker
+            id="twemoji-picker"
             :emojiData="emojiDataAll"
             :emojiGroups="emojiGroups"
             :skinsSelection="true"
             :pickerPaddingOffset="0"
             pickerPlacement="top"
             @emojiUnicodeAdded="handleEmojiSelect"
-            id="twemoji-picker"
           >
             <template v-slot:twemoji-picker-button>
-              <button class="preview" :key="connection.avatar">
+              <button :key="connection.avatar" class="preview">
                 {{ connection.avatar }}
               </button>
             </template>
