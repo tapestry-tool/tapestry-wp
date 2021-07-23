@@ -518,6 +518,7 @@ describe("Activity", () => {
       })
 
       cy.openLightbox(node.id)
+      cy.contains(/edit question/i).click()
       cy.lightbox().within(() => {
         cy.getByTestId("list-input-0").should("be.visible")
         cy.getByTestId("list-input-1").should("be.visible")
