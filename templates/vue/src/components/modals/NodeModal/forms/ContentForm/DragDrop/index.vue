@@ -95,7 +95,7 @@ export default {
     return { bucketRemovalEnabled: { to: false, from: false }, hasAnswers: false }
   },
   created() {
-    client.questionHasAnswer(this.node.id, this.questionId).then(res => {
+    client.questionHasAnswer(this.node.id, this.questionId, "dragDrop").then(res => {
       this.hasAnswers = res.data
     })
 

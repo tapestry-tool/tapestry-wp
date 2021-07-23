@@ -140,15 +140,16 @@ class TapestryUserProgress implements ITapestryUserProgress
      * 
      * @return boolean $hasAnswer
      */
-    public static function questionsHasAnyAnswer($postId, $nodeMetaId, $questionId)
+    public static function questionsHasAnyAnswer($postId, $nodeMetaId, $questionId, $answerType)
     {
         $userIds = get_users(array('fields'=> array('ID')));
         $hasAnswer = false;
     
         foreach($userIds as $userId) {
            $user_answer = get_user_meta($userId->ID, 'tapestry_'.$postId.'_'.$nodeMetaId.'_question_'.$questionId.'_answers', true);
-           if($user_answer != '') {
+           if(array_key_exists($answerType, $user_answer) && $user_answer != '') {
                $hasAnswer = true;
+               break;
            }
         }
 
