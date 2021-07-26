@@ -20,7 +20,7 @@
       <b-input-group-append>
         <b-input-group-text v-if="!useImages">
           <color-picker
-            class="m-n1 mr-n3"
+            class="m-n1 mr-n3 item-background-color"
             :currentColor="item.color"
             @change="item.color = $event"
           />
