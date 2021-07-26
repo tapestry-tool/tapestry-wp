@@ -256,8 +256,8 @@ button[disabled] {
 }
 
 .accordion-row {
-  color: #111;
-  background: #eeeeee;
+  color: #eee;
+  background: #eee;
   border-radius: 4px;
   padding: 8px 16px;
   margin-bottom: 8px;
