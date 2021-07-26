@@ -264,7 +264,6 @@ export default {
     },
   },
   mounted() {
-    console.log(this.node.mediaType)
     document.querySelector("body").classList.add("tapestry-lightbox-open")
     DragSelectModular.removeDragSelectListener()
     if (this.node.mediaType === "multi-content") {
