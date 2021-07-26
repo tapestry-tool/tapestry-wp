@@ -13,10 +13,8 @@
         </b-col>
       </b-row>
       <b-row align-h="center">
-        <h3>
-          Great job! Here are some of
-          <br />
-          your connections.
+        <h3 style="max-width:350px;">
+          Great job! Here are some of your connections.
         </h3>
       </b-row>
       <b-row align-h="center">
