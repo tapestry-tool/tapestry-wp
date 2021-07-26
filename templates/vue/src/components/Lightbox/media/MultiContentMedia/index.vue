@@ -217,6 +217,9 @@ export default {
     },
     changeRow(rowInfo) {
       const { rowId, context } = rowInfo
+      console.log("changingRow")
+      console.log(rowId)
+      console.log(context)
       if (this.isNestedMultiContent(context)) {
         if (rowId) {
           this.$router.push({

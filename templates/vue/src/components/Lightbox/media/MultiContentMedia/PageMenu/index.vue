@@ -226,16 +226,16 @@ export default {
     },
     changeActiveMenuIndex(menuIndex) {
       const titleNodeId = this.menuGroups[menuIndex][0].node.id
-      const rowId = this.menuGroups[menuIndex][0].node.id
+      // const rowId = this.menuGroups[menuIndex][0].node.id
       console.log(this.menuGroups)
       console.log(titleNodeId)
-      this.$router.push({
-        ...this.$route,
-        query: {
-          ...this.$route.query,
-          row: rowId,
-        },
-      })
+      // this.$router.push({
+      //   ...this.$route,
+      //   query: {
+      //     ...this.$route.query,
+      //     row: rowId,
+      //   },
+      // })
       this.$emit("changeActiveMenuIndex", menuIndex)
     },
   },
