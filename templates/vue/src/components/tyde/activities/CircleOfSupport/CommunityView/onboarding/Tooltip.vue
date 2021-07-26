@@ -11,23 +11,12 @@
 <script>
 // import Helpers from "@/utils/Helpers"
 export default {
-  props: {
-    /**
-     * ID of the DOM element that we want to position this tooltip against.
-     */
-    // refId: {
-    //   type: String,
-    //   required: false,
-    // },
-  },
   data() {
     return {
       positioned: false,
     }
   },
   mounted() {
-    // const container = document.getElementById("cos")
-    // const target = container.querySelector(`#${this.refId}`)
     this.positioned = true
     this.$emit("tooltip-positioned")
   },
