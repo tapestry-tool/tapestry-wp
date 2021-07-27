@@ -136,6 +136,14 @@
           Crop video to fill window (not recommended)
         </b-form-radio>
       </b-form-group>
+      <b-form-group>
+        <b-form-checkbox
+          v-model="node.halfWidth"
+          data-qa="page-child-node-behaviour-half-width"
+        >
+          Show this as half width
+        </b-form-checkbox>
+      </b-form-group>
     </b-card>
   </div>
 </template>
