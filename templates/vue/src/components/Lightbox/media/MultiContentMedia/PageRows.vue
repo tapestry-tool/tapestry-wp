@@ -5,7 +5,7 @@
     @input="changeRow"
   >
     <template v-slot="{ isVisible, hasNext, next }">
-      <b-container data-qa="page-rows">
+      <b-container fluid data-qa="page-rows">
         <b-row>
           <template v-for="(row, index) in rows">
             <b-col
