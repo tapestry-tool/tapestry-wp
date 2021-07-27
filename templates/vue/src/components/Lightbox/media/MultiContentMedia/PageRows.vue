@@ -129,10 +129,10 @@ export default {
       required: false,
       default: 0,
     },
-    activeMenuIndex: {
-      type: Number,
+    pageMenuData: {
+      type: Object,
       required: false,
-      default: -1,
+      default: () => ({}),
     },
   },
   data() {
@@ -168,8 +168,9 @@ export default {
       return menu
     },
     activeRows() {
-      return this.activeMenuIndex > -1
-        ? this.menuGroups[this.activeMenuIndex]
+      console.log("Page rows menuIndex: " + this.pageMenuData.menuIndex)
+      return this.pageMenuData.menuIndex
+        ? this.menuGroups[this.pageMenuData.menuIndex]
         : this.rows
     },
     lockRows() {

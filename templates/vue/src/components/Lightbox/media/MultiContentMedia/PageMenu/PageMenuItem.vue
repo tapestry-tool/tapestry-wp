@@ -99,9 +99,10 @@ export default {
       this.scrollToRow()
     },
     scrollToRow(nodeId) {
-      if (!nodeId) {
+      if (typeof nodeId === "undefined" || !nodeId) {
         nodeId = this.node.id
       }
+      this.$emit("handleMenuItemClick", nodeId)
       this.$emit("scroll-to", nodeId)
     },
   },
@@ -113,6 +114,7 @@ export default {
   &.fa-ul {
     margin-top: 1.5em;
     margin-bottom: 1.5em;
+    background-color: blue;
   }
 
   li {

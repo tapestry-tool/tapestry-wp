@@ -36,7 +36,7 @@
       :subRowId="subRowId"
       :context="context"
       :level="level"
-      :activeMenuIndex="activeMenuIndex"
+      :pageMenuData="pageMenuData"
       @load="handleLoad"
       @changeRow="changeRow"
       @updateProgress="updateProgress"
@@ -103,10 +103,10 @@ export default {
       required: false,
       default: 0,
     },
-    activeMenuIndex: {
-      type: Number,
+    pageMenuData: {
+      type: Object,
       required: false,
-      default: -1,
+      default: () => ({}),
     },
   },
   data() {
@@ -160,6 +160,15 @@ export default {
     },
     isMultiContentContext() {
       return this.isNestedMultiContent(this.context)
+    },
+  },
+  watch: {
+    pageMenuData(pageMenuData) {
+      const rowInfo = {
+        context: pageMenuData.context,
+        rowId: pageMenuData.nodeId,
+      }
+      this.changeRow(rowInfo)
     },
   },
   mounted() {
@@ -216,12 +225,11 @@ export default {
       })
     },
     changeRow(rowInfo) {
+      console.log(rowInfo)
       const { rowId, context } = rowInfo
-      console.log("changingRow")
-      console.log(rowId)
-      console.log(context)
       if (this.isNestedMultiContent(context)) {
         if (rowId) {
+          console.log("CASE 1: opening subrowID")
           this.$router.push({
             name: names.NESTEDMULTICONTENT,
             params: {
@@ -235,6 +243,7 @@ export default {
           })
         } else {
           if (this.$route.params.subRowId) {
+            console.log("CASE 2: closing tab")
             let updatedSubRowIds = this.$route.params.subRowId.split(",")
             updatedSubRowIds.pop()
             this.$router.push({
@@ -250,12 +259,14 @@ export default {
         }
       } else {
         if (rowId) {
+          console.log("CASE 3: opening child of MC")
           this.$router.push({
             name: names.MULTICONTENT,
             params: { nodeId: this.node.id, rowId },
             query: this.$route.query,
           })
         } else {
+          console.log("CASE 4: opening lightbox only")
           this.$router.push({
             name: names.LIGHTBOX,
             params: { nodeId: this.node.id },

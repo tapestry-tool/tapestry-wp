@@ -15,7 +15,7 @@
       v-if="node.mediaType === 'multi-content'"
       :node="node"
       :row-id="rowId"
-      :activeMenuIndex="activeMenuIndex"
+      :pageMenuData="pageMenuData"
       :sub-row-id="subRowId"
       @close="handleAutoClose"
       @complete="complete"
@@ -25,7 +25,7 @@
       :node="node"
       :rowRefs="rowRefs"
       :dimensions="dimensions"
-      @changeActiveMenuIndex="setActiveMenuIndex"
+      @handlePageMenuClick="handlePageMenuClick"
     />
     <tapestry-media
       v-if="node.mediaType !== 'multi-content'"
@@ -84,7 +84,7 @@ export default {
       },
       showCompletionScreen: false,
       rowRefs: [],
-      activeMenuIndex: -1,
+      pageMenuData: {},
     }
   },
   computed: {
@@ -295,8 +295,8 @@ export default {
         height: this.lightboxDimensions.height,
       }
     },
-    setActiveMenuIndex(menuIndex) {
-      this.activeMenuIndex = menuIndex
+    handlePageMenuClick(pageMenuData) {
+      this.pageMenuData = pageMenuData
     },
   },
 }

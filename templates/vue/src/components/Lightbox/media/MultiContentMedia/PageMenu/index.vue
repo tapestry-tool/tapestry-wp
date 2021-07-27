@@ -45,7 +45,7 @@
               v-b-toggle="
                 index === 0 || menu.length === 0 ? `` : `collapse-${index}`
               "
-              @click="changeActiveMenuIndex(index)"
+              @click="handleMenuTitleClick(index)"
             >
               {{ getMenuName(index) }}
             </b-card-text>
@@ -54,7 +54,7 @@
               :visible="index === 0"
               class="mt-2"
             >
-              <ul class="page-menu-item fa-ul" @click="changeActiveMenuIndex(index)">
+              <ul class="page-menu-item fa-ul">
                 <page-menu-item
                   v-for="row in menu"
                   :key="row.node.id"
@@ -62,6 +62,7 @@
                   :lockRows="lockRows"
                   :disabled="disabledRow(row.node)"
                   @scroll-to="scrollToRef"
+                  @handleMenuItemClick="handleMenuItemClick"
                 />
               </ul>
             </b-collapse>
@@ -104,7 +105,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getDirectChildren", "getNode", "isMultiContent"]),
+    ...mapGetters(["getDirectChildren", "getNode", "isMultiContent", "getParent"]),
     nodeId() {
       return parseInt(this.$route.params.nodeId, 10)
     },
@@ -156,6 +157,16 @@ export default {
       }
       return filteredMenu
     },
+    menuTitleNodeIds() {
+      let menuTitleNodeIds = []
+      menuTitleNodeIds.push(this.node.id)
+      this.rows.forEach(row => {
+        if (row.node.typeData.isSecondaryNode) {
+          menuTitleNodeIds.push(row.node.id)
+        }
+      })
+      return menuTitleNodeIds
+    },
     lockRows() {
       return this.node.typeData.lockRows
     },
@@ -179,7 +190,7 @@ export default {
         },
       })
     }
-    this.$emit("changeActiveMenuIndex", 0)
+    this.handleMenuTitleClick(0)
   },
   methods: {
     disabledRow(node) {
@@ -224,19 +235,45 @@ export default {
         return this.menuGroups[index][0].node.title
       }
     },
-    changeActiveMenuIndex(menuIndex) {
-      const titleNodeId = this.menuGroups[menuIndex][0].node.id
-      // const rowId = this.menuGroups[menuIndex][0].node.id
-      console.log(this.menuGroups)
-      console.log(titleNodeId)
-      // this.$router.push({
-      //   ...this.$route,
-      //   query: {
-      //     ...this.$route.query,
-      //     row: rowId,
-      //   },
-      // })
-      this.$emit("changeActiveMenuIndex", menuIndex)
+    getContextFromNodeId(nodeId) {
+      const match = this.menuTitleNodeIds.find(id => id === nodeId)
+      if (match > -1) {
+        let context = this.getNode(match).presentationStyle
+        return context
+      } else {
+        return this.getContextFromNodeId(this.getParent(nodeId))
+      }
+    },
+    getMenuIndexFromNodeId(nodeId) {
+      const match = this.menuTitleNodeIds.findIndex(id => id === nodeId)
+      if (match > -1) {
+        return match
+      } else {
+        return this.getMenuIndexFromNodeId(this.getParent(nodeId))
+      }
+    },
+    getNodeIdFromMenuIndex(index) {
+      if (index === 0) {
+        return this.node.id
+      } else {
+        return this.menuGroups[index][0].node.id
+      }
+    },
+    handleMenuTitleClick(index) {
+      const pageMenuData = {
+        menuIndex: index,
+        nodeId: this.getNodeIdFromMenuIndex(index),
+        context: index === 0 ? "" : "page",
+      }
+      this.$emit("handlePageMenuClick", pageMenuData)
+    },
+    handleMenuItemClick(nodeId) {
+      const pageMenuData = {
+        menuIndex: this.getMenuIndexFromNodeId(nodeId),
+        nodeId: nodeId,
+        context: this.getContextFromNodeId(nodeId),
+      }
+      this.$emit("handlePageMenuClick", pageMenuData)
     },
   },
 }
