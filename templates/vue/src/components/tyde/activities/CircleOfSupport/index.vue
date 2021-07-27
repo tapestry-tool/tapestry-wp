@@ -8,6 +8,7 @@
         :communities="cos.communities"
         @add-connection="addConnection"
         @edit-connection="editConnection"
+        @delete-connection="handleDeleteConnection"
         @add-community="addCommunity"
       />
       <circle-view
@@ -114,6 +115,13 @@ export default {
     removeConnectionFromCommunity(communityId, connectionId) {
       const community = this.cos.communities[communityId]
       community.connections = community.connections.filter(id => id !== connectionId)
+    },
+    handleDeleteConnection(connectionId) {
+      delete this.cos.connections[connectionId]
+
+      Object.values(this.cos.communities).forEach(community => {
+        this.removeConnectionFromCommunity(community.id, connectionId)
+      })
     },
   },
 }

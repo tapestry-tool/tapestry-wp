@@ -31,6 +31,9 @@
         </div>
         <div class="controls">
           <button @click="$emit('back')">Cancel</button>
+          <b-button v-if="connection.id" variant="danger" @click="handleDelete">
+            Delete connection
+          </b-button>
           <button
             class="submit"
             :disabled="validationState"
@@ -198,6 +201,11 @@ export default {
     handleAddCommunity(community) {
       this.$emit("add-community", community)
       this.showCommunityForm = false
+    },
+    handleDelete() {
+      if (confirm("Are you sure you want to delete this connection?")) {
+        this.$emit("delete", this.connection.id)
+      }
     },
   },
 }

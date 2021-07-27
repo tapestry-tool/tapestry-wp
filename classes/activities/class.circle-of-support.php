@@ -85,6 +85,17 @@ class CircleOfSupport
 
         return $community;
     }
+    
+    public function deleteConnection($connectionId)
+    {
+        foreach ($this->current['communities'] as $key => $value)
+        {
+            $this->removeConnectionFromCommunity($connectionId, $key);            
+        }
+        error_log(print_r($this->current['connections']->$connectionId,true));
+        unset($this->current['connections']->$connectionId);
+
+    }
 
     public function updateConnection($id, $connection)
     {
