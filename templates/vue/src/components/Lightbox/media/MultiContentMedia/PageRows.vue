@@ -1,5 +1,6 @@
 <template>
   <headless-multi-content
+    v-if="activeRows"
     :rows="activeRows.map(row => row.node.id)"
     :value="rowId"
     @input="changeRow"
@@ -138,6 +139,7 @@ export default {
   data() {
     return {
       showCompletion: false,
+      activeRows: this.rows,
     }
   },
   computed: {
@@ -167,12 +169,6 @@ export default {
       menu.unshift(mainMenu)
       return menu
     },
-    activeRows() {
-      console.log("Page rows menuIndex: " + this.pageMenuData.menuIndex)
-      return this.pageMenuData.menuIndex
-        ? this.menuGroups[this.pageMenuData.menuIndex]
-        : this.rows
-    },
     lockRows() {
       return this.node.typeData.lockRows
     },
@@ -197,6 +193,11 @@ export default {
       } else {
         return null
       }
+    },
+  },
+  watch: {
+    pageMenuData() {
+      this.activeRows = this.menuGroups[this.pageMenuData.menuIndex]
     },
   },
   mounted() {

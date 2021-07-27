@@ -114,7 +114,6 @@ export default {
   &.fa-ul {
     margin-top: 1.5em;
     margin-bottom: 1.5em;
-    background-color: blue;
   }
 
   li {
