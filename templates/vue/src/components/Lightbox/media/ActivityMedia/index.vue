@@ -33,17 +33,24 @@
       @complete="handleComplete('answer')"
       @close="$emit('close')"
       @load="$emit('load', $event)"
-      @edit-question="state = 'activity'"
     ></answer-media>
     <footer class="question-footer">
       <template v-if="state !== 'completion-screen'">
         <b-button
           v-if="hasAnswers && state === 'activity'"
-          variant="secondary"
+          variant="info"
           style="margin-right:auto;"
           @click="state = 'answer'"
         >
-          Show previos answer
+          Show previos answers
+        </b-button>
+        <b-button
+          v-else-if="state === 'answer'"
+          variant="info"
+          style="margin-right:auto;"
+          @click="state = 'activity'"
+        >
+          Change answers
         </b-button>
         <template v-if="initialType === 'activity'">
           <p class="question-step">{{ currentQuestionText }}</p>

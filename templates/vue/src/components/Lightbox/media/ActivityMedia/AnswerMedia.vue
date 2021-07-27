@@ -20,11 +20,6 @@
       <div v-show="!hasAnswer" class="media-wrapper">
         You have not completed this question yet.
       </div>
-      <footer>
-        <b-button variant="primary" @click="$emit('edit-question')">
-          Edit Question
-        </b-button>
-      </footer>
     </div>
   </div>
 </template>
