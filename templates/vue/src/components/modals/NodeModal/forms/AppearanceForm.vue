@@ -136,7 +136,7 @@
           Crop video to fill window (not recommended)
         </b-form-radio>
       </b-form-group>
-      <b-form-group>
+      <b-form-group v-if="isPageChild">
         <b-form-checkbox
           v-model="node.halfWidth"
           data-qa="page-child-node-behaviour-half-width"
@@ -161,6 +161,10 @@ export default {
   props: {
     node: {
       type: Object,
+      required: true,
+    },
+    isPageChild: {
+      type: Boolean,
       required: true,
     },
   },
