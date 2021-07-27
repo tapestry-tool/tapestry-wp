@@ -259,6 +259,10 @@ export default {
       this.$emit("handlePageMenuClick", pageMenuData)
     },
     handleMenuItemClick(nodeId) {
+      this.$router.push({
+        ...this.$route,
+        query: { ...this.$route.query, row: nodeId },
+      })
       const pageMenuData = {
         menuIndex: this.getMenuIndexFromNodeId(nodeId),
         nodeId: nodeId,
