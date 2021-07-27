@@ -18,12 +18,21 @@
             {{ errorMessages[validationState.type] }}
           </b-form-invalid-feedback>
           <div id="emoji-picker" style="position: relative">
-            <button class="preview" @click="showPicker = !showPicker">
-              {{ community.icon }}
-            </button>
-            <div v-show="showPicker" class="picker" data-qa="emoji-picker">
-              <v-emoji-picker @select="handleChange('icon', $event.data)" />
-            </div>
+            <twemoji-picker
+              id="twemoji-picker"
+              :emojiData="emojiDataAll"
+              :emojiGroups="emojiGroups"
+              :skinsSelection="true"
+              :pickerPaddingOffset="0"
+              pickerPlacement="top"
+              @emojiUnicodeAdded="handleEmojiSelect"
+            >
+              <template v-slot:twemoji-picker-button>
+                <button :key="community.icon" class="preview">
+                  {{ community.icon }}
+                </button>
+              </template>
+            </twemoji-picker>
           </div>
           <div class="controls">
             <button @click="$emit('back')">Cancel</button>
@@ -54,13 +63,15 @@
 </template>
 
 <script>
-import { VEmojiPicker } from "v-emoji-picker"
+import { TwemojiPicker } from "@kevinfaguiar/vue-twemoji-picker"
+import EmojiAllData from "@kevinfaguiar/vue-twemoji-picker/emoji-data/en/emoji-all-groups.json"
+import EmojiGroups from "@kevinfaguiar/vue-twemoji-picker/emoji-data/emoji-groups.json"
 import client from "@/services/TapestryAPI"
 import { MAX_COMMUNITY_NAME_LENGTH } from "../cos.config"
 
 export default {
   components: {
-    VEmojiPicker,
+    "twemoji-picker": TwemojiPicker,
   },
   model: {
     prop: "community",
@@ -80,6 +91,12 @@ export default {
     }
   },
   computed: {
+    emojiDataAll() {
+      return EmojiAllData
+    },
+    emojiGroups() {
+      return EmojiGroups
+    },
     colors() {
       return [
         "#FF7878",
@@ -156,6 +173,9 @@ export default {
     })
   },
   methods: {
+    handleEmojiSelect(event){
+      this.community.icon = event.data
+    },
     handleChange(prop, value) {
       this.$emit("change", { ...this.community, [prop]: value })
     },
