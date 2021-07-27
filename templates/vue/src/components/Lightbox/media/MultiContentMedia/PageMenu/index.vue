@@ -235,15 +235,6 @@ export default {
         return this.menuGroups[index][0].node.title
       }
     },
-    getContextFromNodeId(nodeId) {
-      const match = this.menuTitleNodeIds.find(id => id === nodeId)
-      if (match > -1) {
-        let context = this.getNode(match).presentationStyle
-        return context
-      } else {
-        return this.getContextFromNodeId(this.getParent(nodeId))
-      }
-    },
     getMenuIndexFromNodeId(nodeId) {
       const match = this.menuTitleNodeIds.findIndex(id => id === nodeId)
       if (match > -1) {
@@ -271,7 +262,7 @@ export default {
       const pageMenuData = {
         menuIndex: this.getMenuIndexFromNodeId(nodeId),
         nodeId: nodeId,
-        context: this.getContextFromNodeId(nodeId),
+        context: "multi-content",
       }
       this.$emit("handlePageMenuClick", pageMenuData)
     },
