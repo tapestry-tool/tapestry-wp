@@ -233,7 +233,11 @@ export default {
       this.formOpened = true
     },
     performDyadNodeCheck() {
-      return wp.getCurrentUser().roles.includes("youth") || !this.node.isDyad
+      let roles = wp.getCurrentUser().roles
+      if (!this.node.isDyad || !roles.includes("youth") || !roles.include("dyad")) {
+        return true
+      }
+      return roles.includes("youth")
     },
     async handleSubmit(formData) {
       this.formOpened = false
