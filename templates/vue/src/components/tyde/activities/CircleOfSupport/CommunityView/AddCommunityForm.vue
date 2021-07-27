@@ -173,8 +173,8 @@ export default {
     })
   },
   methods: {
-    handleEmojiSelect(event){
-      this.community.icon = event.data
+    handleEmojiSelect(emoji) {
+      this.community.icon = emoji
     },
     handleChange(prop, value) {
       this.$emit("change", { ...this.community, [prop]: value })
