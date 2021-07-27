@@ -161,10 +161,11 @@ export default {
     },
     performDyadNodeCheck() {
       let roles = wp.getCurrentUser().roles
-      if (!this.node.isDyad || !roles.includes("youth") || !roles.include("dyad")) {
+      if (!this.node.isDyad) {
         return true
+      } else {
+        return !roles.includes("dyad")
       }
-      return roles.includes("youth")
     },
   },
 }
