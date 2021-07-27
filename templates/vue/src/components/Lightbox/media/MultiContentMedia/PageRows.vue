@@ -55,7 +55,8 @@
                     v-if="row.children.length > 0 && !areAllPopup(row.children)"
                     style="color: white;"
                   >
-                    {{ row.node.typeData.subAccordionText }}
+                    https://bootstrap-vue.org/docs/components/layoutypeData.subAccordionText
+                    }}
                   </p>
                   <accordion-rows
                     v-if="row.children.length > 0"
@@ -197,6 +198,9 @@ export default {
     this.$root.$emit("observe-rows", this.$refs.rowRefs)
   },
   created() {
+    /* NOTE: Generating the instructions for the 50% width rows
+     *
+     */
     let previousHadTwoHalfs = false
     this.rows.forEach((row, index) => {
       const previous = index ? this.rows[index - 1] : null
@@ -211,9 +215,11 @@ export default {
           if (!next?.node.halfWidth) {
             this.insertInstructions[index] += "spacer col"
           }
-        } else if (!previous?.node.halfWidth && !next?.node.halfWidth) {
-          this.insertInstructions[index] += "spacer col"
-        } else if (previous?.node.halfWidth && !previousHadTwoHalfs) {
+        } else if (!previous?.node.halfWidth) {
+          if (!next?.node.halfWidth) {
+            this.insertInstructions[index] += "spacer col"
+          }
+        } else if (!previousHadTwoHalfs) {
           this.insertInstructions[index] += "spacer"
           previousHadTwoHalfs = true
         }
