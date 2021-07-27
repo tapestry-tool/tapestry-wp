@@ -12,9 +12,9 @@
               :id="`row-${row.node.id}`"
               :key="row.node.id"
               ref="rowRefs"
-              class="page-row"
+              class="page-row m-1"
               :class="{
-                'w-50 m-1': row.node.halfWidth,
+                'w-50': row.node.halfWidth,
               }"
               :style="rowBackground"
             >
@@ -87,13 +87,13 @@
                 {{ node.typeData.finishButtonText }}
               </button>
             </b-col>
+            <b-col
+              v-if="insertInstructions[index].includes('col')"
+              :key="'column' + row.node.id"
+              class="w-50"
+            ></b-col>
             <div
-              v-if="
-                index &&
-                  rows[index - 1].node.halfWidth &&
-                  row.node.halfWidth &&
-                  !rows[index + 1].node.halfWidth
-              "
+              v-if="insertInstructions[index].includes('spacer')"
               :key="'spacer' + row.node.id"
               class="w-100"
             ></div>
@@ -152,6 +152,7 @@ export default {
   data() {
     return {
       showCompletion: false,
+      insertInstructions: [],
     }
   },
   computed: {
@@ -194,6 +195,32 @@ export default {
   },
   mounted() {
     this.$root.$emit("observe-rows", this.$refs.rowRefs)
+  },
+  created() {
+    let previousHadTwoHalfs = false
+    this.rows.forEach((row, index) => {
+      const previous = index ? this.rows[index - 1] : null
+      const next = index !== this.rows.length ? this.rows[index + 1] : null
+
+      this.insertInstructions[index] = ""
+
+      if (row.node.halfWidth) {
+        if (previousHadTwoHalfs) {
+          previousHadTwoHalfs = false
+
+          if (!next?.node.halfWidth) {
+            this.insertInstructions[index] += "spacer col"
+          }
+        } else if (!previous?.node.halfWidth && !next?.node.halfWidth) {
+          this.insertInstructions[index] += "spacer col"
+        } else if (previous?.node.halfWidth && !previousHadTwoHalfs) {
+          this.insertInstructions[index] += "spacer"
+          previousHadTwoHalfs = true
+        }
+      } else {
+        this.insertInstructions[index] += "spacer"
+      }
+    })
   },
   methods: {
     ...mapMutations(["updateNode"]),
