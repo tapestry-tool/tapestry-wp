@@ -314,7 +314,7 @@ button[disabled] {
   margin-bottom: 1em;
 }
 
-.tyde-mode .title {
+.has-navbar .title {
   text-align: left;
 }
 

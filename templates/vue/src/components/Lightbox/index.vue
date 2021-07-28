@@ -2,11 +2,11 @@
   <tapestry-modal
     id="lightbox"
     data-qa="lightbox"
+    :node-id="nodeId"
     :class="{
       'full-screen': node.fullscreen || tydeModeEnabled,
       'content-text': node.mediaType === 'text' || node.mediaType === 'wp-post',
     }"
-    :node-id="nodeId"
     :content-container-style="lightboxContentStyles"
     :allow-close="canSkip && !tydeModeEnabled"
     :show-fav="!tydeModeEnabled"
@@ -17,14 +17,19 @@
       :selectedTab="selectedTab"
       @change-tab="handleTabChange"
     ></navbar>
-    <circle-of-support v-if="selectedTab === 'cos'" />
-
-    <template v-if="isNodeView">
+    <div
+      v-show="selectedTab === 'default'"
+      class="node-container"
+      :class="{
+        'multi-content': node.mediaType === 'multi-content',
+        'video-content': node.mediaType === 'video' || node.mediaType === 'h5p',
+      }"
+    >
       <multi-content-media
         v-if="node.mediaType === 'multi-content'"
         :node="node"
         :row-id="rowId"
-        :class="{ 'tyde-mode': tydeModeEnabled }"
+        :class="{ 'has-navbar': tydeModeEnabled }"
         :sub-row-id="subRowId"
         @close="handleAutoClose"
         @complete="complete"
@@ -41,13 +46,14 @@
         :node-id="nodeId"
         :dimensions="dimensions"
         context="lightbox"
-        :class="{ 'tyde-mode': tydeModeEnabled }"
+        :class="{ 'has-navbar': tydeModeEnabled }"
         @load="handleLoad"
         @close="handleAutoClose"
         @complete="complete"
         @change:dimensions="updateDimensions"
       />
-    </template>
+    </div>
+    <circle-of-support v-if="selectedTab === 'cos'" />
   </tapestry-modal>
 </template>
 
@@ -112,9 +118,6 @@ export default {
     },
     canSkip() {
       return this.node.completed || this.node.skippable !== false
-    },
-    isNodeView() {
-      return this.selectedTab === "default" ? true : false
     },
     tydeModeEnabled() {
       return !canEditTapestry() && this.settings.tydeModeEnabled
@@ -349,7 +352,19 @@ body.tapestry-lightbox-open {
   height: 100%;
 }
 
-.tyde-mode {
+.has-navbar {
   padding-top: 6rem;
+}
+
+.node-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+}
+.multi-content {
+  flex-direction: row-reverse;
+}
+.video-content {
+  display: block !important;
 }
 </style>

@@ -127,13 +127,13 @@ export default {
   --cos-border: 3px solid var(--cos-color-secondary);
 
   border: var(--cos-border);
-  height: 80vh;
-  width: 90vw;
+  height: calc(100vh - 150px);
+  width: 100vw;
   min-height: 250px;
   min-width: 320px;
   position: relative;
   margin: 0 auto;
-  top: 55%;
+  top: calc(50% + 30px);
   -ms-transform: translateY(-50%);
   transform: translateY(-50%);
   overflow: hidden;
