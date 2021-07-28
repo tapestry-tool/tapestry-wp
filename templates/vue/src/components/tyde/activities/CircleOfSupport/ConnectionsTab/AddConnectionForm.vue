@@ -29,6 +29,8 @@
             :skinsSelection="true"
             :pickerPaddingOffset="0"
             pickerPlacement="top"
+            :pickerWidth="375"
+            :pickerHeight="225"
             @emojiUnicodeAdded="handleEmojiSelect"
           >
             <template v-slot:twemoji-picker-button>
@@ -220,9 +222,6 @@ export default {
 </script>
 
 <style scoped lang="scss">
-#twemoji-picker {
-  transform: scale(1.5);
-}
 form {
   display: flex;
   column-gap: 3rem;
@@ -343,14 +342,6 @@ button {
   line-height: 1;
 }
 
-.picker {
-  position: absolute;
-  left: calc(100% + 2rem);
-  top: 50%;
-  transform: translateY(-55%);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-}
-
 .controls {
   color: #757575;
   display: flex;
@@ -376,7 +367,8 @@ button {
 </style>
 
 <style>
-.emoji.border {
-  border: none !important;
+#emoji-container > #emoji-popup .emoji-popover-inner > div > .emoji-list > span,
+#emoji-container > #emoji-popup > #emoji-popover-header > .emoji-tab {
+  font-size: 22.5px !important;
 }
 </style>

@@ -25,6 +25,8 @@
               :skinsSelection="true"
               :pickerPaddingOffset="0"
               pickerPlacement="top"
+              :pickerWidth="375"
+              :pickerHeight="225"
               @emojiUnicodeAdded="handleEmojiSelect"
             >
               <template v-slot:twemoji-picker-button>
