@@ -340,15 +340,6 @@ button {
   line-height: 1;
 }
 
-.picker {
-  position: absolute;
-  left: calc(100% + 2rem);
-  top: 50%;
-  transform: translateY(-55%);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  z-index: 10;
-}
-
 .controls {
   color: #757575;
   display: flex;
@@ -371,11 +362,5 @@ button {
 .submit:hover:not(:disabled) {
   background: var(--cos-color-secondary);
   color: white;
-}
-</style>
-
-<style>
-.emoji.border {
-  border: none !important;
 }
 </style>
