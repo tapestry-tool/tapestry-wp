@@ -181,7 +181,7 @@ export default {
     },
     rowBackground() {
       if (this.isMultiContentContext) {
-        let rgb = 40
+        let rgb = 238
         let colorOffset = this.level * 10
         rgb = colorOffset > rgb ? 0 : rgb - colorOffset
         return {
