@@ -1,39 +1,40 @@
 <template>
-  <div class="container">
-    <div>
+  <div class="item-container" :style="itemStyle">
+    <b-form-group v-if="useImages">
+      <file-upload
+        v-model="item.imageUrl"
+        input-test-id="node-bucketitem-thumbnail-url"
+        :show-url-upload="false"
+        :show-image-preview="true"
+        :compact-mode="true"
+        file-types="image/*"
+        @isUploading="handleUploadChange"
+      />
+    </b-form-group>
+    <b-input-group>
       <b-form-input
         v-model="item.text"
-        placeholder="New Item"
+        placeholder="Enter item name"
         class="item-text"
       ></b-form-input>
-      <color-picker
-        v-if="!useImages"
-        label="Background color"
-        class="item-background-color"
-        :currentColor="item.color"
-        @change="item.color = $event"
-      />
-      <b-form-group v-if="useImages">
-        <file-upload
-          v-model="item.imageUrl"
-          input-test-id="node-bucketitem-thumbnail-url"
-          :show-url-upload="false"
-          :show-image-preview="true"
-          :compact-mode="true"
-          file-types="image/*"
-          @isUploading="handleUploadChange"
-        />
-      </b-form-group>
-
-      <b-button
-        v-if="itemRemovalAllowed"
-        squared
-        variant="outline-danger"
-        @click="$emit('remove-item')"
-      >
-        Remove item
-      </b-button>
-    </div>
+      <b-input-group-append>
+        <b-input-group-text v-if="!useImages">
+          <color-picker
+            class="m-n1 mr-n3 item-background-color"
+            :currentColor="item.color"
+            @change="item.color = $event"
+          />
+        </b-input-group-text>
+        <b-button
+          v-if="itemRemovalAllowed"
+          squared
+          variant="danger"
+          @click="$emit('remove-item')"
+        >
+          <i class="fas fa-trash-alt"></i>
+        </b-button>
+      </b-input-group-append>
+    </b-input-group>
   </div>
 </template>
 
@@ -60,6 +61,11 @@ export default {
       required: true,
     },
   },
+  computed: {
+    itemStyle() {
+      return this.item.color ? "background-color: " + this.item.color : ""
+    },
+  },
   methods: {
     handleUploadChange(state) {
       this.$root.$emit("node-modal::uploading", state)
@@ -69,11 +75,11 @@ export default {
 </script>
 
 <style scoped>
-.container {
-  border: solid;
-  background-color: #add8e6;
+.item-container {
+  border: solid 1px #a8a8a8;
+  background-color: #e4e4e4;
   margin: 10px 0;
-  border-radius: 15px;
+  border-radius: 5px;
   margin-left: 0px;
   padding: 1rem;
 }

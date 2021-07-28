@@ -271,8 +271,8 @@ class TapestryApi {
     })
   }
 
-  async questionHasAnswer(nodeId, questionId) {
-    const url = `/activity/question?post_id=${this.postId}&node_id=${nodeId}&question_id=${questionId}`
+  async questionHasAnswer(nodeId, questionId, answerType) {
+    const url = `/activity/question?post_id=${this.postId}&node_id=${nodeId}&question_id=${questionId}&answer_type=${answerType}`
     const response = await this.client.post(url)
     return response
   }

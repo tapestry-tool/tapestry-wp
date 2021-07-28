@@ -1,8 +1,8 @@
 <template>
   <b-form @submit="handleDragDropSubmit">
+    <p>Drag items from the left to the right.</p>
     <b-row align-h="between">
-      <b-col cols="4">
-        <b style="color: #009688">From buckets</b>
+      <b-col cols="6">
         <bucket
           v-for="bucket in getBuckets('from')"
           :key="bucket.id"
@@ -14,8 +14,7 @@
           @item-drop="handleDrop"
         />
       </b-col>
-      <b-col cols="4">
-        <b style="color: #3f51b5">To buckets</b>
+      <b-col cols="6">
         <bucket
           v-for="bucket in getBuckets('to')"
           :key="bucket.id"
@@ -28,7 +27,6 @@
         />
       </b-col>
     </b-row>
-
     <b-form-invalid-feedback :state="canSubmit">
       Please complete this question to continue
     </b-form-invalid-feedback>

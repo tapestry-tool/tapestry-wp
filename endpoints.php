@@ -1386,6 +1386,7 @@ function getQuestionHasAnswers($request)
     $postId = $request['post_id'];
     $nodeMetaId = $request['node_id'];
     $questionId = $request['question_id'];
+    $answerType = $request['answer_type'];
     
     try {
         if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
@@ -1398,7 +1399,7 @@ function getQuestionHasAnswers($request)
             throw new TapestryError('EDIT_NODE_PERMISSION_DENIED');
         }
 
-        return TapestryUserProgress::questionsHasAnyAnswer($postId, $nodeMetaId, $questionId);
+        return TapestryUserProgress::questionsHasAnyAnswer($postId, $nodeMetaId, $questionId, $answerType);
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
