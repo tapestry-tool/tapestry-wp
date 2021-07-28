@@ -94,6 +94,9 @@ class CircleOfSupport
         
         foreach ($this->current['communities'] as $key => $value)
         {
+            /* removeConnectionFromCommunity checks whether the connection is
+             * inside the community
+             */
             $this->removeConnectionFromCommunity($connectionId, $key);            
         }
         unset($this->current['connections']->$connectionId);

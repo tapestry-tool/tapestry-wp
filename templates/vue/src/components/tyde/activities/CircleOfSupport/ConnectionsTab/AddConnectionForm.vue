@@ -31,7 +31,12 @@
         </div>
         <div class="controls">
           <button @click="$emit('back')">Cancel</button>
-          <b-button v-if="connection.id" variant="danger" @click="handleDelete">
+          <b-button
+            v-if="connection.id"
+            tag="div"
+            variant="danger"
+            @click="handleDelete"
+          >
             Delete connection
           </b-button>
           <button
