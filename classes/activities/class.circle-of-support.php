@@ -88,11 +88,14 @@ class CircleOfSupport
     
     public function deleteConnection($connectionId)
     {
+        if(!isset($this->current['connections']->$connectionId)){
+            return;
+        }
+        
         foreach ($this->current['communities'] as $key => $value)
         {
             $this->removeConnectionFromCommunity($connectionId, $key);            
         }
-        error_log(print_r($this->current['connections']->$connectionId,true));
         unset($this->current['connections']->$connectionId);
 
     }
