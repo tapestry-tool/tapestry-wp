@@ -1,6 +1,5 @@
 <template>
   <headless-multi-content
-    v-if="activeRows"
     :rows="activeRows.map(row => row.node.id)"
     :value="rowId"
     @input="changeRow"
@@ -199,6 +198,9 @@ export default {
     pageMenuData() {
       this.activeRows = this.menuGroups[this.pageMenuData.menuIndex]
     },
+  },
+  beforeMount() {
+    this.activeRows = this.rows
   },
   mounted() {
     this.$root.$emit("observe-rows", this.$refs.rowRefs)
