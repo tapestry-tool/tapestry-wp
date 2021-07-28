@@ -232,6 +232,10 @@ export default {
   display: flex;
 }
 
+#popper-container {
+  transform: scale(10) !important;
+}
+
 form {
   display: flex;
   column-gap: clamp(1rem, 8vw, 3rem);

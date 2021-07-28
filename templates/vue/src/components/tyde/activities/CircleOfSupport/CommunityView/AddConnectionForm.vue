@@ -224,6 +224,7 @@ export default {
 #twemoji-picker {
   transform: scale(1.5);
 }
+
 form {
   display: flex;
   column-gap: 3rem;
