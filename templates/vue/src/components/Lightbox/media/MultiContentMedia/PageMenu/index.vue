@@ -138,12 +138,11 @@ export default {
     },
     filteredMenuGroups() {
       const filteredMenu = []
-      const menuGroupsCopy = this.menuGroups
-      for (let i = 0; i < menuGroupsCopy.length; i++) {
-        if (i === 0) {
-          filteredMenu.push(menuGroupsCopy[i])
+      this.menuGroups.forEach((menu, mIndex) => {
+        if (mIndex === 0) {
+          filteredMenu.push(menu)
         } else {
-          let childrenNodes = menuGroupsCopy[i][0].children
+          let childrenNodes = menu[0].children
           const newMenu = []
           childrenNodes.forEach(childNode => {
             let newRow = {
@@ -154,7 +153,7 @@ export default {
           })
           filteredMenu.push(newMenu)
         }
-      }
+      })
       return filteredMenu
     },
     menuTitleNodeIds() {
@@ -229,26 +228,14 @@ export default {
       })
     },
     getMenuName(index) {
-      if (index === 0) {
-        return this.node.title
-      } else {
-        return this.menuGroups[index][0].node.title
-      }
+      return index === 0 ? this.node.title : this.menuGroups[index][0].node.title
     },
     getMenuIndexFromNodeId(nodeId) {
-      const match = this.menuTitleNodeIds.findIndex(id => id === nodeId)
-      if (match > -1) {
-        return match
-      } else {
-        return this.getMenuIndexFromNodeId(this.getParent(nodeId))
-      }
+      let match = this.menuTitleNodeIds.findIndex(id => id === nodeId)
+      return match > -1 ? match : this.getMenuIndexFromNodeId(this.getParent(nodeId))
     },
     getNodeIdFromMenuIndex(index) {
-      if (index === 0) {
-        return this.node.id
-      } else {
-        return this.menuGroups[index][0].node.id
-      }
+      return index === 0 ? this.node.id : this.menuGroups[index][0].node.id
     },
     handleMenuTitleClick(index) {
       const pageMenuData = {
