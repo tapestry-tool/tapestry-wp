@@ -207,7 +207,12 @@ class TapestryUserProgress implements ITapestryUserProgress
                 $progress->$nodeId->content['userAnswers'] = new stdClass();
                 $progress->$nodeId->content['userAnswers']->activity = new stdClass();
                 foreach ($questionIdArray as $questionId) {
-                    $answer = get_user_meta($userId, 'tapestry_'.$this->postId.'_'.$nodeId.'_question_'.$questionId.'_answers', true);
+                    if ($isDyad && in_array('dyad', $user_roles, true)) {
+                        $teenId = get_user_meta($userId, 'linked_dyad_user_id');
+                        $answer = get_user_meta($teenId[0], 'tapestry_'.$this->postId.'_'.$nodeId.'_question_'.$questionId.'_answers', true);
+                    } else {
+                        $answer = get_user_meta($userId, 'tapestry_'.$this->postId.'_'.$nodeId.'_question_'.$questionId.'_answers', true);
+                    }
                     $progress->$nodeId->content['userAnswers']->activity->{$questionId}->answers = $answer;
                 }
             }
