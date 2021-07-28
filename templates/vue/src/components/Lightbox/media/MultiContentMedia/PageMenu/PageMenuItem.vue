@@ -19,7 +19,7 @@
     <ul class="page-menu-item fa-ul">
       <page-menu-item
         v-for="row in rows"
-        v-show="hasOrIsMulticontent"
+        v-show="isMultiContentChild(row.node)"
         :key="row.node.id"
         :node="row.node"
         :depth="depth + 1"
@@ -68,7 +68,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getDirectChildren", "getNode", "isMultiContent"]),
+    ...mapGetters(["getDirectChildren", "getNode", "isMultiContent", "getParent"]),
     rows() {
       return this.node.childOrdering
         .map(id => {
@@ -86,14 +86,6 @@ export default {
     },
     disabledFrom() {
       return this.rows.findIndex(row => !row.node.completed)
-    },
-    hasOrIsMulticontent() {
-      let hasMulticontentChildren = this.getDirectChildren(this.node.id).some(
-        childId => {
-          this.getNode(childId).mediaType === "multi-content"
-        }
-      )
-      return hasMulticontentChildren ? true : this.node.mediaType === "multi-content"
     },
   },
   methods: {
@@ -113,6 +105,9 @@ export default {
       }
       this.$emit("handleMenuItemClick", nodeId)
       this.$emit("scroll-to", nodeId)
+    },
+    isMultiContentChild(node) {
+      return this.getNode(this.getParent(node.id)).mediaType === "multi-content"
     },
   },
 }
