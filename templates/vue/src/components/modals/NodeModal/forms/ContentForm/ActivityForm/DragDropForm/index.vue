@@ -180,7 +180,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .add-btn {
   margin-top: 20px;
 }

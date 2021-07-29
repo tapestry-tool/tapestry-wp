@@ -47,7 +47,6 @@
             :id="question.id"
             :node="node"
             :question="question"
-            :drag-drop="question.answerTypes.dragDrop"
             :answer="answer"
             @submit="handleSubmit"
           ></component>
@@ -56,15 +55,15 @@
           <p class="question-answer-text">I want to answer with...</p>
           <div class="button-container">
             <answer-button
-              v-for="enabledAnswer in enabledAnswerTypes"
-              :key="enabledAnswer[0]"
+              v-for="enabledAnswerType in enabledAnswerTypes"
+              :key="enabledAnswerType[0]"
               class="text-capitalize"
-              :completed="isFormCompleted(enabledAnswer[0])"
-              :icon="enabledAnswer[0]"
-              :data-qa="`answer-button-${enabledAnswer[0]}`"
-              @click="openForm(enabledAnswer[0])"
+              :completed="isFormCompleted(enabledAnswerType[0])"
+              :icon="enabledAnswerType[0]"
+              :data-qa="`answer-button-${enabledAnswerType[0]}`"
+              @click="openForm(enabledAnswerType[0])"
             >
-              {{ enabledAnswer[0].replace(/([A-Z])/g, " $1").trim() }}
+              {{ enabledAnswerType[0].replace(/([A-Z])/g, " $1").trim() }}
             </answer-button>
           </div>
         </div>
@@ -79,7 +78,7 @@ import client from "@/services/TapestryAPI"
 import AnswerButton from "./AnswerButton"
 import AudioQuestion from "./AudioQuestion"
 import TextQuestion from "./TextQuestion"
-import DragDropQuestion from "./DragDrop"
+import DragDropQuestion from "./DragDropQuestion"
 import MultipleChoiceQuestion from "./MultipleChoiceQuestion"
 import Loading from "@/components/common/Loading"
 import CompletedActivityMedia from "../../common/CompletedActivityMedia"

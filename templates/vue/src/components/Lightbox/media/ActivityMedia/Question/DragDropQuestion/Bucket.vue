@@ -47,8 +47,8 @@ export default {
   computed: {
     bucketClass() {
       return this.bucket.type === "from"
-        ? "from-bucket-container"
-        : "to-bucket-container"
+        ? "bucket-container-from"
+        : "bucket-container-to"
     },
     bucketTestId() {
       return `user-${this.bucket.type}-bucket-${this.bucket.id}`
@@ -63,24 +63,25 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .bucket-container {
   display: flex;
   flex-direction: column;
   min-height: 250px;
   border-radius: 15px;
   overflow-wrap: break-word;
-}
 
-.from-bucket-container {
-  color: #333;
-  background-color: #bbb;
-}
-.to-bucket-container {
-  color: #555;
-  background-color: #eee;
-}
-.bucket-label {
-  font-size: 28px;
+  &-from {
+    color: #444;
+    background-color: #ddd;
+  }
+  &-to {
+    color: #555;
+    background-color: #eee;
+  }
+
+  .bucket-label {
+    font-size: 28px;
+  }
 }
 </style>
