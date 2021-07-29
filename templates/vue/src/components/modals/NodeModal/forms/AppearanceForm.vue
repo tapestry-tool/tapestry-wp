@@ -141,7 +141,7 @@
           v-model="node.halfWidth"
           data-qa="page-child-node-behaviour-half-width"
         >
-          Show this as half width
+          Show this node as half width
         </b-form-checkbox>
       </b-form-group>
     </b-card>

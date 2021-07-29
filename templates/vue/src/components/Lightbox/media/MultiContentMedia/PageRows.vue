@@ -55,8 +55,7 @@
                     v-if="row.children.length > 0 && !areAllPopup(row.children)"
                     style="color: white;"
                   >
-                    https://bootstrap-vue.org/docs/components/layoutypeData.subAccordionText
-                    }}
+                    {{ row.node.typeData.subAccordionText }}
                   </p>
                   <accordion-rows
                     v-if="row.children.length > 0"
