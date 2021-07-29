@@ -132,9 +132,11 @@
                   "
                   class="mt-2 pl-4"
                 >
-                  <label for="placeholder">Placeholder (optional):</label>
+                  <label :for="`placeholder-${index}`">
+                    Placeholder (optional):
+                  </label>
                   <b-form-input
-                    id="placeholder"
+                    :id="`placeholder-${index}`"
                     v-model="question.answerTypes.text.placeholder"
                     :data-qa="`question-answer-text-single-placeholder-${index}`"
                   ></b-form-input>
