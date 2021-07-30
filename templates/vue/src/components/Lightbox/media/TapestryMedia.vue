@@ -167,6 +167,7 @@ export default {
   border-radius: 15px;
   overflow: auto;
   height: 100%;
+  width: 100%;
   padding: 0;
 
   &-no-scroll {
