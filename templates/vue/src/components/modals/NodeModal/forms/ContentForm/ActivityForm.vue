@@ -91,6 +91,7 @@
               <b-form-checkbox
                 v-model="question.optional"
                 :data-qa="`question-optional-checkbox`"
+                :disabled="hasAnswer(question)"
                 switch
               >
                 Optional Question
@@ -247,7 +248,7 @@
 </template>
 
 <script>
-import { mapState } from "vuex"
+import { mapState, mapGetters } from "vuex"
 import Combobox from "@/components/modals/common/Combobox"
 import Helpers from "@/utils/Helpers"
 import RichTextForm from "./RichTextForm"
@@ -309,6 +310,7 @@ export default {
   },
   computed: {
     ...mapState(["nodes"]),
+    ...mapGetters(["getQuestion", "getAnswers"]),
   },
   watch: {
     questions(newQuestions) {
@@ -357,6 +359,11 @@ export default {
       if (!question.answerTypes.text.isMultiLine) {
         question.answerTypes.text.allowMultiple = false
       }
+    },
+    hasAnswer(question) {
+      return !question.id || !this.getQuestion(question.id)
+        ? false
+        : Object.keys(this.getAnswers(this.node.id, question.id)).length > 0
     },
   },
 }
