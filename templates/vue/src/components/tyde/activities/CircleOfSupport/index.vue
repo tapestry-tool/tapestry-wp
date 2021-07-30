@@ -117,17 +117,19 @@ export default {
       const community = this.cos.communities[communityId]
       community.connections = community.connections.filter(id => id !== connectionId)
     },
-    handleDeleteConnection(connectionId) {
+    async handleDeleteConnection(connectionId) {
       delete this.cos.connections[connectionId]
 
       Object.values(this.cos.communities).forEach(community => {
         this.removeConnectionFromCommunity(community.id, connectionId)
       })
 
-      this.cos.circles.forEach((circle, index) => {
-        const connectionIndex = circle.indexOf(connectionId)
-        delete this.cos.circles[index][connectionIndex]
+      const newCircles = []
+      this.cos.circles.forEach(circle => {
+        const newCircle = circle.filter(connection => connection !== connectionId)
+        newCircles.push(newCircle)
       })
+      this.cos.circles = newCircles
     },
   },
 }
