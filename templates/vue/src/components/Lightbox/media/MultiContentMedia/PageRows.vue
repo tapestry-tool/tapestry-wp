@@ -222,7 +222,7 @@ button[disabled] {
   background: none;
   width: 100%;
   text-align: left;
-  color: #111;
+  color: var(--text-color);
   font-size: 1.75rem;
   font-weight: 500;
 
@@ -232,7 +232,7 @@ button[disabled] {
 }
 
 .page-row {
-  background: #eee;
+  background: var(--background-color);
   border-radius: 4px;
   padding: 8px 16px;
   margin-bottom: 8px;

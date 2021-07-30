@@ -60,6 +60,8 @@ export default {
     },
   },
   mounted() {
+    document.documentElement.setAttribute("data-theme", "dark")
+
     if (isLoggedIn()) {
       var that = this
       jQuery(function($) {
@@ -108,6 +110,15 @@ export default {
 </script>
 
 <style lang="scss">
+[data-theme="dark"] {
+  --background-color: #111;
+  --text-color: #eee;
+}
+
+[data-theme="light"] {
+  --background-color: #eee;
+  --text-color: #111;
+}
 html {
   font-size: 100%;
 
