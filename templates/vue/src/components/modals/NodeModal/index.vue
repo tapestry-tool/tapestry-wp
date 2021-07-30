@@ -437,7 +437,7 @@ export default {
     },
     isPageMultiConentNodeChild() {
       return (
-        this.isMultiContentNodeChild && this?.parent?.presentationStyle === "page"
+        !!this.isMultiContentNodeChild && this?.parent?.presentationStyle === "page"
       )
     },
     isMultipleChoiceValueValid() {

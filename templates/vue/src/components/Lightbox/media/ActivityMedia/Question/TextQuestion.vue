@@ -170,5 +170,6 @@ export default {
   float: right;
   margin-top: 30px;
   width: 15%;
+  min-width: 80px;
 }
 </style>
