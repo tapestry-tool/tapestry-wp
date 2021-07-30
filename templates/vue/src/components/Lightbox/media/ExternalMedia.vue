@@ -3,7 +3,7 @@
     <h1 v-if="showTitle" class="external-media-title external-page-style">
       {{ node.title }}
     </h1>
-    <div class="external-media-container">
+    <div class="external-media-container w-100 h-100">
       <iframe
         v-if="node.behaviour === 'embed'"
         id="external"
@@ -13,8 +13,8 @@
         :style="'min-height:' + dimensions.height + 'px'"
         @load="$emit('load')"
       ></iframe>
-      <b-container v-else class="preview" :style="previewStyles">
-        <b-row align-v="center">
+      <b-container v-else class="preview w-100 h-100" :style="previewStyles">
+        <b-row align-v="center" class="w-100 h-100">
           <b-col class="w-50">
             <a :href="node.typeData.mediaURL" target="blank">
               <img
@@ -95,6 +95,7 @@ export default {
 
 .preview {
   .preview-image {
+    width: 100%;
     cursor: pointer;
     position: relative;
     background-size: cover;
@@ -150,6 +151,7 @@ export default {
 }
 
 .external-media-title {
+  color: white;
   font-weight: 500;
   font-size: 1.75rem;
 
