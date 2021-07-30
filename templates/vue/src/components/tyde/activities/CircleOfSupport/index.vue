@@ -18,6 +18,7 @@
         :communities="cos.communities"
         @add-connection="addConnection"
         @edit-connection="editConnection"
+        @delete-connection="handleDeleteConnection"
         @add-community="addCommunity"
       />
       <div class="switch">
@@ -121,6 +122,11 @@ export default {
 
       Object.values(this.cos.communities).forEach(community => {
         this.removeConnectionFromCommunity(community.id, connectionId)
+      })
+
+      this.cos.circles.forEach((circle, index) => {
+        const connectionIndex = circle.indexOf(connectionId)
+        delete this.cos.circles[index][connectionIndex]
       })
     },
   },
