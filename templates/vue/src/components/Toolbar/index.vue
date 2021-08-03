@@ -1,18 +1,40 @@
 <template>
   <div class="toolbar">
-    <tapestry-filter v-if="!showMap" style="z-index: 10;" />
-    <div v-show="canEdit || (!showMap && hasDepth)" class="slider-wrapper">
-      <help-button v-if="canEdit" />
-      <review-notifications v-if="canEdit && settings.submitNodesEnabled" />
-      <settings-modal-button
-        v-if="canEdit"
-        :max-depth="maxDepth"
-      ></settings-modal-button>
-      <tapestry-depth-slider
-        v-show="!showMap && hasDepth"
-        @change="updateViewBox"
-        @change:max-depth="maxDepth = $event"
-      ></tapestry-depth-slider>
+    <tapestry-filter v-if="!showMap" style="z-index: 10" />
+    <div
+      v-show="isLoggedIn"
+      :class="[{ 'hide-toolbar': hideToolbar }, 'slider-wrapper']"
+    >
+      <b-container class="can-edit">
+        <b-row>
+          <b-col>
+            <user-settings-button
+              data-qa="user-settings-button"
+            ></user-settings-button>
+          </b-col>
+          <template v-if="canEdit || (!showMap && hasDepth)">
+            <b-col>
+              <help-button v-if="canEdit" />
+            </b-col>
+            <b-col>
+              <review-notifications v-if="canEdit && settings.submitNodesEnabled" />
+            </b-col>
+            <b-col>
+              <settings-modal-button
+                v-if="canEdit"
+                :max-depth="maxDepth"
+              ></settings-modal-button>
+            </b-col>
+          </template>
+        </b-row>
+        <b-row>
+          <tapestry-depth-slider
+            v-show="!showMap && hasDepth"
+            @change="updateViewBox"
+            @change:max-depth="maxDepth = $event"
+          ></tapestry-depth-slider>
+        </b-row>
+      </b-container>
     </div>
   </div>
 </template>
@@ -21,6 +43,7 @@
 import { mapMutations, mapState } from "vuex"
 import TapestryDepthSlider from "./TapestryDepthSlider"
 import SettingsModalButton from "./SettingsModalButton"
+import UserSettingsButton from "./UserSettingsButton"
 import TapestryFilter from "./TapestryFilter"
 import ReviewNotifications from "./ReviewNotifications"
 import HelpButton from "./HelpButton"
@@ -32,6 +55,7 @@ export default {
     TapestryFilter,
     SettingsModalButton,
     ReviewNotifications,
+    UserSettingsButton,
     HelpButton,
   },
   data() {
@@ -50,6 +74,9 @@ export default {
     showMap() {
       return this.settings.renderMap
     },
+    isLoggedIn() {
+      return wp.isLoggedIn()
+    },
   },
   methods: {
     ...mapMutations(["select", "unselect", "clearSelection"]),
@@ -58,6 +85,9 @@ export default {
     },
     getNodeDimensions() {
       this.$parent.getNodeDimensions()
+    },
+    hideToolbar() {
+      return !(this.canEdit || (!this.showMap && this.hasDepth))
     },
   },
 }

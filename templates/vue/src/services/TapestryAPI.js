@@ -216,6 +216,18 @@ class TapestryApi {
     return response.data
   }
 
+  async getTheme() {
+    const url = `/users/userSettings/theme`
+    const response = await this.client.get(url)
+    return response
+  }
+
+  async updateUserSettings(userSettings) {
+    const url = `/users/userSettings`
+    const response = await this.client.put(url, userSettings)
+    return response
+  }
+
   async updateUserFavourites(favourites) {
     const url = `/users/favourites?post_id=${this.postId}`
     const response = await this.client.post(url, {

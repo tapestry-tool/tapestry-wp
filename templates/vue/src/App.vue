@@ -60,7 +60,7 @@ export default {
     },
   },
   mounted() {
-    document.documentElement.setAttribute("data-theme", "dark")
+    document.documentElement.setAttribute("data-theme", "light")
 
     if (isLoggedIn()) {
       var that = this

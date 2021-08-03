@@ -159,3 +159,9 @@ export function addApiError(state, error) {
 export function setTapestryErrorReporting(state, isEnabled) {
   state.displayErrors = isEnabled
 }
+
+// theme
+
+export function addTheme(state, newTheme) {
+  state.theme = newTheme
+}

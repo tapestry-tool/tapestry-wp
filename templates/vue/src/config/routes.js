@@ -54,6 +54,11 @@ const settings = {
   name: "settings",
 }
 
+const userSettings = {
+  path: `${ROOT_PATH}/user-settings/:tab`,
+  name: "userSettings",
+}
+
 const help = {
   path: `${ROOT_PATH}/help`,
   name: "help",
@@ -77,6 +82,10 @@ const redirects = [
     path: `${ROOT_PATH}/edit`,
     redirect: `${ROOT_PATH}/edit/content`,
   },
+  {
+    path: `${ROOT_PATH}/user-settings`,
+    redirect: `${ROOT_PATH}/user-settings/avatar`,
+  },
 ]
 
 const routes = {
@@ -87,6 +96,7 @@ const routes = {
   settings,
   nestedMultiContent,
   redirects,
+  userSettings,
   help,
 }
 
