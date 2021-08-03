@@ -6,7 +6,7 @@
     @click="$emit('click')"
   >
     <p>{{ connection.name }}</p>
-    <h1>{{ connection.avatar }}</h1>
+    <h1 v-html="emojiAvatar"></h1>
     <ul v-if="variant !== 'name'" class="community-list">
       <li
         v-for="community in connection.communities"
@@ -19,6 +19,7 @@
 
 <script>
 import * as d3 from "d3"
+import Twemoji from "twemoji"
 
 export default {
   props: {
@@ -45,9 +46,14 @@ export default {
   data() {
     return {
       isDragging: false,
+      emojiAvatar: null,
     }
   },
   computed: {
+    connectionAvatarImg(emoji) {
+      console.log(emoji)
+      return Twemoji.parse(emoji)
+    },
     fontSize() {
       const sizes = {
         sm: "0.6rem",
@@ -88,6 +94,7 @@ export default {
           })
       )
     }
+    this.emojiAvatar = Twemoji.parse(this.connection.avatar)
   },
 }
 </script>
