@@ -322,11 +322,11 @@ button[disabled] {
   max-width: 150vh;
   margin: 0 auto;
   overflow: auto;
-  scrollbar-color: auto var(--text-color)
+  scrollbar-color: auto var(--text-color);
   scrollbar-width: none;
 
   ::-webkit-scrollbar-track {
-    background-color: var(--text-color);
+    background-color: black;
   }
 }
 
