@@ -2,9 +2,11 @@ import { createMachine } from "xstate"
 
 export const OnboardingStates = {
   Welcome: "Welcome",
+  MoveConnections: "MoveConnections",
   AddMoreConfirmation: "AddMoreConfirmation",
   AddLaterTooltip: "AddLaterTooltip",
   AddAnotherTooltip: "AddAnotherTooltip",
+  ToggleRings: "ToggleRings",
   Form: "Form",
   FormClosed: "FormClosed",
   Finish: "Finish",
@@ -15,12 +17,14 @@ const Events = {
   Empty: "Empty",
   NoUserCommunities: "NoUserCommunities",
   NoConnections: "NoConnections",
+  CommunityOnboardingComplete: "CommunityOnboardingComplete",
   Done: "Done",
   Continue: "Continue",
   AddLater: "AddLater",
   AddAnother: "AddAnother",
   Add: "Add",
   Added: "Added",
+  Switch: "Switch",
 }
 
 export const OnboardingEvents = Events
@@ -30,7 +34,7 @@ export const OnboardingEvents = Events
  * using xstate.
  */
 const onboardingMachine = createMachine({
-  id: "CommunityViewOnboarding",
+  id: "CoSOnboarding",
   initial: "Idle",
   states: {
     Idle: {
@@ -38,6 +42,7 @@ const onboardingMachine = createMachine({
         [Events.Empty]: "#Communities.Welcome",
         [Events.NoUserCommunities]: "#Communities.AddMoreConfirmation",
         [Events.NoConnections]: "#Connections.AddMoreConfirmation",
+        [Events.CommunityOnboardingComplete]: "#Circles.Welcome",
         [Events.Continue]: "#Connections",
         [Events.Done]: OnboardingStates.Complete,
       },
@@ -104,10 +109,60 @@ const onboardingMachine = createMachine({
         },
         FormClosed: {
           on: {
+            [Events.Continue]: "#Connections",
+          },
+        },
+      },
+    },
+    Circles: {
+      id: "Circles",
+      initial: OnboardingStates.Welcome,
+      states: {
+        Welcome: {
+          on: {
+            [Events.Switch]: OnboardingStates.Welcome,
+            [Events.Continue]: OnboardingStates.MoveConnections,
+          },
+        },
+        MoveConnections: {
+          on: {
+            [Events.Continue]: OnboardingStates.AddAnotherTooltip,
+          },
+        },
+        AddAnotherTooltip: {
+          on: {
+            [Events.Add]: OnboardingStates.Form,
+            [Events.Added]: OnboardingStates.FormClosed,
+          },
+        },
+        Form: {
+          on: {
+            [Events.Added]: OnboardingStates.FormClosed,
+          },
+        },
+        FormClosed: {
+          on: {
+            [Events.Continue]: OnboardingStates.AddMoreConfirmation,
+          },
+        },
+        AddMoreConfirmation: {
+          on: {
+            [Events.AddAnother]: OnboardingStates.AddAnotherTooltip,
+            [Events.AddLater]: OnboardingStates.AddLaterTooltip,
+          },
+        },
+        AddLaterTooltip: {
+          on: {
+            [Events.Continue]: OnboardingStates.ToggleRings,
+          },
+        },
+        ToggleRings: {
+          on: {
             [Events.Continue]: OnboardingStates.Finish,
           },
         },
         Finish: {
+          type: "final",
           on: {
             [Events.Done]: "#Complete",
           },

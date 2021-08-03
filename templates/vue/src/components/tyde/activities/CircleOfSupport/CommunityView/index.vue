@@ -41,7 +41,7 @@
 </template>
 
 <script>
-import OnBoarding from "./onboarding/index.vue"
+import OnBoarding from "../onboarding/index.vue"
 import AddCommunityTab from "./AddCommunityTab"
 import ConnectionsTab from "../ConnectionsTab"
 import CommunitiesList from "./CommunitiesList"
