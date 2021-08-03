@@ -31,8 +31,11 @@
               @emojiImgAdded="getEmojiImg"
             >
               <template v-slot:twemoji-picker-button>
-                <button :key="community.icon" class="preview" v-html="emojiImg">
-                </button>
+                <button
+                  :key="community.icon"
+                  class="preview"
+                  v-html="getEmojiImgFromUnicode(community.icon)"
+                />
               </template>
             </twemoji-picker>
           </div>
@@ -179,6 +182,11 @@ export default {
   methods: {
     getEmojiImg(img) {
       this.emojiImg = img
+    },
+    getEmojiImgFromUnicode(unicode) {
+      let div = document.createElement("div")
+      div.textContent = unicode
+      return Twemoji.parse(div).innerHTML
     },
     handleEmojiSelect(emoji) {
       this.community.icon = emoji
@@ -341,8 +349,8 @@ button {
 }
 
 .preview {
-  font-size: clamp(7rem, 10vw, 10rem);
-  line-height: 1.5;
+  font-size: 4.5rem;
+  line-height: 1.8;
   margin-left: -10px;
 }
 
