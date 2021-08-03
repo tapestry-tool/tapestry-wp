@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import { mapState, mapMutations } from "vuex"
+import { mapState, mapMutations, mapGetters } from "vuex"
 import NodeModal from "@/components/modals/NodeModal"
 import TapestryApp from "@/components/TapestryApp"
 import Sidebar from "@/components/Sidebar"
@@ -48,6 +48,7 @@ export default {
   },
   computed: {
     ...mapState(["nodes"]),
+    ...mapGetters(["getTheme"]),
     isEmpty() {
       return Object.keys(this.nodes).length === 0
     },
@@ -60,7 +61,11 @@ export default {
     },
   },
   mounted() {
-    document.documentElement.setAttribute("data-theme", "light")
+    client.getTheme().then(res => {
+      this.changeTheme(res.data)
+      const theme = this.getTheme
+      document.documentElement.setAttribute("data-theme", theme ? theme : "light")
+    })
 
     if (isLoggedIn()) {
       var that = this
@@ -90,7 +95,7 @@ export default {
     window.removeEventListener("click", this.recordAnalytics)
   },
   methods: {
-    ...mapMutations(["init"]),
+    ...mapMutations(["init", "changeTheme"]),
     refresh() {
       this.$router.go()
     },

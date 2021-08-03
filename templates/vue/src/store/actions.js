@@ -28,7 +28,7 @@ export async function updateH5pSettings({ commit, dispatch }, newSettings) {
 export async function updateUserSettings({ commit, dispatch }, userSettings) {
   try {
     await client.updateUserSettings(JSON.stringify(userSettings))
-    commit("addTheme", userSettings.theme)
+    commit("changeTheme", userSettings.theme)
   } catch (error) {
     dispatch("addApiError", error)
   }

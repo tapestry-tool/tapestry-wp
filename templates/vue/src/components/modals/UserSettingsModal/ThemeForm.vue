@@ -16,16 +16,11 @@
 </template>
 
 <script>
-import { mapActions } from "vuex"
+import { mapActions, mapState } from "vuex"
+
 export default {
   name: "theme-form",
   components: {},
-  props: {
-    theme: {
-      type: String,
-      required: true,
-    },
-  },
   data() {
     return {
       userTheme: "",
@@ -35,10 +30,11 @@ export default {
       ],
     }
   },
-  computed: {},
+  computed: {
+    ...mapState(["theme"]),
+  },
   created() {
     this.userTheme = this.theme ? this.theme : "light"
-    console.log(this.userTheme)
   },
   methods: {
     ...mapActions(["updateUserSettings"]),

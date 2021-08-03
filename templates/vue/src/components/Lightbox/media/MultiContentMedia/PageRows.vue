@@ -24,7 +24,7 @@
               <i
                 class="fas fa-heart fa-sm"
                 :style="{
-                  color: isFavourite(row.node.id) ? 'red' : --text - color,
+                  color: isFavourite(row.node.id) ? 'red' : 'var(--text-color)',
                   cursor: 'pointer',
                 }"
                 @click="toggleFavourite(row.node.id)"
@@ -222,7 +222,7 @@ button[disabled] {
   background: none;
   width: 100%;
   text-align: left;
-  color: var(var(--text-color));
+  color: var(--text-color);
   font-size: 1.75rem;
   font-weight: 500;
 

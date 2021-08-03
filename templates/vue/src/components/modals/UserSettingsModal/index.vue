@@ -16,7 +16,7 @@
           :active="tab === 'theme'"
           @click="$emit('change:tab', 'theme')"
         ></b-tab>
-        <theme-form ref="ThemeForm" :theme="theme"></theme-form>
+        <theme-form ref="ThemeForm"></theme-form>
       </b-tabs>
     </b-container>
     <template slot="modal-footer">
@@ -39,7 +39,6 @@
 <script>
 import DragSelectModular from "@/utils/dragSelectModular"
 import ThemeForm from "./ThemeForm"
-import { mapState } from "vuex"
 export default {
   name: "user-settings-modal",
   components: {
@@ -55,9 +54,6 @@ export default {
       required: false,
       default: "",
     },
-  },
-  computed: {
-    ...mapState(["theme"]),
   },
   mounted() {
     this.$root.$on("bv::modal::show", (_, modalId) => {

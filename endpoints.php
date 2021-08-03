@@ -1258,7 +1258,7 @@ function getUserTheme($request)
 {
     try {
         $userProgress = new TapestryUserProgress();
-        return $userProgress->getUserTheme();
+        return $userProgress->getTheme();
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }

@@ -6,28 +6,23 @@
       :class="[{ 'hide-toolbar': hideToolbar }, 'slider-wrapper']"
     >
       <b-container class="can-edit">
-        <b-row>
+        <b-row align-v="center">
           <b-col>
             <user-settings-button
               data-qa="user-settings-button"
             ></user-settings-button>
           </b-col>
           <template v-if="canEdit || (!showMap && hasDepth)">
-            <b-col>
-              <help-button v-if="canEdit" />
+            <b-col v-if="canEdit">
+              <help-button />
             </b-col>
-            <b-col>
-              <review-notifications v-if="canEdit && settings.submitNodesEnabled" />
+            <b-col v-if="canEdit && settings.submitNodesEnabled">
+              <review-notifications />
             </b-col>
-            <b-col>
-              <settings-modal-button
-                v-if="canEdit"
-                :max-depth="maxDepth"
-              ></settings-modal-button>
+            <b-col v-if="canEdit">
+              <settings-modal-button :max-depth="maxDepth"></settings-modal-button>
             </b-col>
           </template>
-        </b-row>
-        <b-row>
           <tapestry-depth-slider
             v-show="!showMap && hasDepth"
             @change="updateViewBox"

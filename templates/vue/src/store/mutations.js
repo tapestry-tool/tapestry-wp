@@ -162,6 +162,6 @@ export function setTapestryErrorReporting(state, isEnabled) {
 
 // theme
 
-export function addTheme(state, newTheme) {
+export function changeTheme(state, newTheme) {
   state.theme = newTheme
 }

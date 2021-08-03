@@ -22,7 +22,7 @@ export const store = {
     visibleNodes: [],
     apiError: null,
     displayErrors: false,
-    theme: {},
+    theme: "",
     userAnswers: {},
   },
   getters,
