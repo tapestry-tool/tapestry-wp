@@ -53,7 +53,7 @@
               @click="toggleConnectionInfo(connection.id, community.id)"
             >
               <p>{{ connection.name }}</p>
-              <h1>{{ connection.avatar }}</h1>
+              <img :src="getImg(connection.avatar)" />
             </button>
           </li>
         </ul>
@@ -86,6 +86,7 @@
 </template>
 
 <script>
+import Twemoji from "twemoji"
 import TapestryIcon from "@/components/common/TapestryIcon"
 import Helpers from "@/utils/Helpers"
 
@@ -175,6 +176,12 @@ export default {
     this.$nextTick(() => this.updateClickables())
   },
   methods: {
+    getImg(emoji) {
+      let result = Twemoji.parse(emoji)
+      var div = document.createElement("div")
+      div.innerHTML = result
+      return div.querySelector("img").src
+    },
     editCommunity(community) {
       this.$emit("edit-community", community)
       this.activeCommunityTooltipId = null
