@@ -28,10 +28,10 @@
               :pickerWidth="375"
               :pickerHeight="225"
               @emojiUnicodeAdded="handleEmojiSelect"
+              @emojiImgAdded="getEmojiImg"
             >
               <template v-slot:twemoji-picker-button>
-                <button :key="community.icon" class="preview">
-                  {{ community.icon }}
+                <button :key="community.icon" class="preview" v-html="emojiImg">
                 </button>
               </template>
             </twemoji-picker>
@@ -65,6 +65,7 @@
 </template>
 
 <script>
+import Twemoji from "twemoji"
 import { TwemojiPicker } from "@kevinfaguiar/vue-twemoji-picker"
 import EmojiAllData from "@kevinfaguiar/vue-twemoji-picker/emoji-data/en/emoji-all-groups.json"
 import EmojiGroups from "@kevinfaguiar/vue-twemoji-picker/emoji-data/emoji-groups.json"
@@ -90,6 +91,7 @@ export default {
       showPicker: false,
       isLoading: false,
       isInputTouched: false,
+      emojiImg: null,
     }
   },
   computed: {
@@ -175,6 +177,9 @@ export default {
     })
   },
   methods: {
+    getEmojiImg(img) {
+      this.emojiImg = img
+    },
     handleEmojiSelect(emoji) {
       this.community.icon = emoji
     },
