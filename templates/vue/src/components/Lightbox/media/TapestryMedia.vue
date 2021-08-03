@@ -163,7 +163,7 @@ export default {
 
 <style lang="scss" scoped>
 .media-wrapper {
-  color: #111;
+  color: var(--text-color);
   outline: none;
   background: #bbb;
   border-radius: 15px;
@@ -176,7 +176,7 @@ export default {
   }
 
   &-embed {
-    background: white;
+    background: var(--background-color);
   }
 }
 </style>

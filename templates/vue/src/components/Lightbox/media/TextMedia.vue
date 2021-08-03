@@ -39,7 +39,7 @@ export default {
 
 <style lang="scss" scoped>
 .article {
-  color: #111;
+  color: var(--text-color);
   padding: 1em;
   text-align: left;
   min-height: 100%;

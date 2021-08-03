@@ -169,8 +169,8 @@ export default {
   justify-content: space-between;
   width: 100%;
   min-height: 100%;
-  background: #bbb;
-  color: #111;
+  background: #bbb; /* COME HERE */
+  color: var(--text-color);
   z-index: 10;
   padding: 24px;
 

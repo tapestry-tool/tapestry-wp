@@ -84,7 +84,7 @@ const redirects = [
   },
   {
     path: `${ROOT_PATH}/user-settings`,
-    redirect: `${ROOT_PATH}/user-settings/avatar`,
+    redirect: `${ROOT_PATH}/user-settings/theme`,
   },
 ]
 

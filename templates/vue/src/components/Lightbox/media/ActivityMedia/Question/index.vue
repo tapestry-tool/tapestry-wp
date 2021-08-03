@@ -313,7 +313,7 @@ export default {
   }
 
   .loading {
-    background: #eee;
+    background: var(--background-color);
     position: absolute;
     top: 0;
     left: 0;

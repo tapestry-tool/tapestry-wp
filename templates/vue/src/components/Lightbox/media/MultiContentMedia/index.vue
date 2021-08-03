@@ -310,29 +310,28 @@ button[disabled] {
 }
 
 .title {
-  color: #111;
+  color: var(--text-color);
   margin-bottom: 1em;
 }
 
 .media-container {
-  background: #eee;
-  background-color: #eee;
-  color: #111;
+  background-color: var(--background-color);
+  color: var(--text-color);
   height: 100%;
   width: 100%;
   max-width: 150vh;
   margin: 0 auto;
   overflow: auto;
-  scrollbar-color: auto black;
+  scrollbar-color: auto var(--text-color)
   scrollbar-width: none;
 
   ::-webkit-scrollbar-track {
-    background-color: black;
+    background-color: var(--text-color);
   }
 }
 
 .nested-media-title {
-  color: #111;
+  color: var(--text-color);
   text-align: left;
   font-size: 1.75rem;
   font-weight: 500;

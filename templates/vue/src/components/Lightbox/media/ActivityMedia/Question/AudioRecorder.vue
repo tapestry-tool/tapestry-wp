@@ -245,7 +245,7 @@ export default {
 <style lang="scss" scoped>
 .recorder {
   #durationText {
-    color: #111;
+    color: var(--text-color);
   }
   h1 {
     margin-bottom: 32px;

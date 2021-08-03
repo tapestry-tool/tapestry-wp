@@ -26,7 +26,7 @@
               <i
                 v-else
                 class="fas fa-lock fa-sm title-row-icon"
-                style="color:black;"
+                style="color:var(--text-color);"
               ></i>
               {{ row.node.title }}
               <locked-content
@@ -230,7 +230,7 @@ button[disabled] {
 }
 
 .button-row {
-  color: #111;
+  color: var(--text-color);
   background: #00bfff;
   display: flex;
   align-items: center;
@@ -240,7 +240,7 @@ button[disabled] {
 
   i {
     margin-right: 8px;
-    color: #111;
+    color: var(--text-color);
   }
 
   a {
@@ -249,15 +249,15 @@ button[disabled] {
 }
 
 .button-row-trigger {
-  color: #111;
+  color: var(--text-color);
   background: none;
   width: 100%;
   text-align: left;
 }
 
 .accordion-row {
-  color: #eee;
-  background: #eee;
+  color: var(--text-color);
+  background: var(--text-color);
   border-radius: 4px;
   padding: 8px 16px;
   margin-bottom: 8px;
