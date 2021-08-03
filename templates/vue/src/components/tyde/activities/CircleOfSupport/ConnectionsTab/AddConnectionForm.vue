@@ -32,10 +32,10 @@
             :pickerWidth="375"
             :pickerHeight="225"
             @emojiUnicodeAdded="handleEmojiSelect"
+            @emojiImgAdded="getEmojiImg"
           >
             <template v-slot:twemoji-picker-button>
-              <button :key="connection.avatar" class="preview">
-                {{ connection.avatar }}
+              <button :key="connection.avatar" class="preview" v-html="emojiImg">
               </button>
             </template>
           </twemoji-picker>
@@ -88,6 +88,7 @@
 </template>
 
 <script>
+import Twemoji from "twemoji"
 import { TwemojiPicker } from "@kevinfaguiar/vue-twemoji-picker"
 import EmojiAllData from "@kevinfaguiar/vue-twemoji-picker/emoji-data/en/emoji-all-groups.json"
 import EmojiGroups from "@kevinfaguiar/vue-twemoji-picker/emoji-data/emoji-groups.json"
@@ -120,6 +121,7 @@ export default {
       showPicker: false,
       isInputTouched: false,
       showCommunityForm: false,
+      emojiImg: null,
       community: {
         name: "",
         icon: "👨‍👩‍👦",
@@ -188,8 +190,12 @@ export default {
     this.$once("hook:destroyed", () => {
       document.removeEventListener("click", handleClick)
     })
+    this.emojiImg = Twemoji.parse(this.connection.avatar)
   },
   methods: {
+    getEmojiImg(img) {
+      this.emojiImg = img
+    },
     toggleCommunity(communityId) {
       if (this.connection.communities.includes(communityId)) {
         this.connection.communities = this.connection.communities.filter(
