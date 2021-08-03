@@ -342,7 +342,8 @@ button {
 
 .preview {
   font-size: clamp(7rem, 7vw, 7rem);
-  line-height: 1;
+  line-height: 1.5;
+  margin-left: -10px;
 }
 
 .picker {
