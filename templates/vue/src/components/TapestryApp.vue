@@ -19,7 +19,6 @@ import { mapMutations, mapState } from "vuex"
 import TapestryMap from "./TapestryMap"
 import Helpers from "@/utils/Helpers"
 import { isLoggedIn, getCurrentUser, canEditTapestry } from "@/services/wp"
-import { getCurrentUser, canEditTapestry } from "@/services/wp"
 
 export default {
   components: {
