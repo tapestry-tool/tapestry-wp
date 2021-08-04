@@ -1,6 +1,7 @@
 <template>
   <b-form @submit="handleDragDropSubmit">
     <p>Drag items from the left to the right.</p>
+    <h1 class="mb-3 mt-n3">&raquo;</h1>
     <b-row align-h="between">
       <b-col cols="6">
         <bucket
@@ -55,7 +56,7 @@ export default {
       type: Object,
       required: true,
     },
-    dragDrop: {
+    question: {
       type: Object,
       required: true,
     },
@@ -70,6 +71,9 @@ export default {
     }
   },
   computed: {
+    dragDrop() {
+      return this.question.answerTypes.dragDrop
+    },
     canSubmit() {
       const toBuckets = this.getBuckets("to")
       return this.answerData.some(dataEntry => {

@@ -33,7 +33,8 @@ export default {
   },
 }
 </script>
-<style scoped>
+
+<style lang="scss" scoped>
 .bucket-container {
   background-color: #eee;
   color: #555;

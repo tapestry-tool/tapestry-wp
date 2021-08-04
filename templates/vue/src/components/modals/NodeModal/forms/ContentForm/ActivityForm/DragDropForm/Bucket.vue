@@ -8,6 +8,7 @@
   >
     <template #header>
       <b-form-input
+        ref="input"
         v-model="bucket.text"
         placeholder="Enter bucket name"
         class="side bucket-label"
@@ -75,6 +76,12 @@ export default {
     itemRemovalAllowed() {
       return this.items.length > 1
     },
+  },
+  mounted() {
+    this.$nextTick(() => {
+      let self = this
+      self.$refs.input.$el.focus()
+    })
   },
 }
 </script>

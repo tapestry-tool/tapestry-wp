@@ -150,6 +150,13 @@ $REST_API_ENDPOINTS = [
             'callback' => 'getTapestryNodeHasDraftChildren',
         ],
     ],
+    'GET_QUESTION_HAS_ANSWERS' => (object) [
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/question/hasAnswers',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => 'getQuestionHasAnswers',
+        ],
+    ],
     'POST_TAPESTRY_LINK' => (object) [
         'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/links',
         'ARGUMENTS' => [
@@ -278,13 +285,6 @@ $REST_API_ENDPOINTS = [
             'methods' => $REST_API_POST_METHOD,
             'callback' => 'optimizeTapestryNodeThumbnails',
             'permission_callback' => 'TapestryPermissions::putTapestrySettings',
-        ],
-    ],
-    'GET_QUESTION_HAS_ANSWERS' => (object) [
-        'ROUTE' => '/activity/question',
-        'ARGUMENTS' => [
-            'methods' => $REST_API_POST_METHOD,
-            'callback' => 'getQuestionHasAnswers',
         ],
     ],
 ];
@@ -1383,8 +1383,8 @@ function getTapestryContributors($request)
  */
 function getQuestionHasAnswers($request)
 {
-    $postId = $request['post_id'];
-    $nodeMetaId = $request['node_id'];
+    $postId = $request['tapestryPostId'];
+    $nodeMetaId = $request['nodeMetaId'];
     $questionId = $request['question_id'];
     $answerType = $request['answer_type'];
     

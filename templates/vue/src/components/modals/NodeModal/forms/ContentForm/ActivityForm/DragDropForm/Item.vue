@@ -13,6 +13,7 @@
     </b-form-group>
     <b-input-group>
       <b-form-input
+        ref="input"
         v-model="item.text"
         placeholder="Enter item name"
         class="item-text"
@@ -66,6 +67,12 @@ export default {
       return this.item.color ? "background-color: " + this.item.color : ""
     },
   },
+  mounted() {
+    this.$nextTick(() => {
+      let self = this
+      self.$refs.input.$el.focus()
+    })
+  },
   methods: {
     handleUploadChange(state) {
       this.$root.$emit("node-modal::uploading", state)
@@ -74,7 +81,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .item-container {
   border: solid 1px #a8a8a8;
   background-color: #e4e4e4;

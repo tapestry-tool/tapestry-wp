@@ -147,7 +147,7 @@ class TapestryUserProgress implements ITapestryUserProgress
     
         foreach($userIds as $userId) {
            $user_answer = get_user_meta($userId->ID, 'tapestry_'.$postId.'_'.$nodeMetaId.'_question_'.$questionId.'_answers', true);
-           if(array_key_exists($answerType, $user_answer) && $user_answer != '') {
+           if($user_answer != '' && is_array($user_answer) && array_key_exists($answerType, $user_answer)) {
                $hasAnswer = true;
                break;
            }

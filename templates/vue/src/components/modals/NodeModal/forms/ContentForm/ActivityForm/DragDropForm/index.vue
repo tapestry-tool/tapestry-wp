@@ -1,9 +1,17 @@
 <template>
-  <b-overlay :show="hasAnswers">
+  <b-overlay :show="hasAnswers && !override">
     <template #overlay>
-      <p class="overlay">
-        Cannot re-edit this question because a user has already answered it
-      </p>
+      <div class="overlay p-3 mx-n4">
+        <p>
+          Some users have already answered this question. Editing the drag and drop
+          might cause issues for those users at this point. It's highly recommended
+          for you to recreate the activity node and just hide this node from all
+          users from the access tab.
+        </p>
+        <b-button variant="danger" @click="override = true">
+          I understand, but still want to continue
+        </b-button>
+      </div>
     </template>
     <b-form-group class="mt-2">
       <b-form-checkbox v-model="dragDrop.useImages" data-qa="dragdrop-use-images">
@@ -17,49 +25,53 @@
         Hide Text
       </b-form-checkbox>
       <b-row class="ml-1 mt-2">
-        <b-col class="mr-2">
-          <b-row>Drag from:</b-row>
-          <b-row v-for="bucket in getBuckets('from')" :key="bucket.id">
-            <bucket
-              :bucket="bucket"
-              :items="getBucketsItems(bucket.id)"
-              :bucketRemovalAllowed="bucketRemovalEnabled.from"
-              :useImages="dragDrop.useImages"
-              @remove-item="handleRemoveItem"
-              @remove-bucket="handleRemoveBucket"
-              @add="addItem(bucket.id)"
-            />
-          </b-row>
-          <b-row>
-            <b-button
-              class="add-btn"
-              variant="primary"
-              data-qa="add-from-bucket-button"
-              @click="addBucket('from')"
-            >
-              Add bucket
-            </b-button>
-          </b-row>
+        <b-col class="pl-0">
+          <b-col>
+            <b-row>Drag from:</b-row>
+            <b-row v-for="bucket in getBuckets('from')" :key="bucket.id">
+              <bucket
+                :bucket="bucket"
+                :items="getBucketsItems(bucket.id)"
+                :bucketRemovalAllowed="bucketRemovalEnabled.from"
+                :useImages="dragDrop.useImages"
+                @remove-item="handleRemoveItem"
+                @remove-bucket="handleRemoveBucket"
+                @add="addItem(bucket.id)"
+              />
+            </b-row>
+            <b-row>
+              <b-button
+                class="add-btn"
+                variant="primary"
+                data-qa="add-from-bucket-button"
+                @click="addBucket('from')"
+              >
+                Add bucket
+              </b-button>
+            </b-row>
+          </b-col>
         </b-col>
         <b-col>
-          <b-row>Drag to:</b-row>
-          <b-row v-for="bucket in getBuckets('to')" :key="bucket.id">
-            <bucket
-              :bucket="bucket"
-              :bucketRemovalAllowed="bucketRemovalEnabled.to"
-              @remove-bucket="handleRemoveBucket"
-            />
-          </b-row>
-          <b-row>
-            <b-button
-              class="add-btn"
-              variant="primary"
-              data-qa="add-to-bucket-button"
-              @click="addBucket('to')"
-            >
-              Add bucket
-            </b-button>
-          </b-row>
+          <b-col>
+            <b-row>Drag to:</b-row>
+            <b-row v-for="bucket in getBuckets('to')" :key="bucket.id">
+              <bucket
+                :bucket="bucket"
+                :bucketRemovalAllowed="bucketRemovalEnabled.to"
+                @remove-bucket="handleRemoveBucket"
+              />
+            </b-row>
+            <b-row>
+              <b-button
+                class="add-btn"
+                variant="primary"
+                data-qa="add-to-bucket-button"
+                @click="addBucket('to')"
+              >
+                Add bucket
+              </b-button>
+            </b-row>
+          </b-col>
         </b-col>
       </b-row>
     </b-form-group>
@@ -90,7 +102,11 @@ export default {
     },
   },
   data() {
-    return { bucketRemovalEnabled: { to: false, from: false }, hasAnswers: false }
+    return {
+      bucketRemovalEnabled: { to: false, from: false },
+      hasAnswers: false,
+      override: false,
+    }
   },
   created() {
     client.questionHasAnswer(this.node.id, this.questionId, "dragDrop").then(res => {
@@ -180,13 +196,13 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .add-btn {
   margin-top: 20px;
 }
 .overlay {
+  width: 80%;
   background-color: #bdc3c7;
-  padding: 7px;
   border-radius: 10px;
 }
 </style>
