@@ -18,9 +18,9 @@
             {{ errorMessages[validationState.type] }}
           </b-form-invalid-feedback>
           <div id="emoji-picker" style="position: relative">
-            <twemoji-picker
+            <TwemojiPicker
               id="twemoji-picker"
-              :emojiData="emojiDataAll"
+              :emojiData="emojiAllData"
               :emojiGroups="emojiGroups"
               :skinsSelection="true"
               :pickerPaddingOffset="0"
@@ -28,7 +28,6 @@
               :pickerWidth="375"
               :pickerHeight="225"
               @emojiUnicodeAdded="handleEmojiSelect"
-              @emojiImgAdded="getEmojiImg"
             >
               <template v-slot:twemoji-picker-button>
                 <button
@@ -37,7 +36,7 @@
                   v-html="getEmojiImgFromUnicode(community.icon)"
                 />
               </template>
-            </twemoji-picker>
+            </TwemojiPicker>
           </div>
           <div class="controls">
             <button @click="$emit('back')">Cancel</button>
@@ -77,7 +76,7 @@ import { MAX_COMMUNITY_NAME_LENGTH } from "../cos.config"
 
 export default {
   components: {
-    "twemoji-picker": TwemojiPicker,
+    TwemojiPicker,
   },
   model: {
     prop: "community",
@@ -94,11 +93,10 @@ export default {
       showPicker: false,
       isLoading: false,
       isInputTouched: false,
-      emojiImg: null,
     }
   },
   computed: {
-    emojiDataAll() {
+    emojiAllData() {
       return EmojiAllData
     },
     emojiGroups() {
@@ -180,9 +178,6 @@ export default {
     })
   },
   methods: {
-    getEmojiImg(img) {
-      this.emojiImg = img
-    },
     getEmojiImgFromUnicode(unicode) {
       let div = document.createElement("div")
       div.textContent = unicode

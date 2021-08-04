@@ -22,21 +22,20 @@
           </b-form-invalid-feedback>
         </div>
         <div id="emoji-picker" style="position: relative">
-          <twemoji-picker
+          <TwemojiPicker
             id="twemoji-picker"
-            :emojiData="emojiDataAll"
+            :emojiData="emojiAllData"
             :emojiGroups="emojiGroups"
             :skinsSelection="true"
             :pickerPaddingOffset="0"
             pickerPlacement="top"
             @emojiUnicodeAdded="handleEmojiSelect"
-            @emojiImgAdded="getEmojiImg"
           >
             <template v-slot:twemoji-picker-button>
               <button :key="connection.avatar" class="preview" v-html="emojiImg">
               </button>
             </template>
-          </twemoji-picker>
+          </TwemojiPicker>
         </div>
         <div class="controls">
           <button @click="$emit('back')">Cancel</button>
@@ -98,7 +97,7 @@ export default {
   components: {
     AddCommunityForm,
     TapestryIcon,
-    "twemoji-picker": TwemojiPicker,
+    TwemojiPicker,
   },
   model: {
     prop: "connection",
@@ -128,7 +127,7 @@ export default {
     }
   },
   computed: {
-    emojiDataAll() {
+    emojiAllData() {
       return EmojiAllData
     },
     emojiGroups() {
@@ -190,9 +189,6 @@ export default {
     })
   },
   methods: {
-    getEmojiImg(img) {
-      this.emojiImg = img
-    },
     toggleCommunity(communityId) {
       if (this.connection.communities.includes(communityId)) {
         this.connection.communities = this.connection.communities.filter(
