@@ -8,7 +8,13 @@
       @click="toggle()"
     >
       <tapestry-icon v-if="isOpen" icon="chevron-down" />
-      <span v-else>😊</span>
+      <span v-else>
+        <img
+          height="40"
+          width="40"
+          src="https://twemoji.maxcdn.com/v/13.1.0/72x72/1f60a.png"
+        />
+      </span>
     </cos-popup-button>
     <div
       v-if="state === states.Add || state === states.Edit"

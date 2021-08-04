@@ -21,13 +21,26 @@
             {{ errorMessages[validationState.type] }}
           </b-form-invalid-feedback>
         </div>
-        <div id="emoji-picker" style="position: relative">
-          <button class="preview" @click="showPicker = !showPicker">
-            {{ connection.avatar }}
-          </button>
-          <div v-show="showPicker" class="picker" data-qa="emoji-picker">
-            <v-emoji-picker @select="handleEmojiSelect" />
-          </div>
+        <div id="emoji-picker">
+          <twemoji-picker
+            id="twemoji-picker"
+            :emojiData="emojiDataAll"
+            :emojiGroups="emojiGroups"
+            :skinsSelection="true"
+            :pickerPaddingOffset="0"
+            pickerPlacement="top"
+            :pickerWidth="375"
+            :pickerHeight="225"
+            @emojiUnicodeAdded="handleEmojiSelect"
+          >
+            <template v-slot:twemoji-picker-button>
+              <button
+                :key="connection.avatar"
+                class="preview"
+                v-html="getEmojiImgFromUnicode(connection.avatar)"
+              ></button>
+            </template>
+          </twemoji-picker>
         </div>
         <div class="controls">
           <button @click="$emit('back')">Cancel</button>
@@ -85,7 +98,10 @@
 </template>
 
 <script>
-import { VEmojiPicker } from "v-emoji-picker"
+import Twemoji from "twemoji"
+import { TwemojiPicker } from "@kevinfaguiar/vue-twemoji-picker"
+import EmojiAllData from "@kevinfaguiar/vue-twemoji-picker/emoji-data/en/emoji-all-groups.json"
+import EmojiGroups from "@kevinfaguiar/vue-twemoji-picker/emoji-data/emoji-groups.json"
 import TapestryIcon from "@/components/common/TapestryIcon"
 import AddCommunityForm from "../CommunityView/AddCommunityForm"
 import { MAX_COMMUNITIES, MAX_CONNECTION_NAME_LENGTH } from "../cos.config"
@@ -94,7 +110,7 @@ export default {
   components: {
     AddCommunityForm,
     TapestryIcon,
-    VEmojiPicker,
+    "twemoji-picker": TwemojiPicker,
   },
   model: {
     prop: "connection",
@@ -115,6 +131,7 @@ export default {
       showPicker: false,
       isInputTouched: false,
       showCommunityForm: false,
+      emojiImg: null,
       community: {
         name: "",
         icon: "👨‍👩‍👦",
@@ -123,6 +140,12 @@ export default {
     }
   },
   computed: {
+    emojiDataAll() {
+      return EmojiAllData
+    },
+    emojiGroups() {
+      return EmojiGroups
+    },
     submitLabel() {
       return this.connection.id ? "Save connection" : "Add connection"
     },
@@ -179,6 +202,11 @@ export default {
     })
   },
   methods: {
+    getEmojiImgFromUnicode(unicode) {
+      let div = document.createElement("div")
+      div.textContent = unicode
+      return Twemoji.parse(div).innerHTML
+    },
     toggleCommunity(communityId) {
       if (this.connection.communities.includes(communityId)) {
         this.connection.communities = this.connection.communities.filter(
@@ -188,9 +216,8 @@ export default {
         this.connection.communities.push(communityId)
       }
     },
-    handleEmojiSelect(event) {
-      this.connection.avatar = event.data
-      this.showPicker = false
+    handleEmojiSelect(emoji) {
+      this.connection.avatar = emoji
     },
     submitConnection() {
       this.isInputTouched = true
@@ -333,16 +360,9 @@ button {
 }
 
 .preview {
-  font-size: clamp(7rem, 10vw, 10rem);
-  line-height: 1;
-}
-
-.picker {
-  position: absolute;
-  left: calc(100% + 2rem);
-  top: 50%;
-  transform: translateY(-55%);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  font-size: clamp(4.5rem, 4.5vw, 4.5rem);
+  line-height: 1.75;
+  margin-left: -10px;
 }
 
 .controls {
@@ -370,7 +390,8 @@ button {
 </style>
 
 <style>
-.emoji.border {
-  border: none !important;
+#emoji-container > #emoji-popup .emoji-popover-inner > div > .emoji-list > span,
+#emoji-container > #emoji-popup > #emoji-popover-header > .emoji-tab {
+  font-size: 22.5px !important;
 }
 </style>

@@ -6,7 +6,7 @@
     @click="$emit('click')"
   >
     <p class="ob-connection">{{ connection.name }}</p>
-    <h1>{{ connection.avatar }}</h1>
+    <h1 v-html="getEmojiImgFromUnicode(connection.avatar)"></h1>
     <ul v-if="variant !== 'name'" class="community-list">
       <li
         v-for="community in connection.communities"
@@ -18,6 +18,7 @@
 </template>
 
 <script>
+import Twemoji from "twemoji"
 import * as d3 from "d3"
 export default {
   props: {
@@ -44,6 +45,7 @@ export default {
   data() {
     return {
       isDragging: false,
+      emojiAvatar: null,
     }
   },
   computed: {
@@ -88,6 +90,13 @@ export default {
       )
     }
   },
+  methods: {
+    getEmojiImgFromUnicode(unicode) {
+      let div = document.createElement("div")
+      div.textContent = unicode
+      return Twemoji.parse(div).innerHTML
+    },
+  },
 }
 </script>
 
@@ -114,7 +123,7 @@ export default {
     background: white;
   }
   h1 {
-    font-size: 4em;
+    font-size: 3em;
     cursor: default;
   }
   &:hover {
@@ -129,6 +138,8 @@ export default {
   flex-wrap: wrap;
   align-items: center;
   gap: 4px;
+  min-height: 16px;
+
   li {
     height: 1em;
     width: 1em;
