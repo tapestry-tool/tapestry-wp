@@ -6,7 +6,7 @@
       :is-sidebar-open="isSidebarOpen"
       data-qa="tapestry-map"
     />
-    <tapestry-main v-else ref="graph" :viewBox="viewBox" />
+    <tapestry-main v-else-if="!tydeModeEnabled" ref="graph" :viewBox="viewBox" />
   </div>
 </template>
 
@@ -18,7 +18,8 @@ import TapestryMain from "./TapestryMain"
 import { mapMutations, mapState } from "vuex"
 import TapestryMap from "./TapestryMap"
 import Helpers from "@/utils/Helpers"
-import { isLoggedIn } from "@/services/wp"
+import { isLoggedIn, getCurrentUser, canEditTapestry } from "@/services/wp"
+import { getCurrentUser, canEditTapestry } from "@/services/wp"
 
 export default {
   components: {
@@ -46,6 +47,9 @@ export default {
     avatarsEnabled() {
       return isLoggedIn() && process.env.VUE_APP_AVATARS === "TRUE"
     },
+    tydeModeEnabled() {
+      return !canEditTapestry() && this.settings.tydeModeEnabled
+    },
   },
   watch: {
     analyticsEnabled: {
@@ -70,6 +74,8 @@ export default {
       this.editNode(id)
     })
     client.recordAnalyticsEvent("app", "load", "tapestry")
+
+    this.setupTydeView()
   },
   methods: {
     ...mapMutations(["select", "unselect", "clearSelection"]),
@@ -161,6 +167,27 @@ export default {
         params: { nodeId: id, type: "edit", tab: "content" },
         query: this.$route.query,
       })
+    },
+    setupTydeView() {
+      if (this.tydeModeEnabled) {
+        /* NOTE: Opening the default Node for a specific role 
+             in fullscreen only if this role cannot edit the 
+             default node, otherwise the regular tapestry will
+             open
+        */
+
+        let userMainRole = getCurrentUser().roles[0]
+        if (!userMainRole || !(userMainRole in this.settings.tydeModeDefaultNodes)) {
+          userMainRole = "public"
+        }
+
+        const defaultNodeId = this.settings.tydeModeDefaultNodes[userMainRole]
+        this.$router.push({
+          name: names.LIGHTBOX,
+          params: { nodeId: defaultNodeId },
+          query: this.$route.query,
+        })
+      }
     },
   },
 }
