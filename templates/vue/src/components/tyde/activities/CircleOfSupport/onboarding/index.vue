@@ -14,6 +14,11 @@
       class="welcome-connections"
       @continue="handleContinue"
     />
+    <welcome-circles
+      v-if="isState('Circles.Welcome')"
+      class="welcome-circles"
+      @continue="handleContinue"
+    />
     <add-confirmation
       v-if="isState('Communities.AddMoreConfirmation')"
       @later="send(OnboardingEvents.AddLater)"
@@ -72,6 +77,7 @@
 import { interpret } from "xstate"
 import onboardingMachine, { OnboardingEvents } from "./onboardingMachine"
 import WelcomeCommunities from "./WelcomeCommunities"
+import WelcomeCircles from "./WelcomeCircles"
 import AddConfirmation from "./AddConfirmation"
 import WelcomeConnections from "./WelcomeConnections"
 import ObFinishView from "./ObFinishView"
@@ -87,6 +93,7 @@ const States = {
 export default {
   components: {
     WelcomeCommunities,
+    WelcomeCircles,
     AddConfirmation,
     WelcomeConnections,
     ObFinishView,
@@ -169,7 +176,7 @@ export default {
       if (Object.values(this.communities).length > 0) {
         startingEvent = OnboardingEvents.Continue
         if (Object.values(this.connections).length > 0) {
-          startingEvent = OnboardingEvents.Done
+          startingEvent = OnboardingEvents.CommunityOnboardingComplete
         }
       }
       this.send(startingEvent)
