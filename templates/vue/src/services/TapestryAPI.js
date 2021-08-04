@@ -270,6 +270,12 @@ class TapestryApi {
       comments,
     })
   }
+
+  async questionHasAnswer(nodeId, questionId, answerType) {
+    const url = `/tapestries/${this.postId}/nodes/${nodeId}/question/hasAnswers?question_id=${questionId}&answer_type=${answerType}`
+    const response = await this.client.get(url)
+    return response
+  }
 }
 
 export default new TapestryApi(postId)
