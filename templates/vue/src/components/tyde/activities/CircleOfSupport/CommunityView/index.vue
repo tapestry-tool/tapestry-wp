@@ -14,6 +14,7 @@
       @back="handleBack"
       @add-connection="$emit('add-connection', $event)"
       @edit-connection="handleEditConnection"
+      @delete-connection="$emit('delete-connection', $event)"
       @add-community="$emit('add-community', $event)"
     />
     <add-community-tab

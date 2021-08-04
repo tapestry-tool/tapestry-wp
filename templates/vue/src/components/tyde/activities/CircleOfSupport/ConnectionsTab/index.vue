@@ -14,6 +14,7 @@
           :communities="communities"
           @back="back"
           @submit="handleSubmit"
+          @delete="handleDelete"
           @add-community="$emit('add-community', $event)"
         />
       </b-overlay>
@@ -150,6 +151,16 @@ export default {
 
       this.isSubmitting = false
       this.resetConnection()
+      this.state = States.Home
+    },
+    async handleDelete(connectionId) {
+      this.isSubmitting = true
+
+      await client.cos.deleteConnection(connectionId)
+
+      this.$emit("delete-connection", connectionId)
+
+      this.isSubmitting = false
       this.state = States.Home
     },
     async addNewConnection() {
