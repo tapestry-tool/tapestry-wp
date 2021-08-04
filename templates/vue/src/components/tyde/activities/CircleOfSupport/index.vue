@@ -144,7 +144,7 @@ export default {
 
   border: var(--cos-border);
   height: calc(100vh - 150px);
-  width: 100vw;
+  width: 98vw;
   min-height: 250px;
   min-width: 320px;
   position: relative;

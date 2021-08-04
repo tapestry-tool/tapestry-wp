@@ -1,6 +1,12 @@
 <template>
   <div :class="['wrapper', { show: isOpen, hidden: isHidden }]">
-    <cos-popup-button style="left: 2rem" aria-label="Connections" @click="toggle">
+    <cos-popup-button
+      id="connections-tab-popup-trigger"
+      :disabled="toolTipPositioned"
+      style="left: 2rem"
+      aria-label="Connections"
+      @click="toggle()"
+    >
       <tapestry-icon v-if="isOpen" icon="chevron-down" />
       <span v-else>😊</span>
     </cos-popup-button>
@@ -36,17 +42,14 @@
 <script>
 import TapestryIcon from "@/components/common/TapestryIcon"
 import client from "@/services/TapestryAPI"
-
 import CosPopupButton from "../CosPopupButton"
 import AddConnectionForm from "./AddConnectionForm"
 import ConnectionsList from "./ConnectionsList"
-
 const States = {
   Home: 0,
   Add: 1,
-  Edit: 2,
+  Edit: 3, // Should match editing state in the community
 }
-
 export default {
   components: {
     CosPopupButton,
@@ -67,6 +70,10 @@ export default {
       type: Boolean,
       required: false,
       default: false,
+    },
+    toolTipPositioned: {
+      type: Boolean,
+      required: true,
     },
   },
   data() {
@@ -90,10 +97,15 @@ export default {
   },
   methods: {
     toggle() {
-      if (this.isOpen) {
-        this.state = States.Home
+      // FIX : Disable attribute for community-list does not work as it is a self-made component
+      if (!this.toolTipPositioned) {
+        this.$emit("toggle")
+        if (this.isOpen) {
+          this.state = States.Home
+          this.$emit("connection-closed")
+        }
+        this.isOpen = !this.isOpen
       }
-      this.isOpen = !this.isOpen
     },
     hide() {
       if (this.isOpen) {
@@ -137,10 +149,10 @@ export default {
     },
     async handleSubmit() {
       this.isSubmitting = true
-
       switch (this.state) {
         case States.Add:
           await this.addNewConnection()
+          this.$emit("connection-submitted")
           break
         case States.Edit:
           await this.updateConnection()
@@ -148,7 +160,6 @@ export default {
         default:
           break
       }
-
       this.isSubmitting = false
       this.resetConnection()
       this.state = States.Home
@@ -168,7 +179,6 @@ export default {
         name: this.connection.name,
         avatar: this.connection.avatar,
       })
-
       if (this.connection.communities.length) {
         /**
          * Add connection to community one at a time to avoid race condition where
@@ -185,21 +195,19 @@ export default {
     },
     async updateConnection() {
       const currentCommunities = this.getCommunities(this.connection.id)
-      await client.cos.updateConnection(this.connection.id, { ...this.connection })
-
+      await client.cos.updateConnection(this.connection.id, {
+        ...this.connection,
+      })
       const { additions, deletions } = this.getDifferences(
         currentCommunities.map(community => community.id),
         this.connection.communities
       )
-
       for (const addition of additions) {
         await client.cos.addConnectionToCommunity(addition, this.connection.id)
       }
-
       for (const deletion of deletions) {
         await client.cos.removeConnectionFromCommunity(deletion, this.connection.id)
       }
-
       this.$emit("edit-connection", {
         ...this.connection,
         additions,
@@ -229,28 +237,23 @@ export default {
   display: flex;
   flex-direction: column;
   z-index: 9;
-
   &.show {
     z-index: 75;
     transform: translateY(0);
   }
-
   &.hidden {
     transform: translateY(90%);
   }
 }
-
 ul {
   list-style: none;
   margin: 0;
   padding: 0;
 }
-
 .form {
   width: 100%;
   height: 100%;
 }
-
 .content-wrapper {
   background: white;
   position: relative;
