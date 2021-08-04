@@ -102,7 +102,6 @@ class CircleOfSupport
             $this->removeConnectionFromCommunity($connectionId, $key);
         }
 
-        
         unset($this->current['connections']->$connectionId);
     }
 
@@ -195,7 +194,6 @@ class CircleOfSupport
 
     public function removeConnectionFromCircle($circleIndex, $connectionId)
     {
-        
         // Check if circle exists
         if (!isset($this->current['circles'][$circleIndex])) {
             throw new TapestryError('CIRCLE_DOESNT_EXIST', sprintf('Cannot find circle with index %d', $circleIndex), 404);
@@ -205,7 +203,7 @@ class CircleOfSupport
         if (!isset($this->current['connections']->$connectionId)) {
             throw new TapestryError('CONNECTION_DOESNT_EXIST', sprintf('Cannot find connection with id %s', $connectionId), 404);
         }
-        
+
         $circle = $this->current['circles'][$circleIndex];
 
         if (count($circle) == 0) {
@@ -217,15 +215,15 @@ class CircleOfSupport
         if (!isset($index) || $index == null) {
             return;
         }
-              
+
         // This circle doesn't contain the connection
         if (!is_numeric($index)) {
             throw new TapestryError('CONNECTION_DOESNT_EXIST', sprintf("Circle %d doesn't contain connection %s", $circleIndex, $connectionId), 404);
         }
-        
+
         array_splice($circle, $index, 1);
         $this->current['circles'][$circleIndex] = $circle;
-        
+
         return $circle;
     }
 
