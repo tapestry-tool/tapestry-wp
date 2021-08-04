@@ -85,6 +85,25 @@ class CircleOfSupport
 
         return $community;
     }
+    
+    public function deleteConnection($connectionId)
+    {
+        if (!isset($this->current['connections']->$connectionId)) {
+            return;
+        }
+        for ($i=0; $i < count($this->current['circles']) ; $i++) {
+            $this->removeConnectionFromCircle($i, $connectionId);
+        }
+
+        foreach ($this->current['communities'] as $key => $value) {
+            /* removeConnectionFromCommunity checks whether the connection is
+             * inside the community
+             */
+            $this->removeConnectionFromCommunity($connectionId, $key);
+        }
+
+        unset($this->current['connections']->$connectionId);
+    }
 
     public function updateConnection($id, $connection)
     {
@@ -186,7 +205,16 @@ class CircleOfSupport
         }
 
         $circle = $this->current['circles'][$circleIndex];
+
+        if (count($circle) == 0) {
+            return;
+        }
+
         $index = array_search($connectionId, $circle);
+        
+        if (!isset($index) || $index == null) {
+            return;
+        }
 
         // This circle doesn't contain the connection
         if (!is_numeric($index)) {

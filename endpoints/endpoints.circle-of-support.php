@@ -109,4 +109,18 @@ class CircleOfSupportEndpoints
             return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
         }
     }
+
+    public static function deleteConnection($request)
+    {
+        try {
+            $connectionId = $request['connectionId'];
+            
+            $cos = new CircleOfSupport();
+            $cos->deleteConnection($connectionId);
+            $cos->save();
+            return $connectionId;
+        } catch (TapestryError $e) {
+            return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+        }
+    }
 }
