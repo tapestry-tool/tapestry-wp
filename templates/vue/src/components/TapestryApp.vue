@@ -65,7 +65,7 @@ export default {
     this.setupTydeView()
   },
   methods: {
-    ...mapMutations(["select", "unselect", "clearSelection", "setDisplayTydeMode"]),
+    ...mapMutations(["select", "unselect", "clearSelection"]),
     updateViewBox() {
       const MAX_RADIUS = 240
       const MIN_TAPESTRY_WIDTH_FACTOR = 1.5
@@ -161,9 +161,14 @@ export default {
              in fullscreen only if this role cannot edit the 
              default node, otherwise the regular tapestry will
              open
-      */
-        const userMainRole = getCurrentUser().roles[0] || "public"
-        const defaultNodeId = this.settings.tydeModeDefualtNodes[userMainRole]
+        */
+
+        let userMainRole = getCurrentUser().roles[0]
+        if (!userMainRole || !(userMainRole in this.settings.tydeModeDefaultNodes)) {
+          userMainRole = "public"
+        }
+
+        const defaultNodeId = this.settings.tydeModeDefaultNodes[userMainRole]
         this.$router.push({
           name: names.LIGHTBOX,
           params: { nodeId: defaultNodeId },
