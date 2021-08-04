@@ -32,7 +32,7 @@
             @emojiUnicodeAdded="handleEmojiSelect"
           >
             <template v-slot:twemoji-picker-button>
-              <button :key="connection.avatar" class="preview" v-html="emojiImg">
+              <button :key="connection.avatar" class="preview">
               </button>
             </template>
           </TwemojiPicker>
@@ -118,7 +118,6 @@ export default {
       showPicker: false,
       isInputTouched: false,
       showCommunityForm: false,
-      emojiImg: null,
       community: {
         name: "",
         icon: "👨‍👩‍👦",

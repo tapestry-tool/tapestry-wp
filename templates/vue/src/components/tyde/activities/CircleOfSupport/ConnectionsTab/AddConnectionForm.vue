@@ -32,7 +32,6 @@
             :pickerWidth="375"
             :pickerHeight="225"
             @emojiUnicodeAdded="handleEmojiSelect"
-            @emojiImgAdded="getEmojiImg"
           >
             <template v-slot:twemoji-picker-button>
               <button :key="connection.avatar" class="preview" v-html="emojiImg">
@@ -193,9 +192,6 @@ export default {
     this.emojiImg = Twemoji.parse(this.connection.avatar)
   },
   methods: {
-    getEmojiImg(img) {
-      this.emojiImg = img
-    },
     toggleCommunity(communityId) {
       if (this.connection.communities.includes(communityId)) {
         this.connection.communities = this.connection.communities.filter(

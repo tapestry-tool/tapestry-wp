@@ -51,7 +51,6 @@ export default {
   },
   computed: {
     connectionAvatarImg(emoji) {
-      console.log(emoji)
       return Twemoji.parse(emoji)
     },
     fontSize() {
