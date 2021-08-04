@@ -25,7 +25,7 @@
           class="community-icon"
           @click="toggleCommunityTooltip(community.id)"
         >
-        <img :src="getEmojiImgSrcFromUnicode(community.avatar)" />
+        <img height="40" width="40" :src="getEmojiImgSrcFromUnicode(community.icon)" />
         </button>
         <button
           v-if="clickables[community.id]"
@@ -53,7 +53,7 @@
               @click="toggleConnectionInfo(connection.id, community.id)"
             >
               <p>{{ connection.name }}</p>
-              <img :src="getEmojiImgSrcFromUnicode(connection.avatar)" />
+              <img height="40" width="40" :src="getEmojiImgSrcFromUnicode(connection.avatar)" />
             </button>
           </li>
         </ul>
@@ -71,7 +71,8 @@
       ref="community-tooltip"
       class="community-tooltip"
     >
-      <p>{{ activeCommunityTooltip.icon }}</p>
+      <p>{{ activeCommunityTooltip.icon }}
+      </p>
       <h1>
         {{ activeCommunityTooltip.name }}
       </h1>
