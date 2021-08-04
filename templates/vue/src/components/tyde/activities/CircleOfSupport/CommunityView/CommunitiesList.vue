@@ -24,9 +24,8 @@
           :ref="`${community.id}-icon`"
           class="community-icon"
           @click="toggleCommunityTooltip(community.id)"
-        >
-        <img height="40" width="40" :src="getEmojiImgSrcFromUnicode(community.icon)" />
-        </button>
+          v-html="getEmojiImgFromUnicode(community.icon)"
+        />
         <button
           v-if="clickables[community.id]"
           class="toggle"
@@ -53,7 +52,10 @@
               @click="toggleConnectionInfo(connection.id, community.id)"
             >
               <p>{{ connection.name }}</p>
-              <img height="40" width="40" :src="getEmojiImgSrcFromUnicode(connection.avatar)" />
+              <span
+                style="font-size: 1.5em"
+                v-html="getEmojiImgFromUnicode(connection.avatar)"
+              />
             </button>
           </li>
         </ul>
@@ -71,8 +73,6 @@
       ref="community-tooltip"
       class="community-tooltip"
     >
-      <p>{{ activeCommunityTooltip.icon }}
-      </p>
       <h1>
         {{ activeCommunityTooltip.name }}
       </h1>
@@ -176,11 +176,10 @@ export default {
     this.$nextTick(() => this.updateClickables())
   },
   methods: {
-    getEmojiImgSrcFromUnicode(unicode) {
-      let result = Twemoji.parse(unicode)
+    getEmojiImgFromUnicode(unicode) {
       let div = document.createElement("div")
-      div.innerHTML = result
-      return div.querySelector("img").src
+      div.textContent = unicode
+      return Twemoji.parse(div).innerHTML
     },
     editCommunity(community) {
       this.$emit("edit-community", community)

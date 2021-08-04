@@ -18,7 +18,7 @@
             {{ errorMessages[validationState.type] }}
           </b-form-invalid-feedback>
           <div id="emoji-picker" style="position: relative">
-            <TwemojiPicker
+            <twemoji-picker
               id="twemoji-picker"
               :emojiData="emojiAllData"
               :emojiGroups="emojiGroups"
@@ -36,7 +36,7 @@
                   v-html="getEmojiImgFromUnicode(community.icon)"
                 />
               </template>
-            </TwemojiPicker>
+            </twemoji-picker>
           </div>
           <div class="controls">
             <button @click="$emit('back')">Cancel</button>

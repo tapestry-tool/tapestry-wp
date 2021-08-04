@@ -22,7 +22,7 @@
           </b-form-invalid-feedback>
         </div>
         <div id="emoji-picker" style="position: relative">
-          <TwemojiPicker
+          <twemoji-picker
             id="twemoji-picker"
             :emojiData="emojiAllData"
             :emojiGroups="emojiGroups"
@@ -32,10 +32,13 @@
             @emojiUnicodeAdded="handleEmojiSelect"
           >
             <template v-slot:twemoji-picker-button>
-              <button :key="connection.avatar" class="preview"                   v-html="getEmojiImgFromUnicode(connection.avatar)">
-              </button>
+              <button
+                :key="connection.avatar"
+                class="preview"
+                v-html="getEmojiImgFromUnicode(connection.avatar)"
+              ></button>
             </template>
-          </TwemojiPicker>
+          </twemoji-picker>
         </div>
         <div class="controls">
           <button @click="$emit('back')">Cancel</button>
@@ -346,8 +349,8 @@ button {
 }
 
 .preview {
-  font-size: clamp(7rem, 7vw, 7rem);
-  line-height: 1.5;
+  font-size: clamp(4.5rem, 4.5vw, 4.5rem);
+  line-height: 1.75;
   margin-left: -10px;
 }
 

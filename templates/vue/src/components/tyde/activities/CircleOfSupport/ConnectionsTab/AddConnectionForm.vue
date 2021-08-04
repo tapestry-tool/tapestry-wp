@@ -34,8 +34,11 @@
             @emojiUnicodeAdded="handleEmojiSelect"
           >
             <template v-slot:twemoji-picker-button>
-              <button :key="connection.avatar" class="preview" v-html="getEmojiImgFromUnicode(connection.avatar)">
-              </button>
+              <button
+                :key="connection.avatar"
+                class="preview"
+                v-html="getEmojiImgFromUnicode(connection.avatar)"
+              ></button>
             </template>
           </twemoji-picker>
         </div>
@@ -344,8 +347,8 @@ button {
 }
 
 .preview {
-  font-size: clamp(7rem, 7vw, 7rem);
-  line-height: 1.5;
+  font-size: clamp(4.5rem, 4.5vw, 4.5rem);
+  line-height: 1.75;
   margin-left: -10px;
 }
 

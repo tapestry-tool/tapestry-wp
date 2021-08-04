@@ -97,7 +97,7 @@ export default {
       div.textContent = unicode
       return Twemoji.parse(div).innerHTML
     },
-  }
+  },
 }
 </script>
 
@@ -126,7 +126,7 @@ export default {
   }
 
   h1 {
-    font-size: 4em;
+    font-size: 3em;
     cursor: default;
   }
 
@@ -143,6 +143,7 @@ export default {
   flex-wrap: wrap;
   align-items: center;
   gap: 4px;
+  min-height: 16px;
 
   li {
     height: 1em;
