@@ -13,6 +13,12 @@
     {{ textContent[icon] }}
   </text>
   <i v-else-if="icon === 'text'" class="icon-plaintext">{{ textContent[icon] }}</i>
+  <img
+    v-else-if="icon === 'dragDrop'"
+    :src="dragDropIcon"
+    style="display:inline"
+    width="30"
+  />
   <i v-else :class="iconClass"></i>
 </template>
 
@@ -60,6 +66,9 @@ const aliases = {
  * Then doing a "Cmd + F" on the icon name. The unicode is the value of the
  * "content" attribute of that icon.
  */
+import DragDropIcon from "@/assets/icons/drag_drop.svg"
+import { data as wpData } from "@/services/wp"
+
 export default {
   name: "tapestry-icon",
   props: {
@@ -74,6 +83,9 @@ export default {
     },
   },
   computed: {
+    dragDropIcon() {
+      return `${wpData.vue_uri}/${DragDropIcon.split("dist")[1]}`
+    },
     svgClass() {
       switch (this.icon) {
         case "text":
