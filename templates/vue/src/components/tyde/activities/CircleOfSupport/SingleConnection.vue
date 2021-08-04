@@ -6,7 +6,7 @@
     @click="$emit('click')"
   >
     <p>{{ connection.name }}</p>
-    <h1 v-html="emojiAvatar"></h1>
+    <h1 v-html="getEmojiImgFromUnicode(connection.avatar)"></h1>
     <ul v-if="variant !== 'name'" class="community-list">
       <li
         v-for="community in connection.communities"
@@ -18,6 +18,7 @@
 </template>
 
 <script>
+import Twemoji from "twemoji"
 import * as d3 from "d3"
 
 export default {
@@ -90,6 +91,13 @@ export default {
       )
     }
   },
+  methods: {
+    getEmojiImgFromUnicode(unicode) {
+      let div = document.createElement("div")
+      div.textContent = unicode
+      return Twemoji.parse(div).innerHTML
+    },
+  }
 }
 </script>
 
