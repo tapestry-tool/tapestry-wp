@@ -60,19 +60,41 @@
     <div v-show="draggingConnection" ref="dragging-connection" class="draggable">
       {{ draggingConnection && draggingConnection.avatar }}
     </div>
-    <div class="user">😊</div>
+    <div>
+      <avataaars
+        v-if="hasAvatar"
+        class="user"
+        :isCircle="avatar.isCircle"
+        :circleColor="avatar.circleColor"
+        :accessoriesType="avatar.accessoriesType"
+        :clotheType="avatar.clotheType"
+        :clotheColor="avatar.clotheColor"
+        :eyebrowType="avatar.eyebrowType"
+        :eyeType="avatar.eyeType"
+        :facialHairColor="avatar.facialHairColor"
+        :facialHairType="avatar.facialHairType"
+        :graphicType="avatar.graphicType"
+        :hairColor="avatar.hairColor"
+        :mouthType="avatar.mouthType"
+        :skinColor="avatar.skinColor"
+        :topType="avatar.topType"
+        :topColor="avatar.topColor"
+      ></avataaars>
+      <div v-else class="user">😊</div>
+    </div>
   </ul>
 </template>
 
 <script>
 import Helpers from "@/utils/Helpers"
 import client from "@/services/TapestryAPI"
-
 import ConnectionsTab from "../ConnectionsTab"
 import ConnectionTooltip from "../ConnectionTooltip"
 import SingleConnection from "../SingleConnection"
 import CircleToggle from "./CircleToggle"
 import { CircleStates } from "./states"
+import Avataaars from "vuejs-avataaars"
+import { mapState } from "vuex"
 
 const CONNECTION_SPACE = 10
 const CONNECTION_OFFSET = 56
@@ -90,6 +112,7 @@ export default {
     CircleToggle,
     ConnectionTooltip,
     SingleConnection,
+    Avataaars,
   },
   model: {
     prop: "circles",
@@ -119,6 +142,7 @@ export default {
     }
   },
   computed: {
+    ...mapState(["avatar"]),
     activeConnection() {
       if (!this.activeConnectionId) {
         return {
@@ -158,6 +182,9 @@ export default {
           radius: `${radius}px`,
         }
       })
+    },
+    hasAvatar() {
+      return !(!this.avatar || Object.keys(this.avatar).length === 0)
     },
   },
   methods: {
@@ -398,6 +425,8 @@ ul {
 
 .user {
   position: absolute;
+  height: 90px;
+  width: 90px;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
