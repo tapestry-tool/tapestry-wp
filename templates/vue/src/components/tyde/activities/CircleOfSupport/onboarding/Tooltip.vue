@@ -1,7 +1,7 @@
 <template>
   <div
     ref="tooltip"
-    class="tooltip-container"
+    :class="[topLeftType ? 'top-left-tooltip-container' : 'tooltip-container']"
     :style="{ opacity: positioned ? 1 : 0 }"
   >
     <slot></slot>
@@ -11,10 +11,22 @@
 <script>
 // import Helpers from "@/utils/Helpers"
 export default {
+  props: {
+    tooltipType: {
+      type: String,
+      required: false,
+      default: "normal",
+    },
+  },
   data() {
     return {
       positioned: false,
     }
+  },
+  computed: {
+    topLeftType() {
+      return this.tooltipType === "top-left"
+    },
   },
   mounted() {
     this.positioned = true
@@ -32,6 +44,12 @@ export default {
   left: 22px;
   bottom: 95px;
 }
+
+.top-left {
+  left: 22px;
+  top: 110px;
+}
+
 .tooltip-container {
   position: absolute;
   padding: 2rem;
@@ -40,6 +58,7 @@ export default {
   border-radius: 1rem;
   z-index: 100;
 }
+
 .tooltip-container::before {
   content: "";
   position: absolute;
@@ -60,8 +79,41 @@ export default {
   border-left: 24px solid transparent;
   border-right: 24px solid transparent;
   border-top: 24px solid #bbb;
+  bottom: 24px;
+}
+
+.top-left-tooltip-container {
+  position: absolute;
+  padding: 2rem;
+  background: white;
+  border: var(--cos-border);
+  border-radius: 1rem;
+  z-index: 100;
+}
+
+.top-left-tooltip-container::before {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-left: 24px solid transparent;
+  border-right: 24px solid transparent;
+  border-top: 24px solid #fff;
+  bottom: 23px;
+  z-index: 5;
+}
+.top-left-tooltip-container::after {
+  content: "";
+  display: block;
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-left: 24px solid transparent;
+  border-right: 24px solid transparent;
+  border-top: 24px solid #bbb;
   bottom: -24px;
 }
+
 .right::before,
 .right::after {
   right: 25px;

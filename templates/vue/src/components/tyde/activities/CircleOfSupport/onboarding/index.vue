@@ -14,11 +14,11 @@
       class="welcome-connections"
       @continue="handleContinue"
     />
-    <welcome-circles
+    <!-- <welcome-circles
       v-if="isState('Circles.Welcome')"
       class="welcome-circles"
       @continue="handleContinue"
-    />
+    /> -->
     <add-confirmation
       v-if="isState('Communities.AddMoreConfirmation')"
       @later="send(OnboardingEvents.AddLater)"
@@ -66,8 +66,25 @@
       <h3 style="max-width:300px;">
         Click here to add some of your connections!
       </h3>
-      <b-button pill variant="secondary" @click="handleClick(OnboardingEvents.Add)">
+      <b-button
+        pill
+        variant="secondary"
+        @click="handleClick(OnboardingEvents.Continue)"
+      >
         Got it &#8594;
+      </b-button>
+    </tooltip>
+    <tooltip
+      v-if="isState('Circles.Welcome')"
+      class="top-left"
+      tooltipType="top-left"
+      @tooltip-positioned="$emit('tooltip-positioned')"
+    >
+      <h3 style="max-width:300px;">
+        Click here to toggle to the circle view.
+      </h3>
+      <b-button pill variant="secondary" @click="handleClick(OnboardingEvents.Add)">
+        Continue &#8594;
       </b-button>
     </tooltip>
   </div>
@@ -77,7 +94,7 @@
 import { interpret } from "xstate"
 import onboardingMachine, { OnboardingEvents } from "./onboardingMachine"
 import WelcomeCommunities from "./WelcomeCommunities"
-import WelcomeCircles from "./WelcomeCircles"
+// import WelcomeCircles from "./WelcomeCircles"
 import AddConfirmation from "./AddConfirmation"
 import WelcomeConnections from "./WelcomeConnections"
 import ObFinishView from "./ObFinishView"
@@ -93,7 +110,7 @@ const States = {
 export default {
   components: {
     WelcomeCommunities,
-    WelcomeCircles,
+    // WelcomeCircles,
     AddConfirmation,
     WelcomeConnections,
     ObFinishView,
