@@ -34,7 +34,7 @@
             @emojiUnicodeAdded="handleEmojiSelect"
           >
             <template v-slot:twemoji-picker-button>
-              <button :key="connection.avatar" class="preview" v-html="emojiImg">
+              <button :key="connection.avatar" class="preview" v-html="getEmojiImgFromUnicode(connection.avatar)">
               </button>
             </template>
           </twemoji-picker>
@@ -189,9 +189,13 @@ export default {
     this.$once("hook:destroyed", () => {
       document.removeEventListener("click", handleClick)
     })
-    this.emojiImg = Twemoji.parse(this.connection.avatar)
   },
   methods: {
+    getEmojiImgFromUnicode(unicode) {
+      let div = document.createElement("div")
+      div.textContent = unicode
+      return Twemoji.parse(div).innerHTML
+    },
     toggleCommunity(communityId) {
       if (this.connection.communities.includes(communityId)) {
         this.connection.communities = this.connection.communities.filter(

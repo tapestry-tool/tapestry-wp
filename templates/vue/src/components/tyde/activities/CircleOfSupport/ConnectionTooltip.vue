@@ -2,7 +2,7 @@
   <div :class="['connection-tooltip', { active: show }]">
     <div class="info">
       <p>{{ connection.name }}</p>
-      <h1 v-html="emojiAvatar"></h1>
+      <h1 v-html="emojiImg"></h1>
       <ul class="community-list">
         <li
           v-for="community in connection.communities"
@@ -45,9 +45,11 @@ export default {
       emojiAvatar: null,
     }
   },
-  mounted() {
-    this.emojiAvatar = Twemoji.parse(this.connection.avatar)
-  }
+  computed: {
+    emojiImg: function() {
+      return this.emojiAvatar = Twemoji.parse(this.connection.avatar)
+    },
+  },
 }
 </script>
 

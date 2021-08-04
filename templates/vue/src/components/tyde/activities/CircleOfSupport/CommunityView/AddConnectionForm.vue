@@ -32,7 +32,7 @@
             @emojiUnicodeAdded="handleEmojiSelect"
           >
             <template v-slot:twemoji-picker-button>
-              <button :key="connection.avatar" class="preview">
+              <button :key="connection.avatar" class="preview"                   v-html="getEmojiImgFromUnicode(connection.avatar)">
               </button>
             </template>
           </TwemojiPicker>
@@ -188,6 +188,11 @@ export default {
     })
   },
   methods: {
+    getEmojiImgFromUnicode(unicode) {
+      let div = document.createElement("div")
+      div.textContent = unicode
+      return Twemoji.parse(div).innerHTML
+    },
     toggleCommunity(communityId) {
       if (this.connection.communities.includes(communityId)) {
         this.connection.communities = this.connection.communities.filter(
