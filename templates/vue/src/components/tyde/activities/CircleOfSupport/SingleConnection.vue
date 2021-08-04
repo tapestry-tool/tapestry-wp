@@ -19,7 +19,6 @@
 
 <script>
 import * as d3 from "d3"
-import Twemoji from "twemoji"
 
 export default {
   props: {
@@ -50,9 +49,6 @@ export default {
     }
   },
   computed: {
-    connectionAvatarImg(emoji) {
-      return Twemoji.parse(emoji)
-    },
     fontSize() {
       const sizes = {
         sm: "0.6rem",
@@ -93,7 +89,6 @@ export default {
           })
       )
     }
-    this.emojiAvatar = Twemoji.parse(this.connection.avatar)
   },
 }
 </script>
