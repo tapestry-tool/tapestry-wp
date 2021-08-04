@@ -25,7 +25,7 @@
           class="community-icon"
           @click="toggleCommunityTooltip(community.id)"
         >
-          {{ community.icon }}
+        <img :src="getEmojiImgSrcFromUnicode(community.avatar)" />
         </button>
         <button
           v-if="clickables[community.id]"
@@ -53,7 +53,7 @@
               @click="toggleConnectionInfo(connection.id, community.id)"
             >
               <p>{{ connection.name }}</p>
-              <img :src="getImg(connection.avatar)" />
+              <img :src="getEmojiImgSrcFromUnicode(connection.avatar)" />
             </button>
           </li>
         </ul>
@@ -89,7 +89,6 @@
 import Twemoji from "twemoji"
 import TapestryIcon from "@/components/common/TapestryIcon"
 import Helpers from "@/utils/Helpers"
-
 import ConnectionTooltip from "../ConnectionTooltip"
 
 export default {
@@ -176,9 +175,9 @@ export default {
     this.$nextTick(() => this.updateClickables())
   },
   methods: {
-    getImg(emoji) {
-      let result = Twemoji.parse(emoji)
-      var div = document.createElement("div")
+    getEmojiImgSrcFromUnicode(unicode) {
+      let result = Twemoji.parse(unicode)
+      let div = document.createElement("div")
       div.innerHTML = result
       return div.querySelector("img").src
     },

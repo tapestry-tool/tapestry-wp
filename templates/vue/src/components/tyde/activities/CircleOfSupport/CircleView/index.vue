@@ -60,7 +60,7 @@
     <div v-show="draggingConnection" ref="dragging-connection" class="draggable">
       {{ draggingConnection && draggingConnection.avatar }}
     </div>
-    <div class="user">😊</div>
+    <div class="user"><img src="https://twemoji.maxcdn.com/v/13.1.0/72x72/1f60a.png"  /></div>
   </ul>
 </template>
 

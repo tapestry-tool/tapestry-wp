@@ -7,7 +7,7 @@
         @click="$emit('toggle')"
       >
         <tapestry-icon v-if="show" icon="chevron-down" />
-        <span v-else>😊</span>
+        <span v-else><img src="https://twemoji.maxcdn.com/v/13.1.0/72x72/1f60a.png" /> </span>
       </cos-popup-button>
     </template>
     <template #content>
