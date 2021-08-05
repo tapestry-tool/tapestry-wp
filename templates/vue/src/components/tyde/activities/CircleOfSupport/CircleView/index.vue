@@ -10,6 +10,7 @@
       @add-connection="$emit('add-connection', $event)"
       @edit-connection="handleEditConnection"
       @add-community="$emit('add-community', $event)"
+      @delete-connection="$emit('delete-connection', $event)"
       @drag:start="handleDragStart"
       @drag:move="handleDragMove"
       @drag:end="handleDragEnd"
@@ -57,8 +58,20 @@
       @edit="editConnection(activeConnection)"
       @close="activeConnectionId = null"
     />
-    <div v-show="draggingConnection" ref="dragging-connection" class="draggable">
-      {{ draggingConnection && draggingConnection.avatar }}
+    <div
+      v-show="draggingConnection && draggingConnection.avatar"
+      ref="dragging-connection"
+      class="draggable"
+      v-html="
+        getEmojiImgFromUnicode(draggingConnection && draggingConnection.avatar)
+      "
+    />
+    <div class="user">
+      <img
+        height="40"
+        width="40"
+        src="https://twemoji.maxcdn.com/v/13.1.0/72x72/1f60a.png"
+      />
     </div>
     <div>
       <avataaars
@@ -86,6 +99,8 @@
 </template>
 
 <script>
+import Twemoji from "twemoji"
+
 import Helpers from "@/utils/Helpers"
 import client from "@/services/TapestryAPI"
 import ConnectionsTab from "../ConnectionsTab"
@@ -193,6 +208,11 @@ export default {
         return `hsl(0, 0%, 93%)`
       }
       return "white"
+    },
+    getEmojiImgFromUnicode(unicode) {
+      let div = document.createElement("div")
+      div.textContent = unicode
+      return Twemoji.parse(div).innerHTML
     },
     handleDragStart({ x, y, connection }) {
       this.activeCircleOrig = this.activeCircle

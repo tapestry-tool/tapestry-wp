@@ -18,12 +18,25 @@
             {{ errorMessages[validationState.type] }}
           </b-form-invalid-feedback>
           <div id="emoji-picker" style="position: relative">
-            <button class="preview" @click="showPicker = !showPicker">
-              {{ community.icon }}
-            </button>
-            <div v-show="showPicker" class="picker" data-qa="emoji-picker">
-              <v-emoji-picker @select="handleChange('icon', $event.data)" />
-            </div>
+            <twemoji-picker
+              id="twemoji-picker"
+              :emojiData="emojiAllData"
+              :emojiGroups="emojiGroups"
+              :skinsSelection="true"
+              :pickerPaddingOffset="0"
+              pickerPlacement="top"
+              :pickerWidth="375"
+              :pickerHeight="225"
+              @emojiUnicodeAdded="handleEmojiSelect"
+            >
+              <template v-slot:twemoji-picker-button>
+                <button
+                  :key="community.icon"
+                  class="preview"
+                  v-html="getEmojiImgFromUnicode(community.icon)"
+                />
+              </template>
+            </twemoji-picker>
           </div>
           <div class="controls">
             <button @click="$emit('back')">Cancel</button>
@@ -54,13 +67,16 @@
 </template>
 
 <script>
-import { VEmojiPicker } from "v-emoji-picker"
+import Twemoji from "twemoji"
+import { TwemojiPicker } from "@kevinfaguiar/vue-twemoji-picker"
+import EmojiAllData from "@kevinfaguiar/vue-twemoji-picker/emoji-data/en/emoji-all-groups.json"
+import EmojiGroups from "@kevinfaguiar/vue-twemoji-picker/emoji-data/emoji-groups.json"
 import client from "@/services/TapestryAPI"
 import { MAX_COMMUNITY_NAME_LENGTH } from "../cos.config"
 
 export default {
   components: {
-    VEmojiPicker,
+    TwemojiPicker,
   },
   model: {
     prop: "community",
@@ -80,6 +96,12 @@ export default {
     }
   },
   computed: {
+    emojiAllData() {
+      return EmojiAllData
+    },
+    emojiGroups() {
+      return EmojiGroups
+    },
     colors() {
       return [
         "#FF7878",
@@ -156,6 +178,14 @@ export default {
     })
   },
   methods: {
+    getEmojiImgFromUnicode(unicode) {
+      let div = document.createElement("div")
+      div.textContent = unicode
+      return Twemoji.parse(div).innerHTML
+    },
+    handleEmojiSelect(emoji) {
+      this.community.icon = emoji
+    },
     handleChange(prop, value) {
       this.$emit("change", { ...this.community, [prop]: value })
     },
@@ -210,6 +240,10 @@ export default {
 .content {
   height: 100%;
   display: flex;
+}
+
+#popper-container {
+  transform: scale(10) !important;
 }
 
 form {
@@ -310,17 +344,9 @@ button {
 }
 
 .preview {
-  font-size: clamp(7rem, 10vw, 10rem);
-  line-height: 1;
-}
-
-.picker {
-  position: absolute;
-  left: calc(100% + 2rem);
-  top: 50%;
-  transform: translateY(-55%);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  z-index: 10;
+  font-size: 4.5rem;
+  line-height: 1.8;
+  margin-left: -10px;
 }
 
 .controls {
@@ -345,11 +371,5 @@ button {
 .submit:hover:not(:disabled) {
   background: var(--cos-color-secondary);
   color: white;
-}
-</style>
-
-<style>
-.emoji.border {
-  border: none !important;
 }
 </style>

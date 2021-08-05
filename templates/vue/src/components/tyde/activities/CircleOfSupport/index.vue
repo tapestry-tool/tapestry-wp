@@ -8,6 +8,7 @@
         :communities="cos.communities"
         @add-connection="addConnection"
         @edit-connection="editConnection"
+        @delete-connection="handleDeleteConnection"
         @add-community="addCommunity"
       />
       <circle-view
@@ -17,6 +18,7 @@
         :communities="cos.communities"
         @add-connection="addConnection"
         @edit-connection="editConnection"
+        @delete-connection="handleDeleteConnection"
         @add-community="addCommunity"
       />
       <div class="switch">
@@ -115,6 +117,20 @@ export default {
       const community = this.cos.communities[communityId]
       community.connections = community.connections.filter(id => id !== connectionId)
     },
+    async handleDeleteConnection(connectionId) {
+      delete this.cos.connections[connectionId]
+
+      Object.values(this.cos.communities).forEach(community => {
+        this.removeConnectionFromCommunity(community.id, connectionId)
+      })
+
+      const newCircles = []
+      this.cos.circles.forEach(circle => {
+        const newCircle = circle.filter(connection => connection !== connectionId)
+        newCircles.push(newCircle)
+      })
+      this.cos.circles = newCircles
+    },
   },
 }
 </script>
@@ -128,7 +144,7 @@ export default {
 
   border: var(--cos-border);
   height: calc(100vh - 150px);
-  width: 100vw;
+  width: 98vw;
   min-height: 250px;
   min-width: 320px;
   position: relative;
