@@ -7,19 +7,19 @@
     >
       <b-container class="can-edit">
         <b-row align-v="center">
-          <b-col>
+          <b-col class="p-0">
             <user-settings-button
               data-qa="user-settings-button"
             ></user-settings-button>
           </b-col>
           <template v-if="canEdit || (!showMap && hasDepth)">
-            <b-col v-if="canEdit">
+            <b-col v-if="canEdit" class="p-0">
               <help-button />
             </b-col>
-            <b-col v-if="canEdit && settings.submitNodesEnabled">
+            <b-col v-if="canEdit && settings.submitNodesEnabled" class="p-0">
               <review-notifications />
             </b-col>
-            <b-col v-if="canEdit">
+            <b-col v-if="canEdit" class="p-0">
               <settings-modal-button :max-depth="maxDepth"></settings-modal-button>
             </b-col>
           </template>

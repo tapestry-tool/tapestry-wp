@@ -7,6 +7,7 @@
         :options="options"
         :aria-describedby="ariaDescribedby"
         button-variant="outline-primary"
+        data-qa="theme-settings"
         size="lg"
         name="radio-btn-outline"
         buttons
