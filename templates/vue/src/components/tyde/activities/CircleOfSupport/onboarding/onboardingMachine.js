@@ -2,7 +2,6 @@ import { createMachine } from "xstate"
 
 export const OnboardingStates = {
   Welcome: "Welcome",
-  // CircleWelcome: "CircleWelcome",
   MoveConnections: "MoveConnections",
   AddMoreConfirmation: "AddMoreConfirmation",
   AddLaterTooltip: "AddLaterTooltip",
@@ -25,7 +24,6 @@ const Events = {
   AddAnother: "AddAnother",
   Add: "Add",
   Added: "Added",
-  // Switch: "Switch",
 }
 
 export const OnboardingEvents = Events
@@ -153,7 +151,7 @@ const onboardingMachine = createMachine({
         },
         AddMoreConfirmation: {
           on: {
-            [Events.AddAnother]: OnboardingStates.AddAnotherTooltip,
+            [Events.AddAnother]: OnboardingStates.Form,
             [Events.AddLater]: OnboardingStates.AddLaterTooltip,
           },
         },

@@ -6,6 +6,7 @@
         v-if="view === views.Community"
         :connections="cos.connections"
         :communities="cos.communities"
+        :activeView="view"
         @add-connection="addConnection"
         @edit-connection="editConnection"
         @add-community="addCommunity"
@@ -15,6 +16,7 @@
         v-model="cos.circles"
         :connections="cos.connections"
         :communities="cos.communities"
+        :activeView="view"
         @add-connection="addConnection"
         @edit-connection="editConnection"
         @add-community="addCommunity"
@@ -67,6 +69,7 @@ export default {
       },
     }
   },
+
   computed: {
     views() {
       return CosView

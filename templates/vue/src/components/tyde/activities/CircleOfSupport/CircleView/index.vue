@@ -5,14 +5,17 @@
       class="tab"
       :connections="connections"
       :communities="communities"
+      :toolTipPositioned="toolTipPositioned"
       draggable
       @back="handleBack"
-      @add-connection="$emit('add-connection', $event)"
+      @add-connection="handleConnectionOpen"
       @edit-connection="handleEditConnection"
       @add-community="$emit('add-community', $event)"
       @drag:start="handleDragStart"
       @drag:move="handleDragMove"
       @drag:end="handleDragEnd"
+      @connection-submitted="$emit('connection-submitted')"
+      @connection-closed="handleConnectionClosed"
     />
     <li
       v-for="(circle, index) in circlesWithData"
@@ -61,13 +64,21 @@
       {{ draggingConnection && draggingConnection.avatar }}
     </div>
     <div class="user">😊</div>
+    <onboarding
+      :communities="communities"
+      :connections="connections"
+      :parent-state="state"
+      :activeView="activeView"
+      @tooltip-positioned="handleToolTipPositioned"
+      @tooltip-removed="handleTooltipRemoved"
+    />
   </ul>
 </template>
 
 <script>
 import Helpers from "@/utils/Helpers"
 import client from "@/services/TapestryAPI"
-
+import OnBoarding from "../onboarding/index.vue"
 import ConnectionsTab from "../ConnectionsTab"
 import ConnectionTooltip from "../ConnectionTooltip"
 import SingleConnection from "../SingleConnection"
@@ -82,6 +93,8 @@ const OFFSET_SIZE = MIN_CIRCLE_SIZE * 0.85
 const States = {
   Home: 0,
   EditConnection: 1,
+  ConnectionClosed: 4,
+  AddConnection: 5,
 }
 
 export default {
@@ -90,6 +103,7 @@ export default {
     CircleToggle,
     ConnectionTooltip,
     SingleConnection,
+    onboarding: OnBoarding,
   },
   model: {
     prop: "circles",
@@ -108,14 +122,20 @@ export default {
       type: Array,
       required: true,
     },
+    activeView: {
+      type: Number,
+      required: true,
+    },
   },
   data() {
     return {
       activeCircle: CircleStates.All,
       activeCircleOrig: null,
       state: States.Home,
+      lastState: States.Home,
       activeConnectionId: null,
       draggingConnection: null,
+      toolTipPositioned: false,
     }
   },
   computed: {
@@ -158,6 +178,11 @@ export default {
           radius: `${radius}px`,
         }
       })
+    },
+  },
+  watch: {
+    state(_, lastState) {
+      this.lastState = lastState
     },
   },
   methods: {
@@ -318,6 +343,23 @@ export default {
           document.getElementById("cos")
         )
       )
+    },
+    handleConnectionOpen(event) {
+      this.state = States.AddConnection
+      this.$emit("add-connection", event)
+    },
+    handleConnectionClosed() {
+      if (this.state === States.ConnectionClosed) {
+        this.state === States.Home
+      } else {
+        this.state = States.ConnectionClosed
+      }
+    },
+    handleToolTipPositioned() {
+      this.toolTipPositioned = true
+    },
+    handleTooltipRemoved() {
+      this.toolTipPositioned = false
     },
   },
 }

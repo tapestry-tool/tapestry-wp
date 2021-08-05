@@ -33,6 +33,7 @@
       :communities="communities"
       :connections="connections"
       :parent-state="state"
+      :activeView="activeView"
       @tooltip-positioned="handleToolTipPositioned"
       @tooltip-removed="handleTooltipRemoved"
       @add-community="$emit('add-community', $event)"
@@ -68,6 +69,10 @@ export default {
     },
     communities: {
       type: Object,
+      required: true,
+    },
+    activeView: {
+      type: Number,
       required: true,
     },
   },
