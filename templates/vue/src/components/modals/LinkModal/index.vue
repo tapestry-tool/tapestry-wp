@@ -102,13 +102,15 @@ export default {
       this.close()
     },
     async remove() {
-      this.isLoading = true
-      await this.deleteLink({ source: this.source.id, target: this.target.id })
-      this.isLoading = false
-      if (this.isMultiContent(this.source.id)) {
-        this.source.childOrdering = this.source.childOrdering.filter(
-          id => id !== this.target.id
-        )
+      if (confirm("Are you sure you want to delete this connections?")) {
+        this.isLoading = true
+        await this.deleteLink({ source: this.source.id, target: this.target.id })
+        this.isLoading = false
+        if (this.isMultiContent(this.source.id)) {
+          this.source.childOrdering = this.source.childOrdering.filter(
+            id => id !== this.target.id
+          )
+        }
       }
       this.close()
     },
