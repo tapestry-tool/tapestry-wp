@@ -37,7 +37,12 @@
 <script>
 export default {
   name: "import-changelog",
-  props: ["changes"],
+  props: {
+    changes: {
+      type: Object,
+      required: true,
+    },
+  },
   methods: {
     confirmReload() {
       location.reload()

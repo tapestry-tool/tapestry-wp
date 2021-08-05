@@ -161,17 +161,6 @@ class TapestryApi {
     return response
   }
 
-  async getUserEntry(formId = 0) {
-    const url = `/users/entries`
-    const response = await this.client.get(url, {
-      params: {
-        post_id: this.postId,
-        form_id: formId,
-      },
-    })
-    return response.data
-  }
-
   async getSettings() {
     const tapestry = await this.getTapestry()
     return tapestry.settings
@@ -191,22 +180,9 @@ class TapestryApi {
    *
    * @return  {Object}
    */
-  async saveAudio(audio, nodeId, questionId) {
-    const url = `/tapestries/${this.postId}/nodes/${nodeId}/audio`
-    const response = await this.client.post(url, { audio, questionId })
-    return response
-  }
-
-  /**
-   * Get audio from server
-   *
-   * @param   {Number}    nodeId
-   *
-   * @return  {String}    audio       base64 data string
-   */
-  async getAudio(nodeId, questionId) {
-    const url = `/tapestries/${this.postId}/nodes/${nodeId}/audio/${questionId}`
-    const response = await this.client.get(url)
+  async saveAudio(nodeId, questionId, audio) {
+    const url = `/users/activity/audio/tapestries/${this.postId}/nodes/${nodeId}`
+    const response = await this.client.post(url, { questionId, audio })
     return response.data
   }
 
@@ -216,9 +192,9 @@ class TapestryApi {
     return response
   }
 
-  async completeQuestion(nodeId, questionId) {
-    const url = `/users/quiz?post_id=${this.postId}&node_id=${nodeId}&question_id=${questionId}`
-    const response = await this.client.post(url)
+  async completeQuestion(nodeId, questionId, answerType, answer) {
+    const url = `/users/activity?post_id=${this.postId}&node_id=${nodeId}&question_id=${questionId}`
+    const response = await this.client.post(url, { answerType, answer })
     return response
   }
 
@@ -293,6 +269,12 @@ class TapestryApi {
     return this.client.post(`/tapestries/${this.postId}/nodes/${id}/review`, {
       comments,
     })
+  }
+
+  async questionHasAnswer(nodeId, questionId, answerType) {
+    const url = `/tapestries/${this.postId}/nodes/${nodeId}/question/hasAnswers?question_id=${questionId}&answer_type=${answerType}`
+    const response = await this.client.get(url)
+    return response
   }
 }
 

@@ -231,7 +231,6 @@ export default {
         case "text":
           return "text"
         case "activity":
-        case "gravity-form":
           return "tasks"
         case "url-embed":
           return "window-maximize"
@@ -239,6 +238,8 @@ export default {
           return "bars"
         case "wp-post":
           return "post"
+        case "answer":
+          return "answer"
         default:
           return "exclamation"
       }
@@ -427,7 +428,7 @@ export default {
           name: names.APP,
           params: { nodeId: this.node.id },
           query: this.$route.query,
-          path: `/nodes/${this.node.id}`
+          path: `/nodes/${this.node.id}`,
         })
       }
     },
