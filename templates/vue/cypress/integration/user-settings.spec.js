@@ -7,10 +7,7 @@ describe("User Settings", () => {
   it(`should be able to open user settings modal and change theme settings`, () => {
     cy.store()
       .its("state.theme")
-      .then(theme => {
-        if (Object.keys(theme).length === 0) {
-          cy.get(`[aria-label="Close"]`).click()
-        }
+      .then(() => {
         cy.getByTestId("user-settings-button").click({ force: true })
 
         cy.contains(/light mode/i).click()
