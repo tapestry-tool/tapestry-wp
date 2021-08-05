@@ -3,7 +3,7 @@
     <h1 v-if="showTitle" class="external-media-title external-page-style">
       {{ node.title }}
     </h1>
-    <div class="external-media-container">
+    <div class="external-media-container w-100 h-100">
       <iframe
         v-if="node.behaviour === 'embed'"
         id="external"
@@ -13,25 +13,29 @@
         :style="'min-height:' + dimensions.height + 'px'"
         @load="$emit('load')"
       ></iframe>
-      <div v-else class="preview" :style="previewStyles">
-        <div
-          class="preview-image"
-          :style="{ 'background-image': `url(${node.typeData.linkMetadata.image})` }"
-        >
-          <a :href="node.typeData.mediaURL" target="blank"></a>
-        </div>
-        <div class="preview-content">
-          <h1>
+      <b-container v-else class="preview w-100 h-100" :style="previewStyles">
+        <b-row align-v="center" class="w-100 h-100">
+          <b-col class="w-50">
             <a :href="node.typeData.mediaURL" target="blank">
-              {{ node.typeData.linkMetadata.title }}
+              <img
+                class="preview-image"
+                :src="`${node.typeData.linkMetadata.image}`"
+              />
             </a>
-          </h1>
-          <p>{{ node.typeData.linkMetadata.description }}</p>
-          <p>
-            <a :href="node.typeData.mediaURL" target="blank">Open link</a>
-          </p>
-        </div>
-      </div>
+          </b-col>
+          <b-col class="preview-content w-50">
+            <h1>
+              <a :href="node.typeData.mediaURL" target="blank">
+                {{ node.typeData.linkMetadata.title }}
+              </a>
+            </h1>
+            <p>{{ node.typeData.linkMetadata.description }}</p>
+            <p>
+              <a :href="node.typeData.mediaURL" target="blank">Open link</a>
+            </p>
+          </b-col>
+        </b-row>
+      </b-container>
     </div>
   </div>
 </template>
@@ -90,16 +94,10 @@ export default {
 }
 
 .preview {
-  display: flex;
-  height: 100%;
-  width: 100%;
-
   .preview-image {
+    width: 100%;
     cursor: pointer;
     position: relative;
-    flex: 1;
-    width: auto;
-    min-height: 100%;
     background-size: cover;
     background-position: center;
     transition: all 0.2s ease;
@@ -118,10 +116,8 @@ export default {
   }
 
   .preview-content {
-    flex: 1;
     text-align: left;
     font-family: "Source Sans Pro", sans-serif;
-    padding: 2em;
 
     h1 {
       margin: 0;
@@ -137,7 +133,7 @@ export default {
 
     p {
       margin: 0;
-      margin-top: 1.5em;
+      margin-top: 1em;
       padding: 0;
       font-family: inherit;
     }
@@ -155,6 +151,7 @@ export default {
 }
 
 .external-media-title {
+  color: white;
   font-weight: 500;
   font-size: 1.75rem;
 
