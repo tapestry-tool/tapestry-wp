@@ -35,7 +35,7 @@
  * The `<page-menu-item>` component is a child component used in PageMenu used recursively
  * for nested navigation.
  */
-import { mapGetters, mapMutations } from "vuex"
+import { mapGetters } from "vuex"
 
 export default {
   name: "page-menu-item",
@@ -67,7 +67,6 @@ export default {
     }
   },
   computed: {
-    ...mapMutations(["updateVisibleNodes"]),
     ...mapGetters(["getDirectChildren", "getNode", "isMultiContent"]),
     rows() {
       return this.node.childOrdering
