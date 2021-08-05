@@ -224,7 +224,7 @@
           <b-form-group
             class="mt-4"
             label="Enable TYDE mode"
-            description="TO BE EDITED"
+            description="Replace Tapestry with a full-screen lightbox with TYDE tabs"
           >
             <b-form-checkbox
               v-model="tydeModeEnabled"
@@ -239,7 +239,7 @@
               <b-col class="text-capitalize">{{ role }}</b-col>
               <b-col>
                 <combobox
-                  v-model="tydeModeDefualtNodes[role]"
+                  v-model="tydeModeDefaultNodes[role]"
                   :options="nodesValues"
                   :placeholder="nodesValues[0].title"
                   item-text="title"
@@ -347,13 +347,12 @@ import { data as wpData } from "@/services/wp"
 import client from "@/services/TapestryAPI"
 import Combobox from "../common/Combobox.vue"
 
+const editorRoles = ["editor", "administrator", "author"]
 const defaultPermissions = Object.fromEntries(
   [
     "public",
     "authenticated",
-    ...Object.keys(wpData.roles).filter(
-      role => role !== "editor" && role !== "administrator" && role !== "author"
-    ),
+    ...Object.keys(wpData.roles).filter(role => !editorRoles.includes(role)),
   ].map(rowName => [rowName, ["read"]])
 )
 
@@ -395,7 +394,7 @@ export default {
       renderImages: true,
       analyticsEnabled: false,
       tydeModeEnabled: false,
-      tydeModeDefualtNodes: {},
+      tydeModeDefaultNodes: {},
       draftNodesEnabled: true,
       submitNodesEnabled: true,
       renderMap: false,
@@ -435,7 +434,10 @@ export default {
       return true
     },
     roles() {
-      return ["public", ...Object.keys(wpData.roles)]
+      return [
+        "public",
+        ...Object.keys(wpData.roles).filter(role => !editorRoles.includes(role)),
+      ]
     },
     nodesValues() {
       return Object.values(this.nodes)
@@ -478,7 +480,7 @@ export default {
         renderImages = true,
         renderMap = false,
         tydeModeEnabled = false,
-        tydeModeDefualtNodes = {},
+        tydeModeDefaultNodes = {},
         analyticsEnabled = false,
         draftNodesEnabled = true,
         submitNodesEnabled = true,
@@ -495,7 +497,7 @@ export default {
       this.renderImages = renderImages
       this.renderMap = renderMap
       this.tydeModeEnabled = tydeModeEnabled
-      this.tydeModeDefualtNodes = tydeModeDefualtNodes
+      this.tydeModeDefaultNodes = tydeModeDefaultNodes
       this.analyticsEnabled = analyticsEnabled
       this.draftNodesEnabled = draftNodesEnabled
       this.submitNodesEnabled = submitNodesEnabled
@@ -507,9 +509,9 @@ export default {
         */
       if (this.tydeModeEnabled) {
         this.roles.forEach(role => {
-          const rolesDefualtNode = this.tydeModeDefualtNodes[role]
-          if (!rolesDefualtNode || !this.nodes[rolesDefualtNode]) {
-            this.tydeModeDefualtNodes[role] = this.rootId
+          const rolesDefaultNode = this.tydeModeDefaultNodes[role]
+          if (!rolesDefaultNode || !this.nodes[rolesDefaultNode]) {
+            this.tydeModeDefaultNodes[role] = this.rootId
           }
         })
       }
@@ -526,7 +528,7 @@ export default {
         renderImages: this.renderImages,
         renderMap: this.renderMap,
         tydeModeEnabled: this.tydeModeEnabled,
-        tydeModeDefualtNodes: this.tydeModeDefualtNodes,
+        tydeModeDefaultNodes: this.tydeModeDefaultNodes,
         analyticsEnabled: this.analyticsEnabled,
         draftNodesEnabled: this.draftNodesEnabled,
         submitNodesEnabled: this.submitNodesEnabled,
