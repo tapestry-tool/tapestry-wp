@@ -66,11 +66,7 @@
       <h3 style="max-width:300px;">
         Click here to add some of your connections!
       </h3>
-      <b-button
-        pill
-        variant="secondary"
-        @click="handleClick(OnboardingEvents.Continue)"
-      >
+      <b-button pill variant="secondary" @click="handleClick(OnboardingEvents.Add)">
         Got it &#8594;
       </b-button>
     </tooltip>
@@ -206,6 +202,7 @@ export default {
     },
     handleClick(event) {
       this.send(event)
+      console.log("tooltip-clicked")
       this.$emit("tooltip-removed")
     },
   },
