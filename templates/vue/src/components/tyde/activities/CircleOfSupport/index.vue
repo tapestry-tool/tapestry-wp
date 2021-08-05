@@ -69,7 +69,6 @@ export default {
       },
     }
   },
-
   computed: {
     views() {
       return CosView
