@@ -198,6 +198,23 @@
                 Audio recorder
               </b-form-checkbox>
             </b-form-group>
+            <b-form-group>
+              <b-form-checkbox
+                v-model="question.answerTypes.dragDrop.enabled"
+                data-qa="question-answer-dragdrop"
+                switch
+              >
+                Drag and drop
+              </b-form-checkbox>
+              <div class="mt-2 pl-4 ml-2">
+                <drag-drop-form
+                  v-if="question.answerTypes.dragDrop.enabled"
+                  :node="node"
+                  :drag-drop="question.answerTypes.dragDrop"
+                  :question-id="question.id"
+                />
+              </div>
+            </b-form-group>
             <b-form-group class="mt-3">
               <b-form-checkbox
                 v-model="question.answerTypes.multipleChoice.enabled"
@@ -251,7 +268,8 @@
 import { mapState, mapGetters } from "vuex"
 import Combobox from "@/components/modals/common/Combobox"
 import Helpers from "@/utils/Helpers"
-import RichTextForm from "./RichTextForm"
+import RichTextForm from "../RichTextForm"
+import DragDropForm from "./DragDropForm"
 import MultipleChoiceForm from "./MultipleChoiceForm"
 
 const defaultQuestion = {
@@ -272,6 +290,9 @@ const defaultQuestion = {
       maxFields: 100,
     },
     audio: {
+      enabled: false,
+    },
+    dragDrop: {
       enabled: false,
     },
     multipleChoice: {
@@ -295,6 +316,7 @@ export default {
   components: {
     Combobox,
     RichTextForm,
+    DragDropForm,
     MultipleChoiceForm,
   },
   props: {

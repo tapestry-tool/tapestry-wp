@@ -71,7 +71,7 @@ if (!window.MediaRecorder) {
 }
 
 export default {
-  name: "audio-recorder",
+  name: "audio-question",
   props: {
     id: {
       type: String,
