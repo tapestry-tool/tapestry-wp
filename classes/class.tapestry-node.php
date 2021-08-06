@@ -366,6 +366,13 @@ class TapestryNode implements ITapestryNode
         return $node;
     }
 
+    public function getTypeData()
+    {
+        $node = $this->get();
+
+        return $node->typeData;
+    }
+
     public function isAvailableToUser($userId = 0)
     {
         $nodeMeta = $this->getMeta();
