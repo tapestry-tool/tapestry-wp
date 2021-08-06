@@ -1473,8 +1473,6 @@ function upload_videos_to_kaltura($request)
         }
     }
 
-    $nodes_to_upload = array();
-
     foreach($video_nodes as $node) {
 
         foreach($video_links as $original_link => $kaltura_link) {
@@ -1487,6 +1485,9 @@ function upload_videos_to_kaltura($request)
                 $node->set($typeData);
                 $node->save();
 
+                error_log($upload_folder."/".$original_link);
+
+                wp_delete_file($upload_folder."/".$original_link);
                 break;
             }
         }

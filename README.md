@@ -60,6 +60,8 @@ You may optionally set uploaded videos in Tapestry to upload to Kaltura (if you 
     ```
 The Kaltura Admininstrator Secret and Partner ID can be found by going to your Kaltura Settings > Integration tab in the Kaltura admin. The service URL is simply the main domain where your Kaltura videos are hosted on.
 
+3. On wordpress admin, open Settings->Media and make sure `Organize my uploads into month- and year-based folders` is un-checked
+
 3. Note the following wp variables as they can effect file uploading and HTTP request execution time limits in the WordPress server. This might be relevant for Kaltura and regular file upload as well.
   File: `php.ini` or `php.conf.ini`
   Variables of interest:
