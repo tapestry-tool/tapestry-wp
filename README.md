@@ -46,3 +46,36 @@ It's strongly recommended you complete this to get link previews working for the
     where `<key>` is the key you generated.
 
 If you complete these steps before running `npm run build`, you will have link previews working.
+
+### Changing videos to upload to Kaltura instead of localhost
+
+You may optionally set uploaded videos in Tapestry to upload to Kaltura (if you have access to the Kaltura platform) by following these instructions:
+
+1. In your wordpress root directory, run `composer install`. If successful, you will be able to see a `vendor` folder containing `kaltura`.
+2. Edit your Wordpress `wp-config.php` file and add the following lines right above the comment "That's all, stop editing! Happy publishing":
+    ```
+    define('KALTURA_ADMIN_SECRET', '');
+    define('KALTURA_PARTNER_ID', '');
+    define('KALTURA_SERVICE_URL', '');
+    ```
+The Kaltura Admininstrator Secret and Partner ID can be found by going to your Kaltura Settings > Integration tab in the Kaltura admin. The service URL is simply the main domain where your Kaltura videos are hosted on.
+
+3. Note the following wp variables as they can effect file uploading and HTTP request execution time limits in the WordPress server. This might be relevant for Kaltura and regular file upload as well.
+  File: `php.ini` or `php.conf.ini`
+  Variables of interest:
+    ```
+    post_max_size = 
+    upload_max_filesize =
+    max_execution_time =
+    ```
+  In case of an HTTPS/SSL error troubleshoot with the following ([source](https://stackoverflow.com/questions/28858351/php-ssl-certificate-error-unable-to-get-local-issuer-certificate)):
+    ```
+    // Download the cacert.pem file from here: https://curl.se/docs/caextract.html and move it into C:/MAMP
+    // make sure this is uncommented
+    extension=php_openssl.dll
+    // Add these configuration lines
+    [SSL]
+    curl.cainfo="C:/MAMP/cacert.pem"
+    openssl.cafile="C:/MAMP/cacert.pem"
+    ```
+You should now be able to upload videos onto Kaltura.

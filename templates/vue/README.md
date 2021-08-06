@@ -125,3 +125,4 @@ Again you can view a more comprehensive report on your browser using:
 ```
 npm run report:open
 ```
+

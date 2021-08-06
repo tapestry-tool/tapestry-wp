@@ -316,3 +316,11 @@ function tapestry_tool_log_event()
 
     wp_die();
 }
+
+
+// Kaltura
+// add_action('upload_videos_to_kalture', 'upload_videos_to_kalture');
+// function upload_videos_to_kaltura()
+// {
+//     error_log("im here");
+// }
