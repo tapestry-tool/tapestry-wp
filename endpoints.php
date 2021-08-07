@@ -358,6 +358,14 @@ $REST_API_ENDPOINTS = [
             'callback' => 'CircleOfSupportEndpoints::removeConnectionFromCircle'
         ]
     ],
+    'DELETE_COS_CONNECTION' => (object) [
+        'ROUTE' => '/activities/cos/connections/(?P<connectionId>[a-zA-Z0-9]+)',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_DELETE_METHOD,
+            'callback' => 'CircleOfSupportEndpoints::deleteConnection'
+        ]
+    ],
+    
 ];
 
 /*

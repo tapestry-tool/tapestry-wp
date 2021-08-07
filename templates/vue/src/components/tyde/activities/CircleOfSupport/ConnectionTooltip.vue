@@ -2,9 +2,7 @@
   <div :class="['connection-tooltip', { active: show }]">
     <div class="info">
       <p>{{ connection.name }}</p>
-      <h1>
-        {{ connection.avatar }}
-      </h1>
+      <h1 v-html="getEmojiImgFromUnicode(connection.avatar)"></h1>
       <ul class="community-list">
         <li
           v-for="community in connection.communities"
@@ -26,6 +24,7 @@
 
 <script>
 import TapestryIcon from "@/components/common/TapestryIcon"
+import Twemoji from "twemoji"
 
 export default {
   components: {
@@ -39,6 +38,13 @@ export default {
     show: {
       type: Boolean,
       required: true,
+    },
+  },
+  methods: {
+    getEmojiImgFromUnicode(unicode) {
+      let div = document.createElement("div")
+      div.textContent = unicode
+      return Twemoji.parse(div).innerHTML
     },
   },
 }

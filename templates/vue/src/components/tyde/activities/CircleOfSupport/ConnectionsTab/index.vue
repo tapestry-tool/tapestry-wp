@@ -8,7 +8,13 @@
       @click="toggle()"
     >
       <tapestry-icon v-if="isOpen" icon="chevron-down" />
-      <span v-else>😊</span>
+      <span v-else>
+        <img
+          height="40"
+          width="40"
+          src="https://twemoji.maxcdn.com/v/13.1.0/72x72/1f60a.png"
+        />
+      </span>
     </cos-popup-button>
     <div
       v-if="state === states.Add || state === states.Edit"
@@ -20,6 +26,7 @@
           :communities="communities"
           @back="back"
           @submit="handleSubmit"
+          @delete="handleDelete"
           @add-community="$emit('add-community', $event)"
         />
       </b-overlay>
@@ -161,6 +168,16 @@ export default {
       }
       this.isSubmitting = false
       this.resetConnection()
+      this.state = States.Home
+    },
+    async handleDelete(connectionId) {
+      this.isSubmitting = true
+
+      await client.cos.deleteConnection(connectionId)
+
+      this.$emit("delete-connection", connectionId)
+
+      this.isSubmitting = false
       this.state = States.Home
     },
     async addNewConnection() {

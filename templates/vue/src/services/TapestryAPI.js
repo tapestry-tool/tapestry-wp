@@ -319,6 +319,11 @@ class TapestryApi {
           .post(`${baseUrl}/circles/${circleIndex}`, { id: connectionId })
           .then(res => res.data)
       },
+      deleteConnection(connectionId) {
+        return client
+          .delete(`${baseUrl}/connections/${connectionId}`)
+          .then(res => res.data)
+      },
       removeConnectionFromCircle(circleIndex, connectionId) {
         return client
           .delete(`${baseUrl}/circles/${circleIndex}/connections/${connectionId}`)

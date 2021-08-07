@@ -15,6 +15,7 @@
       @back="handleBack"
       @add-connection="$emit('add-connection', $event)"
       @edit-connection="handleEditConnection"
+      @delete-connection="$emit('delete-connection', $event)"
       @add-community="$emit('add-community', $event)"
       @connection-submitted="$emit('connection-submitted')"
       @connection-closed="handleConnectionClosed"
