@@ -6,7 +6,7 @@ export const OnboardingStates = {
   AddMoreConfirmation: "AddMoreConfirmation",
   AddLaterTooltip: "AddLaterTooltip",
   AddAnotherTooltip: "AddAnotherTooltip",
-  ToggleRings: "ToggleRings",
+  ToggleRingsTooltip: "ToggleRingsTooltip",
   Form: "Form",
   FormClosed: "FormClosed",
   Finish: "Finish",
@@ -124,7 +124,6 @@ const onboardingMachine = createMachine({
       states: {
         Welcome: {
           on: {
-            // [Events.Switch]: OnboardingStates.Welcome,
             [Events.Continue]: OnboardingStates.MoveConnections,
           },
         },
@@ -157,10 +156,10 @@ const onboardingMachine = createMachine({
         },
         AddLaterTooltip: {
           on: {
-            [Events.Continue]: OnboardingStates.ToggleRings,
+            [Events.Continue]: OnboardingStates.ToggleRingsTooltip,
           },
         },
-        ToggleRings: {
+        ToggleRingsTooltip: {
           on: {
             [Events.Continue]: OnboardingStates.Finish,
           },

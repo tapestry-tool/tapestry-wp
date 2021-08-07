@@ -95,6 +95,7 @@ const States = {
   EditConnection: 1,
   ConnectionClosed: 4,
   AddConnection: 5,
+  MoveConnection: 6,
 }
 
 export default {
@@ -210,6 +211,7 @@ export default {
       this.activeCircle = this.getActiveCircle(connectionRef)
     },
     async handleDragEnd() {
+      this.state = States.MoveConnection
       clearTimeout(this.timeout)
 
       if (this.draggingConnection) {
@@ -234,9 +236,9 @@ export default {
         connectionRef.style.setProperty("--x", `0px`)
         connectionRef.style.setProperty("--y", `0px`)
         this.draggingConnection = null
-
         setTimeout(() => this.$refs.connectionsTab.show(), 300)
       } else {
+        this.state = States.MoveConnection
         this.activeCircle = this.activeCircleOrig
       }
     },

@@ -2,6 +2,9 @@
   <div
     ref="tooltip"
     class="tooltip-container"
+    :class="{
+      'on-circle-view': onCircleView,
+    }"
     :style="{ opacity: positioned ? 1 : 0 }"
   >
     <slot></slot>
@@ -10,10 +13,21 @@
 
 <script>
 export default {
+  props: {
+    activeView: {
+      type: Number,
+      required: true,
+    },
+  },
   data() {
     return {
       positioned: false,
     }
+  },
+  computed: {
+    onCircleView() {
+      return this.activeView === 1
+    },
   },
   mounted() {
     this.positioned = true
@@ -25,22 +39,12 @@ export default {
 <style scoped lang="scss">
 .right {
   right: 22px;
-  bottom: 95px;
+  top: 200px;
 }
 
 .left {
-  left: 22px;
-  bottom: 95px;
-}
-
-.top-left {
-  left: 22px;
+  left: 10px;
   top: 110px;
-}
-
-.top-right {
-  right: 22px;
-  top: 200px;
 }
 
 .tooltip-container {
@@ -59,9 +63,17 @@ export default {
   height: 0;
   border-left: 24px solid transparent;
   border-right: 24px solid transparent;
-  border-top: 24px solid #fff;
-  bottom: -23px;
+  border-bottom: 24px solid #fff;
+  top: -23px;
   z-index: 5;
+
+  &.on-circle-view {
+    border-left: 24px solid transparent;
+    border-right: 24px solid transparent;
+    border-bottom: 24px solid #bbb;
+    top: -23px;
+    z-index: 5;
+  }
 }
 
 .tooltip-container::after {
@@ -72,8 +84,15 @@ export default {
   height: 0;
   border-left: 24px solid transparent;
   border-right: 24px solid transparent;
-  border-top: 24px solid #bbb;
-  bottom: -24px;
+  border-bottom: 24px solid #bbb;
+  top: -23px;
+
+  &.on-circle-view {
+    border-left: 24px solid transparent;
+    border-right: 24px solid transparent;
+    border-bottom: 24px solid #bbb;
+    top: -23px;
+  }
 }
 
 .right::before,
