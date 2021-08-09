@@ -139,6 +139,35 @@ export async function updateNodeCoordinates(
   }
 }
 
+export async function uncompleteNode(context, { nodeId, progress }) {
+  const { commit, dispatch, getters } = context
+  try {
+    if (!wp.isLoggedIn()) {
+      const progressObj = JSON.parse(localStorage.getItem(LOCAL_PROGRESS_ID))
+      const nodeProgress = progressObj[nodeId] || {}
+      nodeProgress.completed = false
+      localStorage.setItem(LOCAL_PROGRESS_ID, JSON.stringify(progressObj))
+    } else {
+      await client.uncompleteNode(nodeId)
+    }
+    commit("updateNode", {
+      id: nodeId,
+      newNode: { completed: false },
+    })
+
+    const node = getters.getNode(nodeId)
+    if (node.mediaType !== "video") {
+      await dispatch("updateNodeProgress", {
+        id: nodeId,
+        progress: progress,
+      })
+    }
+    return unlockNodes(context)
+  } catch (error) {
+    dispatch("addApiError", error)
+  }
+}
+
 export async function completeNode(context, nodeId) {
   const { commit, dispatch, getters } = context
   try {

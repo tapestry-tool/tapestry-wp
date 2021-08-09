@@ -91,7 +91,6 @@
               <b-form-checkbox
                 v-model="question.optional"
                 :data-qa="`question-optional-checkbox`"
-                :disabled="hasAnswer(question)"
                 switch
               >
                 Optional Question
@@ -332,7 +331,7 @@ export default {
   },
   computed: {
     ...mapState(["nodes"]),
-    ...mapGetters(["getQuestion", "getAnswers"]),
+    ...mapGetters(["getQuestion"]),
   },
   watch: {
     questions(newQuestions) {
@@ -381,11 +380,6 @@ export default {
       if (!question.answerTypes.text.isMultiLine) {
         question.answerTypes.text.allowMultiple = false
       }
-    },
-    hasAnswer(question) {
-      return !question.id || !this.getQuestion(question.id)
-        ? false
-        : Object.keys(this.getAnswers(this.node.id, question.id)).length > 0
     },
   },
 }

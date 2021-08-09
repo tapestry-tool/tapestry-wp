@@ -185,6 +185,13 @@ $REST_API_ENDPOINTS = [
             'callback' => 'updateProgressByNodeId',
         ],
     ],
+    'UPDATE_TAPESTRY_USER_UNCOMPLETED' => (object) [
+        'ROUTE' => 'users/completed',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_POST_METHOD,
+            'callback' => 'uncompleteByNodeId',
+        ],
+    ],
     'UPDATE_TAPESTRY_USER_COMPLETED' => (object) [
         'ROUTE' => 'users/completed',
         'ARGUMENTS' => [
@@ -1170,6 +1177,27 @@ function updateProgressByNodeId($request)
 }
 
 /**
+ * Set node as uncompleted for the current user
+ * Example: /wp-json/tapestry-tool/v1/users/completed?post_id=44&node_id=1.
+ *
+ * @param object $request HTTP request
+ *
+ * @return null
+ */
+function uncompleteByNodeId($request)
+{
+    $postId = $request['post_id'];
+    $nodeMetaId = $request['node_id'];
+
+    try {
+        $userProgress = new TapestryUserProgress($postId, $nodeMetaId);
+        $userProgress->uncomplete();
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+/**
  * Set node as completed for the current user
  * Example: /wp-json/tapestry-tool/v1/users/completed?post_id=44&node_id=1.
  *
@@ -1403,5 +1431,4 @@ function getQuestionHasAnswers($request)
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
-    
 }

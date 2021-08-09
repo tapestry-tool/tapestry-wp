@@ -69,6 +69,17 @@ class TapestryUserProgress implements ITapestryUserProgress
     }
 
     /**
+     * Set 'completed' status of a Tapestry Node for this User to false.
+     *
+     * @return null
+     */
+    public function uncomplete()
+    {
+        $this->_checkPostId();
+        $this->_uncomplete();
+    }
+        
+    /**
      * Set 'completed' status of a Tapestry Node for this User to true.
      *
      * @return null
@@ -159,6 +170,11 @@ class TapestryUserProgress implements ITapestryUserProgress
     private function _updateUserProgress($progressValue)
     {
         update_user_meta($this->_userId, 'tapestry_'.$this->postId.'_progress_node_'.$this->nodeMetaId, $progressValue);
+    }
+
+    private function _uncomplete()
+    {
+        update_user_meta($this->_userId, 'tapestry_'.$this->postId.'_node_completed_'.$this->nodeMetaId, false);
     }
 
     private function _complete()

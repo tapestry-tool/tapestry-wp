@@ -113,7 +113,7 @@ export default {
     this.markQuestionsComplete()
   },
   methods: {
-    ...mapActions(["updateNodeProgress"]),
+    ...mapActions(["updateNodeProgress", "uncompleteNode"]),
     markQuestionsComplete() {
       for (let i = 0; i < this.questions.length; i++) {
         const currentQuestion = this.questions[i]
@@ -142,6 +142,8 @@ export default {
       this.updateNodeProgress({ id: this.node.id, progress }).then(() => {
         if (progress === 1) {
           this.$emit("complete")
+        } else {
+          this.uncompleteNode({ nodeId: this.node.id, progress: progress })
         }
       })
     },
