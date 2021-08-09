@@ -33,12 +33,12 @@
         </b-row>
         <b-collapse :id="`question-${index}-container`" visible>
           <b-card
-            sub-title="Show answer to a previous activity first"
+            sub-title="Question properties"
             bg-variant="light"
             text-variant="dark"
             class="mb-3"
           >
-            <b-form-group>
+            <b-form-group label="Show answer to a previous activity first">
               <b-form-checkbox
                 v-model="question.followUp.enabled"
                 switch
@@ -74,6 +74,11 @@
                   </p>
                 </template>
               </combobox>
+            </b-form-group>
+            <b-form-group label="Allow user to edit this answer">
+              <b-form-checkbox switch v-model="question.followUp.allowAnswerEdit">
+                {{ question.followUp.allowAnswerEdit ? "Yes" : "No" }}
+              </b-form-checkbox>
             </b-form-group>
           </b-card>
           <b-card
@@ -269,6 +274,7 @@ const defaultQuestion = {
     text: "",
     nodeId: null,
     questionId: null,
+    allowAnswerEdit: false,
   },
   answerTypes: {
     text: {
