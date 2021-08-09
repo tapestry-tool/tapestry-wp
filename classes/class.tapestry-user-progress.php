@@ -78,7 +78,7 @@ class TapestryUserProgress implements ITapestryUserProgress
         $this->_checkPostId();
         $this->_uncomplete();
     }
-        
+
     /**
      * Set 'completed' status of a Tapestry Node for this User to true.
      *
