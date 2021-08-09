@@ -2,7 +2,12 @@
   <cos-modal show>
     <b-container class="confirm">
       <b-row align-h="center" class="py-2">
-        <h2 class="ob-title">You can always add more connections or move them.</h2>
+        <h2 class="ob-title">
+          You can also delete or move connections between rings.
+        </h2>
+      </b-row>
+      <b-row align-h="center">
+        <img src="https://media.giphy.com/media/X6Qs1RYrQ1qYP3lxM0/giphy.gif" />
       </b-row>
       <b-row>
         <b-container>

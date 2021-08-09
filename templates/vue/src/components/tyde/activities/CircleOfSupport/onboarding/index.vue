@@ -93,7 +93,10 @@
       :activeView="activeView"
       @tooltip-positioned="$emit('tooltip-positioned')"
     >
-      <h3 style="max-width:300px;">
+      <h3 v-if="activeView === 1" style="max-width:300px;">
+        Click here to toggle back to the community view.
+      </h3>
+      <h3 v-else style="max-width:300px;">
         Click here to toggle to the circle view.
       </h3>
       <b-button
@@ -111,7 +114,7 @@
       @tooltip-positioned="$emit('tooltip-positioned')"
     >
       <h3 style="max-width:300px;">
-        You can add connections to the circle view from here.
+        Try adding some connections into your circle.
       </h3>
       <b-button pill variant="secondary" @click="handleClick(OnboardingEvents.Add)">
         Got it &#8594;
@@ -124,7 +127,7 @@
       @tooltip-positioned="$emit('tooltip-positioned')"
     >
       <h3 style="max-width:300px;">
-        You can toggle the rings by pressing this box here.
+        You can also toggle the circle rings by pressing this circle in this box.
       </h3>
       <b-button pill variant="secondary" @click="handleContinue">
         Continue &#8594;

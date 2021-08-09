@@ -2,14 +2,9 @@
   <cos-modal show>
     <b-container class="modal-container">
       <b-row align-h="center">
-        <h3 style="max-width:350px;">
+        <h3 style="max-width: 500px;">
           Great job! You have completed the Circle of Support onboarding!
         </h3>
-      </b-row>
-      <b-row align-h="center">
-        <h5 class="ob-secondary">
-          You'll be able to edit and add more at any time.
-        </h5>
       </b-row>
       <b-col align-self="center">
         <b-button
@@ -18,7 +13,7 @@
           class="secondary"
           @click="$emit('ob-finish')"
         >
-          Continue &#8594;
+          Finish &#8594;
         </b-button>
       </b-col>
     </b-container>

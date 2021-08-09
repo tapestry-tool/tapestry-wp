@@ -1,10 +1,7 @@
 <template>
   <div
     ref="tooltip"
-    class="tooltip-container"
-    :class="{
-      'on-circle-view': onCircleView,
-    }"
+    :class="[onCircleView ? 'on-circle-view' : 'tooltip-container']"
     :style="{ opacity: positioned ? 1 : 0 }"
   >
     <slot></slot>
@@ -64,16 +61,9 @@ export default {
   border-left: 24px solid transparent;
   border-right: 24px solid transparent;
   border-bottom: 24px solid #fff;
+  margin-left: 84px;
   top: -23px;
   z-index: 5;
-
-  &.on-circle-view {
-    border-left: 24px solid transparent;
-    border-right: 24px solid transparent;
-    border-bottom: 24px solid #bbb;
-    top: -23px;
-    z-index: 5;
-  }
 }
 
 .tooltip-container::after {
@@ -85,14 +75,41 @@ export default {
   border-left: 24px solid transparent;
   border-right: 24px solid transparent;
   border-bottom: 24px solid #bbb;
+  margin-left: 84px;
   top: -23px;
+}
 
-  &.on-circle-view {
-    border-left: 24px solid transparent;
-    border-right: 24px solid transparent;
-    border-bottom: 24px solid #bbb;
-    top: -23px;
-  }
+.on-circle-view {
+  position: absolute;
+  padding: 2rem;
+  background: white;
+  border: var(--cos-border);
+  border-radius: 1rem;
+  z-index: 100;
+}
+
+.on-circle-view::before {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-left: 24px solid transparent;
+  border-right: 24px solid transparent;
+  border-bottom: 24px solid #fff;
+  top: -23px;
+  z-index: 5;
+}
+
+.on-circle-view::after {
+  content: "";
+  display: block;
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-left: 24px solid transparent;
+  border-right: 24px solid transparent;
+  border-bottom: 24px solid #bbb;
+  top: -23px;
 }
 
 .right::before,
