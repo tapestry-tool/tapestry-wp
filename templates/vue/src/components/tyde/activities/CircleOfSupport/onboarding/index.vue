@@ -15,10 +15,7 @@
       @continue="handleContinue"
     />
     <add-confirmation
-      v-if="
-        isState('Communities.AddMoreConfirmation') ||
-          isState('Circles.AddMoreConfirmation')
-      "
+      v-if="isState('Communities.AddMoreConfirmation')"
       @later="send(OnboardingEvents.AddLater)"
       @another="send(OnboardingEvents.AddAnother)"
     />
@@ -127,7 +124,7 @@
       @tooltip-positioned="$emit('tooltip-positioned')"
     >
       <h3 style="max-width:300px;">
-        You can also toggle the circle rings by pressing this circle in this box.
+        Toggle the circle rings by pressing the circle in this box.
       </h3>
       <b-button pill variant="secondary" @click="handleContinue">
         Continue &#8594;
@@ -280,7 +277,6 @@ export default {
     },
     handleClick(event) {
       this.send(event)
-      console.log("tooltip-clicked")
       this.$emit("tooltip-removed")
     },
   },

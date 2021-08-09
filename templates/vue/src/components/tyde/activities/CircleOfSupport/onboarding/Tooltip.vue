@@ -33,16 +33,6 @@ export default {
   bottom: 95px;
 }
 
-.top-left {
-  left: 22px;
-  top: 110px;
-}
-
-.top-right {
-  right: 22px;
-  top: 200px;
-}
-
 .tooltip-container {
   position: absolute;
   padding: 2rem;
