@@ -48,6 +48,7 @@
             :node="node"
             :question="question"
             :answer="answer"
+            @skipQuestion="$emit('skipQuestion')"
             @submit="handleSubmit"
           ></component>
         </div>

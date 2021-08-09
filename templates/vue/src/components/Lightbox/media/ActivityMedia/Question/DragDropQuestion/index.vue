@@ -33,6 +33,14 @@
     </b-form-invalid-feedback>
     <p>
       <b-button
+        v-if="question.optional"
+        class="submit-btn mt-3 mx-1"
+        variant="outline-primary"
+        @click="$emit('skipQuestion')"
+      >
+        Skip
+      </b-button>
+      <b-button
         v-if="canSubmit"
         class="submit-btn mt-3"
         variant="primary"
