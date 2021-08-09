@@ -9,7 +9,7 @@ describe("Activity", () => {
       const fromBucketLabel1 = "From bucket 1"
       const toBucketLabel1 = "To bucket 1"
       const toBucketLabel2 = "To bucket 2"
-      cy.contains(/question text/i).click()
+      cy.getByTestId("question-text-0").click()
       cy.focused().type(question)
       cy.getByTestId("question-answer-dragdrop").click({ force: true })
       cy.get(".bucket-label")
@@ -64,7 +64,7 @@ describe("Activity", () => {
       const fromBucketLabel2 = "From bucket 2"
       const toBucketLabel1 = "Put red item here"
       const toBucketLabel2 = "Put blue item here"
-      cy.contains(/question text/i).click()
+      cy.getByTestId("question-text-0").click()
       cy.focused().type(question)
       cy.getByTestId("question-answer-dragdrop").click({ force: true })
       cy.get(".bucket-label")
@@ -168,7 +168,7 @@ describe("Activity", () => {
       const fromBucketLabel2 = "From bucket 2"
       const toBucketLabel1 = "Put red item here"
       const toBucketLabel2 = "Put blue item here"
-      cy.contains(/question text/i).click()
+      cy.getByTestId("question-text-0").click()
       cy.focused().type(question)
       cy.getByTestId("question-answer-dragdrop").click({ force: true })
       cy.get(".bucket-label")
