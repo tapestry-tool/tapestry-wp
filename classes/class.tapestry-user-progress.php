@@ -132,25 +132,25 @@ class TapestryUserProgress implements ITapestryUserProgress
     }
 
     /**
-     * This function checks if any user has answered a question
+     * This function checks if any user has answered a question.
      *
-     * @param string $postId 
-     * @param string $nodeMetaId 
-     * @param string $questionId 
-     * 
-     * @return boolean $hasAnswer
+     * @param string $postId
+     * @param string $nodeMetaId
+     * @param string $questionId
+     *
+     * @return bool $hasAnswer
      */
     public static function questionsHasAnyAnswer($postId, $nodeMetaId, $questionId, $answerType)
     {
-        $userIds = get_users(array('fields'=> array('ID')));
+        $userIds = get_users(['fields' => ['ID']]);
         $hasAnswer = false;
-    
-        foreach($userIds as $userId) {
-           $user_answer = get_user_meta($userId->ID, 'tapestry_'.$postId.'_'.$nodeMetaId.'_question_'.$questionId.'_answers', true);
-           if($user_answer != '' && is_array($user_answer) && array_key_exists($answerType, $user_answer)) {
-               $hasAnswer = true;
-               break;
-           }
+
+        foreach ($userIds as $userId) {
+            $user_answer = get_user_meta($userId->ID, 'tapestry_'.$postId.'_'.$nodeMetaId.'_question_'.$questionId.'_answers', true);
+            if ('' != $user_answer && is_array($user_answer) && array_key_exists($answerType, $user_answer)) {
+                $hasAnswer = true;
+                break;
+            }
         }
 
         return $hasAnswer;
