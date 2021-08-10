@@ -36,8 +36,13 @@
             <div class="community-view"></div>
           </button>
           <button
-            :class="['change-view', { active: view === views.Circle }]"
+            :class="[
+              'change-view',
+              { active: view === views.Circle },
+              { disabled: !circleViewEnabled },
+            ]"
             aria-label="Circle view"
+            :disabled="!circleViewEnabled"
             @click="view = views.Circle"
           >
             <div class="circle-view"></div>
@@ -52,7 +57,7 @@
 </template>
 
 <script>
-import { mapState } from "vuex"
+import { mapState, mapGetters } from "vuex"
 import client from "@/services/TapestryAPI"
 import { dyadLinkedUser } from "@/services/wp"
 import CommunityView from "./CommunityView"
@@ -74,12 +79,17 @@ export default {
     }
   },
   computed: {
-    ...mapState(["cos"]),
+    ...mapState(["cos", "settings"]),
+    ...mapGetters(["getNode"]),
     views() {
       return CosView
     },
     isReadOnly() {
       return !!dyadLinkedUser()
+    },
+    circleViewEnabled() {
+      const circleViewNode = this.getNode(this.settings.circleViewNode)
+      return circleViewNode ? circleViewNode && circleViewNode.completed : false
     },
   },
   methods: {
@@ -246,5 +256,12 @@ export default {
   border-radius: 50%;
   border: 2px solid var(--cos-bg-tertiary);
   background: white;
+}
+
+.disabled {
+  cursor: not-allowed;
+  background-color: #6c757d;
+  border-color: #6c757d;
+  opacity: 0.65;
 }
 </style>

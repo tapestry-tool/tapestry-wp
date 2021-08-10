@@ -2,14 +2,16 @@
   <cos-modal show @change="$emit('later')">
     <b-container class="confirm">
       <b-row align-h="center" class="py-2">
-        <h2 class="ob-title">
-          You can add connections to your circle by dragging and dropping them from
-          the connections tab into one of the circle rings.
-        </h2>
+        <h3>
+          Add connections to your circle by dragging and dropping them from the
+          connections tab into one of the circle rings.
+        </h3>
       </b-row>
-      <img src="https://media.giphy.com/media/cxcxMvNm5YgWkaMcPS/giphy.gif" />
+      <img src="https://media.giphy.com/media/jduo3uSe0KZsKL9Jbb/giphy.gif" />
       <b-row align-h="center" class="py-2">
-        <h4 class="ob-secondary">You can also add more connections at any time.</h4>
+        <h4 class="ob-secondary">
+          You can also add more connections at any time in the connections tab.
+        </h4>
       </b-row>
       <b-row>
         <b-container>

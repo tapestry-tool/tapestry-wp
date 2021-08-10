@@ -1,17 +1,17 @@
 <template>
   <cos-modal show>
-    <b-container class="confirm">
+    <b-container>
       <b-row align-h="center" class="py-2">
-        <h2 class="ob-title">
-          You can also delete or move connections between rings.
-        </h2>
+        <h3>
+          You can delete or move connections between rings.
+        </h3>
       </b-row>
       <b-row align-h="center">
-        <img src="https://media.giphy.com/media/X6Qs1RYrQ1qYP3lxM0/giphy.gif" />
+        <img src="https://media.giphy.com/media/jqY4EOoJTqBBAbGDJd/giphy.gif" />
       </b-row>
       <b-row>
         <b-container>
-          <b-row class="controls py-2">
+          <b-row class="py-2">
             <b-col>
               <b-button
                 pill
