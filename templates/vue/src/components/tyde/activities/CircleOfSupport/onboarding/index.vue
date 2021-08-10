@@ -22,7 +22,9 @@
     <ob-finish-view
       v-if="isState('Connections.Finish')"
       :connections="connections"
+      :circleViewEnabled="circleViewEnabled"
       @ob-finish="send(OnboardingEvents.Done)"
+      @continue="send(OnboardingEvents.Continue)"
     />
     <move-connections-circles
       v-if="isState('Circles.MoveConnections')"
@@ -134,6 +136,7 @@
 </template>
 
 <script>
+import { mapState, mapGetters } from "vuex"
 import { interpret } from "xstate"
 import onboardingMachine, { OnboardingEvents } from "./onboardingMachine"
 import WelcomeCommunities from "./WelcomeCommunities"
@@ -194,6 +197,14 @@ export default {
       },
       OnboardingEvents: OnboardingEvents,
     }
+  },
+  computed: {
+    ...mapState(["settings"]),
+    ...mapGetters(["getNode"]),
+    circleViewEnabled() {
+      const circleViewNode = this.getNode(this.settings.circleViewNode)
+      return circleViewNode ? circleViewNode && circleViewNode.completed : false
+    },
   },
   watch: {
     communities() {
@@ -264,7 +275,11 @@ export default {
       if (Object.values(this.communities).length > 0) {
         startingEvent = OnboardingEvents.Continue
         if (Object.values(this.connections).length > 0) {
-          startingEvent = OnboardingEvents.CommunityOnboardingComplete
+          if (this.circleViewEnabled) {
+            startingEvent = OnboardingEvents.CommunityOnboardingComplete
+          } else {
+            startingEvent = OnboardingEvents.Done
+          }
         }
       }
       this.send(startingEvent)
