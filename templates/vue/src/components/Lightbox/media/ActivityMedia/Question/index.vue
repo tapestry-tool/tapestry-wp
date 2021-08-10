@@ -1,70 +1,92 @@
 <template>
   <div class="question">
-    <button
-      v-if="formOpened && enabledAnswerTypes.length > 1"
-      class="button-nav m-auto"
-      @click="back"
-    >
-      <i class="fas fa-arrow-left"></i>
-    </button>
-    <loading v-if="submitting" label="Submitting..." />
-    <div v-else>
-      <div v-if="question.followUp.enabled" class="follow-up">
-        <div
-          v-if="previousQuestionAnswers.length"
-          class="answer-container mx-auto mb-3"
-        >
-          <h3 class="mb-4">
-            {{ question.followUp.text || "Previously, you said:" }}
-          </h3>
-          <completed-activity-media
-            v-for="previousAnswer in previousQuestionAnswers"
-            :key="previousAnswer[0]"
-            :type="previousAnswer[0]"
-            :answerData="previousAnswer[1]"
-            :question="getQuestion(question.followUp.questionId)"
-          ></completed-activity-media>
-        </div>
-        <div v-else>
-          <p>You haven't done the previous activity yet.</p>
-        </div>
-      </div>
-      <h1 class="question-title">
-        {{ question.text }}
-      </h1>
-      <b-alert
-        v-if="!isLoggedIn"
-        show
-        variant="warning"
-        class="loggedout-alert mx-auto"
+    <div v-if="summaryScreen" class="question-editable-screen">
+      <h1>{{ question.text }}</h1>
+      <h5>Your submitted answer:</h5>
+      <completed-activity-media
+        v-for="questionAnswer in questionSubmittedAnswers"
+        :key="questionAnswer[0]"
+        :type="questionAnswer[0]"
+        :answerData="questionAnswer[1]"
+        :question="getQuestion(question.id)"
+      ></completed-activity-media>
+      <br />
+      <button
+        v-if="isEditable"
+        class="btn btn-primary"
+        @click="summaryScreen = !summaryScreen"
       >
-        Please login to have your answers saved.
-      </b-alert>
-      <div class="question-body">
-        <div v-if="formOpened">
-          <component
-            :is="formType + '-question'"
-            :id="question.id"
-            :node="node"
-            :question="question"
-            :answer="answer"
-            @submit="handleSubmit"
-          ></component>
+        Edit your answer
+      </button>
+      <p v-else>Changing your answer is disabled for this question.</p>
+    </div>
+    <div v-else>
+      <button
+        v-if="formOpened && enabledAnswerTypes.length > 1"
+        class="button-nav m-auto"
+        @click="back"
+      >
+        <i class="fas fa-arrow-left"></i>
+      </button>
+      <loading v-if="submitting" label="Submitting..." />
+      <div v-else>
+        <div v-if="question.followUp.enabled" class="follow-up">
+          <div
+            v-if="previousQuestionAnswers.length"
+            class="answer-container mx-auto mb-3"
+          >
+            <h3 class="mb-4">
+              {{ question.followUp.text || "Previously, you said:" }}
+            </h3>
+            <completed-activity-media
+              v-for="previousAnswer in previousQuestionAnswers"
+              :key="previousAnswer[0]"
+              :type="previousAnswer[0]"
+              :answerData="previousAnswer[1]"
+              :question="getQuestion(question.followUp.questionId)"
+            ></completed-activity-media>
+          </div>
+          <div v-else>
+            <p>You haven't done the previous activity yet.</p>
+          </div>
         </div>
-        <div v-else class="question-answer-types">
-          <p class="question-answer-text">I want to answer with...</p>
-          <div class="button-container">
-            <answer-button
-              v-for="enabledAnswerType in enabledAnswerTypes"
-              :key="enabledAnswerType[0]"
-              class="text-capitalize"
-              :completed="isFormCompleted(enabledAnswerType[0])"
-              :icon="enabledAnswerType[0]"
-              :data-qa="`answer-button-${enabledAnswerType[0]}`"
-              @click="openForm(enabledAnswerType[0])"
-            >
-              {{ enabledAnswerType[0].replace(/([A-Z])/g, " $1").trim() }}
-            </answer-button>
+        <h1 class="question-title">
+          {{ question.text }}
+        </h1>
+        <b-alert
+          v-if="!isLoggedIn"
+          show
+          variant="warning"
+          class="loggedout-alert mx-auto"
+        >
+          Please login to have your answers saved.
+        </b-alert>
+        <div class="question-body">
+          <div v-if="formOpened">
+            <component
+              :is="formType + '-question'"
+              :id="question.id"
+              :node="node"
+              :question="question"
+              :answer="answer"
+              @submit="handleSubmit"
+            ></component>
+          </div>
+          <div v-else class="question-answer-types">
+            <p class="question-answer-text">I want to answer with...</p>
+            <div class="button-container">
+              <answer-button
+                v-for="enabledAnswerType in enabledAnswerTypes"
+                :key="enabledAnswerType[0]"
+                class="text-capitalize"
+                :completed="isFormCompleted(enabledAnswerType[0])"
+                :icon="enabledAnswerType[0]"
+                :data-qa="`answer-button-${enabledAnswerType[0]}`"
+                @click="openForm(enabledAnswerType[0])"
+              >
+                {{ enabledAnswerType[0].replace(/([A-Z])/g, " $1").trim() }}
+              </answer-button>
+            </div>
           </div>
         </div>
       </div>
@@ -109,6 +131,7 @@ export default {
     return {
       submitting: false,
       formOpened: false,
+      summaryScreen: true,
       formType: "",
       answers: {},
       prevQuestionId: null,
@@ -119,6 +142,22 @@ export default {
     ...mapState(["userAnswers"]),
     isLoggedIn() {
       return wp.isLoggedIn()
+    },
+    hasPreviousSubmission() {
+      return Object.keys(this.answers).length != 0
+    },
+    isEditable() {
+      return this.question.followUp.allowAnswerEdit
+    },
+    questionSubmittedAnswers() {
+      let result = []
+      for (const [type, answer] of Object.entries(this.answers)) {
+        let temp = []
+        temp.push(type)
+        temp.push(answer)
+        result.push(temp)
+      }
+      return result
     },
     previousQuestionAnswers() {
       if (this.question.followUp.questionId !== null) {
@@ -170,12 +209,19 @@ export default {
   },
   mounted() {
     this.openFormIfSingle()
+    if (this.hasPreviousSubmission) {
+      this.summaryScreen = true
+    }
   },
   methods: {
     ...mapActions(["completeQuestion", "saveAudio"]),
     back() {
       client.recordAnalyticsEvent("user", "back", "question", this.question.id)
       this.formOpened = false
+    },
+    closeSummary() {
+      this.summaryScreen = false
+      this.formOpened = true
     },
     openFormIfSingle() {
       if (this.enabledAnswerTypes.length === 1) {
