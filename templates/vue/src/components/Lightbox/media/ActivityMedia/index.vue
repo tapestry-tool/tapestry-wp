@@ -107,10 +107,8 @@ export default {
         this.$refs.activity.clientHeight - (this.context === "lightbox" ? 0 : 100),
     })
     this.$emit("load")
-    this.updateActivityProgress()
-  },
-  created() {
     this.markQuestionsComplete()
+    this.updateActivityProgress()
   },
   methods: {
     ...mapActions(["updateNodeProgress", "uncompleteNode"]),
@@ -139,12 +137,12 @@ export default {
       const numberCompleted = this.questions.filter(question => question.completed)
         .length
       const progress = numberCompleted / this.node.typeData.activity.questions.length
-      this.updateNodeProgress({ id: this.node.id, progress }).then(() => {
-        if (progress === 1) {
-          this.$emit("complete")
-        } else {
-          this.uncompleteNode({ nodeId: this.node.id, progress: progress })
-        }
+      this.uncompleteNode({ nodeId: this.node.id, progress: progress }).then(() => {
+        this.updateNodeProgress({ id: this.node.id, progress }).then(() => {
+          if (progress === 1) {
+            this.$emit("complete")
+          }
+        })
       })
     },
     next() {
