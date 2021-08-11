@@ -22,18 +22,13 @@ interface ITapestryUserProgress
     public function updateUserProgress($progressValue);
 
     /**
-     * Set 'completed' status of a Tapestry Node for this User to false.
+     * Sets 'completed' status of a Tapestry Node for this User.
+     *
+     * @param bool $completionValue whether the node is completed or not - true or false
      *
      * @return null
      */
-    public function uncomplete();
-
-    /**
-     * Set 'skippable' status of a Tapestry Node for this User to true.
-     *
-     * @return null
-     */
-    public function complete();
+    public function updateCompletion($completionValue);
 
     /**
      * Set the question with the given id to be marked as 'completed'.

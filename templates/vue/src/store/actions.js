@@ -80,30 +80,30 @@ export async function updateNode({ commit, dispatch, getters }, payload) {
   }
 }
 
-export async function updateLockedStatus({ commit, getters, dispatch }) {
-  try {
-    const userProgress = await client.getUserProgress()
-    for (const [nodeId, progress] of Object.entries(userProgress)) {
-      const node = getters.getNode(nodeId)
-      if (node) {
-        const { accessible, unlocked } = progress
-        if (
-          Helpers.isDifferent(
-            {
-              accessible: node.accessible,
-              unlocked: node.unlocked,
-            },
-            { accessible, unlocked }
-          )
-        ) {
-          commit("updateNode", { id: nodeId, newNode: { accessible, unlocked } })
-        }
-      }
-    }
-  } catch (error) {
-    dispatch("addApiError", error)
-  }
-}
+// export async function updateLockedStatus({ commit, getters, dispatch }) {
+//   try {
+//     const userProgress = await client.getUserProgress()
+//     for (const [nodeId, progress] of Object.entries(userProgress)) {
+//       const node = getters.getNode(nodeId)
+//       if (node) {
+//         const { accessible, unlocked } = progress
+//         if (
+//           Helpers.isDifferent(
+//             {
+//               accessible: node.accessible,
+//               unlocked: node.unlocked,
+//             },
+//             { accessible, unlocked }
+//           )
+//         ) {
+//           commit("updateNode", { id: nodeId, newNode: { accessible, unlocked } })
+//         }
+//       }
+//     }
+//   } catch (error) {
+//     dispatch("addApiError", error)
+//   }
+// }
 
 export async function updateNodeProgress({ commit, dispatch }, payload) {
   try {
@@ -139,65 +139,87 @@ export async function updateNodeCoordinates(
   }
 }
 
-export async function uncompleteNode(context, { nodeId, progress }) {
-  const { commit, dispatch, getters } = context
+// export async function completeNode(context, nodeId) {
+//   const { commit, dispatch, getters } = context
+//   try {
+//     if (!wp.isLoggedIn()) {
+//       const progressObj = JSON.parse(localStorage.getItem(LOCAL_PROGRESS_ID))
+//       const nodeProgress = progressObj[nodeId] || {}
+//       nodeProgress.completed = true
+//       localStorage.setItem(LOCAL_PROGRESS_ID, JSON.stringify(progressObj))
+//     } else {
+//       await client.completeNode(nodeId)
+//     }
+//     commit("updateNode", {
+//       id: nodeId,
+//       newNode: { completed: true },
+//     })
+
+//     const node = getters.getNode(nodeId)
+//     if (node.mediaType !== "video") {
+//       await dispatch("updateNodeProgress", {
+//         id: nodeId,
+//         progress: 1,
+//       })
+//     }
+//     return unlockNodes(context)
+//   } catch (error) {
+//     dispatch("addApiError", error)
+//   }
+// }
+
+export async function updateNodeCompletion(context, payload) {
+  const { id, completionValue } = payload
+  const { commit, dispatch } = context
   try {
     if (!wp.isLoggedIn()) {
       const progressObj = JSON.parse(localStorage.getItem(LOCAL_PROGRESS_ID))
-      const nodeProgress = progressObj[nodeId] || {}
-      nodeProgress.completed = false
-      localStorage.setItem(LOCAL_PROGRESS_ID, JSON.stringify(progressObj))
-    } else {
-      await client.uncompleteNode(nodeId)
-    }
-    commit("updateNode", {
-      id: nodeId,
-      newNode: { completed: false },
-    })
-
-    const node = getters.getNode(nodeId)
-    if (node.mediaType !== "video") {
-      await dispatch("updateNodeProgress", {
-        id: nodeId,
-        progress: progress,
-      })
-    }
-    return unlockNodes(context)
-  } catch (error) {
-    dispatch("addApiError", error)
-  }
-}
-
-export async function completeNode(context, nodeId) {
-  const { commit, dispatch, getters } = context
-  try {
-    if (!wp.isLoggedIn()) {
-      const progressObj = JSON.parse(localStorage.getItem(LOCAL_PROGRESS_ID))
-      const nodeProgress = progressObj[nodeId] || {}
+      const nodeProgress = progressObj[payload.id] || {}
       nodeProgress.completed = true
       localStorage.setItem(LOCAL_PROGRESS_ID, JSON.stringify(progressObj))
     } else {
-      await client.completeNode(nodeId)
+      await client.updateNodeCompletion(id, completionValue)
     }
     commit("updateNode", {
-      id: nodeId,
-      newNode: { completed: true },
+      id: payload.id,
+      newNode: { completed: payload.completionValue },
     })
-
-    const node = getters.getNode(nodeId)
-    if (node.mediaType !== "video") {
-      await dispatch("updateNodeProgress", {
-        id: nodeId,
-        progress: 1,
-      })
-    }
-    return unlockNodes(context)
+    return updateLockedStatus(context)
   } catch (error) {
     dispatch("addApiError", error)
   }
 }
 
-async function unlockNodes({ commit, getters, dispatch }) {
+// async function unlockNodes({ commit, getters, dispatch }) {
+//   try {
+//     const progress = await client.getUserProgress()
+//     for (const [id, nodeProgress] of Object.entries(progress)) {
+//       const currentNode = getters.getNode(id)
+//       if (
+//         currentNode &&
+//         Helpers.isDifferent(
+//           {
+//             accessible: nodeProgress.accessible,
+//             unlocked: nodeProgress.unlocked,
+//           },
+//           { accessible: currentNode.accessible, unlocked: currentNode.unlocked }
+//         )
+//       ) {
+//         const { accessible, unlocked, content, conditions } = nodeProgress
+//         const newNode = { accessible, unlocked, conditions }
+//         if (accessible) {
+//           const { typeData } = content
+//           newNode.typeData = typeData
+//         }
+//         commit("updateNode", { id, newNode })
+//       }
+//     }
+//   } catch (error) {
+//     dispatch("addApiError", error)
+//   }
+// }
+
+export async function updateLockedStatus({ commit, getters, dispatch }) {
   try {
     const progress = await client.getUserProgress()
     for (const [id, nodeProgress] of Object.entries(progress)) {
@@ -218,6 +240,7 @@ async function unlockNodes({ commit, getters, dispatch }) {
           const { typeData } = content
           newNode.typeData = typeData
         }
+        // make else condition to relock node?
         commit("updateNode", { id, newNode })
       }
     }

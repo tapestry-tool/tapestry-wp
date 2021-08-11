@@ -69,26 +69,17 @@ class TapestryUserProgress implements ITapestryUserProgress
     }
 
     /**
-     * Set 'completed' status of a Tapestry Node for this User to false.
+     * Set 'completed' status of a Tapestry Node for this User.
      *
      * @return null
      */
-    public function uncomplete()
+    public function updateCompletion($completionValue)
     {
         $this->_checkPostId();
-        $this->_uncomplete();
+        $this->_updateCompletion($completionValue);
     }
 
-    /**
-     * Set 'completed' status of a Tapestry Node for this User to true.
-     *
-     * @return null
-     */
-    public function complete()
-    {
-        $this->_checkPostId();
-        $this->_complete();
-    }
+
 
     /**
      * Set the question with the given id to be marked as 'completed'.
@@ -172,14 +163,9 @@ class TapestryUserProgress implements ITapestryUserProgress
         update_user_meta($this->_userId, 'tapestry_'.$this->postId.'_progress_node_'.$this->nodeMetaId, $progressValue);
     }
 
-    private function _uncomplete()
+    private function _updateCompletion($completionValue)
     {
-        update_user_meta($this->_userId, 'tapestry_'.$this->postId.'_node_completed_'.$this->nodeMetaId, false);
-    }
-
-    private function _complete()
-    {
-        update_user_meta($this->_userId, 'tapestry_'.$this->postId.'_node_completed_'.$this->nodeMetaId, true);
+        update_user_meta($this->_userId, 'tapestry_'.$this->postId.'_node_completed_'.$this->nodeMetaId, $completionValue);
     }
 
     private function _completeQuestion($questionId, $answerType, $answerData)

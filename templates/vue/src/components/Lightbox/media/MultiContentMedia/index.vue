@@ -162,7 +162,7 @@ export default {
   },
   methods: {
     ...mapMutations(["updateNode"]),
-    ...mapActions(["completeNode", "toggleFavourite"]),
+    ...mapActions(["updateNodeCompletion", "toggleFavourite"]),
     handleLoad(el) {
       this.$nextTick(() => {
         if (this.activeIndex >= 0) {
@@ -203,7 +203,8 @@ export default {
       return this.lockRows && this.disabledFrom >= 0 && index > this.disabledFrom
     },
     updateProgress(rowId) {
-      this.completeNode(rowId).then(() => {
+      this.updateNodeProgress({ id: rowId, progress: 1 })
+      this.updateNodeCompletion({ id: rowId, completionValue: true }).then(() => {
         if (this.rows.every(row => row.node.completed)) {
           this.$emit("complete", this.node.id)
         }

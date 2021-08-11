@@ -185,18 +185,11 @@ $REST_API_ENDPOINTS = [
             'callback' => 'updateProgressByNodeId',
         ],
     ],
-    'UPDATE_TAPESTRY_USER_UNCOMPLETED' => (object) [
+    'UPDATE_TAPESTRY_USER_COMPLETION' => (object) [
         'ROUTE' => 'users/completed',
         'ARGUMENTS' => [
             'methods' => $REST_API_POST_METHOD,
-            'callback' => 'uncompleteByNodeId',
-        ],
-    ],
-    'UPDATE_TAPESTRY_USER_COMPLETED' => (object) [
-        'ROUTE' => 'users/completed',
-        'ARGUMENTS' => [
-            'methods' => $REST_API_POST_METHOD,
-            'callback' => 'completeByNodeId',
+            'callback' => 'updateCompletionByNodeId',
         ],
     ],
     'UPDATE_TAPESTRY_USER_ACTIVITY_PROGRESS' => (object) [
@@ -1177,42 +1170,22 @@ function updateProgressByNodeId($request)
 }
 
 /**
- * Set node as uncompleted for the current user
+ * Update node completion for the current user
  * Example: /wp-json/tapestry-tool/v1/users/completed?post_id=44&node_id=1.
  *
  * @param object $request HTTP request
  *
  * @return null
  */
-function uncompleteByNodeId($request)
+function updateCompletionByNodeId($request)
 {
     $postId = $request['post_id'];
     $nodeMetaId = $request['node_id'];
+    $completionValue = $request['completion_value'];
 
     try {
         $userProgress = new TapestryUserProgress($postId, $nodeMetaId);
-        $userProgress->uncomplete();
-    } catch (TapestryError $e) {
-        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
-    }
-}
-
-/**
- * Set node as completed for the current user
- * Example: /wp-json/tapestry-tool/v1/users/completed?post_id=44&node_id=1.
- *
- * @param object $request HTTP request
- *
- * @return null
- */
-function completeByNodeId($request)
-{
-    $postId = $request['post_id'];
-    $nodeMetaId = $request['node_id'];
-
-    try {
-        $userProgress = new TapestryUserProgress($postId, $nodeMetaId);
-        $userProgress->complete();
+        $userProgress->updateCompletion($completionValue);
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }

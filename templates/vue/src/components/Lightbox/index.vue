@@ -253,9 +253,11 @@ export default {
     })
   },
   methods: {
-    ...mapActions(["completeNode"]),
+    ...mapActions(["updateNodeCompletion", "updateNodeProgress"]),
     complete(nodeId) {
-      this.completeNode(nodeId || this.nodeId)
+      const id = nodeId || this.nodeId
+      this.updateNodeProgress({ id: id, progress: 1 })
+      this.updateNodeCompletion({ id: id, completionValue: true })
     },
     handleUserClose() {
       client.recordAnalyticsEvent("user", "close", "lightbox", this.nodeId)
