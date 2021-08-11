@@ -79,8 +79,6 @@ class TapestryUserProgress implements ITapestryUserProgress
         $this->_updateCompletion($completionValue);
     }
 
-
-
     /**
      * Set the question with the given id to be marked as 'completed'.
      *
