@@ -13,6 +13,7 @@
       <loading v-if="loading" style="height: 400px;"></loading>
       <iframe
         v-show="!loading"
+        class="help-modal-iframe"
         height="400px"
         width="100%"
         src="https://tapestry-tool.com/guide/"
@@ -72,7 +73,7 @@ export default {
 </script>
 
 <style>
-iframe {
+iframe .help-modal-iframe {
   border: none;
   min-height: 70vh;
 }
