@@ -4,7 +4,7 @@
       class="embed-responsive-item"
       :video-id="node.typeData.youtubeID"
       :player-width="dimensions.width - 15"
-      :player-height="dimensions.height - 40"
+      :player-height="dimensions.height"
       :player-vars="{
         autoplay: autoplay ? 1 : 0,
         playsinline: 1,
@@ -254,7 +254,6 @@ export default {
 
 <style lang="scss" scoped>
 .embed-responsive {
-  max-height: calc(100vh - 120px);
   height: 100%;
 }
 
