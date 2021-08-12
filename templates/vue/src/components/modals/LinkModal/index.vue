@@ -102,7 +102,7 @@ export default {
       this.close()
     },
     async remove() {
-      if (confirm("Are you sure you want to delete this connections?")) {
+      if (confirm("Are you sure you want to delete this link?")) {
         this.isLoading = true
         await this.deleteLink({ source: this.source.id, target: this.target.id })
         this.isLoading = false

@@ -23,7 +23,7 @@ describe("Link Authoring", () => {
           .then(() => {
             expect(stub).to.be.called
             expect(stub.getCall(0).lastArg).to.match(
-              /are you sure you want to delete this connections?/i
+              /are you sure you want to delete this link?/i
             )
           })
 
@@ -100,7 +100,7 @@ describe("Link Authoring", () => {
           .then(() => {
             expect(stub).to.be.called
             expect(stub.getCall(0).lastArg).to.match(
-              /are you sure you want to delete this connections?/i
+              /are you sure you want to delete this link?/i
             )
           })
         cy.openLightbox(root.id)
