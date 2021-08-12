@@ -1390,140 +1390,140 @@ function getTapestryContributors($request)
  *
  * @param object $request HTTP request
  */
-function getQuestionHasAnswers($request)
-{
-    $postId = $request['tapestryPostId'];
-    $nodeMetaId = $request['nodeMetaId'];
-    $questionId = $request['question_id'];
-    $answerType = $request['answer_type'];
+// function getQuestionHasAnswers($request)
+// {
+//     $postId = $request['tapestryPostId'];
+//     $nodeMetaId = $request['nodeMetaId'];
+//     $questionId = $request['question_id'];
+//     $answerType = $request['answer_type'];
     
-    try {
-        if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
-            throw new TapestryError('INVALID_POST_ID');
-        }
-        if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
-            throw new TapestryError('INVALID_NODE_META_ID');
-        }
-        if (!TapestryHelpers::userIsAllowed('EDIT', $nodeMetaId, $postId)) {
-            throw new TapestryError('EDIT_NODE_PERMISSION_DENIED');
-        }
+//     try {
+//         if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
+//             throw new TapestryError('INVALID_POST_ID');
+//         }
+//         if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
+//             throw new TapestryError('INVALID_NODE_META_ID');
+//         }
+//         if (!TapestryHelpers::userIsAllowed('EDIT', $nodeMetaId, $postId)) {
+//             throw new TapestryError('EDIT_NODE_PERMISSION_DENIED');
+//         }
 
-        return TapestryUserProgress::questionsHasAnyAnswer($postId, $nodeMetaId, $questionId, $answerType);
-    } catch (TapestryError $e) {
-        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
-    }
+//         return TapestryUserProgress::questionsHasAnyAnswer($postId, $nodeMetaId, $questionId, $answerType);
+//     } catch (TapestryError $e) {
+//         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+//     }
     
-}
+// }
 
-// URL - http://localhost:8000/wp-json/tapestry-tool/v1/kaltura
-function upload_videos_to_kaltura($request)
-{
-    if (LOAD_KALTURA) {
-        $upload_folder = getcwd()."/wp-content/uploads";
-        $htaccess_file = getcwd()."/.htaccess";
+// // URL - http://localhost:8000/wp-json/tapestry-tool/v1/kaltura
+// function upload_videos_to_kaltura($request)
+// {
+//     if (LOAD_KALTURA) {
+//         $upload_folder = getcwd()."/wp-content/uploads";
+//         $htaccess_file = getcwd()."/.htaccess";
     
-        $files_in_upload_folder = scandir($upload_folder);
-        $current_date = date('Y/m/d');
+//         $files_in_upload_folder = scandir($upload_folder);
+//         $current_date = date('Y/m/d');
     
 
-        // Clean .htaccess file from previous redirect entries
-        $htaccess_lines = explode("\n", file_get_contents($htaccess_file));
-        $delete = false;
+//         // Clean .htaccess file from previous redirect entries
+//         $htaccess_lines = explode("\n", file_get_contents($htaccess_file));
+//         $delete = false;
     
-        foreach ($htaccess_lines as $index => $line) {
-            preg_match_all('/\d{4}\/\d{2}\/\d{2}/', $line, $matches);
+//         foreach ($htaccess_lines as $index => $line) {
+//             preg_match_all('/\d{4}\/\d{2}\/\d{2}/', $line, $matches);
 
-            if (count($matches[0]) && strtotime($matches[0][0]) !== $current_date) {
-                if (strpos($line, "START")) {
-                    $delete = true;
-                } elseif (strpos($line, "END")) {
-                    $delete = false;
-                }
-                unset($htaccess_lines[$index]);
-            } else {
-                if ($delete) {
-                    unset($htaccess_lines[$index]);
-                }
-            }
-        }
+//             if (count($matches[0]) && strtotime($matches[0][0]) !== $current_date) {
+//                 if (strpos($line, "START")) {
+//                     $delete = true;
+//                 } elseif (strpos($line, "END")) {
+//                     $delete = false;
+//                 }
+//                 unset($htaccess_lines[$index]);
+//             } else {
+//                 if ($delete) {
+//                     unset($htaccess_lines[$index]);
+//                 }
+//             }
+//         }
 
-        $htaccess_final = implode("\n", $htaccess_lines);
+//         $htaccess_final = implode("\n", $htaccess_lines);
 
-        file_put_contents($htaccess_file, $htaccess_final);
+//         file_put_contents($htaccess_file, $htaccess_final);
 
-        /*
-            1.Create redirect for new uploaded files in case of client caching
-            2. Uplaod files from server to kaltura
-            3. Note local server urls to replace with kaltura urls
-         */
-        file_put_contents($htaccess_file, "\n# ".$current_date." - START\n", FILE_APPEND);
+//         /*
+//             1.Create redirect for new uploaded files in case of client caching
+//             2. Uplaod files from server to kaltura
+//             3. Note local server urls to replace with kaltura urls
+//          */
+//         file_put_contents($htaccess_file, "\n# ".$current_date." - START\n", FILE_APPEND);
 
-        $videos_in_upload_folder = array_filter(
-            $files_in_upload_folder,
-            function ($file) {
-            return strpos($file, ".mp4");
-        }
-        );
+//         $videos_in_upload_folder = array_filter(
+//             $files_in_upload_folder,
+//             function ($file) {
+//             return strpos($file, ".mp4");
+//         }
+//         );
 
-        $video_links = array();
+//         $video_links = array();
 
-        $kalturaApi = new KalturaApi();
+//         $kalturaApi = new KalturaApi();
 
-        foreach ($videos_in_upload_folder as $key => $value) {
-            $file_obj = new StdClass();
+//         foreach ($videos_in_upload_folder as $key => $value) {
+//             $file_obj = new StdClass();
         
-            $file_obj->file_path = $upload_folder."/".$value;
-            $file_obj->name = $value;
+//             $file_obj->file_path = $upload_folder."/".$value;
+//             $file_obj->name = $value;
 
-            $result = $kalturaApi->uploadKalturaVideo($file_obj, $current_date);
+//             $result = $kalturaApi->uploadKalturaVideo($file_obj, $current_date);
         
-            // Additing redirect in case of cahacing
-            $redirect_directive = "\nRedirect 301 /wp-content/uploads/".$value." ".$result->dataUrl."\n";
-            file_put_contents($htaccess_file, $redirect_directive, FILE_APPEND);
+//             // Additing redirect in case of cahacing
+//             $redirect_directive = "\nRedirect 301 /wp-content/uploads/".$value." ".$result->dataUrl."\n";
+//             file_put_contents($htaccess_file, $redirect_directive, FILE_APPEND);
 
-            $video_links[$value] = $result->dataUrl;
-        }
+//             $video_links[$value] = $result->dataUrl;
+//         }
 
-        file_put_contents($htaccess_file, "\n# ".$current_date." - END\n", FILE_APPEND);
+//         file_put_contents($htaccess_file, "\n# ".$current_date." - END\n", FILE_APPEND);
 
-        // Replace all local server urls with kaltura urls
-        $tapestries = get_posts(['post_type' => 'tapestry',]);
-        $video_nodes = array();
+//         // Replace all local server urls with kaltura urls
+//         $tapestries = get_posts(['post_type' => 'tapestry',]);
+//         $video_nodes = array();
 
-        foreach ($tapestries as $value) {
-            $tapestry = new Tapestry($value->ID);
+//         foreach ($tapestries as $value) {
+//             $tapestry = new Tapestry($value->ID);
 
-            foreach ($tapestry->getNodeIds() as $node_id) {
-                $node = new TapestryNode($value->ID, $node_id);
-                $nodeMeta = $node->getMeta();
+//             foreach ($tapestry->getNodeIds() as $node_id) {
+//                 $node = new TapestryNode($value->ID, $node_id);
+//                 $nodeMeta = $node->getMeta();
 
-                if ($nodeMeta->mediaType == "video") {
-                    if (strpos($node->getTypeData()->mediaURL, "/wp-content/uploads/")) {
-                        array_push($video_nodes, $node);
-                    }
-                }
-            }
-        }
+//                 if ($nodeMeta->mediaType == "video") {
+//                     if (strpos($node->getTypeData()->mediaURL, "/wp-content/uploads/")) {
+//                         array_push($video_nodes, $node);
+//                     }
+//                 }
+//             }
+//         }
 
-        foreach ($video_nodes as $node) {
-            foreach ($video_links as $original_link => $kaltura_link) {
-                $node_type_data = $node->getTypeData();
+//         foreach ($video_nodes as $node) {
+//             foreach ($video_links as $original_link => $kaltura_link) {
+//                 $node_type_data = $node->getTypeData();
 
-                if (strpos($node_type_data->mediaURL, $original_link)) {
-                    $typeData = $node->getTypeData();
-                    $typeData->mediaURL = $kaltura_link."?.mp4";
+//                 if (strpos($node_type_data->mediaURL, $original_link)) {
+//                     $typeData = $node->getTypeData();
+//                     $typeData->mediaURL = $kaltura_link."?.mp4";
 
-                    $node->set($typeData);
-                    $node->save();
+//                     $node->set($typeData);
+//                     $node->save();
 
-                    error_log($upload_folder."/".$original_link);
+//                     error_log($upload_folder."/".$original_link);
 
-                    wp_delete_file($upload_folder."/".$original_link);
-                    break;
-                }
-            }
-        }
+//                     wp_delete_file($upload_folder."/".$original_link);
+//                     break;
+//                 }
+//             }
+//         }
 
-        return "tapestries";
-    }
-}
+//         return "tapestries";
+//     }
+// }
