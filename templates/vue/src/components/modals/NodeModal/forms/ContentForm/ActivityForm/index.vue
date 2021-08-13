@@ -88,6 +88,9 @@
                 :data-testid="`question-title-${index}`"
                 :data-qa="`question-text-${index}`"
               />
+              <b-card-sub-title class="mt-2 mb-4">
+                Additional Question Options
+              </b-card-sub-title>
               <b-form-checkbox
                 v-model="question.optional"
                 data-qa="question-optional-checkbox"
