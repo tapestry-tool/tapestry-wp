@@ -262,7 +262,7 @@ describe("Node Authoring", () => {
           "Operation failed due to the following error(s):"
 
         cy.getByTestId("submit-node-modal").click()
-        cy.contains(someApiErrorContents, { timeout: 10000 }).should("exist")
+        cy.contains(someApiErrorContents, { timeout: 50000 }).should("exist")
 
         // check that error persists
         cy.getByTestId("submit-node-modal").click()
