@@ -10,7 +10,7 @@
           v-for="(row, index) in nonPopupRows"
           :key="row.node.id"
           ref="rowRefs"
-          class="accordion-row"
+          class="accordion-row primary-background"
           :style="rowBackground"
         >
           <div class="button-row">
@@ -230,7 +230,6 @@ button[disabled] {
 }
 
 .button-row {
-  color: var(--text-color);
   background: #00bfff;
   display: flex;
   align-items: center;
@@ -240,7 +239,6 @@ button[disabled] {
 
   i {
     margin-right: 8px;
-    color: var(--text-color);
   }
 
   a {
@@ -249,15 +247,12 @@ button[disabled] {
 }
 
 .button-row-trigger {
-  color: var(--text-color);
   background: none;
   width: 100%;
   text-align: left;
 }
 
 .accordion-row {
-  color: var(--text-color);
-  background: var(--text-color);
   border-radius: 4px;
   padding: 8px 16px;
   margin-bottom: 8px;

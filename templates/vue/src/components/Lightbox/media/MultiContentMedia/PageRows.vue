@@ -24,7 +24,7 @@
               <i
                 class="fas fa-heart fa-sm"
                 :style="{
-                  color: isFavourite(row.node.id) ? 'red' : 'var(--text-color)',
+                  color: isFavourite(row.node.id) ? 'red' : 'inherit',
                   cursor: 'pointer',
                 }"
                 @click="toggleFavourite(row.node.id)"
