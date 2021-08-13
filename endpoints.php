@@ -14,10 +14,9 @@ require_once __DIR__.'/classes/class.constants.php';
 require_once __DIR__.'/utilities/class.tapestry-user.php';
 
 
-define('LOAD_KALTURA', !empty('KALTURA_ADMIN_SECRET') && !empty('KALTURA_PARTNER_ID') && !empty('KALTURA_SERVICE_URL') );
-if (LOAD_KALTURA) {
-    require_once __DIR__.'/services/class.kaltura-api.php';
-}
+define('LOAD_KALTURA', !empty(KALTURA_ADMIN_SECRET) && !empty(KALTURA_PARTNER_ID) && !empty(KALTURA_SERVICE_URL) );
+require_once __DIR__.'/services/class.kaltura-api.php';
+
 
 $REST_API_NAMESPACE = 'tapestry-tool/v1';
 
