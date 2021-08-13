@@ -13,22 +13,14 @@ interface ITapestryUserProgress
     public function get();
 
     /**
-     * Update User's video progress for a tapestry post.
+     * Update User's progress and completion for a tapestry post.
      *
-     * @param float $progressValue how much the video was viewed, value should be between >= 0 and <= 1
+     * @param float $progressValue how much the node had progressed, value should be between >= 0 and <= 1
      *
      * @return null
      */
     public function updateUserProgress($progressValue);
 
-    /**
-     * Sets 'completed' status of a Tapestry Node for this User.
-     *
-     * @param bool $completionValue whether the node is completed or not - true or false
-     *
-     * @return null
-     */
-    public function updateCompletion($completionValue);
 
     /**
      * Set the question with the given id to be marked as 'completed'.

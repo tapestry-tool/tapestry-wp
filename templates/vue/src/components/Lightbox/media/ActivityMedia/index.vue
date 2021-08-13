@@ -111,7 +111,7 @@ export default {
     this.updateActivityProgress()
   },
   methods: {
-    ...mapActions(["updateNodeProgress", "updateNodeCompletion"]),
+    ...mapActions(["updateNodeProgressAndCompletion"]),
     markQuestionsComplete() {
       for (let i = 0; i < this.questions.length; i++) {
         const currentQuestion = this.questions[i]
@@ -137,12 +137,7 @@ export default {
       const numberCompleted = this.questions.filter(question => question.completed)
         .length
       const progress = numberCompleted / this.node.typeData.activity.questions.length
-      this.updateNodeProgress({ id: this.node.id, progress }).then(() => {
-        this.updateNodeCompletion({
-          id: this.node.id,
-          completionValue: progress === 1,
-        })
-      })
+      this.updateNodeProgressAndCompletion({ id: this.node.id, progress })
     },
     next() {
       this.showCompletionScreen = false

@@ -46,9 +46,9 @@ class TapestryUserProgress implements ITapestryUserProgress
     }
 
     /**
-     * Update User's video progress for a tapestry post.
+     * Update User's progress and completion for a tapestry post.
      *
-     * @param float $progressValue how much the video was viewed, value should be between >= 0 and <= 1
+     * @param float $progressValue how much the node had progressed, value should be between >= 0 and <= 1
      *
      * @return null
      */
@@ -66,17 +66,6 @@ class TapestryUserProgress implements ITapestryUserProgress
         }
 
         $this->_updateUserProgress($progressValue);
-    }
-
-    /**
-     * Set 'completed' status of a Tapestry Node for this User.
-     *
-     * @return null
-     */
-    public function updateCompletion($completionValue)
-    {
-        $this->_checkPostId();
-        $this->_updateCompletion($completionValue);
     }
 
     /**
@@ -159,10 +148,7 @@ class TapestryUserProgress implements ITapestryUserProgress
     private function _updateUserProgress($progressValue)
     {
         update_user_meta($this->_userId, 'tapestry_'.$this->postId.'_progress_node_'.$this->nodeMetaId, $progressValue);
-    }
-
-    private function _updateCompletion($completionValue)
-    {
+        $completionValue = 1 === $progressValue;
         update_user_meta($this->_userId, 'tapestry_'.$this->postId.'_node_completed_'.$this->nodeMetaId, $completionValue);
     }
 

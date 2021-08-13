@@ -186,16 +186,6 @@ class TapestryApi {
     return response.data
   }
 
-  async updateNodeCompletion(nodeId, completionValue) {
-    const url = `/users/completed?post_id=${this.postId}&node_id=${nodeId}`
-    const response = await this.client.post(url, {
-      post_id: this.postId,
-      node_id: nodeId,
-      completion_value: completionValue,
-    })
-    return response
-  }
-
   async completeQuestion(nodeId, questionId, answerType, answer) {
     const url = `/users/activity?post_id=${this.postId}&node_id=${nodeId}&question_id=${questionId}`
     const response = await this.client.post(url, { answerType, answer })

@@ -84,13 +84,15 @@ Cypress.Commands.add("editNode", { prevSubject: false }, (id, newNode) => {
 })
 
 Cypress.Commands.add(
-  "updateNodeProgress",
+  "updateNodeProgressAndCompletion",
   { prevSubject: false },
   (id, progress) => {
     cy.server()
     cy.route("POST", `**/users/progress`).as("saveProgress")
 
-    cy.store().then(store => store.dispatch("updateNodeProgress", { id, progress }))
+    cy.store().then(store =>
+      store.dispatch("updateNodeProgressAndCompletion", { id, progress })
+    )
 
     cy.store()
       .its("state.nodes")

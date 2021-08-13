@@ -59,14 +59,6 @@ export function updateNode(state, payload) {
   state.nodes[payload.id] = copy
 }
 
-export function updateNodeProgress(state, payload) {
-  const node = getters.getNode(state)(payload.id)
-  state.nodes[payload.id] = {
-    ...node,
-    progress: payload.progress,
-  }
-}
-
 export function updateNodeCoordinates(state, payload) {
   const node = getters.getNode(state)(payload.id)
   Object.assign(node.coordinates, payload.coordinates)

@@ -132,13 +132,13 @@ export default {
     },
   },
   beforeDestroy() {
-    this.updateNodeProgress({
+    this.updateNodeProgressAndCompletion({
       id: this.nodeId,
       progress: this.node && this.node.progress,
     })
   },
   methods: {
-    ...mapActions(["updateNodeProgress"]),
+    ...mapActions(["updateNodeProgressAndCompletion"]),
     setHovered() {
       this.$router.push({
         ...this.$route,
@@ -152,7 +152,10 @@ export default {
       this.$emit("load", args)
     },
     updateProgress({ amountViewed }) {
-      this.updateNodeProgress({ id: this.nodeId, progress: amountViewed })
+      this.updateNodeProgressAndCompletion({
+        id: this.nodeId,
+        progress: amountViewed,
+      })
     },
     complete(nodeId) {
       this.$emit("complete", nodeId)

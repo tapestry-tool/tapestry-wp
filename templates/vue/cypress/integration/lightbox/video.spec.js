@@ -42,7 +42,7 @@ describe("Video", () => {
       })
       cy.closeLightbox()
 
-      cy.updateNodeProgress(node.id, 1)
+      cy.updateNodeProgressAndCompletion(node.id, 1)
 
       cy.openLightbox(node.id).within(() => {
         cy.getByTestId("end-screen").should("be.visible")

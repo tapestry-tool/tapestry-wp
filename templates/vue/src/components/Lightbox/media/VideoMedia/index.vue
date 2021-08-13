@@ -221,7 +221,7 @@ export default {
     },
   },
   methods: {
-    ...mapActions(["updateNodeCompletion"]),
+    ...mapActions(["updateNodeProgressAndCompletion"]),
     /**
      * This function calculates the next state given the current state and the event
      * name, as well as perform any necessary side effects.
@@ -349,8 +349,7 @@ export default {
       if (!this.isPopupComplete) {
         this.completing = true
       }
-      this.updateNodeProgress({ id: this.activePopupId, progress: 1 })
-      this.updateNodeCompletion({ id: this.activePopupId, completionValue: true })
+      this.updateNodeProgressAndCompletion({ id: this.activePopupId, progress: 1 })
     },
     handleVideoComplete(nodeId) {
       if (this.popups.every(popUpNode => popUpNode.progress)) {

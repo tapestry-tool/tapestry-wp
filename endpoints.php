@@ -182,14 +182,7 @@ $REST_API_ENDPOINTS = [
         'ROUTE' => 'users/progress',
         'ARGUMENTS' => [
             'methods' => $REST_API_POST_METHOD,
-            'callback' => 'updateProgressByNodeId',
-        ],
-    ],
-    'UPDATE_TAPESTRY_USER_COMPLETION' => (object) [
-        'ROUTE' => 'users/completed',
-        'ARGUMENTS' => [
-            'methods' => $REST_API_POST_METHOD,
-            'callback' => 'updateCompletionByNodeId',
+            'callback' => 'updateProgressandCompletionByNodeId',
         ],
     ],
     'UPDATE_TAPESTRY_USER_ACTIVITY_PROGRESS' => (object) [
@@ -1151,12 +1144,12 @@ function getTapestryNodeHasDraftChildren($request)
 }
 
 /**
- * Update a single node progress for the current user by passing in node id, post id and progress value
+ * Update a single node progress and its completion for the current user by passing in node id, post id and progress value
  * Example: /wp-json/tapestry-tool/v1/users/progress?post_id=44&node_id=1&progress_value=0.2.
  *
  * @param object $request HTTP request
  */
-function updateProgressByNodeId($request)
+function updateProgressandCompletionByNodeId($request)
 {
     $postId = $request['post_id'];
     $nodeMetaId = $request['node_id'];
@@ -1169,27 +1162,7 @@ function updateProgressByNodeId($request)
     }
 }
 
-/**
- * Update node completion for the current user
- * Example: /wp-json/tapestry-tool/v1/users/completed?post_id=44&node_id=1.
- *
- * @param object $request HTTP request
- *
- * @return null
- */
-function updateCompletionByNodeId($request)
-{
-    $postId = $request['post_id'];
-    $nodeMetaId = $request['node_id'];
-    $completionValue = $request['completion_value'];
 
-    try {
-        $userProgress = new TapestryUserProgress($postId, $nodeMetaId);
-        $userProgress->updateCompletion($completionValue);
-    } catch (TapestryError $e) {
-        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
-    }
-}
 
 /**
  * Set activity as completed for the current user
