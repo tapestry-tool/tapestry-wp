@@ -97,6 +97,15 @@ export function addLink(state, link) {
   state.links.push(link)
 }
 
+export function reverseLink(state, newLink) {
+  const linkIndex = state.links.findIndex(
+    link => link.target == newLink.target && link.source == newLink.source
+  )
+
+  state.links[linkIndex].target = newLink.source
+  state.links[linkIndex].source = newLink.target
+}
+
 export function deleteLink(state, { source, target }) {
   state.links = state.links.filter(
     link => link.source !== source || link.target !== target

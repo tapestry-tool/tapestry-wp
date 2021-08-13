@@ -1,5 +1,5 @@
 import Lightbox from "@/components/Lightbox"
-
+import LinkModal from "@/components/modals/LinkModal"
 const ROOT_PATH = `/nodes/:nodeId`
 
 const parseParams = route => {
@@ -7,6 +7,14 @@ const parseParams = route => {
   for (const key in route.params) {
     const val = route.params[key]
     parsedParams[key] = Number(val)
+  }
+  return parsedParams
+}
+const linkParamParser = route => {
+  const parsedParams = {}
+  for (const key in route.params) {
+    const val = route.params[key]
+    parsedParams[key] = val
   }
   return parsedParams
 }
@@ -54,6 +62,16 @@ const settings = {
   name: "settings",
 }
 
+const linkmodal = {
+  path: `${ROOT_PATH}/link`,
+  name: "links",
+  components: {
+    linkmodal: LinkModal,
+  },
+  props: {
+    linkmodal: linkParamParser,
+  },
+}
 const help = {
   path: `${ROOT_PATH}/help`,
   name: "help",
@@ -85,6 +103,7 @@ const routes = {
   lightbox,
   modal,
   settings,
+  linkmodal,
   nestedMultiContent,
   redirects,
   help,
