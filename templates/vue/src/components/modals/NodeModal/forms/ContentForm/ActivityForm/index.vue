@@ -90,7 +90,7 @@
               />
               <b-form-checkbox
                 v-model="question.optional"
-                :data-qa="`question-optional-checkbox`"
+                data-qa="question-optional-checkbox"
                 switch
               >
                 Optional Question

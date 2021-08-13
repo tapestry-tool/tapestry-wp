@@ -587,4 +587,33 @@ describe("Activity", () => {
       cy.lightbox().should("not.exist")
     })
   })
+  it("should be able to add optional question", () => {
+    cy.fixture("one-node.json").as("oneNode")
+    cy.setup("@oneNode")
+    cy.getSelectedNode().then(node => {
+      cy.openModal("edit", node.id)
+      cy.changeMediaType("activity")
+      const question = `What's your name?`
+      const placeholder = "placeholder"
+
+      cy.getByTestId("question-optional-checkbox").click({ force: true })
+      cy.getByTestId("question-text-0").click()
+      cy.focused().type(question)
+      cy.getByTestId("question-answer-text-0").click({ force: true })
+      cy.getByTestId("question-answer-text-single-0").click({ force: true })
+      cy.getByTestId("question-answer-text-single-placeholder-0").type(placeholder)
+      cy.submitModal()
+
+      cy.openLightbox(node.id)
+      cy.route("POST", "/users/activity/**").as("submit")
+
+      cy.lightbox().within(() => {
+        cy.contains(/skip/i).click()
+        cy.contains("Thanks!").should("be.visible")
+        cy.contains(/done/i).click()
+      })
+      cy.getByTestId("progress-bar").should("have.css", "color", "rgb(44, 62, 80)")
+      cy.lightbox().should("not.exist")
+    })
+  })
 })
