@@ -1392,30 +1392,30 @@ function getTapestryContributors($request)
  *
  * @param object $request HTTP request
  */
-// function getQuestionHasAnswers($request)
-// {
-//     $postId = $request['tapestryPostId'];
-//     $nodeMetaId = $request['nodeMetaId'];
-//     $questionId = $request['question_id'];
-//     $answerType = $request['answer_type'];
+function getQuestionHasAnswers($request)
+{
+    $postId = $request['tapestryPostId'];
+    $nodeMetaId = $request['nodeMetaId'];
+    $questionId = $request['question_id'];
+    $answerType = $request['answer_type'];
     
-//     try {
-//         if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
-//             throw new TapestryError('INVALID_POST_ID');
-//         }
-//         if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
-//             throw new TapestryError('INVALID_NODE_META_ID');
-//         }
-//         if (!TapestryHelpers::userIsAllowed('EDIT', $nodeMetaId, $postId)) {
-//             throw new TapestryError('EDIT_NODE_PERMISSION_DENIED');
-//         }
+    try {
+        if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+        if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
+            throw new TapestryError('INVALID_NODE_META_ID');
+        }
+        if (!TapestryHelpers::userIsAllowed('EDIT', $nodeMetaId, $postId)) {
+            throw new TapestryError('EDIT_NODE_PERMISSION_DENIED');
+        }
 
-//         return TapestryUserProgress::questionsHasAnyAnswer($postId, $nodeMetaId, $questionId, $answerType);
-//     } catch (TapestryError $e) {
-//         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
-//     }
+        return TapestryUserProgress::questionsHasAnyAnswer($postId, $nodeMetaId, $questionId, $answerType);
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
     
-// }
+}
 
 // // URL - http://localhost:8000/wp-json/tapestry-tool/v1/kaltura
 // function upload_videos_to_kaltura($request)
