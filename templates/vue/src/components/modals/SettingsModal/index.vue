@@ -539,9 +539,6 @@ export default {
             this.tydeModeDefaultNodes[role] = this.rootId
           }
         })
-        if (!this.circleViewNode) {
-          this.circleViewNode = this.rootId
-        }
       }
 
       const settings = Object.assign(this.settings, {

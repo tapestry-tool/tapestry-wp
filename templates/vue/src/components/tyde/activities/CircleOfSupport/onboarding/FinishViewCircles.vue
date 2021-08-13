@@ -3,7 +3,10 @@
     <b-container class="modal-container">
       <b-row align-h="center">
         <h3 style="max-width: 500px;">
-          Great job! You have completed the Circle of Support onboarding!
+          🎉 Great job!🎉
+          <br />
+          <br />
+          You have completed the Circle of Support onboarding!
         </h3>
       </b-row>
       <b-col align-self="center">

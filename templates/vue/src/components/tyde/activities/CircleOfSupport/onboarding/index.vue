@@ -205,7 +205,7 @@ export default {
     ...mapGetters(["getNode"]),
     circleViewEnabled() {
       const circleViewNode = this.getNode(this.settings.circleViewNode)
-      return circleViewNode ? circleViewNode && circleViewNode.completed : false
+      return circleViewNode ? circleViewNode && circleViewNode.completed : true
     },
   },
   watch: {
