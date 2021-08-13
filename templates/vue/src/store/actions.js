@@ -86,7 +86,6 @@ export async function updateNodeProgressAndCompletion(
 ) {
   try {
     const { id, progress } = payload
-
     if (!wp.isLoggedIn()) {
       const progressObj = JSON.parse(localStorage.getItem(LOCAL_PROGRESS_ID))
       const nodeProgress = progressObj[id] || {}
@@ -95,12 +94,10 @@ export async function updateNodeProgressAndCompletion(
     } else {
       await client.updateUserProgress(id, progress)
     }
-    console.log("Got here")
     commit("updateNode", {
       id: payload.id,
       newNode: { progress: payload.progress, completed: progress === 1 },
     })
-    console.log("Got here2")
     return updateLockedStatus({ commit, dispatch, getters })
   } catch (error) {
     console.log(error)
@@ -145,7 +142,6 @@ export async function updateLockedStatus({ commit, getters, dispatch }) {
           const { typeData } = content
           newNode.typeData = typeData
         }
-
         commit("updateNode", { id, newNode })
       }
     }

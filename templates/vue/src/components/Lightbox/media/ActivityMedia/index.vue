@@ -137,7 +137,7 @@ export default {
       const numberCompleted = this.questions.filter(question => question.completed)
         .length
       const progress = numberCompleted / this.node.typeData.activity.questions.length
-      this.updateNodeProgressAndCompletion({ id: this.node.id, progress })
+      this.updateNodeProgressAndCompletion({ id: this.node.id, progress: progress })
     },
     next() {
       this.showCompletionScreen = false

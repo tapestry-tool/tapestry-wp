@@ -64,7 +64,6 @@ class TapestryUserProgress implements ITapestryUserProgress
         if ($progressValue < 0 || $progressValue > 1) {
             throw new TapestryError('INVALID_PROGRESS');
         }
-
         $this->_updateUserProgress($progressValue);
     }
 
@@ -148,7 +147,10 @@ class TapestryUserProgress implements ITapestryUserProgress
     private function _updateUserProgress($progressValue)
     {
         update_user_meta($this->_userId, 'tapestry_'.$this->postId.'_progress_node_'.$this->nodeMetaId, $progressValue);
-        $completionValue = 1 === $progressValue;
+        $completionValue = false;
+        if (1 == $progressValue) {
+            $completionValue = true;
+        }
         update_user_meta($this->_userId, 'tapestry_'.$this->postId.'_node_completed_'.$this->nodeMetaId, $completionValue);
     }
 
