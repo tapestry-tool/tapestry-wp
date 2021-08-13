@@ -151,7 +151,6 @@ import WelcomeConnections from "./WelcomeConnections"
 import ObFinishView from "./ObFinishView"
 import FinishViewCircles from "./FinishViewCircles"
 import Tooltip from "./Tooltip"
-// import TopTooltip from "./TopTooltip"
 import MoveConnectionsCircles from "./MoveConnectionsCircles.vue"
 const States = {
   Home: 0,
@@ -173,7 +172,6 @@ export default {
     MoveConnectionsCircles,
     AddLaterCircles,
     FinishViewCircles,
-    // TopTooltip,
   },
   props: {
     connections: {
