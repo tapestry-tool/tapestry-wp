@@ -23,11 +23,7 @@
                 v-if="!disableRow(index, row.node)"
                 :class="isVisible(row.node.id) ? 'fas fa-minus' : 'fas fa-plus'"
               ></i>
-              <i
-                v-else
-                class="fas fa-lock fa-sm title-row-icon"
-                style="color:var(--text-color);"
-              ></i>
+              <i v-else class="fas fa-lock fa-sm title-row-icon"></i>
               {{ row.node.title }}
               <locked-content
                 v-if="disableRow(index, row.node)"

@@ -95,7 +95,6 @@ export default {
   justify-content: center;
 }
 .answers {
-  color: var(--text-color);
   margin-top: 15px;
 }
 .answer-container {

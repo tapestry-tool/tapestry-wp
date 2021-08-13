@@ -11,7 +11,7 @@
           :id="`row-${row.node.id}`"
           :key="row.node.id"
           ref="rowRefs"
-          class="page-row"
+          class="page-row primary-background"
           :style="rowBackground"
         >
           <div class="title-row-icon">
@@ -222,7 +222,6 @@ button[disabled] {
   background: none;
   width: 100%;
   text-align: left;
-  color: var(--text-color);
   font-size: 1.75rem;
   font-weight: 500;
 
@@ -232,7 +231,6 @@ button[disabled] {
 }
 
 .page-row {
-  background: var(--background-color);
   border-radius: 4px;
   padding: 8px 16px;
   margin-bottom: 8px;

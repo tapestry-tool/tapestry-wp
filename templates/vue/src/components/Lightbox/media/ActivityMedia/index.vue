@@ -1,5 +1,5 @@
 <template>
-  <div ref="activity" class="activity-media">
+  <div ref="activity" class="activity-media secondary-background">
     <h1 v-if="showTitle" class="media-title">{{ node.title }}</h1>
     <completion-screen v-if="showCompletionScreen" :question="activeQuestion">
       <button
@@ -169,8 +169,6 @@ export default {
   justify-content: space-between;
   width: 100%;
   min-height: 100%;
-  background: #bbb; /* COME HERE */
-  color: var(--text-color);
   z-index: 10;
   padding: 24px;
 
