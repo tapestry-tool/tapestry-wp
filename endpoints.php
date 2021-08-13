@@ -13,7 +13,9 @@ require_once __DIR__.'/classes/class.tapestry-h5p.php';
 require_once __DIR__.'/classes/class.constants.php';
 require_once __DIR__.'/utilities/class.tapestry-user.php';
 
-require_once __DIR__.'/services/class.kaltura-api.php';
+if (LOAD_KALTURA) {
+    require_once __DIR__.'/services/class.kaltura-api.php';
+}
 
 $REST_API_NAMESPACE = 'tapestry-tool/v1';
 
