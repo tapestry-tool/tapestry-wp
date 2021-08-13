@@ -162,7 +162,7 @@ export default {
   },
   methods: {
     ...mapMutations(["updateNode"]),
-    ...mapActions(["updateNodeCompletion", "toggleFavourite"]),
+    ...mapActions(["updateNodeCompletion", "updateNodeProgress", "toggleFavourite"]),
     handleLoad(el) {
       this.$nextTick(() => {
         if (this.activeIndex >= 0) {
