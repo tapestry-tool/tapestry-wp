@@ -2,7 +2,10 @@
   <div
     ref="tooltip"
     class="tooltip-container"
-    :style="{ opacity: positioned ? 1 : 0 }"
+    :style="[
+      { opacity: positioned ? 1 : 0 },
+      { 'margin-left': onTopLeftCircleView ? '84px' : '0px' },
+    ]"
   >
     <slot></slot>
   </div>
@@ -10,14 +13,25 @@
 
 <script>
 export default {
+  props: {
+    activeView: {
+      type: Number,
+      required: true,
+    },
+  },
   data() {
     return {
       positioned: false,
+      onTopLeftCircleView: false,
     }
   },
   mounted() {
     this.positioned = true
     this.$emit("tooltip-positioned")
+    this.onTopLeftCircleView =
+      this.$refs.tooltip.classList.contains("top") &&
+      this.$refs.tooltip.classList.contains("left") &&
+      this.activeView === 1
   },
 }
 </script>
@@ -25,11 +39,25 @@ export default {
 <style scoped lang="scss">
 .right {
   right: 22px;
-  bottom: 95px;
 }
 
 .left {
   left: 22px;
+
+  &.top {
+    left: 10px;
+  }
+}
+
+.top {
+  top: 200px;
+
+  &.left {
+    top: 110px;
+  }
+}
+
+.bottom {
   bottom: 95px;
 }
 
@@ -49,8 +77,6 @@ export default {
   height: 0;
   border-left: 24px solid transparent;
   border-right: 24px solid transparent;
-  border-top: 24px solid #fff;
-  bottom: -23px;
   z-index: 5;
 }
 
@@ -62,8 +88,6 @@ export default {
   height: 0;
   border-left: 24px solid transparent;
   border-right: 24px solid transparent;
-  border-top: 24px solid #bbb;
-  bottom: -24px;
 }
 
 .right::before,
@@ -73,5 +97,15 @@ export default {
 .left::before,
 .left::after {
   left: 25px;
+}
+.top::before,
+.top::after {
+  top: -23px;
+  border-bottom: 24px solid #fff;
+}
+.bottom::before,
+.bottom::after {
+  bottom: -24px;
+  border-top: 24px solid #fff;
 }
 </style>

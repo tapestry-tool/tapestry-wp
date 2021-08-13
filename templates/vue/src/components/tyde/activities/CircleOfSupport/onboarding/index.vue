@@ -47,7 +47,8 @@
     />
     <tooltip
       v-if="isState('Communities.AddLaterTooltip')"
-      class="right"
+      class="right bottom"
+      :activeView="activeView"
       @tooltip-positioned="$emit('tooltip-positioned')"
     >
       <h3>
@@ -64,7 +65,8 @@
     </tooltip>
     <tooltip
       v-if="isState('Communities.AddAnotherTooltip')"
-      class="right"
+      class="right bottom"
+      :activeView="activeView"
       @tooltip-positioned="$emit('tooltip-positioned')"
     >
       <h3>
@@ -76,7 +78,8 @@
     </tooltip>
     <tooltip
       v-if="isState('Connections.AddAnotherTooltip')"
-      class="left"
+      class="left bottom"
+      :activeView="activeView"
       @tooltip-positioned="$emit('tooltip-positioned')"
     >
       <h3 style="max-width:300px;">
@@ -86,9 +89,9 @@
         Got it &#8594;
       </b-button>
     </tooltip>
-    <top-tooltip
+    <tooltip
       v-if="isState('Circles.Welcome')"
-      class="left"
+      class="top left"
       :activeView="activeView"
       @tooltip-positioned="$emit('tooltip-positioned')"
     >
@@ -106,10 +109,11 @@
       >
         Continue &#8594;
       </b-button>
-    </top-tooltip>
+    </tooltip>
     <tooltip
       v-if="isState('Circles.AddAnotherTooltip')"
-      class="left"
+      class="bottom left"
+      :activeView="activeView"
       @tooltip-positioned="$emit('tooltip-positioned')"
     >
       <h3 style="max-width:300px;">
@@ -119,10 +123,10 @@
         Got it &#8594;
       </b-button>
     </tooltip>
-    <top-tooltip
+    <tooltip
       v-if="isState('Circles.ToggleRingsTooltip')"
       :activeView="activeView"
-      class="right"
+      class="top right"
       @tooltip-positioned="$emit('tooltip-positioned')"
     >
       <h3 style="max-width:300px;">
@@ -131,7 +135,7 @@
       <b-button pill variant="secondary" @click="handleContinue">
         Continue &#8594;
       </b-button>
-    </top-tooltip>
+    </tooltip>
   </div>
 </template>
 
@@ -147,7 +151,7 @@ import WelcomeConnections from "./WelcomeConnections"
 import ObFinishView from "./ObFinishView"
 import FinishViewCircles from "./FinishViewCircles"
 import Tooltip from "./Tooltip"
-import TopTooltip from "./TopTooltip"
+// import TopTooltip from "./TopTooltip"
 import MoveConnectionsCircles from "./MoveConnectionsCircles.vue"
 const States = {
   Home: 0,
@@ -169,7 +173,7 @@ export default {
     MoveConnectionsCircles,
     AddLaterCircles,
     FinishViewCircles,
-    TopTooltip,
+    // TopTooltip,
   },
   props: {
     connections: {
