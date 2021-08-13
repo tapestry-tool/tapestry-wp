@@ -247,6 +247,27 @@ class Tapestry implements ITapestry
 
         return $link;
     }
+    /**
+     * Reverse a link from links array.
+     *
+     * @param int $link an array containing the node IDs that this connects
+     *
+     * @return array $links     Tapestry links
+     */
+    public function reverseLink($newLink)
+    {        
+        foreach ($this->links as $linkIndex => $link) {
+            if ($link->target == $newLink->target && $link->source == $newLink->source) {
+                
+                $this->links[$linkIndex]->source = $newLink->target;
+                $this->links[$linkIndex]->target = $newLink->source;
+                break;
+            }
+        }
+        $this->_saveToDatabase();
+
+        return $this->links;
+    }
 
     /**
      * Delete a link from links array.
