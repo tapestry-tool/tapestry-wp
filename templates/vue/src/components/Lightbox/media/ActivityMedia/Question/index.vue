@@ -144,7 +144,7 @@ export default {
       return wp.isLoggedIn()
     },
     hasPreviousSubmission() {
-      return Object.keys(this.answers).length != 0
+      return Object.keys(this.answers).length > 0
     },
     isEditable() {
       return this.question.followUp.allowAnswerEdit
@@ -211,6 +211,8 @@ export default {
     this.openFormIfSingle()
     if (this.hasPreviousSubmission) {
       this.summaryScreen = true
+    } else {
+      this.summaryScreen = false
     }
   },
   methods: {
