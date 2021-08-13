@@ -13,17 +13,20 @@ describe("Link Authoring", () => {
 
         const stub = cy.stub()
         stub.onFirstCall().returns(true)
-
         cy.on("window:confirm", stub)
 
-        cy.link(child1.id, child2.id)
+        cy.link(child1.id, child2.id).click()
+        cy.getByTestId("links-modal").should("be.visible")
+        cy.getByTestId("delete-link-btn").should("not.be.disabled")
+        cy.getByTestId("delete-link-btn")
           .click()
           .then(() => {
             expect(stub).to.be.called
             expect(stub.getCall(0).lastArg).to.match(
-              /are you sure you want to delete the link/i
+              /are you sure you want to delete this link?/i
             )
           })
+
         cy.link(child1.id, child2.id).should("not.exist")
       })
   })
@@ -34,19 +37,10 @@ describe("Link Authoring", () => {
       .then(nodes => {
         const [root, child] = Object.values(nodes)
 
-        const confirm = cy.stub()
-        confirm.onFirstCall().returns(true)
+        cy.link(root.id, child.id).click()
+        cy.getByTestId("delete-link-btn").should("be.disabled")
+        cy.contains(/Save/i).click()
 
-        const alert = cy.stub()
-        cy.on("window:confirm", confirm)
-        cy.on("window:alert", alert)
-
-        cy.link(root.id, child.id)
-          .click()
-          .then(() => {
-            expect(alert).to.be.called
-            expect(alert.getCall(0).lastArg).to.match(/cannot delete this link/i)
-          })
         cy.link(root.id, child.id).should("exist")
       })
   })
@@ -61,6 +55,9 @@ describe("Link Authoring", () => {
         cy.logout().visitTapestry()
 
         cy.link(child1.id, child2.id).click()
+        cy.getByTestId("links-modal").should("be.visible")
+        cy.getByTestId("delete-link-btn").should("not.be.disabled")
+        cy.getByTestId("delete-link-btn").click()
         cy.link(child1.id, child2.id).should("exist")
       })
   })
@@ -90,9 +87,22 @@ describe("Link Authoring", () => {
         })
         cy.closeLightbox()
 
-        cy.link(root.id, child1.id)
+        const stub = cy.stub()
+        stub.onFirstCall().returns(true)
+        cy.on("window:confirm", stub)
+
+        cy.link(root.id, child1.id).click()
+
+        cy.getByTestId("links-modal").should("be.visible")
+        cy.getByTestId("delete-link-btn").should("not.be.disabled")
+        cy.getByTestId("delete-link-btn")
           .click()
-          .should("not.exist")
+          .then(() => {
+            expect(stub).to.be.called
+            expect(stub.getCall(0).lastArg).to.match(
+              /are you sure you want to delete this link?/i
+            )
+          })
         cy.openLightbox(root.id)
         cy.lightbox().within(() => {
           cy.contains(child1.title).should("not.exist")

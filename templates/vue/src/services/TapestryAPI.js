@@ -115,6 +115,11 @@ class TapestryApi {
     return await this.client.delete(url, { data: link })
   }
 
+  async reverseLink(link) {
+    const url = `/tapestries/${this.postId}/links/reverse`
+    return await this.client.post(url, link)
+  }
+
   /**
    * Update node
    *

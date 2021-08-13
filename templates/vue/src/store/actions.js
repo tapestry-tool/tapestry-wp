@@ -226,6 +226,31 @@ export async function addLink({ commit, dispatch, getters }, newLink) {
   }
 }
 
+export async function reverseLink({ commit, dispatch, getters }, link) {
+  try {
+    const parent = getters.getNode(link.source)
+    await commit("updateNode", {
+      id: link.source,
+      newNode: {
+        childOrdering: parent.childOrdering.filter(item => item !== link.target),
+      },
+    })
+
+    const child = getters.getNode(link.target)
+    commit("updateNode", {
+      id: link.target,
+      newNode: {
+        childOrdering: [...child.childOrdering, link.source],
+      },
+    })
+
+    await client.reverseLink(JSON.stringify(link))
+    commit("reverseLink", link)
+  } catch (error) {
+    dispatch("addApiError", error)
+  }
+}
+
 export async function deleteLink(
   { commit, dispatch },
   { source, target, useClient = true }
