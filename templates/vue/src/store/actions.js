@@ -81,7 +81,7 @@ export async function updateNode({ commit, dispatch, getters }, payload) {
 }
 
 export async function updateNodeProgressAndCompletion(
-  { commit, dispatch },
+  { commit, dispatch, getters },
   payload
 ) {
   try {
@@ -95,12 +95,15 @@ export async function updateNodeProgressAndCompletion(
     } else {
       await client.updateUserProgress(id, progress)
     }
+    console.log("Got here")
     commit("updateNode", {
       id: payload.id,
       newNode: { progress: payload.progress, completed: progress === 1 },
     })
-    return updateLockedStatus(context)
+    console.log("Got here2")
+    return updateLockedStatus({ commit, dispatch, getters })
   } catch (error) {
+    console.log(error)
     dispatch("addApiError", error)
   }
 }
