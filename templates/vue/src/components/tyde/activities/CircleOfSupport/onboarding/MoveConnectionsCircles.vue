@@ -7,7 +7,7 @@
           connections tab into one of the circle rings.
         </h3>
       </b-row>
-      <img src="https://media.giphy.com/media/jduo3uSe0KZsKL9Jbb/giphy.gif" />
+      <img src="@/assets/add-connections.gif" />
       <b-row align-h="center" class="py-2">
         <h4 class="ob-secondary">
           You can also add more connections at any time in the connections tab.

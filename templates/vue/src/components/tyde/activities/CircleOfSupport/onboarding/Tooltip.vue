@@ -31,7 +31,7 @@ export default {
     this.onTopLeftCircleView =
       this.$refs.tooltip.classList.contains("top") &&
       this.$refs.tooltip.classList.contains("left") &&
-      this.activeView === 1
+      this.activeView === 0
   },
 }
 </script>

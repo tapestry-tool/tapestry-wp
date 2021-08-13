@@ -3,11 +3,11 @@
     <b-container>
       <b-row align-h="center" class="py-2">
         <h3>
-          You can delete or move connections between rings.
+          You can also delete connections or move connections between rings.
         </h3>
       </b-row>
       <b-row align-h="center">
-        <img src="https://media.giphy.com/media/jqY4EOoJTqBBAbGDJd/giphy.gif" />
+        <img src="@/assets/delete-connections.gif" />
       </b-row>
       <b-row>
         <b-container>
