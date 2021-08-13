@@ -9,6 +9,3 @@ data/
 bin/config.sh
 
 vendor/
-
-composer.json
-composer.lock
