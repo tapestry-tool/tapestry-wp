@@ -3,6 +3,7 @@
   <div v-else id="app">
     <tapestry-app></tapestry-app>
     <router-view name="lightbox"></router-view>
+    <router-view name="linkmodal"></router-view>
     <node-modal></node-modal>
     <sidebar v-if="!isEmpty"></sidebar>
     <tapestry-error></tapestry-error>
