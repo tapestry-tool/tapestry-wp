@@ -1,5 +1,5 @@
 <template>
-  <b-container class="completed-activity-media">
+  <b-container class="completed-activity-media primary-background">
     <b-row align-v="center" style="min-height:150px;">
       <b-col v-if="type === 'text' && !isListTextType" align-self="center">
         <div class="text">
@@ -77,8 +77,6 @@ export default {
 
 <style lang="scss" scoped>
 .completed-activity-media {
-  background: var(--background-color);
-  color: var(--text-color);
   border-radius: 8px;
   margin-bottom: 8px;
   padding: 8px 16px 8px 16px;

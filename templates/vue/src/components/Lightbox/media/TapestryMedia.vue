@@ -2,6 +2,7 @@
   <div
     :class="[
       'media-wrapper',
+      'secondary-background',
       { 'media-wrapper-embed': node.mediaFormat === 'embed' },
       {
         'media-wrapper-no-scroll':
@@ -163,9 +164,7 @@ export default {
 
 <style lang="scss" scoped>
 .media-wrapper {
-  color: var(--text-color);
   outline: none;
-  background: #bbb;
   border-radius: 15px;
   overflow: auto;
   height: 100%;

@@ -1,0 +1,19 @@
+[data-theme="dark"] {
+    --background-color: #111;
+    --text-color: #eee;
+}
+  
+[data-theme="light"] {
+    --background-color: #eee;
+    --text-color: #111;
+}
+  
+.primary-text {
+    color: var(--text-color);
+}
+.primary-background {
+    background-color: var(--background-color);
+}
+.secondary-background {
+    background-color: #bbb;
+}

@@ -87,7 +87,4 @@ export default {
   color: #11a6d8;
   transform: scale(1.1);
 }
-.user-settings-button:only-child {
-  margin-right: 12px;
-}
 </style>

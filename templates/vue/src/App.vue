@@ -1,6 +1,6 @@
 <template>
   <loading v-if="loading" data-qa="tapestry-loading" style="height: 75vh;"></loading>
-  <div v-else id="app">
+  <div v-else id="app" class="primary-text">
     <tapestry-app></tapestry-app>
     <router-view name="lightbox"></router-view>
     <node-modal></node-modal>
@@ -30,6 +30,7 @@ import TapestryError from "@/components/TapestryError"
 import Loading from "@/components/common/Loading"
 import client from "@/services/TapestryAPI"
 import { isLoggedIn } from "./services/wp"
+import "@/assets/styles/themes.css"
 
 export default {
   name: "app",
@@ -115,15 +116,6 @@ export default {
 </script>
 
 <style lang="scss">
-[data-theme="dark"] {
-  --background-color: #111;
-  --text-color: #eee;
-}
-
-[data-theme="light"] {
-  --background-color: #eee;
-  --text-color: #111;
-}
 html {
   font-size: 100%;
 
@@ -132,7 +124,6 @@ html {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-align: center;
-    color: #2c3e50;
 
     li {
       line-height: initial;

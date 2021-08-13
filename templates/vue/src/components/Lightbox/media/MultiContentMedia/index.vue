@@ -1,7 +1,7 @@
 <template>
   <div
     ref="container"
-    class="media-container"
+    class="media-container primary-background"
     :style="navBarStyle"
     data-qa="multi-content"
   >
@@ -310,13 +310,10 @@ button[disabled] {
 }
 
 .title {
-  color: var(--text-color);
   margin-bottom: 1em;
 }
 
 .media-container {
-  background-color: var(--background-color);
-  color: var(--text-color);
   height: 100%;
   width: 100%;
   max-width: 150vh;
@@ -331,7 +328,6 @@ button[disabled] {
 }
 
 .nested-media-title {
-  color: var(--text-color);
   text-align: left;
   font-size: 1.75rem;
   font-weight: 500;
