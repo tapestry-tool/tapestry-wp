@@ -39,15 +39,15 @@
         <b-button
           v-if="hasAnswers && state === 'activity'"
           variant="info"
-          style="margin-right:auto;"
+          class="mr-auto"
           @click="state = 'answer'"
         >
-          Show previos answers
+          Show previous answers
         </b-button>
         <b-button
           v-else-if="state === 'answer'"
           variant="info"
-          style="margin-right:auto;"
+          class="mr-auto"
           @click="state = 'activity'"
         >
           Change answers
@@ -86,7 +86,7 @@ import AnswerMedia from "./AnswerMedia.vue"
 const states = {
   ACTIVITY: "activity",
   ANSWER: "answer",
-  COMPLETIONSCREEN: "completion-screen",
+  COMPLETION_SCREEN: "completion-screen",
 }
 
 export default {
@@ -213,9 +213,9 @@ export default {
         }
       })
     },
-    handleComplete(sender) {
-      if (sender === states.ACTIVITY) {
-        this.state = states.COMPLETIONSCREEN
+    handleComplete(initiatingComponent) {
+      if (initiatingComponent === "activity") {
+        this.state = states.COMPLETION_SCREEN
         const numberCompleted = this.questionNode.typeData.activity.questions.filter(
           question => question.completed
         ).length
@@ -228,7 +228,7 @@ export default {
         })
       } else if (
         this.initialType === states.ANSWER &&
-        sender === states.ANSWER &&
+        initiatingComponent === "answer" &&
         this.hasAnswers
       ) {
         this.$emit("complete")
@@ -252,8 +252,9 @@ export default {
     },
     close() {
       client.recordAnalyticsEvent("user", "close", "activity", this.node.id)
-      if (this.initialType === "activity") this.$emit("close")
-      else {
+      if (this.initialType === "activity") {
+        this.$emit("close")
+      } else {
         this.state = states.ANSWER
       }
     },
