@@ -1,19 +1,22 @@
 [data-theme="dark"] {
-    --background-color: #111;
+    --primary-background-color: #111;
+    --secondary-background-color: #262626;
     --text-color: #eee;
 }
   
 [data-theme="light"] {
-    --background-color: #eee;
+    --primary-background-color: #eee;
+    --secondary-background-color: #bbb;
     --text-color: #111;
+    
 }
   
 .primary-text {
-    color: var(--text-color);
+    color: var(--text-color) !important;
 }
 .primary-background {
-    background-color: var(--background-color);
+    background-color: var(--primary-background-color) !important;
 }
 .secondary-background {
-    background-color: #bbb;
+    background-color: var(--secondary-background-color) !important;
 }

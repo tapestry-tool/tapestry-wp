@@ -1,5 +1,9 @@
 <template>
-  <button class="button" :disabled="disabled" @click="$emit('click')">
+  <button
+    class="button secondary-background"
+    :disabled="disabled"
+    @click="$emit('click')"
+  >
     <i class="fas fa-check-circle" :class="completed ? 'visible' : 'invisible'"></i>
     <div v-if="isFaIcon" class="icon">
       <i :class="`fas fa-${icon} icon-fa`"></i>
@@ -50,7 +54,6 @@ button {
   padding: 0;
   margin: 0;
   margin-right: 24px;
-  background: black;
   &:last-child,
   &:only-child {
     margin-right: 0;
@@ -59,7 +62,6 @@ button {
 
 .button {
   padding: 0;
-  background-color: #262626;
   color: white;
   width: 136px;
   border-radius: 6px;

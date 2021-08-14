@@ -7,7 +7,7 @@
     >
       <i class="fas fa-arrow-left"></i>
     </button>
-    <loading v-if="submitting" label="Submitting..." />
+    <loading v-if="submitting" label="Submitting..." class="primary-background" />
     <div v-else>
       <div v-if="question.followUp.enabled" class="follow-up">
         <div
@@ -313,7 +313,6 @@ export default {
   }
 
   .loading {
-    background: var(--background-color);
     position: absolute;
     top: 0;
     left: 0;

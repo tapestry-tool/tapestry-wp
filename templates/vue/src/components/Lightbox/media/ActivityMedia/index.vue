@@ -1,5 +1,5 @@
 <template>
-  <div ref="activity" class="activity-media secondary-background">
+  <div ref="activity" class="activity-media primary-background">
     <h1 v-if="showTitle" class="media-title">{{ node.title }}</h1>
     <completion-screen v-if="showCompletionScreen" :question="activeQuestion">
       <button
