@@ -78,7 +78,6 @@ export default {
 }
 
 .wp-media-title {
-  color: #111;
   text-align: left;
   margin: 0.9em 0 0.5em 25px;
   font-weight: 500;
