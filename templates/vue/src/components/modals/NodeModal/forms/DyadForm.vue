@@ -6,8 +6,7 @@
       </b-form-checkbox>
     </b-form-group>
     <small id="emailHelp" class="form-text text-muted">
-      When checked, you will be able to see your child's progress in this node. Only
-      the child's progress will count towards this node's completion.
+      This checkbox only affects users who have a dyad role and a linked teen. When checked, dyad users will see their linked teen's progress for this node instead of their own and their own progress will not be saved.
     </small>
   </div>
 </template>
