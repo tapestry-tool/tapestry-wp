@@ -157,13 +157,7 @@ export default {
       const menu = []
       const mainMenu = []
       this.rows.forEach(row => {
-        if (row.node.typeData.isSecondaryNode) {
-          let subMenu = []
-          subMenu.push(row)
-          menu.push(subMenu)
-        } else {
-          mainMenu.push(row)
-        }
+        row.node.typeData.isSecondaryNode ? menu.push([row]) : mainMenu.push(row)
       })
       menu.unshift(mainMenu)
       return menu

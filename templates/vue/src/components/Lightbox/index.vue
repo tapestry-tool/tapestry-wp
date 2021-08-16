@@ -15,7 +15,7 @@
       v-if="node.mediaType === 'multi-content'"
       :node="node"
       :row-id="rowId"
-      :pageMenuData="pageMenuData"
+      :page-menu-data="pageMenuData"
       :sub-row-id="subRowId"
       @close="handleAutoClose"
       @complete="complete"
@@ -25,7 +25,7 @@
       :node="node"
       :rowRefs="rowRefs"
       :dimensions="dimensions"
-      @handlePageMenuClick="handlePageMenuClick"
+      @handle-page-menu-click="handlePageMenuClick"
     />
     <tapestry-media
       v-if="node.mediaType !== 'multi-content'"

@@ -23,7 +23,7 @@
         :key="row.node.id"
         :node="row.node"
         :depth="depth + 1"
-        :lockRows="lockRows"
+        :lock-rows="lockRows"
         :disabled="disabled || disableRow(row.node)"
         @scroll-to="scrollToRow"
       />
@@ -103,7 +103,7 @@ export default {
       if (typeof nodeId === "undefined" || !nodeId) {
         nodeId = this.node.id
       }
-      this.$emit("handleMenuItemClick", nodeId)
+      this.$emit("handle-menu-item-click", nodeId)
       this.$emit("scroll-to", nodeId)
     },
     isMultiContentChild(node) {

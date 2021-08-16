@@ -59,10 +59,10 @@
                   v-for="row in menu"
                   :key="row.node.id"
                   :node="row.node"
-                  :lockRows="lockRows"
+                  :lock-rows="lockRows"
                   :disabled="disabledRow(row.node)"
                   @scroll-to="scrollToRef"
-                  @handleMenuItemClick="handleMenuItemClick"
+                  @handle-menu-item-click="handleMenuItemClick"
                 />
               </ul>
             </b-collapse>
@@ -125,13 +125,7 @@ export default {
       const menu = []
       const mainMenu = []
       this.rows.forEach(row => {
-        if (row.node.typeData.isSecondaryNode) {
-          let subMenu = []
-          subMenu.push(row)
-          menu.push(subMenu)
-        } else {
-          mainMenu.push(row)
-        }
+        row.node.typeData.isSecondaryNode ? menu.push([row]) : mainMenu.push(row)
       })
       menu.unshift(mainMenu)
       return menu
@@ -243,7 +237,7 @@ export default {
         nodeId: this.getNodeIdFromMenuIndex(index),
         context: index === 0 ? "" : "page",
       }
-      this.$emit("handlePageMenuClick", pageMenuData)
+      this.$emit("handle-page-menu-click", pageMenuData)
     },
     handleMenuItemClick(nodeId) {
       this.$router.push({
@@ -255,7 +249,7 @@ export default {
         nodeId: nodeId,
         context: "multi-content",
       }
-      this.$emit("handlePageMenuClick", pageMenuData)
+      this.$emit("handle-page-menu-click", pageMenuData)
     },
   },
 }
