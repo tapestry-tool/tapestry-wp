@@ -4,7 +4,6 @@
 require_once dirname(__FILE__).'/../interfaces/interface.tapestry-user-progress.php';
 require_once dirname(__FILE__).'/../classes/class.tapestry-node.php';
 require_once dirname(__FILE__).'/../classes/class.tapestry.php';
-require_once dirname(__FILE__).'/../utilities/class.tapestry-user.php';
 
 /**
  * Add/update/retrieve User progress.
