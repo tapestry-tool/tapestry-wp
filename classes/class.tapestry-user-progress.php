@@ -156,8 +156,6 @@ class TapestryUserProgress implements ITapestryUserProgress
         $progress = new stdClass();
         $tapestry = new Tapestry($this->postId);
 
-        $roles = new TapestryUser();
-
         $nodes = $tapestry->setUnlocked($nodeIdArr, $userId);
 
         // Build json object for frontend e.g. {0: 0.1, 1: 0.2} where 0 and 1 are the node IDs
