@@ -35,11 +35,7 @@
           },
         ]"
       >
-        <div
-          v-for="(menu, index) in filteredMenuGroups"
-          :key="index"
-          style="padding-top: 4px; padding-bottom: 4px;"
-        >
+        <div v-for="(menu, index) in filteredMenuGroups" :key="index" class="py-1">
           <b-card>
             <b-card-text
               v-b-toggle="
