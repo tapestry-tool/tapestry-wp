@@ -77,8 +77,7 @@ export default {
 
 <style lang="scss" scoped>
 .completed-activity-media {
-  background: #eeeeee;
-  color: #111;
+  background: #dcdcdc;
   border-radius: 8px;
   margin-bottom: 8px;
   padding: 8px 16px 8px 16px;
