@@ -163,18 +163,18 @@ class TapestryUserProgress implements ITapestryUserProgress
             $nodeId = $node->id;
             $isDyad = $node->isDyad;
 
-            $progress_value = get_user_meta($userId, 'tapestry_'.$this->postId.'_progress_node_'.$nodeId, true);
-
             $user_meta = get_userdata($userId); 
             $user_roles = $user_meta->roles;
+            $teenId = get_user_meta($userId, 'linked_dyad_user_id', true);
+            $isDyad = $node->isDyad && in_array('dyad', $user_roles, true) && $teenId;
 
-            if ($isDyad && in_array('dyad', $user_roles, true)) {
+            if ($isDyad) {
                 // overwrite $progress_value to that of $teenId
                 // if the user is a parent account
-                $teenId = get_user_meta($userId, 'linked_dyad_user_id');
-                $progress_value = get_user_meta($teenId[0], 'tapestry_'.$this->postId.'_progress_node_'.$nodeId, true);
+                $userId = $teenId;
             }
 
+            $progress_value = get_user_meta($userId, 'tapestry_'.$this->postId.'_progress_node_'.$nodeId, true);
             $progress->$nodeId = new stdClass();
             if (null !== $progress_value) {
                 $progress->$nodeId->progress = (float) $progress_value;
@@ -204,12 +204,13 @@ class TapestryUserProgress implements ITapestryUserProgress
                 $progress->$nodeId->content['userAnswers'] = new stdClass();
                 $progress->$nodeId->content['userAnswers']->activity = new stdClass();
                 foreach ($questionIdArray as $questionId) {
-                    if ($isDyad && in_array('dyad', $user_roles, true)) {
-                        $teenId = get_user_meta($userId, 'linked_dyad_user_id');
-                        $answer = get_user_meta($teenId[0], 'tapestry_'.$this->postId.'_'.$nodeId.'_question_'.$questionId.'_answers', true);
-                    } else {
-                        $answer = get_user_meta($userId, 'tapestry_'.$this->postId.'_'.$nodeId.'_question_'.$questionId.'_answers', true);
+                    if ($isDyad) {
+                        // overwrite $progress_value to that of $teenId
+                        // if the user is a parent account
+                        $userId = $teenId;
                     }
+                    
+                    $answer = get_user_meta($userId, 'tapestry_'.$this->postId.'_'.$nodeId.'_question_'.$questionId.'_answers', true);
                     $progress->$nodeId->content['userAnswers']->activity->{$questionId}->answers = $answer;
                 }
             }
