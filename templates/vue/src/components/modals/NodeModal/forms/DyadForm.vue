@@ -2,7 +2,7 @@
   <div>
     <b-form-group>
       <b-form-checkbox v-model="node.isDyad">
-        Enable dyad node behaviour
+        This is a dyad node
       </b-form-checkbox>
     </b-form-group>
     <small id="emailHelp" class="form-text text-muted">
