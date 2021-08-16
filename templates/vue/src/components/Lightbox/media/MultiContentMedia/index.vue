@@ -315,7 +315,6 @@ button[disabled] {
 }
 
 .media-container {
-  background: #eee;
   background-color: #eee;
   color: #111;
   height: 100%;
