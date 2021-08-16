@@ -76,7 +76,7 @@ import H5PMedia from "./H5PMedia"
 import ExternalMedia from "./ExternalMedia"
 import ActivityMedia from "./ActivityMedia"
 import WpPostMedia from "./WpPostMedia"
-import * as wp from "@/services/wp"
+import Helpers from "@/utils/Helpers"
 
 export default {
   name: "tapestry-media",
@@ -124,7 +124,7 @@ export default {
     },
   },
   beforeDestroy() {
-    if (this.performDyadNodeCheck()) {
+    if (Helpers.performDyadNodeCheck(this.node)) {
       this.updateNodeProgress({
         id: this.nodeId,
         progress: this.node && this.node.progress,
@@ -146,21 +146,13 @@ export default {
       this.$emit("load", args)
     },
     updateProgress({ amountViewed }) {
-      if (this.performDyadNodeCheck()) {
+      if (Helpers.performDyadNodeCheck(this.node)) {
         this.updateNodeProgress({ id: this.nodeId, progress: amountViewed })
       }
     },
     complete(nodeId) {
-      if (this.performDyadNodeCheck()) {
+      if (Helpers.performDyadNodeCheck(this.node)) {
         this.$emit("complete", nodeId)
-      }
-    },
-    performDyadNodeCheck() {
-      let roles = wp.getCurrentUser().roles
-      if (!this.node.isDyad) {
-        return true
-      } else {
-        return !roles.includes("dyad")
       }
     },
   },
