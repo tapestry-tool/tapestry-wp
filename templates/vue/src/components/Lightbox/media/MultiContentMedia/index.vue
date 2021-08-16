@@ -329,7 +329,6 @@ button[disabled] {
 }
 
 .nested-media-title {
-  color: #111;
   text-align: left;
   font-size: 1.75rem;
   font-weight: 500;
