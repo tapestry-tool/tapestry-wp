@@ -90,7 +90,7 @@
             </b-card>
             <h6 class="mt-4 mb-3">Lock Node</h6>
             <conditions-form :node="node" />
-            <h6 class="mt-4 mb-3">Dyad Node Behaviour</h6>
+            <h6 class="mt-4 mb-3">Dyad Node</h6>
             <dyad-form :node="node" />
           </b-tab>
           <b-tab
