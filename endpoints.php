@@ -173,6 +173,13 @@ $REST_API_ENDPOINTS = [
             'callback' => 'addTapestryLink',
         ],
     ],
+    'REVERSE_TAPESTRY_LINK' => (object) [
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/links/reverse',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_POST_METHOD,
+            'callback' => 'reverseTapestryLink',
+        ],
+    ],
     'DELETE_TAPESTRY_LINK' => (object) [
         'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/links',
         'ARGUMENTS' => [
@@ -677,6 +684,37 @@ function addTapestryLink($request)
     }
 }
 
+/**
+ * Reverses A Tapestry Link.
+ *
+ * @param object $request HTTP request
+ *
+ * @return object $response   HTTP response
+ */
+function reverseTapestryLink($request)
+{
+    $postId = $request['tapestryPostId'];
+    $newLink = json_decode($request->get_body());
+
+
+    try {
+        if (!$newLink->source || !$newLink->target) {
+            throw new TapestryError('INVALID_NEW_LINK');
+        }
+        if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+        if (!TapestryHelpers::userIsAllowed('ADD', $newLink->source, $postId) 
+            || !TapestryHelpers::userIsAllowed('ADD', $newLink->target, $postId)) {
+            throw new TapestryError('ADD_LINK_PERMISSION_DENIED');
+        }
+        $tapestry = new Tapestry($postId);
+
+        return $tapestry->reverseLink($newLink);
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
 /**
  * Delete A Tapestry Link.
  *
