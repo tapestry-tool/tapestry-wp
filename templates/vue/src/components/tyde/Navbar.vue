@@ -3,7 +3,7 @@
     <b-navbar tyde="light" class="navbar">
       <b-navbar-nav class="mx-auto" fill style="width:100%;">
         <b-nav-item
-          v-for="tab in tabs"
+          v-for="(tab, index) in tabs"
           :key="tab"
           :ref="tab + '-tab'"
           active-class="active"
@@ -11,7 +11,11 @@
           :active="selectedTab === tab"
           @click="handleTabChange(tab)"
         >
-          <tyde-icon :selected="isSelectedTap(tab)" :icon="tab" />
+          <tyde-icon
+            :selected="isSelectedTap(tab)"
+            :icon="tab"
+            :placement="index === tabs.length - 1 ? 'left' : 'right'"
+          />
         </b-nav-item>
       </b-navbar-nav>
     </b-navbar>
@@ -50,7 +54,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style scoped lang="scss">
 .nav-container {
   width: 100vw;
   z-index: 9999;

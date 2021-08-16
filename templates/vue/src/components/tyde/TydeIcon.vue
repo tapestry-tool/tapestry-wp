@@ -1,6 +1,15 @@
 <template>
   <div>
-    <img :src="url" :width="size" svg />
+    <img :id="icon" :src="url" :width="size" svg />
+    <b-tooltip
+      v-if="windowWidth > 700"
+      :target="icon"
+      triggers="hover"
+      :placement="placement"
+      custom-class="nav-item-tooltip text-capitalize"
+    >
+      {{ title }}
+    </b-tooltip>
   </div>
 </template>
 
@@ -31,11 +40,37 @@ export default {
       type: Boolean,
       required: true,
     },
+    placement: {
+      type: String,
+      required: true,
+    },
   },
   data() {
     return {
       url: "",
+      windowWidth: window.innerWidth,
     }
+  },
+  computed: {
+    title() {
+      let title = " "
+      switch (this.icon) {
+        case "default":
+          title = "Learning Program"
+          break
+        case "profile":
+          title = "Profile"
+          break
+        case "goals":
+          title = "Goals"
+          break
+        case "cos":
+          title = "Circle of Support"
+          break
+      }
+
+      return title
+    },
   },
   watch: {
     selected() {
@@ -44,6 +79,10 @@ export default {
   },
   mounted() {
     this.selectIcon()
+
+    window.addEventListener("resize", () => {
+      this.windowWidth = window.innerWidth
+    })
   },
   methods: {
     createUrl(selected) {
@@ -76,3 +115,19 @@ export default {
   },
 }
 </script>
+
+<style>
+.nav-item-tooltip .tooltip-inner {
+  background: transparent !important;
+  color: black !important;
+  font-family: "Source Sans Pro", sans-serif !important;
+  font-size: 1rem;
+  font-weight: 500;
+  max-width: 100px;
+  padding: 0.25rem 0 !important;
+  line-height: 100% !important;
+}
+.nav-item-tooltip > .arrow {
+  display: none !important;
+}
+</style>
