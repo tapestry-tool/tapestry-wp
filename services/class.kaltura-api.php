@@ -1,5 +1,5 @@
 <?php
-    (defined("LOAD_KALTURA") && LOAD_KALTURA) or exit();
+    (defined("LOAD_KALTURA") && LOAD_KALTURA != false) or exit();
     require_once plugin_dir_path(dirname(__FILE__)) . 'vendor/autoload.php';
 
     use Kaltura\Client\Client;
