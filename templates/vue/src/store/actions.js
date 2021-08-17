@@ -328,6 +328,19 @@ export async function updateUserFavourites({ commit, dispatch }, favourites) {
   }
 }
 
+// last selected node
+export async function updateUserLastSelectedNode(
+  { commit, dispatch },
+  selectedNodeId
+) {
+  try {
+    await client.updateUserLastSelectedNode(selectedNodeId)
+    commit("updateSelectedNodeId", selectedNodeId)
+  } catch (error) {
+    dispatch("addApiError", error)
+  }
+}
+
 export async function refetchTapestryData(
   { commit, state, dispatch },
   filterUserId = null

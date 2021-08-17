@@ -152,6 +152,10 @@ export function updateFavourites(state, { favourites }) {
   state.favourites = favourites
 }
 
+export function updateSelectedNodeId(state, selectedNodeId) {
+  state.selectedNodeId = selectedNodeId
+}
+
 export function updateOrdering(state, payload) {
   const node = getters.getNode(state)(payload.id)
   node.childOrdering = payload.ord

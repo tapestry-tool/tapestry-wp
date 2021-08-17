@@ -40,7 +40,7 @@
 
 <script>
 import DragSelectModular from "@/utils/dragSelectModular"
-import { mapMutations, mapState } from "vuex"
+import { mapMutations, mapState, mapActions } from "vuex"
 import TapestryNode from "./TapestryNode"
 import TapestryLink from "./TapestryLink"
 import RootNodeButton from "./RootNodeButton"
@@ -48,7 +48,6 @@ import LockedTooltip from "./LockedTooltip"
 import Helpers from "@/utils/Helpers"
 import { names } from "@/config/routes"
 import * as wp from "@/services/wp"
-import client from "@/services/TapestryAPI"
 
 export default {
   components: {
@@ -126,6 +125,7 @@ export default {
   },
   methods: {
     ...mapMutations(["select", "unselect", "clearSelection"]),
+    ...mapActions(["updateUserLastSelectedNode"]),
     addRootNode() {
       this.$root.$emit("add-node", null)
     },
@@ -150,9 +150,11 @@ export default {
       }
     },
     clearLastSelectedNodeTimeout(selectedNodeId) {
+      console.log(selectedNodeId)
       clearTimeout(this.updateLastSelectedNodeTimer)
       this.updateLastSelectedNodeTimer = setTimeout(() => {
-        client.updateUserLastSelectedNode(selectedNodeId)
+        this.updateUserLastSelectedNode(selectedNodeId)
+        console.log("saved!")
       }, 5000)
     },
   },
