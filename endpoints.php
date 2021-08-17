@@ -1465,43 +1465,14 @@ function upload_videos_to_kaltura($request)
 {
     if (LOAD_KALTURA) {
         $upload_folder = getcwd()."/wp-content/uploads";
-        //$htaccess_file = getcwd()."/.htaccess";
     
         $files_in_upload_folder = scandir($upload_folder);
         $current_date = date('Y/m/d');
-    
 
-        // Clean .htaccess file from previous redirect entries
-        // $htaccess_lines = explode("\n", file_get_contents($htaccess_file));
-        // $delete = false;
-    
-        // foreach ($htaccess_lines as $index => $line) {
-        //     preg_match_all('/\d{4}\/\d{2}\/\d{2}/', $line, $matches);
-
-        //     if (count($matches[0]) && strtotime($matches[0][0]) !== $current_date) {
-        //         if (strpos($line, "START")) {
-        //             $delete = true;
-        //         } elseif (strpos($line, "END")) {
-        //             $delete = false;
-        //         }
-        //         unset($htaccess_lines[$index]);
-        //     } else {
-        //         if ($delete) {
-        //             unset($htaccess_lines[$index]);
-        //         }
-        //     }
-        // }
-
-        // $htaccess_final = implode("\n", $htaccess_lines);
-
-        // file_put_contents($htaccess_file, $htaccess_final);
-
-        // /*
-        //     1.Create redirect for new uploaded files in case of client caching
-        //     2. Uplaod files from server to kaltura
-        //     3. Note local server urls to replace with kaltura urls
-        //  */
-        // file_put_contents($htaccess_file, "\n# ".$current_date." - START\n", FILE_APPEND);
+        /*
+            1. Uplaod files from server to kaltura
+            2. Note local server urls to replace with kaltura urls
+         */
 
         $videos_in_upload_folder = array_filter(
             $files_in_upload_folder,
@@ -1521,15 +1492,9 @@ function upload_videos_to_kaltura($request)
             $file_obj->name = $value;
 
             $result = $kalturaApi->uploadKalturaVideo($file_obj, $current_date);
-        
-            // Additing redirect in case of cahacing
-            //$redirect_directive = "\nRedirect 301 /wp-content/uploads/".$value." ".$result->dataUrl."\n";
-            //file_put_contents($htaccess_file, $redirect_directive, FILE_APPEND);
-
+            error_log(print_r($result,true));
             $video_links[$value] = $result->dataUrl;
         }
-
-        // file_put_contents($htaccess_file, "\n# ".$current_date." - END\n", FILE_APPEND);
 
         // Replace all local server urls with kaltura urls
         $tapestries = get_posts(['post_type' => 'tapestry',]);
