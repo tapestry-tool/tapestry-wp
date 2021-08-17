@@ -22,7 +22,7 @@
       ></i>
     </button>
     <div class="w-100">
-      <code v-if="state !== states.SAVED" id="durationText">
+      <code v-if="state !== states.SAVED" id="duration-text">
         {{ durationText }}
       </code>
     </div>
@@ -244,7 +244,7 @@ export default {
 
 <style lang="scss" scoped>
 .recorder {
-  #durationText {
+  #duration-text {
     color: #111;
   }
   h1 {

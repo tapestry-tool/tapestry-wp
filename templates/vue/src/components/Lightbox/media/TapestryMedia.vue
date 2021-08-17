@@ -156,7 +156,6 @@ export default {
 <style lang="scss" scoped>
 .media-wrapper {
   outline: none;
-  background: #bbb;
   border-radius: 15px;
   overflow: auto;
   height: 100%;

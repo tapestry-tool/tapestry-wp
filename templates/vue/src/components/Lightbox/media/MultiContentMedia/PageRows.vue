@@ -15,11 +15,7 @@
           :style="rowBackground"
         >
           <div class="title-row-icon">
-            <i
-              v-if="disableRow(index, row.node)"
-              class="fas fa-lock fa-sm"
-              style="color:white;"
-            ></i>
+            <i v-if="disableRow(index, row.node)" class="fas fa-lock fa-sm"></i>
             <a v-else>
               <i
                 class="fas fa-heart fa-sm"
@@ -43,14 +39,11 @@
                 :node-id="row.node.id"
                 :dimensions="dimensions"
                 context="page"
-                style="color: white; margin-bottom: 24px;"
+                style="margin-bottom: 24px;"
                 @complete="updateProgress(row.node.id)"
                 @load="handleLoad($refs.rowRefs[index])"
               />
-              <p
-                v-if="row.children.length > 0 && !areAllPopup(row.children)"
-                style="color: white;"
-              >
+              <p v-if="row.children.length > 0 && !areAllPopup(row.children)">
                 {{ row.node.typeData.subAccordionText }}
               </p>
               <accordion-rows
@@ -167,7 +160,7 @@ export default {
       if (this.isMultiContentContext) {
         let rgb = 187
         let colorOffset = this.level * 10
-        rgb = colorOffset > rgb ? 0 : rgb - colorOffset
+        rgb = colorOffset > rgb ? 0 : rgb + colorOffset
         return {
           background: `rgb(${rgb}, ${rgb}, ${rgb})`,
         }
@@ -232,7 +225,7 @@ button[disabled] {
 }
 
 .page-row {
-  background: #eee;
+  background: #ddd;
   border-radius: 4px;
   padding: 8px 16px;
   margin-bottom: 8px;

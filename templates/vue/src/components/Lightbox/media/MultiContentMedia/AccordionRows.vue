@@ -183,7 +183,7 @@ export default {
       if (this.isMultiContentContext) {
         let rgb = 187
         let colorOffset = this.level * 10
-        rgb = colorOffset > rgb ? 0 : rgb - colorOffset
+        rgb = colorOffset > rgb ? 0 : rgb + colorOffset
         return {
           background: `rgb(${rgb}, ${rgb}, ${rgb})`,
         }
@@ -230,8 +230,6 @@ button[disabled] {
 }
 
 .button-row {
-  color: #111;
-  background: #00bfff;
   display: flex;
   align-items: center;
   margin: 0;

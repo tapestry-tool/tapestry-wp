@@ -33,7 +33,6 @@ export default {
 
 <style lang="scss" scoped>
 .completion-screen {
-  background-color: #bbbbbb;
   width: 100%;
   height: 100%;
   display: flex;
