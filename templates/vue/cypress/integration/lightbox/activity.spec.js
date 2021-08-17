@@ -401,6 +401,7 @@ describe("Activity", () => {
       cy.getByTestId("question-answer-text-multi-0").click({ force: true })
       cy.submitModal()
       cy.openLightbox(node.id)
+      cy.contains(/Change answers/i).click()
       cy.route("POST", "/users/activity/**").as("submit")
       cy.lightbox().within(() => {
         cy.get("textarea").type(answer2)
@@ -522,6 +523,7 @@ describe("Activity", () => {
       })
 
       cy.openLightbox(node.id)
+      cy.contains(/Change answers/i).click()
       cy.lightbox().within(() => {
         cy.getByTestId("list-input-0").should("be.visible")
         cy.getByTestId("list-input-1").should("be.visible")
@@ -577,6 +579,7 @@ describe("Activity", () => {
         })
       })
       cy.openLightbox(node.id)
+      cy.contains(/Change answers/i).click()
       cy.lightbox().within(() => {
         console.log(cy.get(`[class="grid-container"]`))
         cy.get(`[class="grid-container"]`)
