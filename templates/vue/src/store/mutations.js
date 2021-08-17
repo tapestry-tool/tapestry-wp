@@ -2,7 +2,7 @@ import Vue from "vue"
 import * as getters from "./getters"
 import { parse } from "@/utils/dataset"
 
-export function init(state, { dataset, progress = {} }) {
+export function init(state, { dataset, progress = {}, selectedNodeId }) {
   const datasetWithProgress = parse(dataset, progress)
   Object.entries(datasetWithProgress).forEach(([key, value]) => {
     if (key === "nodes") {
@@ -11,6 +11,8 @@ export function init(state, { dataset, progress = {} }) {
         // Has to call this so `state.nodes` is reactive
         Vue.set(state.nodes, node.id, node)
       })
+    } else if (key === "selectedNodeId") {
+      state[key] = selectedNodeId
     } else {
       state[key] = value
     }

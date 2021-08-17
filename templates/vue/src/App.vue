@@ -48,7 +48,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(["nodes"]),
+    ...mapState(["nodes", "selectedNodeId"]),
     isEmpty() {
       return Object.keys(this.nodes).length === 0
     },
@@ -79,14 +79,14 @@ export default {
       client.getLastSelectedNode(),
     ]
     Promise.all(data).then(([dataset, progress, selectedNodeId]) => {
-      this.init({ dataset, progress })
+      this.init({ dataset, progress, selectedNodeId })
       this.loading = false
       if (!this.$route.params.nodeId && dataset.nodes.length > 0) {
-        if (!selectedNodeId) {
+        if (!this.selectedNodeId) {
           selectedNodeId = dataset.rootId
         }
         this.$router.replace({
-          path: `/nodes/${selectedNodeId}`,
+          path: `/nodes/${this.selectedNodeId}`,
           query: this.$route.query,
         })
       }
@@ -96,7 +96,7 @@ export default {
     window.removeEventListener("click", this.recordAnalytics)
   },
   methods: {
-    ...mapMutations(["init"]),
+    ...mapMutations(["init", "updateSelectedNodeId"]),
     refresh() {
       this.$router.go()
     },
