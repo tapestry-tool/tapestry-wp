@@ -11,6 +11,7 @@
       @seeked="handleSeek"
       @seeking="$emit('seeking')"
       @timeupdate="updateVideoProgress"
+      @error="handleError"
     ></video>
   </div>
 </template>
@@ -125,6 +126,18 @@ export default {
         type: "html5-video",
         currentTime,
       })
+    },
+    handleError() {
+      // Error code 4 - The associated resource or media provider object has been found to be unsuitable.
+      if (this.$refs.video.error.code === 4) {
+        if (
+          confirm(
+            "It seems this video cannot be load, would you like to refresh the page?"
+          )
+        ) {
+          location.reload()
+        }
+      }
     },
     updateVideoProgress() {
       const video = this.$refs.video
