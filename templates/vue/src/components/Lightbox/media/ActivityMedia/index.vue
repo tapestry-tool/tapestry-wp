@@ -212,45 +212,26 @@ export default {
           question.completed = true
         }
       })
-      // for (let i = 0; i < this.questions.length; i++) {
-      //   const currentQuestion = this.questions[i]
-      //   const currentQuestionAnswer = this.getAnswers(
-      //     this.node.id,
-      //     currentQuestion.id
-      //   )
-      //   if (
-      //     Object.keys(currentQuestionAnswer).length === 0 &&
-      //     !currentQuestion.optional
-      //   ) {
-      //     currentQuestion.completed = false
-      //   } else {
-      //     currentQuestion.completed = true
-      //   }
-      // }
     },
     handleSubmit() {
       this.showCompletionScreen = true
       this.updateActivityProgress()
     },
     updateActivityProgress() {
-      const numberCompleted = this.questions.filter(question => question.completed)
-        .length
-      const progress = numberCompleted / this.node.typeData.activity.questions.length
-      this.updateNodeProgressAndCompletion({ id: this.node.id, progress: progress })
+      const numberCompleted = this.questionNode.typeData.activity.questions.filter(
+        question => question.completed
+      ).length
+      const progress =
+        numberCompleted / this.questionNode.typeData.activity.questions.length
+      this.updateNodeProgressAndCompletion({
+        id: this.questionNode.id,
+        progress: progress,
+      })
     },
     handleComplete(initiatingComponent) {
       if (initiatingComponent === "activity") {
         this.state = states.COMPLETION_SCREEN
-        const numberCompleted = this.questionNode.typeData.activity.questions.filter(
-          question => question.completed
-        ).length
-        const progress =
-          numberCompleted / this.questionNode.typeData.activity.questions.length
-        this.updateNodeProgress({ id: this.questionNode.id, progress }).then(() => {
-          if (progress === 1) {
-            this.$emit("complete")
-          }
-        })
+        this.updateActivityProgress()
       } else if (
         this.initialType === states.ANSWER &&
         initiatingComponent === "answer" &&
