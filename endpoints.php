@@ -303,13 +303,13 @@ $REST_API_ENDPOINTS = [
             'permission_callback' => 'TapestryPermissions::putTapestrySettings',
         ],
     ],
-    // 'KALTURA_TEST' => (object) [
-    //     'ROUTE' => '/kaltura',
-    //     'ARGUMENTS' => [
-    //         'methods' => $REST_API_POST_METHOD,
-    //         'callback' => 'upload_videos_to_kaltura',
-    //     ],
-    // ],
+    'KALTURA_TEST' => (object) [
+        'ROUTE' => '/kaltura',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_POST_METHOD,
+            'callback' => 'upload_videos_to_kaltura',
+        ],
+    ],
 ];
 
 /*
