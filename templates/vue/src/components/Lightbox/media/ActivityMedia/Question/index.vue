@@ -18,7 +18,7 @@
       >
         Edit your answer
       </button>
-      <p v-else>Changing your answer is disabled for this question.</p>
+      <h6 v-else style="padding-top: 15px;">Changing your answer is disabled for this question.</h6>
     </div>
     <div v-else>
       <button
