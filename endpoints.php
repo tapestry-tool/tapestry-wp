@@ -1493,7 +1493,7 @@ function upload_videos_to_kaltura($request)
 
             $result = $kalturaApi->uploadKalturaVideo($file_obj, $current_date);
             error_log(print_r($result,true));
-            $video_links[$value] = $result->dataUrl;
+            $video_links[$value] = $result;
         }
 
         // Replace all local server urls with kaltura urls
@@ -1516,17 +1516,19 @@ function upload_videos_to_kaltura($request)
         }
 
         foreach ($video_nodes as $node) {
-            foreach ($video_links as $original_link => $kaltura_link) {
+            foreach ($video_links as $original_link => $kaltura_data) {
                 $node_type_data = $node->getTypeData();
 
                 if (strpos($node_type_data->mediaURL, $original_link)) {
                     $typeData = $node->getTypeData();
-                    $typeData->mediaURL = $kaltura_link."?.mp4";
+                    $typeData->mediaURL = $kaltura_data->dataUrl."?.mp4";
+                    $typeData->kaltura_data = array(
+                        "id" => $kaltura_data->id,
+                        "partnerId" => $kaltura_data->partnerId,
+                    );
 
                     $node->set($typeData);
                     $node->save();
-
-                    error_log($upload_folder."/".$original_link);
 
                     wp_delete_file($upload_folder."/".$original_link);
                     break;
