@@ -150,11 +150,9 @@ export default {
       }
     },
     clearLastSelectedNodeTimeout(selectedNodeId) {
-      console.log(selectedNodeId)
       clearTimeout(this.updateLastSelectedNodeTimer)
       this.updateLastSelectedNodeTimer = setTimeout(() => {
         this.updateUserLastSelectedNode(selectedNodeId)
-        console.log("saved!")
       }, 5000)
     },
   },
