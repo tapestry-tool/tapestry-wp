@@ -1522,7 +1522,7 @@ function upload_videos_to_kaltura($request)
                 if (strpos($node_type_data->mediaURL, $original_link)) {
                     $typeData = $node->getTypeData();
                     $typeData->mediaURL = $kaltura_data->dataUrl."?.mp4";
-                    $typeData->kaltura_data = array(
+                    $typeData->kalturaData = array(
                         "id" => $kaltura_data->id,
                         "partnerId" => $kaltura_data->partnerId,
                     );
