@@ -21,6 +21,7 @@
                 class="fas fa-heart fa-sm"
                 :style="{
                   color: isFavourite(row.node.id) ? 'red' : 'black',
+                  opacity: isFavourite(row.node.id) ? '1' : '0.25',
                   cursor: 'pointer',
                 }"
                 @click="toggleFavourite(row.node.id)"
