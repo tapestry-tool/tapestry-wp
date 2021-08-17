@@ -85,6 +85,7 @@ export default {
         if (!selectedNodeId) {
           selectedNodeId = dataset.rootId
         }
+        this.updateSelectedNodeId(selectedNodeId)
         this.$router.replace({
           path: `/nodes/${selectedNodeId}`,
           query: this.$route.query,
@@ -96,7 +97,7 @@ export default {
     window.removeEventListener("click", this.recordAnalytics)
   },
   methods: {
-    ...mapMutations(["init"]),
+    ...mapMutations(["init", "updateSelectedNodeId"]),
     refresh() {
       this.$router.go()
     },
