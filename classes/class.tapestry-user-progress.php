@@ -158,20 +158,23 @@ class TapestryUserProgress implements ITapestryUserProgress
 
         $nodes = $tapestry->setUnlocked($nodeIdArr, $userId);
 
+        $thisUserId = $userId;
+        $otherUserId = get_user_meta($userId, 'linked_dyad_user_id', true);
+
+        $user_roles = get_userdata($userId)->roles;
+        $isDyadUser = in_array('dyad', $user_roles, true) && $otherUserId;
+
         // Build json object for frontend e.g. {0: 0.1, 1: 0.2} where 0 and 1 are the node IDs
         foreach ($nodes as $node) {
             $nodeId = $node->id;
-            $isDyad = $node->isDyad;
 
-            $user_meta = get_userdata($userId); 
-            $user_roles = $user_meta->roles;
-            $teenId = get_user_meta($userId, 'linked_dyad_user_id', true);
-            $isDyad = $node->isDyad && in_array('dyad', $user_roles, true) && $teenId;
-
-            if ($isDyad) {
-                // overwrite $progress_value to that of $teenId
-                // if the user is a parent account
-                $userId = $teenId;
+            // overwrite $progress_value to that of $otherUserId if the user is a dyad and 
+            // this node is a dyad node
+            if ($node->isDyad && $isDyadUser) {
+                $userId = $otherUserId;
+            }
+            else {
+                $userId = $thisUserId;
             }
 
             $progress_value = get_user_meta($userId, 'tapestry_'.$this->postId.'_progress_node_'.$nodeId, true);
@@ -204,12 +207,6 @@ class TapestryUserProgress implements ITapestryUserProgress
                 $progress->$nodeId->content['userAnswers'] = new stdClass();
                 $progress->$nodeId->content['userAnswers']->activity = new stdClass();
                 foreach ($questionIdArray as $questionId) {
-                    if ($isDyad) {
-                        // overwrite $progress_value to that of $teenId
-                        // if the user is a parent account
-                        $userId = $teenId;
-                    }
-                    
                     $answer = get_user_meta($userId, 'tapestry_'.$this->postId.'_'.$nodeId.'_question_'.$questionId.'_answers', true);
                     $progress->$nodeId->content['userAnswers']->activity->{$questionId}->answers = $answer;
                 }
