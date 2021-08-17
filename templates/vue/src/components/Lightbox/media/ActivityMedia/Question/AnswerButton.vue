@@ -2,7 +2,10 @@
   <button class="button" :disabled="disabled" @click="$emit('click')">
     <i class="fas fa-check-circle" :class="completed ? 'visible' : 'invisible'"></i>
     <div v-if="isFaIcon" class="icon">
-      <i :class="`fas fa-${icon} icon-fa`"></i>
+      <i :class="`fas fa-${faIcon} icon-fa`"></i>
+    </div>
+    <div v-else-if="isDragAndDropIcon" class="drag-drop-icon">
+      <img :src="dragDropIcon" style="height:56px;" />
     </div>
     <img v-else :src="textIcon" class="icon" />
     <div>
@@ -13,6 +16,7 @@
 
 <script>
 import TextIcon from "@/assets/Aa.svg"
+import DragDropIcon from "@/assets/icons/drag_drop.svg"
 import { data } from "@/services/wp"
 
 export default {
@@ -35,11 +39,29 @@ export default {
     },
   },
   computed: {
+    faIcon() {
+      switch (this.icon) {
+        case "multipleChoice":
+          return "tasks"
+
+        case "audio":
+          return "microphone"
+
+        default:
+          return this.icon
+      }
+    },
     isFaIcon() {
-      return this.icon === "tasks" || this.icon === "microphone"
+      return this.faIcon === "tasks" || this.faIcon === "microphone"
     },
     textIcon() {
       return `${data.vue_uri}/${TextIcon.split("dist")[1]}`
+    },
+    isDragAndDropIcon() {
+      return this.icon === "dragDrop"
+    },
+    dragDropIcon() {
+      return `${data.vue_uri}/${DragDropIcon.split("dist")[1]}`
     },
   },
 }
@@ -91,6 +113,13 @@ button {
 
   &-fa {
     font-size: 56px;
+  }
+}
+
+.container {
+  height: 56px;
+  img {
+    margin-top: -30px;
   }
 }
 </style>
