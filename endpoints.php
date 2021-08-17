@@ -1569,6 +1569,6 @@ function upload_videos_to_kaltura($request)
             }
         }
 
-        return "tapestries";
+        return true; // This is only a placeholder for testing
     }
 }
