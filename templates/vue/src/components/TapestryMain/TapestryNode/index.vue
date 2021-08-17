@@ -423,6 +423,7 @@ export default {
     ...mapActions(["updateNodeCoordinates"]),
     ...mapMutations(["select", "unselect"]),
     updateRootNode() {
+      this.$emit("clear-last-selected-node-timeout", this.node.id)
       if (!this.root) {
         this.$router.push({
           name: names.APP,
@@ -434,10 +435,12 @@ export default {
     },
     openNode(id) {
       this.$root.$emit("open-node", id)
+      this.$emit("clear-last-selected-node-timeout", id)
       client.recordAnalyticsEvent("app", "open", "lightbox", id)
     },
     editNode(id) {
       this.$root.$emit("edit-node", id)
+      this.$emit("clear-last-selected-node-timeout", id)
       client.recordAnalyticsEvent("user", "click", "edit-node-button", id)
     },
     reviewNode() {
@@ -498,9 +501,6 @@ export default {
           ? this.openNode(this.node.id)
           : this.updateRootNode()
       }
-      setTimeout(() => {
-        client.updateUserLastSelectedNode(this.node.id)
-      }, 3000)
       client.recordAnalyticsEvent("user", "click", "node", this.node.id)
     },
     hasPermission(action) {
