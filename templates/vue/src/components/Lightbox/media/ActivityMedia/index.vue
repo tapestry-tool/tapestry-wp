@@ -213,10 +213,6 @@ export default {
         }
       })
     },
-    handleSubmit() {
-      this.showCompletionScreen = true
-      this.updateActivityProgress()
-    },
     updateActivityProgress() {
       const numberCompleted = this.questionNode.typeData.activity.questions.filter(
         question => question.completed
@@ -265,7 +261,7 @@ export default {
       }
     },
     skip() {
-      this.hasNext ? this.next() : (this.showCompletionScreen = true)
+      this.hasNext ? this.next() : (this.state = states.COMPLETION_SCREEN)
     },
   },
 }
