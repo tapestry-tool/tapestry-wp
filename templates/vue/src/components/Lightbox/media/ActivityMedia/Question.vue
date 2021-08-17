@@ -91,6 +91,7 @@ import Loading from "@/components/common/Loading"
 import TapestryActivity from "./TapestryActivity"
 import * as wp from "@/services/wp"
 import { data as wpData } from "@/services/wp"
+import Helpers from "@/utils/Helpers"
 
 export default {
   name: "question",
@@ -232,14 +233,6 @@ export default {
       this.formType = answerType
       this.formOpened = true
     },
-    performDyadNodeCheck() {
-      let roles = wp.getCurrentUser().roles
-      if (!this.node.isDyad) {
-        return true
-      } else {
-        return !roles.includes("dyad")
-      }
-    },
     async handleSubmit(formData) {
       this.formOpened = false
       this.submitting = true
@@ -266,7 +259,7 @@ export default {
           break
         }
       }
-      if (this.performDyadNodeCheck()) {
+      if (!Helpers.nodeAndUserAreDyad(this.node)) {
         await this.completeQuestion({
           nodeId: this.node.id,
           questionId: this.question.id,

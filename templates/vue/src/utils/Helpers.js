@@ -386,12 +386,12 @@ export default class Helpers {
     return Helpers.deepMerge(baseNode, overrides)
   }
 
-  static performDyadNodeCheck(node) {
+  static nodeAndUserAreDyad(node) {
     let roles = wp.getCurrentUser().roles
     if (!node.isDyad) {
-      return true
+      return false
     } else {
-      return !roles.includes("dyad")
+      return roles.includes("dyad")
     }
   }
 }

@@ -124,7 +124,7 @@ export default {
     },
   },
   beforeDestroy() {
-    if (Helpers.performDyadNodeCheck(this.node)) {
+    if (!Helpers.nodeAndUserAreDyad(this.node)) {
       this.updateNodeProgress({
         id: this.nodeId,
         progress: this.node && this.node.progress,
@@ -146,12 +146,12 @@ export default {
       this.$emit("load", args)
     },
     updateProgress({ amountViewed }) {
-      if (Helpers.performDyadNodeCheck(this.node)) {
+      if (!Helpers.nodeAndUserAreDyad(this.node)) {
         this.updateNodeProgress({ id: this.nodeId, progress: amountViewed })
       }
     },
     complete(nodeId) {
-      if (Helpers.performDyadNodeCheck(this.node)) {
+      if (!Helpers.nodeAndUserAreDyad(this.node)) {
         this.$emit("complete", nodeId)
       }
     },
