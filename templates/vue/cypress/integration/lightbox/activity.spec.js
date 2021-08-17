@@ -361,7 +361,7 @@ describe("Activity", () => {
     })
   })
 
-  it("should be able to edit single-line text already answered question", () => {
+  it("should not be able to edit single-line text already answered question without Allow user to edit this answer", () => {
     cy.fixture("one-node.json").as("oneNode")
     cy.setup("@oneNode")
 
@@ -399,10 +399,12 @@ describe("Activity", () => {
       cy.openLightbox(node.id)
       cy.route("POST", "/users/activity/**").as("submit")
       cy.lightbox().within(() => {
-        cy.get("textarea").type(answer2)
-        cy.contains(/submit/i).click()
-        cy.contains("Thanks!").should("be.visible")
-        cy.contains(/done/i).click()
+        cy.get("textarea").should("not.exist")
+        cy.get(".completed-activity-media").find(".text").should("be.visible")
+        cy.contains("Changing your answer is disabled for this question.").should(
+          "be.visible"
+        )
+        cy.getByTestId("close-lightbox").click()
       })
       cy.lightbox().should("not.exist")
     })
@@ -518,10 +520,15 @@ describe("Activity", () => {
 
       cy.openLightbox(node.id)
       cy.lightbox().within(() => {
-        cy.getByTestId("list-input-0").should("be.visible")
-        cy.getByTestId("list-input-1").should("be.visible")
-        cy.getByTestId("list-input-2").should("be.visible")
-        cy.getByTestId("list-input-3").should("be.visible")
+        cy.get(".completed-activity-media").within(() => {
+          cy.contains("British Columbia").should("be.visible")
+          cy.contains("Alberta").should("be.visible")
+          cy.contains("Nova Scotia").should("be.visible")
+          cy.contains("Manitoba").should("be.visible")
+        })
+        cy.contains("Changing your answer is disabled for this question.").should(
+          "be.visible"
+        )
         cy.getByTestId("close-lightbox").click()
       })
       cy.lightbox().should("not.exist")
@@ -572,10 +579,10 @@ describe("Activity", () => {
       })
       cy.openLightbox(node.id)
       cy.lightbox().within(() => {
-        console.log(cy.get(`[class="grid-container"]`))
-        cy.get(`[class="grid-container"]`)
-          .children(".input-group")
-          .should("have.length", 10)
+        cy.contains("Changing your answer is disabled for this question.").should(
+          "be.visible"
+        )
+        cy.get("ol > li").should("have.length", 10)
         cy.getByTestId("close-lightbox").click()
       })
       cy.lightbox().should("not.exist")
