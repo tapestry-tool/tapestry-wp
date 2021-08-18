@@ -15,16 +15,13 @@
           :style="rowBackground"
         >
           <div class="title-row-icon">
-            <i
-              v-if="disableRow(index, row.node)"
-              class="fas fa-lock fa-sm"
-              style="color:white;"
-            ></i>
+            <i v-if="disableRow(index, row.node)" class="fas fa-lock fa-sm"></i>
             <a v-else>
               <i
                 class="fas fa-heart fa-sm"
                 :style="{
-                  color: isFavourite(row.node.id) ? 'red' : 'white',
+                  color: isFavourite(row.node.id) ? 'red' : 'black',
+                  opacity: isFavourite(row.node.id) ? '1' : '0.25',
                   cursor: 'pointer',
                 }"
                 @click="toggleFavourite(row.node.id)"
@@ -43,11 +40,11 @@
                 :node-id="row.node.id"
                 :dimensions="dimensions"
                 context="page"
-                style="color: white; margin-bottom: 24px;"
+                style="margin-bottom: 24px;"
                 @complete="updateProgress(row.node.id)"
                 @load="handleLoad($refs.rowRefs[index])"
               />
-              <p v-if="row.children.length > 0" style="color: white;">
+              <p v-if="row.children.length > 0 && !areAllPopup(row.children)">
                 {{ row.node.typeData.subAccordionText }}
               </p>
               <accordion-rows
@@ -177,9 +174,9 @@ export default {
     },
     rowBackground() {
       if (this.isMultiContentContext) {
-        let rgb = 40
+        let rgb = 187
         let colorOffset = this.level * 10
-        rgb = colorOffset > rgb ? 0 : rgb - colorOffset
+        rgb = colorOffset > rgb ? 0 : rgb + colorOffset
         return {
           background: `rgb(${rgb}, ${rgb}, ${rgb})`,
         }
@@ -242,7 +239,7 @@ button[disabled] {
   background: none;
   width: 100%;
   text-align: left;
-  color: #fff;
+  color: #111;
   font-size: 1.75rem;
   font-weight: 500;
 
@@ -252,7 +249,7 @@ button[disabled] {
 }
 
 .page-row {
-  background: #262626;
+  background: #ddd;
   border-radius: 4px;
   padding: 8px 16px;
   margin-bottom: 8px;
