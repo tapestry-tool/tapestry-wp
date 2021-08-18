@@ -151,11 +151,25 @@ $REST_API_ENDPOINTS = [
             'callback' => 'getTapestryNodeHasDraftChildren',
         ],
     ],
+    'GET_QUESTION_HAS_ANSWERS' => (object) [
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/question/hasAnswers',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => 'getQuestionHasAnswers',
+        ],
+    ],
     'POST_TAPESTRY_LINK' => (object) [
         'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/links',
         'ARGUMENTS' => [
             'methods' => $REST_API_POST_METHOD,
             'callback' => 'addTapestryLink',
+        ],
+    ],
+    'REVERSE_TAPESTRY_LINK' => (object) [
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/links/reverse',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_POST_METHOD,
+            'callback' => 'reverseTapestryLink',
         ],
     ],
     'DELETE_TAPESTRY_LINK' => (object) [
@@ -295,92 +309,9 @@ $REST_API_ENDPOINTS = [
             'permission_callback' => 'TapestryPermissions::putTapestrySettings',
         ],
     ],
-    'GET_CIRCLE_OF_SUPPORT' => (object) [
-        'ROUTE' => '/activities/cos',
-        'ARGUMENTS' => [
-            'methods' => $REST_API_GET_METHOD,
-            'callback' => 'CircleOfSupportEndpoints::get',
-        ]
-    ],
-    'POST_CIRCLE_OF_SUPPORT' => (object) [
-        'ROUTE' => '/activities/cos',
-        'ARGUMENTS' => [
-            'methods' => $REST_API_POST_METHOD,
-            'callback' => 'CircleOfSupportEndpoints::save'
-        ]
-    ],
-    'DELETE_CIRCLE_OF_SUPPORT' => (object) [
-        'ROUTE' => '/activities/cos',
-        'ARGUMENTS' => [
-            'methods' => $REST_API_DELETE_METHOD,
-            'callback' => 'CircleOfSupportEndpoints::delete'
-        ]
-    ],
-    'POST_CIRCLE_OF_SUPPORT_CONNECTIONS' => (object) [
-        'ROUTE' => '/activities/cos/connections',
-        'ARGUMENTS' => [
-            'methods' => $REST_API_POST_METHOD,
-            'callback' => 'CircleOfSupportEndpoints::addConnection'
-        ]
-    ],
-    'PUT_CIRCLE_OF_SUPPORT_CONNECTION' => (object) [
-        'ROUTE' => '/activities/cos/connections/(?P<connectionId>[a-zA-Z0-9]+)',
-        'ARGUMENTS' => [
-            'methods' => $REST_API_PUT_METHOD,
-            'callback' => 'CircleOfSupportEndpoints::updateConnection'
-        ]
-    ],
-    'POST_CIRCLE_OF_SUPPORT_COMMUNITIES' => (object) [
-        'ROUTE' => '/activities/cos/communities',
-        'ARGUMENTS' => [
-            'methods' => $REST_API_POST_METHOD,
-            'callback' => 'CircleOfSupportEndpoints::addCommunity'
-        ]
-    ],
-    'PUT_CIRCLE_OF_SUPPORT_COMMUNITIES' => (object) [
-        'ROUTE' => '/activities/cos/communities/(?P<communityId>[a-zA-Z0-9]+)',
-        'ARGUMENTS' => [
-            'methods' => $REST_API_PUT_METHOD,
-            'callback' => 'CircleOfSupportEndpoints::updateCommunity'
-        ]
-    ],
-    'POST_CIRCLE_OF_SUPPORT_COMMUNITIES_CONNECTION' => (object) [
-        'ROUTE' => '/activities/cos/communities/(?P<communityId>[a-zA-Z0-9]+)',
-        'ARGUMENTS' => [
-            'methods' => $REST_API_POST_METHOD,
-            'callback' => 'CircleOfSupportEndpoints::addConnectionToCommunity'
-        ]
-    ],
-    'DELETE_CIRCLE_OF_SUPPORT_COMMUNITIES_CONNECTION' => (object) [
-        'ROUTE' => '/activities/cos/communities/(?P<communityId>[a-zA-Z0-9]+)/connections/(?P<connectionId>[a-zA-Z0-9]+)',
-        'ARGUMENTS' => [
-            'methods' => $REST_API_DELETE_METHOD,
-            'callback' => 'CircleOfSupportEndpoints::removeConnectionFromCommunity'
-        ]
-    ],
-    'COS_ADD_CONNECTION_TO_CIRCLE' => (object) [
-        'ROUTE' => '/activities/cos/circles/(?P<circleIndex>[0-2])',
-        'ARGUMENTS' => [
-            'methods' => $REST_API_POST_METHOD,
-            'callback' => 'CircleOfSupportEndpoints::addConnectionToCircle'
-        ]
-    ],
-    'COS_REMOVE_CONNECTION_FROM_CIRCLE' => (object) [
-        'ROUTE' => '/activities/cos/circles/(?P<circleIndex>[0-2])/connections/(?P<connectionId>[a-zA-Z0-9]+)',
-        'ARGUMENTS' => [
-            'methods' => $REST_API_DELETE_METHOD,
-            'callback' => 'CircleOfSupportEndpoints::removeConnectionFromCircle'
-        ]
-    ],
-    'DELETE_COS_CONNECTION' => (object) [
-        'ROUTE' => '/activities/cos/connections/(?P<connectionId>[a-zA-Z0-9]+)',
-        'ARGUMENTS' => [
-            'methods' => $REST_API_DELETE_METHOD,
-            'callback' => 'CircleOfSupportEndpoints::deleteConnection'
-        ]
-    ],
-    
 ];
+
+$REST_API_ENDPOINTS = array_merge($REST_API_ENDPOINTS, CircleOfSupportEndpoints::getRoutes());
 
 /*
  * REGISTER API ENDPOINTS
@@ -754,6 +685,37 @@ function addTapestryLink($request)
     }
 }
 
+/**
+ * Reverses A Tapestry Link.
+ *
+ * @param object $request HTTP request
+ *
+ * @return object $response   HTTP response
+ */
+function reverseTapestryLink($request)
+{
+    $postId = $request['tapestryPostId'];
+    $newLink = json_decode($request->get_body());
+
+
+    try {
+        if (!$newLink->source || !$newLink->target) {
+            throw new TapestryError('INVALID_NEW_LINK');
+        }
+        if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+        if (!TapestryHelpers::userIsAllowed('ADD', $newLink->source, $postId) 
+            || !TapestryHelpers::userIsAllowed('ADD', $newLink->target, $postId)) {
+            throw new TapestryError('ADD_LINK_PERMISSION_DENIED');
+        }
+        $tapestry = new Tapestry($postId);
+
+        return $tapestry->reverseLink($newLink);
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
 /**
  * Delete A Tapestry Link.
  *
@@ -1488,4 +1450,35 @@ function getTapestryContributors($request)
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
+}
+
+/**
+ * Checks whether any user has answered a spesific question
+ * inside an acitivity
+ *
+ * @param object $request HTTP request
+ */
+function getQuestionHasAnswers($request)
+{
+    $postId = $request['tapestryPostId'];
+    $nodeMetaId = $request['nodeMetaId'];
+    $questionId = $request['question_id'];
+    $answerType = $request['answer_type'];
+    
+    try {
+        if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+        if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
+            throw new TapestryError('INVALID_NODE_META_ID');
+        }
+        if (!TapestryHelpers::userIsAllowed('EDIT', $nodeMetaId, $postId)) {
+            throw new TapestryError('EDIT_NODE_PERMISSION_DENIED');
+        }
+
+        return TapestryUserProgress::questionsHasAnyAnswer($postId, $nodeMetaId, $questionId, $answerType);
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+    
 }

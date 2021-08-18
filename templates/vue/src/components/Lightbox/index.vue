@@ -341,8 +341,11 @@ body.tapestry-lightbox-open {
 }
 
 #lightbox {
+  color: #111;
+
   &.full-screen {
-    background: #000;
+    background: #eee;
+
     .close-btn {
       position: fixed;
       top: 50px;
