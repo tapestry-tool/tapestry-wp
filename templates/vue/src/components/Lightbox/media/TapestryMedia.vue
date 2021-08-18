@@ -124,12 +124,10 @@ export default {
     },
   },
   beforeDestroy() {
-    if (!Helpers.nodeAndUserAreDyad(this.node)) {
-      this.updateNodeProgress({
-        id: this.nodeId,
-        progress: this.node && this.node.progress,
-      })
-    }
+    this.updateNodeProgress({
+      id: this.nodeId,
+      progress: this.node && this.node.progress,
+    })
   },
   methods: {
     ...mapActions(["updateNodeProgress"]),
@@ -151,9 +149,7 @@ export default {
       }
     },
     complete(nodeId) {
-      if (!Helpers.nodeAndUserAreDyad(this.node)) {
-        this.$emit("complete", nodeId)
-      }
+      this.$emit("complete", nodeId)
     },
   },
 }

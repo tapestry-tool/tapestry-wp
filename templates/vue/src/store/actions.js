@@ -140,6 +140,10 @@ export async function updateNodeCoordinates(
 }
 
 export async function completeNode(context, nodeId) {
+  const node = getters.getNode(nodeId)
+  if (Helpers.nodeAndUserAreDyad(node)) {
+    return
+  }
   const { commit, dispatch, getters } = context
   try {
     if (!wp.isLoggedIn()) {
@@ -155,7 +159,6 @@ export async function completeNode(context, nodeId) {
       newNode: { completed: true },
     })
 
-    const node = getters.getNode(nodeId)
     if (node.mediaType !== "video") {
       await dispatch("updateNodeProgress", {
         id: nodeId,
