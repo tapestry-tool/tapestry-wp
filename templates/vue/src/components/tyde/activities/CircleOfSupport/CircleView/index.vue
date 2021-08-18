@@ -80,6 +80,7 @@
     <onboarding
       :communities="communities"
       :connections="connections"
+      :has-no-connection-in-circles="hasNoConnectionInCircles"
       :parent-state="state"
       :activeView="activeView"
       @tooltip-positioned="handleToolTipPositioned"
@@ -140,6 +141,10 @@ export default {
     },
     activeView: {
       type: Number,
+      required: true,
+    },
+    hasNoConnectionInCircles: {
+      type: Boolean,
       required: true,
     },
   },

@@ -190,6 +190,10 @@ export default {
       type: Number,
       required: true,
     },
+    hasNoConnectionInCircles: {
+      type: Boolean,
+      required: true,
+    },
   },
   data() {
     return {
@@ -210,7 +214,7 @@ export default {
   },
   watch: {
     communities() {
-      this.HandleCommunityAdded()
+      this.handleCommunityAdded()
     },
     connections() {
       this.handleConnectionSubmitted()
@@ -255,7 +259,7 @@ export default {
         this.send(OnboardingEvents.Added)
       }
     },
-    HandleCommunityAdded() {
+    handleCommunityAdded() {
       if (
         this.onboarding.current.matches("Circles.Form") ||
         this.onboarding.current.matches("Communities.Form") ||
@@ -277,8 +281,8 @@ export default {
       if (Object.values(this.communities).length > 0) {
         startingEvent = OnboardingEvents.Continue
         if (Object.values(this.connections).length > 0) {
-          if (this.circleViewEnabled) {
-            startingEvent = OnboardingEvents.CommunityOnboardingComplete
+          if (this.circleViewEnabled && this.hasNoConnectionInCircles) {
+            startingEvent = OnboardingEvents.NoConnectionsInCircle
           } else {
             startingEvent = OnboardingEvents.Done
           }

@@ -7,6 +7,7 @@
         :connections="cos.connections"
         :communities="cos.communities"
         :activeView="view"
+        :has-no-connection-in-circles="hasNoConnectionInCircles"
         @add-connection="addConnection"
         @edit-connection="editConnection"
         @delete-connection="handleDeleteConnection"
@@ -18,6 +19,7 @@
         :connections="cos.connections"
         :communities="cos.communities"
         :activeView="view"
+        :has-no-connection-in-circles="hasNoConnectionInCircles"
         @add-connection="addConnection"
         @edit-connection="editConnection"
         @delete-connection="handleDeleteConnection"
@@ -86,6 +88,13 @@ export default {
     circleViewEnabled() {
       const circleViewNode = this.getNode(this.settings.circleViewNode)
       return circleViewNode ? circleViewNode && circleViewNode.completed : true
+    },
+    hasNoConnectionInCircles() {
+      return (
+        this.cos.circles[0].length === 2 &&
+        this.cos.circles[1].length === 7 &&
+        this.cos.circles[2].length === 4
+      )
     },
   },
   async mounted() {
@@ -230,7 +239,7 @@ export default {
 }
 
 .disabled {
-  cursor: not-allowed;
+  // cursor: not-allowed;
   background-color: #6c757d;
   border-color: #6c757d;
   opacity: 0.65;
