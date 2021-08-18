@@ -13,7 +13,9 @@ describe("Node Operations", () => {
       cy.openModal("add", id)
       cy.getByTestId("node-modal").should("be.visible")
       cy.contains(/cancel/i).click()
-      cy.contains(/close/i).click()
+      cy.get("button")
+        .contains(/close/i)
+        .click()
       cy.getByTestId("node-modal").should("not.be.visible")
 
       cy.openModal("edit", id)
