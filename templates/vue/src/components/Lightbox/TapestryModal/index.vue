@@ -37,7 +37,7 @@ const defaultStyles = {
   transform: "translateX(-50%)",
   width: "600px",
   height: "400px",
-  color: "#fff",
+  color: "#eee",
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
@@ -111,7 +111,7 @@ export default {
     z-index: 100;
     background-position: 0 0;
     background-size: cover;
-    background-color: black;
+    background-color: #eee;
     box-shadow: 0 0 100px -40px #000;
     border-radius: 15px;
     height: 100%;

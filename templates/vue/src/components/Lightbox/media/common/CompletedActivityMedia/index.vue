@@ -1,13 +1,26 @@
 <template>
   <b-container class="completed-activity-media">
     <b-row align-v="center" style="min-height:150px;">
-      <b-col v-if="type === 'text'" align-self="center">
+      <b-col v-if="type === 'text' && !isListTextType" align-self="center">
         <div class="text">
-          {{ answerData }}
+          {{ Array.isArray(answerData) ? answerData[0] : answerData }}
         </div>
+      </b-col>
+      <b-col v-if="type === 'text' && isListTextType">
+        <ol>
+          <li v-for="answer in answerData" :key="answer.index">
+            {{ answer }}
+          </li>
+        </ol>
       </b-col>
       <b-col v-if="type === 'audio'" align-self="center">
         <audio controls :src="urlAnswer"></audio>
+      </b-col>
+      <b-col v-if="type === 'dragDrop'" align-self="center">
+        <drag-drop
+          :answer-data="answerData"
+          :drag-drop="question.answerTypes.dragDrop"
+        />
       </b-col>
       <b-col v-if="type === 'multipleChoice'" align-self="center">
         <ul>
@@ -24,19 +37,22 @@
 </template>
 
 <script>
+import DragDrop from "./DragDrop"
 import CompletedMultipleChoiceItem from "./CompletedMultipleChoiceItem"
 import { data as wpData } from "@/services/wp"
 
 export default {
   name: "completed-activity-media",
   components: {
+    DragDrop,
     CompletedMultipleChoiceItem,
   },
   props: {
     type: {
       type: String,
       required: true,
-      validator: val => ["text", "audio", "multipleChoice"].includes(val),
+      validator: val =>
+        ["text", "audio", "multipleChoice", "dragDrop"].includes(val),
     },
     answerData: {
       type: [Object, String, Array, Number],
@@ -54,6 +70,9 @@ export default {
         wpData.uploadDirArray.baseurl + "/" + this.answerData.url + "?" + Date.now()
       )
     },
+    isListTextType() {
+      return this.question.answerTypes?.text.allowMultiple
+    },
   },
   methods: {
     getMultipleChoiceAnswerItem(id) {
@@ -67,7 +86,7 @@ export default {
 
 <style lang="scss" scoped>
 .completed-activity-media {
-  background: #262626;
+  background: #dcdcdc;
   border-radius: 8px;
   margin-bottom: 8px;
   padding: 8px 16px 8px 16px;
