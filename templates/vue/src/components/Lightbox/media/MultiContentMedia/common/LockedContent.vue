@@ -29,10 +29,10 @@ export default {
 
 <style lang="scss" scoped>
 .locked-content {
-  color: #999;
+  color: #555;
   text-align: center;
   font-weight: normal;
-  background: #222;
+  background: #fff;
   border-radius: 1em;
   padding: 1em 0.5em 0.5em;
   margin: 0 auto 20px;

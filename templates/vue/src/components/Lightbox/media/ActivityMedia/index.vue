@@ -275,8 +275,6 @@ export default {
   justify-content: space-between;
   width: 100%;
   min-height: 100%;
-  background: #111;
-  color: #eee;
   z-index: 10;
   padding: 24px;
 
@@ -285,6 +283,7 @@ export default {
     font-size: 1.75rem;
     font-weight: 500;
     margin-bottom: 0.9em;
+    width: 100%;
 
     :before {
       display: none;
@@ -360,7 +359,7 @@ export default {
   padding: 0;
   font-weight: bold;
   font-size: 40px;
-  color: var(--tyde-blue);
+  opacity: 0.5;
   margin-right: 32px;
 }
 </style>
