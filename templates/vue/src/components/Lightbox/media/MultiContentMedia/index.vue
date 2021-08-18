@@ -310,7 +310,7 @@ button[disabled] {
 }
 
 .title {
-  color: rgb(51, 51, 51);
+  color: #111;
   margin-bottom: 1em;
 }
 
