@@ -33,14 +33,6 @@
         </b-col>
         <b-col v-else class="ob-connection-box"></b-col>
         <b-button
-          pill
-          variant="secondary"
-          class="secondary mx-2"
-          @click="$emit('ob-finish')"
-        >
-          Continue &#8594;
-        </b-button>
-        <b-button
           v-if="circleViewEnabled"
           pill
           variant="secondary"

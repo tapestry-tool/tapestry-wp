@@ -113,7 +113,6 @@ const onboardingMachine = createMachine({
         },
         Finish: {
           on: {
-            [Events.Done]: "#Complete",
             [Events.Continue]: "#Circles",
           },
         },

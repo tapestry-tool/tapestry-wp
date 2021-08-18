@@ -277,16 +277,18 @@ export default {
     },
     initializeOnboarding() {
       let startingEvent = OnboardingEvents.Empty
-      // For now, always initialize the onboarding process at the start
-      if (Object.values(this.communities).length > 0) {
+      // // For now, always initialize the onboarding process at the start
+      if (Object.values(this.communities).length <= 0) {
+        this.send(startingEvent)
+      } else if (
+        Object.values(this.connections).length <= 0 &&
+        this.activeView === 0
+      ) {
         startingEvent = OnboardingEvents.Continue
-        if (Object.values(this.connections).length > 0) {
-          if (this.circleViewEnabled && this.hasNoConnectionInCircles) {
-            startingEvent = OnboardingEvents.NoConnectionsInCircle
-          } else {
-            startingEvent = OnboardingEvents.Done
-          }
-        }
+      } else if (this.hasNoConnectionInCircles) {
+        startingEvent = OnboardingEvents.NoConnectionsInCircle
+      } else {
+        startingEvent = OnboardingEvents.Done
       }
       this.send(startingEvent)
     },

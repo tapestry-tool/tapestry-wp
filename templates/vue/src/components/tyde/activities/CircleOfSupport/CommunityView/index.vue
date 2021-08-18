@@ -35,7 +35,7 @@
       :connections="connections"
       :parent-state="state"
       :activeView="activeView"
-      :has-connection-in-circle="hasNoConnectionInCircles"
+      :has-no-connection-in-circles="hasNoConnectionInCircles"
       @tooltip-positioned="handleToolTipPositioned"
       @tooltip-removed="handleTooltipRemoved"
       @add-community="$emit('add-community', $event)"
