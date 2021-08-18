@@ -23,7 +23,6 @@
       v-if="isState('Connections.Finish')"
       :connections="connections"
       :circleViewEnabled="circleViewEnabled"
-      @ob-finish="send(OnboardingEvents.Done)"
       @continue="send(OnboardingEvents.Continue)"
     />
     <move-connections-circles
