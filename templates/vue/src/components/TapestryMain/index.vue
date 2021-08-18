@@ -26,7 +26,7 @@
           @mouseover="handleMouseover(id)"
           @mouseleave="activeNode = null"
           @mounted="dragSelectEnabled ? updateSelectableNodes(node) : null"
-          @clear-last-selected-node-timeout="clearLastSelectedNodeTimeout"
+          @selected="saveLastSelectedNode"
         ></tapestry-node>
       </g>
       <locked-tooltip
@@ -66,7 +66,7 @@ export default {
     return {
       dragSelectReady: false,
       activeNode: null,
-      updateLastSelectedNodeTimer: 0,
+      lastSelectedNodeTimeout: null,
     }
   },
   computed: {
@@ -149,9 +149,13 @@ export default {
         this.activeNode = id
       }
     },
-    clearLastSelectedNodeTimeout(selectedNodeId) {
-      clearTimeout(this.updateLastSelectedNodeTimer)
-      this.updateLastSelectedNodeTimer = setTimeout(() => {
+    saveLastSelectedNode(selectedNodeId) {
+      clearTimeout(this.lastSelectedNodeTimeout)
+      /**
+       * We place a timeout to throttle the number of requests we send
+       * out if the user is quickly traversing between nodes.
+       */
+      this.lastSelectedNodeTimeout = setTimeout(() => {
         this.updateUserLastSelectedNode(selectedNodeId)
       }, 5000)
     },

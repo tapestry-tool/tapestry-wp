@@ -142,7 +142,7 @@ export default {
   methods: {
     ...mapActions(["addLink"]),
     addNode() {
-      this.$emit("clear-last-selected-node-timeout", this.node.id)
+      this.$parent.$emit("selected", this.node.id)
       this.$router.push({
         name: names.MODAL,
         params: { nodeId: this.node.id, type: "add", tab: "content" },

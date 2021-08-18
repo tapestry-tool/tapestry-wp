@@ -107,7 +107,6 @@
               :fill="buttonBackgroundColor"
               :x="canReview || hasPermission('edit') ? -35 : 0"
               :y="radius"
-              @clear-last-selected-node-timeout="clearLastSelectedNodeTimeout"
             ></add-child-button>
             <node-button
               v-if="hasPermission('edit')"
@@ -423,8 +422,8 @@ export default {
   methods: {
     ...mapActions(["updateNodeCoordinates"]),
     ...mapMutations(["select", "unselect"]),
-    updateRootNode() {
-      this.clearLastSelectedNodeTimeout(this.node.id)
+    selectNode() {
+      this.$emit("selected", this.node.id)
       if (!this.root) {
         this.$router.push({
           name: names.APP,
@@ -436,12 +435,12 @@ export default {
     },
     openNode(id) {
       this.$root.$emit("open-node", id)
-      this.clearLastSelectedNodeTimeout(id)
+      this.$emit("selected", this.node.id)
       client.recordAnalyticsEvent("app", "open", "lightbox", id)
     },
     editNode(id) {
       this.$root.$emit("edit-node", id)
-      this.clearLastSelectedNodeTimeout(id)
+      this.$emit("selected", this.node.id)
       client.recordAnalyticsEvent("user", "click", "edit-node-button", id)
     },
     reviewNode() {
@@ -500,15 +499,12 @@ export default {
       } else if (this.node.accessible || this.hasPermission("edit")) {
         this.root && this.node.hideMedia
           ? this.openNode(this.node.id)
-          : this.updateRootNode()
+          : this.selectNode()
       }
       client.recordAnalyticsEvent("user", "click", "node", this.node.id)
     },
     hasPermission(action) {
       return Helpers.hasPermission(this.node, action, this.settings.showRejected)
-    },
-    clearLastSelectedNodeTimeout(selectedNodeId) {
-      this.$emit("clear-last-selected-node-timeout", selectedNodeId)
     },
   },
 }
