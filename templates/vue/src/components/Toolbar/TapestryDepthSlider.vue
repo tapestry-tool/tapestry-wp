@@ -308,6 +308,7 @@ export default {
   width: 100%;
   top: calc(100% - 1px);
   right: 0;
+  color: black;
   box-shadow: 0 7px 7px 0 #ddd;
   border-top-right-radius: 0;
   border-top-left-radius: 0;
