@@ -81,7 +81,6 @@ import client from "@/services/TapestryAPI"
 import Question from "./Question"
 import CompletionScreen from "./CompletionScreen"
 import { mapActions, mapGetters } from "vuex"
-import * as wp from "@/services/wp"
 import AnswerMedia from "./AnswerMedia.vue"
 
 const states = {
@@ -257,14 +256,6 @@ export default {
         this.$emit("close")
       } else {
         this.state = states.ANSWER
-      }
-    },
-    performDyadNodeCheck() {
-      let roles = wp.getCurrentUser().roles
-      if (!this.node.isDyad) {
-        return true
-      } else {
-        return !roles.includes("dyad")
       }
     },
   },

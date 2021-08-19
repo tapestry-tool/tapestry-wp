@@ -231,10 +231,14 @@ export async function getTapestryExport({ dispatch }) {
 }
 
 export async function completeQuestion(
-  { commit, dispatch },
+  { commit, getters, dispatch },
   { nodeId, questionId, answerType, answer }
 ) {
   try {
+    const node = getters.getNode(nodeId)
+    if (Helpers.nodeAndUserAreDyad(node)) {
+      return
+    }
     await client.completeQuestion(nodeId, questionId, answerType, answer)
     commit("completeQuestion", { nodeId, questionId, answerType, answer })
   } catch (error) {
