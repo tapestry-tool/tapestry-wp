@@ -23,6 +23,11 @@ To get started with developing locally:
 - Make sure `$TAPESTRY_USE_DEV_MODE` is set to `TRUE` in `tapestry.php`
 - In the `templates/vue` directory, run `npm start` to serve with hot reload at localhost:8080
 
+**IMPORTANT NOTES ON USING DOCKER:** 
+*By default, Docker containers only accepts internet traffic from the host machine.* This means any LAN devices cannot access the tapestry website hosted using Docker without additional setup. This may limit your ability to test tapestry using other devices (mobile devices connected to LAN).
+
+In addition, Docker outputs PHP error logs to `docker.stderr` by default. Meaning you can only view PHP error logs by viewing the docker container logs. **This behaviour is hardcoded by Docker, and it can make debugging the PHP backend tricky as the PHP prints will not be visible.** You can view the docker container logs (and the PHP errors) by doing `docker logs -f [CONTAINER_ID]` while the container is running. Learn more about this workaround [by clicking here](https://carlosguzman.dev/how-to-see-the-error-logs-in-wordpress-with-docker-in-linux/).
+
 ### Build & Deployment
 
 To build a new plugin zip file with your local edits:
