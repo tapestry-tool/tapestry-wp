@@ -254,7 +254,7 @@ export default {
     },
     close() {
       client.recordAnalyticsEvent("user", "close", "activity", this.node.id)
-      if (this.initialType === "activity") {
+      if (this.initialType === "activity" && this.context === "lightbox") {
         this.$emit("close")
       } else {
         this.state = states.ANSWER
@@ -277,6 +277,7 @@ export default {
   min-height: 100%;
   z-index: 10;
   padding: 24px;
+  position: relative;
 
   .media-title {
     text-align: left;
@@ -321,6 +322,10 @@ export default {
     margin: 1em auto 0;
     padding: 0;
     font-weight: 600;
+  }
+
+  i {
+    align-self: center;
   }
 }
 

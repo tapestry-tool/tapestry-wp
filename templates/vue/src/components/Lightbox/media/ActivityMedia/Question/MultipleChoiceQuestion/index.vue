@@ -23,21 +23,19 @@
     >
       Please select {{ allowSelectMultiple ? "one or more choices" : "a choice" }}.
     </b-form-invalid-feedback>
-    <b-form-group>
-      <b-button-group class="button-row">
-        <b-button
-          v-if="question.optional"
-          class="mt-3 mx-1"
-          variant="outline-primary"
-          @click="$emit('skipQuestion')"
-        >
-          Skip
-        </b-button>
-        <b-button class="mt-3 mx-1" variant="primary" type="submit">
-          Submit
-        </b-button>
-      </b-button-group>
-    </b-form-group>
+
+    <div class="w-100 mt-4 text-right">
+      <b-button
+        v-if="question.optional"
+        variant="link"
+        @click="$emit('skipQuestion')"
+      >
+        Skip
+      </b-button>
+      <b-button variant="primary" type="submit">
+        Submit
+      </b-button>
+    </div>
   </b-form>
 </template>
 
@@ -121,11 +119,5 @@ export default {
 .container {
   display: flex;
   flex-direction: column;
-}
-
-.button-row {
-  float: right;
-  margin-top: 30px;
-  width: 30%;
 }
 </style>

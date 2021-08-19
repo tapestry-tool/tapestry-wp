@@ -82,22 +82,29 @@
             text-variant="dark"
             class="mb-3"
           >
+            <b-form-group class="optional-checkbox">
+              <b-form-checkbox
+                v-model="question.optional"
+                data-qa="question-optional-checkbox"
+                :value="false"
+                :unchecked-value="true"
+                switch
+              >
+                <span
+                  title="If made optional, users can skip the question without answering
+                          it. Furthermore, the completion of this question will not be
+                          used to determine completion status of the activity."
+                >
+                  {{ question.optional ? "Optional" : "Required" }}
+                </span>
+              </b-form-checkbox>
+            </b-form-group>
             <b-form-group label="Question text">
               <b-form-input
                 v-model="question.text"
                 :data-testid="`question-title-${index}`"
                 :data-qa="`question-text-${index}`"
               />
-              <b-card-sub-title class="mt-2 mb-4">
-                Additional Question Options
-              </b-card-sub-title>
-              <b-form-checkbox
-                v-model="question.optional"
-                data-qa="question-optional-checkbox"
-                switch
-              >
-                Optional Question
-              </b-form-checkbox>
             </b-form-group>
             <b-card-sub-title class="mt-2 mb-2">Answer Options</b-card-sub-title>
             <b-form-group class="mt-3">
@@ -379,6 +386,9 @@ export default {
       question.followUp.questionId = ""
       question.followUp.nodeId = ""
     },
+    questionOptional(q) {
+      return q.optional
+    },
     disableList(question) {
       if (!question.answerTypes.text.isMultiLine) {
         question.answerTypes.text.allowMultiple = false
@@ -392,6 +402,12 @@ export default {
 .activity {
   .icon {
     margin-right: 4px;
+  }
+
+  .optional-checkbox {
+    position: absolute;
+    right: 20px;
+    top: 10px;
   }
 
   .question-text {

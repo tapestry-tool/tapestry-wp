@@ -1,5 +1,5 @@
 <template>
-  <b-form class="grid-container">
+  <b-form class="grid-container" @submit="handleTextSubmit">
     <b-form-input
       v-if="
         !question.answerTypes.text.isMultiLine &&
@@ -51,19 +51,18 @@
     <b-form-invalid-feedback class="mt-3" :state="isAnswerValid">
       Please enter at least {{ minFields }} entr{{ minFields > 1 ? "ies" : "y" }}
     </b-form-invalid-feedback>
-    <b-button-group class="button-row">
+    <div class="w-100 mt-4 text-right">
       <b-button
         v-if="question.optional"
-        class="mx-1"
-        variant="outline-primary"
+        variant="link"
         @click="$emit('skipQuestion')"
       >
         Skip
       </b-button>
-      <b-button class="mx-1" variant="primary" @click="handleTextSubmit">
+      <b-button variant="primary" @click="handleTextSubmit">
         Submit
       </b-button>
-    </b-button-group>
+    </div>
   </b-form>
 </template>
 
@@ -175,11 +174,5 @@ export default {
   .input-group-append button {
     min-width: 45px;
   }
-}
-
-.button-row {
-  float: right;
-  margin-top: 30px;
-  width: 30%;
 }
 </style>
