@@ -397,6 +397,7 @@ describe("Activity", () => {
       cy.getByTestId("question-answer-text-multi-0").click({ force: true })
       cy.submitModal()
       cy.openLightbox(node.id)
+      cy.contains(/Change answers/i).click()
       cy.route("POST", "/users/activity/**").as("submit")
       cy.lightbox().within(() => {
         cy.get("textarea").should("not.exist")
@@ -519,6 +520,7 @@ describe("Activity", () => {
       })
 
       cy.openLightbox(node.id)
+      cy.contains(/Change answers/i).click()
       cy.lightbox().within(() => {
         cy.get(".completed-activity-media").within(() => {
           cy.contains("British Columbia").should("be.visible")
@@ -578,6 +580,7 @@ describe("Activity", () => {
         })
       })
       cy.openLightbox(node.id)
+      cy.contains(/Change answers/i).click()
       cy.lightbox().within(() => {
         cy.contains("Changing your answer is disabled for this question.").should(
           "be.visible"
