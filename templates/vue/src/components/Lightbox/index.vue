@@ -309,8 +309,6 @@ body.tapestry-lightbox-open {
 }
 
 #lightbox {
-  color: #111;
-
   &.full-screen {
     background: var(--background-color);
 
