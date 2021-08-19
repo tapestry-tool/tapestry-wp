@@ -368,3 +368,10 @@ export function addApiError({ commit }, error) {
 export function setTapestryErrorReporting({ commit }, isEnabled) {
   commit("setTapestryErrorReporting", isEnabled)
 }
+
+export function fetchKalturaStatus({ commit }) {
+  client.getKalturaStatus().then(response => {
+    const status = response.data
+    commit("setKalturaStatus", status)
+  })
+}

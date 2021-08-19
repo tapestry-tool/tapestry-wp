@@ -146,6 +146,12 @@ function tapestry_enqueue_vue_app()
         // make custom data available to the Vue app with wp_localize_script.
         global $post;
         global $wp_roles;
+
+        $kaltura_partner_id = null;
+        if(LOAD_KALTURA) {
+            $kaltura_partner_id = KALTURA_PARTNER_ID;
+        }
+        
         wp_localize_script(
             'tapestry_d3_vue', // vue script handle defined in wp_register_script.
             'wpData', // javascript object that will made availabe to Vue.
@@ -169,6 +175,7 @@ function tapestry_enqueue_vue_app()
                 'wpCanEditTapestry' => current_user_can('edit_post', get_the_ID()),
                 'currentUser' => wp_get_current_user(),
                 'uploadDirArray' => wp_upload_dir(),
+                'kalturaPartnerId' => $kaltura_partner_id,
             ]
         );
 

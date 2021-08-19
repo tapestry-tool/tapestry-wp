@@ -11,7 +11,13 @@
 
 get_header();
 ?>
-<script src="https://admin.video.ubc.ca/p/163/sp/16300/embedIframeJs/uiconf_id/23449696/partner_id/163"></script>
+<?php 
+    if (LOAD_KALTURA) {
+        ?>
+    <script src="https://admin.video.ubc.ca/p/163/sp/16300/embedIframeJs/uiconf_id/23449696/partner_id/163"></script>
+<?php
+    }
+?>
 <div id="primary" class="content-area col-md-12">
     <main id="main" class="site-main post-wrap <?php echo current_user_can('edit_post', get_the_ID()) ? 'is-editor' : ''; ?>" role="main">
 

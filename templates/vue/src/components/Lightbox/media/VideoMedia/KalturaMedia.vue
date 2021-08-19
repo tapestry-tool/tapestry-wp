@@ -7,6 +7,9 @@
 </template>
 
 <script>
+import { mapActions, mapState } from "vuex"
+import { data as wpData } from "@/services/wp"
+
 export default {
   name: "kaltura-video-media",
   props: {
@@ -36,6 +39,7 @@ export default {
     }
   },
   computed: {
+    ...mapState(["kalturaStatus"]),
     kalturaData() {
       return this.node.typeData.kalturaData
     },
@@ -43,7 +47,7 @@ export default {
   mounted() {
     kWidget.embed({
       targetId: `kaltura-container-${this.node.id}`,
-      wid: `_${this.kalturaData.partnerId}`,
+      wid: `_${wpData.kalturaPartnerId}`,
       uiconf_id: 23449696,
       entry_id: this.kalturaData.id,
     })
@@ -58,6 +62,9 @@ export default {
         currentTime: 0,
       })
     })
+  },
+  methods: {
+    ...mapActions(["fetchKalturaStatus"]),
   },
 }
 </script>

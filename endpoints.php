@@ -310,6 +310,13 @@ $REST_API_ENDPOINTS = [
             'callback' => 'upload_videos_to_kaltura',
         ],
     ],
+    'GET_KALTURA_SERVER_STATUS' => (object) [
+        'ROUTE' => '/kaltura/status',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => 'kalturaStatus',
+        ],
+    ]
 ];
 
 /*
@@ -1524,7 +1531,6 @@ function upload_videos_to_kaltura($request)
                     $typeData->mediaURL = $kaltura_data->dataUrl."?.mp4";
                     $typeData->kalturaData = array(
                         "id" => $kaltura_data->id,
-                        "partnerId" => $kaltura_data->partnerId,
                     );
 
                     $node->set($typeData);
@@ -1538,4 +1544,9 @@ function upload_videos_to_kaltura($request)
 
         return true; // This is only a placeholder for testing
     }
+}
+
+function kalturaStatus($request) 
+{
+    return LOAD_KALTURA;
 }

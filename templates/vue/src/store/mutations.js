@@ -168,3 +168,7 @@ export function addApiError(state, error) {
 export function setTapestryErrorReporting(state, isEnabled) {
   state.displayErrors = isEnabled
 }
+
+export function setKalturaStatus(state, status) {
+  state.kalturaStatus = status
+}
