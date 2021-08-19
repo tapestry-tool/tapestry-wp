@@ -1,56 +1,11 @@
 <template>
-  <div>
+  <div class="px-3 mt-n2">
     <b-overlay variant="white">
-      <div class="title-and-avatar">
-        <div class="title">
-          <h2>Avatar Customizer</h2>
-        </div>
-        <div class="avatar">
-          <avataaars
-            v-if="hasAvatar"
-            :isCircle="userAvatar.isCircle"
-            :circleColor="userAvatar.circleColor"
-            :accessoriesType="userAvatar.accessoriesType"
-            :clotheType="userAvatar.clotheType"
-            :clotheColor="userAvatar.clotheColor"
-            :eyebrowType="userAvatar.eyebrowType"
-            :eyeType="userAvatar.eyeType"
-            :facialHairColor="userAvatar.facialHairColor"
-            :facialHairType="userAvatar.facialHairType"
-            :graphicType="userAvatar.graphicType"
-            :hairColor="userAvatar.hairColor"
-            :mouthType="userAvatar.mouthType"
-            :skinColor="userAvatar.skinColor"
-            :topType="userAvatar.topType"
-            :topColor="userAvatar.topColor"
-          ></avataaars>
-        </div>
-      </div>
-      <div class="customizer">
-        <b-card no-body>
-          <b-tabs pills card fill>
-            <b-tab title="Background" active>
-              <b-card-text>
-                <b-form-group label="Background Shape" label-for="input-horizontal">
-                  <b-form-select
-                    v-model="userAvatar.isCircle"
-                    :options="options.isCircleOptions"
-                    data-qa="avatar-background-select"
-                  ></b-form-select>
-                </b-form-group>
-                <b-form-group
-                  v-if="userAvatar.isCircle"
-                  label="Circle Colour"
-                  label-for="input-horizontal"
-                >
-                  <b-form-select
-                    v-model="userAvatar.circleColor"
-                    :options="options.circleColorOptions"
-                  ></b-form-select>
-                </b-form-group>
-              </b-card-text>
-            </b-tab>
-            <b-tab title="Face">
+      <h6 class="mb-3">Customize your avatar</h6>
+      <b-row>
+        <b-col cols="8" class="customizer pt-1">
+          <b-tabs pills vertical>
+            <b-tab title="Face" active>
               <b-card-text>
                 <b-form-group label="Skin Colour" label-for="input-horizontal">
                   <b-form-select
@@ -100,6 +55,10 @@
                     :options="options.topColorOptions"
                   ></b-form-select>
                 </b-form-group>
+              </b-card-text>
+            </b-tab>
+            <b-tab title="Facial Hair">
+              <b-card-text>
                 <b-form-group label="Facial Hair Type" label-for="input-horizontal">
                   <b-form-select
                     v-model="userAvatar.facialHairType"
@@ -150,9 +109,45 @@
                 </b-form-group>
               </b-card-text>
             </b-tab>
+            <b-tab title="Background">
+              <b-card-text>
+                <b-form-group
+                  v-if="userAvatar.isCircle"
+                  label="Background Colour"
+                  label-for="input-horizontal"
+                >
+                  <b-form-select
+                    v-model="userAvatar.circleColor"
+                    :options="options.circleColorOptions"
+                  ></b-form-select>
+                </b-form-group>
+              </b-card-text>
+            </b-tab>
           </b-tabs>
-        </b-card>
-      </div>
+        </b-col>
+        <b-col cols="4" class="title-and-avatar mt-n4">
+          <div class="avatar mt-n4">
+            <avataaars
+              v-if="hasAvatar"
+              :isCircle="userAvatar.isCircle"
+              :circleColor="userAvatar.circleColor"
+              :accessoriesType="userAvatar.accessoriesType"
+              :clotheType="userAvatar.clotheType"
+              :clotheColor="userAvatar.clotheColor"
+              :eyebrowType="userAvatar.eyebrowType"
+              :eyeType="userAvatar.eyeType"
+              :facialHairColor="userAvatar.facialHairColor"
+              :facialHairType="userAvatar.facialHairType"
+              :graphicType="userAvatar.graphicType"
+              :hairColor="userAvatar.hairColor"
+              :mouthType="userAvatar.mouthType"
+              :skinColor="userAvatar.skinColor"
+              :topType="userAvatar.topType"
+              :topColor="userAvatar.topColor"
+            ></avataaars>
+          </div>
+        </b-col>
+      </b-row>
     </b-overlay>
   </div>
 </template>
@@ -222,14 +217,20 @@ export default {
   text-align: center;
 }
 
+.nav-pills .nav-link.active {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.tabs ul {
+  border-left: solid 1px #ddd;
+}
+
 .avatar {
   display: flex;
   justify-content: center;
-  width: 300px;
+  width: 100%;
+  height: 300px;
   margin: 0 auto;
-}
-
-.customizer {
-  margin-top: 50px;
 }
 </style>
