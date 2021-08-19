@@ -126,7 +126,6 @@ export default {
       if (this.node.mediaType === "text" || this.node.mediaType === "wp-post") {
         return Object.assign(styles, {
           background: "var(--background-color);",
-          color: "#333",
           padding: "1em",
         })
       }
