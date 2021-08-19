@@ -6,8 +6,14 @@
   >
     <i class="fas fa-check-circle" :class="completed ? 'visible' : 'invisible'"></i>
     <div v-if="isFaIcon" class="icon">
-      <i :class="`fas fa-${icon} icon-fa`"></i>
+      <i :class="`fas fa-${faIcon} icon-fa`"></i>
     </div>
+    <drag-drop-icon
+      v-else-if="icon === 'dragDrop'"
+      class="drag-drop-icon"
+      width="56"
+      height="56"
+    />
     <img v-else :src="textIcon" class="icon" />
     <div>
       <slot></slot>
@@ -18,9 +24,11 @@
 <script>
 import TextIcon from "@/assets/Aa.svg"
 import { data } from "@/services/wp"
+import DragDropIcon from "@/components/common/TapestryIcon/DragDropIcon.vue"
 
 export default {
   name: "answer-button",
+  components: { DragDropIcon },
   props: {
     completed: {
       type: Boolean,
@@ -39,8 +47,20 @@ export default {
     },
   },
   computed: {
+    faIcon() {
+      switch (this.icon) {
+        case "multipleChoice":
+          return "tasks"
+
+        case "audio":
+          return "microphone"
+
+        default:
+          return this.icon
+      }
+    },
     isFaIcon() {
-      return this.icon === "tasks" || this.icon === "microphone"
+      return this.faIcon === "tasks" || this.faIcon === "microphone"
     },
     textIcon() {
       return `${data.vue_uri}/${TextIcon.split("dist")[1]}`
@@ -67,7 +87,7 @@ button {
   border-radius: 6px;
   display: flex;
   flex-direction: column;
-  align-items: normal;
+  align-items: center;
   font-size: 24px;
   transition: all 0.1s ease-out;
 
@@ -93,6 +113,17 @@ button {
 
   &-fa {
     font-size: 56px;
+  }
+}
+
+.drag-drop-icon {
+  fill: transparent;
+}
+
+.container {
+  height: 56px;
+  img {
+    margin-top: -30px;
   }
 }
 </style>

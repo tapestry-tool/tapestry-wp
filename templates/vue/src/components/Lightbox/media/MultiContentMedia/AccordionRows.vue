@@ -234,6 +234,7 @@ button[disabled] {
 
   i {
     margin-right: 8px;
+    color: #111;
   }
 
   a {
@@ -242,6 +243,7 @@ button[disabled] {
 }
 
 .button-row-trigger {
+  color: #111;
   background: none;
   width: 100%;
   text-align: left;

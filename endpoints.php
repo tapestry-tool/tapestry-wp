@@ -150,11 +150,25 @@ $REST_API_ENDPOINTS = [
             'callback' => 'getTapestryNodeHasDraftChildren',
         ],
     ],
+    'GET_QUESTION_HAS_ANSWERS' => (object) [
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/question/hasAnswers',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => 'getQuestionHasAnswers',
+        ],
+    ],
     'POST_TAPESTRY_LINK' => (object) [
         'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/links',
         'ARGUMENTS' => [
             'methods' => $REST_API_POST_METHOD,
             'callback' => 'addTapestryLink',
+        ],
+    ],
+    'REVERSE_TAPESTRY_LINK' => (object) [
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/links/reverse',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_POST_METHOD,
+            'callback' => 'reverseTapestryLink',
         ],
     ],
     'DELETE_TAPESTRY_LINK' => (object) [
@@ -668,6 +682,37 @@ function addTapestryLink($request)
     }
 }
 
+/**
+ * Reverses A Tapestry Link.
+ *
+ * @param object $request HTTP request
+ *
+ * @return object $response   HTTP response
+ */
+function reverseTapestryLink($request)
+{
+    $postId = $request['tapestryPostId'];
+    $newLink = json_decode($request->get_body());
+
+
+    try {
+        if (!$newLink->source || !$newLink->target) {
+            throw new TapestryError('INVALID_NEW_LINK');
+        }
+        if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+        if (!TapestryHelpers::userIsAllowed('ADD', $newLink->source, $postId) 
+            || !TapestryHelpers::userIsAllowed('ADD', $newLink->target, $postId)) {
+            throw new TapestryError('ADD_LINK_PERMISSION_DENIED');
+        }
+        $tapestry = new Tapestry($postId);
+
+        return $tapestry->reverseLink($newLink);
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
 /**
  * Delete A Tapestry Link.
  *
@@ -1402,4 +1447,35 @@ function getTapestryContributors($request)
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
+}
+
+/**
+ * Checks whether any user has answered a spesific question
+ * inside an acitivity
+ *
+ * @param object $request HTTP request
+ */
+function getQuestionHasAnswers($request)
+{
+    $postId = $request['tapestryPostId'];
+    $nodeMetaId = $request['nodeMetaId'];
+    $questionId = $request['question_id'];
+    $answerType = $request['answer_type'];
+    
+    try {
+        if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+        if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
+            throw new TapestryError('INVALID_NODE_META_ID');
+        }
+        if (!TapestryHelpers::userIsAllowed('EDIT', $nodeMetaId, $postId)) {
+            throw new TapestryError('EDIT_NODE_PERMISSION_DENIED');
+        }
+
+        return TapestryUserProgress::questionsHasAnyAnswer($postId, $nodeMetaId, $questionId, $answerType);
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+    
 }

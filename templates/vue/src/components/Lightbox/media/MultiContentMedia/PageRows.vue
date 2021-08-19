@@ -15,16 +15,13 @@
           :style="rowBackground"
         >
           <div class="title-row-icon">
-            <i
-              v-if="disableRow(index, row.node)"
-              class="fas fa-lock fa-sm"
-              style="color:white;"
-            ></i>
+            <i v-if="disableRow(index, row.node)" class="fas fa-lock fa-sm"></i>
             <a v-else>
               <i
                 class="fas fa-heart fa-sm"
                 :style="{
                   color: isFavourite(row.node.id) ? 'red' : 'inherit',
+                  opacity: isFavourite(row.node.id) ? '1' : '0.25',
                   cursor: 'pointer',
                 }"
                 @click="toggleFavourite(row.node.id)"
@@ -47,10 +44,7 @@
                 @complete="updateProgress(row.node.id)"
                 @load="handleLoad($refs.rowRefs[index])"
               />
-              <p
-                v-if="row.children.length > 0 && !areAllPopup(row.children)"
-                style="color: white;"
-              >
+              <p v-if="row.children.length > 0 && !areAllPopup(row.children)">
                 {{ row.node.typeData.subAccordionText }}
               </p>
               <accordion-rows
@@ -166,8 +160,8 @@ export default {
     rowBackground() {
       if (this.isMultiContentContext) {
         let rgb = 187
-        // let colorOffset = this.level * 10
-        // rgb = colorOffset > rgb ? 0 : rgb - colorOffset
+        let colorOffset = this.level * 10
+        rgb = colorOffset > rgb ? 0 : rgb + colorOffset
         return {
           background: `rgb(${rgb}, ${rgb}, ${rgb})`,
         }

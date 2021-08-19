@@ -68,7 +68,7 @@ if (!window.MediaRecorder) {
 }
 
 export default {
-  name: "audio-recorder",
+  name: "audio-question",
   props: {
     id: {
       type: String,
@@ -244,6 +244,9 @@ export default {
 
 <style lang="scss" scoped>
 .recorder {
+  #duration-text {
+    color: #111;
+  }
   h1 {
     margin-bottom: 32px;
   }

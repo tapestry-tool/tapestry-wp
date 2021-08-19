@@ -57,18 +57,12 @@
       @load="handleLoad"
     ></wp-post-media>
     <activity-media
-      v-if="node.mediaType === 'activity'"
+      v-if="node.mediaType === 'activity' || node.mediaType === 'answer'"
       :dimensions="dimensions"
       :node="node"
       :context="context"
+      :initial-type="node.mediaType"
       @change:dimensions="$emit('change:dimensions', $event)"
-      @complete="complete"
-      @close="$emit('close')"
-      @load="handleLoad"
-    />
-    <answer-media
-      v-if="node.mediaType === 'answer'"
-      :node="node"
       @complete="complete"
       @close="$emit('close')"
       @load="handleLoad"
@@ -83,7 +77,6 @@ import VideoMedia from "./VideoMedia"
 import H5PMedia from "./H5PMedia"
 import ExternalMedia from "./ExternalMedia"
 import ActivityMedia from "./ActivityMedia"
-import AnswerMedia from "./AnswerMedia"
 import WpPostMedia from "./WpPostMedia"
 
 export default {
@@ -95,7 +88,6 @@ export default {
     ExternalMedia,
     WpPostMedia,
     ActivityMedia,
-    AnswerMedia,
   },
   props: {
     nodeId: {

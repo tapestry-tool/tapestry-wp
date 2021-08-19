@@ -1,7 +1,10 @@
 <template>
   <div ref="activity" class="activity-media primary-background">
     <h1 v-if="showTitle" class="media-title">{{ node.title }}</h1>
-    <completion-screen v-if="showCompletionScreen" :question="activeQuestion">
+    <completion-screen
+      v-if="state === 'completion-screen'"
+      :question="activeQuestion"
+    >
       <button
         v-if="hasNext"
         class="button-completion"
@@ -17,30 +20,58 @@
       </button>
     </completion-screen>
     <question
-      v-else
+      v-else-if="state === 'activity'"
       :question="activeQuestion"
-      :node="node"
-      @submit="handleSubmit"
+      :node="questionNode"
+      @submit="handleComplete('activity')"
       @back="$emit('close')"
     ></question>
-    <footer v-if="!showCompletionScreen" class="question-footer">
-      <p class="question-step">{{ currentQuestionText }}</p>
-      <button
-        v-if="questions.length > 1"
-        class="button-nav"
-        :disabled="!hasPrev"
-        @click="prev"
-      >
-        <i class="fas fa-arrow-left"></i>
-      </button>
-      <button
-        v-if="questions.length > 1"
-        class="button-nav"
-        :disabled="!hasNext"
-        @click="next"
-      >
-        <i class="fas fa-arrow-right"></i>
-      </button>
+    <answer-media
+      v-else-if="state === 'answer'"
+      :node="node"
+      :type-data="currentQuestionTypeData"
+      @complete="handleComplete('answer')"
+      @close="$emit('close')"
+      @load="$emit('load', $event)"
+    ></answer-media>
+    <footer class="question-footer">
+      <template v-if="state !== 'completion-screen'">
+        <b-button
+          v-if="hasAnswers && state === 'activity'"
+          variant="info"
+          class="mr-auto"
+          @click="state = 'answer'"
+        >
+          Show previous answers
+        </b-button>
+        <b-button
+          v-else-if="state === 'answer'"
+          variant="info"
+          class="mr-auto"
+          @click="state = 'activity'"
+        >
+          Change answers
+        </b-button>
+        <template v-if="initialType === 'activity'">
+          <p class="question-step">{{ currentQuestionText }}</p>
+          <button
+            v-if="questions.length > 1"
+            class="button-nav"
+            :disabled="!hasPrev"
+            @click="prev"
+          >
+            <i class="fas fa-arrow-left"></i>
+          </button>
+          <button
+            v-if="questions.length > 1"
+            class="button-nav"
+            :disabled="!hasNext"
+            @click="next"
+          >
+            <i class="fas fa-arrow-right"></i>
+          </button>
+        </template>
+      </template>
     </footer>
   </div>
 </template>
@@ -50,12 +81,20 @@ import client from "@/services/TapestryAPI"
 import Question from "./Question"
 import CompletionScreen from "./CompletionScreen"
 import { mapActions, mapGetters } from "vuex"
+import AnswerMedia from "./AnswerMedia.vue"
+
+const states = {
+  ACTIVITY: "activity",
+  ANSWER: "answer",
+  COMPLETION_SCREEN: "completion-screen",
+}
 
 export default {
   name: "activity-media",
   components: {
     CompletionScreen,
     Question,
+    AnswerMedia,
   },
   props: {
     node: {
@@ -71,20 +110,35 @@ export default {
       required: false,
       default: "",
     },
+    initialType: {
+      type: String,
+      required: true,
+    },
   },
   data() {
     return {
       activeQuestionIndex: 0,
-      showCompletionScreen: false,
+      state: "",
     }
   },
   computed: {
-    ...mapGetters(["getAnswers"]),
+    ...mapGetters(["getAnswers", "getQuestion", "getNode"]),
+    questionNode() {
+      return this.initialType === states.ACTIVITY
+        ? this.node
+        : this.getNode(this.node.typeData.activityId)
+    },
     showTitle() {
       return this.context === "page" && this.node.typeData.showTitle !== false
     },
     questions() {
-      return this.node.typeData.activity.questions
+      /* NOTE: If this is an answer node we retreive the single question
+       *       that is stored in the answer node.
+       */
+
+      return this.initialType === states.ACTIVITY
+        ? this.node.typeData.activity.questions
+        : [this.getQuestion(this.node.typeData.questionId)]
     },
     activeQuestion() {
       return this.questions[this.activeQuestionIndex]
@@ -98,8 +152,45 @@ export default {
     hasPrev() {
       return this.activeQuestionIndex !== 0
     },
+    hasAnswers() {
+      return !!Object.entries(
+        this.getAnswers(this.questionNode.id, this.activeQuestion.id)
+      ).length
+    },
+    currentQuestionTypeData() {
+      return this.initialType === states.ACTIVITY
+        ? {
+            activityId: this.node.id,
+            questionId: this.activeQuestion.id,
+          }
+        : {}
+    },
+  },
+  watch: {
+    activeQuestion() {
+      if (this.initialType === states.ACTIVITY) {
+        if (this.hasAnswers && this.state === states.ACTIVITY) {
+          this.state = states.ANSWER
+        } else if (!this.hasAnswers) {
+          this.state = states.ACTIVITY
+        }
+      }
+    },
   },
   mounted() {
+    switch (this.initialType) {
+      case states.ACTIVITY:
+        if (this.hasAnswers) {
+          this.state = states.ANSWER
+        } else {
+          this.state = states.ACTIVITY
+        }
+        break
+      case states.ANSWER:
+        this.state = states.ANSWER
+        break
+    }
+
     this.$emit("change:dimensions", {
       width: this.dimensions.width,
       height:
@@ -113,32 +204,38 @@ export default {
   methods: {
     ...mapActions(["updateNodeProgress"]),
     markQuestionsComplete() {
-      for (let i = 0; i < this.questions.length; i++) {
-        const currentQuestion = this.questions[i]
-        const currentQuestionAnswer = this.getAnswers(
-          this.node.id,
-          currentQuestion.id
-        )
-        if (Object.keys(currentQuestionAnswer).length === 0) {
-          currentQuestion.completed = false
+      this.questions.forEach(question => {
+        const answer = this.getAnswers(this.questionNode.id, question.id)
+        if (Object.entries(answer).length === 0) {
+          question.completed = false
         } else {
-          currentQuestion.completed = true
-        }
-      }
-    },
-    handleSubmit() {
-      this.showCompletionScreen = true
-      const numberCompleted = this.questions.filter(question => question.completed)
-        .length
-      const progress = numberCompleted / this.node.typeData.activity.questions.length
-      this.updateNodeProgress({ id: this.node.id, progress }).then(() => {
-        if (progress === 1) {
-          this.$emit("complete")
+          question.completed = true
         }
       })
     },
+    handleComplete(initiatingComponent) {
+      if (initiatingComponent === "activity") {
+        this.state = states.COMPLETION_SCREEN
+        const numberCompleted = this.questionNode.typeData.activity.questions.filter(
+          question => question.completed
+        ).length
+        const progress =
+          numberCompleted / this.questionNode.typeData.activity.questions.length
+        this.updateNodeProgress({ id: this.questionNode.id, progress }).then(() => {
+          if (progress === 1) {
+            this.$emit("complete")
+          }
+        })
+      } else if (
+        this.initialType === states.ANSWER &&
+        initiatingComponent === "answer" &&
+        this.hasAnswers
+      ) {
+        this.$emit("complete")
+      }
+    },
     next() {
-      this.showCompletionScreen = false
+      this.state = states.ACTIVITY
       client.recordAnalyticsEvent("user", "next", "activity", this.node.id, {
         from: this.activeQuestionIndex,
         to: this.activeQuestionIndex + 1,
@@ -146,7 +243,7 @@ export default {
       this.activeQuestionIndex++
     },
     prev() {
-      this.showCompletionScreen = false
+      this.state = states.ACTIVITY
       client.recordAnalyticsEvent("user", "prev", "activity", this.node.id, {
         from: this.activeQuestionIndex,
         to: this.activeQuestionIndex - 1,
@@ -155,7 +252,11 @@ export default {
     },
     close() {
       client.recordAnalyticsEvent("user", "close", "activity", this.node.id)
-      this.$emit("close")
+      if (this.initialType === "activity") {
+        this.$emit("close")
+      } else {
+        this.state = states.ANSWER
+      }
     },
   },
 }
@@ -177,6 +278,7 @@ export default {
     font-size: 1.75rem;
     font-weight: 500;
     margin-bottom: 0.9em;
+    width: 100%;
 
     :before {
       display: none;
@@ -189,6 +291,7 @@ export default {
   display: flex;
   justify-content: flex-end;
   align-items: center;
+  width: 100%;
 }
 
 .button-completion {
@@ -251,7 +354,7 @@ export default {
   padding: 0;
   font-weight: bold;
   font-size: 40px;
-  color: var(--tyde-blue);
+  opacity: 0.5;
   margin-right: 32px;
 }
 </style>
