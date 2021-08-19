@@ -165,7 +165,6 @@ export default {
       return this.getNode(this.nodeId)
     },
     videoComponent() {
-      return "kaltura-video-media"
       switch (this.node.mediaFormat) {
         case "mp4":
           return "url-video-media"
@@ -173,6 +172,8 @@ export default {
           return "youtube-media"
         case "h5p":
           return "h5p-video-media"
+        case "kaltura":
+          return "kaltura-video-media"
         default:
           throw new Error(`Unknown video type: ${this.node.mediaFormat}`)
       }

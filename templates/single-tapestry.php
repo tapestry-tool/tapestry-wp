@@ -13,8 +13,9 @@ get_header();
 ?>
 <?php 
     if (LOAD_KALTURA) {
-        ?>
-    <script src="https://admin.video.ubc.ca/p/163/sp/16300/embedIframeJs/uiconf_id/23449696/partner_id/163"></script>
+        $script_src = "https://admin.video.ubc.ca/p/".KALTURA_PARTNER_ID."/sp/".KALTURA_PARTNER_ID."300/embedIframeJs/uiconf_id/".KALTURA_UNIQUE_CONFIG."/partner_id/".KALTURA_PARTNER_ID
+?>
+    <script src="<?php echo $script_src?>"></script>
 <?php
     }
 ?>

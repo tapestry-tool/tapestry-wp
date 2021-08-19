@@ -148,8 +148,10 @@ function tapestry_enqueue_vue_app()
         global $wp_roles;
 
         $kaltura_partner_id = null;
+        $kaltura_unique_configuration = null;
         if(LOAD_KALTURA) {
             $kaltura_partner_id = KALTURA_PARTNER_ID;
+            $kaltura_unique_configuration = KALTURA_UNIQUE_CONFIG;
         }
         
         wp_localize_script(
@@ -175,7 +177,10 @@ function tapestry_enqueue_vue_app()
                 'wpCanEditTapestry' => current_user_can('edit_post', get_the_ID()),
                 'currentUser' => wp_get_current_user(),
                 'uploadDirArray' => wp_upload_dir(),
-                'kalturaPartnerId' => $kaltura_partner_id,
+                'kaltura' => array(
+                    "kalturaPartnerId" => $kaltura_partner_id,
+                    "uniqueConfiguration" => $kaltura_unique_configuration,
+                ),
             ]
         );
 

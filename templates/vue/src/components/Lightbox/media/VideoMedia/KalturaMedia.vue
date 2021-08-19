@@ -47,8 +47,8 @@ export default {
   mounted() {
     kWidget.embed({
       targetId: `kaltura-container-${this.node.id}`,
-      wid: `_${wpData.kalturaPartnerId}`,
-      uiconf_id: 23449696,
+      wid: `_${wpData.kaltura.kalturaPartnerId}`,
+      uiconf_id: wpData.kaltura.uniqueConfiguration,
       entry_id: this.kalturaData.id,
     })
     kWidget.addReadyCallback(playerId => {

@@ -17,7 +17,9 @@ require_once __DIR__.'/utilities/class.tapestry-user.php';
 define('LOAD_KALTURA',
     (defined('KALTURA_ADMIN_SECRET') && !empty(KALTURA_ADMIN_SECRET)) && 
     (defined('KALTURA_PARTNER_ID') && !empty(KALTURA_PARTNER_ID)) && 
-    (defined('KALTURA_SERVICE_URL') && !empty(KALTURA_SERVICE_URL)));
+    (defined('KALTURA_SERVICE_URL') && !empty(KALTURA_SERVICE_URL)) &&
+    (defined('KALTURA_UNIQUE_CONFIG') && !empty(KALTURA_UNIQUE_CONFIG)));
+
 if (LOAD_KALTURA) {
     require_once __DIR__.'/services/class.kaltura-api.php';
 }
@@ -1534,6 +1536,7 @@ function upload_videos_to_kaltura($request)
                     );
 
                     $node->set($typeData);
+                    $node->set((object)["mediaFormat"=>"kaltura"]);
                     $node->save();
 
                     wp_delete_file($upload_folder."/".$original_link);
