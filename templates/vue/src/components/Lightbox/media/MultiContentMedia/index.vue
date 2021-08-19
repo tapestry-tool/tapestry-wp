@@ -310,8 +310,12 @@ button[disabled] {
 }
 
 .title {
-  color: #fff;
+  color: #111;
   margin-bottom: 1em;
+}
+
+.has-navbar .title {
+  text-align: left;
 }
 
 .media-container {

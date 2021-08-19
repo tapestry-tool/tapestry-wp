@@ -6,14 +6,14 @@
       'context-multi-content': hasMultiContentContext,
     }"
     :style="{
-      height: `${dimensions.height}px`,
+      height: frameHeight ? `${iframeHeight}px` : iframeHeight,
       width: '100%',
     }"
   >
     <iframe
       id="h5p"
       ref="h5p"
-      height="100%"
+      :height="iframeHeight"
       width="100%"
       frameborder="0"
       :src="node.typeData && node.typeData.mediaURL"
@@ -58,6 +58,9 @@ export default {
     },
     hasMultiContentContext() {
       return this.context === "multi-content" || this.context === "page"
+    },
+    iframeHeight() {
+      return this.frameHeight ? this.frameHeight : "100%"
     },
   },
   methods: {
@@ -120,7 +123,7 @@ export default {
 .h5p-media-iframe-container {
   margin: auto;
   overflow: hidden;
-  border-radius: 15px;
+  border-radius: 5px;
   &:not(.context-multi-content) {
     position: absolute;
     top: 0;

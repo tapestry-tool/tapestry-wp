@@ -13,6 +13,13 @@
     {{ textContent[icon] }}
   </text>
   <i v-else-if="icon === 'text'" class="icon-plaintext">{{ textContent[icon] }}</i>
+  <drag-drop-icon
+    v-else-if="icon === 'dragDrop'"
+    class="icon-dragdrop"
+    style="display:inline;"
+    width="30"
+    height="30"
+  />
   <i v-else :class="iconClass"></i>
 </template>
 
@@ -30,6 +37,7 @@ const textContent = {
   plus: "\uf067",
   play: "\uf04b",
   text: "Aa",
+  answer: "\uf02e",
   "comment-dots": "\uf4ad",
 }
 
@@ -59,8 +67,13 @@ const aliases = {
  * Then doing a "Cmd + F" on the icon name. The unicode is the value of the
  * "content" attribute of that icon.
  */
+import DragDropIcon from "./DragDropIcon.vue"
+
 export default {
   name: "tapestry-icon",
+  components: {
+    DragDropIcon,
+  },
   props: {
     icon: {
       type: String,
@@ -108,5 +121,9 @@ export default {
 
 .free {
   font-family: "Font Awesome 5 Free";
+}
+
+.icon-drag-drop svg {
+  fill: #000;
 }
 </style>

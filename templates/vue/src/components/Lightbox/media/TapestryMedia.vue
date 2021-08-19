@@ -56,10 +56,11 @@
       @load="handleLoad"
     ></wp-post-media>
     <activity-media
-      v-if="node.mediaType === 'activity'"
+      v-if="node.mediaType === 'activity' || node.mediaType === 'answer'"
       :dimensions="dimensions"
       :node="node"
       :context="context"
+      :initial-type="node.mediaType"
       @change:dimensions="$emit('change:dimensions', $event)"
       @complete="complete"
       @close="$emit('close')"
@@ -76,7 +77,6 @@ import H5PMedia from "./H5PMedia"
 import ExternalMedia from "./ExternalMedia"
 import ActivityMedia from "./ActivityMedia"
 import WpPostMedia from "./WpPostMedia"
-import Helpers from "@/utils/Helpers"
 
 export default {
   name: "tapestry-media",
@@ -144,9 +144,7 @@ export default {
       this.$emit("load", args)
     },
     updateProgress({ amountViewed }) {
-      if (!Helpers.nodeAndUserAreDyad(this.node)) {
-        this.updateNodeProgress({ id: this.nodeId, progress: amountViewed })
-      }
+      this.updateNodeProgress({ id: this.nodeId, progress: amountViewed })
     },
     complete(nodeId) {
       this.$emit("complete", nodeId)

@@ -12,8 +12,10 @@ export const routes = [
   routeConfig.multiContent,
   routeConfig.nestedMultiContent,
   routeConfig.settings,
+  routeConfig.linkmodal,
   ...routeConfig.redirects,
   routeConfig.modal,
+  routeConfig.help,
 ]
 
 const router = new VueRouter({

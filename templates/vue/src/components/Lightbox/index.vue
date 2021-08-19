@@ -2,39 +2,58 @@
   <tapestry-modal
     id="lightbox"
     data-qa="lightbox"
+    :node-id="nodeId"
     :class="{
-      'full-screen': node.fullscreen,
+      'full-screen': node.fullscreen || tydeModeEnabled,
       'content-text': node.mediaType === 'text' || node.mediaType === 'wp-post',
     }"
-    :node-id="nodeId"
     :content-container-style="lightboxContentStyles"
-    :allow-close="canSkip"
+    :allow-close="canSkip && !tydeModeEnabled"
+    :show-fav="!tydeModeEnabled"
     @close="handleUserClose"
   >
-    <multi-content-media
-      v-if="node.mediaType === 'multi-content'"
-      :node="node"
-      :row-id="rowId"
-      :sub-row-id="subRowId"
-      @close="handleAutoClose"
-      @complete="complete"
-    />
-    <page-menu
-      v-if="node.typeData.showNavBar && node.presentationStyle === 'page'"
-      :node="node"
-      :rowRefs="rowRefs"
-      :dimensions="dimensions"
-    />
-    <tapestry-media
-      v-if="node.mediaType !== 'multi-content'"
-      :node-id="nodeId"
-      :dimensions="dimensions"
-      context="lightbox"
-      @load="handleLoad"
-      @close="handleAutoClose"
-      @complete="complete"
-      @change:dimensions="updateDimensions"
-    />
+    <navbar
+      v-if="tydeModeEnabled"
+      :selectedTab="selectedTab"
+      @change-tab="handleTabChange"
+    ></navbar>
+    <div
+      v-show="selectedTab === 'default'"
+      class="node-container"
+      :class="{
+        'multi-content': node.mediaType === 'multi-content',
+        'video-content': node.mediaType === 'video' || node.mediaType === 'h5p',
+      }"
+    >
+      <multi-content-media
+        v-if="node.mediaType === 'multi-content'"
+        :node="node"
+        :row-id="rowId"
+        :class="{ 'has-navbar': tydeModeEnabled }"
+        :sub-row-id="subRowId"
+        @close="handleAutoClose"
+        @complete="complete"
+      />
+      <page-menu
+        v-if="node.typeData.showNavBar && node.presentationStyle === 'page'"
+        :node="node"
+        :rowRefs="rowRefs"
+        :dimensions="dimensions"
+        :full-screen="tydeModeEnabled"
+      />
+      <tapestry-media
+        v-if="node.mediaType !== 'multi-content'"
+        :node-id="nodeId"
+        :dimensions="dimensions"
+        context="lightbox"
+        :class="{ 'has-navbar': tydeModeEnabled }"
+        @load="handleLoad"
+        @close="handleAutoClose"
+        @complete="complete"
+        @change:dimensions="updateDimensions"
+      />
+    </div>
+    <circle-of-support v-if="selectedTab === 'cos'" />
   </tapestry-modal>
 </template>
 
@@ -49,6 +68,9 @@ import { names } from "@/config/routes"
 import Helpers from "@/utils/Helpers"
 import { sizes } from "@/utils/constants"
 import DragSelectModular from "@/utils/dragSelectModular"
+import Navbar from "@/components/tyde/Navbar"
+import CircleOfSupport from "@/components/tyde/activities/CircleOfSupport"
+import { canEditTapestry } from "@/services/wp"
 
 export default {
   name: "lightbox",
@@ -57,6 +79,8 @@ export default {
     TapestryMedia,
     TapestryModal,
     PageMenu,
+    Navbar,
+    CircleOfSupport,
   },
   props: {
     nodeId: {
@@ -82,10 +106,11 @@ export default {
       },
       showCompletionScreen: false,
       rowRefs: [],
+      selectedTab: "default",
     }
   },
   computed: {
-    ...mapState(["h5pSettings", "rootId"]),
+    ...mapState(["h5pSettings", "rootId", "settings"]),
     ...mapGetters(["getNode", "isMultiContent", "isMultiContentRow"]),
     node() {
       const node = this.getNode(this.nodeId)
@@ -93,6 +118,9 @@ export default {
     },
     canSkip() {
       return this.node.completed || this.node.skippable !== false
+    },
+    tydeModeEnabled() {
+      return !canEditTapestry() && this.settings.tydeModeEnabled
     },
     lightboxContentStyles() {
       const styles = {
@@ -102,7 +130,7 @@ export default {
         height: this.dimensions.height + "px",
       }
 
-      if (this.node.fullscreen) {
+      if (this.node.fullscreen || this.tydeModeEnabled) {
         styles.top = "auto"
         styles.left = "auto"
         styles.width = "100vw"
@@ -292,6 +320,9 @@ export default {
         height: this.lightboxDimensions.height,
       }
     },
+    handleTabChange(newTab) {
+      this.selectedTab = newTab
+    },
   },
 }
 </script>
@@ -310,8 +341,10 @@ body.tapestry-lightbox-open {
 }
 
 #lightbox {
+  color: #111;
+
   &.full-screen {
-    background: #000;
+    background: #eee;
 
     .close-btn {
       position: fixed;
@@ -320,5 +353,21 @@ body.tapestry-lightbox-open {
     }
   }
   height: 100%;
+}
+
+.has-navbar {
+  padding-top: 6rem;
+}
+
+.node-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+}
+.multi-content {
+  flex-direction: row-reverse;
+}
+.video-content {
+  display: block !important;
 }
 </style>

@@ -17,12 +17,13 @@
           <h3 class="mb-4">
             {{ question.followUp.text || "Previously, you said:" }}
           </h3>
-          <tapestry-activity
-            v-for="answer in previousQuestionAnswers"
-            :key="answer.type"
-            :type="answer.type"
-            :answerData="answer.answerData"
-          ></tapestry-activity>
+          <completed-activity-media
+            v-for="previousAnswer in previousQuestionAnswers"
+            :key="previousAnswer[0]"
+            :type="previousAnswer[0]"
+            :answerData="previousAnswer[1]"
+            :question="getQuestion(question.followUp.questionId)"
+          ></completed-activity-media>
         </div>
         <div v-else>
           <p>You haven't done the previous activity yet.</p>
@@ -41,38 +42,28 @@
       </b-alert>
       <div class="question-body">
         <div v-if="formOpened">
-          <text-question
-            v-if="formType === 'text'"
+          <component
+            :is="formType + '-question'"
+            :id="question.id"
+            :node="node"
             :question="question"
             :answer="answer"
             @submit="handleSubmit"
-          ></text-question>
-          <audio-recorder
-            v-else-if="formType === 'audio'"
-            :id="question.id"
-            :node="node"
-            @submit="handleSubmit"
-          />
+          ></component>
         </div>
         <div v-else class="question-answer-types">
           <p class="question-answer-text">I want to answer with...</p>
           <div class="button-container">
             <answer-button
-              v-if="question.answerTypes.text.enabled"
-              :completed="textFormCompleted"
-              data-qa="answer-button-text"
-              @click="openForm('text')"
+              v-for="enabledAnswerType in enabledAnswerTypes"
+              :key="enabledAnswerType[0]"
+              class="text-capitalize"
+              :completed="isFormCompleted(enabledAnswerType[0])"
+              :icon="enabledAnswerType[0]"
+              :data-qa="`answer-button-${enabledAnswerType[0]}`"
+              @click="openForm(enabledAnswerType[0])"
             >
-              text
-            </answer-button>
-            <answer-button
-              v-if="question.answerTypes.audio.enabled"
-              :completed="audioFormCompleted"
-              icon="microphone"
-              data-qa="answer-button-audio"
-              @click="openForm('audio')"
-            >
-              audio
+              {{ enabledAnswerType[0].replace(/([A-Z])/g, " $1").trim() }}
             </answer-button>
           </div>
         </div>
@@ -85,22 +76,25 @@
 import { mapActions, mapGetters, mapState } from "vuex"
 import client from "@/services/TapestryAPI"
 import AnswerButton from "./AnswerButton"
-import AudioRecorder from "./AudioRecorder"
+import AudioQuestion from "./AudioQuestion"
 import TextQuestion from "./TextQuestion"
+import DragDropQuestion from "./DragDropQuestion"
+import MultipleChoiceQuestion from "./MultipleChoiceQuestion"
 import Loading from "@/components/common/Loading"
-import TapestryActivity from "./TapestryActivity"
+import CompletedActivityMedia from "../../common/CompletedActivityMedia"
 import * as wp from "@/services/wp"
-import { data as wpData } from "@/services/wp"
 import Helpers from "@/utils/Helpers"
 
 export default {
   name: "question",
   components: {
     AnswerButton,
-    AudioRecorder,
+    AudioQuestion,
     TextQuestion,
+    DragDropQuestion,
+    MultipleChoiceQuestion,
     Loading,
-    TapestryActivity,
+    CompletedActivityMedia,
   },
   props: {
     question: {
@@ -118,10 +112,11 @@ export default {
       formOpened: false,
       formType: "",
       answers: {},
+      prevQuestionId: null,
     }
   },
   computed: {
-    ...mapGetters(["getAnswers"]),
+    ...mapGetters(["getAnswers", "getQuestion"]),
     ...mapState(["userAnswers"]),
     isLoggedIn() {
       return wp.isLoggedIn()
@@ -137,6 +132,8 @@ export default {
           ) {
             // eslint-disable-next-line vue/no-side-effects-in-computed-properties
             this.question.followUp.nodeId = tempNodeId
+            // eslint-disable-next-line vue/no-side-effects-in-computed-properties
+            this.prevQuestionId = this.question.followUp.questionId
           }
         }
       }
@@ -144,26 +141,7 @@ export default {
         this.question.followUp.nodeId,
         this.question.followUp.questionId
       )
-      let previousAnswers = []
-      if (answerObject !== undefined) {
-        if (this.question.followUp.questionId !== null) {
-          for (const [key, value] of Object.entries(answerObject)) {
-            if (key === "text") {
-              var tempObj = { type: key, answerData: value }
-              previousAnswers.push(tempObj)
-            } else {
-              var tempAudioObj = {
-                type: key,
-                answerData:
-                  wpData.uploadDirArray.baseurl + "/" + value.url + "?" + Date.now(),
-              }
-              previousAnswers.push(tempAudioObj)
-            }
-          }
-          return previousAnswers
-        }
-      }
-      return []
+      return answerObject ? Object.entries(answerObject) : null
     },
     enabledAnswerTypes() {
       return Object.entries(this.question.answerTypes).filter(([, value]) => {
@@ -174,24 +152,12 @@ export default {
       if (this.formOpened && this.answers?.[this.formType]) {
         return this.answers[this.formType]
       }
-      return ""
-    },
-    textFormCompleted() {
-      if (
-        this.userAnswers?.[this.node.id]?.activity?.[this.question.id]?.answers?.text
-      ) {
-        return true
+      switch (this.formType) {
+        case "text":
+          return []
+        default:
+          return null
       }
-      return false
-    },
-    audioFormCompleted() {
-      if (
-        this.userAnswers?.[this.node.id]?.activity?.[this.question.id]?.answers
-          ?.audio
-      ) {
-        return true
-      }
-      return false
     },
   },
   watch: {
@@ -219,6 +185,10 @@ export default {
       } else {
         this.formOpened = false
       }
+    },
+    isFormCompleted(type) {
+      return !!this.userAnswers?.[this.node.id]?.activity?.[this.question.id]
+        ?.answers[type]
     },
     openForm(answerType) {
       client.recordAnalyticsEvent(
@@ -274,6 +244,10 @@ export default {
       })
       this.$emit("submit")
     },
+    formIsCompleted(type) {
+      return !!this.userAnswers?.[this.node.id]?.activity?.[this.question.id]
+        ?.answers?.[type]
+    },
   },
 }
 </script>
@@ -327,7 +301,7 @@ export default {
   }
 
   .loading {
-    background: #111;
+    background: #eee;
     position: absolute;
     top: 0;
     left: 0;

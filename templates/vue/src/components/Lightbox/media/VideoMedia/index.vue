@@ -7,7 +7,7 @@
         width: '100%',
       }"
     >
-      <loading v-if="state === states.Loading" style="color: white;" />
+      <loading v-if="state === states.Loading" />
       <component
         :is="videoComponent"
         ref="video"
@@ -18,7 +18,7 @@
         :autoplay="autoplay"
         :context="context"
         @change:dimensions="$emit('change:dimensions', $event)"
-        @complete="$emit('complete', nodeId)"
+        @complete="handleVideoComplete"
         @close="$emit('close')"
         @load="transition(events.Load, $event)"
         @play="transition(events.Play)"
@@ -73,7 +73,7 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex"
+import { mapGetters, mapActions } from "vuex"
 
 import UrlVideoMedia from "./UrlVideoMedia"
 import H5PVideoMedia from "./H5PVideoMedia"
@@ -178,7 +178,11 @@ export default {
       const popups = this.getDirectChildren(this.node.id)
         .map(this.getNode)
         .filter(child => child.popup != null)
-        .map(child => ({ time: child.popup.time, id: child.id }))
+        .map(child => ({
+          time: child.popup.time,
+          id: child.id,
+          progress: child.progress,
+        }))
       popups.sort((a, b) => a.time - b.time)
       return popups
     },
@@ -217,6 +221,7 @@ export default {
     },
   },
   methods: {
+    ...mapActions(["completeNode"]),
     /**
      * This function calculates the next state given the current state and the event
      * name, as well as perform any necessary side effects.
@@ -280,7 +285,7 @@ export default {
                 this.activePopupId = activePopup.id
               } else {
                 if (amountViewed >= COMPLETION_THRESHOLD) {
-                  this.$emit("complete")
+                  this.handleVideoComplete()
                 }
 
                 // End of video
@@ -344,7 +349,12 @@ export default {
       if (!this.isPopupComplete) {
         this.completing = true
       }
-      this.$emit("complete", this.activePopupId)
+      this.completeNode(this.activePopupId)
+    },
+    handleVideoComplete(nodeId) {
+      if (this.popups.every(popUpNode => popUpNode.progress)) {
+        this.$emit("complete", nodeId)
+      }
     },
   },
 }

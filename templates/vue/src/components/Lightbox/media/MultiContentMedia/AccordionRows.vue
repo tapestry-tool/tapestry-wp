@@ -26,7 +26,7 @@
               <i
                 v-else
                 class="fas fa-lock fa-sm title-row-icon"
-                style="color:white;"
+                style="color:black;"
               ></i>
               {{ row.node.title }}
               <locked-content
@@ -43,7 +43,7 @@
                 class="fas fa-heart fa-sm"
                 style="color:red;"
               ></i>
-              <i v-else class="fas fa-heart fa-sm" style="color:white;"></i>
+              <i v-else class="fas fa-heart fa-sm"></i>
             </a>
           </div>
           <div v-if="isVisible(row.node.id)" :data-qa="`row-content-${row.node.id}`">
@@ -52,15 +52,12 @@
                 :node-id="row.node.id"
                 :dimensions="dimensions"
                 context="multi-content"
-                style="color: white; margin-bottom: 24px;"
+                style="margin-bottom: 24px;"
                 @complete="updateProgress(row.node.id)"
                 @close="toggle(row.node.id)"
                 @load="handleLoad($refs.rowRefs[index])"
               />
-              <p
-                v-if="row.children.length > 0 && !areAllPopup(row)"
-                style="color: white;"
-              >
+              <p v-if="row.children.length > 0 && !areAllPopup(row.children)">
                 {{ row.node.typeData.subAccordionText }}
               </p>
               <accordion-rows
@@ -184,9 +181,9 @@ export default {
     },
     rowBackground() {
       if (this.isMultiContentContext) {
-        let rgb = 40
+        let rgb = 187
         let colorOffset = this.level * 10
-        rgb = colorOffset > rgb ? 0 : rgb - colorOffset
+        rgb = colorOffset > rgb ? 0 : rgb + colorOffset
         return {
           background: `rgb(${rgb}, ${rgb}, ${rgb})`,
         }
@@ -219,18 +216,8 @@ export default {
     handleAutoClose() {
       this.$emit("close")
     },
-    areAllPopup(row) {
-      let popCount = 0
-      row.children.forEach(child => {
-        if (child.popup !== null) {
-          popCount++
-        }
-      })
-
-      if (popCount === row.children.length) {
-        return true
-      }
-      return false
+    areAllPopup(nodes) {
+      return nodes.every(node => node.popup !== null)
     },
   },
 }
@@ -251,6 +238,7 @@ button[disabled] {
 
   i {
     margin-right: 8px;
+    color: #111;
   }
 
   a {
@@ -259,13 +247,14 @@ button[disabled] {
 }
 
 .button-row-trigger {
+  color: #111;
   background: none;
   width: 100%;
   text-align: left;
 }
 
 .accordion-row {
-  background: #262626;
+  background: #eee;
   border-radius: 4px;
   padding: 8px 16px;
   margin-bottom: 8px;
