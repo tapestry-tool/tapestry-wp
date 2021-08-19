@@ -7,6 +7,8 @@
 </template>
 
 <script>
+import client from "@/services/TapestryAPI"
+import { SEEK_THRESHOLD } from "./video.config"
 import { mapActions, mapState } from "vuex"
 import { data as wpData } from "@/services/wp"
 
@@ -36,6 +38,7 @@ export default {
   data() {
     return {
       videoDimensions: null,
+      playerId: "",
     }
   },
   computed: {
@@ -51,20 +54,68 @@ export default {
       uiconf_id: wpData.kaltura.uniqueConfiguration,
       entry_id: this.kalturaData.id,
     })
-    kWidget.addReadyCallback(playerId => {
-      const kalturaVideo = document.getElementById(playerId)
-      const kalturaIframe = document.querySelector(
-        `#kaltura-container-${this.node.id} > iframe`
-      )
 
+    kWidget.addReadyCallback(playerId => {
+      this.playerId = playerId
+      const kalturaVideo = document.getElementById(playerId)
+
+      const kalturaIframe = document.querySelector(
+        `#kaltura-container-${this.node.id} iframe`
+      )
       kalturaIframe.style.minHeight = "0"
-      this.$emit("load", {
-        currentTime: 0,
+
+      const nodeProgress = this.node.progress
+      const shoudAutoPlay = this.autoplay
+
+      kalturaVideo.kBind("mediaReady", function() {
+        const videoDuration = kalturaVideo.evaluate("{duration}")
+        const currentTime = nodeProgress * videoDuration
+        kalturaVideo.sendNotification("doSeek", currentTime)
+        this.lastTime = currentTime
+
+        if (shoudAutoPlay) {
+          kalturaVideo.sendNotification("doPlay")
+        }
+
+        this.$emit("load", { currentTime, type: "kaltura-video" })
       })
+
+      kalturaVideo.kBind("playerPaused", () => {
+        this.$emit("pause")
+        client.recordAnalyticsEvent("user", "pause", "kaltura-video", this.node.id, {
+          time: kalturaVideo.evaluate("{utility.timestamp}"),
+        })
+      })
+
+      kalturaVideo.kBind("playerPlayed", () => {
+        this.$emit("play")
+        client.recordAnalyticsEvent("user", "play", "kaltura-video", this.node.id, {
+          time: kalturaVideo.evaluate("{utility.timestamp}"),
+        })
+      })
+
+      kalturaVideo.kBind("playerUpdatePlayhead", currentTime => {
+        const videoDuration = kalturaVideo.evaluate("{duration}")
+        this.updateVideoProgress(currentTime, videoDuration)
+      })
+
+      this.$emit("load", { currentTime: 0 })
     })
+  },
+  beforeDestroy() {
+    kWidget.destroy(`kaltura-container-${this.node.id}`)
   },
   methods: {
     ...mapActions(["fetchKalturaStatus"]),
+    updateVideoProgress(currentTime, duration) {
+      const amountViewed = currentTime / duration
+      if (Math.abs(currentTime - this.lastTime) > SEEK_THRESHOLD) {
+        this.$emit("seeked", { currentTime })
+      } else {
+        this.$emit("timeupdate", { amountViewed, currentTime })
+      }
+      this.lastTime = currentTime
+    },
   },
 }
 </script>
