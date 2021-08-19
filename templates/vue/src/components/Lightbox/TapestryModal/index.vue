@@ -86,7 +86,6 @@ export default {
     },
   },
   mounted() {
-    console.log(this.contentContainerStyle)
     this.load = true
   },
   methods: {
