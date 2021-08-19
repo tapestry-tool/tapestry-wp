@@ -965,7 +965,30 @@ export default {
         if (!validPreviousAnswers) {
           errMsgs.push("Please select a previous activity to display")
         }
-
+        if (
+          this.node.typeData.activity.questions[0].answerTypes.text.allowMultiple
+        ) {
+          let listQuestion = this.node.typeData.activity.questions[0].answerTypes
+            .text
+          let minValue = parseInt(listQuestion.minFields, 10)
+          let maxValue = parseInt(listQuestion.maxFields, 10)
+          if (!Number.isInteger(minValue)) {
+            errMsgs.push(
+              "Please enter a valid number as the minimum number of fields"
+            )
+          } else if (minValue < 1) {
+            errMsgs.push("Minimum number of fields cannot be less than 1")
+          }
+          if (!Number.isInteger(maxValue)) {
+            errMsgs.push(
+              "Please enter a valid number as the maximum number of fields"
+            )
+          } else if (maxValue < minValue) {
+            errMsgs.push(
+              "Please ensure minimum number of fields is less than or equal to the maximum number of fields"
+            )
+          }
+        }
         const validMultipleChoiceValues = this.isMultipleChoiceValueValid
         if (!validMultipleChoiceValues) {
           errMsgs.push("Please enter a text for all multiple choice options")
@@ -973,6 +996,36 @@ export default {
         const validMultipleChoiceImages = this.isMultipleChoiceImageValid
         if (!validMultipleChoiceImages) {
           errMsgs.push("Please upload an image for all multiple choice options")
+        }
+
+        // Drag and Drop form validation
+        const dragDropQuestions = this.node.typeData.activity.questions.filter(
+          question => question.answerTypes.dragDrop.enabled
+        )
+
+        const validBucketsText = dragDropQuestions.every(question => {
+          return question.answerTypes.dragDrop.buckets.every(bucket => bucket.text)
+        })
+        if (!validBucketsText) {
+          errMsgs.push("Please enter a name for all buckets")
+        }
+
+        const validItemsText = dragDropQuestions.every(question => {
+          return question.answerTypes.dragDrop.items.every(item => item.text)
+        })
+        if (!validItemsText) {
+          errMsgs.push("Please enter a name for all items")
+        }
+
+        const validItemsImages = dragDropQuestions
+          .filter(question => question.answerTypes.dragDrop.useImages)
+          .every(question => {
+            return question.answerTypes.dragDrop.items.every(item => item.imageUrl)
+          })
+        if (!validItemsImages) {
+          errMsgs.push(
+            "Images must be uploaded for all drag and drop questions that have 'Use Images' enabled"
+          )
         }
       } else if (this.node.mediaType === "answer") {
         const hasActivityId = this.node.typeData.activityId
@@ -985,7 +1038,6 @@ export default {
           errMsgs.push("Please select a question")
         }
       }
-
       return errMsgs
     },
     isValidVideo(typeData) {

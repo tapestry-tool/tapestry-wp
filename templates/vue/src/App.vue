@@ -1,8 +1,9 @@
 <template>
   <loading v-if="loading" data-qa="tapestry-loading" style="height: 75vh;"></loading>
   <div v-else id="app">
-    <router-view name="lightbox"></router-view>
     <tapestry-app></tapestry-app>
+    <router-view name="lightbox"></router-view>
+    <router-view name="linkmodal"></router-view>
     <node-modal></node-modal>
     <sidebar v-if="!isEmpty"></sidebar>
     <tapestry-error></tapestry-error>
