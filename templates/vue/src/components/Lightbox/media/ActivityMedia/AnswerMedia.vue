@@ -26,7 +26,7 @@
 
 <script>
 import { mapGetters, mapState } from "vuex"
-import CompletedActivityMedia from "./common/CompletedActivityMedia"
+import CompletedActivityMedia from "@/components/Lightbox/media/common/CompletedActivityMedia"
 import TapestryIcon from "@/components/common/TapestryIcon"
 
 export default {
@@ -40,12 +40,18 @@ export default {
       type: Object,
       required: true,
     },
+    typeData: {
+      type: Object,
+      required: true,
+    },
   },
   computed: {
     ...mapState(["userAnswers"]),
     ...mapGetters(["getQuestion", "getAnswers"]),
     answersTypeData() {
-      return this.node.typeData
+      return Object.entries(this.typeData).length
+        ? this.typeData
+        : this.node.typeData
     },
     question() {
       return this.getQuestion(this.answersTypeData.questionId)
@@ -77,9 +83,9 @@ export default {
 </script>
 <style lang="scss">
 .nav-tablist a {
-  color: #777;
+  color: #111;
   &.active {
-    color: #fff;
+    color: #111;
   }
 }
 </style>
@@ -87,7 +93,6 @@ export default {
 .media-wrapper {
   position: relative;
   align-items: center;
-  background: #262626;
   border-radius: 8px;
   display: flex;
   margin-bottom: 8px;
@@ -96,8 +101,9 @@ export default {
   justify-content: center;
 }
 .answers {
-  color: #fff;
+  color: #111;
   margin-top: 15px;
+  width: 100%;
 }
 .answer-container {
   width: 75%;
