@@ -78,6 +78,7 @@ import { mapGetters, mapActions } from "vuex"
 import UrlVideoMedia from "./UrlVideoMedia"
 import H5PVideoMedia from "./H5PVideoMedia"
 import YouTubeMedia from "./YouTubeMedia"
+import KalturaMedia from "./KalturaMedia.vue"
 import EndScreen from "./EndScreen"
 import PlayScreen from "./PlayScreen"
 import { COMPLETION_THRESHOLD } from "./video.config"
@@ -117,6 +118,7 @@ export default {
     TapestryMedia: () => import("../TapestryMedia"),
     "youtube-media": YouTubeMedia,
     "h5p-video-media": H5PVideoMedia,
+    "kaltura-video-media": KalturaMedia,
     UrlVideoMedia,
     EndScreen,
     PlayScreen,
@@ -163,6 +165,7 @@ export default {
       return this.getNode(this.nodeId)
     },
     videoComponent() {
+      return "kaltura-video-media"
       switch (this.node.mediaFormat) {
         case "mp4":
           return "url-video-media"
