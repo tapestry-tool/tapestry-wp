@@ -103,6 +103,10 @@ export default {
         nodeId = this.node.id
       }
       this.$emit("scroll-to", nodeId)
+      this.$router.push({
+        ...this.$route,
+        query: { ...this.$route.query, row: nodeId },
+      })
     },
   },
 }
