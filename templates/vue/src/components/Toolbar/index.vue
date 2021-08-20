@@ -1,27 +1,25 @@
 <template>
   <div class="toolbar">
-    <tapestry-filter v-if="!showMap" style="z-index: 10" />
+    <tapestry-filter v-if="!showMap" style="z-index: 10;" />
     <div
-      v-show="isLoggedIn"
-      :class="[{ 'hide-toolbar': hideToolbar }, 'slider-wrapper']"
+      v-show="avatarsEnabled || canEdit || (!showMap && hasDepth)"
+      class="slider-wrapper"
     >
       <user-settings-button
         v-if="avatarsEnabled"
         data-qa="user-settings-button"
       ></user-settings-button>
-      <div v-show="canEdit || (!showMap && hasDepth)" class="can-edit">
-        <help-button v-if="canEdit" />
-        <review-notifications v-if="canEdit && settings.submitNodesEnabled" />
-        <settings-modal-button
-          v-if="canEdit"
-          :max-depth="maxDepth"
-        ></settings-modal-button>
-        <tapestry-depth-slider
-          v-show="!showMap && hasDepth"
-          @change="updateViewBox"
-          @change:max-depth="maxDepth = $event"
-        ></tapestry-depth-slider>
-      </div>
+      <help-button v-if="canEdit" />
+      <review-notifications v-if="canEdit && settings.submitNodesEnabled" />
+      <settings-modal-button
+        v-if="canEdit"
+        :max-depth="maxDepth"
+      ></settings-modal-button>
+      <tapestry-depth-slider
+        v-show="!showMap && hasDepth"
+        @change="updateViewBox"
+        @change:max-depth="maxDepth = $event"
+      ></tapestry-depth-slider>
     </div>
   </div>
 </template>
@@ -67,13 +65,6 @@ export default {
     avatarsEnabled() {
       return this.isLoggedIn && process.env.VUE_APP_AVATARS === "TRUE"
     },
-    hideToolbar() {
-      return !(
-        this.avatarsEnabled ||
-        this.canEdit ||
-        (!this.showMap && this.hasDepth)
-      )
-    },
   },
   methods: {
     ...mapMutations(["select", "unselect", "clearSelection"]),
@@ -106,13 +97,5 @@ export default {
   padding: 8px 6px 8px 6px;
   margin-left: auto;
   position: relative;
-}
-
-.can-edit {
-  display: flex;
-}
-
-.hide-toolbar {
-  display: none;
 }
 </style>
