@@ -13,7 +13,7 @@
     ></audio>
     <button
       v-else
-      class="main-button my-2"
+      class="main-button my-2 secondary-background"
       data-qa="record"
       @click="toggleRecording"
     >
@@ -28,7 +28,7 @@
     </div>
     <button
       :disabled="duration === 0 && state !== states.SAVED"
-      class="my-3"
+      class="my-3 secondary-background"
       @click="resetRecording"
     >
       <i class="fas fa-undo"></i>
@@ -37,7 +37,7 @@
     <button
       v-if="state === states.PAUSED || state === states.RECORDING"
       :disabled="duration === 0"
-      class="my-3"
+      class="my-3 secondary-background"
       data-qa="done-button-audio"
       @click="stopRecording"
     >
@@ -46,7 +46,7 @@
     </button>
     <button
       v-if="state === states.UNSAVED"
-      class="my-3"
+      class="my-3 secondary-background"
       data-qa="submit-button-audio"
       @click="handleSubmit"
     >
