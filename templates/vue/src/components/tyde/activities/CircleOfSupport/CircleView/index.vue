@@ -464,7 +464,7 @@ ul {
   position: absolute;
   height: 90px;
   width: 90px;
-  top: 50%;
+  top: 48.5%;
   left: 50%;
   transform: translate(-50%, -50%);
   font-size: 4rem;
