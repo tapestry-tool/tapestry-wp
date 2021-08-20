@@ -59,13 +59,6 @@ export default {
     },
   },
   mounted() {
-    if (!this.hasAvatar && this.avatarsEnabled) {
-      this.$router.push({
-        name: open ? names.USERSETTINGS : names.APP,
-        params: { nodeId: this.$route.params.nodeId, tab: "avatar" },
-        query: this.$route.query,
-      })
-    }
     this.$root.$on("open-node", id => {
       this.openNode(id)
     })
@@ -73,8 +66,14 @@ export default {
       this.editNode(id)
     })
     client.recordAnalyticsEvent("app", "load", "tapestry")
-
-    this.setupTydeView()
+    if (!this.hasAvatar && this.avatarsEnabled) {
+      this.setupUserAvatar()
+      this.$root.$on("avatar-form-closed", () => {
+        this.setupTydeView()
+      })
+    } else {
+      this.setupTydeView()
+    }
   },
   methods: {
     ...mapMutations(["select", "unselect", "clearSelection"]),
@@ -187,6 +186,13 @@ export default {
           query: this.$route.query,
         })
       }
+    },
+    setupUserAvatar() {
+      this.$router.push({
+        name: open ? names.USERSETTINGS : names.APP,
+        params: { nodeId: this.$route.params.nodeId, tab: "avatar" },
+        query: this.$route.query,
+      })
     },
   },
 }

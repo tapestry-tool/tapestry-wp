@@ -60,6 +60,7 @@ export default {
     },
     close() {
       this.avatarFormOpen = false
+      this.$root.$emit("avatar-form-closed")
       client.recordAnalyticsEvent("user", "close", "user-settings")
     },
     changeTab(tab) {
