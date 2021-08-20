@@ -37,7 +37,7 @@ const defaultStyles = {
   transform: "translateX(-50%)",
   width: "600px",
   height: "400px",
-  color: "#fff",
+  color: "#eee",
   display: "flex",
   flexDirection: "column",
   alignItems: "center",

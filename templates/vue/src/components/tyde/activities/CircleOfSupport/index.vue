@@ -237,11 +237,4 @@ export default {
   border: 2px solid var(--cos-color-tertiary);
   background: white;
 }
-
-.disabled {
-  // cursor: not-allowed;
-  background-color: #6c757d;
-  border-color: #6c757d;
-  opacity: 0.65;
-}
 </style>

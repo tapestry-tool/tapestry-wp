@@ -115,6 +115,11 @@ class TapestryApi {
     return await this.client.delete(url, { data: link })
   }
 
+  async reverseLink(link) {
+    const url = `/tapestries/${this.postId}/links/reverse`
+    return await this.client.post(url, link)
+  }
+
   /**
    * Update node
    *
@@ -269,6 +274,12 @@ class TapestryApi {
     return this.client.post(`/tapestries/${this.postId}/nodes/${id}/review`, {
       comments,
     })
+  }
+
+  async questionHasAnswer(nodeId, questionId, answerType) {
+    const url = `/tapestries/${this.postId}/nodes/${nodeId}/question/hasAnswers?question_id=${questionId}&answer_type=${answerType}`
+    const response = await this.client.get(url)
+    return response
   }
 
   get cos() {

@@ -21,7 +21,7 @@
             class="swatch"
           ></v-swatches>
         </div>
-        <div class="form__label">
+        <div v-if="label" class="form__label">
           <p>{{ label }}</p>
         </div>
       </b-row>
@@ -39,7 +39,7 @@ export default {
   props: {
     label: {
       type: String,
-      required: true,
+      required: false,
       default: "",
     },
     currentColor: {
