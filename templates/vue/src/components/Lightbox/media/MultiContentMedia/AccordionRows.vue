@@ -15,7 +15,7 @@
         >
           <div class="button-row">
             <button
-              class="button-row-trigger"
+              class="button-row-trigger  primary-text"
               :disabled="disableRow(index, row.node)"
               @click="toggle(row.node.id)"
             >
@@ -23,7 +23,7 @@
                 v-if="!disableRow(index, row.node)"
                 :class="isVisible(row.node.id) ? 'fas fa-minus' : 'fas fa-plus'"
               ></i>
-              <i v-else class="fas fa-lock fa-sm title-row-icon"></i>
+              <i v-else class="fas fa-lock fa-sm title-row-ico"></i>
               {{ row.node.title }}
               <locked-content
                 v-if="disableRow(index, row.node)"
@@ -39,7 +39,7 @@
                 class="fas fa-heart fa-sm"
                 style="color:red;"
               ></i>
-              <i v-else class="fas fa-heart fa-sm"></i>
+              <i v-else class="fas fa-heart fa-sm primary-text"></i>
             </a>
           </div>
           <div v-if="isVisible(row.node.id)" :data-qa="`row-content-${row.node.id}`">
@@ -234,7 +234,6 @@ button[disabled] {
 
   i {
     margin-right: 8px;
-    color: #111;
   }
 
   a {
@@ -243,7 +242,6 @@ button[disabled] {
 }
 
 .button-row-trigger {
-  color: #111;
   background: none;
   width: 100%;
   text-align: left;
