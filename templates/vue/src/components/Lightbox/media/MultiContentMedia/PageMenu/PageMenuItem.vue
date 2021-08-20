@@ -105,6 +105,10 @@ export default {
       }
       this.$emit("handle-menu-item-click", nodeId)
       this.$emit("scroll-to", nodeId)
+      this.$router.push({
+        ...this.$route,
+        query: { ...this.$route.query, row: nodeId },
+      })
     },
     isMultiContentChild(node) {
       return this.getNode(this.getParent(node.id)).mediaType === "multi-content"
