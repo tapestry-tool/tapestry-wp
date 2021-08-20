@@ -85,13 +85,13 @@ class CircleOfSupport
 
         return $community;
     }
-        
+
     public function deleteConnection($connectionId)
     {
         if (!isset($this->current['connections']->$connectionId)) {
             return;
         }
-        for ($i=0; $i < count($this->current['circles']) ; $i++) {
+        for ($i = 0; $i < count($this->current['circles']); ++$i) {
             $this->removeConnectionFromCircle($i, $connectionId);
         }
 
@@ -206,13 +206,13 @@ class CircleOfSupport
 
         $circle = $this->current['circles'][$circleIndex];
 
-        if (count($circle) == 0) {
+        if (0 == count($circle)) {
             return;
         }
 
         $index = array_search($connectionId, $circle);
-        
-        if (!isset($index) || $index == null) {
+
+        if (!isset($index) || null == $index) {
             return;
         }
 
