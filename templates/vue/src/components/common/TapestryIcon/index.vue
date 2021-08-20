@@ -33,6 +33,7 @@ const textContent = {
   post: "\uf411",
   exclamation: "\uf12a",
   microphone: "\uf130",
+  font: "\uf031",
   pen: "\uf304",
   plus: "\uf067",
   play: "\uf04b",

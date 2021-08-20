@@ -72,12 +72,12 @@ export default {
   overflow-wrap: break-word;
 
   &-from {
-    color: #444;
-    background-color: #ddd;
+    color: var(--primary-color);
+    background-color: var(--secondary-background-color);
   }
   &-to {
-    color: #555;
-    background-color: #eee;
+    color: var(--primary-color-offset);
+    background-color: var(--secondary-background-color-offset);
   }
 
   .bucket-label {

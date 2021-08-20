@@ -4,9 +4,12 @@
     :disabled="disabled"
     @click="$emit('click')"
   >
-    <i class="fas fa-check-circle" :class="completed ? 'visible' : 'invisible'"></i>
+    <i
+      class="fas fa-check-circle primary-text"
+      :class="completed ? 'visible' : 'invisible'"
+    ></i>
     <div v-if="isFaIcon" class="icon">
-      <i :class="`fas fa-${faIcon} icon-fa`"></i>
+      <i :class="`fas fa-${faIcon} icon-fa primary-text`"></i>
     </div>
     <drag-drop-icon
       v-else-if="icon === 'dragDrop'"
@@ -15,7 +18,7 @@
       height="56"
     />
     <img v-else :src="textIcon" class="icon" />
-    <div>
+    <div class="primary-text">
       <slot></slot>
     </div>
   </button>
@@ -54,13 +57,18 @@ export default {
 
         case "audio":
           return "microphone"
-
+        case "text":
+          return "font"
         default:
           return this.icon
       }
     },
     isFaIcon() {
-      return this.faIcon === "tasks" || this.faIcon === "microphone"
+      return (
+        this.faIcon === "tasks" ||
+        this.faIcon === "microphone" ||
+        this.faIcon === "font"
+      )
     },
     textIcon() {
       return `${data.vue_uri}/${TextIcon.split("dist")[1]}`
@@ -82,7 +90,6 @@ button {
 
 .button {
   padding: 0;
-  color: white;
   width: 136px;
   border-radius: 6px;
   display: flex;
@@ -92,8 +99,6 @@ button {
   transition: all 0.1s ease-out;
 
   i {
-    color: white;
-
     &:first-of-type {
       align-self: flex-end;
     }

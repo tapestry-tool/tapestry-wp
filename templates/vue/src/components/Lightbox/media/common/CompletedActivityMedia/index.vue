@@ -1,5 +1,5 @@
 <template>
-  <b-container class="completed-activity-media primary-background">
+  <b-container class="completed-activity-media secondary-background">
     <b-row align-v="center" style="min-height:150px;">
       <b-col v-if="type === 'text' && !isListTextType" align-self="center">
         <div class="text">
