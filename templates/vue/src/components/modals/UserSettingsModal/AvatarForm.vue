@@ -182,23 +182,7 @@ export default {
   },
   created() {
     if (!this.preferences || Object.keys(this.preferences).length === 0) {
-      this.userAvatar = {
-        isCircle: true,
-        circleColor: "#6fb8e0",
-        topType: "NoHair",
-        accessoriesType: "Blank",
-        facialHairType: "Blank",
-        clotheType: "ShirtCrewNeck",
-        eyeType: "Default",
-        eyebrowType: "Default",
-        mouthType: "Default",
-        skinColor: "Tanned",
-        graphicType: "Bat",
-        hairColor: "Black",
-        facialHairColor: "Black",
-        clotheColor: "Black",
-        topColor: "Black",
-      }
+      this.userAvatar = avatarOptions.defaultAvatar
     } else {
       this.userAvatar = { ...this.preferences }
     }

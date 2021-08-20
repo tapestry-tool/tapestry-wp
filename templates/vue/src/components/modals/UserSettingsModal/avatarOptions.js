@@ -201,6 +201,23 @@ const avatarOptions = {
     { value: "Red", text: "Red" },
     { value: "White", text: "White" },
   ],
+  defaultAvatar: {
+    isCircle: true,
+    circleColor: "#6fb8e0",
+    topType: "NoHair",
+    accessoriesType: "Blank",
+    facialHairType: "Blank",
+    clotheType: "ShirtCrewNeck",
+    eyeType: "Default",
+    eyebrowType: "Default",
+    mouthType: "Default",
+    skinColor: "Tanned",
+    graphicType: "Bat",
+    hairColor: "Black",
+    facialHairColor: "Black",
+    clotheColor: "Black",
+    topColor: "Black",
+  },
 }
 
 export default avatarOptions

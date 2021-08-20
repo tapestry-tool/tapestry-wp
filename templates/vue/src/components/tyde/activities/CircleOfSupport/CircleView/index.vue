@@ -73,34 +73,50 @@
         src="https://twemoji.maxcdn.com/v/13.1.0/72x72/1f60a.png"
       />
     </div>
-    <div>
-      <avataaars
-        v-if="hasAvatar"
-        class="user"
-        :isCircle="avatar.isCircle"
-        :circleColor="avatar.circleColor"
-        :accessoriesType="avatar.accessoriesType"
-        :clotheType="avatar.clotheType"
-        :clotheColor="avatar.clotheColor"
-        :eyebrowType="avatar.eyebrowType"
-        :eyeType="avatar.eyeType"
-        :facialHairColor="avatar.facialHairColor"
-        :facialHairType="avatar.facialHairType"
-        :graphicType="avatar.graphicType"
-        :hairColor="avatar.hairColor"
-        :mouthType="avatar.mouthType"
-        :skinColor="avatar.skinColor"
-        :topType="avatar.topType"
-        :topColor="avatar.topColor"
-      ></avataaars>
-      <div v-else class="user">😊</div>
-    </div>
+    <avataaars
+      v-if="hasAvatar"
+      class="user"
+      :isCircle="avatar.isCircle"
+      :circleColor="avatar.circleColor"
+      :accessoriesType="avatar.accessoriesType"
+      :clotheType="avatar.clotheType"
+      :clotheColor="avatar.clotheColor"
+      :eyebrowType="avatar.eyebrowType"
+      :eyeType="avatar.eyeType"
+      :facialHairColor="avatar.facialHairColor"
+      :facialHairType="avatar.facialHairType"
+      :graphicType="avatar.graphicType"
+      :hairColor="avatar.hairColor"
+      :mouthType="avatar.mouthType"
+      :skinColor="avatar.skinColor"
+      :topType="avatar.topType"
+      :topColor="avatar.topColor"
+    ></avataaars>
+    <avataaars
+      v-else
+      class="user"
+      :isCircle="defaultAvatar.isCircle"
+      :circleColor="defaultAvatar.circleColor"
+      :accessoriesType="defaultAvatar.accessoriesType"
+      :clotheType="defaultAvatar.clotheType"
+      :clotheColor="defaultAvatar.clotheColor"
+      :eyebrowType="defaultAvatar.eyebrowType"
+      :eyeType="defaultAvatar.eyeType"
+      :facialHairColor="defaultAvatar.facialHairColor"
+      :facialHairType="defaultAvatar.facialHairType"
+      :graphicType="defaultAvatar.graphicType"
+      :hairColor="defaultAvatar.hairColor"
+      :mouthType="defaultAvatar.mouthType"
+      :skinColor="defaultAvatar.skinColor"
+      :topType="defaultAvatar.topType"
+      :topColor="defaultAvatar.topColor"
+    ></avataaars>
   </ul>
 </template>
 
 <script>
 import Twemoji from "twemoji"
-
+import avatarOptions from "@/components/modals/UserSettingsModal/avatarOptions.js"
 import Helpers from "@/utils/Helpers"
 import client from "@/services/TapestryAPI"
 import ConnectionsTab from "../ConnectionsTab"
@@ -154,6 +170,7 @@ export default {
       state: States.Home,
       activeConnectionId: null,
       draggingConnection: null,
+      defaultAvatar: avatarOptions.defaultAvatar,
     }
   },
   computed: {
