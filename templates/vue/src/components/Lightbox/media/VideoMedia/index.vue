@@ -279,6 +279,8 @@ export default {
               break
             }
             case VideoEvents.Timeupdate: {
+              console.log(context)
+              console.log(this.state)
               const { amountViewed, currentTime } = context
               const activePopup = this.popups.find(
                 popup =>

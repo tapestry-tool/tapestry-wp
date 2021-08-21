@@ -8,7 +8,6 @@
 
 <script>
 import client from "@/services/TapestryAPI"
-import { SEEK_THRESHOLD } from "./video.config"
 import { mapActions, mapState } from "vuex"
 import { data as wpData } from "@/services/wp"
 
@@ -37,8 +36,9 @@ export default {
   },
   data() {
     return {
-      videoDimensions: null,
+      onLoad: true,
       playerId: "",
+      amountViewed: 0,
     }
   },
   computed: {
@@ -47,74 +47,117 @@ export default {
       return this.node.typeData.kalturaData
     },
   },
-  mounted() {
-    kWidget.embed({
-      targetId: `kaltura-container-${this.node.id}`,
-      wid: `_${wpData.kaltura.kalturaPartnerId}`,
-      uiconf_id: wpData.kaltura.uniqueConfiguration,
-      entry_id: this.kalturaData.id,
-    })
+  watch: {
+    playing() {
+      if (this.playing && this.playerId) {
+        const kalturaVideo = document.getElementById(this.playerId)
+        if (this.onLoad) {
+          const videoDuration = kalturaVideo.evaluate("{duration}")
+          const currentTime = this.node.progress * videoDuration
+          if (this.node.completed) {
+            this.$emit("timeupdate", { amountViewed: currentTime, currentTime })
+          } else {
+            kalturaVideo.sendNotification("doSeek", currentTime)
+            this.lastTime = currentTime
+            this.onLoad = false
+          }
+        }
+        kalturaVideo.sendNotification("doPlay")
+      }
+    },
+  },
+  created() {
+    const kalturaScript = document.createElement("script")
+    kalturaScript.src =
+      "https://admin.video.ubc.ca/p/163/sp/163300/embedIframeJs/uiconf_id/23449696/partner_id/163"
 
-    kWidget.addReadyCallback(playerId => {
-      this.playerId = playerId
-      const kalturaVideo = document.getElementById(playerId)
+    kalturaScript.id = "kaltura-script"
+
+    kalturaScript.addEventListener("load", () => {
+      kWidget.embed({
+        targetId: `kaltura-container-${this.node.id}`,
+        wid: `_${wpData.kaltura.kalturaPartnerId}`,
+        uiconf_id: wpData.kaltura.uniqueConfiguration,
+        entry_id: this.kalturaData.id,
+      })
 
       const kalturaIframe = document.querySelector(
-        `#kaltura-container-${this.node.id} iframe`
+        `#kaltura-container-${this.node.id} > iframe`
       )
       kalturaIframe.style.minHeight = "0"
 
-      const nodeProgress = this.node.progress
-      const shoudAutoPlay = this.autoplay
+      kalturaIframe.onload = () => {
+        kWidget.addReadyCallback(playerId => {
+          this.playerId = playerId
+          const kalturaVideo = document.getElementById(playerId)
 
-      kalturaVideo.kBind("mediaReady", function() {
-        const videoDuration = kalturaVideo.evaluate("{duration}")
-        const currentTime = nodeProgress * videoDuration
-        kalturaVideo.sendNotification("doSeek", currentTime)
-        this.lastTime = currentTime
+          kalturaVideo.kBind("playerUpdatePlayhead", currentTime => {
+            const videoDuration = kalturaVideo.evaluate("{duration}")
+            this.updateVideoProgress(currentTime, videoDuration)
+          })
 
-        if (shoudAutoPlay) {
-          kalturaVideo.sendNotification("doPlay")
-        }
+          kalturaVideo.kBind("playerPaused", () => {
+            if (this.amountViewed < 0.99) {
+              this.$emit("pause")
+              client.recordAnalyticsEvent(
+                "user",
+                "pause",
+                "kaltura-video",
+                this.node.id,
+                {
+                  time: kalturaVideo.evaluate("{utility.timestamp}"),
+                }
+              )
+            }
+          })
+          kalturaVideo.kBind("playbackComplete", () => {
+            const videoDuration = kalturaVideo.evaluate("{duration}")
+            this.updateVideoProgress(videoDuration, videoDuration)
+          })
 
-        this.$emit("load", { currentTime, type: "kaltura-video" })
-      })
+          kalturaVideo.kBind("playerPlayed", () => {
+            this.$emit("play")
+            client.recordAnalyticsEvent(
+              "user",
+              "play",
+              "kaltura-video",
+              this.node.id,
+              {
+                time: kalturaVideo.evaluate("{utility.timestamp}"),
+              }
+            )
+          })
 
-      kalturaVideo.kBind("playerPaused", () => {
-        this.$emit("pause")
-        client.recordAnalyticsEvent("user", "pause", "kaltura-video", this.node.id, {
-          time: kalturaVideo.evaluate("{utility.timestamp}"),
+          kalturaVideo.kBind("closeFullScreen", () => {
+            kalturaIframe.contentDocument.getElementsByClassName(
+              "mwPlayerContainer"
+            )[0].style.height = "100%"
+          })
+
+          const nodeProgress = this.node.progress
+          const videoDuration = kalturaVideo.evaluate("{duration}")
+          const currentTime = nodeProgress * videoDuration
+          this.$emit("load", { currentTime, type: "kaltura-video" })
         })
-      })
-
-      kalturaVideo.kBind("playerPlayed", () => {
-        this.$emit("play")
-        client.recordAnalyticsEvent("user", "play", "kaltura-video", this.node.id, {
-          time: kalturaVideo.evaluate("{utility.timestamp}"),
-        })
-      })
-
-      kalturaVideo.kBind("playerUpdatePlayhead", currentTime => {
-        const videoDuration = kalturaVideo.evaluate("{duration}")
-        this.updateVideoProgress(currentTime, videoDuration)
-      })
-
-      this.$emit("load", { currentTime: 0 })
+      }
     })
+
+    document.head.appendChild(kalturaScript)
   },
   beforeDestroy() {
-    kWidget.destroy(`kaltura-container-${this.node.id}`)
+    const kalturaScript = document.getElementById("kaltura-script")
+    document.head.removeChild(kalturaScript)
   },
   methods: {
     ...mapActions(["fetchKalturaStatus"]),
     updateVideoProgress(currentTime, duration) {
-      const amountViewed = currentTime / duration
-      if (Math.abs(currentTime - this.lastTime) > SEEK_THRESHOLD) {
-        this.$emit("seeked", { currentTime })
-      } else {
-        this.$emit("timeupdate", { amountViewed, currentTime })
-      }
+      this.amountViewed = currentTime / duration
+      this.$emit("timeupdate", { amountViewed: this.amountViewed, currentTime })
       this.lastTime = currentTime
+    },
+    reset() {
+      this.amountViewed = 0
+      this.$emit("timeupdate", { amountViewed: this.amountViewed, currentTime: 0 })
     },
   },
 }

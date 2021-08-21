@@ -11,14 +11,6 @@
 
 get_header();
 ?>
-<?php 
-    if (LOAD_KALTURA) {
-        $script_src = "https://admin.video.ubc.ca/p/".KALTURA_PARTNER_ID."/sp/".KALTURA_PARTNER_ID."300/embedIframeJs/uiconf_id/".KALTURA_UNIQUE_CONFIG."/partner_id/".KALTURA_PARTNER_ID
-?>
-    <script src="<?php echo $script_src?>"></script>
-<?php
-    }
-?>
 <div id="primary" class="content-area col-md-12">
     <main id="main" class="site-main post-wrap <?php echo current_user_can('edit_post', get_the_ID()) ? 'is-editor' : ''; ?>" role="main">
 
