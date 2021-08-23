@@ -257,7 +257,6 @@ export default {
   max-height: calc(100vh - 120px);
   height: 100%;
 }
-
 .video-title {
   text-align: left;
   margin-bottom: 0.9em;
@@ -267,5 +266,11 @@ export default {
   :before {
     display: none;
   }
+}
+</style>
+
+<style>
+.embed-responsive iframe {
+  min-height: 0;
 }
 </style>
