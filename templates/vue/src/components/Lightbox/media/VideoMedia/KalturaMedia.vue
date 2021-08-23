@@ -156,7 +156,10 @@ export default {
       this.lastTime = currentTime
     },
     reset() {
-      this.amountViewed = 0
+      this.onLoad = false
+      const kalturaVideo = document.getElementById(this.playerId)
+      this.updateVideoProgress(0, kalturaVideo.evaluate("{duration}"))
+      kalturaVideo.sendNotification("doSeek", 0)
       this.$emit("timeupdate", { amountViewed: this.amountViewed, currentTime: 0 })
     },
   },
