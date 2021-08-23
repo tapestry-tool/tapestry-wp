@@ -66,11 +66,15 @@ export default {
       this.editNode(id)
     })
     client.recordAnalyticsEvent("app", "load", "tapestry")
-    if (!this.hasAvatar && this.avatarsEnabled) {
-      this.setupUserAvatar()
+    if (this.avatarsEnabled) {
       this.$root.$on("avatar-form-closed", () => {
         this.setupTydeView()
       })
+      if (!this.hasAvatar) {
+        this.setupUserAvatar()
+      } else {
+        this.setupTydeView()
+      }
     } else {
       this.setupTydeView()
     }
@@ -174,12 +178,19 @@ export default {
              open
         */
 
-        let userMainRole = getCurrentUser().roles[0]
-        if (!userMainRole || !(userMainRole in this.settings.tydeModeDefaultNodes)) {
-          userMainRole = "public"
+        let defaultNodeId = this.rootId
+
+        if (this.settings.tydeModeDefaultNodes) {
+          let userMainRole = getCurrentUser().roles[0]
+          if (
+            !userMainRole ||
+            !(userMainRole in this.settings.tydeModeDefaultNodes)
+          ) {
+            userMainRole = "public"
+          }
+          defaultNodeId = this.settings.tydeModeDefaultNodes[userMainRole]
         }
 
-        const defaultNodeId = this.settings.tydeModeDefaultNodes[userMainRole]
         this.$router.push({
           name: names.LIGHTBOX,
           params: { nodeId: defaultNodeId },

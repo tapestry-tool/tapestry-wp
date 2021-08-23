@@ -15,17 +15,24 @@
         </b-nav-item>
       </b-navbar-nav>
     </b-navbar>
+    <user-settings-button
+      icon-class="fas fa-cog fa-s"
+      class="user-settings-button"
+    ></user-settings-button>
   </div>
 </template>
 
 <script>
 import { mapState } from "vuex"
 import TydeIcon from "./TydeIcon.vue"
+import UserSettingsButton from "../Toolbar/UserSettingsButton"
+import * as wp from "@/services/wp"
 
 export default {
   name: "navbar",
   components: {
     TydeIcon,
+    UserSettingsButton,
   },
   data() {
     return {
@@ -36,6 +43,9 @@ export default {
     ...mapState(["settings"]),
     tabs() {
       return ["default", "profile", "goals", "cos"]
+    },
+    avatarsEnabled() {
+      return wp.isLoggedIn() && process.env.VUE_APP_AVATARS === "TRUE"
     },
   },
   methods: {
@@ -50,7 +60,20 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
+.user-settings-button {
+  position: absolute;
+  top: 7px;
+  right: 2em;
+  background: #fff !important;
+  padding: 0.5em 0.75em !important;
+  border-radius: 100%;
+  border: solid 2px #c4e4ea;
+
+  @media screen and (max-width: 670px) {
+    right: 1em;
+  }
+}
 .nav-container {
   width: 100vw;
   z-index: 9999;

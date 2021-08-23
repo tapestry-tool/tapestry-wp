@@ -1,6 +1,6 @@
 <template>
   <button class="user-settings-button" @click="open">
-    <span class="fas fa-user fa-s"></span>
+    <span :class="`${iconClass}`"></span>
     <user-settings-modal
       :show="avatarFormOpen"
       :tab="tab"
@@ -18,6 +18,13 @@ import UserSettingsModal from "../modals/UserSettingsModal"
 export default {
   components: {
     UserSettingsModal,
+  },
+  props: {
+    iconClass: {
+      type: String,
+      required: false,
+      default: "fas fa-user fa-s",
+    },
   },
   computed: {
     avatarFormOpen: {
