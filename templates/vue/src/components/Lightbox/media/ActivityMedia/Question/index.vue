@@ -18,7 +18,8 @@
       >
         Edit your answer
       </button>
-      <h6 v-else style="padding-top: 15px;">Changing your answer is disabled for this question.</h6>
+      <h6 v-else style="padding-top: 15px;">
+        Changing your answer is disabled for this question.</h6>
     </div>
     <div v-else>
       <button
@@ -209,7 +210,8 @@ export default {
   },
   mounted() {
     this.openFormIfSingle()
-    if (this.hasPreviousSubmission) {
+    console.log(this.$parent.initialType)
+    if (this.hasPreviousSubmission && this.$parent.initialType == "answer") {
       this.summaryScreen = true
     } else {
       this.summaryScreen = false
