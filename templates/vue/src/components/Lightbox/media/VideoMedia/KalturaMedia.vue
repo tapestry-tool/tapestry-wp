@@ -68,16 +68,17 @@ export default {
   },
   created() {
     const kalturaScript = document.createElement("script")
-    kalturaScript.src =
-      "https://admin.video.ubc.ca/p/163/sp/163300/embedIframeJs/uiconf_id/23449696/partner_id/163"
+    const partnerId = wpData.kaltura.partnerId
+    const uniqueConfiguration = wpData.kaltura.uniqueConfiguration
+    kalturaScript.src = `https://admin.video.ubc.ca/p/${partnerId}/sp/${partnerId}00/embedIframeJs/uiconf_id/${uniqueConfiguration}/partner_id/${partnerId}`
 
     kalturaScript.id = "kaltura-script"
 
     kalturaScript.addEventListener("load", () => {
       kWidget.embed({
         targetId: `kaltura-container-${this.node.id}`,
-        wid: `_${wpData.kaltura.kalturaPartnerId}`,
-        uiconf_id: wpData.kaltura.uniqueConfiguration,
+        wid: `_${partnerId}`,
+        uiconf_id: uniqueConfiguration,
         entry_id: this.kalturaData.id,
       })
 

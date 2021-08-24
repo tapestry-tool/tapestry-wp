@@ -1501,7 +1501,7 @@ function upload_videos_to_kaltura($request)
             $file_obj->name = $value;
 
             $result = $kalturaApi->uploadKalturaVideo($file_obj, $current_date);
-            error_log(print_r($result,true));
+            
             $video_links[$value] = $result;
         }
 
