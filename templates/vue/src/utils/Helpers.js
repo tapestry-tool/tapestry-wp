@@ -398,7 +398,7 @@ export default class Helpers {
       return roles.includes("dyad")
     }
   }
-
+    return !node.isDyad ? false : roles.includes("dyad")
   /**
    * Positions the tooltip to the given target.
    *
