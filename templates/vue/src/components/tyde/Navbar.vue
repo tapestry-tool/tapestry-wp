@@ -12,7 +12,7 @@
           @click="handleTabChange(tab)"
         >
           <tyde-icon
-            :selected="isSelectedTap(tab)"
+            :selected="isSelectedTab(tab)"
             :icon="tab"
             :placement="index === tabs.length - 1 ? 'left' : 'right'"
           />
@@ -47,7 +47,7 @@ export default {
       this.$emit("change-tab", tab)
       this.selectedTab = tab
     },
-    isSelectedTap(tab) {
+    isSelectedTab(tab) {
       return this.selectedTab === tab
     },
   },
