@@ -272,6 +272,45 @@ class TapestryUserProgress implements ITapestryUserProgress
         update_user_meta($this->_userId, 'tapestry_favourites_'.$this->postId, $favourites);
     }
 
+    /**
+     * Get User's last selected node for a tapestry post.
+     *
+     * @return int $nodeId  node id of the last selected node in the tapestry
+     */
+    public function getLastSelectedNode()
+    {
+        $this->_isValidTapestryPost();
+        $this->_checkPostId();
+
+        $lastSelectedNode = get_user_meta($this->_userId, 'tapestry_last_selected_node_'.$this->postId, true);
+
+        return $lastSelectedNode;
+    }
+
+    /**
+     * Update User's last selected node for a tapestry post.
+     *
+     * @param int $nodeId node id of the last selected node in the tapestry
+     *
+     * @return null
+     */
+    public function updateLastSelectedNode($nodeId, $rowId, $subRowId)
+    {
+        $this->_checkPostId();
+
+        $lastSelectedNode = new stdClass();
+        $lastSelectedNode->nodeId = $nodeId;
+
+        if ($rowId) {
+            $lastSelectedNode->rowId = $rowId;
+        }
+        if ($subRowId) {
+            $lastSelectedNode->subRowId = $subRowId;
+        }
+
+        update_user_meta($this->_userId, 'tapestry_last_selected_node_'.$this->postId, $lastSelectedNode);
+    }
+
     /* Helpers */
 
     private function _checkPostId()
