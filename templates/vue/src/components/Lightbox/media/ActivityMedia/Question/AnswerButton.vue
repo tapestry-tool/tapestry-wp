@@ -13,11 +13,10 @@
     </div>
     <drag-drop-icon
       v-else-if="icon === 'dragDrop'"
-      class="drag-drop-icon"
+      class="drag-drop-icon primary-text"
       width="56"
       height="56"
     />
-    <img v-else :src="textIcon" class="icon" />
     <div class="primary-text">
       <slot></slot>
     </div>
@@ -25,8 +24,6 @@
 </template>
 
 <script>
-import TextIcon from "@/assets/Aa.svg"
-import { data } from "@/services/wp"
 import DragDropIcon from "@/components/common/TapestryIcon/DragDropIcon.vue"
 
 export default {
@@ -69,9 +66,6 @@ export default {
         this.faIcon === "microphone" ||
         this.faIcon === "font"
       )
-    },
-    textIcon() {
-      return `${data.vue_uri}/${TextIcon.split("dist")[1]}`
     },
   },
 }
@@ -119,10 +113,6 @@ button {
   &-fa {
     font-size: 56px;
   }
-}
-
-.drag-drop-icon {
-  fill: transparent;
 }
 
 .container {
