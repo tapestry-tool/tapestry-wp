@@ -42,7 +42,6 @@ export default {
     }
   },
   computed: {
-    ...mapState(["kalturaStatus"]),
     kalturaData() {
       return this.node.typeData.kalturaData
     },
@@ -150,7 +149,6 @@ export default {
     document.head.removeChild(kalturaScript)
   },
   methods: {
-    ...mapActions(["fetchKalturaStatus"]),
     updateVideoProgress(currentTime, duration) {
       this.amountViewed = currentTime / duration
       this.$emit("timeupdate", { amountViewed: this.amountViewed, currentTime })

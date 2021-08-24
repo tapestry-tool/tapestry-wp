@@ -15,7 +15,7 @@ import client from "../services/TapestryAPI"
 import { names } from "@/config/routes"
 import Toolbar from "./Toolbar"
 import TapestryMain from "./TapestryMain"
-import { mapMutations, mapState } from "vuex"
+import { mapActions, mapMutations, mapState } from "vuex"
 import TapestryMap from "./TapestryMap"
 import Helpers from "@/utils/Helpers"
 
@@ -55,10 +55,12 @@ export default {
     this.$root.$on("edit-node", id => {
       this.editNode(id)
     })
+    this.fetchKalturaStatus()
     client.recordAnalyticsEvent("app", "load", "tapestry")
   },
   methods: {
     ...mapMutations(["select", "unselect", "clearSelection"]),
+    ...mapActions(["fetchKalturaStatus"]),
     updateViewBox() {
       const MAX_RADIUS = 240
       const MIN_TAPESTRY_WIDTH_FACTOR = 1.5

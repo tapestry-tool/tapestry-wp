@@ -57,8 +57,11 @@ You may optionally set uploaded videos in Tapestry to upload to Kaltura (if you 
     define('KALTURA_ADMIN_SECRET', '');
     define('KALTURA_PARTNER_ID', '');
     define('KALTURA_SERVICE_URL', '');
+    define('KALTURA_UNIQUE_CONFIG', '');
     ```
 The Kaltura Admininstrator Secret and Partner ID can be found by going to your Kaltura Settings > Integration tab in the Kaltura admin. The service URL is simply the main domain where your Kaltura videos are hosted on.
+
+The Kaltura Unique Configuration sets the media player design. It can be found in the Studio tab. 
 
 3. On wordpress admin, open Settings->Media and make sure `Organize my uploads into month- and year-based folders` is un-checked
 

@@ -73,7 +73,7 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from "vuex"
+import { mapGetters, mapActions, mapState } from "vuex"
 
 import UrlVideoMedia from "./UrlVideoMedia"
 import H5PVideoMedia from "./H5PVideoMedia"
@@ -154,6 +154,7 @@ export default {
     }
   },
   computed: {
+    ...mapState(["kalturaStatus"]),
     ...mapGetters(["getNode", "getDirectChildren"]),
     states() {
       return VideoStates
@@ -173,7 +174,7 @@ export default {
         case "h5p":
           return "h5p-video-media"
         case "kaltura":
-          return "kaltura-video-media"
+          return this.kalturaStatus ? "kaltura-video-media" : "url-video-media"
         default:
           throw new Error(`Unknown video type: ${this.node.mediaFormat}`)
       }
