@@ -93,20 +93,16 @@ export default {
 
       switch (this.icon) {
         case "default":
-          if (this.selected) selectedIcon = tyde
-          else selectedIcon = tydeUnselected
+          selectedIcon = this.selected ? tyde : tydeUnselected
           break
         case "profile":
-          if (this.selected) selectedIcon = profile
-          else selectedIcon = profileUnselected
+          selectedIcon = this.selected ? profile : profileUnselected
           break
         case "goals":
-          if (this.selected) selectedIcon = goals
-          else selectedIcon = goalsUnselected
+          selectedIcon = this.selected ? goals : goalsUnselected
           break
         case "cos":
-          if (this.selected) selectedIcon = cos
-          else selectedIcon = cosUnselected
+          selectedIcon = this.selected ? cos : cosUnselected
           break
       }
 
