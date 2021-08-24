@@ -12,7 +12,7 @@
           "
         />
       </span>
-      <span class="page-nav-title" @click="handleTitleClick">
+      <span class="page-nav-title" @click="nestedItemClick">
         {{ node.typeData.menuTitle ? node.typeData.menuTitle : node.title }}
       </span>
     </div>
@@ -25,7 +25,7 @@
         :depth="depth + 1"
         :lock-rows="lockRows"
         :disabled="disabled || disableRow(row.node)"
-        @scroll-to="scrollToRow"
+        @item-click="itemClick"
       />
     </ul>
   </li>
@@ -96,19 +96,19 @@ export default {
         !node.unlocked
       )
     },
-    handleTitleClick() {
-      this.scrollToRow()
+    nestedItemClick() {
+      this.itemClick()
     },
-    scrollToRow(nodeId) {
+    itemClick(nodeId) {
       if (typeof nodeId === "undefined" || !nodeId) {
         nodeId = this.node.id
       }
-      this.$emit("handle-menu-item-click", nodeId)
-      this.$emit("scroll-to", nodeId)
       this.$router.push({
         ...this.$route,
         query: { ...this.$route.query, row: nodeId },
       })
+      this.$emit("item-click", nodeId)
+      this.$emit("scroll-to", nodeId)
     },
     isMultiContentChild(node) {
       return this.getNode(this.getParent(node.id)).mediaType === "multi-content"
@@ -122,6 +122,7 @@ export default {
   &.fa-ul {
     margin-top: 1.5em;
     margin-bottom: 1.5em;
+    background-color: red;
   }
 
   li {
