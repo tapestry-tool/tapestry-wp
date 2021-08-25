@@ -20,6 +20,7 @@
       v-if="node.presentationStyle === 'accordion'"
       :dimensions="dimensions"
       :node="node"
+      :rows="rows"
       :rowId="rowId"
       :subRowId="subRowId"
       :context="context"
@@ -36,6 +37,8 @@
       :subRowId="subRowId"
       :context="context"
       :level="level"
+      :rows="rows"
+      :menuGroups="menuGroups"
       :page-menu-data="pageMenuData"
       @load="handleLoad"
       @changeRow="changeRow"
@@ -46,6 +49,8 @@
       :node="node"
       :rowRefs="rowRefs"
       :dimensions="dimensions"
+      :rows="rows"
+      :menuGroups="menuGroups"
       @handle-page-menu-click="handlePageMenuClick"
     />
     <tapestry-modal
@@ -140,6 +145,15 @@ export default {
           : this.getDirectChildren(id).map(this.getNode)
         return { node, children }
       })
+    },
+    menuGroups() {
+      const menu = []
+      const mainMenu = []
+      this.rows.forEach(row => {
+        row.node.typeData.isSecondaryNode ? menu.push([row]) : mainMenu.push(row)
+      })
+      menu.unshift(mainMenu)
+      return menu
     },
     dimensions() {
       if (!this.isMounted) {

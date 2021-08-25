@@ -51,6 +51,7 @@
                 v-if="row.children.length > 0"
                 :dimensions="dimensions"
                 :node="row.node"
+                :rows="rows"
                 :rowId="subRowId"
                 context="page"
                 :level="level + 1"
@@ -126,6 +127,14 @@ export default {
       required: false,
       default: 0,
     },
+    rows: {
+      type: Array,
+      required: true,
+    },
+    menuGroups: {
+      type: Array,
+      required: true,
+    },
     pageMenuData: {
       type: Object,
       required: false,
@@ -141,24 +150,6 @@ export default {
   computed: {
     ...mapGetters(["getDirectChildren", "getNode", "isFavourite", "isMultiContent"]),
     ...mapState(["favourites"]),
-    rows() {
-      return this.node.childOrdering.map(id => {
-        const node = this.getNode(id)
-        const children = this.isMultiContent(node.id)
-          ? node.childOrdering.map(this.getNode)
-          : this.getDirectChildren(id).map(this.getNode)
-        return { node, children }
-      })
-    },
-    menuGroups() {
-      const menu = []
-      const mainMenu = []
-      this.rows.forEach(row => {
-        row.node.typeData.isSecondaryNode ? menu.push([row]) : mainMenu.push(row)
-      })
-      menu.unshift(mainMenu)
-      return menu
-    },
     lockRows() {
       return this.node.typeData.lockRows
     },
