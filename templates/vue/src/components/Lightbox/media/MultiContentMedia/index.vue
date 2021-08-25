@@ -20,7 +20,6 @@
       v-if="node.presentationStyle === 'accordion'"
       :dimensions="dimensions"
       :node="node"
-      :rows="rows"
       :rowId="rowId"
       :subRowId="subRowId"
       :context="context"
