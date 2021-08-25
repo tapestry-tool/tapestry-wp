@@ -772,6 +772,12 @@ export default {
     },
     async submitNode() {
       if (this.type === "add") {
+        if (this.node.mediaFormat === "kaltura") {
+          const videoUrl = await client.getKalturaVideoUrl(
+            this.node.typeData.kaltura.id
+          )
+          this.node.typeData.mediaURL = videoUrl
+        }
         const id = await this.addNode(this.node)
         this.node.id = id
         if (this.parent) {
@@ -1124,14 +1130,14 @@ export default {
       return this.submitNode()
     },
     shouldReloadDuration() {
+      if (this.node.mediaFormat === "kaltura") {
+        return false
+      }
       if (this.node.mediaType !== "video" && this.node.mediaType !== "h5p") {
         return false
       }
       if (this.type === "add") {
         return true
-      }
-      if (this.node.mediaFormat === "kaltura") {
-        return false
       }
 
       const oldNode = this.getNode(this.nodeId)

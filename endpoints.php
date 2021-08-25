@@ -320,10 +320,17 @@ $REST_API_ENDPOINTS = [
         ],
     ],
     'GET_KALTURA_VIDEO_STATUS' => (object) [
-        'ROUTE' => '/kaltura/video',
+        'ROUTE' => '/kaltura/video/status',
         'ARGUMENTS' => [
             'methods' => $REST_API_GET_METHOD,
             'callback' => 'checkKalturaVideo',
+        ],
+    ],
+    'GET_KALTURA_VIDEO_URL' => (object) [
+        'ROUTE' => '/kaltura/video/url',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => 'getKalturaVideoByEntryId',
         ],
     ]
 ];
@@ -1572,4 +1579,16 @@ function checkKalturaVideo($request)
         return true;
     }
     return false;
+}
+
+function getKalturaVideoByEntryId($request)
+{
+    $entryId = $request['entry_id'];
+
+    $kaltura_api = new KalturaApi();
+    $result = $kaltura_api->getVideo($entryId);
+    
+    if ($result != null) {
+        return $result->dataUrl;
+    }
 }
