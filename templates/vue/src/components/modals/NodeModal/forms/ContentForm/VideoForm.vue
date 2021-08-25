@@ -1,16 +1,52 @@
 <template>
-  <div>
-    <b-form-group label="Video URL">
-      <file-upload
-        id="node-video-media-url"
-        v-model="node.typeData.mediaURL"
-        input-test-id="node-video-url"
-        placeholder="Enter URL for MP4 or YouTube video"
-        required
-        @isUploading="handleUploadChange"
-      />
-    </b-form-group>
-  </div>
+  <b-container>
+    <b-row>
+      <b-col>
+        <b-overlay :show="useKaltura">
+          <template #overlay><div></div></template>
+          <b-form-group label="Video URL">
+            <file-upload
+              id="node-video-media-url"
+              v-model="node.typeData.mediaURL"
+              input-test-id="node-video-url"
+              placeholder="Enter URL for MP4 or YouTube video"
+              required
+              @isUploading="handleUploadChange"
+            />
+          </b-form-group>
+        </b-overlay>
+      </b-col>
+    </b-row>
+    <b-row>
+      <b-col cols="1" align-v="center" style="text-align:right;">
+        <i id="kaltura-info" class="far fa-question-circle"></i>
+        <b-tooltip v-model="useKaltura" target="kaltura-info" triggers="hover">
+          Video ID can be found in the Kaltura managment console under
+          Content->Entries.
+        </b-tooltip>
+      </b-col>
+      <b-col>
+        <b-form-checkbox
+          v-model="useKaltura"
+          :checked-value="true"
+          :unchecked-value="false"
+          style="display:inline-block;"
+          @input="handleKalturaCheck"
+        >
+          Use Kaltura Id
+        </b-form-checkbox>
+      </b-col>
+      <b-col cols="8">
+        <b-form-input
+          v-show="useKaltura"
+          name="text-input"
+          placeholder="Enter kaltura video id"
+          required
+          @input="handleKalturaIdChange"
+        />
+      </b-col>
+    </b-row>
+  </b-container>
 </template>
 
 <script>
@@ -27,6 +63,11 @@ export default {
       required: true,
     },
   },
+  data() {
+    return {
+      useKaltura: false,
+    }
+  },
   computed: {
     youtubeId() {
       return Helpers.getYoutubeID(this.node.typeData.mediaURL)
@@ -34,6 +75,26 @@ export default {
   },
   watch: {
     youtubeId(id) {
+      this.updateFormatType(id)
+    },
+  },
+  methods: {
+    handleUploadChange(state) {
+      this.$root.$emit("node-modal::uploading", state)
+    },
+    handleKalturaCheck() {
+      if (this.useKaltura) {
+        this.node.mediaFormat = "kaltura"
+        this.node.typeData.mediaURL = ""
+      } else {
+        this.node.typeData.kalturaId = {}
+        this.updateFormatType(this.youtubeId)
+      }
+    },
+    handleKalturaIdChange(kalturaId) {
+      this.node.typeData.kaltura = { id: kalturaId }
+    },
+    updateFormatType(id) {
       if (id !== null) {
         this.node.mediaFormat = "youtube"
         this.node.typeData.youtubeID = id
@@ -41,11 +102,6 @@ export default {
         this.node.mediaFormat = "mp4"
         this.node.typeData.youtubeID = undefined
       }
-    },
-  },
-  methods: {
-    handleUploadChange(state) {
-      this.$root.$emit("node-modal::uploading", state)
     },
   },
 }

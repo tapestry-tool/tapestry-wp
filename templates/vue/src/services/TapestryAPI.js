@@ -287,6 +287,12 @@ class TapestryApi {
     const response = await this.client.get(url)
     return response
   }
+
+  async checkKalturaVideo(entryId) {
+    const url = `/kaltura/video?entry_id=${entryId}`
+    const response = await this.client.get(url)
+    return response.data
+  }
 }
 
 export default new TapestryApi(postId)

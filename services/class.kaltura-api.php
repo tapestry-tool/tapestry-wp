@@ -12,6 +12,7 @@
     use Kaltura\Client\Type\MediaEntry;
     use Kaltura\Client\Type\UploadedFileTokenResource;
     use Kaltura\Client\Type\UploadToken;
+    use Kaltura\Client\ApiException;
 
     use Spatie\Async\Pool;
 
@@ -116,5 +117,19 @@
                 $status = $result->status;
             }
             return $result;
+        }
+
+        public function getVideo($entryId)
+        {
+            $client = $this->getKClient();
+
+            try {
+                $result = $client->media->get($entryId, -1);
+                return $result;
+            }
+            catch(ApiException $e) {
+                error_log("Kaltura Client Error: " . $e);
+                return null;
+            }
         }
     }

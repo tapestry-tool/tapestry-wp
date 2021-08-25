@@ -273,6 +273,7 @@ import { sizes, nodeStatus } from "@/utils/constants"
 import { getLinkMetadata } from "@/services/LinkPreviewApi"
 import DragSelectModular from "@/utils/dragSelectModular"
 import * as wp from "@/services/wp"
+import client from "@/services/TapestryAPI"
 
 const shouldFetch = (url, selectedNode) => {
   if (!selectedNode.typeData.linkMetadata) {
@@ -728,7 +729,8 @@ export default {
       this.setTapestryErrorReporting(true)
     },
     async handleSubmit() {
-      this.errors = this.validateNode()
+      this.errors = await this.validateNode()
+
       if (!this.hasSubmissionError) {
         this.loading = true
         this.updateNodeCoordinates()
@@ -885,7 +887,7 @@ export default {
         this.coinToss() ? this.calculateX(false) : this.calculateY(false)
       }
     },
-    validateNode() {
+    async validateNode() {
       const errMsgs = []
 
       if (this.node.title.length == 0) {
@@ -914,11 +916,20 @@ export default {
       if (!this.node.mediaType) {
         errMsgs.push("Please select a Content Type")
       } else if (this.node.mediaType === "video") {
-        if (!this.isValidVideo(this.node.typeData)) {
-          errMsgs.push("Please enter a valid Video URL")
-        }
-        if (!Helpers.onlyContainsDigits(this.node.mediaDuration)) {
-          this.node.mediaDuration = 0
+        if (this.node.mediaFormat === "kaltura") {
+          const validKalturaVideo = await client.checkKalturaVideo(
+            this.node.typeData.kaltura.id
+          )
+          if (!validKalturaVideo) {
+            errMsgs.push("Please enter a valid kaltura video ID")
+          }
+        } else {
+          if (!this.isValidVideo(this.node.typeData)) {
+            errMsgs.push("Please enter a valid Video URL")
+          }
+          if (!Helpers.onlyContainsDigits(this.node.mediaDuration)) {
+            this.node.mediaDuration = 0
+          }
         }
       } else if (this.node.mediaType === "h5p") {
         if (this.node.typeData.mediaURL === "") {

@@ -318,6 +318,13 @@ $REST_API_ENDPOINTS = [
             'methods' => $REST_API_GET_METHOD,
             'callback' => 'kalturaStatus',
         ],
+    ],
+    'GET_KALTURA_VIDEO_STATUS' => (object) [
+        'ROUTE' => '/kaltura/video',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => 'checkKalturaVideo',
+        ],
     ]
 ];
 
@@ -1552,4 +1559,17 @@ function upload_videos_to_kaltura($request)
 function kalturaStatus($request) 
 {
     return LOAD_KALTURA;
+}
+
+function checkKalturaVideo($request)
+{
+    $entryId = $request['entry_id'];
+
+    $kaltura_api = new KalturaApi();
+    $result = $kaltura_api->getVideo($entryId);
+
+    if($result != null){
+        return true;
+    }
+    return false;
 }
