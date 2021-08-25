@@ -2,7 +2,6 @@ import client from "../services/TapestryAPI"
 import * as wp from "../services/wp"
 import Helpers from "../utils/Helpers"
 import ErrorHelper from "../utils/errorHelper"
-import * as Getters from "./getters"
 
 const LOCAL_PROGRESS_ID = "tapestry-progress"
 
@@ -146,11 +145,11 @@ export async function updateNodeCoordinates(
 }
 
 export async function completeNode(context, nodeId) {
-  const node = Getters.getNode(nodeId)
+  const { commit, dispatch, getters } = context
+  const node = getters.getNode(nodeId)
   if (Helpers.nodeAndUserAreDyad(node)) {
     return
   }
-  const { commit, dispatch, getters } = context
   try {
     if (!wp.isLoggedIn()) {
       const progressObj = JSON.parse(localStorage.getItem(LOCAL_PROGRESS_ID))
