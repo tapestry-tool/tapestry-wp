@@ -392,13 +392,8 @@ export default class Helpers {
 
   static nodeAndUserAreDyad(node) {
     let roles = wp.getCurrentUser().roles
-    if (!node.isDyad) {
-      return false
-    } else {
-      return roles.includes("dyad")
-    }
-  }
     return !node.isDyad ? false : roles.includes("dyad")
+  }
   /**
    * Positions the tooltip to the given target.
    *
