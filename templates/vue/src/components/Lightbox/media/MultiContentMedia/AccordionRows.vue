@@ -7,7 +7,7 @@
     <template v-slot="{ isVisible, hasNext, next, toggle }">
       <div data-qa="accordion-rows">
         <div
-          v-for="(row, index) in rows"
+          v-for="(row, index) in nonPopupRows"
           :key="row.node.id"
           ref="rowRefs"
           class="accordion-row"
