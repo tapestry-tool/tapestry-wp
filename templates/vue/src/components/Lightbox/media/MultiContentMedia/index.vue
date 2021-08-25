@@ -20,7 +20,6 @@
       v-if="node.presentationStyle === 'accordion'"
       :dimensions="dimensions"
       :node="node"
-      :rows="rows"
       :rowId="rowId"
       :subRowId="subRowId"
       :context="context"
@@ -138,13 +137,16 @@ export default {
     ]),
     ...mapState(["favourites", "rootId"]),
     rows() {
-      return this.node.childOrdering.map(id => {
-        const node = this.getNode(id)
-        const children = this.isMultiContent(node.id)
-          ? node.childOrdering.map(this.getNode)
-          : this.getDirectChildren(id).map(this.getNode)
-        return { node, children }
-      })
+      return this.node.childOrdering
+        .map(id => {
+          const node = this.getNode(id)
+          let children = this.isMultiContent(node.id)
+            ? node.childOrdering.map(this.getNode)
+            : this.getDirectChildren(id).map(this.getNode)
+          children = children.filter(node => !node.popup)
+          return { node, children }
+        })
+        .filter(row => !row.node.popup)
     },
     menuGroups() {
       const menu = []

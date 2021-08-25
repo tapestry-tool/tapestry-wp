@@ -7,7 +7,7 @@
     <template v-slot="{ isVisible, hasNext, next, toggle }">
       <div data-qa="accordion-rows">
         <div
-          v-for="(row, index) in nonPopupRows"
+          v-for="(row, index) in rows"
           :key="row.node.id"
           ref="rowRefs"
           class="accordion-row"
@@ -159,9 +159,6 @@ export default {
       "isMultiContent",
     ]),
     ...mapState(["favourites"]),
-    nonPopupRows() {
-      return this.rows.filter(row => row.node.popup === null)
-    },
     lockRows() {
       return this.node.typeData.lockRows
     },
