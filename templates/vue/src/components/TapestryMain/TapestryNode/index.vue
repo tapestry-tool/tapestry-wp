@@ -359,10 +359,6 @@ export default {
     },
   },
   mounted() {
-    if (this.node.isMultiContentChild) {
-      const parentNode = this.getNode(this.$route.params.nodeId)
-      this.node.isDyad = parentNode.isDyad
-    }
     this.$emit("mounted")
     this.$refs.circle.setAttribute("r", this.radius)
     const nodeRef = this.$refs.node

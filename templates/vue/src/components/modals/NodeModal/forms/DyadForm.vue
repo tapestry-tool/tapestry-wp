@@ -1,7 +1,7 @@
 <template>
   <div>
     <b-form-group>
-      <b-form-checkbox v-model="node.isDyad">
+      <b-form-checkbox v-model="node.isDyad" @change="updateChild">
         This is a dyad node
       </b-form-checkbox>
     </b-form-group>
@@ -12,12 +12,32 @@
 </template>
 
 <script>
+import { mapActions } from "vuex"
+
 export default {
   name: "dyad-form",
   props: {
     node: {
       type: Object,
       required: true,
+    },
+  },
+  methods: {
+    ...mapActions([
+      "updateNode",
+    ]),
+    updateChild(val) {
+      console.log(val)
+      if (this.node.mediaType == "multi-content") {
+        for (const nodeId of this.node.childOrdering) {
+          const childNode = this.$store.getters.getNode(nodeId)
+          childNode.isDyad = val
+          this.updateNode({
+            id: nodeId,
+            newNode: childNode,
+          })
+        }
+      }
     },
   },
 }

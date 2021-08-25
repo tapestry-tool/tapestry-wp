@@ -197,8 +197,7 @@ class TapestryUserProgress implements ITapestryUserProgress
             // this node is a dyad node
             if ($node->isDyad && $isDyadUser) {
                 $userId = $otherUserId;
-            }
-            else {
+            } else {
                 $userId = $thisUserId;
             }
 
