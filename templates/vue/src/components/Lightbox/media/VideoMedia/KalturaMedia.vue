@@ -43,7 +43,7 @@ export default {
   },
   computed: {
     kalturaData() {
-      return this.node.typeData.kalturaData
+      return this.node.typeData.kaltura
     },
   },
   watch: {

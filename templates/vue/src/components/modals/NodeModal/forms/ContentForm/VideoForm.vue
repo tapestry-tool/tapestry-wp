@@ -28,7 +28,7 @@
       <b-col>
         <b-form-checkbox
           v-model="useKaltura"
-          :checked-value="true"
+          :value="true"
           :unchecked-value="false"
           style="display:inline-block;"
           @input="handleKalturaCheck"
@@ -39,10 +39,10 @@
       <b-col cols="8">
         <b-form-input
           v-show="useKaltura"
+          v-model="node.typeData.kaltura.id"
           name="text-input"
           placeholder="Enter kaltura video id"
           required
-          @input="handleKalturaIdChange"
         />
       </b-col>
     </b-row>
@@ -78,6 +78,13 @@ export default {
       this.updateFormatType(id)
     },
   },
+  created() {
+    if (typeof this.node.typeData.kaltura === "undefined") {
+      this.node.typeData.kaltura = { id: "" }
+    } else if (this.node.typeData.kaltura.id !== "") {
+      this.useKaltura = true
+    }
+  },
   methods: {
     handleUploadChange(state) {
       this.$root.$emit("node-modal::uploading", state)
@@ -87,12 +94,9 @@ export default {
         this.node.mediaFormat = "kaltura"
         this.node.typeData.mediaURL = ""
       } else {
-        this.node.typeData.kalturaId = {}
+        this.node.typeData.kaltura.id = ""
         this.updateFormatType(this.youtubeId)
       }
-    },
-    handleKalturaIdChange(kalturaId) {
-      this.node.typeData.kaltura = { id: kalturaId }
     },
     updateFormatType(id) {
       if (id !== null) {

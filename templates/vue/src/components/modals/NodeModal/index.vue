@@ -1130,6 +1130,10 @@ export default {
       if (this.type === "add") {
         return true
       }
+      if (this.node.mediaFormat === "kaltura") {
+        return false
+      }
+
       const oldNode = this.getNode(this.nodeId)
       const { youtubeID, mediaURL } = oldNode.typeData
       return this.node.mediaFormat === "youtube"
