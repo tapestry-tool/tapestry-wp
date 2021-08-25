@@ -1,11 +1,6 @@
 <template>
   <b-card>
-    <b-card-text
-      v-b-toggle="
-        menuIndex === 0 || menu.length === 0 ? `` : `collapse-${menuIndex}`
-      "
-      @click="handleMenuTitleClick"
-    >
+    <b-card-text v-b-toggle="canToggleMenu" @click="handleMenuTitleClick">
       {{ menuTitleNode.title }}
     </b-card-text>
     <b-collapse
@@ -62,6 +57,11 @@ export default {
     disabledFrom() {
       return this.rows.findIndex(row => !row.node.completed)
     },
+    canToggleMenu() {
+      return this.menuIndex === 0 || this.menu.length === 0
+        ? ``
+        : `collapse-${this.menuIndex}`
+    },
   },
   methods: {
     disabledRow(node) {
@@ -80,9 +80,6 @@ export default {
       this.$emit("menu-click", pageMenuData)
     },
     handleMenuItemClick(nodeId) {
-      if (!nodeId || nodeId === null) {
-        return
-      }
       const pageMenuData = {
         menuIndex: this.menuIndex,
         nodeId: nodeId,

@@ -35,21 +35,18 @@
           },
         ]"
       >
-        <div
+        <menu-group
           v-for="(menu, menuIndex) in filteredMenuGroups"
           :key="menuIndex"
-          class="py-1"
-        >
-          <menu-group
-            :node="node"
-            :rows="rows"
-            :menu="menu"
-            :menuTitleNode="menuIndex === 0 ? node : menuGroups[menuIndex][0].node"
-            :menuIndex="menuIndex"
-            @menu-click="handlePageMenuClick"
-            @scroll-to="scrollToRef"
-          ></menu-group>
-        </div>
+          class="my-2"
+          :node="node"
+          :rows="rows"
+          :menu="menu"
+          :menuTitleNode="menuIndex === 0 ? node : menuGroups[menuIndex][0].node"
+          :menuIndex="menuIndex"
+          @menu-click="handlePageMenuClick"
+          @scroll-to="scrollToRef"
+        ></menu-group>
       </div>
     </aside>
   </div>
@@ -87,7 +84,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getDirectChildren", "getNode", "isMultiContent", "getParent"]),
+    ...mapGetters(["getDirectChildren", "getNode", "isMultiContent"]),
     nodeId() {
       return parseInt(this.$route.params.nodeId, 10)
     },

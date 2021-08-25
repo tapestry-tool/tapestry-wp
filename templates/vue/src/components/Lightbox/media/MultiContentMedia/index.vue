@@ -41,6 +41,13 @@
       @changeRow="changeRow"
       @updateProgress="updateProgress"
     ></page-rows>
+    <page-menu
+      v-if="node.typeData.showNavBar && node.presentationStyle === 'page'"
+      :node="node"
+      :rowRefs="rowRefs"
+      :dimensions="dimensions"
+      @handle-page-menu-click="handlePageMenuClick"
+    />
     <tapestry-modal
       v-if="showCompletion"
       :node-id="node.id"
@@ -67,6 +74,7 @@
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex"
 import client from "@/services/TapestryAPI"
 import TapestryModal from "../../TapestryModal"
+import PageMenu from "./PageMenu"
 import AccordionRows from "./AccordionRows"
 import PageRows from "./PageRows"
 import { names } from "@/config/routes"
@@ -77,6 +85,7 @@ export default {
     TapestryModal,
     AccordionRows,
     PageRows,
+    PageMenu,
   },
   props: {
     node: {
@@ -103,11 +112,6 @@ export default {
       required: false,
       default: 0,
     },
-    pageMenuData: {
-      type: Object,
-      required: false,
-      default: () => ({}),
-    },
   },
   data() {
     return {
@@ -115,6 +119,8 @@ export default {
       showCompletion: false,
       isMounted: false,
       navBarStyle: {},
+      rowRefs: [],
+      pageMenuData: {},
     }
   },
   computed: {
@@ -174,6 +180,9 @@ export default {
   mounted() {
     this.isMounted = true
     this.activeIndex = this.node.presentationStyle === "page" ? -1 : 0
+    this.$root.$on("observe-rows", refs => {
+      this.rowRefs = this.rowRefs.concat(refs)
+    })
   },
   methods: {
     ...mapMutations(["updateNode"]),
@@ -313,6 +322,9 @@ export default {
         rowId: parentId,
         subRowId: path.join(","),
       }
+    },
+    handlePageMenuClick(pageMenuData) {
+      this.pageMenuData = pageMenuData
     },
   },
 }
