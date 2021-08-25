@@ -44,7 +44,7 @@
           :menu="menu"
           :menuTitleNode="menuIndex === 0 ? node : menuGroups[menuIndex][0].node"
           :menuIndex="menuIndex"
-          @menu-click="handlePageMenuClick"
+          @menu-click="menuClicked"
           @scroll-to="scrollToRef"
         ></menu-group>
       </div>
@@ -146,7 +146,7 @@ export default {
       nodeId: this.node.id,
       context: "",
     }
-    this.$emit("handle-page-menu-click", pageMenuData)
+    this.$emit("menu-clicked", pageMenuData)
   },
   methods: {
     getRowOrder(node, nodes = [], visited = new Set()) {
@@ -177,8 +177,8 @@ export default {
         }
       })
     },
-    handlePageMenuClick(pageMenuData) {
-      this.$emit("handle-page-menu-click", pageMenuData)
+    menuClicked(pageMenuData) {
+      this.$emit("menu-clicked", pageMenuData)
     },
   },
 }

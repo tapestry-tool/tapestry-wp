@@ -48,7 +48,7 @@
       :menuGroups="menuGroups"
       :rowRefs="rowRefs"
       :dimensions="dimensions"
-      @handle-page-menu-click="handlePageMenuClick"
+      @menu-clicked="handlePageMenuClick"
     />
     <tapestry-modal
       v-if="showCompletion"
