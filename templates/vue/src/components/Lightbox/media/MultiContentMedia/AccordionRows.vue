@@ -64,7 +64,6 @@
                 v-if="row.children.length > 0"
                 :dimensions="dimensions"
                 :node="row.node"
-                :rows="rows"
                 :rowId="subRowId"
                 context="accordion"
                 :level="level + 1"
@@ -140,10 +139,6 @@ export default {
       required: false,
       default: 0,
     },
-    rows: {
-      type: Array,
-      required: true,
-    },
   },
   data() {
     return {
@@ -159,6 +154,18 @@ export default {
       "isMultiContent",
     ]),
     ...mapState(["favourites"]),
+    rows() {
+      return this.node.childOrdering.map(id => {
+        const node = this.getNode(id)
+        const children = this.isMultiContent(node.id)
+          ? node.childOrdering.map(this.getNode)
+          : this.getDirectChildren(id).map(this.getNode)
+        return { node, children }
+      })
+    },
+    nonPopupRows() {
+      return this.rows.filter(row => row.node.popup === null)
+    },
     lockRows() {
       return this.node.typeData.lockRows
     },

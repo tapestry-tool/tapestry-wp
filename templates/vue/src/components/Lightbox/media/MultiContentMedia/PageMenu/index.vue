@@ -76,14 +76,6 @@ export default {
       required: false,
       default: null,
     },
-    rows: {
-      type: Array,
-      required: true,
-    },
-    menuGroups: {
-      type: Array,
-      required: true,
-    },
   },
   data() {
     return {
@@ -95,6 +87,27 @@ export default {
     ...mapGetters(["getDirectChildren", "getNode", "isMultiContent"]),
     nodeId() {
       return parseInt(this.$route.params.nodeId, 10)
+    },
+    rows() {
+      return this.node.childOrdering
+        .map(id => {
+          const node = this.getNode(id)
+          let children = this.isMultiContent(node.id)
+            ? node.childOrdering.map(this.getNode)
+            : this.getDirectChildren(id).map(this.getNode)
+          children = children.filter(node => !node.popup)
+          return { node, children }
+        })
+        .filter(row => !row.node.popup)
+    },
+    menuGroups() {
+      const menu = []
+      const mainMenu = []
+      this.rows.forEach(row => {
+        row.node.typeData.isSecondaryNode ? menu.push([row]) : mainMenu.push(row)
+      })
+      menu.unshift(mainMenu)
+      return menu
     },
     filteredMenuGroups() {
       const filteredMenu = []
