@@ -244,9 +244,6 @@ export default {
 
 <style lang="scss" scoped>
 .recorder {
-  #duration-text {
-    color: #111;
-  }
   h1 {
     margin-bottom: 32px;
   }
@@ -256,7 +253,6 @@ export default {
   }
 
   button {
-    background-color: rgba(26, 26, 26, 0.8);
     border-radius: 30px;
     font-size: 24px;
     height: 56px;
@@ -271,7 +267,7 @@ export default {
     }
 
     &:not(:disabled):hover {
-      background-color: #11a6d8;
+      background-color: #11a6d8 !important;
     }
 
     &:disabled {
