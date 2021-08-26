@@ -117,6 +117,10 @@ export default {
       required: false,
       default: null,
     },
+    rowRefs: {
+      type: Array,
+      required: true,
+    },
   },
   data() {
     return {
@@ -124,7 +128,6 @@ export default {
       showCompletion: false,
       isMounted: false,
       navBarStyle: {},
-      rowRefs: [],
       pageMenuData: {},
     }
   },
@@ -185,9 +188,6 @@ export default {
   mounted() {
     this.isMounted = true
     this.activeIndex = this.node.presentationStyle === "page" ? -1 : 0
-    this.$root.$on("observe-rows", refs => {
-      this.rowRefs = this.rowRefs.concat(refs)
-    })
   },
   methods: {
     ...mapMutations(["updateNode"]),

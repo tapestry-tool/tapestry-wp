@@ -16,6 +16,7 @@
       :node="node"
       :row-id="rowId"
       :sub-row-id="subRowId"
+      :rowRefs="rowRefs"
       :pageMenuDimensions="dimensions"
       @close="handleAutoClose"
       @complete="complete"
@@ -73,6 +74,7 @@ export default {
         top: 100,
         left: 50,
       },
+      rowRefs: [],
       showCompletionScreen: false,
     }
   },
@@ -230,6 +232,9 @@ export default {
   mounted() {
     document.querySelector("body").classList.add("tapestry-lightbox-open")
     DragSelectModular.removeDragSelectListener()
+    this.$root.$on("observe-rows", refs => {
+      this.rowRefs = this.rowRefs.concat(refs)
+    })
   },
   beforeDestroy() {
     document.querySelector("body").classList.remove("tapestry-lightbox-open")
