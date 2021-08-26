@@ -808,6 +808,9 @@ export default {
         this.loading = false
       }
 
+      await this.updateLockedStatus()
+      this.loading = false
+
       /**
        * Sometimes changes in the parent node causes changes in child nodes. For
        * example, when a node goes from a video to a non-video, all child popups
