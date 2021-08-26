@@ -772,12 +772,6 @@ export default {
     },
     async submitNode() {
       if (this.type === "add") {
-        if (this.node.mediaFormat === "kaltura") {
-          const videoUrl = await client.getKalturaVideoUrl(
-            this.node.typeData.kaltura.id
-          )
-          this.node.typeData.mediaURL = videoUrl
-        }
         const id = await this.addNode(this.node)
         this.node.id = id
         if (this.parent) {
@@ -924,7 +918,7 @@ export default {
       } else if (this.node.mediaType === "video") {
         if (this.node.mediaFormat === "kaltura") {
           const validKalturaVideo = await client.checkKalturaVideo(
-            this.node.typeData.kaltura.id
+            this.node.typeData.kalturaId
           )
           if (!validKalturaVideo) {
             errMsgs.push("Please enter a valid kaltura video ID")
@@ -1142,6 +1136,7 @@ export default {
 
       const oldNode = this.getNode(this.nodeId)
       const { youtubeID, mediaURL } = oldNode.typeData
+
       return this.node.mediaFormat === "youtube"
         ? this.node.typeData.youtubeID !== youtubeID
         : this.node.mediaURL !== mediaURL

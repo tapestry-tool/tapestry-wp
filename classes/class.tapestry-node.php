@@ -6,6 +6,10 @@ require_once dirname(__FILE__).'/../interfaces/interface.tapestry-node.php';
 require_once dirname(__FILE__).'/../classes/class.tapestry-user-progress.php';
 require_once dirname(__FILE__).'/../classes/class.constants.php';
 
+if (LOAD_KALTURA) {
+    require_once __DIR__.'/../services/class.kaltura-api.php';
+}
+
 /**
  * Add/update/retrieve Tapestry post and its child nodes.
  */
@@ -147,8 +151,22 @@ class TapestryNode implements ITapestryNode
         if (isset($node->behaviour) && is_string($node->behaviour)) {
             $this->behaviour = $node->behaviour;
         }
+        if (isset($node->mediaDuration) && is_numeric($node->mediaDuration)) {
+            $this->mediaDuration = $node->mediaDuration;
+        }
         if (isset($node->typeData) && is_object($node->typeData)) {
             $this->typeData = $node->typeData;
+            
+            if(isset($node->typeData->kalturaId) && is_string($node->typeData->kalturaId)) {
+                $kaltura_api = new KalturaApi();
+                $result = $kaltura_api->getVideo($node->typeData->kalturaId);
+                error_log(print_r($result,true));
+                
+                if ($result != null) {
+                    $this->typeData->mediaURL = $result->dataUrl;
+                    $this->mediaDuration = $result->duration;
+                } 
+            }
         }
         if (isset($node->imageURL) && is_string($node->imageURL)) {
             $this->imageURL = $node->imageURL;
@@ -190,9 +208,6 @@ class TapestryNode implements ITapestryNode
         }
         if (isset($node->mediaFormat) && is_string($node->mediaFormat)) {
             $this->mediaFormat = $node->mediaFormat;
-        }
-        if (isset($node->mediaDuration) && is_numeric($node->mediaDuration)) {
-            $this->mediaDuration = $node->mediaDuration;
         }
         if (isset($node->description) && is_string($node->description)) {
             $this->description = $node->description;

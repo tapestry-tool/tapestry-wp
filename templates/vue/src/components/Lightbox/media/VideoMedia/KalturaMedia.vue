@@ -42,8 +42,8 @@ export default {
     }
   },
   computed: {
-    kalturaData() {
-      return this.node.typeData.kaltura
+    kalturaId() {
+      return this.node.typeData.kalturaId
     },
   },
   watch: {
@@ -66,6 +66,7 @@ export default {
     },
   },
   created() {
+    console.log(this.node)
     const kalturaScript = document.createElement("script")
     const partnerId = wpData.kaltura.partnerId
     const uniqueConfiguration = wpData.kaltura.uniqueConfiguration
@@ -78,7 +79,7 @@ export default {
         targetId: `kaltura-container-${this.node.id}`,
         wid: `_${partnerId}`,
         uiconf_id: uniqueConfiguration,
-        entry_id: this.kalturaData.id,
+        entry_id: this.kalturaId,
       })
 
       const kalturaIframe = document.querySelector(

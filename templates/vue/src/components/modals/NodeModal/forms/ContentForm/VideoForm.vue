@@ -39,7 +39,7 @@
       <b-col cols="8">
         <b-form-input
           v-show="useKaltura"
-          v-model="node.typeData.kaltura.id"
+          v-model="node.typeData.kalturaId"
           name="text-input"
           placeholder="Enter kaltura video id"
           required
@@ -79,9 +79,9 @@ export default {
     },
   },
   created() {
-    if (typeof this.node.typeData.kaltura === "undefined") {
-      this.node.typeData.kaltura = { id: "" }
-    } else if (this.node.typeData.kaltura.id !== "") {
+    if (typeof this.node.typeData.kalturaId === "undefined") {
+      this.node.typeData.kalturaId = ""
+    } else if (this.node.typeData.kalturaId !== "") {
       this.useKaltura = true
     }
   },
@@ -94,7 +94,7 @@ export default {
         this.node.mediaFormat = "kaltura"
         this.node.typeData.mediaURL = ""
       } else {
-        this.node.typeData.kaltura.id = ""
+        this.node.typeData.kalturaId = ""
         this.updateFormatType(this.youtubeId)
       }
     },

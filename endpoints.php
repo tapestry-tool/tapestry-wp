@@ -1,5 +1,11 @@
 <?php
 
+define('LOAD_KALTURA',
+    (defined('KALTURA_ADMIN_SECRET') && !empty(KALTURA_ADMIN_SECRET)) && 
+    (defined('KALTURA_PARTNER_ID') && !empty(KALTURA_PARTNER_ID)) && 
+    (defined('KALTURA_SERVICE_URL') && !empty(KALTURA_SERVICE_URL)) &&
+    (defined('KALTURA_UNIQUE_CONFIG') && !empty(KALTURA_UNIQUE_CONFIG)));
+
 /**
  * Tapestry Endpoints.
  */
@@ -12,13 +18,6 @@ require_once __DIR__.'/classes/class.tapestry-audio.php';
 require_once __DIR__.'/classes/class.tapestry-h5p.php';
 require_once __DIR__.'/classes/class.constants.php';
 require_once __DIR__.'/utilities/class.tapestry-user.php';
-
-
-define('LOAD_KALTURA',
-    (defined('KALTURA_ADMIN_SECRET') && !empty(KALTURA_ADMIN_SECRET)) && 
-    (defined('KALTURA_PARTNER_ID') && !empty(KALTURA_PARTNER_ID)) && 
-    (defined('KALTURA_SERVICE_URL') && !empty(KALTURA_SERVICE_URL)) &&
-    (defined('KALTURA_UNIQUE_CONFIG') && !empty(KALTURA_UNIQUE_CONFIG)));
 
 if (LOAD_KALTURA) {
     require_once __DIR__.'/services/class.kaltura-api.php';
@@ -326,13 +325,6 @@ $REST_API_ENDPOINTS = [
             'callback' => 'checkKalturaVideo',
         ],
     ],
-    'GET_KALTURA_VIDEO_URL' => (object) [
-        'ROUTE' => '/kaltura/video/url',
-        'ARGUMENTS' => [
-            'methods' => $REST_API_GET_METHOD,
-            'callback' => 'getKalturaVideoByEntryId',
-        ],
-    ]
 ];
 
 /*
@@ -1545,9 +1537,7 @@ function upload_videos_to_kaltura($request)
                 if (strpos($node_type_data->mediaURL, $original_link)) {
                     $typeData = $node->getTypeData();
                     $typeData->mediaURL = $kaltura_data->dataUrl."?.mp4";
-                    $typeData->kaltura = array(
-                        "id" => $kaltura_data->id,
-                    );
+                    $typeData->kalturaId = $kaltura_data->id;
 
                     $node->set($typeData);
                     $node->set((object)["mediaFormat"=>"kaltura"]);
@@ -1579,16 +1569,4 @@ function checkKalturaVideo($request)
         return true;
     }
     return false;
-}
-
-function getKalturaVideoByEntryId($request)
-{
-    $entryId = $request['entry_id'];
-
-    $kaltura_api = new KalturaApi();
-    $result = $kaltura_api->getVideo($entryId);
-    
-    if ($result != null) {
-        return $result->dataUrl;
-    }
 }
