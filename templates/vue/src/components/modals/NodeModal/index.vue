@@ -320,6 +320,8 @@ export default {
       "getParent",
       "getNode",
       "getNeighbours",
+      "getAnswers",
+      "getQuestion",
     ]),
     ...mapState(["nodes", "rootId", "settings", "visibleNodes", "apiError"]),
     parent() {
@@ -549,6 +551,7 @@ export default {
       "updateNode",
       "updateLockedStatus",
       "setTapestryErrorReporting",
+      "updateNodeProgressAndCompletion",
     ]),
     setLoading(status) {
       this.loading = status
@@ -800,8 +803,10 @@ export default {
           newNode: this.node,
         })
       }
-      await this.updateLockedStatus()
-      this.loading = false
+      if (this.node.mediaType === "activity") {
+        await this.updateActivityNodeProgress()
+        this.loading = false
+      }
 
       /**
        * Sometimes changes in the parent node causes changes in child nodes. For
@@ -1140,6 +1145,23 @@ export default {
         "The video could not be found! Please re-upload or check the URL"
       )
       this.loadDuration = false
+    },
+    updateActivityNodeProgress() {
+      const questions = this.node.typeData.activity.questions
+      questions.forEach(question => {
+        const answer = this.getAnswers(this.node.id, question.id)
+        if (Object.entries(answer).length === 0 && !question.optional) {
+          question.completed = false
+        } else {
+          question.completed = true
+        }
+      })
+      const numberCompleted = questions.filter(question => question.completed).length
+      const progress = numberCompleted / questions.length
+      this.updateNodeProgressAndCompletion({
+        id: this.node.id,
+        progress: progress,
+      })
     },
   },
 }

@@ -198,8 +198,6 @@ export default {
         this.$refs.activity.clientHeight - (this.context === "lightbox" ? 0 : 100),
     })
     this.$emit("load")
-    this.markQuestionsComplete()
-    this.updateActivityProgress()
   },
   methods: {
     ...mapActions(["updateNodeProgressAndCompletion"]),
