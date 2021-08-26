@@ -91,9 +91,3 @@ export default {
   },
 }
 </script>
-
-<style lang="scss">
-.page-menu-item {
-  background-color: blue;
-}
-</style>
