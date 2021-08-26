@@ -119,7 +119,8 @@ export default {
     },
     rowRefs: {
       type: Array,
-      required: true,
+      required: false,
+      default: () => [],
     },
   },
   data() {
@@ -240,6 +241,7 @@ export default {
     },
     changeRow(rowInfo) {
       const { rowId, context } = rowInfo
+      console.log({ rowId, context })
       if (this.isNestedMultiContent(context)) {
         if (rowId) {
           this.$router.push({

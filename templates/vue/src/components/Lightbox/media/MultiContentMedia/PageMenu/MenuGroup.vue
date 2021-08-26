@@ -75,7 +75,7 @@ export default {
       const pageMenuData = {
         menuIndex: this.menuIndex,
         nodeId: this.menuTitleNode.id,
-        context: this.menuIndex === 0 ? "" : "page",
+        context: "",
       }
       this.$emit("menu-click", pageMenuData)
     },
@@ -83,7 +83,7 @@ export default {
       const pageMenuData = {
         menuIndex: this.menuIndex,
         nodeId: nodeId,
-        context: "multi-content",
+        context: this.menuIndex === 0 ? "" : "multi-content",
       }
       this.$emit("menu-click", pageMenuData)
       this.$emit("scroll-to", nodeId)

@@ -69,7 +69,8 @@ export default {
     },
     rowRefs: {
       type: Array,
-      required: true,
+      required: false,
+      default: () => [],
     },
     dimensions: {
       type: Object,
