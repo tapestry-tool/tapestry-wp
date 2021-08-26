@@ -67,10 +67,6 @@ export default {
       type: Object,
       required: true,
     },
-    menuGroups: {
-      type: Array,
-      required: true,
-    },
     rowRefs: {
       type: Array,
       required: true,
@@ -104,15 +100,15 @@ export default {
         })
         .filter(row => !row.node.popup)
     },
-    // menuGroups() {
-    //   const menu = []
-    //   const mainMenu = []
-    //   this.rows.forEach(row => {
-    //     row.node.typeData.isSecondaryNode ? menu.push([row]) : mainMenu.push(row)
-    //   })
-    //   menu.unshift(mainMenu)
-    //   return menu
-    // },
+    menuGroups() {
+      const menu = []
+      const mainMenu = []
+      this.rows.forEach(row => {
+        row.node.typeData.isSecondaryNode ? menu.push([row]) : mainMenu.push(row)
+      })
+      menu.unshift(mainMenu)
+      return menu
+    },
     filteredMenuGroups() {
       const filteredMenu = []
       this.menuGroups.forEach((menu, mIndex) => {

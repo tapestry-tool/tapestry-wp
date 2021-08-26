@@ -103,10 +103,6 @@ export default {
       type: Object,
       required: true,
     },
-    menuGroups: {
-      type: Array,
-      required: true,
-    },
     rowId: {
       type: Number,
       required: true,
@@ -154,15 +150,15 @@ export default {
         return { node, children }
       })
     },
-    // menuGroups() {
-    //   const menu = []
-    //   const mainMenu = []
-    //   this.rows.forEach(row => {
-    //     row.node.typeData.isSecondaryNode ? menu.push([row]) : mainMenu.push(row)
-    //   })
-    //   menu.unshift(mainMenu)
-    //   return menu
-    // },
+    menuGroups() {
+      const menu = []
+      const mainMenu = []
+      this.rows.forEach(row => {
+        row.node.typeData.isSecondaryNode ? menu.push([row]) : mainMenu.push(row)
+      })
+      menu.unshift(mainMenu)
+      return menu
+    },
     lockRows() {
       return this.node.typeData.lockRows
     },
