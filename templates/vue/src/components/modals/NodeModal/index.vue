@@ -355,7 +355,8 @@ export default {
     linkHasThumbnailData() {
       return (
         (this.node.mediaType === "url-embed" && this.node.behaviour !== "embed") ||
-        this.node.mediaFormat === "youtube"
+        this.node.mediaFormat === "youtube" ||
+        this.node.mediaFormat === "kaltura"
       )
     },
     canPublish() {
@@ -1065,8 +1066,14 @@ export default {
     },
     async setLinkData() {
       if (shouldFetch(this.node.typeData.mediaURL, this.node)) {
-        const url = this.node.typeData.mediaURL
-        const { data } = await getLinkMetadata(url)
+        let data
+
+        if (this.node.mediaFormat === "kaltura") {
+          data = await client.getKalturaVideoMeta(this.node.typeData.kalturaId)
+        } else {
+          const url = this.node.typeData.mediaURL
+          data = (await getLinkMetadata(url)).data
+        }
 
         if (data) {
           this.node.typeData.linkMetadata = data

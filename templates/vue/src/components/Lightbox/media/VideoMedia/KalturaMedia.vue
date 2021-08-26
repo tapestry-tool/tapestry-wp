@@ -66,7 +66,6 @@ export default {
     },
   },
   created() {
-    console.log(this.node)
     const kalturaScript = document.createElement("script")
     const partnerId = wpData.kaltura.partnerId
     const uniqueConfiguration = wpData.kaltura.uniqueConfiguration

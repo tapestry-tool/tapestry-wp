@@ -325,6 +325,13 @@ $REST_API_ENDPOINTS = [
             'callback' => 'checkKalturaVideo',
         ],
     ],
+    'GET_KALTURA_VIDEO_META' => (object) [
+        'ROUTE' => '/kaltura/video/meta',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => 'getKalturaVideMeta',
+        ],
+    ],
 ];
 
 /*
@@ -1567,6 +1574,19 @@ function checkKalturaVideo($request)
 
     if($result != null){
         return true;
+    }
+    return false;
+}
+
+function getKalturaVideMeta($request)
+{
+    $entryId = $request['entry_id'];
+
+    $kaltura_api = new KalturaApi();
+    $result = $kaltura_api->getVideo($entryId);
+
+    if($result != null){
+        return array("image" => $result->thumbnailUrl);
     }
     return false;
 }

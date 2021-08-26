@@ -33,7 +33,7 @@
           style="display:inline-block;"
           @input="handleKalturaCheck"
         >
-          Use Kaltura Id
+          Use Kaltura Player
         </b-form-checkbox>
       </b-col>
       <b-col cols="8">
