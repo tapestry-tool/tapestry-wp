@@ -32,7 +32,6 @@
       v-else-if="node.presentationStyle === 'page'"
       :dimensions="dimensions"
       :node="node"
-      :menuGroups="menuGroups"
       :rowId="rowId"
       :subRowId="subRowId"
       :context="context"
@@ -45,7 +44,6 @@
     <page-menu
       v-if="node.typeData.showNavBar && node.presentationStyle === 'page'"
       :node="node"
-      :menuGroups="menuGroups"
       :rowRefs="rowRefs"
       :dimensions="dimensions"
       @menu-clicked="handlePageMenuClick"
@@ -142,16 +140,6 @@ export default {
           : this.getDirectChildren(id).map(this.getNode)
         return { node, children }
       })
-    },
-    menuGroups() {
-      const menu = []
-      const mainMenu = []
-      const filteredRows = this.rows.filter(row => !row.node.popup)
-      filteredRows.forEach(row => {
-        row.node.typeData.isSecondaryNode ? menu.push([row]) : mainMenu.push(row)
-      })
-      menu.unshift(mainMenu)
-      return menu
     },
     dimensions() {
       if (!this.isMounted) {
