@@ -146,7 +146,7 @@ export default {
     menuGroups() {
       const menu = []
       const mainMenu = []
-      this.rows.forEach(row => {
+      this.nonPopUpRows.forEach(row => {
         row.node.typeData.isSecondaryNode ? menu.push([row]) : mainMenu.push(row)
       })
       menu.unshift(mainMenu)
