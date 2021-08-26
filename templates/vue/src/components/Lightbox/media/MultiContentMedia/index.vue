@@ -45,7 +45,7 @@
       v-if="node.typeData.showNavBar && node.presentationStyle === 'page'"
       :node="node"
       :rowRefs="rowRefs"
-      :dimensions="dimensions"
+      :dimensions="pageMenuDimensions"
       @menu-clicked="handlePageMenuClick"
     />
     <tapestry-modal
@@ -111,6 +111,11 @@ export default {
       type: Number,
       required: false,
       default: 0,
+    },
+    pageMenuDimensions: {
+      type: Object,
+      required: false,
+      default: null,
     },
   },
   data() {

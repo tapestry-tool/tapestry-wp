@@ -16,6 +16,7 @@
       :node="node"
       :row-id="rowId"
       :sub-row-id="subRowId"
+      :pageMenuDimensions="dimensions"
       @close="handleAutoClose"
       @complete="complete"
     />
