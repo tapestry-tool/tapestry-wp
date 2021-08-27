@@ -94,14 +94,13 @@
       :activeView="activeView"
       @tooltip-positioned="$emit('tooltip-positioned')"
     >
-      <h3 v-if="activeView === 1" style="max-width:300px;">
+      <h3 v-if="activeView === 1" style="width:300px;">
         Click here to toggle back to the community view.
       </h3>
-      <h3 v-else style="max-width:300px;">
+      <h3 v-else style="width:300px;">
         Click here to toggle to the circle view.
       </h3>
       <b-button
-        v-if="activeView === 1"
         pill
         variant="secondary"
         @click="handleClick(OnboardingEvents.Continue)"
@@ -189,7 +188,7 @@ export default {
       type: Number,
       required: true,
     },
-    hasNoConnectionInCircles: {
+    hasConnectionInCircles: {
       type: Boolean,
       required: true,
     },
@@ -284,7 +283,7 @@ export default {
         this.activeView === 0
       ) {
         startingEvent = OnboardingEvents.Continue
-      } else if (this.hasNoConnectionInCircles) {
+      } else if (!this.hasConnectionInCircles) {
         startingEvent = OnboardingEvents.NoConnectionsInCircle
       } else {
         startingEvent = OnboardingEvents.Done

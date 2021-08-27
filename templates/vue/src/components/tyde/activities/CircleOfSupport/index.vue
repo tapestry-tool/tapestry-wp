@@ -7,7 +7,7 @@
         :connections="cos.connections"
         :communities="cos.communities"
         :activeView="view"
-        :has-no-connection-in-circles="hasNoConnectionInCircles"
+        :has-connection-in-circles="hasConnectionInCircles"
         @add-connection="addConnection"
         @edit-connection="editConnection"
         @delete-connection="handleDeleteConnection"
@@ -19,7 +19,7 @@
         :connections="cos.connections"
         :communities="cos.communities"
         :activeView="view"
-        :has-no-connection-in-circles="hasNoConnectionInCircles"
+        :has-connection-in-circles="hasConnectionInCircles"
         @add-connection="addConnection"
         @edit-connection="editConnection"
         @delete-connection="handleDeleteConnection"
@@ -77,6 +77,7 @@ export default {
         communities: {},
         connections: {},
       },
+      hasConnectionInCircles: false,
     }
   },
   computed: {
@@ -89,17 +90,12 @@ export default {
       const circleViewNode = this.getNode(this.settings.circleViewNode)
       return circleViewNode ? circleViewNode && circleViewNode.completed : true
     },
-    hasNoConnectionInCircles() {
-      return (
-        this.cos.circles[0].length === 2 &&
-        this.cos.circles[1].length === 7 &&
-        this.cos.circles[2].length === 4
-      )
-    },
+  },
+  updated() {
+    this.countConnectionsInCircle(this.cos)
   },
   async mounted() {
     const { circles, communities, connections } = await client.cos.getActivity()
-
     circles.forEach(circle => this.cos.circles.push(circle))
     Object.entries(communities).forEach(([id, community]) =>
       this.$set(this.cos.communities, id, community)
@@ -107,7 +103,6 @@ export default {
     Object.entries(connections).forEach(([id, connection]) =>
       this.$set(this.cos.connections, id, connection)
     )
-
     this.isLoading = false
   },
   methods: {
@@ -153,6 +148,19 @@ export default {
         newCircles.push(newCircle)
       })
       this.cos.circles = newCircles
+    },
+    countConnectionsInCircle(cos) {
+      let count = 0
+      let connections = Object.keys(cos.connections)
+      cos.circles.forEach(circle => {
+        connections.forEach(connection => {
+          if (circle.includes(connection)) {
+            count = count + 1
+          }
+        })
+      })
+      this.hasConnectionInCircles = count > 0
+      console.log(this.hasConnectionInCircles)
     },
   },
 }
