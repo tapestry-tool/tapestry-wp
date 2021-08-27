@@ -186,6 +186,15 @@ export default {
   overflow: hidden;
 }
 
+.disabled {
+  opacity: 0.5;
+  &:hover {
+    cursor: not-allowed;
+    stroke: #999;
+    stroke-width: 6;
+  }
+}
+
 .contents {
   height: 100%;
 }
