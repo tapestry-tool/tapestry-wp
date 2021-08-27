@@ -101,6 +101,7 @@
         Click here to toggle to the circle view.
       </h3>
       <b-button
+        v-if="activeView === 1"
         pill
         variant="secondary"
         @click="handleClick(OnboardingEvents.Continue)"
