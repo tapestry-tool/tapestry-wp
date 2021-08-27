@@ -39,7 +39,7 @@
           class="secondary mx-2"
           @click="$emit('continue')"
         >
-          Move onto Circle View Onboarding &#8594;
+          Continue &#8594;
         </b-button>
         <b-col v-if="visibleConnections.length == 5" class="ob-connection-box">
           <p class="ob-connection">
