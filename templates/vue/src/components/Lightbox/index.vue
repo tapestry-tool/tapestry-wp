@@ -12,12 +12,12 @@
     @close="handleUserClose"
   >
     <multi-content-media
-      v-if="node.mediaType === 'multi-content'"
+      v-if="node.mediaType === 'multi-content' && dimensions"
       :node="node"
       :row-id="rowId"
       :sub-row-id="subRowId"
       :rowRefs="rowRefs"
-      :pageMenuDimensions="dimensions"
+      :page-menu-dimensions="dimensions"
       @close="handleAutoClose"
       @complete="complete"
     />

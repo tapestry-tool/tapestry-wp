@@ -75,7 +75,10 @@ export default {
     dimensions: {
       type: Object,
       required: false,
-      default: null,
+      default: () => ({
+        top: 100,
+        left: 50,
+      }),
     },
   },
   data() {

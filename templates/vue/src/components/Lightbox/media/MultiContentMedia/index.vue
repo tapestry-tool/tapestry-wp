@@ -112,15 +112,18 @@ export default {
       required: false,
       default: 0,
     },
-    pageMenuDimensions: {
-      type: Object,
-      required: false,
-      default: null,
-    },
     rowRefs: {
       type: Array,
       required: false,
       default: () => [],
+    },
+    pageMenuDimensions: {
+      type: Object,
+      required: false,
+      default: () => ({
+        top: 100,
+        left: 50,
+      }),
     },
   },
   data() {
