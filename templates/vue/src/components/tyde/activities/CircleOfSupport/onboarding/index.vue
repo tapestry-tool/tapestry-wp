@@ -24,6 +24,7 @@
       :connections="connections"
       :circleViewEnabled="circleViewEnabled"
       @continue="send(OnboardingEvents.Continue)"
+      @done="send(OnboardingEvents.Done)"
     />
     <move-connections-circles
       v-if="isState('Circles.MoveConnections')"
@@ -115,7 +116,7 @@
       :activeView="activeView"
       @tooltip-positioned="$emit('tooltip-positioned')"
     >
-      <h3 style="max-width:300px;">
+      <h3 style="width:300px;">
         Try adding some connections into your circle.
       </h3>
       <b-button pill variant="secondary" @click="handleClick(OnboardingEvents.Add)">
@@ -128,7 +129,7 @@
       class="top right"
       @tooltip-positioned="$emit('tooltip-positioned')"
     >
-      <h3 style="max-width:300px;">
+      <h3 style="width:300px;">
         Toggle the circle rings by pressing the circle in this box.
       </h3>
       <b-button pill variant="secondary" @click="handleContinue">
