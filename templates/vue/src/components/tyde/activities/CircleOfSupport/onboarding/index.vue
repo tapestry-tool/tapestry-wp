@@ -276,7 +276,7 @@ export default {
     },
     initializeOnboarding() {
       let startingEvent = OnboardingEvents.Empty
-      // // For now, always initialize the onboarding process at the start
+      // For now, always initialize the onboarding process at the start
       if (Object.values(this.communities).length <= 0) {
         this.send(startingEvent)
       } else if (

@@ -96,6 +96,7 @@ export default {
   },
   async mounted() {
     const { circles, communities, connections } = await client.cos.getActivity()
+    this.countConnectionsInCircle({ circles, communities, connections })
     circles.forEach(circle => this.cos.circles.push(circle))
     Object.entries(communities).forEach(([id, community]) =>
       this.$set(this.cos.communities, id, community)
@@ -160,7 +161,6 @@ export default {
         })
       })
       this.hasConnectionInCircles = count > 0
-      console.log(this.hasConnectionInCircles)
     },
   },
 }
