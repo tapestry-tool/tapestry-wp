@@ -20,7 +20,10 @@
       @complete="complete"
     />
     <page-menu
-      v-if="node.typeData.showNavBar && node.presentationStyle === 'page'"
+      v-if="
+        node.typeData.showNavBar &&
+          (node.presentationStyle === 'page' || node.presentationStyle === 'units')
+      "
       :node="node"
       :rowRefs="rowRefs"
       :dimensions="dimensions"

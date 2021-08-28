@@ -16,6 +16,9 @@
         {{ node.title }}
       </h1>
     </header>
+    <div v-if="node.presentationStyle === 'units'">
+      <b-form-select v-model="selectedPage" :options="unitsTitle"></b-form-select>
+    </div>
     <accordion-rows
       v-if="node.presentationStyle === 'accordion'"
       :dimensions="dimensions"
@@ -29,9 +32,11 @@
       @updateProgress="updateProgress"
     ></accordion-rows>
     <page-rows
-      v-else-if="node.presentationStyle === 'page'"
+      v-else-if="
+        node.presentationStyle === 'page' || node.presentationStyle === 'units'
+      "
       :dimensions="dimensions"
-      :node="node"
+      :node="presentationNode"
       :rowId="rowId"
       :subRowId="subRowId"
       :context="context"
@@ -109,6 +114,7 @@ export default {
       showCompletion: false,
       isMounted: false,
       navBarStyle: {},
+      selectedPage: "",
     }
   },
   computed: {
@@ -120,13 +126,29 @@ export default {
       "isMultiContent",
     ]),
     ...mapState(["favourites", "rootId"]),
+    presentationNode() {
+      return this.node.presentationStyle === "units"
+        ? this.getNode(this.selectedPage)
+        : this.node
+    },
     rows() {
-      return this.node.childOrdering.map(id => {
+      let node = this.node
+      if (this.node.presentationStyle === "units") {
+        node = this.getNode(this.selectedPage)
+      }
+
+      return node.childOrdering.map(id => {
         const node = this.getNode(id)
         const children = this.isMultiContent(node.id)
           ? node.childOrdering.map(this.getNode)
           : this.getDirectChildren(id).map(this.getNode)
         return { node, children }
+      })
+    },
+    unitsTitle() {
+      return this.node.childOrdering.map(id => {
+        const node = this.getNode(id)
+        return { value: node.id, text: node.title }
       })
     },
     dimensions() {
@@ -155,6 +177,11 @@ export default {
     isMultiContentContext() {
       return this.isNestedMultiContent(this.context)
     },
+  },
+  created() {
+    if (this.node.presentationStyle === "units") {
+      this.selectedPage = this.unitsTitle[0].value
+    }
   },
   mounted() {
     this.isMounted = true

@@ -77,7 +77,8 @@
           :is="activeForm"
           v-if="activeForm"
           :node="node"
-          :actionType="actionType"
+          :action-type="actionType"
+          :is-unit-child="isUnitChild"
           @load="$emit('load')"
           @unload="$emit('unload')"
         ></component>
@@ -135,31 +136,47 @@ export default {
   data() {
     return {
       addDesc: false,
-      mediaTypes: [
-        { value: "", text: "Select content type" },
-        {
-          label: "Basic",
-          options: [
-            { value: "text", text: "Text" },
-            { value: "video", text: "Video" },
-            { value: "h5p", text: "H5P" },
-            { value: "url-embed", text: "External Link" },
-            { value: "wp-post", text: "Wordpress Post" },
-            { value: "activity", text: "Activity" },
-            { value: "multi-content", text: "Multi-Content" },
-          ],
-        },
-        {
-          label: "Advanced",
-          options: [{ value: "answer", text: "Answer" }],
-        },
-      ],
       shouldShowTitle: this.node.typeData.showTitle !== false,
       addMenuTitle: false,
     }
   },
+
   computed: {
     ...mapGetters(["isMultiContentRow"]),
+    mediaTypes() {
+      if (
+        this.parent?.mediaType === "multi-content" &&
+        this.parent?.presentationStyle === "units"
+      ) {
+        return [{ value: "multi-content", text: "Multi-Content" }]
+      } else {
+        return [
+          { value: "", text: "Select content type" },
+          {
+            label: "Basic",
+            options: [
+              { value: "text", text: "Text" },
+              { value: "video", text: "Video" },
+              { value: "h5p", text: "H5P" },
+              { value: "url-embed", text: "External Link" },
+              { value: "wp-post", text: "Wordpress Post" },
+              { value: "activity", text: "Activity" },
+              { value: "multi-content", text: "Multi-Content" },
+            ],
+          },
+          {
+            label: "Advanced",
+            options: [{ value: "answer", text: "Answer" }],
+          },
+        ]
+      }
+    },
+    isUnitChild() {
+      return (
+        this.parent?.mediaType === "multi-content" &&
+        this.parent?.presentationStyle === "units"
+      )
+    },
     activeForm() {
       return this.node.mediaType ? this.node.mediaType + "-form" : null
     },
@@ -194,6 +211,12 @@ export default {
     shouldShowTitle(shouldShowTitle) {
       this.node.typeData.showTitle = shouldShowTitle
     },
+    mediaTypes() {
+      this.selectUnitChild()
+    },
+  },
+  created() {
+    this.selectUnitChild()
   },
   methods: {
     handleTypeChange(evt) {
@@ -203,6 +226,15 @@ export default {
         this.node.mediaFormat = evt === "video" ? "mp4" : "h5p"
       }
       this.$emit("type-changed", evt)
+    },
+    selectUnitChild() {
+      if (
+        this.parent?.mediaType === "multi-content" &&
+        this.parent?.presentationStyle === "units"
+      ) {
+        this.node.mediaType = "multi-content"
+        this.node.presentationStyle = "page"
+      }
     },
   },
 }
