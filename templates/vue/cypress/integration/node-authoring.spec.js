@@ -306,7 +306,7 @@ describe("Node Authoring", () => {
             cy.getByTestId(`edit-node-${childId}`).click({ force: true })
             cy.getByTestId("node-modal").should("be.visible")
             cy.submitModal()
-            cy.getByTestId("node-modal").should("not.be.visible")
+            cy.getByTestId("node-modal").should("not.exist")
           })
       })
     })
