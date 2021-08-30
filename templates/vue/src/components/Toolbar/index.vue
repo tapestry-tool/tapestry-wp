@@ -8,6 +8,7 @@
         v-if="canEdit"
         :max-depth="maxDepth"
       ></settings-modal-button>
+      <user-answers-button data-qa="user-answers-button"></user-answers-button>
       <tapestry-depth-slider
         v-show="!showMap && hasDepth"
         @change="updateViewBox"
@@ -21,6 +22,7 @@
 import { mapMutations, mapState } from "vuex"
 import TapestryDepthSlider from "./TapestryDepthSlider"
 import SettingsModalButton from "./SettingsModalButton"
+import UserAnswersButton from "./UserAnswersButton"
 import TapestryFilter from "./TapestryFilter"
 import ReviewNotifications from "./ReviewNotifications"
 import HelpButton from "./HelpButton"
@@ -33,6 +35,7 @@ export default {
     SettingsModalButton,
     ReviewNotifications,
     HelpButton,
+    UserAnswersButton,
   },
   data() {
     return {

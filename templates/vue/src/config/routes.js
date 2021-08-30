@@ -62,6 +62,11 @@ const settings = {
   name: "settings",
 }
 
+const userAnswers = {
+  path: `${ROOT_PATH}/user-answers/:tab`,
+  name: "userAnswers",
+}
+
 const linkmodal = {
   path: `${ROOT_PATH}/link`,
   name: "links",
@@ -95,6 +100,10 @@ const redirects = [
     path: `${ROOT_PATH}/edit`,
     redirect: `${ROOT_PATH}/edit/content`,
   },
+  {
+    path: `${ROOT_PATH}/user-answers`,
+    redirect: `${ROOT_PATH}/user-answers/answers`,
+  },
 ]
 
 const routes = {
@@ -107,6 +116,7 @@ const routes = {
   nestedMultiContent,
   redirects,
   help,
+  userAnswers,
 }
 
 export const names = Object.fromEntries(
