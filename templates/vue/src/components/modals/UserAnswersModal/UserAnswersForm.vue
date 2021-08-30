@@ -56,6 +56,7 @@
 
 <script>
 import { mapState, mapGetters } from "vuex"
+import client from "@/services/TapestryAPI"
 import Combobox from "@/components/modals/common/Combobox"
 // import { data } from "@/services/wp"
 
@@ -125,11 +126,16 @@ export default {
         .filter(node => node.id == this.activityId)
         .flatMap(node => node.typeData.activity.questions)
     },
-    userAnswers() {
-      return this.userAnswers
+    // userAnswers() {
+    //   return this.userAnswers
+    // },
+  },
+  watch: {
+    questionId(questionId) {
+      client.getAllUsersAnswers(this.activityId, questionId)
+      console.log("called getALlUsersAnswers")
     },
   },
   mounted() {},
-  methods: {},
 }
 </script>

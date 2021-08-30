@@ -94,6 +94,17 @@ class TapestryUserProgress implements ITapestryUserProgress
     }
 
     /**
+     * Get all user's answers for a question
+     *
+     * @return array $allAnswers array of users' answers
+     */
+    public function getAllUsersAnswers($questionId)
+    {
+        $this->_checkPostId();
+        $this->_getAllUsersAnswers($questionId);
+    }
+
+    /**
      * Update User's h5p video setting for a tapestry post.
      *
      * @param string $h5pSettingsData stores volume,
@@ -172,8 +183,25 @@ class TapestryUserProgress implements ITapestryUserProgress
         if ('' === $userAnswer) {
             $userAnswer = [];
         }
-        $userAnswer[$answerType] = $answerData;
-        update_user_meta($this->_userId, 'tapestry_'.$this->postId.'_'.$this->nodeMetaId.'_question_'.$questionId.'_answers', $userAnswer);
+
+        $settings = get_user_meta($this->_userId, 'tapestry_h5p_setting_'.$this->postId, true);
+
+        return $settings ? json_decode($settings) : (object) [];
+    }
+
+    private function _getAllUsersAnswers($questionId)
+    {
+        $userIds = get_users(['fields' => ['ID']]);
+        $allAnswers = new stdClass();
+        foreach ($userIds as $userId) {
+            error_log(print_r($userId, true));
+            $user_answer = get_user_meta($userId->ID, 'tapestry_'.$this->postId.'_'.$this->nodeMetaId.'_question_'.$questionId.'_answers', true);
+            if ('' != $user_answer && is_array($user_answer)) {
+                error_log(print_r($user_answer, true));
+            }
+        }
+
+        return $allAnswers;
     }
 
     private function _getUserProgress($nodeIdArr, $userId)

@@ -206,6 +206,13 @@ $REST_API_ENDPOINTS = [
             'callback' => 'completeQuestionById',
         ],
     ],
+    'GET_TAPESTRY_USER_ALL_ANSWERS' => (object) [
+        'ROUTE' => 'users/answers',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => 'getAllUsersAnswers',
+        ],
+    ],
     'GET_TAPESTRY_USER_H5P_SETTING' => (object) [
         'ROUTE' => 'users/h5psettings/(?P<tapestryPostId>[\d]+)',
         'ARGUMENTS' => [
@@ -688,7 +695,7 @@ function reverseTapestryLink($request)
         if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
             throw new TapestryError('INVALID_POST_ID');
         }
-        if (!TapestryHelpers::userIsAllowed('ADD', $newLink->source, $postId) 
+        if (!TapestryHelpers::userIsAllowed('ADD', $newLink->source, $postId)
             || !TapestryHelpers::userIsAllowed('ADD', $newLink->target, $postId)) {
             throw new TapestryError('ADD_LINK_PERMISSION_DENIED');
         }
@@ -1254,6 +1261,30 @@ function completeQuestionById($request)
 }
 
 /**
+ * Get all answers from all users for a question
+ * Example: /wp-json/tapestry-tool/v1/users/answers?post_id=44&node_id=3&question_id=abcd.
+ *
+ * @param object $request HTTP request
+ *
+ * @return object $response HTTP response
+ */
+function getAllUsersAnswers($request)
+{
+    $postId = $request['post_id'];
+    $nodeMetaId = $request['node_id'];
+    $questionId = $request['question_id'];
+
+    try {
+        $userProgress = new TapestryUserProgress($postId, $nodeMetaId);
+        return $userProgress->getAllUsersAnswers($questionId);
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+
+
+/**
  * Get user h5p video setting on a tapestry page by post id. Will need to pass these as query parameters
  * Example: /wp-json/tapestry-tool/v1/users/h5psettings/42.
  *
@@ -1441,5 +1472,4 @@ function getQuestionHasAnswers($request)
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
-    
 }
