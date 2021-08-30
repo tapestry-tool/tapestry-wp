@@ -39,6 +39,17 @@
           </div>
         </b-col>
       </b-row>
+      <b-row>
+        <b-col>
+          <b-table
+            responsive
+            bordered
+            fixed
+            :items="items"
+            :fields="fields"
+          ></b-table>
+        </b-col>
+      </b-row>
     </b-overlay>
   </div>
 </template>
@@ -46,6 +57,8 @@
 <script>
 import { mapState, mapGetters } from "vuex"
 import Combobox from "@/components/modals/common/Combobox"
+// import { data } from "@/services/wp"
+
 export default {
   name: "user-answers-form",
   components: {
@@ -56,11 +69,46 @@ export default {
     return {
       activityId: null,
       questionId: null,
+      // turn into computed property
+      fields: ["user", "text", "audio", "multiple_choice", "drag_and_drop"],
+      // turn into computed property
+      items: [
+        {
+          text: 40,
+          audio: "Dickerson",
+          multiple_choice: "Macdonald",
+          drag_and_drop: "Yes",
+        },
+        {
+          text: 40,
+          audio: "Dickerson",
+          multiple_choice: "Macdonald",
+          drag_and_drop: "Yes",
+        },
+        {
+          text: 40,
+          audio: "Dickerson",
+          multiple_choice: "Macdonald",
+          drag_and_drop: "Yes",
+        },
+        {
+          text: 40,
+          audio: "Dickerson",
+          multiple_choice: "Macdonald",
+          drag_and_drop: "Yes",
+        },
+        {
+          text: 40,
+          audio: "Dickerson",
+          multiple_choice: "Macdonald",
+          drag_and_drop: "Yes",
+        },
+      ],
     }
   },
   computed: {
-    ...mapState(["nodes"]),
-    ...mapGetters(["getNode"]),
+    ...mapState(["nodes", "userAnswers"]),
+    ...mapGetters(["getNode", "getAnswers", "getQuestion"]),
     activityNode() {
       return this.getNode(this.activityId)
     },
@@ -77,7 +125,11 @@ export default {
         .filter(node => node.id == this.activityId)
         .flatMap(node => node.typeData.activity.questions)
     },
+    userAnswers() {
+      return this.userAnswers
+    },
   },
+  mounted() {},
   methods: {},
 }
 </script>
