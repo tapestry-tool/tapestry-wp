@@ -94,7 +94,7 @@ class TapestryUserProgress implements ITapestryUserProgress
     }
 
     /**
-     * Get all user's answers for a question
+     * Get all user's answers for a question.
      *
      * @return array $allAnswers array of users' answers
      */
@@ -191,11 +191,13 @@ class TapestryUserProgress implements ITapestryUserProgress
 
     private function _getAllUsersAnswers($questionId)
     {
-        $userIds = get_users(['fields' => ['ID']]);
-        $allAnswers = new stdClass();
-        foreach ($userIds as $userId) {
-            error_log(print_r($userId, true));
-            $user_answer = get_user_meta($userId->ID, 'tapestry_'.$this->postId.'_'.$this->nodeMetaId.'_question_'.$questionId.'_answers', true);
+        $users = get_users(['fields' => ['ID', 'display_name']]);
+        error_log(print_r($users, true));
+        $allAnswers = $users;
+        foreach ($users as $user) {
+            error_log(print_r($user, true));
+            $user_answer = get_user_meta($user->ID, 'tapestry_'.$this->postId.'_'.$this->nodeMetaId.'_question_'.$questionId.'_answers', true);
+            error_log(print_r($user_answer, true)."Is user answer");
             if ('' != $user_answer && is_array($user_answer)) {
                 error_log(print_r($user_answer, true));
             }

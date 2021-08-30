@@ -71,34 +71,12 @@ export default {
       activityId: null,
       questionId: null,
       // turn into computed property
-      fields: ["user", "text", "audio", "multiple_choice", "drag_and_drop"],
+      fields: ["ID", "user", "text", "audio", "multiple_choice", "drag_and_drop"],
       // turn into computed property
       items: [
         {
-          text: 40,
-          audio: "Dickerson",
-          multiple_choice: "Macdonald",
-          drag_and_drop: "Yes",
-        },
-        {
-          text: 40,
-          audio: "Dickerson",
-          multiple_choice: "Macdonald",
-          drag_and_drop: "Yes",
-        },
-        {
-          text: 40,
-          audio: "Dickerson",
-          multiple_choice: "Macdonald",
-          drag_and_drop: "Yes",
-        },
-        {
-          text: 40,
-          audio: "Dickerson",
-          multiple_choice: "Macdonald",
-          drag_and_drop: "Yes",
-        },
-        {
+          id: "4",
+          user: "User Name",
           text: 40,
           audio: "Dickerson",
           multiple_choice: "Macdonald",
