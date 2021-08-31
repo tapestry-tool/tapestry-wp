@@ -182,9 +182,9 @@ export default {
     },
     rowBackground() {
       if (this.isMultiContentContext) {
-        let rgb = 40
+        let rgb = 187
         let colorOffset = this.level * 10
-        rgb = colorOffset > rgb ? 0 : rgb - colorOffset
+        rgb = colorOffset > rgb ? 0 : rgb + colorOffset
         return {
           background: `rgb(${rgb}, ${rgb}, ${rgb})`,
         }
@@ -270,7 +270,7 @@ button[disabled] {
   background: none;
   width: 100%;
   text-align: left;
-  color: #fff;
+  color: #111;
   font-size: 1.75rem;
   font-weight: 500;
 
@@ -280,7 +280,7 @@ button[disabled] {
 }
 
 .page-row {
-  background: #262626;
+  background: #ddd;
   border-radius: 4px;
   padding: 8px 16px;
   margin-bottom: 8px;
