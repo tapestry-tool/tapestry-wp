@@ -61,6 +61,7 @@ export default {
 .container {
   cursor: move;
   border-radius: 15px;
+  transform: translate(0, 0);
   width: 75%;
   border: solid 1px;
   background-size: cover;
