@@ -319,8 +319,82 @@ function tapestry_tool_log_event()
 
 
 // Kaltura
-// add_action('upload_videos_to_kalture', 'upload_videos_to_kalture');
-// function upload_videos_to_kaltura()
-// {
-//     error_log("im here");
-// }
+add_action('upload_videos_to_kalture', 'upload_videos_to_kalture');
+function upload_videos_to_kaltura()
+{
+    if (LOAD_KALTURA) {
+        $upload_folder = getcwd()."/wp-content/uploads";
+    
+        $files_in_upload_folder = scandir($upload_folder);
+        $current_date = date('Y/m/d');
+
+        /*
+            1. Uplaod files from server to kaltura
+            2. Note local server urls to replace with kaltura urls
+         */
+
+        $videos_in_upload_folder = array_filter(
+            $files_in_upload_folder,
+            function ($file) {
+            return strpos($file, ".mp4");
+        }
+        );
+
+        $video_links = array();
+
+        $kalturaApi = new KalturaApi();
+
+        foreach ($videos_in_upload_folder as $key => $value) {
+            $file_obj = new StdClass();
+        
+            $file_obj->file_path = $upload_folder."/".$value;
+            $file_obj->name = $value;
+
+            $result = $kalturaApi->uploadKalturaVideo($file_obj, $current_date);
+
+            $video_links[$value] = $result;
+        }
+
+        // Replace all local server urls with kaltura urls
+        $tapestries = get_posts(['post_type' => 'tapestry',]);
+        $video_nodes = array();
+
+        foreach ($tapestries as $value) {
+            $tapestry = new Tapestry($value->ID);
+
+            foreach ($tapestry->getNodeIds() as $node_id) {
+                $node = new TapestryNode($value->ID, $node_id);
+                $nodeMeta = $node->getMeta();
+
+                if ($nodeMeta->mediaType == "video") {
+                    if (strpos($node->getTypeData()->mediaURL, "/wp-content/uploads/")) {
+                        array_push($video_nodes, $node);
+                    }
+                }
+            }
+        }
+
+        foreach ($video_nodes as $node) {
+            foreach ($video_links as $original_link => $kaltura_data) {
+                $node_type_data = $node->getTypeData();
+
+                if (strpos($node_type_data->mediaURL, $original_link)) {
+                    $typeData = $node->getTypeData();
+                    $typeData->mediaURL = $kaltura_data->dataUrl."?.mp4";
+                    $typeData->kalturaData = array(
+                        "id" => $kaltura_data->id,
+                        "partnerId" => $kaltura_data->partnerId,
+                    );
+
+                    $node->set($typeData);
+                    $node->save();
+
+                    wp_delete_file($upload_folder."/".$original_link);
+                    break;
+                }
+            }
+        }
+
+        error_log("Background Kaltura uplaod complete.");
+    }
+}

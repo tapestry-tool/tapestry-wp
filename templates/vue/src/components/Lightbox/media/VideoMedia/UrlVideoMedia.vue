@@ -132,7 +132,7 @@ export default {
       if (this.$refs.video.error.code === 4) {
         if (
           confirm(
-            "It seems this video cannot be load, would you like to refresh the page?"
+            "It seems this video cannot be loaded, would you like to refresh the page?"
           )
         ) {
           location.reload()
