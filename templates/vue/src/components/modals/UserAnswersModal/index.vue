@@ -1,6 +1,7 @@
 <template>
   <b-modal
     id="user-answers-modal"
+    class="xl-modal"
     data-qa="user-answers-modal"
     :visible="show"
     size="xl"
@@ -22,9 +23,6 @@
     <template slot="modal-footer">
       <b-button size="sm" variant="secondary" @click="closeModal">
         Cancel
-      </b-button>
-      <b-button>
-        Random Button
       </b-button>
     </template>
   </b-modal>

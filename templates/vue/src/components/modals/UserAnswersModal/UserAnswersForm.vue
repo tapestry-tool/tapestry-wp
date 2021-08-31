@@ -2,7 +2,7 @@
   <div class="px-3 mt-n2">
     <b-overlay variant="white">
       <b-row>
-        <b-col cols="12">
+        <b-col cols="6">
           <div>
             <b-form-group data-qa="select-activity" label="Activity">
               <combobox
@@ -38,9 +38,34 @@
             </b-form-group>
           </div>
         </b-col>
+        <b-col class="ml-3" cols="4">
+          <b-form-group
+            label="Export Answers"
+            description="Export answers of all users to an Excel or CSV file."
+          >
+            <b-row>
+              <b-form-checkbox
+                v-model="exportToCsv"
+                data-qa="export-answer-button"
+                :value="true"
+                :unchecked-value="false"
+                switch
+              >
+                <span>
+                  {{ exportToCsv ? "CSV" : "Excel" }}
+                </span>
+              </b-form-checkbox>
+            </b-row>
+            <b-row class="mb-2">
+              <b-button block variant="light" @click="exportAnswers">
+                Export Answers
+              </b-button>
+            </b-row>
+          </b-form-group>
+        </b-col>
       </b-row>
       <b-row>
-        <b-col>
+        <b-col v-if="questionId">
           <b-table responsive bordered :fields="answerFields" :items="userAnswers">
             <template #cell(text)="text">
               <completed-activity-media
@@ -95,6 +120,7 @@ export default {
       activityId: null,
       questionId: null,
       userAnswers: [],
+      exportToCsv: false,
     }
   },
   computed: {
@@ -125,6 +151,11 @@ export default {
       client.getAllUsersAnswers(this.activityId, questionId).then(response => {
         this.userAnswers = response.data
       })
+    },
+  },
+  methods: {
+    exportAnswers() {
+      return
     },
   },
 }
