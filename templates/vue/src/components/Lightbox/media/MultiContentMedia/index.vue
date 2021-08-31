@@ -17,7 +17,11 @@
       </h1>
     </header>
     <div v-if="node.presentationStyle === 'units'">
-      <b-form-select v-model="selectedPage" :options="unitsTitle"></b-form-select>
+      <b-form-select
+        v-model="selectedPage"
+        :options="unitsTitle"
+        @change="$emit('unit-changed', $event)"
+      ></b-form-select>
     </div>
     <accordion-rows
       v-if="node.presentationStyle === 'accordion'"
@@ -181,6 +185,7 @@ export default {
   created() {
     if (this.node.presentationStyle === "units") {
       this.selectedPage = this.unitsTitle[0].value
+      this.$emit("unit-changed", this.selectedPage)
     }
   },
   mounted() {

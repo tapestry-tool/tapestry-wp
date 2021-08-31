@@ -18,13 +18,14 @@
       :sub-row-id="subRowId"
       @close="handleAutoClose"
       @complete="complete"
+      @unit-changed="handleUnitChange"
     />
     <page-menu
       v-if="
         node.typeData.showNavBar &&
           (node.presentationStyle === 'page' || node.presentationStyle === 'units')
       "
-      :node="node"
+      :node="menuNode"
       :rowRefs="rowRefs"
       :dimensions="dimensions"
     />
@@ -85,6 +86,7 @@ export default {
       },
       showCompletionScreen: false,
       rowRefs: [],
+      pageNode: null,
     }
   },
   computed: {
@@ -93,6 +95,11 @@ export default {
     node() {
       const node = this.getNode(this.nodeId)
       return node
+    },
+    menuNode() {
+      return this.node.presentationStyle === "units" && this.pageNode
+        ? this.getNode(this.pageNode)
+        : this.node
     },
     canSkip() {
       return this.node.completed || this.node.skippable !== false
@@ -294,6 +301,9 @@ export default {
         width: this.lightboxDimensions.width,
         height: this.lightboxDimensions.height,
       }
+    },
+    handleUnitChange(pageNode) {
+      this.pageNode = pageNode
     },
   },
 }
