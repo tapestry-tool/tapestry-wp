@@ -101,7 +101,8 @@ class TapestryUserProgress implements ITapestryUserProgress
     public function getAllUsersAnswers($questionId)
     {
         $this->_checkPostId();
-        $this->_getAllUsersAnswers($questionId);
+
+        return $this->_getAllUsersAnswers($questionId);
     }
 
     /**
@@ -183,23 +184,21 @@ class TapestryUserProgress implements ITapestryUserProgress
         if ('' === $userAnswer) {
             $userAnswer = [];
         }
-
-        $settings = get_user_meta($this->_userId, 'tapestry_h5p_setting_'.$this->postId, true);
-
-        return $settings ? json_decode($settings) : (object) [];
+        $userAnswer[$answerType] = $answerData;
+        update_user_meta($this->_userId, 'tapestry_'.$this->postId.'_'.$this->nodeMetaId.'_question_'.$questionId.'_answers', $userAnswer);
     }
 
     private function _getAllUsersAnswers($questionId)
     {
         $users = get_users(['fields' => ['ID', 'display_name']]);
-        error_log(print_r($users, true));
-        $allAnswers = $users;
+        $allAnswers = [];
         foreach ($users as $user) {
-            error_log(print_r($user, true));
             $user_answer = get_user_meta($user->ID, 'tapestry_'.$this->postId.'_'.$this->nodeMetaId.'_question_'.$questionId.'_answers', true);
-            error_log(print_r($user_answer, true)."Is user answer");
             if ('' != $user_answer && is_array($user_answer)) {
-                error_log(print_r($user_answer, true));
+                $userAnswers = array_merge((array) $user, $user_answer);
+                array_push($allAnswers, $userAnswers);
+            } else {
+                array_push($allAnswers, $user);
             }
         }
 

@@ -110,8 +110,10 @@ export default {
   },
   watch: {
     questionId(questionId) {
-      client.getAllUsersAnswers(this.activityId, questionId)
-      console.log("called getALlUsersAnswers")
+      client.getAllUsersAnswers(this.activityId, questionId).then(response => {
+        console.log("called getALlUsersAnswers")
+        console.log(response.data)
+      })
     },
   },
   mounted() {},
