@@ -3,7 +3,7 @@
     id="user-answers-modal"
     data-qa="user-answers-modal"
     :visible="show"
-    size="lg"
+    size="xl"
     title="User Answers"
     scrollable
     body-class="p-0"

@@ -8,7 +8,10 @@
         v-if="canEdit"
         :max-depth="maxDepth"
       ></settings-modal-button>
-      <user-answers-button data-qa="user-answers-button"></user-answers-button>
+      <user-answers-button
+        v-if="isAdmin"
+        data-qa="user-answers-button"
+      ></user-answers-button>
       <tapestry-depth-slider
         v-show="!showMap && hasDepth"
         @change="updateViewBox"
@@ -46,6 +49,10 @@ export default {
     ...mapState(["nodes", "links", "selection", "settings", "rootId"]),
     canEdit() {
       return wp.canEditTapestry()
+    },
+    isAdmin() {
+      const currentUser = wp.getCurrentUser()
+      return currentUser.roles ? currentUser.roles.includes("administrator") : false
     },
     hasDepth() {
       return this.maxDepth > 1 && this.settings.defaultDepth > 0
