@@ -104,6 +104,7 @@
 
 <script>
 import { mapState, mapGetters } from "vuex"
+import XLSX from "xlsx"
 import client from "@/services/TapestryAPI"
 import Combobox from "@/components/modals/common/Combobox"
 import CompletedActivityMedia from "@/components/Lightbox/media/common/CompletedActivityMedia"
@@ -155,7 +156,45 @@ export default {
   },
   methods: {
     exportAnswers() {
+      const formattedAnswers = this.formatAnswersForExcel()
+      const currentQuestionAnswers = XLSX.utils.json_to_sheet(formattedAnswers)
+      let newWorkBook = XLSX.utils.book_new()
+      XLSX.utils.book_append_sheet(
+        newWorkBook,
+        currentQuestionAnswers,
+        "User Answers"
+      )
+      XLSX.writeFile(newWorkBook, "answers.xlsx")
+    },
+    formatAnswersForExcel() {
+      let formattedAnswers = []
+      this.userAnswers.forEach(userAnswer => {
+        let newAnswer = {
+          userId: userAnswer.ID,
+          displayName: userAnswer.display_name,
+          text: userAnswer.text?.join(),
+          audio: userAnswer.audio?.url,
+          multipleChoice: userAnswer.multipleChoice
+            ? this.formatMultipleChoiceAnswers(userAnswer.multipleChoice)
+            : "",
+        }
+        formattedAnswers.push(newAnswer)
+      })
+      console.log(formattedAnswers)
+      return formattedAnswers
+    },
+    formatAnswersForCSV() {
       return
+    },
+    formatMultipleChoiceAnswers(answers) {
+      let answerOptions = []
+      answers.forEach(choice => {
+        let answer = this.question.answerTypes.multipleChoice.choices.find(
+          option => option.id === choice
+        )
+        answerOptions.push(answer.value)
+      })
+      return answerOptions.join()
     },
   },
 }
