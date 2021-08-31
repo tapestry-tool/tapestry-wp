@@ -5,69 +5,73 @@
     :style="navBarStyle"
     data-qa="multi-content"
   >
-    <header>
-      <h1
-        v-if="showTitle"
-        :class="{
-          title: true,
-          'nested-media-title': isMultiContentContext,
-        }"
+    <b-container class="title">
+      <b-row>
+        <b-col cols="8">
+          <h1
+            v-if="showTitle"
+            :class="{
+              'nested-media-title': isMultiContentContext,
+            }"
+          >
+            {{ node.title }}
+          </h1>
+        </b-col>
+        <b-col v-if="node.presentationStyle === 'units'">
+          <b-form-select
+            v-model="selectedPage"
+            :options="unitsTitle"
+            @change="$emit('unit-changed', $event)"
+          ></b-form-select>
+        </b-col>
+      </b-row>
+
+      <accordion-rows
+        v-if="node.presentationStyle === 'accordion'"
+        :dimensions="dimensions"
+        :node="node"
+        :rowId="rowId"
+        :subRowId="subRowId"
+        :context="context"
+        :level="level"
+        @load="handleLoad"
+        @changeRow="changeRow"
+        @updateProgress="updateProgress"
+      ></accordion-rows>
+      <page-rows
+        v-else-if="
+          node.presentationStyle === 'page' || node.presentationStyle === 'units'
+        "
+        :dimensions="dimensions"
+        :node="presentationNode"
+        :rowId="rowId"
+        :subRowId="subRowId"
+        :context="context"
+        :level="level"
+        @load="handleLoad"
+        @changeRow="changeRow"
+        @updateProgress="updateProgress"
+      ></page-rows>
+      <tapestry-modal
+        v-if="showCompletion"
+        :node-id="node.id"
+        :allow-close="false"
+        @close="handleCancel"
       >
-        {{ node.title }}
-      </h1>
-    </header>
-    <div v-if="node.presentationStyle === 'units'">
-      <b-form-select
-        v-model="selectedPage"
-        :options="unitsTitle"
-        @change="$emit('unit-changed', $event)"
-      ></b-form-select>
-    </div>
-    <accordion-rows
-      v-if="node.presentationStyle === 'accordion'"
-      :dimensions="dimensions"
-      :node="node"
-      :rowId="rowId"
-      :subRowId="subRowId"
-      :context="context"
-      :level="level"
-      @load="handleLoad"
-      @changeRow="changeRow"
-      @updateProgress="updateProgress"
-    ></accordion-rows>
-    <page-rows
-      v-else-if="
-        node.presentationStyle === 'page' || node.presentationStyle === 'units'
-      "
-      :dimensions="dimensions"
-      :node="presentationNode"
-      :rowId="rowId"
-      :subRowId="subRowId"
-      :context="context"
-      :level="level"
-      @load="handleLoad"
-      @changeRow="changeRow"
-      @updateProgress="updateProgress"
-    ></page-rows>
-    <tapestry-modal
-      v-if="showCompletion"
-      :node-id="node.id"
-      :allow-close="false"
-      @close="handleCancel"
-    >
-      <h1>{{ node.typeData.confirmationTitleText }}</h1>
-      <p>{{ node.typeData.confirmationBodyText }}</p>
-      <div class="button-container">
-        <button class="button-completion" @click="handleClose">
-          <i class="far fa-arrow-alt-circle-right fa-4x"></i>
-          <p>{{ node.typeData.continueButtonText }}</p>
-        </button>
-        <button class="button-completion" @click="handleCancel">
-          <i class="far fa-times-circle fa-4x"></i>
-          <p>{{ node.typeData.cancelLinkText }}</p>
-        </button>
-      </div>
-    </tapestry-modal>
+        <h1>{{ node.typeData.confirmationTitleText }}</h1>
+        <p>{{ node.typeData.confirmationBodyText }}</p>
+        <div class="button-container">
+          <button class="button-completion" @click="handleClose">
+            <i class="far fa-arrow-alt-circle-right fa-4x"></i>
+            <p>{{ node.typeData.continueButtonText }}</p>
+          </button>
+          <button class="button-completion" @click="handleCancel">
+            <i class="far fa-times-circle fa-4x"></i>
+            <p>{{ node.typeData.cancelLinkText }}</p>
+          </button>
+        </div>
+      </tapestry-modal>
+    </b-container>
   </div>
 </template>
 
@@ -342,7 +346,6 @@ button[disabled] {
 }
 
 .title {
-  color: #111;
   margin-bottom: 1em;
 }
 
