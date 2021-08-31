@@ -75,11 +75,6 @@
                 </template>
               </combobox>
             </b-form-group>
-            <b-form-group label="Allow user to edit this answer">
-              <b-form-checkbox v-model="question.followUp.allowAnswerEdit" switch>
-                {{ question.followUp.allowAnswerEdit ? "Yes" : "No" }}
-              </b-form-checkbox>
-            </b-form-group>
           </b-card>
           <b-card
             sub-title="Question details"

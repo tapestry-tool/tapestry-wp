@@ -32,6 +32,15 @@
         </template>
       </combobox>
     </b-form-group>
+    <b-form-group label="Allow user to edit this answer">
+      <b-form-checkbox
+        v-model="followUpCheckboxValue"
+        :disabled="originalQuestionText === undefined"
+        switch
+      >
+        {{ followUpCheckboxValue ? "Yes" : "No" }}
+      </b-form-checkbox>
+    </b-form-group>
     <b-form-group label="Show this text first">
       <b-form-input
         v-if="node.typeData.questionId"
@@ -59,6 +68,18 @@ export default {
   },
   computed: {
     ...mapState(["nodes"]),
+    followUpCheckboxValue: {
+      get() {
+        if (this.originalQuestionText) {
+          return this.availableQuestions[0].followUp.allowAnswerEdit
+        } else {
+          return false
+        }
+      },
+      set(val) {
+        this.availableQuestions[0].followUp.allowAnswerEdit = val
+      },
+    },
     activityNodes() {
       return Object.values(this.nodes).filter(node => node.mediaType == "activity")
     },

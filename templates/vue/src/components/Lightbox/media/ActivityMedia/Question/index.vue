@@ -210,7 +210,6 @@ export default {
   },
   mounted() {
     this.openFormIfSingle()
-    console.log(this.$parent.initialType)
     if (this.hasPreviousSubmission && this.$parent.initialType == "answer") {
       this.summaryScreen = true
     } else {
