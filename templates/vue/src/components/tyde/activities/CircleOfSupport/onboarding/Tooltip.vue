@@ -4,7 +4,7 @@
     class="tooltip-container"
     :style="[
       { opacity: positioned ? 1 : 0 },
-      { left: onTopLeftCircleView ? '84px' : '0px' },
+      { left: onTopLeftCircleView ? '84px !important' : '0px' },
     ]"
   >
     <slot></slot>
