@@ -7,7 +7,7 @@
         width: '100%',
       }"
     >
-      <loading v-if="state === states.Loading" style="color: white;" />
+      <loading v-if="state === states.Loading" />
       <component
         :is="videoComponent"
         ref="video"

@@ -48,8 +48,6 @@ export default {
   top: 0;
   width: 100%;
   height: 100%;
-  background: #111;
-  color: #eee;
   opacity: 1;
   transition: opacity 0.4s ease-out;
   z-index: 10;
