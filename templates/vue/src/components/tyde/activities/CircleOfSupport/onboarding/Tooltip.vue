@@ -4,7 +4,7 @@
     class="tooltip-container"
     :style="[
       { opacity: positioned ? 1 : 0 },
-      { 'margin-left': onTopLeftCircleView ? '84px' : '0px' },
+      { left: onTopLeftCircleView ? '84px' : '0px' },
     ]"
   >
     <slot></slot>
@@ -42,7 +42,7 @@ export default {
 }
 
 .left {
-  left: 22px;
+  left: 52px;
 
   &.top {
     left: 10px;
