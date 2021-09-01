@@ -190,19 +190,48 @@ class TapestryUserProgress implements ITapestryUserProgress
 
     private function _getAllUsersAnswers($questionId)
     {
-        $users = get_users(['fields' => ['ID', 'display_name']]);
-        $allAnswers = [];
-        foreach ($users as $user) {
-            $user_answer = get_user_meta($user->ID, 'tapestry_'.$this->postId.'_'.$this->nodeMetaId.'_question_'.$questionId.'_answers', true);
-            if ('' != $user_answer && is_array($user_answer)) {
-                $userAnswers = array_merge((array) $user, $user_answer);
-                array_push($allAnswers, $userAnswers);
-            } else {
-                array_push($allAnswers, $user);
+        $tapestry = new Tapestry($this->postId);
+        $tapestryNode = new TapestryNode($this->postId);
+        $nodeIds = $tapestry->getNodeIds();
+        $activityNodes = [];
+        foreach ($nodeIds as $nodeId) {
+            $node = $tapestry->getNode($nodeId);
+            if ('activity' === $tapestryNode->getMediaType($node)) {
+                array_push($activityNodes, $node);
             }
         }
+        $allUsersAnswers = [];
+        foreach ($activityNodes as $activity) {
+            $activityId = $tapestryNode->getNodeId($activity);
+            $typeData = $tapestryNode->getTypeData($activity);
+            $activityQuestions = $typeData->activity->questions;
+            $activityAnswers = [];
+            foreach ($activityQuestions as $question) {
+                $users = get_users(['fields' => ['ID', 'display_name']]);
+                $questionId = $question->id;
+                foreach ($users as $user) {
+                    $questionAnswers = [];
+                    $user_answer = get_user_meta($user->ID, 'tapestry_'.$this->postId.'_'.$activityId.'_question_'.$questionId.'_answers', true);
+                    if ('' != $user_answer && is_array($user_answer)) {
+                        $userAnswers = array_merge((array) $user, $user_answer);
+                        array_merge($questionAnswers, $userAnswers);
+                    } else {
+                        array_merge($questionAnswers, $user);
+                    }
+                    error_log(print_r($questionAnswers, true).'is questioNAnswer');
+                    // error_log(print_r($userAnswers, true)."is the user_answer");
+                }
+                $activityAnswers[$questionId] = $questionAnswers;
+                // error_log(print_r($activityAnswers, true)."is the activityAnswersArray");
+                // array_push($activityAnswers, [$questionId => $questionAnswers]);
+            }
+            error_log(print_r($activityAnswers, true).'is the activityAnswers');
+            $allUsersAnswers[$activityId] = $activityAnswers;
+            // array_push($allUsersAnswers, [$activityId => $activityAnswers]);
+        }
+        error_log(print_r($allUsersAnswers, true).'are all the answers');
 
-        return $allAnswers;
+        return $allUsersAnswers;
     }
 
     private function _getUserProgress($nodeIdArr, $userId)

@@ -41,7 +41,7 @@
         <b-col class="ml-3" cols="4">
           <b-form-group
             label="Export Answers"
-            description="Export answers of all users to an Excel or CSV file."
+            description="Export answers of all users for all activities and questions to an Excel or CSV file."
           >
             <b-row>
               <b-form-checkbox
@@ -66,7 +66,7 @@
       </b-row>
       <b-row>
         <b-col v-if="questionId">
-          <b-table responsive bordered :fields="answerFields" :items="userAnswers">
+          <b-table responsive bordered :fields="fields" :items="userAnswers">
             <template #cell(text)="text">
               <completed-activity-media
                 :type="`text`"
@@ -143,7 +143,7 @@ export default {
         .filter(node => node.id == this.activityId)
         .flatMap(node => node.typeData.activity.questions)
     },
-    answerFields() {
+    fields() {
       return Object.keys(this.userAnswers) > 0 ? Object.keys(this.userAnswers) : []
     },
   },
@@ -156,19 +156,63 @@ export default {
   },
   methods: {
     exportAnswers() {
-      const formattedAnswers = this.formatAnswersForExcel()
-      const currentQuestionAnswers = XLSX.utils.json_to_sheet(formattedAnswers)
-      let newWorkBook = XLSX.utils.book_new()
-      XLSX.utils.book_append_sheet(
-        newWorkBook,
-        currentQuestionAnswers,
-        "User Answers"
-      )
-      XLSX.writeFile(newWorkBook, "answers.xlsx")
+      let workBook = XLSX.utils.book_new()
+      this.activityNodes.forEach(activityNode => {
+        const activityAnswers = this.formatActivityAnswers(activityNode)
+        const answerSheet = XLSX.utils.json_to_sheet(activityAnswers)
+        XLSX.utils.book_append_sheet(workBook, answerSheet)
+      })
+      this.exportToCsv
+        ? XLSX.writeFile(workBook, "answers.csv")
+        : XLSX.writeFile(workBook, "answers.xlsx")
     },
-    formatAnswersForExcel() {
+    async formatActivityAnswers(activity) {
       let formattedAnswers = []
-      this.userAnswers.forEach(userAnswer => {
+      const questions = activity.typeData.activity.questions
+      questions.forEach(question => {
+        const userAnswers = client.getAllUsersAnswers(activity.id, question.id)
+        console.log(userAnswers + "are the user answers")
+        userAnswers.forEach(userAnswer => {
+          let newAnswer = {
+            question: question.text,
+            userId: userAnswer.ID,
+            displayName: userAnswer.display_name,
+            text: userAnswer.text?.join(),
+            audio: userAnswer.audio?.url,
+            multipleChoice: userAnswer.multipleChoice
+              ? this.formatMultipleChoiceAnswers(userAnswer.multipleChoice)
+              : "",
+          }
+          formattedAnswers.push(newAnswer)
+        })
+      })
+      console.log(formattedAnswers + "are the formatted answers")
+      return formattedAnswers
+    },
+    // async formatQuestionAnswers(question) {
+    //   // Promise.resolve(client.getAllUsersAnswers(activity.id, question.id)).then(
+    //   //   response => {
+    //   //     const userAnswers = response.data
+    //   //     console.log(userAnswers + "are the user answers")
+    //   //     userAnswers.forEach(userAnswer => {
+    //   //       let newAnswer = {
+    //   //         question: question.text,
+    //   //         userId: userAnswer.ID,
+    //   //         displayName: userAnswer.display_name,
+    //   //         text: userAnswer.text?.join(),
+    //   //         audio: userAnswer.audio?.url,
+    //   //         multipleChoice: userAnswer.multipleChoice
+    //   //           ? this.formatMultipleChoiceAnswers(userAnswer.multipleChoice)
+    //   //           : "",
+    //   //       }
+    //   //       formattedAnswers.push(newAnswer)
+    //   //     })
+    //   //   }
+    //   // )
+    // },
+    formatAnswers2(question) {
+      let formattedAnswers = []
+      question.forEach(userAnswer => {
         let newAnswer = {
           userId: userAnswer.ID,
           displayName: userAnswer.display_name,
@@ -183,18 +227,24 @@ export default {
       console.log(formattedAnswers)
       return formattedAnswers
     },
-    formatAnswersForCSV() {
-      return
+    exportAnswers2() {
+      let newWorkBook = XLSX.utils.book_new()
+      const formattedAnswers = this.formatAnswers()
+      const answerSheet = XLSX.utils.json_to_sheet(formattedAnswers)
+      XLSX.utils.book_append_sheet(newWorkBook, answerSheet, "User Answers")
+      this.exportToCsv
+        ? XLSX.writeFile(newWorkBook, "answers.csv")
+        : XLSX.writeFile(newWorkBook, "answers.xlsx")
     },
-    formatMultipleChoiceAnswers(answers) {
-      let answerOptions = []
-      answers.forEach(choice => {
+    formatMultipleChoiceAnswers(mcAnswers) {
+      let answerValues = []
+      mcAnswers.forEach(choice => {
         let answer = this.question.answerTypes.multipleChoice.choices.find(
           option => option.id === choice
         )
-        answerOptions.push(answer.value)
+        answerValues.push(answer.value)
       })
-      return answerOptions.join()
+      return answerValues.join()
     },
   },
 }
