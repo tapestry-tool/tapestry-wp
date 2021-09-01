@@ -1076,6 +1076,12 @@ export default {
         }
 
         if (data) {
+          if (data.duration) {
+            // setting video duration for kaltura video
+            this.node.mediaDuration = data.duration
+            this.loadDuration = false
+          }
+
           this.node.typeData.linkMetadata = data
           if (
             confirm(

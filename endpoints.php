@@ -1586,7 +1586,7 @@ function getKalturaVideMeta($request)
     $result = $kaltura_api->getVideo($entryId);
 
     if($result != null){
-        return array("image" => $result->thumbnailUrl);
+        return array("image" => $result->thumbnailUrl, "duration" => $result->duration);
     }
     return false;
 }

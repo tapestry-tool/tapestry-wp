@@ -8,7 +8,6 @@
 
 <script>
 import client from "@/services/TapestryAPI"
-import { mapActions, mapState } from "vuex"
 import { data as wpData } from "@/services/wp"
 
 export default {
