@@ -1482,26 +1482,30 @@ function kalturaStatus($request)
 
 function checkKalturaVideo($request)
 {
-    $entryId = $request['entry_id'];
+    if (LOAD_KALTURA) {
+        $entryId = $request['entry_id'];
 
-    $kaltura_api = new KalturaApi();
-    $result = $kaltura_api->getVideo($entryId);
+        $kaltura_api = new KalturaApi();
+        $result = $kaltura_api->getVideo($entryId);
 
-    if($result != null){
-        return true;
+        if ($result != null) {
+            return true;
+        }
+        return false;
     }
-    return false;
 }
 
 function getKalturaVideMeta($request)
 {
-    $entryId = $request['entry_id'];
+    if (LOAD_KALTURA) {
+        $entryId = $request['entry_id'];
 
-    $kaltura_api = new KalturaApi();
-    $result = $kaltura_api->getVideo($entryId);
+        $kaltura_api = new KalturaApi();
+        $result = $kaltura_api->getVideo($entryId);
 
-    if($result != null){
-        return array("image" => $result->thumbnailUrl, "duration" => $result->duration);
+        if ($result != null) {
+            return array("image" => $result->thumbnailUrl, "duration" => $result->duration);
+        }
+        return false;
     }
-    return false;
 }
