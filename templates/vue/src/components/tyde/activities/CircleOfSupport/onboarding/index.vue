@@ -93,6 +93,7 @@
       v-if="isState('Circles.Welcome')"
       class="top left"
       :activeView="activeView"
+      :style="[{ 'margin-left': activeView === 1 ? '84px' : '0px' }]"
       @tooltip-positioned="$emit('tooltip-positioned')"
     >
       <h3 v-if="activeView === 1" style="width:300px;">

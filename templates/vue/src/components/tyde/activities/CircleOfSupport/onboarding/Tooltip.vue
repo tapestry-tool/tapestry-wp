@@ -2,10 +2,7 @@
   <div
     ref="tooltip"
     class="tooltip-container"
-    :style="[
-      { opacity: positioned ? 1 : 0 },
-      { left: onTopLeftCircleView ? '84px !important' : '0px' },
-    ]"
+    :style="[{ opacity: positioned ? 1 : 0 }]"
   >
     <slot></slot>
   </div>
