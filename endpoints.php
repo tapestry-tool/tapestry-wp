@@ -1272,11 +1272,10 @@ function getAllUsersAnswers($request)
 {
     $postId = $request['post_id'];
     $nodeMetaId = $request['node_id'];
-    $questionId = $request['question_id'];
 
     try {
         $userProgress = new TapestryUserProgress($postId, $nodeMetaId);
-        return $userProgress->getAllUsersAnswers($questionId);
+        return $userProgress->getAllUsersAnswers();
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }

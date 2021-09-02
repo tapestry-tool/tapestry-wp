@@ -94,15 +94,15 @@ class TapestryUserProgress implements ITapestryUserProgress
     }
 
     /**
-     * Get all user's answers for a question.
+     * Get all user's answers for a Tapestry
      *
-     * @return array $allAnswers array of users' answers
+     * @return object $allAnswers all users' answers from a Tapestry
      */
-    public function getAllUsersAnswers($questionId)
+    public function getAllUsersAnswers()
     {
         $this->_checkPostId();
 
-        return $this->_getAllUsersAnswers($questionId);
+        return $this->_getAllUsersAnswers();
     }
 
     /**
@@ -188,7 +188,7 @@ class TapestryUserProgress implements ITapestryUserProgress
         update_user_meta($this->_userId, 'tapestry_'.$this->postId.'_'.$this->nodeMetaId.'_question_'.$questionId.'_answers', $userAnswer);
     }
 
-    private function _getAllUsersAnswers($questionId)
+    private function _getAllUsersAnswers()
     {
         $tapestry = new Tapestry($this->postId);
         $tapestryNode = new TapestryNode($this->postId);
@@ -223,6 +223,7 @@ class TapestryUserProgress implements ITapestryUserProgress
             }
             $allUsersAnswers->$activityId = $activityAnswers;
         }
+
         return $allUsersAnswers;
     }
 

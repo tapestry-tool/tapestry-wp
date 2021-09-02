@@ -57,7 +57,7 @@
               </b-form-checkbox>
             </b-row>
             <b-row class="mb-2">
-              <b-button block variant="light" @click="exportAnswers">
+              <b-button block variant="light">
                 Export Answers
               </b-button>
             </b-row>
@@ -66,7 +66,7 @@
       </b-row>
       <b-row>
         <b-col v-if="questionId">
-          <b-table responsive bordered :fields="fields" :items="userAnswers">
+          <b-table responsive bordered :fields="fields" :items="questionAnswers">
             <template #cell(text)="text">
               <completed-activity-media
                 :type="`text`"
@@ -120,7 +120,7 @@ export default {
     return {
       activityId: null,
       questionId: null,
-      userAnswers: [],
+      allAnswers: null,
       exportToCsv: false,
     }
   },
@@ -144,15 +144,16 @@ export default {
         .flatMap(node => node.typeData.activity.questions)
     },
     fields() {
-      return Object.keys(this.userAnswers) > 0 ? Object.keys(this.userAnswers) : []
+      return Object.keys(this.allAnswers[this.activityId][this.questionId][0])
+    },
+    questionAnswers() {
+      return this.allAnswers[this.activityId][this.questionId]
     },
   },
-  watch: {
-    questionId(questionId) {
-      client.getAllUsersAnswers(this.activityId, questionId).then(response => {
-        this.userAnswers = response.data
-      })
-    },
+  mounted() {
+    client.getAllUsersAnswers(this.activityId).then(response => {
+      this.allAnswers = response.data
+    })
   },
   methods: {
     exportAnswers() {
@@ -166,13 +167,13 @@ export default {
         ? XLSX.writeFile(workBook, "answers.csv")
         : XLSX.writeFile(workBook, "answers.xlsx")
     },
-    async formatActivityAnswers(activity) {
+    formatActivityAnswers(activity) {
       let formattedAnswers = []
       const questions = activity.typeData.activity.questions
       questions.forEach(question => {
-        const userAnswers = client.getAllUsersAnswers(activity.id, question.id)
-        console.log(userAnswers + "are the user answers")
-        userAnswers.forEach(userAnswer => {
+        const allAnswers = client.getAllUsersAnswers(activity.id, question.id)
+        console.log(allAnswers + "are the user answers")
+        allAnswers.forEach(userAnswer => {
           let newAnswer = {
             question: question.text,
             userId: userAnswer.ID,
@@ -192,9 +193,9 @@ export default {
     // async formatQuestionAnswers(question) {
     //   // Promise.resolve(client.getAllUsersAnswers(activity.id, question.id)).then(
     //   //   response => {
-    //   //     const userAnswers = response.data
-    //   //     console.log(userAnswers + "are the user answers")
-    //   //     userAnswers.forEach(userAnswer => {
+    //   //     const allAnswers = response.data
+    //   //     console.log(allAnswers + "are the user answers")
+    //   //     allAnswers.forEach(userAnswer => {
     //   //       let newAnswer = {
     //   //         question: question.text,
     //   //         userId: userAnswer.ID,

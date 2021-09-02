@@ -40,11 +40,11 @@ interface ITapestryUserProgress
     public function completeQuestion($questionId, $answerData, $answerType);
 
     /**
-     * Get all user's answers for a question
+     * Get all user's answers for a Tapestry
      *
-     * @return array $allAnswers array of users' answers
+     * @return object $allAnswers all users' answers from a Tapestry
      */
-    public function getAllUsersAnswers($questionId);
+    public function getAllUsersAnswers();
 
     /**
      * Update User's h5p video setting for a tapestry post.

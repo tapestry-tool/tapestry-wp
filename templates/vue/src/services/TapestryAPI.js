@@ -203,8 +203,8 @@ class TapestryApi {
     return response
   }
 
-  async getAllUsersAnswers(nodeId, questionId) {
-    const url = `/users/answers?post_id=${this.postId}&node_id=${nodeId}&question_id=${questionId}`
+  async getAllUsersAnswers(nodeId) {
+    const url = `/users/answers?post_id=${this.postId}&node_id=${nodeId}`
     const response = await this.client.get(url)
     return response
   }
