@@ -1,8 +1,18 @@
 <template>
   <div class="px-3 mt-n2">
     <b-overlay variant="white">
+      <b-row class="mx-2">
+        <b-form-group
+          label="Export All User Answers"
+          description="Export answers of all users for all activities and questions in the Tapestry to an Excel file."
+        >
+          <b-button block variant="light" @click="exportAnswers">
+            Export Answers
+          </b-button>
+        </b-form-group>
+      </b-row>
       <b-row>
-        <b-col cols="6">
+        <b-col cols="12">
           <div>
             <b-form-group data-qa="select-activity" label="Activity">
               <combobox
@@ -37,31 +47,6 @@
               </combobox>
             </b-form-group>
           </div>
-        </b-col>
-        <b-col class="ml-3" cols="4">
-          <b-form-group
-            label="Export Answers"
-            description="Export answers of all users for all activities and questions to an Excel or CSV file."
-          >
-            <b-row>
-              <b-form-checkbox
-                v-model="exportToCsv"
-                data-qa="export-answer-button"
-                :value="true"
-                :unchecked-value="false"
-                switch
-              >
-                <span>
-                  {{ exportToCsv ? "CSV" : "Excel" }}
-                </span>
-              </b-form-checkbox>
-            </b-row>
-            <b-row class="mb-2">
-              <b-button block variant="light" @click="exportAnswers">
-                Export Answers
-              </b-button>
-            </b-row>
-          </b-form-group>
         </b-col>
       </b-row>
       <b-row>
@@ -125,7 +110,6 @@ export default {
       activityId: null,
       questionId: null,
       allAnswers: null,
-      exportToCsv: false,
     }
   },
   computed: {
@@ -176,25 +160,25 @@ export default {
         answerSheet["!cols"] = wscols
         XLSX.utils.book_append_sheet(newWorkBook, answerSheet, `${activity.title}`)
       })
-      this.exportToCsv
-        ? XLSX.writeFile(newWorkBook, "answers.csv")
-        : XLSX.writeFile(newWorkBook, "answers.xlsx")
+      XLSX.writeFile(newWorkBook, "answers.xlsx")
     },
     formatAnswers(activityId) {
       let formattedAnswers = []
       const activity = this.allAnswers[activityId]
       const questionIds = Object.keys(activity)
       questionIds.forEach(questionId => {
+        let question = this.getQuestion(questionId)
         const questionAnswers = activity[questionId]
         questionAnswers.forEach(userAnswer => {
           let newAnswer = {
-            question: this.getQuestion(questionId).text,
+            question: question.text,
             userId: userAnswer.ID,
             displayName: userAnswer.display_name,
             text: userAnswer.text?.join(),
             audio: userAnswer.audio?.url,
             multipleChoice: this.formatMultipleChoiceAnswers(
-              userAnswer.multipleChoice
+              userAnswer.multipleChoice,
+              question
             ),
           }
           formattedAnswers.push(newAnswer)
@@ -203,14 +187,14 @@ export default {
       })
       return formattedAnswers
     },
-    formatMultipleChoiceAnswers(mcAnswers) {
-      if (!mcAnswers) return
+    formatMultipleChoiceAnswers(mcAnswers, question) {
+      if (!mcAnswers) return ""
       let answerValues = []
       mcAnswers.forEach(choice => {
-        let answer = this.question.answerTypes.multipleChoice.choices.find(
+        let answer = question.answerTypes.multipleChoice.choices.find(
           option => option.id === choice
         )
-        answerValues.push(answer ? answer.value : "")
+        answerValues.push(answer.value)
       })
       return answerValues.join()
     },
