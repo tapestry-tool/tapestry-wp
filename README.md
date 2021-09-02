@@ -77,7 +77,7 @@ The Kaltura Admininstrator Secret and Partner ID can be found by going to your K
     extension=php_openssl.dll
     // Add these configuration lines
     [SSL]
-    curl.cainfo="C:/MAMP/cacert.pem"
-    openssl.cafile="C:/MAMP/cacert.pem"
+    curl.cainfo="route/to/mamp/cacert.pem"
+    openssl.cafile="route/to/mamp/cacert.pem"
     ```
 You should now be able to upload videos onto Kaltura.
