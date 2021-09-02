@@ -3,6 +3,7 @@
     <video
       ref="video"
       controls
+      muted
       :src="node.typeData.mediaURL"
       :style="videoStyles"
       @loadeddata="handleLoad"
