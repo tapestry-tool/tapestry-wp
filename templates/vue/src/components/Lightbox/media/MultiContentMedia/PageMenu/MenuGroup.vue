@@ -9,7 +9,7 @@
           :node="row.node"
           :lock-rows="lockRows"
           :disabled="disabledRow(row.node)"
-          @item-click="itemClicked"
+          @item-click="handleItemClick"
         />
       </ul>
     </b-collapse>
@@ -72,7 +72,7 @@ export default {
       }
       this.$emit("title-click", pageMenuData)
     },
-    itemClicked(nodeId) {
+    handleItemClick(nodeId) {
       const pageMenuData = {
         menuIndex: this.index,
         nodeId: nodeId,
