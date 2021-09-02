@@ -94,7 +94,7 @@ class TapestryUserProgress implements ITapestryUserProgress
     }
 
     /**
-     * Get all user's answers for a Tapestry
+     * Get all user's answers for a Tapestry.
      *
      * @return object $allAnswers all users' answers from a Tapestry
      */
