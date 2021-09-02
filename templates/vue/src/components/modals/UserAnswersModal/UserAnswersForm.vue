@@ -69,6 +69,7 @@
           <b-table responsive bordered :fields="fields" :items="questionAnswers">
             <template #cell(text)="text">
               <completed-activity-media
+                v-if="text.value"
                 :type="`text`"
                 :answerData="text.value"
                 :question="question"
@@ -76,6 +77,7 @@
             </template>
             <template #cell(audio)="audio">
               <completed-activity-media
+                v-if="audio.value"
                 :type="`audio`"
                 :answerData="audio.value"
                 :question="question"
@@ -83,6 +85,7 @@
             </template>
             <template #cell(dragDrop)="dragDrop">
               <completed-activity-media
+                v-if="dragDrop.value"
                 :type="`dragDrop`"
                 :answerData="dragDrop.value"
                 :question="question"
@@ -90,6 +93,7 @@
             </template>
             <template #cell(multipleChoice)="multipleChoice">
               <completed-activity-media
+                v-if="multipleChoice.value"
                 :type="`multipleChoice`"
                 :answerData="multipleChoice.value"
                 :question="question"

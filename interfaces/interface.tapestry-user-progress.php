@@ -42,7 +42,7 @@ interface ITapestryUserProgress
     /**
      * Get all user's answers for a Tapestry
      *
-     * @return object $allAnswers all users' answers from a Tapestry
+     * @return object $allUsersAnswers all users' answers from a Tapestry
      */
     public function getAllUsersAnswers();
 
