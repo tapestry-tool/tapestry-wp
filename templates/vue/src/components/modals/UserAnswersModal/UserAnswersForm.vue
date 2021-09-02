@@ -104,7 +104,6 @@ export default {
     Combobox,
     CompletedActivityMedia,
   },
-  props: {},
   data() {
     return {
       activityId: null,
@@ -136,6 +135,11 @@ export default {
     },
     questionAnswers() {
       return this.allAnswers[this.activityId][this.questionId]
+    },
+  },
+  watch: {
+    activityId() {
+      this.questionId = null
     },
   },
   mounted() {
