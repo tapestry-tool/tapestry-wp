@@ -117,7 +117,7 @@ describe("Node Authoring", () => {
 
         const modalTitle = "Are you sure you want to continue?"
 
-        // Expect cancel to not delete node
+        Expect cancel to not delete node
         cy.contains(/delete/i).click()
         cy.contains(modalTitle).should("be.visible")
         cy.contains(modalTitle)
@@ -125,10 +125,10 @@ describe("Node Authoring", () => {
           .within(() => {
             cy.contains(/cancel/i).click()
           })
-        cy.contains(modalTitle).should("not.be.visible")
+        cy.contains(modalTitle).should("not.exist")
         cy.contains(/delete node/i).should("be.visible")
 
-        // Expect delete to delete node
+        Expect delete to delete node
         cy.server()
         cy.route("DELETE", `**/nodes/**`).as("deleteNode")
 

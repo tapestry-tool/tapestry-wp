@@ -4,6 +4,7 @@
       ref="video"
       controls
       muted
+      autoplay="autoplay"
       :src="node.typeData.mediaURL"
       :style="videoStyles"
       @loadeddata="handleLoad"
@@ -138,14 +139,6 @@ export default {
           this.$emit("timeupdate", { amountViewed, currentTime })
         }
         this.lastTime = currentTime
-      }
-    },
-    mounted() {
-      const video = this.$refs.video
-      if (this.autoplay) {
-        video.play()
-      } else {
-        video.pause()
       }
     },
   },
