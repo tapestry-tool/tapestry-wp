@@ -46,7 +46,7 @@
       :node="node"
       :rowRefs="rowRefs"
       :dimensions="pageMenuDimensions"
-      @menu-clicked="handlePageMenuClick"
+      @menu-click="handlePageMenuClick"
     />
     <tapestry-modal
       v-if="showCompletion"

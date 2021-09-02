@@ -39,12 +39,12 @@
           v-for="(menu, menuIndex) in filteredMenuGroups"
           :key="menuIndex"
           class="my-2"
-          :node="node"
+          :node="menuIndex === 0 ? node : menuGroups[menuIndex][0].node"
+          :lock-rows="node.typeData.lockRows"
           :rows="rows"
           :menu="menu"
-          :menuTitleNode="menuIndex === 0 ? node : menuGroups[menuIndex][0].node"
-          :menuIndex="menuIndex"
-          @menu-click="menuClicked"
+          :index="menuIndex"
+          @title-click="handleMenuGroupTitleClick"
           @scroll-to="scrollToRef"
         ></menu-group>
       </div>
@@ -105,19 +105,21 @@ export default {
         .filter(row => !row.node.popup)
     },
     menuGroups() {
-      const menu = []
-      const mainMenu = []
+      const menuGroups = []
+      const firstMenuGroup = []
       this.rows.forEach(row => {
-        row.node.typeData.isSecondaryNode ? menu.push([row]) : mainMenu.push(row)
+        row.node.typeData.isSecondaryNode
+          ? menuGroups.push([row])
+          : firstMenuGroup.push(row)
       })
-      menu.unshift(mainMenu)
-      return menu
+      menuGroups.unshift(firstMenuGroup)
+      return menuGroups
     },
     filteredMenuGroups() {
-      const filteredMenu = []
-      this.menuGroups.forEach((menu, mIndex) => {
-        if (mIndex === 0) {
-          filteredMenu.push(menu)
+      const filteredMenuGroups = []
+      this.menuGroups.forEach((menu, index) => {
+        if (index === 0) {
+          filteredMenuGroups.push(menu)
         } else {
           let childrenNodes = menu[0].children
           const newMenu = []
@@ -128,10 +130,10 @@ export default {
             }
             newMenu.push(newRow)
           })
-          filteredMenu.push(newMenu)
+          filteredMenuGroups.push(newMenu)
         }
       })
-      return filteredMenu
+      return filteredMenuGroups
     },
     rowOrder() {
       return this.getRowOrder(this.node)
@@ -155,7 +157,7 @@ export default {
       nodeId: this.node.id,
       context: "",
     }
-    this.$emit("menu-clicked", pageMenuData)
+    this.$emit("menu-click", pageMenuData)
   },
   methods: {
     getRowOrder(node, nodes = [], visited = new Set()) {
@@ -186,8 +188,8 @@ export default {
         }
       })
     },
-    menuClicked(pageMenuData) {
-      this.$emit("menu-clicked", pageMenuData)
+    handleMenuGroupTitleClick(pageMenuData) {
+      this.$emit("menu-click", pageMenuData)
     },
   },
 }

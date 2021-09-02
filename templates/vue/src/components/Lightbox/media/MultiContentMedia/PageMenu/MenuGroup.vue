@@ -1,13 +1,9 @@
 <template>
   <b-card>
     <b-card-text v-b-toggle="canToggleMenu" @click="titleClicked">
-      {{ menuTitleNode.title }}
+      {{ node.title }}
     </b-card-text>
-    <b-collapse
-      :id="`collapse-${menuIndex}`"
-      :visible="menuIndex === 0"
-      class="mt-2"
-    >
+    <b-collapse :id="`collapse-${index}`" :visible="index === 0" class="mt-2">
       <ul v-for="row in menu" :key="row.node.id" class="page-menu-item fa-ul">
         <page-menu-item
           :node="row.node"
@@ -33,6 +29,10 @@ export default {
       type: Object,
       required: true,
     },
+    lockRows: {
+      type: Boolean,
+      required: true,
+    },
     rows: {
       type: Array,
       required: true,
@@ -41,51 +41,44 @@ export default {
       type: Array,
       required: true,
     },
-    menuTitleNode: {
-      type: Object,
-      required: true,
-    },
-    menuIndex: {
+    index: {
       type: Number,
       required: true,
     },
   },
   computed: {
-    lockRows() {
-      return this.node.typeData.lockRows
-    },
     disabledFrom() {
       return this.rows.findIndex(row => !row.node.completed)
     },
     canToggleMenu() {
-      return this.menuIndex === 0 || this.menu.length === 0
+      return this.index === 0 || this.menu.length === 0
         ? ``
-        : `collapse-${this.menuIndex}`
+        : `collapse-${this.index}`
     },
   },
   methods: {
     disabledRow(node) {
-      const index = this.rows.findIndex(row => row.node.id === node.id)
+      const rowIndex = this.rows.findIndex(row => row.node.id === node.id)
       return (
-        (this.lockRows && this.disabledFrom >= 0 && index > this.disabledFrom) ||
+        (this.lockRows && this.disabledFrom >= 0 && rowIndex > this.disabledFrom) ||
         !node.unlocked
       )
     },
     titleClicked() {
       const pageMenuData = {
-        menuIndex: this.menuIndex,
-        nodeId: this.menuTitleNode.id,
+        menuIndex: this.index,
+        nodeId: this.node.id,
         context: "",
       }
-      this.$emit("menu-click", pageMenuData)
+      this.$emit("title-click", pageMenuData)
     },
     itemClicked(nodeId) {
       const pageMenuData = {
-        menuIndex: this.menuIndex,
+        menuIndex: this.index,
         nodeId: nodeId,
         context: this.menuIndex === 0 ? "" : "multi-content",
       }
-      this.$emit("menu-click", pageMenuData)
+      this.$emit("title-click", pageMenuData)
       this.$emit("scroll-to", nodeId)
     },
   },
