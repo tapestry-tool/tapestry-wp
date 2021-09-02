@@ -26,6 +26,13 @@
         <i v-if="!opened" class="fas fa-bars fa-lg" style="color: black;"></i>
         <i v-else class="fas fa-times fa-lg"></i>
       </button>
+      <div v-if="unitsTitle.length > 0 && opened" class="m-2">
+        <b-form-select
+          v-model="selected"
+          :options="unitsTitle"
+          @change="$emit('unit-changed', $event)"
+        ></b-form-select>
+      </div>
       <div
         :class="[
           'page-nav-content',
@@ -79,12 +86,17 @@ export default {
     return {
       opened: false || this.browserWidth > 800,
       browserWidth: Helpers.getBrowserWidth(),
+      selected: this.node.id,
     }
   },
   computed: {
-    ...mapGetters(["getDirectChildren", "getNode", "isMultiContent"]),
+    ...mapGetters(["getDirectChildren", "getNode", "isMultiContent", "getParent"]),
     nodeId() {
       return parseInt(this.$route.params.nodeId, 10)
+    },
+    parentNode() {
+      const parentNodeId = this.getParent(this.node.id)
+      return this.getNode(parentNodeId)
     },
     rows() {
       return this.node.childOrdering
@@ -107,6 +119,15 @@ export default {
     rowOrder() {
       return this.getRowOrder(this.node)
     },
+    unitsTitle() {
+      if (this.parentNode?.presentationStyle === "units") {
+        return this.parentNode.childOrdering.map(id => {
+          const node = this.getNode(id)
+          return { value: node.id, text: node.title }
+        })
+      }
+      return []
+    },
   },
   mounted() {
     if (this.rowRefs) {
@@ -121,6 +142,7 @@ export default {
         },
       })
     }
+    console.log(this.unitsTitle)
   },
   methods: {
     disabledRow(node) {

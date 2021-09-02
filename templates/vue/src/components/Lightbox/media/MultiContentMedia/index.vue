@@ -7,7 +7,7 @@
   >
     <b-container class="title">
       <b-row>
-        <b-col cols="8">
+        <b-col>
           <h1
             v-if="showTitle"
             :class="{
@@ -16,13 +16,6 @@
           >
             {{ node.title }}
           </h1>
-        </b-col>
-        <b-col v-if="node.presentationStyle === 'units'">
-          <b-form-select
-            v-model="selectedPage"
-            :options="unitsTitle"
-            @change="$emit('unit-changed', $event)"
-          ></b-form-select>
         </b-col>
       </b-row>
 
@@ -39,11 +32,9 @@
         @updateProgress="updateProgress"
       ></accordion-rows>
       <page-rows
-        v-else-if="
-          node.presentationStyle === 'page' || node.presentationStyle === 'units'
-        "
+        v-else-if="node.presentationStyle === 'page'"
         :dimensions="dimensions"
-        :node="presentationNode"
+        :node="node"
         :rowId="rowId"
         :subRowId="subRowId"
         :context="context"
@@ -122,7 +113,6 @@ export default {
       showCompletion: false,
       isMounted: false,
       navBarStyle: {},
-      selectedPage: "",
     }
   },
   computed: {
@@ -134,16 +124,8 @@ export default {
       "isMultiContent",
     ]),
     ...mapState(["favourites", "rootId"]),
-    presentationNode() {
-      return this.node.presentationStyle === "units"
-        ? this.getNode(this.selectedPage)
-        : this.node
-    },
     rows() {
       let node = this.node
-      if (this.node.presentationStyle === "units") {
-        node = this.getNode(this.selectedPage)
-      }
 
       return node.childOrdering.map(id => {
         const node = this.getNode(id)
@@ -151,12 +133,6 @@ export default {
           ? node.childOrdering.map(this.getNode)
           : this.getDirectChildren(id).map(this.getNode)
         return { node, children }
-      })
-    },
-    unitsTitle() {
-      return this.node.childOrdering.map(id => {
-        const node = this.getNode(id)
-        return { value: node.id, text: node.title }
       })
     },
     dimensions() {
@@ -185,12 +161,6 @@ export default {
     isMultiContentContext() {
       return this.isNestedMultiContent(this.context)
     },
-  },
-  created() {
-    if (this.node.presentationStyle === "units") {
-      this.selectedPage = this.unitsTitle[0].value
-      this.$emit("unit-changed", this.selectedPage)
-    }
   },
   mounted() {
     this.isMounted = true

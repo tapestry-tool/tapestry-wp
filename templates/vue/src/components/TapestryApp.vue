@@ -15,7 +15,7 @@ import client from "../services/TapestryAPI"
 import { names } from "@/config/routes"
 import Toolbar from "./Toolbar"
 import TapestryMain from "./TapestryMain"
-import { mapMutations, mapState } from "vuex"
+import { mapMutations, mapState, mapGetters } from "vuex"
 import TapestryMap from "./TapestryMap"
 import Helpers from "@/utils/Helpers"
 
@@ -33,6 +33,7 @@ export default {
   },
   computed: {
     ...mapState(["nodes", "links", "selection", "settings", "rootId"]),
+    ...mapGetters(["getNode"]),
     isSidebarOpen() {
       return Boolean(this.$route.query.sidebar)
     },
@@ -50,7 +51,12 @@ export default {
   },
   mounted() {
     this.$root.$on("open-node", id => {
-      this.openNode(id)
+      let urlNodeId = id
+      const node = this.getNode(id)
+      if (node.presentationStyle === "units") {
+        urlNodeId = node.childOrdering[0]
+      }
+      this.openNode(urlNodeId)
     })
     this.$root.$on("edit-node", id => {
       this.editNode(id)
