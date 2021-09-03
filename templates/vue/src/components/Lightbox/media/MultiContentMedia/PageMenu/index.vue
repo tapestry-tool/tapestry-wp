@@ -92,6 +92,8 @@ export default {
     nodeId() {
       return parseInt(this.$route.params.nodeId, 10)
     },
+    // An array of objects, each one being { node , children } where node is
+    // one of this Page node's child, and the children of that child.
     rows() {
       return this.node.childOrdering
         .map(id => {
@@ -104,6 +106,7 @@ export default {
         })
         .filter(row => !row.node.popup)
     },
+    // 2D array of menus. Each sub-array is a rows() array.
     menuGroups() {
       const menuGroups = []
       const firstMenuGroup = []
@@ -115,6 +118,7 @@ export default {
       menuGroups.unshift(firstMenuGroup)
       return menuGroups
     },
+    // same as menuGroups(), but filtering out the first menu item of each menu.
     filteredMenuGroups() {
       const filteredMenuGroups = []
       this.menuGroups.forEach((menu, index) => {
