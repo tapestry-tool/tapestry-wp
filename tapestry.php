@@ -323,7 +323,7 @@ add_action('upload_videos_to_kalture', 'upload_videos_to_kalture');
 function upload_videos_to_kaltura()
 {
     if (LOAD_KALTURA) {
-        $upload_folder = getcwd()."/wp-content/uploads";
+        $upload_folder = wp_upload_dir();
     
         $files_in_upload_folder = scandir($upload_folder);
         $current_date = date('Y/m/d');
