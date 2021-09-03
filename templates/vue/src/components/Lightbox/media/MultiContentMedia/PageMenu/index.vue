@@ -152,12 +152,14 @@ export default {
         },
       })
     }
-    const pageMenuData = {
-      menuIndex: 0,
-      nodeId: this.node.id,
-      context: "",
+    if (this.$route.params.nodeId === this.node.id) {
+      const pageMenuData = {
+        menuIndex: 0,
+        nodeId: this.node.id,
+        context: "",
+      }
+      this.$emit("menu-click", pageMenuData)
     }
-    this.$emit("menu-click", pageMenuData)
   },
   methods: {
     getRowOrder(node, nodes = [], visited = new Set()) {
@@ -209,6 +211,7 @@ export default {
     z-index: 0;
     overflow-y: auto;
     min-width: 200px;
+    overflow-x: hidden;
 
     &.lightbox {
       position: absolute;
