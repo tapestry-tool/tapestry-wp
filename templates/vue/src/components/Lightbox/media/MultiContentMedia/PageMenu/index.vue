@@ -140,18 +140,6 @@ export default {
     },
   },
   mounted() {
-    if (this.rowRefs) {
-      this.$router.push({
-        ...this.$route,
-        query: {
-          ...this.$route.query,
-          row:
-            this.node.childOrdering.length > 0
-              ? this.node.childOrdering[0]
-              : undefined,
-        },
-      })
-    }
     if (this.$route.params.nodeId === this.node.id) {
       const pageMenuData = {
         menuIndex: 0,
