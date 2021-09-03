@@ -13,11 +13,9 @@
     use Kaltura\Client\Type\UploadedFileTokenResource;
     use Kaltura\Client\Type\UploadToken;
 
-    use Spatie\Async\Pool;
 
     class KalturaApi
     {
-        private $thread_pool;
 
         /**
          * Creates Kaltura Client and starts Kaltura Session.
@@ -26,7 +24,6 @@
          */
         public function getKClient($type = SessionType::USER)
         {
-            $this->thread_pool = POOL::create();
 
             $user = wp_get_current_user()->ID;
             $kconf = new Configuration(KALTURA_PARTNER_ID);
@@ -92,12 +89,11 @@
             $uploadToken = new UploadToken();
             $token = $kclient->uploadToken->add($uploadToken);
 
-            $this->thread_pool[] = async(function () use ($kclient,$token,$filepath) {
-                $resume = false;
-                $finalChunk = true;
-                $resumeAt = -1;
-                $upload = $kclient->uploadToken->upload($token->id, $filepath, $resume, $finalChunk, $resumeAt);
-            })->then(function ($output) {});
+
+            $resume = false;
+            $finalChunk = true;
+            $resumeAt = -1;
+            $upload = $kclient->uploadToken->upload($token->id, $filepath, $resume, $finalChunk, $resumeAt);
             
             $mediaEntry = new MediaEntry();
             $mediaEntry->name = $filename;

@@ -349,10 +349,15 @@ function upload_videos_to_kaltura()
         
             $file_obj->file_path = $upload_folder."/".$value;
             $file_obj->name = $value;
+            try {
+                $result = $kalturaApi->uploadKalturaVideo($file_obj, $current_date);
 
-            $result = $kalturaApi->uploadKalturaVideo($file_obj, $current_date);
-
-            $video_links[$value] = $result;
+                $video_links[$value] = $result;
+            }
+            catch(Exception $e){
+                error_log("Unable to upload video - ".$file_obj->file_path." to kaltura, ".$e);
+            }
+            
         }
 
         // Replace all local server urls with kaltura urls
@@ -395,6 +400,5 @@ function upload_videos_to_kaltura()
             }
         }
 
-        error_log("Background Kaltura uplaod complete.");
     }
 }
