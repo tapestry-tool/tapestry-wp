@@ -12,7 +12,7 @@
           "
         />
       </span>
-      <span class="page-nav-title" @click="nestedItemClick">
+      <span class="page-nav-title" @click="handleItemClick(undefined)">
         {{ node.typeData.menuTitle ? node.typeData.menuTitle : node.title }}
       </span>
     </div>
@@ -25,7 +25,7 @@
         :depth="depth + 1"
         :lock-rows="lockRows"
         :disabled="disabled || disableRow(row.node)"
-        @item-click="itemClick"
+        @item-click="handleItemClick"
       />
     </ul>
   </li>
@@ -96,10 +96,7 @@ export default {
         !node.unlocked
       )
     },
-    nestedItemClick() {
-      this.itemClick()
-    },
-    itemClick(nodeId) {
+    handleItemClick(nodeId) {
       if (typeof nodeId === "undefined" || !nodeId) {
         nodeId = this.node.id
       }

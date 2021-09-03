@@ -1,6 +1,6 @@
 <template>
   <b-card>
-    <b-card-text v-b-toggle="canToggleMenu" @click="titleClicked">
+    <b-card-text v-b-toggle="canToggleMenu" @click="handleTitleClick">
       {{ node.title }}
     </b-card-text>
     <b-collapse :id="`collapse-${index}`" :visible="index === 0" class="mt-2">
@@ -64,7 +64,7 @@ export default {
         !node.unlocked
       )
     },
-    titleClicked() {
+    handleTitleClick() {
       const pageMenuData = {
         menuIndex: this.index,
         nodeId: this.node.id,
