@@ -44,7 +44,7 @@
           :rows="rows"
           :menu="menu"
           :index="menuIndex"
-          @title-click="handleMenuGroupTitleClick"
+          @menu-click="handleMenuGroupClick"
           @scroll-to="scrollToRef"
         ></menu-group>
       </div>
@@ -190,7 +190,7 @@ export default {
         }
       })
     },
-    handleMenuGroupTitleClick(pageMenuData) {
+    handleMenuGroupClick(pageMenuData) {
       this.$emit("menu-click", pageMenuData)
     },
   },

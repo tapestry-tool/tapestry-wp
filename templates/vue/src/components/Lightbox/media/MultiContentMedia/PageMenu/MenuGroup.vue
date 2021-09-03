@@ -70,7 +70,7 @@ export default {
         nodeId: this.node.id,
         context: "",
       }
-      this.$emit("title-click", pageMenuData)
+      this.$emit("menu-click", pageMenuData)
     },
     handleItemClick(nodeId) {
       const pageMenuData = {
@@ -78,7 +78,7 @@ export default {
         nodeId: nodeId,
         context: this.menuIndex === 0 ? "" : "multi-content",
       }
-      this.$emit("title-click", pageMenuData)
+      this.$emit("menu-click", pageMenuData)
       this.$emit("scroll-to", nodeId)
     },
   },

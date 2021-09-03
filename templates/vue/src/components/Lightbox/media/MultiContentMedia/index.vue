@@ -36,6 +36,7 @@
       :subRowId="subRowId"
       :context="context"
       :level="level"
+      :page-menu-data="pageMenuData"
       @load="handleLoad"
       @changeRow="changeRow"
       @updateProgress="updateProgress"

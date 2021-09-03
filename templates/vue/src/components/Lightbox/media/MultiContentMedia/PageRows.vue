@@ -152,11 +152,13 @@ export default {
     },
     menuGroups() {
       const menu = []
-      const mainMenu = []
+      const firstMenuGroup = []
       this.rows.forEach(row => {
-        row.node.typeData.isSecondaryNode ? menu.push([row]) : mainMenu.push(row)
+        row.node.typeData.isSecondaryNode
+          ? menu.push([row])
+          : firstMenuGroup.push(row)
       })
-      menu.unshift(mainMenu)
+      menu.unshift(firstMenuGroup)
       return menu
     },
     lockRows() {
