@@ -157,6 +157,7 @@ export default {
         { wch: 25 },
         { wch: 50 },
         { wch: 15 },
+        { wch: 50 },
       ]
       this.activityNodes.forEach(activity => {
         const formattedAnswers = this.formatAnswers(activity.id)
@@ -184,6 +185,7 @@ export default {
               userAnswer.multipleChoice,
               question
             ),
+            dragDrop: this.formatDragDropAnswers(userAnswer.dragDrop, question),
           }
           formattedAnswers.push(newAnswer)
         })
@@ -191,16 +193,45 @@ export default {
       })
       return formattedAnswers
     },
-    formatMultipleChoiceAnswers(mcAnswers, question) {
-      if (!mcAnswers) return ""
+    formatMultipleChoiceAnswers(answers, question) {
+      if (!answers) return ""
       let answerValues = []
-      mcAnswers.forEach(choice => {
+      answers.forEach(choice => {
         let answer = question.answerTypes.multipleChoice.choices.find(
           option => option.id === choice
         )
         answerValues.push(answer.value)
       })
       return answerValues.join()
+    },
+    formatDragDropAnswers(answers, question) {
+      if (!answers) return ""
+      let dragDropInfo = question.answerTypes.dragDrop
+      let answerValues = []
+      let bucketInfo = {}
+      let itemInfo = {}
+      dragDropInfo.buckets.forEach(bucket => {
+        bucketInfo[bucket.id] = bucket.text
+      })
+      dragDropInfo.items.forEach(item => {
+        itemInfo[item.id] = item.text
+      })
+      answers.forEach(answer => {
+        if (answer.items.length > 0) {
+          let bucketKey = Object.keys(bucketInfo).find(
+            bucketId => bucketId === answer.bucketId
+          )
+          let bucketName = bucketInfo[bucketKey]
+          let itemNames = []
+          answer.items.forEach(item => {
+            let itemKey = Object.keys(itemInfo).find(itemId => itemId === item)
+            itemNames.push(itemInfo[itemKey])
+          })
+          let answerValue = `${bucketName}: ` + itemNames.join(",")
+          answerValues.push(answerValue)
+        }
+      })
+      return answerValues.join("|")
     },
   },
 }
