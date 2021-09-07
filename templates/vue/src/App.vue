@@ -63,12 +63,6 @@ export default {
     },
   },
   mounted() {
-    client.getTheme().then(res => {
-      this.changeTheme(res.data)
-      const theme = this.getTheme
-      document.documentElement.setAttribute("data-theme", theme ? theme : "light")
-    })
-
     if (isLoggedIn()) {
       var that = this
       jQuery(function($) {
@@ -81,8 +75,15 @@ export default {
     }
 
     window.addEventListener("click", this.recordAnalytics)
-    const data = [client.getTapestry(), client.getUserProgress()]
-    Promise.all(data).then(([dataset, progress]) => {
+    const data = [client.getTapestry(), client.getUserProgress(), client.getTheme()]
+    Promise.all(data).then(([dataset, progress, theme]) => {
+      this.changeTheme(theme.data)
+      const currentTheme = this.getTheme
+      document.documentElement.setAttribute(
+        "data-theme",
+        currentTheme ? currentTheme : "light"
+      )
+
       this.init({ dataset, progress })
       this.loading = false
       if (!this.$route.params.nodeId && dataset.nodes.length > 0) {

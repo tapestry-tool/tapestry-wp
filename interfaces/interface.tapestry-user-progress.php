@@ -56,7 +56,7 @@ interface ITapestryUserProgress
      */
     public function getH5PSettings();
 
-        /**
+    /**
      * Update the user's user settings.
      *
      * @param string $userSettings stores user settings

@@ -120,7 +120,7 @@ class TapestryUserProgress implements ITapestryUserProgress
         return $this->_getUserH5PSettings();
     }
 
-        /**
+    /**
      * Update the user's theme.
      *
      * @param string $userSettings stores theme
