@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="h-100">
     <h1 v-if="showTitle" class="external-media-title external-page-style">
       {{ node.title }}
     </h1>
@@ -88,10 +88,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.external-media-container {
-  height: 100%;
-}
-
 .preview {
   .preview-image {
     width: 100%;
@@ -146,7 +142,7 @@ export default {
 
 .external-page-style {
   text-align: left;
-  margin-bottom: 0.9em;
+  margin: 0.9em 0 0.5em 25px;
 }
 
 .external-media-title {

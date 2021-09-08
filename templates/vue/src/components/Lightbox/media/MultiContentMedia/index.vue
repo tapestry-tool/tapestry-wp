@@ -331,7 +331,7 @@ button[disabled] {
   text-align: left;
   font-size: 1.75rem;
   font-weight: 500;
-  margin-bottom: 0.9em;
+  margin-bottom: 0.9em 0 0.5em 25px;
 
   :before {
     display: none;
