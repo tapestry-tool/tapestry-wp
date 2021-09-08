@@ -57,12 +57,10 @@ export default {
 
 <style lang="scss" scoped>
 .article {
-  color: #111;
   padding: 25px;
   text-align: left;
 
   &-title {
-    color: #111;
     font-size: 1.75rem;
     font-weight: bold;
     margin: 1em 0;
@@ -73,14 +71,12 @@ export default {
   }
 
   article {
-    color: #111;
     font-family: "Source Sans Pro", sans-serif;
     font-size: 16px;
   }
 }
 
 .wp-media-title {
-  color: #111;
   text-align: left;
   margin: 0.9em 0 0.5em 25px;
   font-weight: 500;
