@@ -19,6 +19,7 @@
 <script>
 import client from "@/services/TapestryAPI"
 import { SEEK_THRESHOLD } from "./video.config"
+import { mapMutations } from "vuex"
 
 export default {
   name: "url-video-media",
@@ -89,6 +90,7 @@ export default {
     this.updateVideoProgress()
   },
   methods: {
+    ...mapMutations(["updateNode"]),
     handleSeek() {
       this.$emit("seeked", { currentTime: this.$refs.video.currentTime })
     },
@@ -127,10 +129,16 @@ export default {
         currentTime,
       })
     },
-    handleError() {
+    async handleError() {
       // Error code 4 - The associated resource or media provider object has been found to be unsuitable.
       if (this.$refs.video.error.code === 4) {
-        if (
+        const fetchedNode = await client.getNode(this.node.id)
+        if (fetchedNode.typeData.mediaURL !== this.node.typeData.mediaURL) {
+          this.this.updateNode({
+            id: this.node.id,
+            newNode: fetchedNode,
+          })
+        } else if (
           confirm(
             "It seems this video cannot be loaded, would you like to refresh the page?"
           )
