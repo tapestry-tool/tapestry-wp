@@ -213,7 +213,7 @@ export default {
     },
     updateActivityProgress() {
       const numberCompleted = this.questionNode.typeData.activity.questions.filter(
-        question => question.completed
+        question => question.completed || question.optional
       ).length
       const progress =
         numberCompleted / this.questionNode.typeData.activity.questions.length
