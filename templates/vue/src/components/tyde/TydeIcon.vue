@@ -5,8 +5,10 @@
       v-if="windowWidth > 700"
       :target="icon"
       triggers="hover"
-      :placement="placement"
+      :placement="isLast && windowWidth < 1100 ? 'left' : 'right'"
       custom-class="nav-item-tooltip text-capitalize"
+      no-fade
+      :delay="0"
     >
       {{ title }}
     </b-tooltip>
@@ -40,9 +42,10 @@ export default {
       type: Boolean,
       required: true,
     },
-    placement: {
-      type: String,
-      required: true,
+    isLast: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   data() {
@@ -120,8 +123,9 @@ export default {
   font-size: 1rem;
   font-weight: 500;
   max-width: 100px;
-  padding: 0.25rem 0 !important;
+  padding: 0.25rem 0 0.25rem 0.5rem !important;
   line-height: 100% !important;
+  text-align: left;
 }
 .nav-item-tooltip > .arrow {
   display: none !important;

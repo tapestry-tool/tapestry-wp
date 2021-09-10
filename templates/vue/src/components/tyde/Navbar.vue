@@ -14,7 +14,7 @@
           <tyde-icon
             :selected="isSelectedTab(tab)"
             :icon="tab"
-            :placement="index === tabs.length - 1 ? 'left' : 'right'"
+            :is-last="index === tabs.length - 1"
           />
         </b-nav-item>
       </b-navbar-nav>
