@@ -279,9 +279,11 @@ export default {
       }
     },
     updateDimensions(dimensions) {
-      this.dimensions = {
-        ...this.dimensions,
-        ...dimensions,
+      if (dimensions.height <= this.lightboxDimensions.height) {
+        this.dimensions = {
+          ...this.dimensions,
+          ...dimensions,
+        }
       }
     },
     applyDimensions() {
