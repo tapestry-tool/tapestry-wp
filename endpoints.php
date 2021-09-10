@@ -295,7 +295,6 @@ $REST_API_ENDPOINTS = [
             'permission_callback' => 'TapestryPermissions::putTapestrySettings',
         ],
     ],
-    
 ];
 
 $REST_API_ENDPOINTS = array_merge($REST_API_ENDPOINTS, CircleOfSupportEndpoints::getRoutes());
