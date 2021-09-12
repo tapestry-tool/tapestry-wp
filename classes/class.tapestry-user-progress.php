@@ -183,11 +183,10 @@ class TapestryUserProgress implements ITapestryUserProgress
 
         $nodes = $tapestry->setUnlocked($nodeIdArr, $userId);
 
-        $thisUserId = $userId;
-        $otherUserId = get_user_meta($userId, 'linked_dyad_user_id', true);
+        $linked_user_id = get_user_meta($userId, 'linked_dyad_user_id', true);
 
         $user_roles = get_userdata($userId)->roles;
-        $isDyadUser = in_array('dyad', $user_roles, true) && $otherUserId;
+        $isDyadUser = in_array('dyad', $user_roles, true) && $linked_user_id;
 
         // Build json object for frontend e.g. {0: 0.1, 1: 0.2} where 0 and 1 are the node IDs
         foreach ($nodes as $node) {
@@ -196,9 +195,7 @@ class TapestryUserProgress implements ITapestryUserProgress
             // overwrite $progress_value to that of $otherUserId if the user is a dyad and 
             // this node is a dyad node
             if ($node->isDyad && $isDyadUser) {
-                $userId = $otherUserId;
-            } else {
-                $userId = $thisUserId;
+                $userId = $linked_user_id;
             }
 
             $progress_value = get_user_meta($userId, 'tapestry_'.$this->postId.'_progress_node_'.$nodeId, true);

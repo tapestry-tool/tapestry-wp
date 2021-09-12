@@ -369,7 +369,7 @@ function save_dyad_youth_user_field($user_id)
         return false;
     }
     $user = get_user_by('id', $user_id);
-    $youth_user_id = $_POST['youth_user_id'] + 0;
+    $youth_user_id = intval($_POST['youth_user_id']);
     if (!in_array('dyad', $user->roles)) {
         return false;
     }
