@@ -110,19 +110,18 @@ export async function updateNodeProgress({ commit, getters, dispatch }, payload)
     const { id, progress } = payload
 
     const node = getters.getNode(id)
-    if (Helpers.nodeAndUserAreDyad(node)) {
-      return
-    }
 
-    if (!wp.isLoggedIn()) {
-      const progressObj = JSON.parse(localStorage.getItem(LOCAL_PROGRESS_ID))
-      const nodeProgress = progressObj[id] || {}
-      nodeProgress.progress = progress
-      localStorage.setItem(LOCAL_PROGRESS_ID, JSON.stringify(progressObj))
-    } else {
-      await client.updateUserProgress(id, progress)
+    if (!Helpers.nodeAndUserAreDyad(node)) {
+      if (!wp.isLoggedIn()) {
+        const progressObj = JSON.parse(localStorage.getItem(LOCAL_PROGRESS_ID))
+        const nodeProgress = progressObj[id] || {}
+        nodeProgress.progress = progress
+        localStorage.setItem(LOCAL_PROGRESS_ID, JSON.stringify(progressObj))
+      } else {
+        await client.updateUserProgress(id, progress)
+      }
+      commit("updateNodeProgress", { id, progress })
     }
-    commit("updateNodeProgress", { id, progress })
   } catch (error) {
     dispatch("addApiError", error)
   }
@@ -147,32 +146,31 @@ export async function updateNodeCoordinates(
 export async function completeNode(context, nodeId) {
   const { commit, dispatch, getters } = context
   const node = getters.getNode(nodeId)
-  if (Helpers.nodeAndUserAreDyad(node)) {
-    return
-  }
-  try {
-    if (!wp.isLoggedIn()) {
-      const progressObj = JSON.parse(localStorage.getItem(LOCAL_PROGRESS_ID))
-      const nodeProgress = progressObj[nodeId] || {}
-      nodeProgress.completed = true
-      localStorage.setItem(LOCAL_PROGRESS_ID, JSON.stringify(progressObj))
-    } else {
-      await client.completeNode(nodeId)
-    }
-    commit("updateNode", {
-      id: nodeId,
-      newNode: { completed: true },
-    })
-
-    if (node.mediaType !== "video") {
-      await dispatch("updateNodeProgress", {
+  if (!Helpers.nodeAndUserAreDyad(node)) {
+    try {
+      if (!wp.isLoggedIn()) {
+        const progressObj = JSON.parse(localStorage.getItem(LOCAL_PROGRESS_ID))
+        const nodeProgress = progressObj[nodeId] || {}
+        nodeProgress.completed = true
+        localStorage.setItem(LOCAL_PROGRESS_ID, JSON.stringify(progressObj))
+      } else {
+        await client.completeNode(nodeId)
+      }
+      commit("updateNode", {
         id: nodeId,
-        progress: 1,
+        newNode: { completed: true },
       })
+
+      if (node.mediaType !== "video") {
+        await dispatch("updateNodeProgress", {
+          id: nodeId,
+          progress: 1,
+        })
+      }
+      return unlockNodes(context)
+    } catch (error) {
+      dispatch("addApiError", error)
     }
-    return unlockNodes(context)
-  } catch (error) {
-    dispatch("addApiError", error)
   }
 }
 
@@ -234,15 +232,14 @@ export async function completeQuestion(
   { commit, getters, dispatch },
   { nodeId, questionId, answerType, answer }
 ) {
-  try {
-    const node = getters.getNode(nodeId)
-    if (Helpers.nodeAndUserAreDyad(node)) {
-      return
+  const node = getters.getNode(nodeId)
+  if (!Helpers.nodeAndUserAreDyad(node)) {
+    try {
+      await client.completeQuestion(nodeId, questionId, answerType, answer)
+      commit("completeQuestion", { nodeId, questionId, answerType, answer })
+    } catch (error) {
+      dispatch("addApiError", error)
     }
-    await client.completeQuestion(nodeId, questionId, answerType, answer)
-    commit("completeQuestion", { nodeId, questionId, answerType, answer })
-  } catch (error) {
-    dispatch("addApiError", error)
   }
 }
 

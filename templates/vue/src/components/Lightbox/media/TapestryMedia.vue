@@ -77,6 +77,7 @@ import H5PMedia from "./H5PMedia"
 import ExternalMedia from "./ExternalMedia"
 import ActivityMedia from "./ActivityMedia"
 import WpPostMedia from "./WpPostMedia"
+import { data as wpData } from "@/services/wp"
 
 export default {
   name: "tapestry-media",
