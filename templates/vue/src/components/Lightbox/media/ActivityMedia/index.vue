@@ -205,14 +205,19 @@ export default {
   methods: {
     ...mapActions(["updateNodeProgress"]),
     markQuestionsComplete() {
+      let numCompleted = 0
       this.questions.forEach(question => {
         const answer = this.getAnswers(this.questionNode.id, question.id)
         if (Object.entries(answer).length === 0 && !question.optional) {
           question.completed = false
         } else {
           question.completed = true
+          numCompleted++
         }
       })
+      if (numCompleted === this.questions.length && !this.node.completed) {
+        this.$emit("complete")
+      }
     },
     handleComplete(initiatingComponent) {
       if (initiatingComponent === "activity") {
