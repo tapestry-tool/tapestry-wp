@@ -90,15 +90,15 @@ export default {
   font-size: 1.2em;
   transition: all 0.2s ease;
   outline: none;
-}
 
-.user-settings-button:hover {
-  background: none;
-  color: #11a6d8;
-  transform: scale(1.1);
-}
+  &:hover {
+    background: none;
+    color: #11a6d8;
+    transform: scale(1.1);
+  }
 
-.user-settings-button:only-child {
-  margin-right: 12px;
+  &:only-child {
+    margin-right: 12px;
+  }
 }
 </style>

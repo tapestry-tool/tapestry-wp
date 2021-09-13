@@ -30,7 +30,6 @@
 import { mapState } from "vuex"
 import TydeIcon from "./TydeIcon.vue"
 import UserSettingsButton from "../Toolbar/UserSettingsButton"
-import * as wp from "@/services/wp"
 
 export default {
   name: "navbar",
