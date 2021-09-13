@@ -48,9 +48,6 @@ export default {
     tabs() {
       return ["default", "profile", "goals", "cos"]
     },
-    avatarsEnabled() {
-      return wp.isLoggedIn() && process.env.VUE_APP_AVATARS === "TRUE"
-    },
   },
   methods: {
     handleTabChange(tab) {

@@ -1,12 +1,9 @@
 <template>
   <div class="toolbar">
     <tapestry-filter v-if="!showMap" style="z-index: 10;" />
-    <div
-      v-show="avatarsEnabled || canEdit || (!showMap && hasDepth)"
-      class="slider-wrapper"
-    >
+    <div v-show="isLoggedIn || (!showMap && hasDepth)" class="slider-wrapper">
       <user-settings-button
-        v-if="avatarsEnabled"
+        v-if="isLoggedIn"
         data-qa="user-settings-button"
       ></user-settings-button>
       <help-button v-if="canEdit" />
@@ -61,9 +58,6 @@ export default {
     },
     showMap() {
       return this.settings.renderMap
-    },
-    avatarsEnabled() {
-      return this.isLoggedIn && process.env.VUE_APP_AVATARS === "TRUE"
     },
   },
   methods: {

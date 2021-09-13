@@ -41,10 +41,7 @@ export default {
       return this.settings.analyticsEnabled
     },
     hasAvatar() {
-      return !(!this.avatar || Object.keys(this.avatar).length === 0)
-    },
-    avatarsEnabled() {
-      return isLoggedIn() && process.env.VUE_APP_AVATARS === "TRUE"
+      return this.avatar && Object.keys(this.avatar).length
     },
     tydeModeEnabled() {
       return !canEditTapestry() && this.settings.tydeModeEnabled
@@ -66,7 +63,7 @@ export default {
       this.editNode(id)
     })
     client.recordAnalyticsEvent("app", "load", "tapestry")
-    if (this.avatarsEnabled) {
+    if (this.isLoggedIn) {
       this.$root.$on("avatar-form-closed", () => {
         this.setupTydeView()
       })
