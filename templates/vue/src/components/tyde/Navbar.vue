@@ -3,7 +3,7 @@
     <b-navbar tyde="light" class="navbar">
       <b-navbar-nav class="mx-auto" fill style="width:100%;">
         <b-nav-item
-          v-for="tab in tabs"
+          v-for="(tab, index) in tabs"
           :key="tab"
           :ref="tab + '-tab'"
           active-class="active"
@@ -11,7 +11,11 @@
           :active="selectedTab === tab"
           @click="handleTabChange(tab)"
         >
-          <tyde-icon :selected="isSelectedTap(tab)" :icon="tab" />
+          <tyde-icon
+            :selected="isSelectedTab(tab)"
+            :icon="tab"
+            :is-last="index === tabs.length - 1"
+          />
         </b-nav-item>
       </b-navbar-nav>
     </b-navbar>
@@ -53,7 +57,7 @@ export default {
       this.$emit("change-tab", tab)
       this.selectedTab = tab
     },
-    isSelectedTap(tab) {
+    isSelectedTab(tab) {
       return this.selectedTab === tab
     },
   },
@@ -61,47 +65,48 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.user-settings-button {
-  position: absolute;
-  top: 7px;
-  right: 2em;
-  background: #fff !important;
-  padding: 0.5em 0.75em !important;
-  border-radius: 100%;
-  border: solid 2px #c4e4ea;
-
-  @media screen and (max-width: 670px) {
-    right: 1em;
-  }
-}
 .nav-container {
   width: 100vw;
   z-index: 9999;
   position: fixed !important;
   top: 40px;
   left: 0;
-}
-.navbar {
-  min-width: 250px;
-  max-width: 900px;
-  margin: 0 auto;
-  width: 75vw;
 
-  border-radius: 30px;
-  border: solid 2px #c4e4ea;
+  .navbar {
+    min-width: 250px;
+    max-width: 900px;
+    margin: 0 auto;
+    width: 75vw;
+    border-radius: 30px;
+    border: solid 2px #c4e4ea;
+    background-color: whitesmoke;
 
-  background-color: whitesmoke;
-}
-.link {
-  padding: 0 !important;
-}
-.nav-container .active::after {
-  content: "";
-  display: block;
-  position: relative;
-  top: 10px;
-  border: 2px solid #4197ac;
-  margin: 0 auto;
-  max-width: 55px;
+    .active::after {
+      content: "";
+      display: block;
+      position: relative;
+      top: 10px;
+      border: 2px solid #4197ac;
+      margin: 0 auto;
+      max-width: 55px;
+    }
+
+    .link {
+      padding: 0 !important;
+    }
+  }
+  .user-settings-button {
+    position: absolute;
+    top: 3px;
+    right: 2em;
+    background: #fff !important;
+    padding: 0.5em 0.75em !important;
+    border-radius: 100%;
+    border: solid 2px #c4e4ea;
+
+    @media screen and (max-width: 670px) {
+      right: 1em;
+    }
+  }
 }
 </style>
