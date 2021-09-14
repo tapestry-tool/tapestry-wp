@@ -9,6 +9,7 @@
     <path
       v-show="!locked && progress > 0"
       ref="path"
+      data-qa="progress-bar"
       class="bar"
       :style="pathStyle"
     ></path>
