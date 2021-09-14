@@ -249,10 +249,10 @@ $REST_API_ENDPOINTS = [
         ],
     ],
     'GET_TAPESTRY_USER_LAST_SELECTED_NODE' => (object) [
-            'ROUTE' => 'users/lastSelectedNode',
-            'ARGUMENTS' => [
-                'methods' => $REST_API_GET_METHOD,
-                'callback' => 'getLastSelectedNode',
+        'ROUTE' => 'users/lastSelectedNode',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => 'getLastSelectedNode',
         ],
     ],
     'UPDATE_TAPESTRY_USER_LAST_SELECTED_NODE' => (object) [
