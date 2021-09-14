@@ -247,6 +247,7 @@ class Tapestry implements ITapestry
 
         return $link;
     }
+
     /**
      * Reverse a link from links array.
      *
@@ -255,10 +256,9 @@ class Tapestry implements ITapestry
      * @return array $links     Tapestry links
      */
     public function reverseLink($newLink)
-    {        
+    {
         foreach ($this->links as $linkIndex => $link) {
             if ($link->target == $newLink->target && $link->source == $newLink->source) {
-                
                 $this->links[$linkIndex]->source = $newLink->target;
                 $this->links[$linkIndex]->target = $newLink->source;
                 break;
