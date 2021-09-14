@@ -71,7 +71,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 iframe {
   border: none;
   min-height: 70vh;
