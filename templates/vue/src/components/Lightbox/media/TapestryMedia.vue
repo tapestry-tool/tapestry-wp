@@ -45,6 +45,7 @@
       :dimensions="dimensions"
       :node="node"
       :context="context"
+      @change:dimensions="$emit('change:dimensions', $event)"
       @load="handleLoad"
       @complete="complete"
     />

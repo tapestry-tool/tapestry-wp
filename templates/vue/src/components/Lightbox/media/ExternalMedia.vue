@@ -11,27 +11,36 @@
         allowfullscreen="allowfullscreen"
         :src="normalizedUrl"
         :style="'min-height:' + dimensions.height + 'px'"
-        @load="$emit('load')"
+        @load="loaded(true)"
       ></iframe>
-      <b-container v-else class="preview w-100 h-100" :style="previewStyles">
+      <b-container
+        v-else
+        ref="preview"
+        class="preview w-100 h-100"
+        :style="previewStyles"
+      >
         <b-row align-v="center" class="w-100 h-100">
-          <b-col class="w-50">
-            <a :href="node.typeData.mediaURL" target="blank">
+          <b-col class="w-50 pl-0">
+            <a href="#" @click.prevent="openLink()">
               <img
                 class="preview-image"
                 :src="`${node.typeData.linkMetadata.image}`"
               />
             </a>
           </b-col>
-          <b-col class="preview-content w-50">
-            <h1>
-              <a :href="node.typeData.mediaURL" target="blank">
+          <b-col class="preview-content w-50 py-4 pl-4">
+            <component
+              :is="node.typeData.linkMetadata.title.length < 20 ? 'h1' : 'h2'"
+            >
+              <a href="#" @click.prevent="openLink()">
                 {{ node.typeData.linkMetadata.title }}
               </a>
-            </h1>
+            </component>
             <p>{{ node.typeData.linkMetadata.description }}</p>
             <p>
-              <a :href="node.typeData.mediaURL" target="blank">Open link</a>
+              <a href="#" @click.prevent="openLink()">
+                Open link
+              </a>
             </p>
           </b-col>
         </b-row>
@@ -79,10 +88,25 @@ export default {
     },
   },
   mounted() {
-    this.$emit("complete")
     if (this.node.behaviour !== "embed") {
-      this.$emit("load")
+      this.loaded()
     }
+  },
+  methods: {
+    loaded() {
+      this.$emit("load")
+      if (this.node.behaviour === "embed") {
+        this.$emit("complete")
+      } else {
+        this.$emit("change:dimensions", {
+          height: this.$refs.preview.clientHeight,
+        })
+      }
+    },
+    openLink() {
+      this.$emit("complete")
+      window.open(this.node.typeData.mediaURL, "_blank")
+    },
   },
 }
 </script>
