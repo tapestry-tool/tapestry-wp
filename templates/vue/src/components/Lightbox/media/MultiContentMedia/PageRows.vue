@@ -14,7 +14,7 @@
               ref="rowRefs"
               class="page-row m-1"
               :class="{
-                'w-50': row.node.halfWidth,
+                'w-50': row.node.typeData.halfWidth,
               }"
               :style="rowBackground"
             >
@@ -204,15 +204,15 @@ export default {
 
       this.insertInstructions[index] = ""
 
-      if (row.node.halfWidth) {
+      if (row.node.typeData.halfWidth) {
         if (previousHadTwoHalfs) {
           previousHadTwoHalfs = false
 
-          if (!next?.node.halfWidth) {
+          if (!next?.node.typeData.halfWidth) {
             this.insertInstructions[index] += "spacer col"
           }
-        } else if (!previous?.node.halfWidth) {
-          if (!next?.node.halfWidth) {
+        } else if (!previous?.node.typeData.halfWidth) {
+          if (!next?.node.typeData.halfWidth) {
             this.insertInstructions[index] += "spacer col"
           }
         } else if (!previousHadTwoHalfs) {

@@ -74,7 +74,6 @@ class TapestryNode implements ITapestryNode
         $this->lockedImageURL = '';
         $this->mediaType = '';
         $this->presentationStyle = '';
-        $this->halfWidth = false;
         $this->mediaFormat = '';
         $this->mediaDuration = 0;
         $this->description = '';
@@ -188,9 +187,6 @@ class TapestryNode implements ITapestryNode
         }
         if (isset($node->presentationStyle) && is_string($node->presentationStyle)) {
             $this->presentationStyle = $node->presentationStyle;
-        }
-        if (isset($node->halfWidth) && is_bool($node->halfWidth)) {
-            $this->halfWidth = $node->halfWidth;
         }
         if (isset($node->mediaFormat) && is_string($node->mediaFormat)) {
             $this->mediaFormat = $node->mediaFormat;
@@ -560,7 +556,6 @@ class TapestryNode implements ITapestryNode
             'lockedImageURL' => $this->lockedImageURL,
             'mediaType' => $this->mediaType,
             'presentationStyle' => $this->presentationStyle,
-            'halfWidth' => $this->halfWidth,
             'mediaFormat' => $this->mediaFormat,
             'mediaDuration' => $this->mediaDuration,
             'description' => $this->description,
