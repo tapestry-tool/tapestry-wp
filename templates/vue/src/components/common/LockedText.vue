@@ -4,7 +4,10 @@
       This content will be unlocked:
       <br />
       <ul class="locked-content-list">
-        <li v-if="isParentLocked">When {{ parent.title }} is unlocked.</li>
+        <li v-if="Object.keys(conditionNode).length">
+          When {{ conditionNode.title }} is completed.
+        </li>
+        <li v-else-if="isParentLocked">When {{ parent.title }} is unlocked.</li>
         <li v-for="(cond, index) in conditions" :key="index">
           <span v-if="cond.type === conditionTypes.NODE_COMPLETED">
             When {{ cond.node.title }} is completed.
@@ -35,6 +38,11 @@ export default {
     node: {
       type: Object,
       required: true,
+    },
+    conditionNode: {
+      type: Object,
+      required: false,
+      default: () => ({}),
     },
   },
   computed: {

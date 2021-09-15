@@ -19,16 +19,13 @@
               :style="rowBackground"
             >
               <div class="title-row-icon">
-                <i
-                  v-if="disableRow(index, row.node)"
-                  class="fas fa-lock fa-sm"
-                  style="color:white;"
-                ></i>
+                <i v-if="disableRow(index, row.node)" class="fas fa-lock fa-sm"></i>
                 <a v-else>
                   <i
                     class="fas fa-heart fa-sm"
                     :style="{
-                      color: isFavourite(row.node.id) ? 'red' : 'white',
+                      color: isFavourite(row.node.id) ? 'red' : 'black',
+                      opacity: isFavourite(row.node.id) ? '1' : '0.25',
                       cursor: 'pointer',
                     }"
                     @click="toggleFavourite(row.node.id)"
@@ -39,7 +36,10 @@
                 <h1 class="title">
                   {{ row.node.title }}
                 </h1>
-                <locked-content :node="row.node"></locked-content>
+                <locked-content
+                  :node="row.node"
+                  :condition-node="index > 0 ? rows[index - 1].node : {}"
+                ></locked-content>
               </div>
               <div v-else :data-qa="`row-content-${row.node.id}`">
                 <div v-if="row.node.mediaType !== 'multi-content'">
@@ -47,14 +47,11 @@
                     :node-id="row.node.id"
                     :dimensions="dimensions"
                     context="page"
-                    style="color: white; margin-bottom: 24px;"
+                    style="margin-bottom: 24px;"
                     @complete="updateProgress(row.node.id)"
                     @load="handleLoad($refs.rowRefs[index])"
                   />
-                  <p
-                    v-if="row.children.length > 0 && !areAllPopup(row.children)"
-                    style="color: white;"
-                  >
+                  <p v-if="row.children.length > 0 && !areAllPopup(row.children)">
                     {{ row.node.typeData.subAccordionText }}
                   </p>
                   <accordion-rows
@@ -229,7 +226,7 @@ export default {
   },
   methods: {
     ...mapMutations(["updateNode"]),
-    ...mapActions(["completeNode", "toggleFavourite"]),
+    ...mapActions(["toggleFavourite"]),
     handleLoad(el) {
       this.$emit("load", el)
     },

@@ -38,7 +38,7 @@ export default {
 .bucket-container {
   background-color: #eee;
   color: #555;
-  display: flex;
+  display: inline-flex;
   flex-direction: column;
   min-height: 250px;
   border-radius: 15px;
