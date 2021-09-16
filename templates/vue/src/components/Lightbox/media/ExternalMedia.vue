@@ -11,40 +11,49 @@
         allowfullscreen="allowfullscreen"
         :src="normalizedUrl"
         :style="'min-height:' + dimensions.height + 'px'"
-        @load="loaded(true)"
+        @load="handleLoad"
       ></iframe>
-      <b-container
+      <b-card
         v-else
         ref="preview"
-        class="preview w-100 h-100"
-        :style="previewStyles"
+        no-body
+        :img-src="showVertically ? node.typeData.linkMetadata.image : ''"
+        class="preview overflow-hidden w-100"
       >
-        <b-row align-v="center" class="w-100 h-100">
-          <b-col class="w-50 pl-0">
-            <a href="#" @click.prevent="openLink()">
-              <img
-                class="preview-image"
-                :src="`${node.typeData.linkMetadata.image}`"
-              />
-            </a>
+        <b-row :no-gutters="showVertically">
+          <b-col
+            v-if="!showVertically"
+            md="6"
+            class="preview-image"
+            :style="{
+              'background-image': `url(${node.typeData.linkMetadata.image})`,
+            }"
+          >
+            <a href="#" @click.prevent="openLink"></a>
           </b-col>
-          <b-col class="preview-content w-50 py-4 pl-4">
-            <component
-              :is="node.typeData.linkMetadata.title.length < 20 ? 'h1' : 'h2'"
-            >
-              <a href="#" @click.prevent="openLink()">
-                {{ node.typeData.linkMetadata.title }}
-              </a>
-            </component>
-            <p>{{ node.typeData.linkMetadata.description }}</p>
-            <p>
-              <a href="#" @click.prevent="openLink()">
-                Open link
-              </a>
-            </p>
+          <b-col :md="showVertically ? 12 : 6" class="preview-content">
+            <b-card-body>
+              <b-card-text>
+                <component
+                  :is="node.typeData.linkMetadata.title.length < 20 ? 'h2' : 'h3'"
+                  class="mb-3"
+                >
+                  <a href="#" @click.prevent="openLink">
+                    {{ node.typeData.linkMetadata.title }}
+                  </a>
+                </component>
+                <p>{{ node.typeData.linkMetadata.description }}</p>
+                <p>
+                  <b-button variant="primary" @click.prevent="openLink">
+                    Open link
+                    <i class="fas fa-external-link-alt ml-1"></i>
+                  </b-button>
+                </p>
+              </b-card-text>
+            </b-card-body>
           </b-col>
         </b-row>
-      </b-container>
+      </b-card>
     </div>
   </div>
 </template>
@@ -86,14 +95,17 @@ export default {
     showTitle() {
       return this.context === "page" && this.node.typeData.showTitle !== false
     },
+    showVertically() {
+      return this.node.typeData.halfWidth && this.context !== "lightbox"
+    },
   },
   mounted() {
     if (this.node.behaviour !== "embed") {
-      this.loaded()
+      this.handleLoad()
     }
   },
   methods: {
-    loaded() {
+    handleLoad() {
       this.$emit("load")
       if (this.node.behaviour === "embed") {
         this.$emit("complete")
@@ -114,52 +126,37 @@ export default {
 <style lang="scss" scoped>
 .external-media-container {
   height: 100%;
-  background: #fff;
-}
 
-.preview {
-  .preview-image {
-    width: 100%;
-    cursor: pointer;
-    position: relative;
-    background-size: cover;
-    background-position: center;
-    transition: all 0.2s ease;
+  .preview {
+    border-radius: 15px;
 
-    &:hover {
-      transform: scale(1.05);
-    }
+    .preview-image {
+      cursor: pointer;
+      background-size: cover;
+      background-position: center;
+      transition: all 0.2s ease;
 
-    a {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-    }
-  }
+      &:hover {
+        transform: scale(1.05);
+      }
 
-  .preview-content {
-    text-align: left;
-    font-family: "Source Sans Pro", sans-serif;
-
-    h1 {
-      margin: 0;
-      padding: 0;
-      line-height: 1.1;
-      font-weight: bold;
-      font-family: inherit;
-
-      &:before {
-        display: none;
+      a {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
       }
     }
 
-    p {
-      margin: 0;
-      margin-top: 1em;
-      padding: 0;
-      font-family: inherit;
+    .preview-content {
+      background: #fff;
+      text-align: left;
+      min-height: 300px;
+
+      .btn i {
+        opacity: 0.5;
+      }
     }
   }
 }
@@ -175,7 +172,6 @@ export default {
 }
 
 .external-media-title {
-  color: white;
   font-weight: 500;
   font-size: 1.75rem;
 
