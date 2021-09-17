@@ -18,6 +18,11 @@ body.admin-bar .modal[role="dialog"] {
     height: calc(100vh - 3em);
 }
 
+body.single-tapestry .btn-link:hover,
+body.single-tapestry .btn-outline:hover {
+    background: initial;
+}
+
 * {
     box-sizing: border-box;
 }
