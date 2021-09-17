@@ -2,11 +2,20 @@
   <li
     ref="connection"
     class="connection"
-    :style="{ opacity: isDragging ? 0.2 : 1, '--size': fontSize }"
+    :style="{
+      opacity: isDragging ? 0.2 : 1,
+      '--size': fontSize,
+      cursor: draggable ? 'move' : 'default',
+    }"
     @click="$emit('click')"
   >
-    <p class="ob-connection">{{ connection.name }}</p>
-    <h1 v-html="getEmojiImgFromUnicode(connection.avatar)"></h1>
+    <p class="ob-connection" :style="{ cursor: draggable ? 'move' : 'default' }">
+      {{ connection.name }}
+    </p>
+    <h1
+      :style="{ cursor: draggable ? 'move' : 'default' }"
+      v-html="getEmojiImgFromUnicode(connection.avatar)"
+    ></h1>
     <ul v-if="variant !== 'name'" class="community-list">
       <li
         v-for="community in connection.communities"
@@ -57,40 +66,48 @@ export default {
       return sizes[this.size]
     },
   },
+  watch: {
+    draggable() {
+      this.handleDraggable()
+    },
+  },
   mounted() {
-    if (this.draggable) {
-      const connectionRef = this.$refs.connection
-      d3.select(connectionRef).call(
-        d3
-          .drag()
-          .container(document.getElementById("cos"))
-          .on("start", () => {
-            this.isDragging = true
-            this.$emit("drag:start", {
-              x: d3.event.x,
-              y: d3.event.y,
-              connection: this.connection,
-            })
-          })
-          .on("drag", () => {
-            this.$emit("drag:move", {
-              x: d3.event.x,
-              y: d3.event.y,
-              connection: this.connection,
-            })
-          })
-          .on("end", () => {
-            this.isDragging = false
-            this.$emit("drag:end", {
-              x: d3.event.x,
-              y: d3.event.y,
-              connection: this.connection,
-            })
-          })
-      )
-    }
+    this.handleDraggable()
   },
   methods: {
+    handleDraggable() {
+      if (this.draggable) {
+        const connectionRef = this.$refs.connection
+        d3.select(connectionRef).call(
+          d3
+            .drag()
+            .container(document.getElementById("cos"))
+            .on("start", () => {
+              this.isDragging = true
+              this.$emit("drag:start", {
+                x: d3.event.x,
+                y: d3.event.y,
+                connection: this.connection,
+              })
+            })
+            .on("drag", () => {
+              this.$emit("drag:move", {
+                x: d3.event.x,
+                y: d3.event.y,
+                connection: this.connection,
+              })
+            })
+            .on("end", () => {
+              this.isDragging = false
+              this.$emit("drag:end", {
+                x: d3.event.x,
+                y: d3.event.y,
+                connection: this.connection,
+              })
+            })
+        )
+      }
+    },
     getEmojiImgFromUnicode(unicode) {
       let div = document.createElement("div")
       div.textContent = unicode
