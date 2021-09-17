@@ -239,7 +239,43 @@
               <b-col class="text-capitalize">{{ role }}</b-col>
               <b-col>
                 <combobox
-                  v-model="tydeModeDefaultNodes[role]"
+                  v-model="tydeModeTabs.default[role]"
+                  :options="nodesValues"
+                  :placeholder="nodesValues[0].title"
+                  item-text="title"
+                  item-value="id"
+                >
+                  <template v-slot="slotProps">
+                    <p>
+                      {{ slotProps.option.title }}
+                    </p>
+                  </template>
+                </combobox>
+              </b-col>
+            </b-row>
+            <b-row style="margin: 17px 0;">
+              <b-col class="text-capitalize">Profile Tab</b-col>
+              <b-col>
+                <combobox
+                  v-model="tydeModeTabs.profile"
+                  :options="nodesValues"
+                  :placeholder="nodesValues[0].title"
+                  item-text="title"
+                  item-value="id"
+                >
+                  <template v-slot="slotProps">
+                    <p>
+                      {{ slotProps.option.title }}
+                    </p>
+                  </template>
+                </combobox>
+              </b-col>
+            </b-row>
+            <b-row style="margin: 17px 0;">
+              <b-col class="text-capitalize">Goals Tab</b-col>
+              <b-col>
+                <combobox
+                  v-model="tydeModeTabs.goals"
                   :options="nodesValues"
                   :placeholder="nodesValues[0].title"
                   item-text="title"
@@ -394,7 +430,7 @@ export default {
       renderImages: true,
       analyticsEnabled: false,
       tydeModeEnabled: false,
-      tydeModeDefaultNodes: {},
+      tydeModeTabs: { default: {}, goals: "", profile: "" },
       draftNodesEnabled: true,
       submitNodesEnabled: true,
       renderMap: false,
@@ -480,7 +516,7 @@ export default {
         renderImages = true,
         renderMap = false,
         tydeModeEnabled = false,
-        tydeModeDefaultNodes = {},
+        tydeModeTabs = {},
         analyticsEnabled = false,
         draftNodesEnabled = true,
         submitNodesEnabled = true,
@@ -497,7 +533,7 @@ export default {
       this.renderImages = renderImages
       this.renderMap = renderMap
       this.tydeModeEnabled = tydeModeEnabled
-      this.tydeModeDefaultNodes = tydeModeDefaultNodes
+      this.tydeModeTabs = tydeModeTabs
       this.analyticsEnabled = analyticsEnabled
       this.draftNodesEnabled = draftNodesEnabled
       this.submitNodesEnabled = submitNodesEnabled
@@ -509,11 +545,19 @@ export default {
         */
       if (this.tydeModeEnabled) {
         this.roles.forEach(role => {
-          const rolesDefaultNode = this.tydeModeDefaultNodes[role]
+          const rolesDefaultNode = this.tydeModeTabs.default[role]
           if (!rolesDefaultNode || !this.nodes[rolesDefaultNode]) {
-            this.tydeModeDefaultNodes[role] = this.rootId
+            this.tydeModeTabs[role] = this.rootId
           }
         })
+        const profileTabNode = this.tydeModeTabs.profile
+        if (!profileTabNode || !this.nodes[profileTabNode]) {
+          this.tydeModeTabs.profile = this.rootId
+        }
+        const gaolsTabNode = this.tydeModeTabs.goals
+        if (!gaolsTabNode || !this.nodes[gaolsTabNode]) {
+          this.tydeModeTabs.goals = this.rootId
+        }
       }
 
       const settings = Object.assign(this.settings, {
