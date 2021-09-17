@@ -516,7 +516,7 @@ export default {
         renderImages = true,
         renderMap = false,
         tydeModeEnabled = false,
-        tydeModeTabs = {},
+        tydeModeTabs = { default: {}, goals: "", profile: "" },
         analyticsEnabled = false,
         draftNodesEnabled = true,
         submitNodesEnabled = true,
@@ -538,6 +538,10 @@ export default {
       this.draftNodesEnabled = draftNodesEnabled
       this.submitNodesEnabled = submitNodesEnabled
       this.mapBounds = mapBounds
+
+      if (!this.tydeModeTabs.default) {
+        this.tydeModeTabs.default = {}
+      }
     },
     async updateSettings() {
       /* NOTE: this functionallity sets the root node as the defualt tyde mode node
@@ -547,7 +551,7 @@ export default {
         this.roles.forEach(role => {
           const rolesDefaultNode = this.tydeModeTabs.default[role]
           if (!rolesDefaultNode || !this.nodes[rolesDefaultNode]) {
-            this.tydeModeTabs[role] = this.rootId
+            this.tydeModeTabs.default[role] = this.rootId
           }
         })
         const profileTabNode = this.tydeModeTabs.profile
@@ -560,6 +564,7 @@ export default {
         }
       }
 
+      console.log(this.tydeModeTabs)
       const settings = Object.assign(this.settings, {
         backgroundUrl: this.backgroundUrl,
         autoLayout: this.autoLayout,
@@ -572,7 +577,7 @@ export default {
         renderImages: this.renderImages,
         renderMap: this.renderMap,
         tydeModeEnabled: this.tydeModeEnabled,
-        tydeModeDefaultNodes: this.tydeModeDefaultNodes,
+        tydeModeTabs: this.tydeModeTabs,
         analyticsEnabled: this.analyticsEnabled,
         draftNodesEnabled: this.draftNodesEnabled,
         submitNodesEnabled: this.submitNodesEnabled,
