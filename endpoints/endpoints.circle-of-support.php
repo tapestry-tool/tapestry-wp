@@ -83,11 +83,11 @@ class CircleOfSupportEndpoints
                     'callback' => 'CircleOfSupportEndpoints::addConnectionToCircle'
                 ]
             ],
-            'COS_REMOVE_CONNECTION_FROM_CIRCLE' => (object) [
-                'ROUTE' => '/activities/cos/circles/(?P<circleIndex>[0-2])/connections/(?P<connectionId>[a-zA-Z0-9]+)',
+            'COS_REMOVE_CONNECTION_FROM_CIRCLES' => (object) [
+                'ROUTE' => '/activities/cos/circles/connections/(?P<connectionId>[a-zA-Z0-9]+)',
                 'ARGUMENTS' => [
                     'methods' => $REST_API_DELETE_METHOD,
-                    'callback' => 'CircleOfSupportEndpoints::removeConnectionFromCircle'
+                    'callback' => 'CircleOfSupportEndpoints::removeConnectionFromCircles'
                 ]
             ],
             'DELETE_COS_CONNECTION' => (object) [
@@ -191,13 +191,12 @@ class CircleOfSupportEndpoints
         }
     }
 
-    public static function removeConnectionFromCircle($request)
+    public static function removeConnectionFromCircles($request)
     {
         try {
-            $circleIndex = $request['circleIndex'];
             $connectionId = $request['connectionId'];
             $cos = new CircleOfSupport();
-            $circle = $cos->removeConnectionFromCircle($circleIndex, $connectionId);
+            $circle = $cos->removeConnectionFromCircles($connectionId);
             $cos->save();
             return $circle;
         } catch (TapestryError $e) {

@@ -5,7 +5,7 @@
       class="tab"
       :connections="connections"
       :communities="communities"
-      draggable
+      :draggable="!dragDisabled"
       @back="handleBack"
       @add-connection="$emit('add-connection', $event)"
       @edit-connection="handleEditConnection"
@@ -41,7 +41,7 @@
           class="connection"
           size="sm"
           variant="name"
-          draggable
+          :draggable="!dragDisabled"
           @click="toggleConnectionTooltip(connection.id)"
           @drag:start="handleDragStart"
           @drag:move="handleDragMove"
@@ -130,6 +130,7 @@ export default {
       state: States.Home,
       activeConnectionId: null,
       draggingConnection: null,
+      dragDisabled: false,
     }
   },
   computed: {
@@ -212,15 +213,12 @@ export default {
           oldCircle != this.activeCircle &&
           this.activeCircle !== CircleStates.All
         ) {
-          if (oldCircle != null) {
-            await this.removeConnectionFromCircle(
-              oldCircle,
-              this.draggingConnection.id
-            )
-          }
           this.addConnectionToCircle(this.activeCircle, this.draggingConnection.id)
           this.activeCircle = CircleStates.All
         } else {
+          if (this.activeCircle === CircleStates.All) {
+            this.removeConnectionFromCircles(this.draggingConnection.id)
+          }
           this.activeCircle = this.activeCircleOrig
         }
 
@@ -242,21 +240,44 @@ export default {
       return circle
     },
     addConnectionToCircle(circle, connectionId) {
-      return client.cos.addConnectionToCircle(circle, connectionId).then(() => {
-        const circles = [...this.circles]
-        const connections = circles[circle]
-        if (!connections.includes(connectionId)) {
-          circles[circle] = [...circles[circle], connectionId]
-        }
-        this.$emit("change", circles)
+      this.dragDisabled = true
+
+      // First do it locally, for responsive UX
+      const circles = [...this.circles]
+      circles.forEach((circleObj, circleIndex) => {
+        circles[circleIndex] = circles[circleIndex].filter(id => id !== connectionId)
       })
+      const connections = circles[circle]
+      if (!connections.includes(connectionId)) {
+        circles[circle] = [...circles[circle], connectionId]
+      }
+      this.$emit("change", circles)
+
+      // Then do it on server (and update locally in case of errors)
+      return client.cos
+        .addConnectionToCircle(circle, connectionId)
+        .then(newCircles => {
+          this.$emit("change", newCircles)
+          this.dragDisabled = false
+        })
     },
-    removeConnectionFromCircle(circle, connectionId) {
-      return client.cos.removeConnectionFromCircle(circle, connectionId).then(() => {
-        const circles = [...this.circles]
-        circles[circle] = circles[circle].filter(id => id !== connectionId)
-        this.$emit("change", circles)
+    removeConnectionFromCircles(connectionId) {
+      this.dragDisabled = true
+
+      // First do it locally, for responsive UX
+      const circles = [...this.circles]
+      circles.forEach((circleObj, circleIndex) => {
+        circles[circleIndex] = circles[circleIndex].filter(id => id !== connectionId)
       })
+      this.$emit("change", circles)
+
+      // Then do it on server (and update locally in case of errors)
+      return client.cos
+        .removeConnectionFromCircles(connectionId)
+        .then(newCircles => {
+          this.$emit("change", newCircles)
+          this.dragDisabled = false
+        })
     },
     /**
      * Gets the circle the ref is currently hovering over. If it's not hovering over
