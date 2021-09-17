@@ -352,7 +352,11 @@ export default {
       this.completeNode(this.activePopupId)
     },
     handleVideoComplete(nodeId) {
-      if (this.popups.every(popUpNode => popUpNode.progress)) {
+      if (
+        !this.node.completed &&
+        this.popups.every(popUpNode => popUpNode.progress)
+      ) {
+        this.node.completed = true
         this.$emit("complete", nodeId)
       }
     },

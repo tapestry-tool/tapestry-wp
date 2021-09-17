@@ -17,13 +17,23 @@
           <h3 class="mb-4">
             {{ question.followUp.text || "Previously, you said:" }}
           </h3>
-          <completed-activity-media
-            v-for="previousAnswer in previousQuestionAnswers"
-            :key="previousAnswer[0]"
-            :type="previousAnswer[0]"
-            :answerData="previousAnswer[1]"
-            :question="getQuestion(question.followUp.questionId)"
-          ></completed-activity-media>
+          <b-tabs vertical no-nav-style nav-class="nav-tablist">
+            <b-tab
+              v-for="previousAnswer in previousQuestionAnswers"
+              :key="previousAnswer[0]"
+            >
+              <template #title>
+                <div class="icon">
+                  <tapestry-icon :icon="getIcon(previousAnswer[0])" />
+                </div>
+              </template>
+              <completed-activity-media
+                :type="previousAnswer[0]"
+                :answerData="previousAnswer[1]"
+                :question="getQuestion(question.followUp.questionId)"
+              ></completed-activity-media>
+            </b-tab>
+          </b-tabs>
         </div>
         <div v-else>
           <p>You haven't done the previous activity yet.</p>
@@ -48,6 +58,7 @@
             :node="node"
             :question="question"
             :answer="answer"
+            @skipQuestion="$emit('skipQuestion')"
             @submit="handleSubmit"
           ></component>
         </div>
@@ -82,6 +93,7 @@ import DragDropQuestion from "./DragDropQuestion"
 import MultipleChoiceQuestion from "./MultipleChoiceQuestion"
 import Loading from "@/components/common/Loading"
 import CompletedActivityMedia from "../../common/CompletedActivityMedia"
+import TapestryIcon from "@/components/common/TapestryIcon"
 import * as wp from "@/services/wp"
 
 export default {
@@ -94,6 +106,7 @@ export default {
     MultipleChoiceQuestion,
     Loading,
     CompletedActivityMedia,
+    TapestryIcon,
   },
   props: {
     question: {
@@ -245,6 +258,12 @@ export default {
       return !!this.userAnswers?.[this.node.id]?.activity?.[this.question.id]
         ?.answers?.[type]
     },
+    getIcon(answerType) {
+      if (answerType == "multipleChoice") {
+        return "tasks"
+      }
+      return answerType
+    },
   },
 }
 </script>
@@ -278,7 +297,7 @@ export default {
     opacity: 1;
     transition: all 0.1s ease-out;
     position: absolute;
-    top: 24px;
+    top: 74px;
     left: 24px;
     z-index: 20;
 

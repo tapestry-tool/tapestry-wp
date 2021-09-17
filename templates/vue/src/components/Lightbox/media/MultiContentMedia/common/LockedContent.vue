@@ -7,7 +7,7 @@
         </span>
       </h2>
     </div>
-    <locked-text class="locked-body" :node="node" />
+    <locked-text class="locked-body" :node="node" :condition-node="conditionNode" />
   </div>
 </template>
 
@@ -22,6 +22,11 @@ export default {
     node: {
       type: Object,
       required: true,
+    },
+    conditionNode: {
+      type: Object,
+      required: false,
+      default: () => ({}),
     },
   },
 }
