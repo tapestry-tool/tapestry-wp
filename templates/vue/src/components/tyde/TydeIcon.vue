@@ -1,6 +1,17 @@
 <template>
   <div>
-    <img :src="url" :width="size" svg />
+    <img :id="icon" :src="url" :width="size" svg />
+    <b-tooltip
+      v-if="windowWidth > 700"
+      :target="icon"
+      triggers="hover"
+      :placement="isLast && windowWidth < 1100 ? 'left' : 'right'"
+      custom-class="nav-item-tooltip text-capitalize"
+      no-fade
+      :delay="0"
+    >
+      {{ title }}
+    </b-tooltip>
   </div>
 </template>
 
@@ -31,11 +42,38 @@ export default {
       type: Boolean,
       required: true,
     },
+    isLast: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   data() {
     return {
       url: "",
+      windowWidth: window.innerWidth,
     }
+  },
+  computed: {
+    title() {
+      let title = " "
+      switch (this.icon) {
+        case "default":
+          title = "Learning Program"
+          break
+        case "profile":
+          title = "Profile"
+          break
+        case "goals":
+          title = "Goals"
+          break
+        case "cos":
+          title = "Circle of Support"
+          break
+      }
+
+      return title
+    },
   },
   watch: {
     selected() {
@@ -44,6 +82,10 @@ export default {
   },
   mounted() {
     this.selectIcon()
+
+    window.addEventListener("resize", () => {
+      this.windowWidth = window.innerWidth
+    })
   },
   methods: {
     createUrl(selected) {
@@ -54,20 +96,16 @@ export default {
 
       switch (this.icon) {
         case "default":
-          if (this.selected) selectedIcon = tyde
-          else selectedIcon = tydeUnselected
+          selectedIcon = this.selected ? tyde : tydeUnselected
           break
         case "profile":
-          if (this.selected) selectedIcon = profile
-          else selectedIcon = profileUnselected
+          selectedIcon = this.selected ? profile : profileUnselected
           break
         case "goals":
-          if (this.selected) selectedIcon = goals
-          else selectedIcon = goalsUnselected
+          selectedIcon = this.selected ? goals : goalsUnselected
           break
         case "cos":
-          if (this.selected) selectedIcon = cos
-          else selectedIcon = cosUnselected
+          selectedIcon = this.selected ? cos : cosUnselected
           break
       }
 
@@ -76,3 +114,20 @@ export default {
   },
 }
 </script>
+
+<style>
+.nav-item-tooltip .tooltip-inner {
+  background: transparent !important;
+  color: black !important;
+  font-family: "Source Sans Pro", sans-serif !important;
+  font-size: 1rem;
+  font-weight: 500;
+  max-width: 100px;
+  padding: 0.25rem 0 0.25rem 0.5rem !important;
+  line-height: 100% !important;
+  text-align: left;
+}
+.nav-item-tooltip > .arrow {
+  display: none !important;
+}
+</style>
