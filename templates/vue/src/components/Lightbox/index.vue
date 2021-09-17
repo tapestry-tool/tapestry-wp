@@ -283,7 +283,10 @@ export default {
   methods: {
     ...mapActions(["completeNode"]),
     complete(nodeId) {
-      this.completeNode(nodeId || this.nodeId)
+      const node = this.getNode(nodeId || this.nodeId)
+      if (!node.completed) {
+        this.completeNode(nodeId || this.nodeId)
+      }
     },
     handleUserClose() {
       client.recordAnalyticsEvent("user", "close", "lightbox", this.nodeId)
