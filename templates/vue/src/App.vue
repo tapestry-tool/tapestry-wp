@@ -70,18 +70,17 @@ export default {
           that.loggedIn = data["wp-auth-check"]
         })
       })
-      Promise.resolve(client.getAvatar()).then(savedAvatar => {
-        this.addAvatar(savedAvatar.data)
-      })
     }
     window.addEventListener("click", this.recordAnalytics)
     const data = [
       client.getTapestry(),
       client.getUserProgress(),
       client.getLastSelectedNode(),
+      client.getAvatar(),
     ]
-    Promise.all(data).then(([dataset, progress, selectedNode]) => {
+    Promise.all(data).then(([dataset, progress, selectedNode, savedAvatar]) => {
       this.init({ dataset, progress })
+      this.addAvatar(savedAvatar.data)
       this.loading = false
       if (!this.$route.params.nodeId && dataset.nodes.length > 0) {
         let path = `/nodes/${dataset.rootId}`

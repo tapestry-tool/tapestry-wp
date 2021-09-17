@@ -63,7 +63,7 @@ export default {
       this.editNode(id)
     })
     client.recordAnalyticsEvent("app", "load", "tapestry")
-    if (this.isLoggedIn) {
+    if (isLoggedIn()) {
       this.$root.$on("avatar-form-closed", () => {
         this.setupTydeView()
       })
