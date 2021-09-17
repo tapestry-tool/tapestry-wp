@@ -52,7 +52,7 @@ export default {
   computed: {
     scrollingValue() {
       const noscroll = ["H5P.ThreeImage"]
-      if (noscroll.includes(this.library)) {
+      if (noscroll.includes(this.library) || this.context !== "lightbox") {
         return "no"
       } else return "auto"
     },
@@ -60,7 +60,15 @@ export default {
       return this.context === "multi-content" || this.context === "page"
     },
     iframeHeight() {
-      return this.frameHeight ? this.frameHeight : "100%"
+      if (this.frameHeight) {
+        if (this.context === "lightbox") {
+          return Math.min(this.frameHeight, this.dimensions.height)
+        } else {
+          return this.frameHeight
+        }
+      } else {
+        return "100%"
+      }
     },
   },
   methods: {
@@ -84,6 +92,21 @@ export default {
 
       this.frameHeight = this.$refs.h5p.contentWindow.document.activeElement.children[0].clientHeight
       this.$emit("change:dimensions", { height: this.frameHeight })
+
+      // Watch for changes in the body of the iframe and update dimensions to match that
+      const h5pBodyContent = this.$refs.h5p.contentWindow.document.body.children[0]
+      let that = this
+      let heightChangeTimeout
+      var ro = new ResizeObserver(entries => {
+        for (let entry of entries) {
+          clearTimeout(heightChangeTimeout)
+          that.frameHeight = entry.contentRect.height
+          heightChangeTimeout = setTimeout(() => {
+            this.$emit("change:dimensions", { height: that.frameHeight })
+          }, 1000)
+        }
+      })
+      ro.observe(h5pBodyContent)
 
       switch (this.library) {
         case "H5P.ThreeImage":

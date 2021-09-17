@@ -88,12 +88,7 @@ class CircleOfSupport
 
     public function deleteConnection($connectionId)
     {
-        if (!isset($this->current['connections']->$connectionId)) {
-            return;
-        }
-        for ($i = 0; $i < count($this->current['circles']); ++$i) {
-            $this->removeConnectionFromCircle($i, $connectionId);
-        }
+        $this->removeConnectionFromCircles($connectionId);
 
         foreach ($this->current['communities'] as $key => $value) {
             /* removeConnectionFromCommunity checks whether the connection is
@@ -185,46 +180,25 @@ class CircleOfSupport
             return;
         }
 
+        // Remove connection from all other circles
+        $this->removeConnectionFromCircles($connectionId);
+
         $circle = $this->current['circles'][$circleIndex];
         array_push($circle, $connectionId);
         $this->current['circles'][$circleIndex] = $circle;
 
-        return $circle;
+        return $this->current['circles'];
     }
 
-    public function removeConnectionFromCircle($circleIndex, $connectionId)
+    public function removeConnectionFromCircles($connectionId)
     {
-        // Check if circle exists
-        if (!isset($this->current['circles'][$circleIndex])) {
-            throw new TapestryError('CIRCLE_DOESNT_EXIST', sprintf('Cannot find circle with index %d', $circleIndex), 404);
+        foreach ($this->current['circles'] as $i => $circleObj) {
+            if (false !== ($key = array_search($connectionId, $this->current['circles'][$i]))) {
+                array_splice($this->current['circles'][$i], $key, 1);
+            }
         }
 
-        // Check if connection exists
-        if (!isset($this->current['connections']->$connectionId)) {
-            throw new TapestryError('CONNECTION_DOESNT_EXIST', sprintf('Cannot find connection with id %s', $connectionId), 404);
-        }
-
-        $circle = $this->current['circles'][$circleIndex];
-
-        if (0 == count($circle)) {
-            return;
-        }
-
-        $index = array_search($connectionId, $circle);
-
-        if (!isset($index) || null == $index) {
-            return;
-        }
-
-        // This circle doesn't contain the connection
-        if (!is_numeric($index)) {
-            throw new TapestryError('CONNECTION_DOESNT_EXIST', sprintf("Circle %d doesn't contain connection %s", $circleIndex, $connectionId), 404);
-        }
-
-        array_splice($circle, $index, 1);
-        $this->current['circles'][$circleIndex] = $circle;
-
-        return $circle;
+        return $this->current['circles'];
     }
 
     private function _getDefaultCos()
