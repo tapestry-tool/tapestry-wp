@@ -74,42 +74,22 @@
       />
     </div>
     <avataaars
-      v-if="hasAvatar"
       class="user"
-      :isCircle="avatar.isCircle"
-      :circleColor="avatar.circleColor"
-      :accessoriesType="avatar.accessoriesType"
-      :clotheType="avatar.clotheType"
-      :clotheColor="avatar.clotheColor"
-      :eyebrowType="avatar.eyebrowType"
-      :eyeType="avatar.eyeType"
-      :facialHairColor="avatar.facialHairColor"
-      :facialHairType="avatar.facialHairType"
-      :graphicType="avatar.graphicType"
-      :hairColor="avatar.hairColor"
-      :mouthType="avatar.mouthType"
-      :skinColor="avatar.skinColor"
-      :topType="avatar.topType"
-      :topColor="avatar.topColor"
-    ></avataaars>
-    <avataaars
-      v-else
-      class="user"
-      :isCircle="defaultAvatar.isCircle"
-      :circleColor="defaultAvatar.circleColor"
-      :accessoriesType="defaultAvatar.accessoriesType"
-      :clotheType="defaultAvatar.clotheType"
-      :clotheColor="defaultAvatar.clotheColor"
-      :eyebrowType="defaultAvatar.eyebrowType"
-      :eyeType="defaultAvatar.eyeType"
-      :facialHairColor="defaultAvatar.facialHairColor"
-      :facialHairType="defaultAvatar.facialHairType"
-      :graphicType="defaultAvatar.graphicType"
-      :hairColor="defaultAvatar.hairColor"
-      :mouthType="defaultAvatar.mouthType"
-      :skinColor="defaultAvatar.skinColor"
-      :topType="defaultAvatar.topType"
-      :topColor="defaultAvatar.topColor"
+      :isCircle="currentAvatar.isCircle"
+      :circleColor="currentAvatar.circleColor"
+      :accessoriesType="currentAvatar.accessoriesType"
+      :clotheType="currentAvatar.clotheType"
+      :clotheColor="currentAvatar.clotheColor"
+      :eyebrowType="currentAvatar.eyebrowType"
+      :eyeType="currentAvatar.eyeType"
+      :facialHairColor="currentAvatar.facialHairColor"
+      :facialHairType="currentAvatar.facialHairType"
+      :graphicType="currentAvatar.graphicType"
+      :hairColor="currentAvatar.hairColor"
+      :mouthType="currentAvatar.mouthType"
+      :skinColor="currentAvatar.skinColor"
+      :topType="currentAvatar.topType"
+      :topColor="currentAvatar.topColor"
     ></avataaars>
   </ul>
 </template>
@@ -170,12 +150,17 @@ export default {
       state: States.Home,
       activeConnectionId: null,
       draggingConnection: null,
-      defaultAvatar: avatarOptions.defaultAvatar,
       dragDisabled: false,
     }
   },
   computed: {
     ...mapState(["avatar"]),
+    currentAvatar() {
+      if (this.avatar && Object.keys(this.avatar).length) {
+        return this.avatar
+      }
+      return avatarOptions.defaultAvatar
+    },
     activeConnection() {
       if (!this.activeConnectionId) {
         return {
@@ -215,9 +200,6 @@ export default {
           radius: `${radius}px`,
         }
       })
-    },
-    hasAvatar() {
-      return !(!this.avatar || Object.keys(this.avatar).length === 0)
     },
   },
   methods: {
