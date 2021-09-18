@@ -328,7 +328,9 @@ describe("Activity", () => {
       const answer = "Tapestry"
       cy.contains(/add question/i).click()
 
-      cy.getByTestId("question-text-0").type(question)
+      cy.getByTestId("question-text-0")
+        .first()
+        .type(question)
       cy.getByTestId("question-answer-text-0").click({ force: true })
       cy.getByTestId("question-answer-text-single-0").click({ force: true })
       cy.getByTestId("question-answer-text-single-placeholder-0").type(placeholder)
@@ -368,7 +370,9 @@ describe("Activity", () => {
       const placeholder = "placeholder"
       const answer = "Tapestry"
 
-      cy.getByTestId("question-text-0").type(question)
+      cy.getByTestId("question-text-0")
+        .first()
+        .type(question)
       cy.getByTestId("question-answer-text-0").click({ force: true })
       cy.getByTestId("question-answer-text-single-0").click({ force: true })
       cy.getByTestId("question-answer-text-single-placeholder-0").type(placeholder)
@@ -415,7 +419,9 @@ describe("Activity", () => {
       const placeholder = "placeholder"
       const answer = "Tapestry"
 
-      cy.getByTestId("question-text-0").type(question)
+      cy.getByTestId("question-text-0")
+        .first()
+        .type(question)
       cy.getByTestId("question-answer-text-0").click({ force: true })
       cy.getByTestId("question-answer-text-single-0").click({ force: true })
       cy.getByTestId("question-answer-text-single-placeholder-0").type(placeholder)
