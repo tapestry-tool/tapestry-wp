@@ -1,9 +1,12 @@
 <template>
   <div class="toolbar">
     <tapestry-filter v-if="!showMap" style="z-index: 10;" />
-    <div v-show="isLoggedIn || (!showMap && hasDepth)" class="slider-wrapper">
+    <div
+      v-show="tydeModeEnabled || canEdit || (!showMap && hasDepth)"
+      class="slider-wrapper"
+    >
       <user-settings-button
-        v-if="isLoggedIn"
+        v-if="tydeModeEnabled"
         data-qa="user-settings-button"
       ></user-settings-button>
       <help-button v-if="canEdit" />
@@ -52,6 +55,9 @@ export default {
     },
     isLoggedIn() {
       return wp.isLoggedIn()
+    },
+    tydeModeEnabled() {
+      return !wp.canEditTapestry() && this.settings.tydeModeEnabled
     },
     hasDepth() {
       return this.maxDepth > 1 && this.settings.defaultDepth > 0

@@ -18,7 +18,7 @@ import TapestryMain from "./TapestryMain"
 import { mapMutations, mapState } from "vuex"
 import TapestryMap from "./TapestryMap"
 import Helpers from "@/utils/Helpers"
-import { isLoggedIn, getCurrentUser, canEditTapestry } from "@/services/wp"
+import { getCurrentUser, canEditTapestry } from "@/services/wp"
 
 export default {
   components: {
@@ -63,7 +63,7 @@ export default {
       this.editNode(id)
     })
     client.recordAnalyticsEvent("app", "load", "tapestry")
-    if (isLoggedIn()) {
+    if (this.tydeModeEnabled) {
       this.$root.$on("avatar-form-closed", () => {
         this.setupTydeView()
       })
