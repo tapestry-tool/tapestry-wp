@@ -76,7 +76,24 @@
         src="https://twemoji.maxcdn.com/v/13.1.0/72x72/1f60a.png"
       />
     </div>
-    <div class="user">😊</div>
+    <avataaars
+      class="user"
+      :isCircle="currentAvatar.isCircle"
+      :circleColor="currentAvatar.circleColor"
+      :accessoriesType="currentAvatar.accessoriesType"
+      :clotheType="currentAvatar.clotheType"
+      :clotheColor="currentAvatar.clotheColor"
+      :eyebrowType="currentAvatar.eyebrowType"
+      :eyeType="currentAvatar.eyeType"
+      :facialHairColor="currentAvatar.facialHairColor"
+      :facialHairType="currentAvatar.facialHairType"
+      :graphicType="currentAvatar.graphicType"
+      :hairColor="currentAvatar.hairColor"
+      :mouthType="currentAvatar.mouthType"
+      :skinColor="currentAvatar.skinColor"
+      :topType="currentAvatar.topType"
+      :topColor="currentAvatar.topColor"
+    ></avataaars>
     <onboarding
       :communities="communities"
       :connections="connections"
@@ -91,7 +108,7 @@
 
 <script>
 import Twemoji from "twemoji"
-
+import avatarOptions from "@/components/modals/UserSettingsModal/avatarOptions.js"
 import Helpers from "@/utils/Helpers"
 import client from "@/services/TapestryAPI"
 import OnBoarding from "../onboarding/index.vue"
@@ -100,11 +117,14 @@ import ConnectionTooltip from "../ConnectionTooltip"
 import SingleConnection from "../SingleConnection"
 import CircleToggle from "./CircleToggle"
 import { CircleStates } from "./states"
+import Avataaars from "vuejs-avataaars"
+import { mapState } from "vuex"
 
-const CONNECTION_SPACE = 10
-const CONNECTION_OFFSET = 56
-const MIN_CIRCLE_SIZE = 125
+const CONNECTION_SPACE = 0
+const CONNECTION_OFFSET = 46
+const MIN_CIRCLE_SIZE = 105
 const OFFSET_SIZE = MIN_CIRCLE_SIZE * 0.85
+const USER_AVATAR_SPACE = 20
 
 const States = {
   Home: 0,
@@ -121,6 +141,7 @@ export default {
     ConnectionTooltip,
     SingleConnection,
     onboarding: OnBoarding,
+    Avataaars,
   },
   model: {
     prop: "circles",
@@ -161,6 +182,13 @@ export default {
     }
   },
   computed: {
+    ...mapState(["avatar"]),
+    currentAvatar() {
+      if (this.avatar && Object.keys(this.avatar).length) {
+        return this.avatar
+      }
+      return avatarOptions.defaultAvatar
+    },
     activeConnection() {
       if (!this.activeConnectionId) {
         return {
@@ -342,7 +370,10 @@ export default {
     getRadius(index) {
       const numConnections = this.circles[index].length
       if (index === 0) {
-        return Math.max(numConnections * CONNECTION_SPACE, MIN_CIRCLE_SIZE)
+        return (
+          Math.max(numConnections * CONNECTION_SPACE, MIN_CIRCLE_SIZE) +
+          USER_AVATAR_SPACE
+        )
       }
       return Math.max(
         numConnections * CONNECTION_SPACE,
@@ -487,7 +518,9 @@ ul {
 
 .user {
   position: absolute;
-  top: 50%;
+  height: 90px;
+  width: 90px;
+  top: 48.5%;
   left: 50%;
   transform: translate(-50%, -50%);
   font-size: 4rem;

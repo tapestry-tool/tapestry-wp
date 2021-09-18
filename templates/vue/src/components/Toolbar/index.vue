@@ -1,7 +1,14 @@
 <template>
   <div class="toolbar">
     <tapestry-filter v-if="!showMap" style="z-index: 10;" />
-    <div v-show="canEdit || (!showMap && hasDepth)" class="slider-wrapper">
+    <div
+      v-show="tydeModeEnabled || canEdit || (!showMap && hasDepth)"
+      class="slider-wrapper"
+    >
+      <user-settings-button
+        v-if="tydeModeEnabled"
+        data-qa="user-settings-button"
+      ></user-settings-button>
       <help-button v-if="canEdit" />
       <review-notifications v-if="canEdit && settings.submitNodesEnabled" />
       <settings-modal-button
@@ -21,6 +28,7 @@
 import { mapMutations, mapState } from "vuex"
 import TapestryDepthSlider from "./TapestryDepthSlider"
 import SettingsModalButton from "./SettingsModalButton"
+import UserSettingsButton from "./UserSettingsButton"
 import TapestryFilter from "./TapestryFilter"
 import ReviewNotifications from "./ReviewNotifications"
 import HelpButton from "./HelpButton"
@@ -32,6 +40,7 @@ export default {
     TapestryFilter,
     SettingsModalButton,
     ReviewNotifications,
+    UserSettingsButton,
     HelpButton,
   },
   data() {
@@ -43,6 +52,12 @@ export default {
     ...mapState(["nodes", "links", "selection", "settings", "rootId"]),
     canEdit() {
       return wp.canEditTapestry()
+    },
+    isLoggedIn() {
+      return wp.isLoggedIn()
+    },
+    tydeModeEnabled() {
+      return !wp.canEditTapestry() && this.settings.tydeModeEnabled
     },
     hasDepth() {
       return this.maxDepth > 1 && this.settings.defaultDepth > 0
@@ -70,6 +85,7 @@ export default {
   padding: 0 5vw;
   transition: all 0.2s ease-out;
 }
+
 .slider-wrapper {
   background: #fbfbfb;
   box-shadow: 0 0 7px 0 #ddd;
@@ -78,7 +94,7 @@ export default {
   border-radius: 4px;
   border-bottom-right-radius: 0;
   border-bottom-left-radius: 0;
-  padding: 8px 6px 8px 12px;
+  padding: 8px 6px 8px 6px;
   margin-left: auto;
   position: relative;
 }

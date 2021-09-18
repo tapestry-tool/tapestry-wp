@@ -221,6 +221,20 @@ $REST_API_ENDPOINTS = [
             'callback' => 'updateUserH5PSettingsByPostId',
         ],
     ],
+    'GET_USER_AVATAR' => (object) [
+        'ROUTE' => '/users/userSettings/avatar',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => 'getUserAvatar',
+        ],
+    ],
+    'UPDATE_USER_SETTINGS' => (object) [
+        'ROUTE' => '/users/userSettings',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_PUT_METHOD,
+            'callback' => 'updateUserSettings',
+        ],
+    ],
     'POST_USER_AUDIO' => (object) [
         'ROUTE' => 'users/activity/audio/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)',
         'ARGUMENTS' => [
@@ -309,91 +323,6 @@ $REST_API_ENDPOINTS = [
             'permission_callback' => 'TapestryPermissions::putTapestrySettings',
         ],
     ],
-    'GET_CIRCLE_OF_SUPPORT' => (object) [
-        'ROUTE' => '/activities/cos',
-        'ARGUMENTS' => [
-            'methods' => $REST_API_GET_METHOD,
-            'callback' => 'CircleOfSupportEndpoints::get',
-        ]
-    ],
-    'POST_CIRCLE_OF_SUPPORT' => (object) [
-        'ROUTE' => '/activities/cos',
-        'ARGUMENTS' => [
-            'methods' => $REST_API_POST_METHOD,
-            'callback' => 'CircleOfSupportEndpoints::save'
-        ]
-    ],
-    'DELETE_CIRCLE_OF_SUPPORT' => (object) [
-        'ROUTE' => '/activities/cos',
-        'ARGUMENTS' => [
-            'methods' => $REST_API_DELETE_METHOD,
-            'callback' => 'CircleOfSupportEndpoints::delete'
-        ]
-    ],
-    'POST_CIRCLE_OF_SUPPORT_CONNECTIONS' => (object) [
-        'ROUTE' => '/activities/cos/connections',
-        'ARGUMENTS' => [
-            'methods' => $REST_API_POST_METHOD,
-            'callback' => 'CircleOfSupportEndpoints::addConnection'
-        ]
-    ],
-    'PUT_CIRCLE_OF_SUPPORT_CONNECTION' => (object) [
-        'ROUTE' => '/activities/cos/connections/(?P<connectionId>[a-zA-Z0-9]+)',
-        'ARGUMENTS' => [
-            'methods' => $REST_API_PUT_METHOD,
-            'callback' => 'CircleOfSupportEndpoints::updateConnection'
-        ]
-    ],
-    'POST_CIRCLE_OF_SUPPORT_COMMUNITIES' => (object) [
-        'ROUTE' => '/activities/cos/communities',
-        'ARGUMENTS' => [
-            'methods' => $REST_API_POST_METHOD,
-            'callback' => 'CircleOfSupportEndpoints::addCommunity'
-        ]
-    ],
-    'PUT_CIRCLE_OF_SUPPORT_COMMUNITIES' => (object) [
-        'ROUTE' => '/activities/cos/communities/(?P<communityId>[a-zA-Z0-9]+)',
-        'ARGUMENTS' => [
-            'methods' => $REST_API_PUT_METHOD,
-            'callback' => 'CircleOfSupportEndpoints::updateCommunity'
-        ]
-    ],
-    'POST_CIRCLE_OF_SUPPORT_COMMUNITIES_CONNECTION' => (object) [
-        'ROUTE' => '/activities/cos/communities/(?P<communityId>[a-zA-Z0-9]+)',
-        'ARGUMENTS' => [
-            'methods' => $REST_API_POST_METHOD,
-            'callback' => 'CircleOfSupportEndpoints::addConnectionToCommunity'
-        ]
-    ],
-    'DELETE_CIRCLE_OF_SUPPORT_COMMUNITIES_CONNECTION' => (object) [
-        'ROUTE' => '/activities/cos/communities/(?P<communityId>[a-zA-Z0-9]+)/connections/(?P<connectionId>[a-zA-Z0-9]+)',
-        'ARGUMENTS' => [
-            'methods' => $REST_API_DELETE_METHOD,
-            'callback' => 'CircleOfSupportEndpoints::removeConnectionFromCommunity'
-        ]
-    ],
-    'COS_ADD_CONNECTION_TO_CIRCLE' => (object) [
-        'ROUTE' => '/activities/cos/circles/(?P<circleIndex>[0-2])',
-        'ARGUMENTS' => [
-            'methods' => $REST_API_POST_METHOD,
-            'callback' => 'CircleOfSupportEndpoints::addConnectionToCircle'
-        ]
-    ],
-    'COS_REMOVE_CONNECTION_FROM_CIRCLE' => (object) [
-        'ROUTE' => '/activities/cos/circles/(?P<circleIndex>[0-2])/connections/(?P<connectionId>[a-zA-Z0-9]+)',
-        'ARGUMENTS' => [
-            'methods' => $REST_API_DELETE_METHOD,
-            'callback' => 'CircleOfSupportEndpoints::removeConnectionFromCircle'
-        ]
-    ],
-    'DELETE_COS_CONNECTION' => (object) [
-        'ROUTE' => '/activities/cos/connections/(?P<connectionId>[a-zA-Z0-9]+)',
-        'ARGUMENTS' => [
-            'methods' => $REST_API_DELETE_METHOD,
-            'callback' => 'CircleOfSupportEndpoints::deleteConnection'
-        ]
-    ],
-    
 ];
 
 $REST_API_ENDPOINTS = array_merge($REST_API_ENDPOINTS, CircleOfSupportEndpoints::getRoutes());
@@ -1370,6 +1299,28 @@ function getUserH5PSettingsByPostId($request)
         $userProgress = new TapestryUserProgress($postId);
 
         return $userProgress->getH5PSettings();
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+function updateUserSettings($request)
+{
+    $userSettings = $request->get_body();
+    try {
+        $userProgress = new TapestryUserProgress();
+        $userProgress->updateUserSettings($userSettings);
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+
+function getUserAvatar($request)
+{
+    try {
+        $userProgress = new TapestryUserProgress();
+        return $userProgress->getAvatar();
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }

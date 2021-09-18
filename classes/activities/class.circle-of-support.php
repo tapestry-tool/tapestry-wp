@@ -97,7 +97,9 @@ class CircleOfSupport
             $this->removeConnectionFromCommunity($connectionId, $key);
         }
 
-        unset($this->current['connections']->$connectionId);
+        if (isset($this->current['connections']->$connectionId)) {
+            unset($this->current['connections']->$connectionId);
+        }
     }
 
     public function updateConnection($id, $connection)
