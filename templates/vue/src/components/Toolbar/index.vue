@@ -32,7 +32,7 @@ import UserSettingsButton from "./UserSettingsButton"
 import TapestryFilter from "./TapestryFilter"
 import ReviewNotifications from "./ReviewNotifications"
 import HelpButton from "./HelpButton"
-import * as wp from "@/services/wp"
+import { canEditTapestry } from "@/services/wp"
 
 export default {
   components: {
@@ -51,13 +51,10 @@ export default {
   computed: {
     ...mapState(["nodes", "links", "selection", "settings", "rootId"]),
     canEdit() {
-      return wp.canEditTapestry()
-    },
-    isLoggedIn() {
-      return wp.isLoggedIn()
+      return canEditTapestry()
     },
     tydeModeEnabled() {
-      return !wp.canEditTapestry() && this.settings.tydeModeEnabled
+      return !canEditTapestry() && this.settings.tydeModeEnabled
     },
     hasDepth() {
       return this.maxDepth > 1 && this.settings.defaultDepth > 0
