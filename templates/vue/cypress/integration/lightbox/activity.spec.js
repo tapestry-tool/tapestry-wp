@@ -9,8 +9,7 @@ describe("Activity", () => {
       const fromBucketLabel1 = "From bucket 1"
       const toBucketLabel1 = "To bucket 1"
       const toBucketLabel2 = "To bucket 2"
-      cy.getByTestId("question-text-0").click()
-      cy.focused().type(question)
+      cy.getByTestId("question-text-0").type(question)
       cy.getByTestId("question-answer-dragdrop").click({ force: true })
       cy.get(".bucket-label")
         .first()
@@ -64,8 +63,7 @@ describe("Activity", () => {
       const fromBucketLabel2 = "From bucket 2"
       const toBucketLabel1 = "Put red item here"
       const toBucketLabel2 = "Put blue item here"
-      cy.getByTestId("question-text-0").click()
-      cy.focused().type(question)
+      cy.getByTestId("question-text-0").type(question)
       cy.getByTestId("question-answer-dragdrop").click({ force: true })
       cy.get(".bucket-label")
         .first()
@@ -168,8 +166,7 @@ describe("Activity", () => {
       const fromBucketLabel2 = "From bucket 2"
       const toBucketLabel1 = "Put red item here"
       const toBucketLabel2 = "Put blue item here"
-      cy.getByTestId("question-text-0").click()
-      cy.focused().type(question)
+      cy.getByTestId("question-text-0").type(question)
       cy.getByTestId("question-answer-dragdrop").click({ force: true })
       cy.get(".bucket-label")
         .first()
@@ -242,8 +239,7 @@ describe("Activity", () => {
       cy.changeMediaType("activity")
       const question = `Select all numbers less than 3`
 
-      cy.getByTestId("question-text-0").click()
-      cy.focused().type(question)
+      cy.getByTestId("question-text-0").type(question)
       cy.getByTestId("question-answer-multipleChoice-0").click({ force: true })
       cy.getByTestId("question-answer-multipleChoice-multipleAnswer").click({
         force: true,
@@ -289,8 +285,7 @@ describe("Activity", () => {
       cy.changeMediaType("activity")
       const question = `What is 5 + 5?`
 
-      cy.getByTestId("question-text-0").click()
-      cy.focused().type(question)
+      cy.getByTestId("question-text-0").type(question)
       cy.getByTestId("question-answer-multipleChoice-0").click({ force: true })
       cy.getByTestId(`choice-row-0`)
         .getByTestId(`choice-row-input-0`)
@@ -333,16 +328,14 @@ describe("Activity", () => {
       const answer = "Tapestry"
       cy.contains(/add question/i).click()
 
-      cy.getByTestId("question-text-0").click()
-      cy.focused().type(question)
+      cy.getByTestId("question-text-0").type(question)
       cy.getByTestId("question-answer-text-0").click({ force: true })
       cy.getByTestId("question-answer-text-single-0").click({ force: true })
       cy.getByTestId("question-answer-text-single-placeholder-0").type(placeholder)
       const question2 = `What's your favorite pet?`
       const placeholder2 = "placeholder 2"
       const answer2 = "Dog"
-      cy.getByTestId("question-text-1").click()
-      cy.focused().type(question2)
+      cy.getByTestId("question-text-1").type(question2)
       cy.getByTestId("question-answer-text-1").click({ force: true })
       cy.getByTestId("question-answer-text-single-1").click({ force: true })
       cy.getByTestId("question-answer-text-single-placeholder-1").type(placeholder2)
@@ -375,8 +368,7 @@ describe("Activity", () => {
       const placeholder = "placeholder"
       const answer = "Tapestry"
 
-      cy.getByTestId("question-text-0").click()
-      cy.focused().type(question)
+      cy.getByTestId("question-text-0").type(question)
       cy.getByTestId("question-answer-text-0").click({ force: true })
       cy.getByTestId("question-answer-text-single-0").click({ force: true })
       cy.getByTestId("question-answer-text-single-placeholder-0").type(placeholder)
@@ -396,8 +388,7 @@ describe("Activity", () => {
       cy.openModal("edit", node.id)
       const question2 = ` and what's your favorite color?`
       const answer2 = " and my favorite color is blue"
-      cy.getByTestId("question-text-0").click()
-      cy.focused().type(question2)
+      cy.getByTestId("question-text-0").type(question2)
       cy.getByTestId("question-answer-text-multi-0").click({ force: true })
       cy.submitModal()
       cy.openLightbox(node.id)
@@ -424,8 +415,7 @@ describe("Activity", () => {
       const placeholder = "placeholder"
       const answer = "Tapestry"
 
-      cy.getByTestId("question-text-0").click()
-      cy.focused().type(question)
+      cy.getByTestId("question-text-0").type(question)
       cy.getByTestId("question-answer-text-0").click({ force: true })
       cy.getByTestId("question-answer-text-single-0").click({ force: true })
       cy.getByTestId("question-answer-text-single-placeholder-0").type(placeholder)
@@ -453,8 +443,7 @@ describe("Activity", () => {
 
       const question = `What's your name?`
 
-      cy.getByTestId("question-text-0").click()
-      cy.focused().type(question)
+      cy.getByTestId("question-text-0").type(question)
       cy.getByTestId("question-answer-audio-0").click({ force: true })
 
       cy.submitModal()
@@ -494,8 +483,7 @@ describe("Activity", () => {
       const listQuestion = `Name 3 provinces of Canada.`
       const listPlaceholder = "Enter answer here"
 
-      cy.getByTestId("question-text-0").click()
-      cy.focused().type(listQuestion)
+      cy.getByTestId("question-text-0").type(listQuestion)
       cy.getByTestId("question-answer-text-0").click({ force: true })
       cy.getByTestId("question-answer-text-single-placeholder-0").type(
         listPlaceholder
@@ -545,8 +533,7 @@ describe("Activity", () => {
       const minFieldsValue = "5"
       const maxFieldsValue = "10"
 
-      cy.getByTestId("question-text-0").click()
-      cy.focused().type(listQuestion)
+      cy.getByTestId("question-text-0").type(listQuestion)
       cy.getByTestId("question-answer-text-0").click({ force: true })
       cy.getByTestId("question-answer-text-single-placeholder-0").type(
         listPlaceholder
@@ -600,8 +587,7 @@ describe("Activity", () => {
       const placeholder = "placeholder"
 
       cy.getByTestId("question-optional-checkbox").click({ force: true })
-      cy.getByTestId("question-text-0").click()
-      cy.focused().type(question)
+      cy.getByTestId("question-text-0").type(question)
       cy.getByTestId("question-answer-text-0").click({ force: true })
       cy.getByTestId("question-answer-text-single-0").click({ force: true })
       cy.getByTestId("question-answer-text-single-placeholder-0").type(placeholder)

@@ -13,8 +13,7 @@ describe("Answers", () => {
       const question = `What's your name?`
       const placeholder = "placeholder"
       const answer = "Tapestry"
-      cy.getByTestId("question-text-0").click()
-      cy.focused().type(question)
+      cy.getByTestId("question-text-0").type(question)
       cy.getByTestId("question-answer-text-0").click({ force: true })
       cy.getByTestId("question-answer-text-single-0").click({ force: true })
       cy.getByTestId("question-answer-text-single-placeholder-0").type(placeholder)
