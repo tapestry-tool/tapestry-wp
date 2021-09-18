@@ -107,10 +107,11 @@ import { CircleStates } from "./states"
 import Avataaars from "vuejs-avataaars"
 import { mapState } from "vuex"
 
-const CONNECTION_SPACE = 10
-const CONNECTION_OFFSET = 56
-const MIN_CIRCLE_SIZE = 125
+const CONNECTION_SPACE = 0
+const CONNECTION_OFFSET = 46
+const MIN_CIRCLE_SIZE = 105
 const OFFSET_SIZE = MIN_CIRCLE_SIZE * 0.85
+const USER_AVATAR_SPACE = 20
 
 const States = {
   Home: 0,
@@ -337,7 +338,10 @@ export default {
     getRadius(index) {
       const numConnections = this.circles[index].length
       if (index === 0) {
-        return Math.max(numConnections * CONNECTION_SPACE, MIN_CIRCLE_SIZE)
+        return (
+          Math.max(numConnections * CONNECTION_SPACE, MIN_CIRCLE_SIZE) +
+          USER_AVATAR_SPACE
+        )
       }
       return Math.max(
         numConnections * CONNECTION_SPACE,
