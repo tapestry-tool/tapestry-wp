@@ -97,7 +97,7 @@
       @tooltip-positioned="$emit('tooltip-positioned')"
     >
       <h3 v-if="activeView === 1" style="width:300px;">
-        Click here to toggle back to the community view.
+        You can always click here to toggle back to the community view.
       </h3>
       <h3 v-else style="width:300px;">
         Click here to toggle to the circle view.
@@ -106,6 +106,7 @@
         v-if="activeView === 1"
         pill
         variant="secondary"
+        class="mt-3"
         @click="handleClick(OnboardingEvents.Continue)"
       >
         Continue &#8594;
@@ -120,7 +121,12 @@
       <h3 style="width:300px;">
         Try adding some connections into your circle.
       </h3>
-      <b-button pill variant="secondary" @click="handleClick(OnboardingEvents.Add)">
+      <b-button
+        pill
+        variant="secondary"
+        class="mt-3"
+        @click="handleClick(OnboardingEvents.Add)"
+      >
         Got it &#8594;
       </b-button>
     </tooltip>

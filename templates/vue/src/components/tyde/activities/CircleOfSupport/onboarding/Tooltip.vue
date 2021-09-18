@@ -91,14 +91,20 @@ export default {
 .left::after {
   left: 25px;
 }
-.top::before,
-.top::after {
-  top: -23px;
+.top::before {
+  top: -22px;
   border-bottom: 24px solid #fff;
 }
-.bottom::before,
-.bottom::after {
-  bottom: -24px;
+.top::after {
+  top: -27px;
+  border-bottom: 24px solid #ccc;
+}
+.bottom::before {
+  bottom: -22px;
   border-top: 24px solid #fff;
+}
+.bottom::after {
+  bottom: -27px;
+  border-top: 24px solid #ccc;
 }
 </style>
