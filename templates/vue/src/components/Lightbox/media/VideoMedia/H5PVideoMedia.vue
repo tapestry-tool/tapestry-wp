@@ -314,7 +314,7 @@ export default {
       const aspectRatio = aspectRatioStr.split(":")
       this.frameHeight = (this.dimensions.width / aspectRatio[0]) * aspectRatio[1]
       // Add height for the video controls
-      this.frameHeight += 38
+      this.frameHeight += Math.min(38, this.frameHeight * 0.08)
       this.frameWidth = 0
 
       this.$emit("change:dimensions", { height: this.frameHeight })

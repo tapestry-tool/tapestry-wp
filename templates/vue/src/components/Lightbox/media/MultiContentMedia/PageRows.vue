@@ -41,7 +41,7 @@
             <div v-if="row.node.mediaType !== 'multi-content'">
               <tapestry-media
                 :node-id="row.node.id"
-                :dimensions="innerDimensions"
+                :dimensions="getRowDimensions(row.node)"
                 context="page"
                 style="margin-bottom: 24px;"
                 @complete="updateProgress(row.node.id)"
@@ -52,7 +52,7 @@
               </p>
               <accordion-rows
                 v-if="row.children.length > 0"
-                :dimensions="innerDimensions"
+                :dimensions="getRowDimensions(row.node)"
                 :node="row.node"
                 :rowId="subRowId"
                 context="page"
@@ -172,12 +172,6 @@ export default {
         return null
       }
     },
-    innerDimensions() {
-      return {
-        ...this.dimensions,
-        width: this.dimensions.width - 32, // excludes padding
-      }
-    },
   },
   mounted() {
     this.$root.$emit("observe-rows", this.$refs.rowRefs)
@@ -193,6 +187,13 @@ export default {
         (this.lockRows && this.disabledFrom >= 0 && index > this.disabledFrom) ||
         !node.unlocked
       )
+    },
+    getRowDimensions(node) {
+      const widthMultiplier = node ? 1 : 1 // this should be updated when half-width feature is here
+      return {
+        ...this.dimensions,
+        width: (this.dimensions.width - 32) * widthMultiplier, // excludes padding
+      }
     },
     updateProgress(rowId) {
       this.$emit("updateProgress", rowId)
