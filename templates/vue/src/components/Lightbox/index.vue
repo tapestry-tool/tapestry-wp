@@ -281,11 +281,14 @@ export default {
     })
   },
   methods: {
-    ...mapActions(["completeNode"]),
+    ...mapActions(["completeNode", "updateNodeProgress"]),
     complete(nodeId) {
       const node = this.getNode(nodeId || this.nodeId)
       if (!node.completed) {
-        this.completeNode(nodeId || this.nodeId)
+        this.completeNode(node.id)
+      }
+      if (node.progress !== 1) {
+        this.updateNodeProgress({ id: node.id, progress: 1 })
       }
     },
     handleUserClose() {
