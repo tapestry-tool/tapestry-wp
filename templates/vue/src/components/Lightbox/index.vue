@@ -259,7 +259,10 @@ export default {
   methods: {
     ...mapActions(["completeNode"]),
     complete(nodeId) {
-      this.completeNode(nodeId || this.nodeId)
+      const node = this.getNode(nodeId || this.nodeId)
+      if (!node.completed) {
+        this.completeNode(nodeId || this.nodeId)
+      }
     },
     handleUserClose() {
       client.recordAnalyticsEvent("user", "close", "lightbox", this.nodeId)
@@ -283,9 +286,11 @@ export default {
       }
     },
     updateDimensions(dimensions) {
-      this.dimensions = {
-        ...this.dimensions,
-        ...dimensions,
+      if (dimensions.height <= this.lightboxDimensions.height) {
+        this.dimensions = {
+          ...this.dimensions,
+          ...dimensions,
+        }
       }
     },
     applyDimensions() {
