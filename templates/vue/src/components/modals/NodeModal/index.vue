@@ -437,7 +437,7 @@ export default {
     },
     isPageMultiConentNodeChild() {
       return (
-        !!this.isMultiContentNodeChild && this?.parent?.presentationStyle === "page"
+        !!this.isMultiContentNodeChild && this.parent?.presentationStyle === "page"
       )
     },
     isMultipleChoiceValueValid() {
@@ -1005,6 +1005,36 @@ export default {
         if (!validMultipleChoiceImages) {
           errMsgs.push("Please upload an image for all multiple choice options")
         }
+
+        // Drag and Drop form validation
+        const dragDropQuestions = this.node.typeData.activity.questions.filter(
+          question => question.answerTypes.dragDrop.enabled
+        )
+
+        const validBucketsText = dragDropQuestions.every(question => {
+          return question.answerTypes.dragDrop.buckets.every(bucket => bucket.text)
+        })
+        if (!validBucketsText) {
+          errMsgs.push("Please enter a name for all buckets")
+        }
+
+        const validItemsText = dragDropQuestions.every(question => {
+          return question.answerTypes.dragDrop.items.every(item => item.text)
+        })
+        if (!validItemsText) {
+          errMsgs.push("Please enter a name for all items")
+        }
+
+        const validItemsImages = dragDropQuestions
+          .filter(question => question.answerTypes.dragDrop.useImages)
+          .every(question => {
+            return question.answerTypes.dragDrop.items.every(item => item.imageUrl)
+          })
+        if (!validItemsImages) {
+          errMsgs.push(
+            "Images must be uploaded for all drag and drop questions that have 'Use Images' enabled"
+          )
+        }
       } else if (this.node.mediaType === "answer") {
         const hasActivityId = this.node.typeData.activityId
         if (!hasActivityId) {
@@ -1016,7 +1046,6 @@ export default {
           errMsgs.push("Please select a question")
         }
       }
-
       return errMsgs
     },
     isValidVideo(typeData) {
