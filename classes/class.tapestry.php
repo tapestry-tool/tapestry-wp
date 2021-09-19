@@ -654,6 +654,10 @@ class Tapestry implements ITapestry
                     $H5PIndex = array_search($H5PId, array_column($allH5Ps, 'id'));
                     if ($H5PIndex || 0 == $H5PIndex) {
                         $nodes[$i]->typeData->h5pMeta = $allH5Ps[$H5PIndex];
+                        // Could not get h5pMeta to populate with fresh data,
+                        // so had to create a new property here.
+                        // TODO: Figure out a way not to have to do this
+                        $nodes[$i]->typeData->h5pMeta2 = $allH5Ps[$H5PIndex];
                     }
                 }
             }

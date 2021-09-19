@@ -3,7 +3,7 @@
     <h1 v-if="showTitle" class="video-title">{{ node.title }}</h1>
     <div
       :style="{
-        height: `${dimensions.height}px`,
+        height: heightCss,
         width: '100%',
       }"
     >
@@ -172,6 +172,13 @@ export default {
           return "h5p-video-media"
         default:
           throw new Error(`Unknown video type: ${this.node.mediaFormat}`)
+      }
+    },
+    heightCss() {
+      if (this.videoComponent == "h5p-video-media" && this.context == "page") {
+        return "auto"
+      } else {
+        return this.dimensions.height + "px"
       }
     },
     popups() {

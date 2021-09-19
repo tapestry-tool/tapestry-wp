@@ -6,7 +6,7 @@
       'context-multi-content': hasMultiContentContext,
     }"
     :style="{
-      height: `${dimensions.height}px`,
+      height: `${frameHeight}px`,
       width: '100%',
     }"
   >
@@ -131,8 +131,9 @@ export default {
         this.settingsLastUpdated = currTimestamp
       }
     },
-
     setFrameDimensions() {
+      // Switching to aspect ratio method for TYDE only
+      /*
       const h5pDimensions = this.instance.parent.$container[0].getBoundingClientRect()
       // default
       this.frameHeight = h5pDimensions.height
@@ -166,6 +167,7 @@ export default {
         updatedDimensions.width = this.frameWidth
       }
       this.$emit("change:dimensions", updatedDimensions)
+      */
     },
     getInstance() {
       if (this.$refs.h5p) {
@@ -297,25 +299,35 @@ export default {
     handleLoad() {
       const h5pObj = this.$refs.h5p.contentWindow.H5P
       const h5pInstance = h5pObj.instances[0]
-      const loadedH5PId = h5pInstance.contentId
       this.library = h5pInstance.libraryInfo.machineName
 
-      this.frameHeight = this.dimensions.height
-      // Check to see whether this is an H5P recorder
-      // If it is, we can emit an event to load the recorded audio (if exists)
-      // and terminate
-      if (h5pInstance.recorder && loadedH5PId) {
-        this.loadedH5PRecorderId = loadedH5PId
-        this.h5pRecorderSaverIsLoaded()
-        return
-      }
       const mediaProgress = this.node.progress
+
+      // This is for TYDE only
+      // Note: This method hardcodes a default 16:9 aspect ratio which is not a good idea
+      // TODO: Allow users to define the aspect ratio or otherwise figure out a way
+      // to get it automatically. Currently it seems H5P has the right aspect ratio for
+      // YouTube videos but not regular mp4's
+      const h5pMeta = JSON.parse(this.node.typeData.h5pMeta2.parameters)
+      const aspectRatioStr =
+        h5pMeta.interactiveVideo.video.files[0].aspectRatio || "16:9"
+      const aspectRatio = aspectRatioStr.split(":")
+      this.frameHeight = (this.dimensions.width / aspectRatio[0]) * aspectRatio[1]
+      // Add height for the video controls
+      this.frameHeight += 38
+      this.frameWidth = 0
+
+      this.$emit("change:dimensions", { height: this.frameHeight })
+      /*
       this.frameHeight = this.$refs.h5p.contentWindow.document.activeElement.children[0].clientHeight
       this.$emit("change:dimensions", { height: this.frameHeight })
+      */
+
       const h5pVideo = h5pInstance.video
       const h5pIframeComponent = this
       const handleH5pAfterLoad = () => {
         h5pIframeComponent.instance = h5pVideo
+        /*
         window.addEventListener("resize", h5pIframeComponent.setFrameDimensions)
         document.addEventListener(
           "fullscreenchange",
@@ -329,6 +341,8 @@ export default {
           "mozfullscreenchange",
           h5pIframeComponent.setFrameDimensions
         )
+        */
+
         const videoDuration = h5pVideo.getDuration()
         if (this.autoplay) {
           h5pVideo.seek(mediaProgress * videoDuration)

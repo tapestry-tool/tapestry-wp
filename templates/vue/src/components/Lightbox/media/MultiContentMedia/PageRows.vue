@@ -41,7 +41,7 @@
             <div v-if="row.node.mediaType !== 'multi-content'">
               <tapestry-media
                 :node-id="row.node.id"
-                :dimensions="dimensions"
+                :dimensions="innerDimensions"
                 context="page"
                 style="margin-bottom: 24px;"
                 @complete="updateProgress(row.node.id)"
@@ -52,7 +52,7 @@
               </p>
               <accordion-rows
                 v-if="row.children.length > 0"
-                :dimensions="dimensions"
+                :dimensions="innerDimensions"
                 :node="row.node"
                 :rowId="subRowId"
                 context="page"
@@ -170,6 +170,12 @@ export default {
         }
       } else {
         return null
+      }
+    },
+    innerDimensions() {
+      return {
+        ...this.dimensions,
+        width: this.dimensions.width - 32, // excludes padding
       }
     },
   },
