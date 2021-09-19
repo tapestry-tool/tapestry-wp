@@ -5,81 +5,90 @@
     @input="changeRow"
   >
     <template v-slot="{ isVisible, hasNext, next }">
-      <div data-qa="page-rows">
-        <div
-          v-for="(row, index) in rows"
-          :id="`row-${row.node.id}`"
-          :key="row.node.id"
-          ref="rowRefs"
-          class="page-row"
-          :style="rowBackground"
-        >
-          <div class="title-row-icon">
-            <i v-if="disableRow(index, row.node)" class="fas fa-lock fa-sm"></i>
-            <a v-else>
-              <i
-                class="fas fa-heart fa-sm"
-                :style="{
-                  color: isFavourite(row.node.id) ? 'red' : 'black',
-                  opacity: isFavourite(row.node.id) ? '1' : '0.25',
-                  cursor: 'pointer',
-                }"
-                @click="toggleFavourite(row.node.id)"
-              ></i>
-            </a>
-          </div>
-          <div v-if="disableRow(index, row.node)">
-            <h1 class="title">
-              {{ row.node.title }}
-            </h1>
-            <locked-content
-              :node="row.node"
-              :condition-node="index > 0 ? rows[index - 1].node : {}"
-            ></locked-content>
-          </div>
-          <div v-else :data-qa="`row-content-${row.node.id}`">
-            <div v-if="row.node.mediaType !== 'multi-content'">
-              <tapestry-media
-                :node-id="row.node.id"
-                :dimensions="getRowDimensions(row.node)"
-                context="page"
-                style="margin-bottom: 24px;"
-                @complete="updateProgress(row.node.id)"
-                @load="handleLoad($refs.rowRefs[index])"
-              />
-              <p v-if="row.children.length > 0 && !areAllPopup(row.children)">
-                {{ row.node.typeData.subAccordionText }}
-              </p>
-              <accordion-rows
-                v-if="row.children.length > 0"
-                :dimensions="getRowDimensions(row.node)"
-                :node="row.node"
-                :rowId="subRowId"
-                context="page"
-                :level="level + 1"
-                @changeRow="changeRow"
-                @load="handleLoad"
-                @updateProgress="updateProgress"
-              ></accordion-rows>
-            </div>
-            <multi-content-media
-              v-else-if="row.children.length > 0"
-              :node="getNode(row.node.id)"
-              :row-id="subRowId"
-              context="page"
-              :level="level + 1"
-              @close="handleAutoClose"
-              @complete="updateProgress"
-            />
-          </div>
-          <button
-            v-if="row.node.completed && isVisible(row)"
-            class="mt-2"
-            @click="hasNext ? next() : (showCompletion = true)"
-          >
-            {{ node.typeData.finishButtonText }}
-          </button>
-        </div>
+      <div data-qa="page-rows" class="page-rows">
+        <b-row>
+          <template v-for="(row, index) in rows">
+            <b-col
+              :id="`row-${row.node.id}`"
+              :key="row.node.id"
+              ref="rowRefs"
+              class="col"
+              cols="12"
+              :lg="row.node.typeData.halfWidth ? 6 : 12"
+            >
+              <div class="page-row" :style="rowBackground">
+                <div class="title-row-icon">
+                  <i
+                    v-if="disableRow(index, row.node)"
+                    class="fas fa-lock fa-sm"
+                  ></i>
+                  <a v-else>
+                    <i
+                      class="fas fa-heart fa-sm"
+                      :style="{
+                        color: isFavourite(row.node.id) ? 'red' : 'black',
+                        opacity: isFavourite(row.node.id) ? '1' : '0.25',
+                        cursor: 'pointer',
+                      }"
+                      @click="toggleFavourite(row.node.id)"
+                    ></i>
+                  </a>
+                </div>
+                <div v-if="disableRow(index, row.node)">
+                  <h1 class="title">
+                    {{ row.node.title }}
+                  </h1>
+                  <locked-content
+                    :node="row.node"
+                    :condition-node="index > 0 ? rows[index - 1].node : {}"
+                  ></locked-content>
+                </div>
+                <div v-else :data-qa="`row-content-${row.node.id}`">
+                  <div v-if="row.node.mediaType !== 'multi-content'">
+                    <tapestry-media
+                      :node-id="row.node.id"
+                      :dimensions="getRowDimensions(row.node)"
+                      context="page"
+                      style="margin-bottom: 24px;"
+                      @complete="updateProgress(row.node.id)"
+                      @load="handleLoad($refs.rowRefs[index])"
+                    />
+                    <p v-if="row.children.length > 0 && !areAllPopup(row.children)">
+                      {{ row.node.typeData.subAccordionText }}
+                    </p>
+                    <accordion-rows
+                      v-if="row.children.length > 0"
+                      :dimensions="getRowDimensions(row.node)"
+                      :node="row.node"
+                      :rowId="subRowId"
+                      context="page"
+                      :level="level + 1"
+                      @changeRow="changeRow"
+                      @load="handleLoad"
+                      @updateProgress="updateProgress"
+                    ></accordion-rows>
+                  </div>
+                  <multi-content-media
+                    v-else-if="row.children.length > 0"
+                    :node="getNode(row.node.id)"
+                    :row-id="subRowId"
+                    context="page"
+                    :level="level + 1"
+                    @close="handleAutoClose"
+                    @complete="updateProgress"
+                  />
+                </div>
+                <button
+                  v-if="row.node.completed && isVisible(row)"
+                  class="mt-2"
+                  @click="hasNext ? next() : (showCompletion = true)"
+                >
+                  {{ node.typeData.finishButtonText }}
+                </button>
+              </div>
+            </b-col>
+          </template>
+        </b-row>
       </div>
     </template>
   </headless-multi-content>
@@ -189,7 +198,8 @@ export default {
       )
     },
     getRowDimensions(node) {
-      const widthMultiplier = node ? 1 : 1 // this should be updated when half-width feature is here
+      const widthMultiplier =
+        node.typeData.halfWidth && window.innerWidth > 990 ? 0.5 : 1
       return {
         ...this.dimensions,
         width: (this.dimensions.width - 32) * widthMultiplier, // excludes padding
@@ -235,14 +245,18 @@ button[disabled] {
   }
 }
 
+.col-6,
+.page-rows {
+  margin-right: -15px;
+}
+.col-12 {
+  max-width: calc(100% - 15px);
+}
+
 .page-row {
   background: #ddd;
   border-radius: 4px;
   padding: 8px 16px;
-  margin-bottom: 8px;
-
-  &:last-child {
-    margin-bottom: 0;
-  }
+  margin-bottom: 16px;
 }
 </style>

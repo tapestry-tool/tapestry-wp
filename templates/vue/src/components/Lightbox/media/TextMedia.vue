@@ -39,9 +39,12 @@ export default {
 
 <style lang="scss" scoped>
 .article {
-  padding: 1em;
   text-align: left;
   min-height: 100%;
+
+  &.context-lightbox {
+    padding: 1em;
+  }
 
   h1 {
     font-size: 1.75rem;
