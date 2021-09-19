@@ -2,7 +2,7 @@
   <div>
     <h1 v-if="showTitle" class="wp-media-title">{{ node.title }}</h1>
     <loading v-if="loading" />
-    <div v-else class="article" :class="'contex-' + context">
+    <div v-else class="article" :class="'context-' + context">
       <h1 class="article-title" v-html="title"></h1>
       <article v-html="content"></article>
     </div>
