@@ -28,7 +28,7 @@
       </button>
       <div v-if="unitsTitle.length > 0 && opened" class="m-2">
         <b-form-select
-          v-model="selected"
+          v-model="selectedUnit"
           :options="unitsTitle"
           @change="$emit('unit-changed', $event)"
         ></b-form-select>
@@ -86,7 +86,7 @@ export default {
     return {
       opened: false || this.browserWidth > 800,
       browserWidth: Helpers.getBrowserWidth(),
-      selected: this.node.id,
+      selectedUnit: this.node.id,
     }
   },
   computed: {
@@ -142,7 +142,6 @@ export default {
         },
       })
     }
-    console.log(this.unitsTitle)
   },
   methods: {
     disabledRow(node) {
