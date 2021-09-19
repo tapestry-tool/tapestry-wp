@@ -13,7 +13,8 @@
               :key="row.node.id"
               ref="rowRefs"
               class="col"
-              :cols="row.node.typeData.halfWidth ? 6 : 12"
+              cols="12"
+              :lg="row.node.typeData.halfWidth ? 6 : 12"
             >
               <div class="page-row" :style="rowBackground">
                 <div class="title-row-icon">
