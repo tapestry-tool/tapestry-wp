@@ -1,12 +1,7 @@
 <template>
   <div>
     <h1 v-if="showTitle" class="video-title">{{ node.title }}</h1>
-    <div
-      :style="{
-        height: `${dimensions.height}px`,
-        width: '100%',
-      }"
-    >
+    <div :class="'video-wrapper context-' + context" :style="{ height: heightCss }">
       <loading v-if="state === states.Loading" />
       <component
         :is="videoComponent"
@@ -54,12 +49,6 @@
       >
         Continue
       </button>
-      <play-screen
-        v-if="state === states.Paused && showPlayScreen"
-        class="screen"
-        :hide-video="hideVideo"
-        @play="transition(events.Play)"
-      />
       <end-screen
         v-if="state === states.Finished"
         class="screen"
@@ -79,7 +68,6 @@ import UrlVideoMedia from "./UrlVideoMedia"
 import H5PVideoMedia from "./H5PVideoMedia"
 import YouTubeMedia from "./YouTubeMedia"
 import EndScreen from "./EndScreen"
-import PlayScreen from "./PlayScreen"
 import { COMPLETION_THRESHOLD } from "./video.config"
 import Loading from "@/components/common/Loading"
 import client from "@/services/TapestryAPI"
@@ -119,7 +107,6 @@ export default {
     "h5p-video-media": H5PVideoMedia,
     UrlVideoMedia,
     EndScreen,
-    PlayScreen,
     Loading,
     MultiContentMedia: () => import("../MultiContentMedia/index"),
   },
@@ -140,7 +127,6 @@ export default {
   data() {
     return {
       state: VideoStates.Loading,
-      showPlayScreen: true,
       hideVideo: false,
       activePopupId: null,
       progressLastUpdated: 0,
@@ -172,6 +158,13 @@ export default {
           return "h5p-video-media"
         default:
           throw new Error(`Unknown video type: ${this.node.mediaFormat}`)
+      }
+    },
+    heightCss() {
+      if (this.context == "page" && this.videoComponent !== "youtube-media") {
+        return "auto"
+      } else {
+        return this.dimensions.height + "px"
       }
     },
     popups() {
@@ -227,9 +220,6 @@ export default {
      * name, as well as perform any necessary side effects.
      */
     transition(eventName, context) {
-      if (eventName == VideoEvents.Play) {
-        this.showPlayScreen = this.node.mediaType !== "h5p"
-      }
       switch (this.state) {
         case VideoStates.Loading: {
           switch (eventName) {
@@ -248,9 +238,8 @@ export default {
                       time: context.currentTime,
                     }
                   )
-                  this.showPlayScreen = this.node.mediaType !== "h5p"
                 }
-              } else {
+              } else if (this.node.mediaType === "h5p") {
                 this.state = VideoStates.H5P
               }
               this.$emit("load", context)
@@ -291,7 +280,6 @@ export default {
                 // End of video
                 if (amountViewed >= 1) {
                   this.state = VideoStates.Finished
-                  this.showPlayScreen = true
                 }
               }
 
@@ -365,6 +353,15 @@ export default {
 </script>
 
 <style scoped lang="scss">
+.video-wrapper {
+  width: 100%;
+
+  &.context-page {
+    border-radius: 15px;
+    overflow: hidden;
+  }
+}
+
 .video-title {
   text-align: left;
   margin-bottom: 0.9em;

@@ -12,15 +12,20 @@
       @seeking="$emit('seeking')"
       @timeupdate="updateVideoProgress"
     ></video>
+    <play-screen v-if="!videoPlaying" class="screen" @play="playVideo" />
   </div>
 </template>
 
 <script>
 import client from "@/services/TapestryAPI"
 import { SEEK_THRESHOLD } from "./video.config"
+import PlayScreen from "./PlayScreen"
 
 export default {
   name: "url-video-media",
+  components: {
+    PlayScreen,
+  },
   props: {
     node: {
       type: Object,
@@ -45,6 +50,7 @@ export default {
   data() {
     return {
       videoDimensions: null,
+      videoPlaying: false,
     }
   },
   computed: {
@@ -76,11 +82,10 @@ export default {
     },
   },
   watch: {
-    playing(isPlaying) {
-      if (isPlaying) {
-        this.$refs.video.play()
-      } else {
-        this.$refs.video.pause()
+    playing() {
+      const video = this.$refs.video
+      if (video) {
+        this.videoPlaying = !video.paused
       }
     },
   },
@@ -88,26 +93,33 @@ export default {
     this.updateVideoProgress()
   },
   methods: {
-    handleSeek() {
-      this.$emit("seeked", { currentTime: this.$refs.video.currentTime })
+    playVideo() {
+      const video = this.$refs.video
+      if (video) {
+        video.play()
+      }
+    },
+    handleSeek($event) {
+      this.$emit("seeked", { currentTime: $event.srcElement.currentTime })
     },
     reset() {
       this.$refs.video.currentTime = 0
     },
-    handlePlay() {
+    handlePlay($event) {
+      this.videoPlaying = true
       this.$emit("play")
       client.recordAnalyticsEvent("user", "play", "html5-video", this.node.id, {
-        time: this.$refs.video.currentTime,
+        time: $event.srcElement.currentTime,
       })
     },
-    handlePause() {
+    handlePause($event) {
       this.$emit("pause")
       client.recordAnalyticsEvent("user", "pause", "html5-video", this.node.id, {
-        time: this.$refs.video.currentTime,
+        time: $event.srcElement.currentTime,
       })
     },
-    handleLoad() {
-      const video = this.$refs.video
+    handleLoad($event) {
+      const video = $event.srcElement
       this.videoDimensions = {
         height: video.videoHeight,
         width: video.videoWidth,
@@ -115,6 +127,8 @@ export default {
       const currentTime = this.node.progress * video.duration
       video.currentTime = currentTime
       this.lastTime = currentTime
+
+      this.videoPlaying = !video.paused
 
       /**
        * Adjust the lightbox height to fit the video
@@ -126,8 +140,8 @@ export default {
         currentTime,
       })
     },
-    updateVideoProgress() {
-      const video = this.$refs.video
+    updateVideoProgress($event) {
+      const video = $event?.srcElement || this.$refs.video
       if (video) {
         const currentTime = video.currentTime
         const amountViewed = currentTime / video.duration
