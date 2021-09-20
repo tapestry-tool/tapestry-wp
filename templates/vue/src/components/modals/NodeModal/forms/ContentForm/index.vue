@@ -144,10 +144,7 @@ export default {
   computed: {
     ...mapGetters(["isMultiContentRow"]),
     mediaTypes() {
-      if (
-        this.parent?.mediaType === "multi-content" &&
-        this.parent?.presentationStyle === "units"
-      ) {
+      if (this.isUnitChild) {
         return [{ value: "multi-content", text: "Multi-Content" }]
       } else {
         return [
@@ -228,10 +225,7 @@ export default {
       this.$emit("type-changed", evt)
     },
     selectUnitChild() {
-      if (
-        this.parent?.mediaType === "multi-content" &&
-        this.parent?.presentationStyle === "units"
-      ) {
+      if (this.isUnitChild) {
         this.node.mediaType = "multi-content"
         this.node.presentationStyle = "page"
       }

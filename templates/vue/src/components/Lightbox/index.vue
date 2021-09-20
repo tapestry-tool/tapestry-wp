@@ -91,6 +91,13 @@ export default {
   computed: {
     ...mapState(["h5pSettings", "rootId"]),
     ...mapGetters(["getNode", "isMultiContent", "isMultiContentRow"]),
+    presentationNodeId() {
+      if (this.node.presentationStyle === "units") {
+        return this.node.childOrdering[0]
+      }
+
+      return this.nodeId
+    },
     node() {
       const node = this.getNode(this.nodeId)
       return node
@@ -242,6 +249,7 @@ export default {
   mounted() {
     document.querySelector("body").classList.add("tapestry-lightbox-open")
     DragSelectModular.removeDragSelectListener()
+
     if (this.node.mediaType === "multi-content") {
       this.$root.$on("observe-rows", refs => {
         this.rowRefs = this.rowRefs.concat(refs)
@@ -301,8 +309,8 @@ export default {
         height: this.lightboxDimensions.height,
       }
     },
-    handleUnitChange(newNode) {
-      this.$root.$emit("open-node", newNode)
+    handleUnitChange(nodeId) {
+      this.$root.$emit("open-node", nodeId)
     },
   },
 }

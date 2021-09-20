@@ -51,12 +51,7 @@ export default {
   },
   mounted() {
     this.$root.$on("open-node", id => {
-      let urlNodeId = id
-      const node = this.getNode(id)
-      if (node.presentationStyle === "units") {
-        urlNodeId = node.childOrdering[0]
-      }
-      this.openNode(urlNodeId)
+      this.openNode(id)
     })
     this.$root.$on("edit-node", id => {
       this.editNode(id)

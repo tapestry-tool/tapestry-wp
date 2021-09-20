@@ -125,9 +125,7 @@ export default {
     ]),
     ...mapState(["favourites", "rootId"]),
     rows() {
-      let node = this.node
-
-      return node.childOrdering.map(id => {
+      return this.node.childOrdering.map(id => {
         const node = this.getNode(id)
         const children = this.isMultiContent(node.id)
           ? node.childOrdering.map(this.getNode)
