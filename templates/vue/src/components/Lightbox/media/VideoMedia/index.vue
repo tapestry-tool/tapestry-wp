@@ -271,6 +271,7 @@ export default {
               )
               if (activePopup) {
                 this.state = VideoStates.Popup
+                this.$refs.video.pauseVideo()
                 this.activePopupId = activePopup.id
               } else {
                 if (amountViewed >= COMPLETION_THRESHOLD) {
@@ -302,6 +303,7 @@ export default {
           switch (eventName) {
             case VideoEvents.Continue:
               this.state = VideoStates.Playing
+              this.$refs.video.playVideo()
               this.activePopupId = null
               this.completing = false
           }

@@ -99,6 +99,12 @@ export default {
         video.play()
       }
     },
+    pauseVideo() {
+      const video = this.$refs.video
+      if (video) {
+        video.pause()
+      }
+    },
     handleSeek($event) {
       this.$emit("seeked", { currentTime: $event.srcElement.currentTime })
     },
