@@ -168,7 +168,6 @@ export default {
           userMainRole = "public"
         }
 
-        console.log(this.settings.tydeModeTabs)
         const defaultNodeId = this.settings.tydeModeTabs.default[userMainRole]
         this.$router.push({
           name: names.LIGHTBOX,

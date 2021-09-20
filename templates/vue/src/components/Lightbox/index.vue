@@ -2,7 +2,7 @@
   <tapestry-modal
     id="lightbox"
     data-qa="lightbox"
-    :node-id="nodeId"
+    :node-id="currentNodeId"
     :class="{
       'full-screen': node.fullscreen || tydeModeEnabled,
       'content-text': node.mediaType === 'text' || node.mediaType === 'wp-post',
@@ -18,7 +18,7 @@
       @change-tab="handleTabChange"
     ></navbar>
     <div
-      v-show="selectedTab === 'default'"
+      v-show="selectedTab !== 'cos'"
       class="node-container"
       :class="{
         'multi-content': node.mediaType === 'multi-content',
@@ -43,7 +43,7 @@
       />
       <tapestry-media
         v-if="node.mediaType !== 'multi-content'"
-        :node-id="nodeId"
+        :node-id="currentNodeId"
         :dimensions="dimensions"
         context="lightbox"
         :class="{ 'has-navbar': tydeModeEnabled }"
@@ -112,8 +112,23 @@ export default {
   computed: {
     ...mapState(["h5pSettings", "rootId", "settings"]),
     ...mapGetters(["getNode", "isMultiContent", "isMultiContentRow"]),
+    currentNodeId() {
+      /*
+          Default tyde node is currently the only node to be directly pushed to the router
+          thus nodeId will always store the values of the default(tyde icon) node
+       */
+      if (this.settings.tydeModeEnabled) {
+        if (this.selectedTab === "profile") {
+          return this.settings.tydeModeTabs.profile
+        } else if (this.selectedTab === "goals") {
+          return this.settings.tydeModeTabs.goals
+        }
+      }
+
+      return this.nodeId
+    },
     node() {
-      const node = this.getNode(this.nodeId)
+      const node = this.getNode(this.currentNodeId)
       return node
     },
     canSkip() {
@@ -216,7 +231,7 @@ export default {
     },
   },
   watch: {
-    nodeId: {
+    currentNodeId: {
       immediate: true,
       handler() {
         if (!this.node) {
@@ -236,12 +251,12 @@ export default {
       handler(rowId) {
         if (rowId) {
           if (
-            !this.isMultiContent(this.nodeId) ||
-            !this.isMultiContentRow(rowId, this.nodeId)
+            !this.isMultiContent(this.currentNodeId) ||
+            !this.isMultiContentRow(rowId, this.currentNodeId)
           ) {
             this.$router.replace({
               name: names.LIGHTBOX,
-              params: { nodeId: this.nodeId },
+              params: { nodeId: this.currentNodeId },
               query: this.$route.query,
             })
           }
@@ -255,7 +270,7 @@ export default {
           if (!this.isMultiContentRow(subRowId, this.rowId)) {
             this.$router.replace({
               name: names.ACCORDION,
-              params: { nodeId: this.nodeId, rowId: this.rowId },
+              params: { nodeId: this.currentNodeId, rowId: this.rowId },
               query: this.$route.query,
             })
           }
@@ -283,20 +298,20 @@ export default {
   methods: {
     ...mapActions(["completeNode"]),
     complete(nodeId) {
-      this.completeNode(nodeId || this.nodeId)
+      this.completeNode(nodeId || this.currentNodeId)
     },
     handleUserClose() {
-      client.recordAnalyticsEvent("user", "close", "lightbox", this.nodeId)
+      client.recordAnalyticsEvent("user", "close", "lightbox", this.currentNodeId)
       this.close()
     },
     handleAutoClose() {
-      client.recordAnalyticsEvent("app", "close", "lightbox", this.nodeId)
+      client.recordAnalyticsEvent("app", "close", "lightbox", this.currentNodeId)
       this.close()
     },
     close() {
       this.$router.push({
         name: names.APP,
-        params: { nodeId: this.nodeId },
+        params: { nodeId: this.currentNodeId },
         query: this.$route.query,
       })
     },
