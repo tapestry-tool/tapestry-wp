@@ -13,7 +13,7 @@
   >
     <multi-content-media
       v-if="node.mediaType === 'multi-content'"
-      :node="node"
+      :node="presentationNodeId"
       :row-id="rowId"
       :sub-row-id="subRowId"
       @close="handleAutoClose"
@@ -24,7 +24,7 @@
         node.typeData.showNavBar &&
           (node.presentationStyle === 'page' || node.presentationStyle === 'units')
       "
-      :node="node"
+      :node="presentationNodeId"
       :rowRefs="rowRefs"
       :dimensions="dimensions"
       @unit-changed="handleUnitChange"
@@ -93,10 +93,10 @@ export default {
     ...mapGetters(["getNode", "isMultiContent", "isMultiContentRow"]),
     presentationNodeId() {
       if (this.node.presentationStyle === "units") {
-        return this.node.childOrdering[0]
+        return this.getNode(this.node.childOrdering[0])
       }
 
-      return this.nodeId
+      return this.node
     },
     node() {
       const node = this.getNode(this.nodeId)
