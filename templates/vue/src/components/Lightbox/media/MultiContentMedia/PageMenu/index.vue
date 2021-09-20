@@ -26,7 +26,7 @@
         <i v-if="!opened" class="fas fa-bars fa-lg" style="color: black;"></i>
         <i v-else class="fas fa-times fa-lg"></i>
       </button>
-      <div v-if="unitsTitle.length > 0 && opened" class="m-2">
+      <div v-if="unitsTitle.length > 0 && contentVisible" class="m-2 mb-4">
         <b-form-select
           v-model="selectedUnit"
           :options="unitsTitle"
@@ -84,8 +84,7 @@ export default {
   },
   data() {
     return {
-      opened: false || this.browserWidth > 800,
-      browserWidth: Helpers.getBrowserWidth(),
+      opened: false,
       selectedUnit: this.node.id,
     }
   },
@@ -127,6 +126,12 @@ export default {
         })
       }
       return []
+    },
+    browserWidth() {
+      return Helpers.getBrowserWidth()
+    },
+    contentVisible() {
+      return this.opened || this.browserWidth > 800
     },
   },
   mounted() {
