@@ -6,14 +6,14 @@
       'full-screen': node.fullscreen,
       'content-text': node.mediaType === 'text' || node.mediaType === 'wp-post',
     }"
-    :node-id="nodeId"
+    :node-id="presentationNode.id"
     :content-container-style="lightboxContentStyles"
     :allow-close="canSkip"
     @close="handleUserClose"
   >
     <multi-content-media
       v-if="node.mediaType === 'multi-content'"
-      :node="presentationNodeId"
+      :node="presentationNode"
       :row-id="rowId"
       :sub-row-id="subRowId"
       @close="handleAutoClose"
@@ -24,7 +24,7 @@
         node.typeData.showNavBar &&
           (node.presentationStyle === 'page' || node.presentationStyle === 'units')
       "
-      :node="presentationNodeId"
+      :node="presentationNode"
       :rowRefs="rowRefs"
       :dimensions="dimensions"
       @unit-changed="handleUnitChange"
@@ -91,7 +91,7 @@ export default {
   computed: {
     ...mapState(["h5pSettings", "rootId"]),
     ...mapGetters(["getNode", "isMultiContent", "isMultiContentRow"]),
-    presentationNodeId() {
+    presentationNode() {
       if (this.node.presentationStyle === "units") {
         return this.getNode(this.node.childOrdering[0])
       }
