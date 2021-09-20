@@ -5,64 +5,60 @@
     :style="navBarStyle"
     data-qa="multi-content"
   >
-    <b-container class="title">
-      <b-row>
-        <b-col>
-          <h1
-            v-if="showTitle"
-            :class="{
-              'nested-media-title': isMultiContentContext,
-            }"
-          >
-            {{ node.title }}
-          </h1>
-        </b-col>
-      </b-row>
-
-      <accordion-rows
-        v-if="node.presentationStyle === 'accordion'"
-        :dimensions="dimensions"
-        :node="node"
-        :rowId="rowId"
-        :subRowId="subRowId"
-        :context="context"
-        :level="level"
-        @load="handleLoad"
-        @changeRow="changeRow"
-        @updateProgress="updateProgress"
-      ></accordion-rows>
-      <page-rows
-        v-else-if="node.presentationStyle === 'page'"
-        :dimensions="dimensions"
-        :node="node"
-        :rowId="rowId"
-        :subRowId="subRowId"
-        :context="context"
-        :level="level"
-        @load="handleLoad"
-        @changeRow="changeRow"
-        @updateProgress="updateProgress"
-      ></page-rows>
-      <tapestry-modal
-        v-if="showCompletion"
-        :node-id="node.id"
-        :allow-close="false"
-        @close="handleCancel"
+    <header>
+      <h1
+        v-if="showTitle"
+        :class="{
+          title: true,
+          'nested-media-title': isMultiContentContext,
+        }"
       >
-        <h1>{{ node.typeData.confirmationTitleText }}</h1>
-        <p>{{ node.typeData.confirmationBodyText }}</p>
-        <div class="button-container">
-          <button class="button-completion" @click="handleClose">
-            <i class="far fa-arrow-alt-circle-right fa-4x"></i>
-            <p>{{ node.typeData.continueButtonText }}</p>
-          </button>
-          <button class="button-completion" @click="handleCancel">
-            <i class="far fa-times-circle fa-4x"></i>
-            <p>{{ node.typeData.cancelLinkText }}</p>
-          </button>
-        </div>
-      </tapestry-modal>
-    </b-container>
+        {{ node.title }}
+      </h1>
+    </header>
+    <accordion-rows
+      v-if="node.presentationStyle === 'accordion'"
+      :dimensions="dimensions"
+      :node="node"
+      :rowId="rowId"
+      :subRowId="subRowId"
+      :context="context"
+      :level="level"
+      @load="handleLoad"
+      @changeRow="changeRow"
+      @updateProgress="updateProgress"
+    ></accordion-rows>
+    <page-rows
+      v-else-if="node.presentationStyle === 'page'"
+      :dimensions="dimensions"
+      :node="node"
+      :rowId="rowId"
+      :subRowId="subRowId"
+      :context="context"
+      :level="level"
+      @load="handleLoad"
+      @changeRow="changeRow"
+      @updateProgress="updateProgress"
+    ></page-rows>
+    <tapestry-modal
+      v-if="showCompletion"
+      :node-id="node.id"
+      :allow-close="false"
+      @close="handleCancel"
+    >
+      <h1>{{ node.typeData.confirmationTitleText }}</h1>
+      <p>{{ node.typeData.confirmationBodyText }}</p>
+      <div class="button-container">
+        <button class="button-completion" @click="handleClose">
+          <i class="far fa-arrow-alt-circle-right fa-4x"></i>
+          <p>{{ node.typeData.continueButtonText }}</p>
+        </button>
+        <button class="button-completion" @click="handleCancel">
+          <i class="far fa-times-circle fa-4x"></i>
+          <p>{{ node.typeData.cancelLinkText }}</p>
+        </button>
+      </div>
+    </tapestry-modal>
   </div>
 </template>
 
@@ -314,6 +310,7 @@ button[disabled] {
 }
 
 .title {
+  color: #111;
   margin-bottom: 1em;
 }
 
