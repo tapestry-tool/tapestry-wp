@@ -132,25 +132,25 @@ class TapestryUserProgress implements ITapestryUserProgress
     }
 
     /**
-     * This function checks if any user has answered a question
+     * This function checks if any user has answered a question.
      *
-     * @param string $postId 
-     * @param string $nodeMetaId 
-     * @param string $questionId 
-     * 
-     * @return boolean $hasAnswer
+     * @param string $postId
+     * @param string $nodeMetaId
+     * @param string $questionId
+     *
+     * @return bool $hasAnswer
      */
     public static function questionsHasAnyAnswer($postId, $nodeMetaId, $questionId, $answerType)
     {
-        $userIds = get_users(array('fields'=> array('ID')));
+        $userIds = get_users(['fields' => ['ID']]);
         $hasAnswer = false;
-    
-        foreach($userIds as $userId) {
-           $user_answer = get_user_meta($userId->ID, 'tapestry_'.$postId.'_'.$nodeMetaId.'_question_'.$questionId.'_answers', true);
-           if($user_answer != '' && is_array($user_answer) && array_key_exists($answerType, $user_answer)) {
-               $hasAnswer = true;
-               break;
-           }
+
+        foreach ($userIds as $userId) {
+            $user_answer = get_user_meta($userId->ID, 'tapestry_'.$postId.'_'.$nodeMetaId.'_question_'.$questionId.'_answers', true);
+            if ('' != $user_answer && is_array($user_answer) && array_key_exists($answerType, $user_answer)) {
+                $hasAnswer = true;
+                break;
+            }
         }
 
         return $hasAnswer;
@@ -270,6 +270,45 @@ class TapestryUserProgress implements ITapestryUserProgress
     {
         $this->_checkPostId();
         update_user_meta($this->_userId, 'tapestry_favourites_'.$this->postId, $favourites);
+    }
+
+    /**
+     * Get User's last selected node for a tapestry post.
+     *
+     * @return int $nodeId  node id of the last selected node in the tapestry
+     */
+    public function getLastSelectedNode()
+    {
+        $this->_isValidTapestryPost();
+        $this->_checkPostId();
+
+        $lastSelectedNode = get_user_meta($this->_userId, 'tapestry_last_selected_node_'.$this->postId, true);
+
+        return $lastSelectedNode;
+    }
+
+    /**
+     * Update User's last selected node for a tapestry post.
+     *
+     * @param int $nodeId node id of the last selected node in the tapestry
+     *
+     * @return null
+     */
+    public function updateLastSelectedNode($nodeId, $rowId, $subRowId)
+    {
+        $this->_checkPostId();
+
+        $lastSelectedNode = new stdClass();
+        $lastSelectedNode->nodeId = $nodeId;
+
+        if ($rowId) {
+            $lastSelectedNode->rowId = $rowId;
+        }
+        if ($subRowId) {
+            $lastSelectedNode->subRowId = $subRowId;
+        }
+
+        update_user_meta($this->_userId, 'tapestry_last_selected_node_'.$this->postId, $lastSelectedNode);
     }
 
     /* Helpers */

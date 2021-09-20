@@ -1,9 +1,9 @@
 <template>
   <div>
-    <img :id="icon" :src="url" :width="size" svg />
+    <img :id="'tyde-icon-' + icon" :src="url" :width="size" svg />
     <b-tooltip
       v-if="windowWidth > 700"
-      :target="icon"
+      :target="'tyde-icon-' + icon"
       triggers="hover"
       :placement="isLast && windowWidth < 1100 ? 'left' : 'right'"
       custom-class="nav-item-tooltip text-capitalize"

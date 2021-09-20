@@ -32,7 +32,10 @@
             <h1 class="title">
               {{ row.node.title }}
             </h1>
-            <locked-content :node="row.node"></locked-content>
+            <locked-content
+              :node="row.node"
+              :condition-node="index > 0 ? rows[index - 1].node : {}"
+            ></locked-content>
           </div>
           <div v-else :data-qa="`row-content-${row.node.id}`">
             <div v-if="row.node.mediaType !== 'multi-content'">
@@ -175,7 +178,7 @@ export default {
   },
   methods: {
     ...mapMutations(["updateNode"]),
-    ...mapActions(["completeNode", "toggleFavourite"]),
+    ...mapActions(["toggleFavourite"]),
     handleLoad(el) {
       this.$emit("load", el)
     },

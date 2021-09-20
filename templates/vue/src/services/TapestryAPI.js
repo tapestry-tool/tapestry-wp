@@ -230,6 +230,23 @@ class TapestryApi {
     return response
   }
 
+  async getLastSelectedNode() {
+    const url = `/users/lastSelectedNode?post_id=${this.postId}`
+    const response = await this.client.get(url)
+    return response.data
+  }
+
+  async updateUserLastSelectedNode(nodeId, rowId, subRowId) {
+    const url = `/users/lastSelectedNode?post_id=${this.postId}`
+    const response = await this.client.post(url, {
+      post_id: this.postId,
+      nodeId,
+      rowId,
+      subRowId,
+    })
+    return response
+  }
+
   async getAllContributors() {
     const url = `/tapestries/${this.postId}/contributors`
     const response = await this.client.get(url)
@@ -335,9 +352,9 @@ class TapestryApi {
           .delete(`${baseUrl}/connections/${connectionId}`)
           .then(res => res.data)
       },
-      removeConnectionFromCircle(circleIndex, connectionId) {
+      removeConnectionFromCircles(connectionId) {
         return client
-          .delete(`${baseUrl}/circles/${circleIndex}/connections/${connectionId}`)
+          .delete(`${baseUrl}/circles/connections/${connectionId}`)
           .then(res => res.data)
       },
     }
