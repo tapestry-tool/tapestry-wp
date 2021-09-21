@@ -26,13 +26,20 @@
         <i v-if="!opened" class="fas fa-bars fa-lg" style="color: black;"></i>
         <i v-else class="fas fa-times fa-lg"></i>
       </button>
-      <div v-if="unitsTitle.length > 0 && contentVisible" class="m-2 mb-4">
-        <b-form-select
-          v-model="selectedUnit"
-          :options="unitsTitle"
-          @change="$emit('unit-changed', $event)"
-        ></b-form-select>
-      </div>
+      <b-dropdown
+        v-if="pages && contentVisible"
+        class="m-2 mb-4 w-100"
+        variant="light"
+        :text="pages[selectedPage].title"
+      >
+        <b-dropdown-item
+          v-for="page in pages"
+          :key="page.id"
+          @click="changePage(page.id)"
+        >
+          {{ page.title }}
+        </b-dropdown-item>
+      </b-dropdown>
       <div
         :class="[
           'page-nav-content',
@@ -85,7 +92,7 @@ export default {
   data() {
     return {
       opened: false,
-      selectedUnit: this.node.id,
+      selectedPage: this.node.id,
     }
   },
   computed: {
@@ -118,14 +125,14 @@ export default {
     rowOrder() {
       return this.getRowOrder(this.node)
     },
-    unitsTitle() {
+    pages() {
       if (this.parentNode?.presentationStyle === "units") {
-        return this.parentNode.childOrdering.map(id => {
-          const node = this.getNode(id)
-          return { value: node.id, text: node.title }
-        })
+        return this.parentNode.childOrdering.reduce((pages, nodeId) => {
+          pages[nodeId] = this.getNode(nodeId)
+          return pages
+        }, {})
       }
-      return []
+      return {}
     },
     browserWidth() {
       return Helpers.getBrowserWidth()
@@ -168,6 +175,10 @@ export default {
         }
       }
       return nodes
+    },
+    changePage(pageNodeId) {
+      this.selectedPage = pageNodeId
+      this.$root.$emit("open-node", pageNodeId)
     },
     scrollToRef(nodeId) {
       this.$nextTick(() => {

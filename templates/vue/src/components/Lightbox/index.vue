@@ -6,28 +6,24 @@
       'full-screen': node.fullscreen,
       'content-text': node.mediaType === 'text' || node.mediaType === 'wp-post',
     }"
-    :node-id="presentationNode.id"
+    :node-id="nodeId"
     :content-container-style="lightboxContentStyles"
     :allow-close="canSkip"
     @close="handleUserClose"
   >
     <multi-content-media
       v-if="node.mediaType === 'multi-content'"
-      :node="presentationNode"
+      :node="node"
       :row-id="rowId"
       :sub-row-id="subRowId"
       @close="handleAutoClose"
       @complete="complete"
     />
     <page-menu
-      v-if="
-        node.typeData.showNavBar &&
-          (node.presentationStyle === 'page' || node.presentationStyle === 'units')
-      "
-      :node="presentationNode"
+      v-if="node.typeData.showNavBar && node.presentationStyle === 'page'"
+      :node="node"
       :rowRefs="rowRefs"
       :dimensions="dimensions"
-      @unit-changed="handleUnitChange"
     />
     <tapestry-media
       v-if="node.mediaType !== 'multi-content'"
@@ -91,13 +87,6 @@ export default {
   computed: {
     ...mapState(["h5pSettings", "rootId"]),
     ...mapGetters(["getNode", "isMultiContent", "isMultiContentRow"]),
-    presentationNode() {
-      if (this.node.presentationStyle === "units") {
-        return this.getNode(this.node.childOrdering[0])
-      }
-
-      return this.node
-    },
     node() {
       const node = this.getNode(this.nodeId)
       return node
@@ -251,6 +240,13 @@ export default {
     DragSelectModular.removeDragSelectListener()
 
     if (this.node.mediaType === "multi-content") {
+      if (
+        this.node.presentationStyle === "units" &&
+        this.node.childOrdering?.length
+      ) {
+        const pageNode = this.getNode(this.node.childOrdering[0])
+        this.$root.$emit("open-node", pageNode.id)
+      }
       this.$root.$on("observe-rows", refs => {
         this.rowRefs = this.rowRefs.concat(refs)
       })
@@ -311,9 +307,6 @@ export default {
         width: this.lightboxDimensions.width,
         height: this.lightboxDimensions.height,
       }
-    },
-    handleUnitChange(nodeId) {
-      this.$root.$emit("open-node", nodeId)
     },
   },
 }
