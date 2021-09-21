@@ -24,7 +24,7 @@ describe("Answers", () => {
       cy.route("POST", "/users/activity/**").as("submit")
       cy.lightbox().within(() => {
         cy.get(`[placeholder="${placeholder}"]`).should("be.visible")
-        cy.get("input").type(answer)
+        cy.get(`[placeholder="${placeholder}"]`).type(answer)
         cy.contains(/submit/i).click()
         cy.contains("Thanks!").should("be.visible")
         cy.contains(/done/i).click()
