@@ -71,15 +71,16 @@ export default {
         })
       })
     }
-
     window.addEventListener("click", this.recordAnalytics)
     const data = [
       client.getTapestry(),
       client.getUserProgress(),
       client.getLastSelectedNode(),
+      client.getAvatar(),
     ]
-    Promise.all(data).then(([dataset, progress, selectedNode]) => {
+    Promise.all(data).then(([dataset, progress, selectedNode, savedAvatar]) => {
       this.init({ dataset, progress })
+      this.addAvatar(savedAvatar.data)
       this.loading = false
       if (!this.$route.params.nodeId && dataset.nodes.length > 0) {
         let path = `/nodes/${dataset.rootId}`
@@ -103,7 +104,7 @@ export default {
     window.removeEventListener("click", this.recordAnalytics)
   },
   methods: {
-    ...mapMutations(["init"]),
+    ...mapMutations(["init", "addAvatar"]),
     refresh() {
       this.$router.go()
     },
