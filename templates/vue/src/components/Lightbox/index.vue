@@ -285,7 +285,10 @@ export default {
     },
     close() {
       let selectedNode = this.nodeId
-      if (this.parentNode.presentationStyle === "units") {
+      if (
+        this.parentNode?.mediaType === "multi-content" &&
+        this.parentNode?.presentationStyle === "units"
+      ) {
         selectedNode = this.parentNode.id
       }
       this.$router.push({

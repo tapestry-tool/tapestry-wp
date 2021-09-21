@@ -126,7 +126,10 @@ export default {
       return this.getRowOrder(this.node)
     },
     pages() {
-      if (this.parentNode?.presentationStyle === "units") {
+      if (
+        this.parentNode?.mediaType === "multi-content" &&
+        this.parentNode?.presentationStyle === "units"
+      ) {
         return this.parentNode.childOrdering.reduce((pages, nodeId) => {
           pages[nodeId] = this.getNode(nodeId)
           return pages
