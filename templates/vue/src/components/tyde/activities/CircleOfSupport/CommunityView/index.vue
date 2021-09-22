@@ -34,7 +34,7 @@
       :communities="communities"
       :connections="connections"
       :parent-state="state"
-      :activeView="activeView"
+      :active-view="activeView"
       :has-connection-in-circles="hasConnectionInCircles"
       @tooltip-positioned="handleToolTipPositioned"
       @tooltip-removed="handleTooltipRemoved"

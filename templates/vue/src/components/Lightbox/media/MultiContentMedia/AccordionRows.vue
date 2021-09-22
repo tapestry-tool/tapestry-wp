@@ -259,9 +259,5 @@ button[disabled] {
   border-radius: 4px;
   padding: 8px 16px;
   margin-bottom: 8px;
-
-  &:last-child {
-    margin-bottom: 0;
-  }
 }
 </style>
