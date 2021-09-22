@@ -88,9 +88,6 @@ class CircleOfSupport
 
     public function deleteConnection($connectionId)
     {
-        if (!isset($this->current['connections']->$connectionId)) {
-            return;
-        }
         $this->removeConnectionFromCircles($connectionId);
 
         foreach ($this->current['communities'] as $key => $value) {
@@ -100,7 +97,9 @@ class CircleOfSupport
             $this->removeConnectionFromCommunity($connectionId, $key);
         }
 
-        unset($this->current['connections']->$connectionId);
+        if (isset($this->current['connections']->$connectionId)) {
+            unset($this->current['connections']->$connectionId);
+        }
     }
 
     public function updateConnection($id, $connection)

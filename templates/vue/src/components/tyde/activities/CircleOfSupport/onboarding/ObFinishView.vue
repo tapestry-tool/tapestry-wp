@@ -32,16 +32,24 @@
           </span>
         </b-col>
         <b-col v-else class="ob-connection-box"></b-col>
-        <b-col align-self="center">
-          <b-button
-            pill
-            variant="secondary"
-            class="secondary"
-            @click="$emit('ob-finish')"
-          >
-            Continue &#8594;
-          </b-button>
-        </b-col>
+        <b-button
+          v-if="circleViewEnabled"
+          pill
+          variant="secondary"
+          class="secondary mx-2"
+          @click="$emit('continue')"
+        >
+          Continue &#8594;
+        </b-button>
+        <b-button
+          v-else
+          pill
+          variant="secondary"
+          class="secondary mx-2"
+          @click="$emit('done')"
+        >
+          Done
+        </b-button>
         <b-col v-if="visibleConnections.length == 5" class="ob-connection-box">
           <p class="ob-connection">
             {{ visibleConnections[4].name }}
@@ -64,6 +72,9 @@ export default {
   },
   props: {
     connections: {
+      require: true,
+    },
+    circleViewEnabled: {
       require: true,
     },
   },
