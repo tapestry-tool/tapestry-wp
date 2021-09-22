@@ -62,7 +62,7 @@ export default {
       return [
         { value: "accordion", text: "Accordion" },
         { value: "page", text: "Page" },
-        { value: "units", text: "Units" },
+        { value: "unit", text: "Unit (collection of pages)" },
       ]
     },
   },

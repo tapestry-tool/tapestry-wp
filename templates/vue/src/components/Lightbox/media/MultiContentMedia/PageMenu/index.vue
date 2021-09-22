@@ -9,6 +9,7 @@
           lightbox: !node.fullscreen,
           fullscreen: node.fullscreen,
           closed: !opened,
+          'is-unit-child': pages && contentVisible,
         },
       ]"
       :style="{ height: node.fullscreen ? '100vh' : dimensions.height + 'px' }"
@@ -26,10 +27,12 @@
         <i v-if="!opened" class="fas fa-bars fa-lg" style="color: black;"></i>
         <i v-else class="fas fa-times fa-lg"></i>
       </button>
+      <h4 v-if="pages && contentVisible" class="pl-2">{{ parentNode.title }}</h4>
       <b-dropdown
         v-if="pages && contentVisible"
-        class="m-2 mb-4 w-100"
-        variant="light"
+        class="m-2 mb-4"
+        block
+        split
         :text="pages[selectedPage].title"
       >
         <b-dropdown-item
@@ -128,10 +131,14 @@ export default {
     pages() {
       if (
         this.parentNode?.mediaType === "multi-content" &&
-        this.parentNode?.presentationStyle === "units"
+        this.parentNode?.presentationStyle === "unit"
       ) {
         return this.parentNode.childOrdering.reduce((pages, nodeId) => {
-          pages[nodeId] = this.getNode(nodeId)
+          const node = this.getNode(nodeId)
+          pages[nodeId] = {
+            id: node.id,
+            title: node.title,
+          }
           return pages
         }, {})
       }
@@ -244,6 +251,11 @@ export default {
       }
     }
 
+    &.is-unit-child {
+      width: 250px;
+      max-width: 25vw;
+    }
+
     @media screen and (min-width: 960px) {
       font-size: calc(14px + (2 * (100vw - 960px) / 1280px - 960px));
     }
@@ -264,8 +276,27 @@ export default {
       }
     }
 
-    .page-nav-title {
-      margin-bottom: 1em;
+    .dropdown {
+      margin: 1.5rem -24px !important;
+      button {
+        border-radius: 0;
+        &:first-child {
+          text-align: left;
+          padding-left: 32px;
+          font-size: 1.2em;
+        }
+      }
+      &-menu {
+        width: 100%;
+        left: 5px !important;
+        border-radius: 0;
+        > li {
+          line-height: 1.75em !important;
+          a {
+            white-space: normal !important;
+          }
+        }
+      }
     }
 
     .page-nav-container {

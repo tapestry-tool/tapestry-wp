@@ -245,7 +245,7 @@ export default {
 
     if (this.node.mediaType === "multi-content") {
       if (
-        this.node.presentationStyle === "units" &&
+        this.node.presentationStyle === "unit" &&
         this.node.childOrdering?.length
       ) {
         const pageNode = this.getNode(this.node.childOrdering[0])
@@ -287,7 +287,7 @@ export default {
       let selectedNode = this.nodeId
       if (
         this.parentNode?.mediaType === "multi-content" &&
-        this.parentNode?.presentationStyle === "units"
+        this.parentNode?.presentationStyle === "unit"
       ) {
         selectedNode = this.parentNode.id
       }

@@ -171,7 +171,7 @@ export default {
     isUnitChild() {
       return (
         this.parent?.mediaType === "multi-content" &&
-        this.parent?.presentationStyle === "units"
+        this.parent?.presentationStyle === "unit"
       )
     },
     activeForm() {
