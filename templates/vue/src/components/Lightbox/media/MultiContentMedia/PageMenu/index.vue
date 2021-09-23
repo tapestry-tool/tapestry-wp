@@ -27,22 +27,24 @@
         <i v-if="!opened" class="fas fa-bars fa-lg" style="color: black;"></i>
         <i v-else class="fas fa-times fa-lg"></i>
       </button>
-      <h4 v-if="pages && contentVisible" class="pl-2">{{ parentNode.title }}</h4>
-      <b-dropdown
-        v-if="pages && contentVisible"
-        class="m-2 mb-4"
-        block
-        split
-        :text="pages[selectedPage].title"
-      >
-        <b-dropdown-item
-          v-for="page in pages"
-          :key="page.id"
-          @click="changePage(page.id)"
+      <div v-if="pages && contentVisible">
+        <b-dropdown
+          v-if="pages && contentVisible"
+          class="unit-switch-dropdown"
+          block
+          split
+          :text="parentNode.title"
         >
-          {{ page.title }}
-        </b-dropdown-item>
-      </b-dropdown>
+          <b-dropdown-item
+            v-for="page in pages"
+            :key="page.id"
+            @click="changePage(page.id)"
+          >
+            {{ page.title }}
+          </b-dropdown-item>
+        </b-dropdown>
+        <h5 class="pl-2 py-1 mb-4">{{ pages[selectedPage].title }}</h5>
+      </div>
       <div
         :class="[
           'page-nav-content',
@@ -52,7 +54,7 @@
           },
         ]"
       >
-        <ul class="page-menu-item fa-ul">
+        <ul class="page-menu-items fa-ul">
           <page-menu-item
             v-for="row in rows"
             :key="row.node.id"
@@ -209,7 +211,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .page-nav-wrapper {
   .page-nav {
     position: relative;
@@ -276,29 +278,6 @@ export default {
       }
     }
 
-    .dropdown {
-      margin: 1.5rem -24px !important;
-      button {
-        border-radius: 0;
-        &:first-child {
-          text-align: left;
-          padding-left: 32px;
-          font-size: 1.2em;
-        }
-      }
-      &-menu {
-        width: 100%;
-        left: 5px !important;
-        border-radius: 0;
-        > li {
-          line-height: 1.75em !important;
-          a {
-            white-space: normal !important;
-          }
-        }
-      }
-    }
-
     .page-nav-container {
       text-align: left;
     }
@@ -315,9 +294,59 @@ export default {
           }
         }
       }
-
       &.closed {
         display: none;
+      }
+
+      .page-menu-items {
+        margin-left: 2em;
+        margin-right: -0.5em;
+      }
+    }
+  }
+}
+</style>
+
+<style lang="scss">
+.unit-switch-dropdown {
+  margin: 1.2rem -24px !important;
+  button {
+    border-radius: 0;
+    background: #fff2;
+    border-color: #fff1;
+    &:hover {
+      background: transparent;
+      border-color: transparent;
+    }
+    &:first-child {
+      text-align: left;
+      padding-left: 30px;
+      font-size: 1.6em;
+      font-weight: bold;
+    }
+  }
+  .dropdown-menu {
+    width: calc(100% - 10px);
+    margin-top: 5px;
+
+    &::after {
+      content: "";
+      position: absolute;
+      width: 0;
+      height: 0;
+      border: solid 7px #fff;
+      border-bottom-width: 8px;
+      border-left-color: transparent;
+      border-right-color: transparent;
+      border-top-color: transparent;
+      top: -15px;
+      right: 2px;
+    }
+
+    > li {
+      line-height: 1.75em !important;
+      a {
+        white-space: normal !important;
       }
     }
   }

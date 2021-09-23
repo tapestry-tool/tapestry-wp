@@ -320,6 +320,7 @@ button[disabled] {
   max-width: 150vh;
   margin: 0 auto;
   overflow: auto;
+  overflow-x: hidden;
   scrollbar-color: auto black;
   scrollbar-width: none;
 
