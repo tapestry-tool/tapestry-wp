@@ -203,7 +203,7 @@ export default {
             query: this.$route.query,
           })
         } else {
-          this.applyDimensions()
+          this.handleNodeChanged()
         }
       },
     },
@@ -242,19 +242,7 @@ export default {
   mounted() {
     document.querySelector("body").classList.add("tapestry-lightbox-open")
     DragSelectModular.removeDragSelectListener()
-
-    if (this.node.mediaType === "multi-content") {
-      if (
-        this.node.presentationStyle === "unit" &&
-        this.node.childOrdering?.length
-      ) {
-        const pageNode = this.getNode(this.node.childOrdering[0])
-        this.$root.$emit("open-node", pageNode.id)
-      }
-      this.$root.$on("observe-rows", refs => {
-        this.rowRefs = this.rowRefs.concat(refs)
-      })
-    }
+    this.handleNodeChanged()
   },
   beforeDestroy() {
     document.querySelector("body").classList.remove("tapestry-lightbox-open")
@@ -317,6 +305,23 @@ export default {
         left: (Helpers.getBrowserWidth() - this.lightboxDimensions.width) / 2,
         width: this.lightboxDimensions.width,
         height: this.lightboxDimensions.height,
+      }
+    },
+    handleNodeChanged() {
+      if (
+        this.node.mediaType === "multi-content" &&
+        this.node.presentationStyle === "unit" &&
+        this.node.childOrdering?.length
+      ) {
+        const pageNode = this.getNode(this.node.childOrdering[0])
+        this.$root.$emit("open-node", pageNode.id)
+      } else {
+        this.applyDimensions()
+        if (this.node.mediaType === "multi-content") {
+          this.$root.$on("observe-rows", refs => {
+            this.rowRefs = this.rowRefs.concat(refs)
+          })
+        }
       }
     },
   },
