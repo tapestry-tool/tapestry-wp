@@ -1,5 +1,6 @@
 import Vue from "vue"
 import VueRouter from "vue-router"
+import client from "./services/TapestryAPI"
 
 import routeConfig, { names } from "./config/routes"
 import store from "./store"
@@ -12,6 +13,7 @@ export const routes = [
   routeConfig.multiContent,
   routeConfig.nestedMultiContent,
   routeConfig.settings,
+  routeConfig.userSettings,
   routeConfig.linkmodal,
   ...routeConfig.redirects,
   routeConfig.modal,
@@ -36,6 +38,28 @@ router.beforeEach((to, from, next) => {
     next({ name: names.APP, params: { nodeId: store.state.rootId } })
   } else {
     next()
+  }
+})
+
+let userLastSelectedNodeTimeout = null
+
+router.afterEach((to, from) => {
+  if (
+    from.matched.length > 0 &&
+    to.matched.length > 0 &&
+    (from.params.nodeId !== to.params.nodeId ||
+      from.params.rowId !== to.params.rowId ||
+      from.query.row !== to.query.row ||
+      from.params.subRowId !== to.params.subRowId)
+  ) {
+    clearTimeout(userLastSelectedNodeTimeout)
+    userLastSelectedNodeTimeout = setTimeout(() => {
+      client.updateUserLastSelectedNode(
+        to.params.nodeId,
+        to.params.rowId ? to.params.rowId : to.query.row,
+        to.params.subRowId
+      )
+    }, 5000)
   }
 })
 

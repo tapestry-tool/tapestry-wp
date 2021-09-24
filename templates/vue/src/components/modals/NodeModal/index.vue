@@ -68,7 +68,10 @@
             :active="tab === 'appearance'"
             @click="changeTab('appearance')"
           >
-            <appearance-form :node="node" />
+            <appearance-form
+              :node="node"
+              :is-page-child="isPageMultiConentNodeChild"
+            />
           </b-tab>
           <b-tab
             v-if="node.mediaType === 'h5p' || node.mediaType === 'video'"
@@ -439,6 +442,11 @@ export default {
     },
     isMultiContentNodeChild() {
       return this.parent && this.parent.mediaType == "multi-content"
+    },
+    isPageMultiConentNodeChild() {
+      return (
+        !!this.isMultiContentNodeChild && this.parent?.presentationStyle === "page"
+      )
     },
     isMultipleChoiceValueValid() {
       const questionsWithMultipleChoiceEnabled = this.node.typeData.activity.questions.filter(

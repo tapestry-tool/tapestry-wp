@@ -53,7 +53,7 @@
         @change:dimensions="updateDimensions"
       />
     </div>
-    <circle-of-support v-if="selectedTab === 'cos'" />
+    <circle-of-support v-show="selectedTab === 'cos'" />
   </tapestry-modal>
 </template>
 
@@ -281,9 +281,15 @@ export default {
     })
   },
   methods: {
-    ...mapActions(["completeNode"]),
+    ...mapActions(["completeNode", "updateNodeProgress"]),
     complete(nodeId) {
-      this.completeNode(nodeId || this.nodeId)
+      const node = this.getNode(nodeId || this.nodeId)
+      if (!node.completed) {
+        this.completeNode(node.id)
+      }
+      if (node.progress !== 1) {
+        this.updateNodeProgress({ id: node.id, progress: 1 })
+      }
     },
     handleUserClose() {
       client.recordAnalyticsEvent("user", "close", "lightbox", this.nodeId)

@@ -33,13 +33,15 @@ export default {
     }
   },
   computed: {
-    ...mapState(["nodes", "links", "selection", "settings", "rootId"]),
-
+    ...mapState(["nodes", "links", "selection", "settings", "rootId", "avatar"]),
     isSidebarOpen() {
       return Boolean(this.$route.query.sidebar)
     },
     analyticsEnabled() {
       return this.settings.analyticsEnabled
+    },
+    hasAvatar() {
+      return this.avatar && Object.keys(this.avatar).length
     },
     tydeModeEnabled() {
       return !canEditTapestry() && this.settings.tydeModeEnabled
@@ -61,8 +63,18 @@ export default {
       this.editNode(id)
     })
     client.recordAnalyticsEvent("app", "load", "tapestry")
-
-    this.setupTydeView()
+    if (this.tydeModeEnabled) {
+      this.$root.$on("avatar-form-closed", () => {
+        this.setupTydeView()
+      })
+      if (!this.hasAvatar) {
+        this.setupUserAvatar()
+      } else {
+        this.setupTydeView()
+      }
+    } else {
+      this.setupTydeView()
+    }
   },
   methods: {
     ...mapMutations(["select", "unselect", "clearSelection"]),
@@ -163,18 +175,32 @@ export default {
              open
         */
 
-        let userMainRole = getCurrentUser().roles[0]
-        if (!userMainRole || !(userMainRole in this.settings.tydeModeDefaultNodes)) {
-          userMainRole = "public"
+        let defaultNodeId = this.rootId
+
+        if (this.settings.tydeModeDefaultNodes) {
+          let userMainRole = getCurrentUser().roles[0]
+          if (
+            !userMainRole ||
+            !(userMainRole in this.settings.tydeModeDefaultNodes)
+          ) {
+            userMainRole = "public"
+          }
+          defaultNodeId = this.settings.tydeModeDefaultNodes[userMainRole]
         }
 
-        const defaultNodeId = this.settings.tydeModeDefaultNodes[userMainRole]
         this.$router.push({
           name: names.LIGHTBOX,
           params: { nodeId: defaultNodeId },
           query: this.$route.query,
         })
       }
+    },
+    setupUserAvatar() {
+      this.$router.push({
+        name: open ? names.USERSETTINGS : names.APP,
+        params: { nodeId: this.$route.params.nodeId, tab: "avatar" },
+        query: this.$route.query,
+      })
     },
   },
 }

@@ -71,15 +71,30 @@ export default {
         })
       })
     }
-
     window.addEventListener("click", this.recordAnalytics)
-    const data = [client.getTapestry(), client.getUserProgress()]
-    Promise.all(data).then(([dataset, progress]) => {
+    const data = [
+      client.getTapestry(),
+      client.getUserProgress(),
+      client.getLastSelectedNode(),
+      client.getAvatar(),
+    ]
+    Promise.all(data).then(([dataset, progress, selectedNode, savedAvatar]) => {
       this.init({ dataset, progress })
+      this.addAvatar(savedAvatar.data)
       this.loading = false
       if (!this.$route.params.nodeId && dataset.nodes.length > 0) {
+        let path = `/nodes/${dataset.rootId}`
+        if (selectedNode) {
+          path = `/nodes/${selectedNode.nodeId}`
+          if (selectedNode.rowId) {
+            path = `${path}/view/${selectedNode.rowId}`
+            if (selectedNode.subRowId) {
+              path = `${path}/rows/${selectedNode.subRowId}`
+            }
+          }
+        }
         this.$router.replace({
-          path: `/nodes/${dataset.rootId}`,
+          path,
           query: this.$route.query,
         })
       }
@@ -89,7 +104,7 @@ export default {
     window.removeEventListener("click", this.recordAnalytics)
   },
   methods: {
-    ...mapMutations(["init"]),
+    ...mapMutations(["init", "addAvatar"]),
     refresh() {
       this.$router.go()
     },

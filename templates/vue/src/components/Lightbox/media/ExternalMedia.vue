@@ -3,7 +3,7 @@
     <h1 v-if="showTitle" class="external-media-title external-page-style">
       {{ node.title }}
     </h1>
-    <div class="external-media-container">
+    <div class="external-media-container w-100 h-100">
       <iframe
         v-if="node.behaviour === 'embed'"
         id="external"
@@ -11,27 +11,49 @@
         allowfullscreen="allowfullscreen"
         :src="normalizedUrl"
         :style="'min-height:' + dimensions.height + 'px'"
-        @load="$emit('load')"
+        @load="handleLoad"
       ></iframe>
-      <div v-else class="preview" :style="previewStyles">
-        <div
-          class="preview-image"
-          :style="{ 'background-image': `url(${node.typeData.linkMetadata.image})` }"
-        >
-          <a :href="node.typeData.mediaURL" target="blank"></a>
-        </div>
-        <div class="preview-content">
-          <h1>
-            <a :href="node.typeData.mediaURL" target="blank">
-              {{ node.typeData.linkMetadata.title }}
-            </a>
-          </h1>
-          <p>{{ node.typeData.linkMetadata.description }}</p>
-          <p>
-            <a :href="node.typeData.mediaURL" target="blank">Open link</a>
-          </p>
-        </div>
-      </div>
+      <b-card
+        v-else
+        ref="preview"
+        no-body
+        :img-src="showVertically ? node.typeData.linkMetadata.image : ''"
+        class="preview overflow-hidden w-100"
+      >
+        <b-row :no-gutters="showVertically">
+          <b-col
+            v-if="!showVertically"
+            md="6"
+            class="preview-image"
+            :style="{
+              'background-image': `url(${node.typeData.linkMetadata.image})`,
+            }"
+          >
+            <a href="#" @click.prevent="openLink"></a>
+          </b-col>
+          <b-col :md="showVertically ? 12 : 6" class="preview-content">
+            <b-card-body>
+              <b-card-text>
+                <component
+                  :is="node.typeData.linkMetadata.title.length < 20 ? 'h2' : 'h3'"
+                  class="mb-3"
+                >
+                  <a href="#" @click.prevent="openLink">
+                    {{ node.typeData.linkMetadata.title }}
+                  </a>
+                </component>
+                <p>{{ node.typeData.linkMetadata.description }}</p>
+                <p>
+                  <b-button variant="primary" @click.prevent="openLink">
+                    Open link
+                    <i class="fas fa-external-link-alt ml-1"></i>
+                  </b-button>
+                </p>
+              </b-card-text>
+            </b-card-body>
+          </b-col>
+        </b-row>
+      </b-card>
     </div>
   </div>
 </template>
@@ -73,12 +95,30 @@ export default {
     showTitle() {
       return this.context === "page" && this.node.typeData.showTitle !== false
     },
+    showVertically() {
+      return this.node.typeData.halfWidth && this.context !== "lightbox"
+    },
   },
   mounted() {
-    this.$emit("complete")
     if (this.node.behaviour !== "embed") {
-      this.$emit("load")
+      this.handleLoad()
     }
+  },
+  methods: {
+    handleLoad() {
+      this.$emit("load")
+      if (this.node.behaviour === "embed") {
+        this.$emit("complete")
+      } else {
+        this.$emit("change:dimensions", {
+          height: this.$refs.preview.clientHeight,
+        })
+      }
+    },
+    openLink() {
+      this.$emit("complete")
+      window.open(this.node.typeData.mediaURL, "_blank")
+    },
   },
 }
 </script>
@@ -86,60 +126,37 @@ export default {
 <style lang="scss" scoped>
 .external-media-container {
   height: 100%;
-  background: #fff;
-}
 
-.preview {
-  display: flex;
-  height: 100%;
-  width: 100%;
+  .preview {
+    border-radius: 15px;
 
-  .preview-image {
-    cursor: pointer;
-    position: relative;
-    flex: 1;
-    width: auto;
-    min-height: 100%;
-    background-size: cover;
-    background-position: center;
-    transition: all 0.2s ease;
+    .preview-image {
+      cursor: pointer;
+      background-size: cover;
+      background-position: center;
+      transition: all 0.2s ease;
 
-    &:hover {
-      transform: scale(1.05);
-    }
+      &:hover {
+        transform: scale(1.05);
+      }
 
-    a {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-    }
-  }
-
-  .preview-content {
-    flex: 1;
-    text-align: left;
-    font-family: "Source Sans Pro", sans-serif;
-    padding: 2em;
-
-    h1 {
-      margin: 0;
-      padding: 0;
-      line-height: 1.1;
-      font-weight: bold;
-      font-family: inherit;
-
-      &:before {
-        display: none;
+      a {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
       }
     }
 
-    p {
-      margin: 0;
-      margin-top: 1.5em;
-      padding: 0;
-      font-family: inherit;
+    .preview-content {
+      background: #fff;
+      text-align: left;
+      min-height: 300px;
+
+      .btn i {
+        opacity: 0.5;
+      }
     }
   }
 }

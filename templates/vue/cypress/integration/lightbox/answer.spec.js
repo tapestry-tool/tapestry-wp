@@ -13,8 +13,9 @@ describe("Answers", () => {
       const question = `What's your name?`
       const placeholder = "placeholder"
       const answer = "Tapestry"
-      cy.contains(/question text/i).click()
-      cy.focused().type(question)
+      cy.getByTestId("question-text-0")
+        .first()
+        .type(question)
       cy.getByTestId("question-answer-text-0").click({ force: true })
       cy.getByTestId("question-answer-text-single-0").click({ force: true })
       cy.getByTestId("question-answer-text-single-placeholder-0").type(placeholder)
@@ -23,7 +24,7 @@ describe("Answers", () => {
       cy.route("POST", "/users/activity/**").as("submit")
       cy.lightbox().within(() => {
         cy.get(`[placeholder="${placeholder}"]`).should("be.visible")
-        cy.get("input").type(answer)
+        cy.get(`[placeholder="${placeholder}"]`).type(answer)
         cy.contains(/submit/i).click()
         cy.contains("Thanks!").should("be.visible")
         cy.contains(/done/i).click()
