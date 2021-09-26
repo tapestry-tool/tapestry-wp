@@ -9,6 +9,7 @@
       :draggable="!dragDisabled"
       @back="handleBack"
       @add-connection="handleConnectionOpen"
+      @connection-opened="handleConnectionOpened"
       @edit-connection="handleEditConnection"
       @add-community="$emit('add-community', $event)"
       @delete-connection="$emit('delete-connection', $event)"
@@ -132,6 +133,7 @@ const States = {
   ConnectionClosed: 4,
   AddConnection: 5,
   MoveConnection: 6,
+  ConnectionOpened: 7,
 }
 
 export default {
@@ -425,6 +427,9 @@ export default {
     handleConnectionOpen(event) {
       this.state = States.AddConnection
       this.$emit("add-connection", event)
+    },
+    handleConnectionOpened() {
+      this.state = States.ConnectionOpened
     },
     handleConnectionClosed() {
       if (this.state === States.ConnectionClosed) {

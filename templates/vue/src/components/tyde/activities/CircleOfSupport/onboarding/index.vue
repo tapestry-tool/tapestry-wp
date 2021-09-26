@@ -2,6 +2,7 @@
   <div
     style="height: 100%; width: 100%;"
     @connection-closed="handleConnectionClosed"
+    @connection-opened="handleConnectionsOpened"
     @connection-submitted="handleConnectionSubmitted"
   >
     <welcome-communities
@@ -25,6 +26,10 @@
       :circleViewEnabled="circleViewEnabled"
       @continue="send(OnboardingEvents.Continue)"
       @done="send(OnboardingEvents.Done)"
+    />
+    <lets-add-connections
+      v-if="isState('Circles.LetsAddConnections')"
+      @continue="send(OnboardingEvents.Continue)"
     />
     <move-connections-circles
       v-if="isState('Circles.MoveConnections')"
@@ -96,21 +101,9 @@
       :style="[{ 'margin-left': activeView === 0 ? '45px' : '0px' }]"
       @tooltip-positioned="$emit('tooltip-positioned')"
     >
-      <h3 v-if="activeView === 1" style="width:300px;">
-        You can always click here to toggle back to the community view.
-      </h3>
-      <h3 v-else style="width:300px;">
+      <h3 style="width:300px;">
         Click here to toggle to the circle view.
       </h3>
-      <b-button
-        v-if="activeView === 1"
-        pill
-        variant="secondary"
-        class="mt-3"
-        @click="handleClick(OnboardingEvents.Continue)"
-      >
-        Continue &#8594;
-      </b-button>
     </tooltip>
     <tooltip
       v-if="isState('Circles.AddAnotherTooltip')"
@@ -125,7 +118,7 @@
         pill
         variant="secondary"
         class="mt-3"
-        @click="handleClick(OnboardingEvents.Add)"
+        @click="handleAddingConnectionsToCircle"
       >
         Got it &#8594;
       </b-button>
@@ -159,6 +152,8 @@ import ObFinishView from "./ObFinishView"
 import FinishViewCircles from "./FinishViewCircles"
 import Tooltip from "./Tooltip"
 import MoveConnectionsCircles from "./MoveConnectionsCircles.vue"
+import LetsAddConnections from "./LetsAddConnections.vue"
+
 const States = {
   Home: 0,
   AddCommunity: 1,
@@ -167,6 +162,7 @@ const States = {
   ConnectionClosed: 4,
   AddConnection: 5,
   MoveConnection: 6,
+  ConnectionOpened: 7,
 }
 export default {
   components: {
@@ -177,6 +173,7 @@ export default {
     ObFinishView,
     Tooltip,
     MoveConnectionsCircles,
+    LetsAddConnections,
     AddLaterCircles,
     FinishViewCircles,
   },
@@ -231,6 +228,9 @@ export default {
         this.handleConnectionClosed()
         this.$emit("connection-closed")
       }
+      if (this.parentState === States.ConnectionOpened) {
+        this.handleConnectionsOpened()
+      }
       if (this.parentState === States.MoveConnection) {
         this.handleConnectionMoved()
       }
@@ -241,11 +241,23 @@ export default {
       .onTransition(state => (this.onboarding.current = state))
       .start()
     this.initializeOnboarding()
+
+    if (
+      this.activeView === 1 &&
+      this.onboarding.current.matches("Circles.Welcome")
+    ) {
+      this.send(OnboardingEvents.Continue)
+    }
   },
   methods: {
     handleConnectionMoved() {
       if (this.onboarding.current.matches("Circles.Form")) {
         this.send(OnboardingEvents.Added)
+      }
+    },
+    handleConnectionsOpened() {
+      if (this.onboarding.current.matches("Circles.WaitToOpenConnectionsTab")) {
+        this.send(OnboardingEvents.Continue)
       }
     },
     handleConnectionClosed() {
@@ -307,6 +319,10 @@ export default {
     },
     handleClick(event) {
       this.send(event)
+      this.$emit("tooltip-removed")
+    },
+    handleAddingConnectionsToCircle() {
+      this.send(OnboardingEvents.Continue)
       this.$emit("tooltip-removed")
     },
   },

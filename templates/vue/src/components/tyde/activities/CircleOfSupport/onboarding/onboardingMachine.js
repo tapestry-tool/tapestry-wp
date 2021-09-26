@@ -3,6 +3,8 @@ import { createMachine } from "xstate"
 export const OnboardingStates = {
   Welcome: "Welcome",
   MoveConnections: "MoveConnections",
+  LetsAddConnections: "LetsAddConnections",
+  WaitToOpenConnectionsTab: "WaitToOpenConnectionsTab",
   AddMoreConfirmation: "AddMoreConfirmation",
   AddLaterTooltip: "AddLaterTooltip",
   AddAnotherTooltip: "AddAnotherTooltip",
@@ -125,22 +127,32 @@ const onboardingMachine = createMachine({
       states: {
         Welcome: {
           on: {
-            [Events.Continue]: OnboardingStates.MoveConnections,
+            [Events.Continue]: OnboardingStates.LetsAddConnections,
           },
         },
-        MoveConnections: {
+        LetsAddConnections: {
           on: {
             [Events.Continue]: OnboardingStates.AddAnotherTooltip,
           },
         },
         AddAnotherTooltip: {
           on: {
-            [Events.Add]: OnboardingStates.Form,
-            [Events.Added]: OnboardingStates.FormClosed,
+            [Events.Continue]: OnboardingStates.WaitToOpenConnectionsTab,
           },
         },
-        Form: {
+        WaitToOpenConnectionsTab: {
           on: {
+            [Events.Continue]: OnboardingStates.MoveConnections,
+          },
+        },
+        MoveConnections: {
+          on: {
+            [Events.Continue]: OnboardingStates.Form,
+          },
+        },
+
+        Form: {
+          son: {
             [Events.Added]: OnboardingStates.FormClosed,
           },
         },
