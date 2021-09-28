@@ -5,6 +5,9 @@ export const OnboardingStates = {
   MoveConnections: "MoveConnections",
   LetsAddConnections: "LetsAddConnections",
   WaitToOpenConnectionsTab: "WaitToOpenConnectionsTab",
+  WaitForConnectionTabToClose: "WaitForConnectionTabToClose",
+  MoveConnectionToCirclesFinish: "MoveConnectionToCirclesFinish",
+  MoveBetweenCircles: "MoveBetweenCircles",
   AddMoreConfirmation: "AddMoreConfirmation",
   AddLaterTooltip: "AddLaterTooltip",
   AddAnotherTooltip: "AddAnotherTooltip",
@@ -147,10 +150,20 @@ const onboardingMachine = createMachine({
         },
         MoveConnections: {
           on: {
-            [Events.Continue]: OnboardingStates.Form,
+            [Events.Continue]: OnboardingStates.WaitForConnectionTabToClose,
           },
         },
-
+        WaitForConnectionTabToClose: {
+          on: {
+            [Events.Continue]: OnboardingStates.MoveConnectionToCirclesFinish,
+          },
+        },
+        MoveConnectionToCirclesFinish: {
+          on: {
+            [Events.Continue]: OnboardingStates.MoveBetweenCircles,
+          },
+        },
+        MoveBetweenCircles: {},
         Form: {
           son: {
             [Events.Added]: OnboardingStates.FormClosed,

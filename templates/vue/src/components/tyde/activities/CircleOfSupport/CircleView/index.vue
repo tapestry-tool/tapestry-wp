@@ -98,6 +98,7 @@
     <onboarding
       :communities="communities"
       :connections="connections"
+      :circles="circles"
       :has-connection-in-circles="hasConnectionInCircles"
       :parent-state="state"
       :activeView="activeView"

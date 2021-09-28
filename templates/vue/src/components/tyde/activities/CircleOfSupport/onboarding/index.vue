@@ -31,6 +31,14 @@
       v-if="isState('Circles.LetsAddConnections')"
       @continue="send(OnboardingEvents.Continue)"
     />
+    <move-connections-to-circle-finish
+      v-if="isState('Circles.MoveConnectionToCirclesFinish')"
+      @continue="send(OnboardingEvents.Continue)"
+    />
+    <move-between-circles
+      v-if="isState('Circles.MoveBetweenCircles')"
+      @continue="send(OnboardingEvents.Continue)"
+    />
     <move-connections-circles
       v-if="isState('Circles.MoveConnections')"
       @continue="send(OnboardingEvents.Continue)"
@@ -40,10 +48,6 @@
       :connections="connections"
       @later="send(OnboardingEvents.AddLater)"
       @another="send(OnboardingEvents.AddAnother)"
-    />
-    <add-later-circles
-      v-if="isState('Circles.AddLaterTooltip')"
-      @continue="handleContinue"
     />
     <finish-view-circles
       v-if="isState('Circles.Finish')"
@@ -146,14 +150,14 @@ import onboardingMachine, { OnboardingEvents } from "./onboardingMachine"
 import WelcomeCommunities from "./WelcomeCommunities"
 import AddConfirmation from "./AddConfirmation"
 import AddConfirmationCircles from "./AddConfirmationCircles"
-import AddLaterCircles from "./AddLaterCircles"
 import WelcomeConnections from "./WelcomeConnections"
 import ObFinishView from "./ObFinishView"
 import FinishViewCircles from "./FinishViewCircles"
 import Tooltip from "./Tooltip"
 import MoveConnectionsCircles from "./MoveConnectionsCircles.vue"
 import LetsAddConnections from "./LetsAddConnections.vue"
-
+import MoveConnectionsToCircleFinish from "./MoveConnectionsToCircleFinish.vue"
+import MoveBetweenCircles from "./MoveBetweenCircles.vue"
 const States = {
   Home: 0,
   AddCommunity: 1,
@@ -173,8 +177,9 @@ export default {
     ObFinishView,
     Tooltip,
     MoveConnectionsCircles,
+    MoveConnectionsToCircleFinish,
+    MoveBetweenCircles,
     LetsAddConnections,
-    AddLaterCircles,
     FinishViewCircles,
   },
   props: {
@@ -185,6 +190,13 @@ export default {
     communities: {
       type: Object,
       required: true,
+    },
+    circles: {
+      type: Array,
+      required: false,
+      default: () => {
+        return []
+      },
     },
     parentState: {
       type: Number,
@@ -264,6 +276,13 @@ export default {
       if (
         this.onboarding.current.matches("Connections.FormClosed") ||
         this.onboarding.current.matches("Circles.FormClosed")
+      ) {
+        this.send(OnboardingEvents.Continue)
+      }
+      console.log(this.circles)
+      if (
+        this.onboarding.current.matches("Circles.WaitForConnectionTabToClose") &&
+        this.circles.some(circle => circle.length > 0)
       ) {
         this.send(OnboardingEvents.Continue)
       }
