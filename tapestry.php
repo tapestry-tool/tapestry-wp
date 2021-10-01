@@ -16,6 +16,18 @@ $TAPESTRY_VERSION_NUMBER = '2.50.0-beta';
 // Set this to false if you want to use the Vue build instead of npm dev
 $TAPESTRY_USE_DEV_MODE = true;
 
+// TYDE settings
+$TYDE_YOUTH_ROLES = [
+    'youth' => 'Youth',
+    'youth_l2' => 'Youth (Level 2)',
+    'youth_l3' => 'Youth (Level 3)',
+];
+$TYDE_DYAD_ROLES = [
+    'dyad' => 'Dyad',
+    'dyad_l2' => 'Dyad (Level 2)',
+    'dyad_l3' => 'Dyad (Level 3)',
+];
+
 /**
  * Register endpoints.
  */
@@ -322,22 +334,28 @@ function tapestry_tool_log_event()
 register_activation_hook(__FILE__, 'add_tyde_roles');
 function add_tyde_roles()
 {
-    add_role(
-        'dyad',
-        'Dyad',
-        [
-            'read' => true,
-            'edit_posts' => true,
-        ]
-    );
-    add_role(
-        'youth',
-        'Youth',
-        [
-            'read' => true,
-            'edit_posts' => true,
-        ]
-    );
+    global $TYDE_DYAD_ROLES;
+    foreach ($TYDE_DYAD_ROLES as $key => $label) {
+        add_role(
+            $key,
+            $label,
+            [
+                'read' => true,
+                'edit_posts' => true,
+            ]
+        );
+    }
+    global $TYDE_YOUTH_ROLES;
+    foreach ($TYDE_YOUTH_ROLES as $key => $label) {
+        add_role(
+            $key,
+            $label,
+            [
+                'read' => true,
+                'edit_posts' => true,
+            ]
+        );
+    }
 }
 
 /**
@@ -345,12 +363,15 @@ function add_tyde_roles()
  */
 function add_dyad_youth_user_field($user)
 {
-    if (in_array('dyad', $user->roles)) : ?>
+    global $TYDE_DYAD_ROLES;
+    $isDyadUser = array_intersect($user->roles, array_keys($TYDE_DYAD_ROLES));
+
+    if ($isDyadUser) : ?>
         <table class="form-table">
             <tr>
-                <th><label for="youth_user_id"><?php _e('Linked Youth User ID'); ?></label></th>
+                <th><label for="linked_dyad_user_id"><?php _e('Linked Youth User ID'); ?></label></th>
                 <td>
-                    <input type="text" name="youth_user_id" id="youth_user_id" value="<?php echo esc_attr(get_the_author_meta('youth_user_id', $user->ID)); ?>" class="regular-text" /><br />
+                    <input type="text" name="linked_dyad_user_id" id="linked_dyad_user_id" value="<?php echo esc_attr(get_the_author_meta('linked_dyad_user_id', $user->ID)); ?>" class="regular-text" /><br />
                     <span class="description"><?php _e("Please enter the user ID for the linked youth user."); ?></span>
                 </td>
             </tr>
@@ -369,11 +390,14 @@ function save_dyad_youth_user_field($user_id)
         return false;
     }
     $user = get_user_by('id', $user_id);
-    $youth_user_id = intval($_POST['youth_user_id']);
-    if (!in_array('dyad', $user->roles)) {
-        return false;
+
+    global $TYDE_DYAD_ROLES;
+    $isDyadUser = array_intersect($user->roles, array_keys($TYDE_DYAD_ROLES));
+    
+    if ($isDyadUser) {
+        $linked_dyad_user_id = intval($_POST['linked_dyad_user_id']);
+        update_user_meta($user_id, 'linked_dyad_user_id', $linked_dyad_user_id);
     }
-    update_user_meta($user_id, 'linked_dyad_user_id', $youth_user_id);
 }
 add_action('personal_options_update', 'save_dyad_youth_user_field');
 add_action('edit_user_profile_update', 'save_dyad_youth_user_field');

@@ -304,7 +304,7 @@ class TapestryNode implements ITapestryNode
         }
     }
 
-    public function getLockedState($userId = 0)
+    public function getLockedState()
     {
         $conditions = $this->conditions;
         $userProgress = new TapestryUserProgress($this->tapestryPostId, $this->nodeMetaId);
@@ -316,7 +316,8 @@ class TapestryNode implements ITapestryNode
         foreach ($conditions as $condition) {
             switch ($condition->type) {
                 case ConditionTypes::NODE_COMPLETED:
-                    if ($userId && $userProgress->isCompleted($condition->nodeId, $userId)) {
+                    $conditionProgress = new TapestryUserProgress($this->tapestryPostId, $condition->nodeId);
+                    if ($conditionProgress->isCompleted()) {
                         $condition->fulfilled = true;
                     }
                     break;
@@ -338,9 +339,9 @@ class TapestryNode implements ITapestryNode
         return $conditions;
     }
 
-    public function isLocked($userId = 0)
+    public function isLocked()
     {
-        $conditions = $this->getLockedState($userId);
+        $conditions = $this->getLockedState();
 
         $numFulfilled = 0;
         foreach ($conditions as $condition) {
@@ -386,6 +387,11 @@ class TapestryNode implements ITapestryNode
         $nodeMeta = $this->getMeta();
 
         return $nodeMeta->author->id == $userId;
+    }
+
+    public function isDyad()
+    {
+        return $this->isDyad;
     }
 
     public function addReview($comments)

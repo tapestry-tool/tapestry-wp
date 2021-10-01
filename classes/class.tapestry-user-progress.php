@@ -13,6 +13,8 @@ class TapestryUserProgress implements ITapestryUserProgress
     private $_userId = null;
     private $postId;
     private $nodeMetaId;
+    private $_dyadLinkedUserId = null;
+    private $node;
 
     /**
      * Constructor.
@@ -24,9 +26,27 @@ class TapestryUserProgress implements ITapestryUserProgress
      */
     public function __construct($postId = null, $nodeMetaId = null)
     {
-        $this->_userId = apply_filters('determine_current_user', false);
         $this->postId = $postId;
         $this->nodeMetaId = $nodeMetaId;
+
+        if ($nodeMetaId) {
+            $this->node = new TapestryNode($postId = null, $nodeMetaId = null);
+        }
+
+        $this->_userId = apply_filters('determine_current_user', false);
+        if ($this->_userId) {
+            global $TYDE_DYAD_ROLES;
+            $isDyadUser = array_intersect(get_userdata($this->_userId)->roles, array_keys($TYDE_DYAD_ROLES));
+            if ($isDyadUser) {
+                $linkedUserId = get_user_meta($this->_userId, 'linked_dyad_user_id', true);
+                if ($linkedUserId) {
+                    if ($this->node && $this->node->isDyad()) {
+                        $this->_userId = $linkedUserId;
+                    }
+                    $this->_dyadLinkedUserId = $linkedUserId;
+                }
+            }
+        }
     }
 
     /**
@@ -42,7 +62,7 @@ class TapestryUserProgress implements ITapestryUserProgress
         $tapestry = new Tapestry($this->postId);
         $nodeIds = $tapestry->getNodeIds();
 
-        return $this->_getUserProgress($nodeIds, $this->_userId);
+        return $this->_getUserProgress($nodeIds);
     }
 
     /**
@@ -55,6 +75,7 @@ class TapestryUserProgress implements ITapestryUserProgress
     public function updateUserProgress($progressValue)
     {
         $this->_checkPostId();
+        $this->_checkProgressAbility();
 
         if (null !== $progressValue) {
             $progressValue = floatval($progressValue);
@@ -76,6 +97,7 @@ class TapestryUserProgress implements ITapestryUserProgress
     public function complete()
     {
         $this->_checkPostId();
+        $this->_checkProgressAbility();
         $this->_complete();
     }
 
@@ -90,6 +112,7 @@ class TapestryUserProgress implements ITapestryUserProgress
     public function completeQuestion($questionId, $answerType, $answerData)
     {
         $this->_checkPostId();
+        $this->_checkProgressAbility();
         $this->_completeQuestion($questionId, $answerType, $answerData);
     }
 
@@ -142,8 +165,19 @@ class TapestryUserProgress implements ITapestryUserProgress
         return $this->_getAvatar();
     }
 
-    public function isCompleted($nodeId, $userId)
+    public function isCompleted($nodeId = null, $userId = null)
     {
+        if (!$nodeId) {
+            $nodeId = $this->nodeMetaId;
+        }
+        if (!$userId) {
+            $userId = $this->_userId;
+        }
+
+        if (!$userId) {
+            return false;
+        }
+
         $nodeMetadata = get_metadata_by_mid('post', $nodeId)->meta_value;
         $completed_value = get_user_meta($userId, 'tapestry_'.$this->postId.'_node_completed_'.$nodeId, true);
         if (null !== $completed_value) {
@@ -198,26 +232,22 @@ class TapestryUserProgress implements ITapestryUserProgress
         update_user_meta($this->_userId, 'tapestry_'.$this->postId.'_'.$this->nodeMetaId.'_question_'.$questionId.'_answers', $userAnswer);
     }
 
-    private function _getUserProgress($nodeIdArr, $userId)
+    private function _getUserProgress($nodeIdArr)
     {
         $progress = new stdClass();
         $tapestry = new Tapestry($this->postId);
 
-        $nodes = $tapestry->setUnlocked($nodeIdArr, $userId);
-
-        $linked_user_id = get_user_meta($userId, 'linked_dyad_user_id', true);
-
-        $user_roles = get_userdata($userId)->roles;
-        $isDyadUser = in_array('dyad', $user_roles, true) && $linked_user_id;
+        $nodes = $tapestry->setUnlocked($nodeIdArr, $this->_userId);
 
         // Build json object for frontend e.g. {0: 0.1, 1: 0.2} where 0 and 1 are the node IDs
         foreach ($nodes as $node) {
             $nodeId = $node->id;
 
-            // overwrite $progress_value to that of $otherUserId if the user is a dyad and 
-            // this node is a dyad node
-            if ($node->isDyad && $isDyadUser) {
-                $userId = $linked_user_id;
+            $userId = $this->_userId;
+            
+            // Use linked user's progress if the user is a dyad and this node is a dyad node
+            if ($node->isDyad && $this->_dyadLinkedUserId) {
+                $userId = $this->_dyadLinkedUserId;
             }
 
             $progress_value = get_user_meta($userId, 'tapestry_'.$this->postId.'_progress_node_'.$nodeId, true);
@@ -231,6 +261,10 @@ class TapestryUserProgress implements ITapestryUserProgress
             $progress->$nodeId->accessible = $node->accessible;
             $progress->$nodeId->conditions = $node->conditions;
             $progress->$nodeId->unlocked = $node->unlocked;
+
+            if ($node->isDyad && $this->_dyadLinkedUserId) {
+                $progress->$nodeId->node = $node;
+            }
 
             if ($node->accessible) {
                 $progress->$nodeId->content = [
@@ -365,6 +399,11 @@ class TapestryUserProgress implements ITapestryUserProgress
         if (!isset($this->postId)) {
             throw new Exception('postId is invalid');
         }
+    }
+
+    private function _checkProgressAbility()
+    {
+        return $this->_dyadLinkedUserId && $this->node && $this->node->isDyad();
     }
 
     private function _isValidTapestryPost()
