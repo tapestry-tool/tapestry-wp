@@ -264,7 +264,7 @@ export default {
       ) {
         this.send(OnboardingEvents.Continue)
       }
-      console.log(this.circles)
+
       if (
         this.onboarding.current.matches("Circles.WaitForConnectionTabToClose") &&
         this.circles.some(circle => circle.length > 0)

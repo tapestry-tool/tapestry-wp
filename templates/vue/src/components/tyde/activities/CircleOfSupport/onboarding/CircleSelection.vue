@@ -9,7 +9,7 @@
       </b-row>
       <b-row>
         <b-col>
-          <img src="@/assets/add-connections.gif" />
+          <img src="@/assets/circle-selections.gif" />
         </b-col>
       </b-row>
       <b-row>
