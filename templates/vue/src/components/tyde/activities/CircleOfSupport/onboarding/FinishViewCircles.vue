@@ -2,11 +2,12 @@
   <cos-modal show>
     <b-container class="modal-container">
       <b-row align-h="center">
-        <h3 style="max-width: 500px;">
+        <h3 style="min-height:100px;">
           🎉 Great job!🎉
-          <br />
-          <br />
-          You have completed the Circle of Support onboarding!
+        </h3>
+        <h3>
+          Don't forget to keep your circle of support updated. You can always come
+          back here to add connections, communities, and update your circles.
         </h3>
       </b-row>
       <b-col align-self="center">
@@ -31,14 +32,3 @@ export default {
   },
 }
 </script>
-
-<style scoped>
-.modal-container {
-  width: 50vw;
-  min-width: 300px;
-  max-width: 650px;
-}
-.row {
-  padding: 10px 0;
-}
-</style>

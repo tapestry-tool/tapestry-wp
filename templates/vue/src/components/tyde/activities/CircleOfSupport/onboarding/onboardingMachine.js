@@ -163,24 +163,7 @@ const onboardingMachine = createMachine({
             [Events.Continue]: OnboardingStates.MoveBetweenCircles,
           },
         },
-        MoveBetweenCircles: {},
-        Form: {
-          son: {
-            [Events.Added]: OnboardingStates.FormClosed,
-          },
-        },
-        FormClosed: {
-          on: {
-            [Events.Continue]: OnboardingStates.AddMoreConfirmation,
-          },
-        },
-        AddMoreConfirmation: {
-          on: {
-            [Events.AddAnother]: OnboardingStates.Form,
-            [Events.AddLater]: OnboardingStates.AddLaterTooltip,
-          },
-        },
-        AddLaterTooltip: {
+        MoveBetweenCircles: {
           on: {
             [Events.Continue]: OnboardingStates.ToggleRingsTooltip,
           },

@@ -43,12 +43,10 @@
       v-if="isState('Circles.MoveConnections')"
       @continue="send(OnboardingEvents.Continue)"
     />
-    <add-confirmation-circles
-      v-if="isState('Circles.AddMoreConfirmation')"
-      :connections="connections"
-      @later="send(OnboardingEvents.AddLater)"
-      @another="send(OnboardingEvents.AddAnother)"
-    />
+    <circle-selection
+      v-if="isState('Circles.ToggleRingsTooltip')"
+      @continue="send(OnboardingEvents.Continue)"
+    ></circle-selection>
     <finish-view-circles
       v-if="isState('Circles.Finish')"
       :connections="connections"
@@ -127,19 +125,6 @@
         Got it &#8594;
       </b-button>
     </tooltip>
-    <tooltip
-      v-if="isState('Circles.ToggleRingsTooltip')"
-      :activeView="activeView"
-      class="top right"
-      @tooltip-positioned="$emit('tooltip-positioned')"
-    >
-      <h3 style="width:300px;">
-        Toggle the circle rings by pressing the circle in this box.
-      </h3>
-      <b-button pill variant="secondary" @click="handleContinue">
-        Continue &#8594;
-      </b-button>
-    </tooltip>
   </div>
 </template>
 
@@ -149,7 +134,6 @@ import { interpret } from "xstate"
 import onboardingMachine, { OnboardingEvents } from "./onboardingMachine"
 import WelcomeCommunities from "./WelcomeCommunities"
 import AddConfirmation from "./AddConfirmation"
-import AddConfirmationCircles from "./AddConfirmationCircles"
 import WelcomeConnections from "./WelcomeConnections"
 import ObFinishView from "./ObFinishView"
 import FinishViewCircles from "./FinishViewCircles"
@@ -158,6 +142,7 @@ import MoveConnectionsCircles from "./MoveConnectionsCircles.vue"
 import LetsAddConnections from "./LetsAddConnections.vue"
 import MoveConnectionsToCircleFinish from "./MoveConnectionsToCircleFinish.vue"
 import MoveBetweenCircles from "./MoveBetweenCircles.vue"
+import CircleSelection from "./CircleSelection.vue"
 const States = {
   Home: 0,
   AddCommunity: 1,
@@ -172,7 +157,6 @@ export default {
   components: {
     WelcomeCommunities,
     AddConfirmation,
-    AddConfirmationCircles,
     WelcomeConnections,
     ObFinishView,
     Tooltip,
@@ -181,6 +165,7 @@ export default {
     MoveBetweenCircles,
     LetsAddConnections,
     FinishViewCircles,
+    CircleSelection,
   },
   props: {
     connections: {
