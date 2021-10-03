@@ -136,6 +136,7 @@ export default {
           const node = this.getNode(nodeId)
           pages[nodeId] = {
             id: node.id,
+            title: node.title,
           }
           return pages
         }, {})
