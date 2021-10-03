@@ -33,14 +33,17 @@
           class="unit-switch-dropdown"
           block
           split
+          :text="parentNode.title"
         >
           <b-dropdown-item
             v-for="page in pages"
             :key="page.id"
             @click="changePage(page.id)"
-          ></b-dropdown-item>
+          >
+            {{ page.title }}
+          </b-dropdown-item>
         </b-dropdown>
-        <h5 class="pl-2 py-1 mb-4">{{ pages[selectedPage].title }}</h5>
+        <h5 class="pl-2 py-1 mb-4"></h5>
       </div>
       <div
         :class="[
