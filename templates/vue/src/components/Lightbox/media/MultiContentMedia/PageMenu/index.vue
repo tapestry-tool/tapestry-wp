@@ -40,7 +40,7 @@
             @click="changePage(page.id)"
           ></b-dropdown-item>
         </b-dropdown>
-        <h5 class="pl-2 py-1 mb-4"></h5>
+        <h5 class="pl-2 py-1 mb-4">{{ pages[selectedPage].title }}</h5>
       </div>
       <div
         :class="[
