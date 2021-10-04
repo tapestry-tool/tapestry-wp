@@ -33,6 +33,7 @@
           class="unit-switch-dropdown"
           block
           split
+          :text="parentNodeTitle"
         >
           <b-dropdown-item
             v-for="page in pages"
@@ -107,6 +108,9 @@ export default {
     parentNode() {
       const parentNodeId = this.getParent(this.node.id)
       return this.getNode(parentNodeId)
+    },
+    parentNodeTitle() {
+      return this.parentNode.title ? this.parentNode.title : ""
     },
     rows() {
       return this.node.childOrdering
