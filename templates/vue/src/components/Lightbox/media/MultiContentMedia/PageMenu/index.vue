@@ -110,7 +110,7 @@ export default {
       return this.getNode(parentNodeId)
     },
     parentNodeTitle() {
-      return this.parentNode.title ? this.parentNode.title : ""
+      return this.parentNode?.title ? this.parentNode.title : ""
     },
     rows() {
       return this.node.childOrdering
