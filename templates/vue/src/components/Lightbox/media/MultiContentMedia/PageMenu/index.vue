@@ -33,7 +33,6 @@
           class="unit-switch-dropdown"
           block
           split
-          :text="parentNode.title"
         >
           <b-dropdown-item
             v-for="page in pages"
