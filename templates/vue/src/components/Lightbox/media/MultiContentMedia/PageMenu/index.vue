@@ -43,7 +43,7 @@
             {{ page.title }}
           </b-dropdown-item>
         </b-dropdown>
-        <h5 class="pl-2 py-1 mb-4"></h5>
+        <h5 class="pl-2 py-1 mb-4">{{ currentPageTitle }}</h5>
       </div>
       <div
         :class="[
@@ -111,6 +111,11 @@ export default {
     },
     parentNodeTitle() {
       return this.parentNode?.title ? this.parentNode.title : ""
+    },
+    currentPageTitle() {
+      return this.pages[this.selectedPage]?.title
+        ? this.pages[this.selectedPage]?.title
+        : ""
     },
     rows() {
       return this.node.childOrdering
