@@ -40,7 +40,6 @@ export default {
   color: #555;
   display: inline-flex;
   flex-direction: column;
-  min-height: 250px;
   border-radius: 15px;
   overflow-wrap: break-word;
 }
