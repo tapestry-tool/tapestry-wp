@@ -116,19 +116,23 @@ export async function updateLockedStatus({ commit, getters, dispatch }) {
   }
 }
 
-export async function updateNodeProgress({ commit, dispatch }, payload) {
+export async function updateNodeProgress({ commit, getters, dispatch }, payload) {
   try {
     const { id, progress } = payload
 
-    if (!wp.isLoggedIn()) {
-      const progressObj = JSON.parse(localStorage.getItem(LOCAL_PROGRESS_ID))
-      const nodeProgress = progressObj[id] || {}
-      nodeProgress.progress = progress
-      localStorage.setItem(LOCAL_PROGRESS_ID, JSON.stringify(progressObj))
-    } else {
-      await client.updateUserProgress(id, progress)
+    const node = getters.getNode(id)
+
+    if (!Helpers.nodeAndUserAreDyad(node)) {
+      if (!wp.isLoggedIn()) {
+        const progressObj = JSON.parse(localStorage.getItem(LOCAL_PROGRESS_ID))
+        const nodeProgress = progressObj[id] || {}
+        nodeProgress.progress = progress
+        localStorage.setItem(LOCAL_PROGRESS_ID, JSON.stringify(progressObj))
+      } else {
+        await client.updateUserProgress(id, progress)
+      }
+      commit("updateNodeProgress", { id, progress })
     }
-    commit("updateNodeProgress", { id, progress })
   } catch (error) {
     dispatch("addApiError", error)
   }
@@ -152,30 +156,32 @@ export async function updateNodeCoordinates(
 
 export async function completeNode(context, nodeId) {
   const { commit, dispatch, getters } = context
-  try {
-    if (!wp.isLoggedIn()) {
-      const progressObj = JSON.parse(localStorage.getItem(LOCAL_PROGRESS_ID))
-      const nodeProgress = progressObj[nodeId] || {}
-      nodeProgress.completed = true
-      localStorage.setItem(LOCAL_PROGRESS_ID, JSON.stringify(progressObj))
-    } else {
-      await client.completeNode(nodeId)
-    }
-    commit("updateNode", {
-      id: nodeId,
-      newNode: { completed: true },
-    })
-
-    const node = getters.getNode(nodeId)
-    if (node.mediaType !== "video") {
-      await dispatch("updateNodeProgress", {
+  const node = getters.getNode(nodeId)
+  if (!Helpers.nodeAndUserAreDyad(node)) {
+    try {
+      if (!wp.isLoggedIn()) {
+        const progressObj = JSON.parse(localStorage.getItem(LOCAL_PROGRESS_ID))
+        const nodeProgress = progressObj[nodeId] || {}
+        nodeProgress.completed = true
+        localStorage.setItem(LOCAL_PROGRESS_ID, JSON.stringify(progressObj))
+      } else {
+        await client.completeNode(nodeId)
+      }
+      commit("updateNode", {
         id: nodeId,
-        progress: 1,
+        newNode: { completed: true },
       })
+
+      if (node.mediaType !== "video") {
+        await dispatch("updateNodeProgress", {
+          id: nodeId,
+          progress: 1,
+        })
+      }
+      return unlockNodes(context)
+    } catch (error) {
+      dispatch("addApiError", error)
     }
-    return unlockNodes(context)
-  } catch (error) {
-    dispatch("addApiError", error)
   }
 }
 
@@ -234,14 +240,17 @@ export async function getTapestryExport({ dispatch }) {
 }
 
 export async function completeQuestion(
-  { commit, dispatch },
+  { commit, getters, dispatch },
   { nodeId, questionId, answerType, answer }
 ) {
-  try {
-    await client.completeQuestion(nodeId, questionId, answerType, answer)
-    commit("completeQuestion", { nodeId, questionId, answerType, answer })
-  } catch (error) {
-    dispatch("addApiError", error)
+  const node = getters.getNode(nodeId)
+  if (!Helpers.nodeAndUserAreDyad(node)) {
+    try {
+      await client.completeQuestion(nodeId, questionId, answerType, answer)
+      commit("completeQuestion", { nodeId, questionId, answerType, answer })
+    } catch (error) {
+      dispatch("addApiError", error)
+    }
   }
 }
 

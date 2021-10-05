@@ -1,5 +1,6 @@
 import Vue from "vue"
 import * as getters from "./getters"
+import Helpers from "@/utils/Helpers"
 import { parse } from "@/utils/dataset"
 
 export function init(state, { dataset, progress = {} }) {
@@ -61,9 +62,11 @@ export function updateNode(state, payload) {
 
 export function updateNodeProgress(state, payload) {
   const node = getters.getNode(state)(payload.id)
-  state.nodes[payload.id] = {
-    ...node,
-    progress: payload.progress,
+  if (!Helpers.nodeAndUserAreDyad(node)) {
+    state.nodes[payload.id] = {
+      ...node,
+      progress: payload.progress,
+    }
   }
 }
 

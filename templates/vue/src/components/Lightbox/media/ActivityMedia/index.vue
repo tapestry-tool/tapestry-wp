@@ -1,6 +1,17 @@
 <template>
   <div ref="activity" class="activity-media">
     <h1 v-if="showTitle" class="media-title">{{ node.title }}</h1>
+    <b-alert
+      v-if="isDyadNodeAndUser"
+      show
+      variant="warning"
+      class="activity-alert mx-auto"
+    >
+      <strong>Note:</strong>
+      This is a dyad activity which can only be completed through the program for
+      your dyad partner, {{ linkedDyadUserName }}. Any progress displayed below is
+      for your dyad partner.
+    </b-alert>
     <completion-screen
       v-if="state === 'completion-screen'"
       :question="activeQuestion"
@@ -46,7 +57,7 @@
           Show previous answers
         </b-button>
         <b-button
-          v-else-if="state === 'answer'"
+          v-else-if="state === 'answer' && !isDyadNodeAndUser"
           variant="info"
           class="mr-auto"
           @click="state = 'activity'"
@@ -83,6 +94,7 @@ import Question from "./Question"
 import CompletionScreen from "./CompletionScreen"
 import { mapActions, mapGetters } from "vuex"
 import AnswerMedia from "./AnswerMedia.vue"
+import { dyadLinkedUser } from "@/services/wp"
 
 const states = {
   ACTIVITY: "activity",
@@ -132,6 +144,12 @@ export default {
     showTitle() {
       return this.context === "page" && this.node.typeData.showTitle !== false
     },
+    isDyadNodeAndUser() {
+      return !!this.linkedDyadUserName && this.node.isDyad
+    },
+    linkedDyadUserName() {
+      return dyadLinkedUser()?.display_name
+    },
     questions() {
       /* NOTE: If this is an answer node we retreive the single question
        *       that is stored in the answer node.
@@ -169,6 +187,9 @@ export default {
   },
   watch: {
     activeQuestion() {
+      if (this.isDyadNodeAndUser) {
+        return
+      }
       if (this.initialType === states.ACTIVITY) {
         if (this.hasAnswers && this.state === states.ACTIVITY) {
           this.state = states.ANSWER
@@ -179,17 +200,21 @@ export default {
     },
   },
   mounted() {
-    switch (this.initialType) {
-      case states.ACTIVITY:
-        if (this.hasAnswers) {
+    if (this.isDyadNodeAndUser) {
+      this.state = states.ANSWER
+    } else {
+      switch (this.initialType) {
+        case states.ACTIVITY:
+          if (this.hasAnswers) {
+            this.state = states.ANSWER
+          } else {
+            this.state = states.ACTIVITY
+          }
+          break
+        case states.ANSWER:
           this.state = states.ANSWER
-        } else {
-          this.state = states.ACTIVITY
-        }
-        break
-      case states.ANSWER:
-        this.state = states.ANSWER
-        break
+          break
+      }
     }
 
     this.$emit("change:dimensions", {
@@ -241,7 +266,7 @@ export default {
       }
     },
     next() {
-      this.state = states.ACTIVITY
+      this.state = this.isDyadNodeAndUser ? states.ANSWER : states.ACTIVITY
       client.recordAnalyticsEvent("user", "next", "activity", this.node.id, {
         from: this.activeQuestionIndex,
         to: this.activeQuestionIndex + 1,
@@ -249,7 +274,7 @@ export default {
       this.activeQuestionIndex++
     },
     prev() {
-      this.state = states.ACTIVITY
+      this.state = this.isDyadNodeAndUser ? states.ANSWER : states.ACTIVITY
       client.recordAnalyticsEvent("user", "prev", "activity", this.node.id, {
         from: this.activeQuestionIndex,
         to: this.activeQuestionIndex - 1,
@@ -285,6 +310,10 @@ export default {
   min-height: 100%;
   z-index: 10;
   padding: 24px;
+
+  .activity-alert {
+    max-width: 500px;
+  }
 
   .media-title {
     text-align: left;
