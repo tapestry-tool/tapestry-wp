@@ -9,7 +9,7 @@
           lightbox: !node.fullscreen,
           fullscreen: node.fullscreen,
           closed: !opened,
-          'is-unit-child': pages && contentVisible,
+          'is-unit-child': unitsMenuVisible,
         },
       ]"
       :style="{ height: node.fullscreen ? '100vh' : dimensions.height + 'px' }"
@@ -27,14 +27,8 @@
         <i v-if="!opened" class="fas fa-bars fa-lg" style="color: black;"></i>
         <i v-else class="fas fa-times fa-lg"></i>
       </button>
-      <div v-if="pages && contentVisible">
-        <b-dropdown
-          v-if="pages && contentVisible"
-          class="unit-switch-dropdown"
-          block
-          split
-          :text="parentNodeTitle"
-        >
+      <div v-if="unitsMenuVisible">
+        <b-dropdown class="unit-switch-dropdown" block split :text="parentNodeTitle">
           <b-dropdown-item
             v-for="page in pages"
             :key="page.id"
@@ -157,8 +151,11 @@ export default {
     browserWidth() {
       return Helpers.getBrowserWidth()
     },
-    contentVisible() {
-      return this.opened || this.browserWidth > 800
+    unitsMenuVisible() {
+      if (!this.pages) {
+        return false
+      }
+      return this.opened || (this.browserWidth > 800 && this.node.fullscreen)
     },
   },
   mounted() {
