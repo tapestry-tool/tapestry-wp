@@ -111,10 +111,14 @@ export default {
   },
   computed: {
     ...mapState(["h5pSettings", "rootId", "settings"]),
-    ...mapGetters(["getNode", "isMultiContent", "isMultiContentRow"]),
+    ...mapGetters(["getNode", "getParent", "isMultiContent", "isMultiContentRow"]),
     node() {
       const node = this.getNode(this.nodeId)
       return node
+    },
+    parentNode() {
+      const parentNodeId = this.getParent(this.node.id)
+      return this.getNode(parentNodeId)
     },
     canSkip() {
       return this.node.completed || this.node.skippable !== false
@@ -227,7 +231,7 @@ export default {
             query: this.$route.query,
           })
         } else {
-          this.applyDimensions()
+          this.handleNodeChanged()
         }
       },
     },
@@ -266,11 +270,7 @@ export default {
   mounted() {
     document.querySelector("body").classList.add("tapestry-lightbox-open")
     DragSelectModular.removeDragSelectListener()
-    if (this.node.mediaType === "multi-content") {
-      this.$root.$on("observe-rows", refs => {
-        this.rowRefs = this.rowRefs.concat(refs)
-      })
-    }
+    this.handleNodeChanged()
   },
   beforeDestroy() {
     document.querySelector("body").classList.remove("tapestry-lightbox-open")
@@ -300,9 +300,16 @@ export default {
       this.close()
     },
     close() {
+      let selectedNode = this.nodeId
+      if (
+        this.parentNode?.mediaType === "multi-content" &&
+        this.parentNode?.presentationStyle === "unit"
+      ) {
+        selectedNode = this.parentNode.id
+      }
       this.$router.push({
         name: names.APP,
-        params: { nodeId: this.nodeId },
+        params: { nodeId: selectedNode },
         query: this.$route.query,
       })
     },
@@ -330,6 +337,23 @@ export default {
     },
     handleTabChange(newTab) {
       this.selectedTab = newTab
+    },
+    handleNodeChanged() {
+      if (
+        this.node.mediaType === "multi-content" &&
+        this.node.presentationStyle === "unit" &&
+        this.node.childOrdering?.length
+      ) {
+        const pageNode = this.getNode(this.node.childOrdering[0])
+        this.$root.$emit("open-node", pageNode.id)
+      } else {
+        this.applyDimensions()
+        if (this.node.mediaType === "multi-content") {
+          this.$root.$on("observe-rows", refs => {
+            this.rowRefs = this.rowRefs.concat(refs)
+          })
+        }
+      }
     },
   },
 }
