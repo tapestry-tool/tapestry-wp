@@ -144,6 +144,16 @@ function tapestry_enqueue_vue_app()
         global $TAPESTRY_VERSION_NUMBER;
         global $TAPESTRY_USE_DEV_MODE;
 
+        global $TYDE_DYAD_ROLES;
+        $isDyad = wp_get_current_user() && array_intersect(wp_get_current_user()->roles, array_keys($TYDE_DYAD_ROLES));
+        $dyadLinkedUser = null;
+        if ($isDyad) {
+            $dyadLinkedUserId = get_the_author_meta('linked_dyad_user_id', wp_get_current_user()->ID);
+            if ($dyadLinkedUserId) {
+                $dyadLinkedUser = get_user_by('id', $dyadLinkedUserId)->data;
+            }
+        }
+
         // register the Vue build script.
         $vueUrl = $TAPESTRY_USE_DEV_MODE ? 'http://localhost:8080/dist' : plugin_dir_url(__FILE__).'templates/vue/dist';
 
@@ -174,6 +184,7 @@ function tapestry_enqueue_vue_app()
                 ]),
                 'nonce' => wp_create_nonce('wp_rest'),
                 'wpUserId' => apply_filters('determine_current_user', false),
+                'dyadLinkedWpUser' => $dyadLinkedUser,
                 'adminAjaxUrl' => admin_url('admin-ajax.php'),
                 'file_upload_nonce' => wp_create_nonce('media-form'),
                 'upload_url' => admin_url('async-upload.php'),

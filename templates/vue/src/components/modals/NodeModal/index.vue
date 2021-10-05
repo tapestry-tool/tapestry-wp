@@ -93,12 +93,7 @@
             </b-card>
             <h6 class="mt-4 mb-3">Lock Node</h6>
             <conditions-form :node="node" />
-            <template v-if="!(isMultiContentNodeChild && parent.isDyad)">
-              <h6 class="mt-4 mb-3">
-                Dyad Node
-              </h6>
-              <dyad-form :node="node" />
-            </template>
+            <dyad-form :node="node" />
           </b-tab>
           <b-tab
             v-if="node.mediaType === 'h5p' || node.mediaType === 'video'"
@@ -786,10 +781,6 @@ export default {
     },
     async submitNode() {
       if (this.type === "add") {
-        if (this.parent && this.parent.mediaType === "multi-content") {
-          this.node.isDyad = true
-        }
-
         const id = await this.addNode(this.node)
         this.node.id = id
         if (this.parent) {
