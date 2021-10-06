@@ -1,25 +1,31 @@
 <template>
-  <div class="answers">
-    <h3>{{ node.title }}</h3>
-    <div class="answer-container mx-auto mb-3" data-qa="answer-display">
-      <h4>{{ answersTypeData.precedingText || question.text }}</h4>
-      <b-tabs vertical no-nav-style nav-class="nav-tablist">
-        <b-tab v-for="questionAnswer in answers" :key="questionAnswer[0]">
-          <template #title>
-            <div class="icon">
-              <tapestry-icon :icon="getIcon(questionAnswer[0])" />
-            </div>
-          </template>
-          <completed-activity-media
-            :type="questionAnswer[0]"
-            :answerData="questionAnswer[1]"
-            :question="question"
-          ></completed-activity-media>
-        </b-tab>
-      </b-tabs>
-      <div v-show="!hasAnswer" class="media-wrapper">
-        You have not completed this question yet.
-      </div>
+  <div class="answer-container mx-auto mb-3" data-qa="answer-display">
+    <h1 class="question-title">
+      {{ answersTypeData.precedingText || question.text }}
+    </h1>
+    <b-tabs v-if="answers.length > 1" vertical no-nav-style nav-class="nav-tablist">
+      <b-tab v-for="questionAnswer in answers" :key="questionAnswer[0]">
+        <template #title>
+          <div class="icon">
+            <tapestry-icon :icon="getIcon(questionAnswer[0])" />
+          </div>
+        </template>
+        <completed-activity-media
+          :type="questionAnswer[0]"
+          :answerData="questionAnswer[1]"
+          :question="question"
+        ></completed-activity-media>
+      </b-tab>
+    </b-tabs>
+    <div v-else-if="hasAnswer">
+      <completed-activity-media
+        :type="answers[0][0]"
+        :answerData="answers[0][1]"
+        :question="question"
+      ></completed-activity-media>
+    </div>
+    <div v-else class="p-2 my-4">
+      <em>This question has not been answered yet.</em>
     </div>
   </div>
 </template>
@@ -64,7 +70,7 @@ export default {
       return answers ? Object.entries(answers) : null
     },
     hasAnswer() {
-      return this.answers.length ? true : false
+      return this.answers?.length ? true : false
     },
   },
   mounted() {
