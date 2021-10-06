@@ -318,8 +318,17 @@ export default {
       } else {
         this.applyDimensions()
         if (this.node.mediaType === "multi-content") {
-          this.$root.$on("observe-rows", refs => {
-            this.rowRefs = this.rowRefs.concat(refs)
+          this.$root.$on("observe-rows", newRefs => {
+            if (Array.isArray(newRefs)) {
+              newRefs.forEach(newRef => {
+                if (
+                  newRef &&
+                  !this.rowRefs.find(ref => ref && ref.id === newRef.id)
+                ) {
+                  this.rowRefs.push(newRef)
+                }
+              })
+            }
           })
         }
       }
