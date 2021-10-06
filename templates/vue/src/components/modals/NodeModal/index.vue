@@ -158,7 +158,7 @@
               @submit="loading = true"
               @setLoading="setLoading"
               @message="setDisabledMessage"
-              @complete="loading = false"
+              @complete="handleDeleteComplete"
             ></delete-node-button>
             <span style="flex-grow:1;"></span>
             <b-button
@@ -324,7 +324,14 @@ export default {
       "getNode",
       "getNeighbours",
     ]),
-    ...mapState(["nodes", "rootId", "settings", "visibleNodes", "apiError"]),
+    ...mapState([
+      "nodes",
+      "rootId",
+      "settings",
+      "visibleNodes",
+      "apiError",
+      "returnRoute",
+    ]),
     parent() {
       const parent = this.getNode(
         this.type === "add" ? this.nodeId : this.getParent(this.nodeId)
@@ -550,7 +557,7 @@ export default {
     this.initialize()
   },
   methods: {
-    ...mapMutations(["updateRootNode"]),
+    ...mapMutations(["updateRootNode", "setReturnRoute"]),
     ...mapActions([
       "addNode",
       "addLink",
@@ -668,6 +675,11 @@ export default {
         })
       }
     },
+    handleDeleteComplete() {
+      this.node = this.parent
+      this.loading = false
+      this.close()
+    },
     handleClose(event) {
       if (
         this.hasUnsavedChanges &&
@@ -697,6 +709,8 @@ export default {
       if (this.show) {
         if (Object.keys(this.nodes).length === 0) {
           this.$router.push({ path: "/", query: this.$route.query })
+        } else if (this.returnRoute) {
+          this.$router.push(this.returnRoute)
         } else if (this.keepOpen) {
           // Switch to edit mode if multi-content just added
           this.$router.push({
@@ -734,6 +748,7 @@ export default {
       }
       this.keepOpen = false
       this.setTapestryErrorReporting(true)
+      this.setReturnRoute(null)
     },
     async handleSubmit() {
       this.errors = this.validateNode()

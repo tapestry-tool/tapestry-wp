@@ -211,6 +211,11 @@ export default class Helpers {
       return wp.canEditTapestry()
     }
 
+    // Public users never have any permissions other than read
+    if (action !== userActions.READ && !wp.isLoggedIn()) {
+      return false
+    }
+
     // Checks related to draft nodes
     /**
      * If node is a draft:

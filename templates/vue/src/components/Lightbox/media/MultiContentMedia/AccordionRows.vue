@@ -35,6 +35,15 @@
                 :condition-node="index > 0 ? nonPopupRows[index - 1].node : {}"
               ></locked-content>
             </button>
+            <a v-if="canEditNode(row.node)" @click="editNode(row.node.id)">
+              <i
+                class="fas fa-pencil-alt fa-sm pr-2"
+                :style="{
+                  opacity: '0.25',
+                  cursor: 'pointer',
+                }"
+              ></i>
+            </a>
             <a
               v-if="!disableRow(index, row.node)"
               @click="toggleFavourite(row.node.id)"
@@ -44,7 +53,7 @@
                 class="fas fa-heart fa-sm"
                 style="color:red;"
               ></i>
-              <i v-else class="fas fa-heart fa-sm"></i>
+              <i v-else class="fas fa-heart fa-sm" :style="{ opacity: '0.25' }"></i>
             </a>
           </div>
           <div v-if="isVisible(row.node.id)" :data-qa="`row-content-${row.node.id}`">
@@ -102,6 +111,8 @@ import TapestryMedia from "../TapestryMedia"
 import HeadlessMultiContent from "./HeadlessMultiContent"
 import AccordionRows from "./AccordionRows"
 import LockedContent from "./common/LockedContent"
+import { names } from "@/config/routes"
+import Helpers from "@/utils/Helpers"
 
 export default {
   name: "accordion-rows",
@@ -197,7 +208,7 @@ export default {
     this.$root.$emit("observe-rows", this.$refs.rowRefs)
   },
   methods: {
-    ...mapMutations(["updateNode"]),
+    ...mapMutations(["updateNode", "setReturnRoute"]),
     ...mapActions(["toggleFavourite"]),
     handleLoad(el) {
       this.$emit("load", el)
@@ -219,6 +230,17 @@ export default {
     },
     areAllPopup(nodes) {
       return nodes.every(node => node.popup !== null)
+    },
+    canEditNode(node) {
+      return Helpers.hasPermission(node, "edit")
+    },
+    editNode(id) {
+      this.setReturnRoute(this.$route)
+      this.$router.push({
+        name: names.MODAL,
+        params: { nodeId: id, type: "edit", tab: "content" },
+        query: this.$route.query,
+      })
     },
   },
 }
