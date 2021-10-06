@@ -17,15 +17,15 @@
         ></completed-activity-media>
       </b-tab>
     </b-tabs>
-    <div v-else>
+    <div v-else-if="hasAnswer">
       <completed-activity-media
         :type="answers[0][0]"
         :answerData="answers[0][1]"
         :question="question"
       ></completed-activity-media>
     </div>
-    <div v-show="!hasAnswer" class="p-2 my-4">
-      <em>You have not completed this question yet.</em>
+    <div v-else class="p-2 my-4">
+      <em>This question has not been answered yet.</em>
     </div>
   </div>
 </template>
@@ -70,7 +70,7 @@ export default {
       return answers ? Object.entries(answers) : null
     },
     hasAnswer() {
-      return this.answers.length ? true : false
+      return this.answers?.length ? true : false
     },
   },
   mounted() {
