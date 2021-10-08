@@ -138,7 +138,7 @@
       </b-form-group>
       <b-form-group v-if="isPageChild">
         <b-form-checkbox
-          v-model="node.halfWidth"
+          v-model="node.typeData.halfWidth"
           data-qa="page-child-node-behaviour-half-width"
         >
           Show this node as half width

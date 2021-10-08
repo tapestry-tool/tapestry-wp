@@ -11,31 +11,49 @@
         allowfullscreen="allowfullscreen"
         :src="normalizedUrl"
         :style="'min-height:' + dimensions.height + 'px'"
-        @load="$emit('load')"
+        @load="handleLoad"
       ></iframe>
-      <b-container v-else class="preview w-100 h-100" :style="previewStyles">
-        <b-row align-v="center" class="w-100 h-100">
-          <b-col class="w-50">
-            <a :href="node.typeData.mediaURL" target="blank">
-              <img
-                class="preview-image"
-                :src="`${node.typeData.linkMetadata.image}`"
-              />
-            </a>
+      <b-card
+        v-else
+        ref="preview"
+        no-body
+        :img-src="showVertically ? node.typeData.linkMetadata.image : ''"
+        class="preview overflow-hidden w-100"
+      >
+        <b-row :no-gutters="showVertically">
+          <b-col
+            v-if="!showVertically"
+            md="6"
+            class="preview-image"
+            :style="{
+              'background-image': `url(${node.typeData.linkMetadata.image})`,
+            }"
+          >
+            <a href="#" @click.prevent="openLink"></a>
           </b-col>
-          <b-col class="preview-content w-50">
-            <h1>
-              <a :href="node.typeData.mediaURL" target="blank">
-                {{ node.typeData.linkMetadata.title }}
-              </a>
-            </h1>
-            <p>{{ node.typeData.linkMetadata.description }}</p>
-            <p>
-              <a :href="node.typeData.mediaURL" target="blank">Open link</a>
-            </p>
+          <b-col :md="showVertically ? 12 : 6" class="preview-content">
+            <b-card-body>
+              <b-card-text>
+                <component
+                  :is="node.typeData.linkMetadata.title.length < 20 ? 'h2' : 'h3'"
+                  class="mb-3"
+                >
+                  <a href="#" @click.prevent="openLink">
+                    {{ node.typeData.linkMetadata.title }}
+                  </a>
+                </component>
+                <p>{{ node.typeData.linkMetadata.description }}</p>
+                <p>
+                  <b-button variant="primary" @click.prevent="openLink">
+                    Open link
+                    <i class="fas fa-external-link-alt ml-1"></i>
+                  </b-button>
+                </p>
+              </b-card-text>
+            </b-card-body>
           </b-col>
         </b-row>
-      </b-container>
+      </b-card>
     </div>
   </div>
 </template>
@@ -77,60 +95,68 @@ export default {
     showTitle() {
       return this.context === "page" && this.node.typeData.showTitle !== false
     },
+    showVertically() {
+      return this.node.typeData.halfWidth && this.context !== "lightbox"
+    },
   },
   mounted() {
-    this.$emit("complete")
     if (this.node.behaviour !== "embed") {
-      this.$emit("load")
+      this.handleLoad()
     }
+  },
+  methods: {
+    handleLoad() {
+      this.$emit("load")
+      if (this.node.behaviour === "embed") {
+        this.$emit("complete")
+      } else {
+        this.$emit("change:dimensions", {
+          height: this.$refs.preview.clientHeight,
+        })
+      }
+    },
+    openLink() {
+      this.$emit("complete")
+      window.open(this.node.typeData.mediaURL, "_blank")
+    },
   },
 }
 </script>
 
 <style lang="scss" scoped>
-.preview {
-  .preview-image {
-    width: 100%;
-    cursor: pointer;
-    position: relative;
-    background-size: cover;
-    background-position: center;
-    transition: all 0.2s ease;
+.external-media-container {
+  height: 100%;
 
-    &:hover {
-      transform: scale(1.05);
-    }
+  .preview {
+    border-radius: 15px;
 
-    a {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-    }
-  }
+    .preview-image {
+      cursor: pointer;
+      background-size: cover;
+      background-position: center;
+      transition: all 0.2s ease;
 
-  .preview-content {
-    text-align: left;
-    font-family: "Source Sans Pro", sans-serif;
+      &:hover {
+        transform: scale(1.05);
+      }
 
-    h1 {
-      margin: 0;
-      padding: 0;
-      line-height: 1.1;
-      font-weight: bold;
-      font-family: inherit;
-
-      &:before {
-        display: none;
+      a {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
       }
     }
 
-    p {
-      margin: 0;
-      margin-top: 1em;
-      padding: 0;
-      font-family: inherit;
+    .preview-content {
+      background: #fff;
+      text-align: left;
+      min-height: 300px;
+
+      .btn i {
+        opacity: 0.5;
+      }
     }
   }
 }

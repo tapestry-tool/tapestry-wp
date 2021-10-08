@@ -75,8 +75,14 @@ export default {
     }
 
     window.addEventListener("click", this.recordAnalytics)
-    const data = [client.getTapestry(), client.getUserProgress(), client.getTheme()]
-    Promise.all(data).then(([dataset, progress, theme]) => {
+
+    const data = [
+      client.getTapestry(),
+      client.getUserProgress(),
+      client.getLastSelectedNode(),
+      client.getTheme(),
+    ]
+    Promise.all(data).then(([dataset, progress, selectedNode, theme]) => {
       this.changeTheme(theme.data)
       const currentTheme = this.getTheme
       document.documentElement.setAttribute(
@@ -87,8 +93,18 @@ export default {
       this.init({ dataset, progress })
       this.loading = false
       if (!this.$route.params.nodeId && dataset.nodes.length > 0) {
+        let path = `/nodes/${dataset.rootId}`
+        if (selectedNode) {
+          path = `/nodes/${selectedNode.nodeId}`
+          if (selectedNode.rowId) {
+            path = `${path}/view/${selectedNode.rowId}`
+            if (selectedNode.subRowId) {
+              path = `${path}/rows/${selectedNode.subRowId}`
+            }
+          }
+        }
         this.$router.replace({
-          path: `/nodes/${dataset.rootId}`,
+          path,
           query: this.$route.query,
         })
       }

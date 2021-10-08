@@ -27,6 +27,13 @@
       </code>
     </div>
     <button
+      v-if="question.optional"
+      class="my-3 btn-link"
+      @click="$emit('skipQuestion')"
+    >
+      Skip
+    </button>
+    <button
       :disabled="duration === 0 && state !== states.SAVED"
       class="my-3 secondary-background"
       @click="resetRecording"
@@ -264,6 +271,11 @@ export default {
       height: 122px;
       font-size: 72px;
       border-radius: 72px;
+    }
+
+    &.btn-link {
+      background: none !important;
+      color: rgba(26, 26, 26, 0.8);
     }
 
     &:not(:disabled):hover {

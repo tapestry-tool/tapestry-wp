@@ -319,6 +319,7 @@ button[disabled] {
   max-width: 150vh;
   margin: 0 auto;
   overflow: auto;
+  overflow-x: hidden;
   scrollbar-color: auto var(--text-color);
   scrollbar-width: none;
 
