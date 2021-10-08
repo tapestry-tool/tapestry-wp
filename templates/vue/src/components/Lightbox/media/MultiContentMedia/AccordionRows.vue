@@ -239,7 +239,6 @@ export default {
       this.$router.push({
         name: names.MODAL,
         params: { nodeId: id, type: "edit", tab: "content" },
-        query: this.$route.query,
       })
     },
   },
