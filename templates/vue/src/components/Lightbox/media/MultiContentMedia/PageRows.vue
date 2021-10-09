@@ -142,7 +142,6 @@ export default {
   data() {
     return {
       showCompletion: false,
-      insertInstructions: [],
     }
   },
   computed: {
@@ -185,37 +184,6 @@ export default {
   },
   mounted() {
     this.$root.$emit("observe-rows", this.$refs.rowRefs)
-  },
-  created() {
-    /* NOTE: Generating the instructions for the 50% width rows
-     *
-     */
-    let previousHadTwoHalfs = false
-    this.rows.forEach((row, index) => {
-      const previous = index ? this.rows[index - 1] : null
-      const next = index !== this.rows.length ? this.rows[index + 1] : null
-
-      this.insertInstructions[index] = ""
-
-      if (row.node.halfWidth) {
-        if (previousHadTwoHalfs) {
-          previousHadTwoHalfs = false
-
-          if (!next?.node.halfWidth) {
-            this.insertInstructions[index] += "spacer col"
-          }
-        } else if (!previous?.node.halfWidth) {
-          if (!next?.node.halfWidth) {
-            this.insertInstructions[index] += "spacer col"
-          }
-        } else if (!previousHadTwoHalfs) {
-          this.insertInstructions[index] += "spacer"
-          previousHadTwoHalfs = true
-        }
-      } else {
-        this.insertInstructions[index] += "spacer"
-      }
-    })
   },
   methods: {
     ...mapMutations(["updateNode"]),

@@ -172,7 +172,6 @@ export default {
 }
 
 .external-media-title {
-  color: white;
   font-weight: 500;
   font-size: 1.75rem;
 
