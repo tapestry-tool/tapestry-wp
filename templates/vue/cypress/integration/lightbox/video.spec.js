@@ -34,7 +34,7 @@ describe("Video", () => {
 
         cy.get("video").should($el => {
           const video = $el.get(0)
-          expect(video.paused).to.be.false
+          expect(video.paused).to.be.true
         })
         cy.get("video").then($el => $el.get(0).pause())
 
