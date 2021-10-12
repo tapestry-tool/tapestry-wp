@@ -1,25 +1,31 @@
 <template>
-  <div class="answers">
-    <h3>{{ node.title }}</h3>
-    <div class="answer-container mx-auto mb-3" data-qa="answer-display">
-      <h4>{{ answersTypeData.precedingText || question.text }}</h4>
-      <b-tabs vertical no-nav-style nav-class="nav-tablist">
-        <b-tab v-for="questionAnswer in answers" :key="questionAnswer[0]">
-          <template #title>
-            <div class="icon">
-              <tapestry-icon :icon="getIcon(questionAnswer[0])" />
-            </div>
-          </template>
-          <completed-activity-media
-            :type="questionAnswer[0]"
-            :answerData="questionAnswer[1]"
-            :question="question"
-          ></completed-activity-media>
-        </b-tab>
-      </b-tabs>
-      <div v-show="!hasAnswer" class="media-wrapper">
-        You have not completed this question yet.
-      </div>
+  <div class="answer-container mx-auto mb-3" data-qa="answer-display">
+    <h1 class="question-title">
+      {{ answersTypeData.precedingText || question.text }}
+    </h1>
+    <b-tabs v-if="answers.length > 1" vertical no-nav-style nav-class="nav-tablist">
+      <b-tab v-for="questionAnswer in answers" :key="questionAnswer[0]">
+        <template #title>
+          <div class="icon">
+            <tapestry-icon :icon="getIcon(questionAnswer[0])" />
+          </div>
+        </template>
+        <completed-activity-media
+          :type="questionAnswer[0]"
+          :answerData="questionAnswer[1]"
+          :question="question"
+        ></completed-activity-media>
+      </b-tab>
+    </b-tabs>
+    <div v-else-if="hasAnswer">
+      <completed-activity-media
+        :type="answers[0][0]"
+        :answerData="answers[0][1]"
+        :question="question"
+      ></completed-activity-media>
+    </div>
+    <div v-else class="p-2 my-4">
+      <em>This question has not been answered yet.</em>
     </div>
   </div>
 </template>
@@ -64,7 +70,7 @@ export default {
       return answers ? Object.entries(answers) : null
     },
     hasAnswer() {
-      return this.answers.length ? true : false
+      return this.answers?.length ? true : false
     },
   },
   mounted() {
@@ -90,22 +96,23 @@ export default {
 }
 </style>
 <style lang="scss" scoped>
-.media-wrapper {
-  position: relative;
-  align-items: center;
-  border-radius: 8px;
-  display: flex;
-  margin-bottom: 8px;
-  margin-top: 8px;
-  padding: 8px 16px 8px 38px;
-  justify-content: center;
-}
-.answers {
-  margin-top: 15px;
-  width: 100%;
-}
 .answer-container {
-  width: 75%;
-  margin-top: 20px;
+  width: 100%;
+  margin-top: 16px;
+
+  @media screen and (min-width: 1000px) {
+    width: 75%;
+  }
+
+  .question-title {
+    position: relative;
+    font-size: 28px;
+    font-weight: 600 !important;
+    margin-top: 4px;
+
+    &:before {
+      display: none;
+    }
+  }
 }
 </style>

@@ -7,7 +7,13 @@
         </div>
       </b-col>
       <b-col v-if="type === 'text' && isListTextType">
-        <ol>
+        <ol
+          :class="{
+            text:
+              answerData.length === 1 &&
+              !question.answerTypes.multipleChoice.useImages,
+          }"
+        >
           <li v-for="answer in answerData" :key="answer.index">
             {{ answer }}
           </li>
@@ -23,7 +29,13 @@
         />
       </b-col>
       <b-col v-if="type === 'multipleChoice'" align-self="center">
-        <ul>
+        <ul
+          :class="{
+            text:
+              answerData.length === 1 &&
+              !question.answerTypes.multipleChoice.useImages,
+          }"
+        >
           <li v-for="answer in answerData" :key="answer.index">
             <completed-multiple-choice-item
               :item="getMultipleChoiceAnswerItem(answer)"
@@ -90,9 +102,13 @@ export default {
   margin-bottom: 8px;
   padding: 8px 16px 8px 16px;
   .text {
-    text-align: left;
-    padding-left: 1em;
-    border-left: solid 1px #666;
+    padding: 0.5em 1em;
+    background: #ffffff6b;
+    display: inline-flex;
+    border-radius: 5px;
+    box-shadow: 0 0 5px inset #0000003b;
+    margin: 0;
+    list-style-type: none;
   }
 }
 </style>
