@@ -1,6 +1,5 @@
 {
     "require": {
-        "kaltura/api-client-library": "^16.14",
-        "spatie/async": "^1.5"
+        "kaltura/api-client-library": "^16.14"
     }
 }
