@@ -2,11 +2,7 @@
   <div class="modal-container">
     <div v-if="allowClose" class="overlay" @click="$emit('close')"></div>
     <transition name="modal">
-      <div
-        v-if="load"
-        class="content primary-background"
-        :style="contentContainerStyle"
-      >
+      <div v-if="load" class="content" :style="contentContainerStyle">
         <div class="buttons-container">
           <modal-button
             v-if="allowClose"

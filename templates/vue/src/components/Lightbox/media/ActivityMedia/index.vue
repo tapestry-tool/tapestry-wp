@@ -1,5 +1,5 @@
 <template>
-  <div ref="activity" class="activity-media primary-background">
+  <div ref="activity" class="activity-media">
     <h1 v-if="showTitle" class="media-title">{{ node.title }}</h1>
     <completion-screen
       v-if="state === 'completion-screen'"
@@ -340,12 +340,12 @@ export default {
   border-radius: 50%;
   height: 56px;
   width: 56px;
-  background: #262626;
+  background: var(--text-color);
+  color: var(--primary-background-color);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 40px;
-  color: white;
   margin: 0;
   margin-right: 12px;
   opacity: 1;

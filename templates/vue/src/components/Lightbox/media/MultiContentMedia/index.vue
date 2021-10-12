@@ -1,7 +1,7 @@
 <template>
   <div
     ref="container"
-    class="media-container primary-background"
+    class="media-container"
     :style="navBarStyle"
     data-qa="multi-content"
   >

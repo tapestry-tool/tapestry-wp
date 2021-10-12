@@ -2,6 +2,7 @@
     --primary-background-color: #111;
     --secondary-background-color: #262626;
     --secondary-background-color-offset: #373737;
+    --layered-background-color: #ffffff11;
     --text-color: #eee;
     --text-color-offset:#fff ;
 }
@@ -10,9 +11,14 @@
     --primary-background-color: #eee;
     --secondary-background-color: #bbb;
     --secondary-background-color-offset: #ccc;
+    --layered-background-color: #00000011;
     --text-color: #111;
     --text-color-offset: #222;
     
+}
+
+body.single-tapestry {
+    background: var(--primary-background-color);
 }
   
 .primary-text {

@@ -73,11 +73,11 @@ export default {
 
   &-from {
     color: var(--primary-color);
-    background-color: var(--secondary-background-color);
+    background-color: var(--layered-background-color);
   }
   &-to {
-    color: var(--primary-color-offset);
-    background-color: var(--secondary-background-color-offset);
+    color: var(--primary-color);
+    background-color: var(--layered-background-color);
   }
 
   .bucket-label {

@@ -16,25 +16,24 @@
               cols="12"
               :lg="row.node.typeData.halfWidth ? 6 : 12"
             >
-              <div class="page-row" :style="rowBackground">
+              <div class="page-row">
                 <div class="title-row-icon">
                   <i
                     v-if="disableRow(index, row.node)"
                     class="fas fa-lock fa-sm"
                   ></i>
-                  <a v-else>
+                  <a
+                    v-else
+                    class="favourite-btn"
+                    :class="{ 'is-favourite': isFavourite(row.node.id) }"
+                  >
                     <i
                       class="fas fa-heart fa-sm"
-                      :style="{
-                        color: isFavourite(row.node.id) ? 'red' : 'black',
-                        opacity: isFavourite(row.node.id) ? '1' : '0.25',
-                        cursor: 'pointer',
-                      }"
                       @click="toggleFavourite(row.node.id)"
                     ></i>
                   </a>
                 </div>
-                <div v-if="disableRow(index, row.node)">
+                <div v-if="disableRow(index, row.node)" class="row-content">
                   <h1 class="title">
                     {{ row.node.title }}
                   </h1>
@@ -43,7 +42,11 @@
                     :condition-node="index > 0 ? rows[index - 1].node : {}"
                   ></locked-content>
                 </div>
-                <div v-else :data-qa="`row-content-${row.node.id}`">
+                <div
+                  v-else
+                  :data-qa="`row-content-${row.node.id}`"
+                  class="row-content"
+                >
                   <div v-if="row.node.mediaType !== 'multi-content'">
                     <tapestry-media
                       :node-id="row.node.id"
@@ -145,7 +148,13 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getDirectChildren", "getNode", "isFavourite", "isMultiContent"]),
+    ...mapGetters([
+      "getDirectChildren",
+      "getNode",
+      "isFavourite",
+      "isMultiContent",
+      "getTheme",
+    ]),
     ...mapState(["favourites"]),
     rows() {
       return this.node.childOrdering.map(id => {
@@ -168,18 +177,6 @@ export default {
         this.context === "page" ||
         this.context === "accordion"
       )
-    },
-    rowBackground() {
-      if (this.isMultiContentContext) {
-        let rgb = 187
-        let colorOffset = this.level * 10
-        rgb = colorOffset > rgb ? 0 : rgb + colorOffset
-        return {
-          background: `rgb(${rgb}, ${rgb}, ${rgb})`,
-        }
-      } else {
-        return null
-      }
     },
   },
   mounted() {
@@ -219,11 +216,6 @@ button[disabled] {
   cursor: not-allowed;
 }
 
-.title-row-icon {
-  flex: 1;
-  text-align: right;
-}
-
 .title {
   background: none;
   width: 100%;
@@ -246,8 +238,35 @@ button[disabled] {
 }
 
 .page-row {
+  position: relative;
   border-radius: 4px;
   padding: 8px 16px;
   margin-bottom: 16px;
+  background: var(--layered-background-color);
+
+  .title-row-icon {
+    position: absolute;
+    right: 12px;
+    text-align: right;
+  }
+
+  .row-content {
+    padding-top: 5px;
+  }
+
+  i {
+    color: var(--text-color);
+  }
+
+  .favourite-btn {
+    i {
+      opacity: 0.25;
+      cursor: pointer;
+    }
+    &.is-favourite > i {
+      color: red;
+      opacity: 1;
+    }
+  }
 }
 </style>

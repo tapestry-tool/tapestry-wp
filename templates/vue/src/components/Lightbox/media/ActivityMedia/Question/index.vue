@@ -7,7 +7,7 @@
     >
       <i class="fas fa-arrow-left"></i>
     </button>
-    <loading v-if="submitting" label="Submitting..." class="primary-background" />
+    <loading v-if="submitting" label="Submitting..." />
     <div v-else>
       <div v-if="question.followUp.enabled" class="follow-up">
         <div
@@ -286,15 +286,15 @@ export default {
     border-radius: 50%;
     width: 80px;
     height: 80px;
-    background: #262626;
+    background: var(--text-color);
+    color: var(--primary-background-color);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 56px;
-    color: white;
     margin: 0;
     margin-right: 12px;
-    opacity: 1;
+    opacity: 0.9;
     transition: all 0.1s ease-out;
     position: absolute;
     top: 74px;
@@ -303,10 +303,11 @@ export default {
 
     &:hover {
       background: #11a6d8;
+      opacity: 1;
     }
 
     &:disabled {
-      opacity: 0.6;
+      opacity: 0.4;
       pointer-events: none;
       cursor: not-allowed;
     }

@@ -84,11 +84,7 @@ export default {
     ]
     Promise.all(data).then(([dataset, progress, selectedNode, theme]) => {
       this.changeTheme(theme.data)
-      const currentTheme = this.getTheme
-      document.documentElement.setAttribute(
-        "data-theme",
-        currentTheme ? currentTheme : "light"
-      )
+      document.documentElement.setAttribute("data-theme", this.getTheme)
 
       this.init({ dataset, progress })
       this.loading = false

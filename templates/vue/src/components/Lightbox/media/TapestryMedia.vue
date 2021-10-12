@@ -2,7 +2,7 @@
   <div
     :class="[
       'media-wrapper',
-      'secondary-background',
+      { 'secondary-background': context === 'lightbox' },
       { 'media-wrapper-embed': node.mediaFormat === 'embed' },
       {
         'media-wrapper-no-scroll':

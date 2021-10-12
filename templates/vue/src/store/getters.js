@@ -200,5 +200,5 @@ export function getNeighbouringLinks(state) {
 }
 
 export function getTheme(state) {
-  return state.theme
+  return state.theme ? state.theme : "light"
 }

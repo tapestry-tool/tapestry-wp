@@ -57,7 +57,6 @@ export default {
 
 <style lang="scss" scoped>
 .article {
-  padding: 25px;
   text-align: left;
 
   &.context-lightbox {

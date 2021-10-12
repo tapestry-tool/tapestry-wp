@@ -12,7 +12,7 @@
   >
     {{ textContent[icon] }}
   </text>
-  <i v-else-if="icon === 'text'" class="icon-plaintext">{{ textContent[icon] }}</i>
+  <i v-else-if="isPlainText" class="icon-plaintext">{{ textContent[icon] }}</i>
   <drag-drop-icon
     v-else-if="icon === 'dragDrop'"
     class="icon-dragdrop"
@@ -37,7 +37,7 @@ const textContent = {
   pen: "\uf304",
   plus: "\uf067",
   play: "\uf04b",
-  text: "Aa",
+  text: "\uf11c",
   answer: "\uf02e",
   "comment-dots": "\uf4ad",
 }
@@ -45,6 +45,7 @@ const textContent = {
 const aliases = {
   audio: "microphone",
   checklist: "tasks",
+  text: "keyboard",
 }
 
 /**
@@ -89,8 +90,6 @@ export default {
   computed: {
     svgClass() {
       switch (this.icon) {
-        case "text":
-          return "text"
         case "post":
           return "brand"
       }
@@ -98,6 +97,9 @@ export default {
     },
     iconClass() {
       return `fas fa-${aliases[this.icon] || this.icon} icon-fa`
+    },
+    isPlainText() {
+      return false
     },
     textContent() {
       return textContent

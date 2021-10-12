@@ -1,25 +1,16 @@
 <template>
-  <button
-    class="button secondary-background"
-    :disabled="disabled"
-    @click="$emit('click')"
-  >
-    <i
-      class="fas fa-check-circle primary-text"
-      :class="completed ? 'visible' : 'invisible'"
-    ></i>
+  <button class="button" :disabled="disabled" @click="$emit('click')">
+    <i class="fas fa-check-circle" :class="completed ? 'visible' : 'invisible'"></i>
     <div v-if="isFaIcon" class="icon">
-      <i :class="`fas fa-${faIcon} icon-fa primary-text`"></i>
+      <i :class="`fas fa-${faIcon} icon-fa`"></i>
     </div>
     <drag-drop-icon
       v-else-if="icon === 'dragDrop'"
-      class="drag-drop-icon primary-text"
+      class="drag-drop-icon"
       width="56"
       height="56"
     />
-    <div class="primary-text">
-      <slot></slot>
-    </div>
+    <slot></slot>
   </button>
 </template>
 
@@ -51,11 +42,10 @@ export default {
       switch (this.icon) {
         case "multipleChoice":
           return "tasks"
-
         case "audio":
           return "microphone"
         case "text":
-          return "font"
+          return "keyboard"
         default:
           return this.icon
       }
@@ -64,6 +54,7 @@ export default {
       return (
         this.faIcon === "tasks" ||
         this.faIcon === "microphone" ||
+        this.faIcon === "keyboard" ||
         this.faIcon === "font"
       )
     },
@@ -72,7 +63,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-button {
+button,
+button:active,
+button:focus {
+  background: var(--text-color);
+  color: var(--primary-background-color);
   padding: 0;
   margin: 0;
   margin-right: 24px;
