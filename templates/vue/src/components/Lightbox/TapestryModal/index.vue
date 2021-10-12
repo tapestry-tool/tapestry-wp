@@ -108,6 +108,8 @@ export default {
   .content {
     position: absolute;
     z-index: 100;
+    background: var(--primary-background-color);
+    color: var(--text-color);
     background-position: 0 0;
     background-size: cover;
     box-shadow: 0 0 100px -40px #000;
@@ -126,6 +128,8 @@ export default {
 
   &.full-screen {
     .content {
+      border-radius: 0;
+
       .buttons-container {
         top: 20px;
         right: 30px;

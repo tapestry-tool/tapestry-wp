@@ -10,7 +10,7 @@
           v-for="(row, index) in nonPopupRows"
           :key="row.node.id"
           ref="rowRefs"
-          class="accordion-row secondary-background"
+          class="accordion-row"
           :style="rowBackground"
         >
           <div class="button-row">
@@ -252,5 +252,6 @@ button[disabled] {
   border-radius: 4px;
   padding: 8px 16px;
   margin-bottom: 8px;
+  background: var(--layered-background-color);
 }
 </style>

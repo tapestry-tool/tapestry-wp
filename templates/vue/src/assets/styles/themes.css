@@ -1,19 +1,17 @@
 [data-theme="dark"] {
     --primary-background-color: #111;
     --secondary-background-color: #262626;
-    --secondary-background-color-offset: #373737;
     --layered-background-color: #ffffff11;
     --text-color: #eee;
-    --text-color-offset:#fff ;
+    --button-color: #dddddd;
 }
   
 [data-theme="light"] {
     --primary-background-color: #eee;
-    --secondary-background-color: #bbb;
-    --secondary-background-color-offset: #ccc;
+    --secondary-background-color: #ddd;
     --layered-background-color: #00000011;
     --text-color: #111;
-    --text-color-offset: #222;
+    --button-color: #222222;
     
 }
 
@@ -24,15 +22,6 @@ body.single-tapestry {
 .primary-text {
     color: var(--text-color) !important;
 }
-.primary-text-offset {
-    color: var(--text-color-offset) !important;
-}
 .primary-background {
     background-color: var(--primary-background-color) !important;
-}
-.secondary-background {
-    background-color: var(--secondary-background-color) !important;
-}
-.secondary-background-offset {
-    background-color: var(--secondary-background-color-offset) !important;
 }
