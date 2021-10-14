@@ -1,5 +1,5 @@
 <template>
-  <b-container class="completed-activity-media">
+  <div class="completed-activity-media">
     <b-row align-v="center" style="min-height:150px;">
       <b-col v-if="type === 'text' && !isListTextType" align-self="center">
         <div class="text">
@@ -22,12 +22,11 @@
       <b-col v-if="type === 'audio'" align-self="center">
         <audio controls :src="urlAnswer"></audio>
       </b-col>
-      <b-col v-if="type === 'dragDrop'" align-self="center">
-        <drag-drop
-          :answer-data="answerData"
-          :drag-drop="question.answerTypes.dragDrop"
-        />
-      </b-col>
+      <drag-drop
+        v-if="type === 'dragDrop'"
+        :answer-data="answerData"
+        :drag-drop="question.answerTypes.dragDrop"
+      />
       <b-col v-if="type === 'multipleChoice'" align-self="center">
         <ul
           :class="{
@@ -45,7 +44,7 @@
         </ul>
       </b-col>
     </b-row>
-  </b-container>
+  </div>
 </template>
 
 <script>
@@ -98,10 +97,13 @@ export default {
 
 <style lang="scss" scoped>
 .completed-activity-media {
-  background: #dcdcdc;
   border-radius: 8px;
   margin-bottom: 8px;
-  padding: 8px 16px 8px 16px;
+  padding: 10px 16px 10px 16px;
+  display: inline-flex;
+  ol li {
+    text-align: left;
+  }
   .text {
     padding: 0.5em 1em;
     background: #ffffff6b;

@@ -1,15 +1,20 @@
 <template>
   <div class="answer-container mx-auto mb-3" data-qa="answer-display">
-    <h1 class="question-title">
-      {{ answersTypeData.precedingText || question.text }}
-    </h1>
-    <b-tabs v-if="answers.length > 1" vertical no-nav-style nav-class="nav-tablist">
+    <b-tabs
+      v-if="answers.length > 1"
+      vertical
+      no-nav-style
+      nav-class="nav-tablist mt-4 pt-4"
+    >
       <b-tab v-for="questionAnswer in answers" :key="questionAnswer[0]">
         <template #title>
           <div class="icon">
             <tapestry-icon :icon="getIcon(questionAnswer[0])" />
           </div>
         </template>
+        <h1 class="question-title mb-3">
+          {{ answersTypeData.precedingText || question.text }}
+        </h1>
         <completed-activity-media
           :type="questionAnswer[0]"
           :answerData="questionAnswer[1]"
@@ -18,6 +23,9 @@
       </b-tab>
     </b-tabs>
     <div v-else-if="hasAnswer">
+      <h1 class="question-title mb-3">
+        {{ answersTypeData.precedingText || question.text }}
+      </h1>
       <completed-activity-media
         :type="answers[0][0]"
         :answerData="answers[0][1]"
