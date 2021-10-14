@@ -1,5 +1,5 @@
 <template>
-  <div class="bucket-container p-2" :data-qa="`user-from-bucket-${bucket.id}`">
+  <div class="bucket-container p-2 mx-2" :data-qa="`user-from-bucket-${bucket.id}`">
     <b style="font-size: 1rem">{{ bucket.text }}</b>
     <item
       v-for="item in items"
