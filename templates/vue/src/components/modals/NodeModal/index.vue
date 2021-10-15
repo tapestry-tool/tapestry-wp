@@ -11,28 +11,27 @@
     @hide="handleClose"
   >
     <template #modal-title>
-      <b-link
-        v-if="isMultiContentNodeChild"
-        class="nav-item modal-header-link"
-        data-qa="node-modal-header-back"
-        @click="handleClose"
-      >
-        <i class="fas fa-chevron-left fa-xs" />
-        Back to "{{ parent.title }}"
-      </b-link>
-      <div v-else data-qa="node-modal-header">
+      <span v-if="isMultiContentNodeChild">
+        <b-link
+          v-for="(parentNode, index) in multiContentChildParents"
+          :key="parentNode.id"
+          class="nav-item modal-header-link"
+          :data-qa="
+            (index =
+              multiContentChildParents.length - 1 ? 'node-modal-header-back' : '')
+          "
+          @click="gotoEdit(parentNode.id)"
+        >
+          {{ parentNode.title }}
+          <i class="fas fa-chevron-right fa-xs mx-2" />
+        </b-link>
+      </span>
+      <span data-qa="node-modal-header">
         {{ title }}
-      </div>
+      </span>
     </template>
     <b-container fluid class="px-0" data-qa="node-modal">
       <b-overlay :show="loading" variant="white">
-        <h4
-          v-if="isMultiContentNodeChild"
-          data-qa="node-modal-title"
-          class="modal-header"
-        >
-          {{ title }}
-        </h4>
         <div v-if="hasSubmissionError" class="error-wrapper">
           <h5>Operation failed due to the following error(s):</h5>
           <ul>
@@ -447,6 +446,17 @@ export default {
         !!this.isMultiContentNodeChild && this.parent?.presentationStyle === "page"
       )
     },
+    multiContentChildParents() {
+      let parents = []
+      let parentId
+      let parent = this.parent
+      while (parent != null) {
+        parents.unshift(parent)
+        parentId = this.getParent(parent.id)
+        parent = parentId ? this.getNode(parentId) : null
+      }
+      return parents
+    },
     isMultipleChoiceValueValid() {
       const questionsWithMultipleChoiceEnabled = this.node.typeData.activity.questions.filter(
         question => {
@@ -749,6 +759,30 @@ export default {
       this.keepOpen = false
       this.setTapestryErrorReporting(true)
       this.setReturnRoute(null)
+    },
+    gotoEdit(nodeId) {
+      if (this.hasUnsavedChanges) {
+        this.$bvModal
+          .msgBoxConfirm("All unsaved changes will be lost.", {
+            modalClass: "node-modal-confirmation",
+            title: "Are you sure you want to continue?",
+            okTitle: "Close",
+          })
+          .then(close => {
+            if (close) {
+              this.$router.push({
+                name: names.MODAL,
+                params: { nodeId, type: "edit", tab: "content" },
+              })
+            }
+          })
+          .catch(err => console.log(err))
+      } else {
+        this.$router.push({
+          name: names.MODAL,
+          params: { nodeId, type: "edit", tab: "content" },
+        })
+      }
     },
     async handleSubmit() {
       this.errors = this.validateNode()
@@ -1273,7 +1307,6 @@ table {
 }
 
 .modal-header-link {
-  font-weight: normal;
   font-size: 16px;
 }
 
