@@ -321,10 +321,16 @@ export default {
           this.$root.$on("observe-rows", newRefs => {
             if (Array.isArray(newRefs)) {
               newRefs.forEach(newRef => {
-                if (
-                  newRef &&
-                  !this.rowRefs.find(ref => ref && ref.id === newRef.id)
-                ) {
+                if (newRef) {
+                  // We need to remove the old ref because it references
+                  // an element that has potentially been destroyed
+                  const existingRefIndex = this.rowRefs.findIndex(
+                    ref => ref && ref.id === newRef.id
+                  )
+                  if (existingRefIndex !== -1) {
+                    this.rowRefs.splice(existingRefIndex, 1)
+                  }
+                  // Add the new ref, pointing to the current ref
                   this.rowRefs.push(newRef)
                 }
               })

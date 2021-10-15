@@ -1,6 +1,11 @@
 <template>
   <li :class="{ disabled: disabled }">
-    <div @mouseover="hovered = true" @mouseleave="hovered = false">
+    <div
+      class="page-menu-item-wrapper"
+      @mouseover="hovered = true"
+      @mouseleave="hovered = false"
+      @click="handleTitleClick"
+    >
       <span class="page-menu-item-title fa-li">
         <i
           :class="
@@ -12,7 +17,7 @@
           "
         />
       </span>
-      <span class="page-nav-title" @click="handleTitleClick">
+      <span class="page-nav-title">
         {{ node.typeData.menuTitle ? node.typeData.menuTitle : node.title }}
       </span>
     </div>
@@ -128,6 +133,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.page-menu-item-wrapper {
+  cursor: pointer;
+}
 .page-menu-item {
   &.fa-ul {
     margin-top: 1.5em;
@@ -144,9 +152,6 @@ export default {
         vertical-align: middle;
         font-size: 0.5rem;
       }
-    }
-    .page-nav-title {
-      cursor: pointer;
     }
   }
 }
