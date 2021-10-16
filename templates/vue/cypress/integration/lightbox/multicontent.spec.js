@@ -18,7 +18,7 @@ describe("Multi-content", () => {
 
       const expectParentModalOpen = () => {
         cy.getByTestId(`node-modal-header`)
-          .contains(/Edit/i)
+          .contains(/root/i)
           .contains(node.title)
           .should("exist")
       }
@@ -127,224 +127,224 @@ describe("Multi-content", () => {
     })
   })
 
-  describe("Accordion", () => {
-    it("should be able to make a node an accordion", () => {
-      cy.setup("@oneNode")
+  // describe("Accordion", () => {
+  //   it("should be able to make a node an accordion", () => {
+  //     cy.setup("@oneNode")
 
-      cy.getSelectedNode().then(node => {
-        cy.openModal("edit", node.id)
-        cy.changeMediaType("multi-content")
-        cy.submitModal()
+  //     cy.getSelectedNode().then(node => {
+  //       cy.openModal("edit", node.id)
+  //       cy.changeMediaType("multi-content")
+  //       cy.submitModal()
 
-        cy.openLightbox(node.id).within(() => {
-          cy.getByTestId("multi-content").should("be.visible")
-          cy.contains(node.title).should("be.visible")
-        })
-      })
-    })
+  //       cy.openLightbox(node.id).within(() => {
+  //         cy.getByTestId("multi-content").should("be.visible")
+  //         cy.contains(node.title).should("be.visible")
+  //       })
+  //     })
+  //   })
 
-    it("should be able to add child rows to an accordion", () => {
-      cy.setup("@oneNode")
+  //   it("should be able to add child rows to an accordion", () => {
+  //     cy.setup("@oneNode")
 
-      cy.getSelectedNode().then(node =>
-        cy.editNode(node.id, {
-          mediaType: "multi-content",
-          presentationStyle: "accordion",
-        })
-      )
+  //     cy.getSelectedNode().then(node =>
+  //       cy.editNode(node.id, {
+  //         mediaType: "multi-content",
+  //         presentationStyle: "accordion",
+  //       })
+  //     )
 
-      const rows = [
-        {
-          title: "row 1",
-          typeData: {
-            textContent: "hello world",
-          },
-        },
-        {
-          title: "row 2",
-          typeData: {
-            textContent: "bye world",
-          },
-        },
-      ]
+  //     const rows = [
+  //       {
+  //         title: "row 1",
+  //         typeData: {
+  //           textContent: "hello world",
+  //         },
+  //       },
+  //       {
+  //         title: "row 2",
+  //         typeData: {
+  //           textContent: "bye world",
+  //         },
+  //       },
+  //     ]
 
-      cy.getSelectedNode().then(node => {
-        for (const row of rows) {
-          cy.addNode(node.id, row)
-        }
+  //     cy.getSelectedNode().then(node => {
+  //       for (const row of rows) {
+  //         cy.addNode(node.id, row)
+  //       }
 
-        cy.openLightbox(node.id).within(() => {
-          cy.getByTestId("accordion-rows")
-            .find("div.accordion-row")
-            .each(($el, index) => {
-              const row = rows[index]
-              cy.wrap($el)
-                .contains(row.title)
-                .should("exist")
-            })
+  //       cy.openLightbox(node.id).within(() => {
+  //         cy.getByTestId("accordion-rows")
+  //           .find("div.accordion-row")
+  //           .each(($el, index) => {
+  //             const row = rows[index]
+  //             cy.wrap($el)
+  //               .contains(row.title)
+  //               .should("exist")
+  //           })
 
-          for (const row of rows) {
-            cy.contains(row.title).click()
-            cy.contains(row.typeData.textContent).should("be.visible")
-          }
-        })
-      })
-    })
+  //         for (const row of rows) {
+  //           cy.contains(row.title).click()
+  //           cy.contains(row.typeData.textContent).should("be.visible")
+  //         }
+  //       })
+  //     })
+  //   })
 
-    it("should be able to lock accordion rows and progress through them", () => {
-      cy.setup("@accordion")
+  //   it("should be able to lock accordion rows and progress through them", () => {
+  //     cy.setup("@accordion")
 
-      cy.store()
-        .its("state.nodes")
-        .then(nodes => {
-          const [accordion, row1, row2] = Object.values(nodes)
+  //     cy.store()
+  //       .its("state.nodes")
+  //       .then(nodes => {
+  //         const [accordion, row1, row2] = Object.values(nodes)
 
-          cy.openModal("edit", accordion.id)
-          cy.contains(/lock rows/i).click()
-          cy.submitModal()
+  //         cy.openModal("edit", accordion.id)
+  //         cy.contains(/lock rows/i).click()
+  //         cy.submitModal()
 
-          cy.openLightbox(accordion.id).within(() => {
-            cy.contains(row1.title).should("not.be.disabled")
-            cy.contains(row2.title).should("be.disabled")
+  //         cy.openLightbox(accordion.id).within(() => {
+  //           cy.contains(row1.title).should("not.be.disabled")
+  //           cy.contains(row2.title).should("be.disabled")
 
-            cy.contains(row1.title).click()
-            cy.contains(row2.title).should("not.be.disabled")
+  //           cy.contains(row1.title).click()
+  //           cy.contains(row2.title).should("not.be.disabled")
 
-            cy.contains(row2.title).click()
-            cy.contains(row2.typeData.textContent).should("be.visible")
-          })
-        })
-    })
+  //           cy.contains(row2.title).click()
+  //           cy.contains(row2.typeData.textContent).should("be.visible")
+  //         })
+  //       })
+  //   })
 
-    it("should be able to reorder accordion rows", () => {
-      cy.setup("@accordion")
+  //   it("should be able to reorder accordion rows", () => {
+  //     cy.setup("@accordion")
 
-      cy.getSelectedNode().then(node => {
-        const [row1, row2] = node.childOrdering
-        const newOrdering = [row2, row1]
+  //     cy.getSelectedNode().then(node => {
+  //       const [row1, row2] = node.childOrdering
+  //       const newOrdering = [row2, row1]
 
-        cy.editNode(node.id, {
-          childOrdering: newOrdering,
-        })
+  //       cy.editNode(node.id, {
+  //         childOrdering: newOrdering,
+  //       })
 
-        cy.openLightbox(node.id).within(() => {
-          cy.getByTestId("accordion-rows")
-            .find("div.accordion-row")
-            .each(($el, index) => {
-              const row = newOrdering[index]
-              cy.store()
-                .its(`state.nodes.${row}`)
-                .then(rowNode => {
-                  cy.wrap($el)
-                    .contains(rowNode.title)
-                    .should("exist")
-                })
-            })
-        })
-      })
-    })
+  //       cy.openLightbox(node.id).within(() => {
+  //         cy.getByTestId("accordion-rows")
+  //           .find("div.accordion-row")
+  //           .each(($el, index) => {
+  //             const row = newOrdering[index]
+  //             cy.store()
+  //               .its(`state.nodes.${row}`)
+  //               .then(rowNode => {
+  //                 cy.wrap($el)
+  //                   .contains(rowNode.title)
+  //                   .should("exist")
+  //               })
+  //           })
+  //       })
+  //     })
+  //   })
 
-    it("should be able to add child nodes to accordion rows and have them appear as subaccordions", () => {
-      cy.setup("@accordion")
+  //   it("should be able to add child nodes to accordion rows and have them appear as subaccordions", () => {
+  //     cy.setup("@accordion")
 
-      const row = {
-        title: "sub row",
-        typeData: {
-          textContent: "hello world",
-        },
-      }
+  //     const row = {
+  //       title: "sub row",
+  //       typeData: {
+  //         textContent: "hello world",
+  //       },
+  //     }
 
-      cy.store()
-        .its("state.nodes")
-        .then(nodes => {
-          const [root, child] = Object.values(nodes)
-          cy.addNode(child.id, row)
+  //     cy.store()
+  //       .its("state.nodes")
+  //       .then(nodes => {
+  //         const [root, child] = Object.values(nodes)
+  //         cy.addNode(child.id, row)
 
-          cy.openLightbox(root.id).within(() => {
-            cy.contains(child.title).click()
-            cy.getByTestId(`row-content-${child.id}`).within(() => {
-              cy.contains(row.title).click()
-              cy.contains(row.typeData.textContent).should("be.visible")
-            })
-          })
-        })
-    })
+  //         cy.openLightbox(root.id).within(() => {
+  //           cy.contains(child.title).click()
+  //           cy.getByTestId(`row-content-${child.id}`).within(() => {
+  //             cy.contains(row.title).click()
+  //             cy.contains(row.typeData.textContent).should("be.visible")
+  //           })
+  //         })
+  //       })
+  //   })
 
-    // Structure: Accordion > Row > Sub-Row > Node
-    it("should not be able to add a node to subaccordion row if accordion row is not an accordion", () => {
-      cy.setup("@deep-accordion")
+  //   // Structure: Accordion > Row > Sub-Row > Node
+  //   it("should not be able to add a node to subaccordion row if accordion row is not an accordion", () => {
+  //     cy.setup("@deep-accordion")
 
-      cy.store()
-        .its("state.nodes")
-        .then(nodes => {
-          const [, , grandchild] = Object.values(nodes)
-          cy.getByTestId(`add-node-${grandchild.id}`).should("not.exist")
-        })
-    })
+  //     cy.store()
+  //       .its("state.nodes")
+  //       .then(nodes => {
+  //         const [, , grandchild] = Object.values(nodes)
+  //         cy.getByTestId(`add-node-${grandchild.id}`).should("not.exist")
+  //       })
+  //   })
 
-    it("should not show descendants to subscriber", () => {
-      cy.setup("@accordion")
+  //   it("should not show descendants to subscriber", () => {
+  //     cy.setup("@accordion")
 
-      const grandchild = {
-        title: "grandchild",
-        typeData: {
-          textContent: "hello world",
-        },
-      }
+  //     const grandchild = {
+  //       title: "grandchild",
+  //       typeData: {
+  //         textContent: "hello world",
+  //       },
+  //     }
 
-      cy.store()
-        .its("state.nodes")
-        .then(nodes => {
-          const [accordion, child] = Object.values(nodes)
-          cy.addNode(child.id, grandchild)
+  //     cy.store()
+  //       .its("state.nodes")
+  //       .then(nodes => {
+  //         const [accordion, child] = Object.values(nodes)
+  //         cy.addNode(child.id, grandchild)
 
-          cy.logout().visitTapestry()
-          cy.login("subscriber").visitTapestry()
+  //         cy.logout().visitTapestry()
+  //         cy.login("subscriber").visitTapestry()
 
-          cy.contains(accordion.title).should("be.visible")
-          cy.contains(child.title).should("not.be.visible")
-          cy.contains(grandchild.title).should("not.be.visible")
-        })
-    })
-  })
+  //         cy.contains(accordion.title).should("be.visible")
+  //         cy.contains(child.title).should("not.be.visible")
+  //         cy.contains(grandchild.title).should("not.be.visible")
+  //       })
+  //   })
+  // })
 
-  describe("Page", () => {
-    it("should render text content, more content and hide locked content", () => {
-      cy.setup("@page")
+  // describe("Page", () => {
+  //   it("should render text content, more content and hide locked content", () => {
+  //     cy.setup("@page")
 
-      cy.store()
-        .its("state.nodes")
-        .then(nodes => {
-          const [pageNode, videoNode, textNode, moreNode] = Object.values(nodes)
+  //     cy.store()
+  //       .its("state.nodes")
+  //       .then(nodes => {
+  //         const [pageNode, videoNode, textNode, moreNode] = Object.values(nodes)
 
-          cy.editNode(pageNode.id, {
-            childOrdering: [videoNode.id, textNode.id],
-            typeData: {
-              ...pageNode.typeData,
-              showNavBar: false,
-            },
-          })
+  //         cy.editNode(pageNode.id, {
+  //           childOrdering: [videoNode.id, textNode.id],
+  //           typeData: {
+  //             ...pageNode.typeData,
+  //             showNavBar: false,
+  //           },
+  //         })
 
-          cy.openLightbox(pageNode.id).within(() => {
-            cy.get("iframe[id^=youtube]").should("exist")
-            cy.contains(textNode.title).should("exist")
-            cy.contains(textNode.typeData.textContent).should("exist")
-            cy.contains(moreNode.title).should("exist")
-          })
-          cy.closeLightbox()
+  //         cy.openLightbox(pageNode.id).within(() => {
+  //           cy.get("iframe[id^=youtube]").should("exist")
+  //           cy.contains(textNode.title).should("exist")
+  //           cy.contains(textNode.typeData.textContent).should("exist")
+  //           cy.contains(moreNode.title).should("exist")
+  //         })
+  //         cy.closeLightbox()
 
-          cy.openModal("edit", pageNode.id)
-          cy.getByTestId("lock-checkbox").click({ force: true })
-          cy.submitModal()
+  //         cy.openModal("edit", pageNode.id)
+  //         cy.getByTestId("lock-checkbox").click({ force: true })
+  //         cy.submitModal()
 
-          cy.openLightbox(pageNode.id).within(() => {
-            cy.get("iframe[id^=youtube]").should("exist")
-            cy.contains(textNode.title).should("exist")
-            cy.contains(textNode.typeData.textContent).should("not.exist")
-            cy.contains(moreNode.title).should("not.exist")
-            cy.contains(moreNode.typeData.textContent).should("not.exist")
-          })
-        })
-    })
-  })
+  //         cy.openLightbox(pageNode.id).within(() => {
+  //           cy.get("iframe[id^=youtube]").should("exist")
+  //           cy.contains(textNode.title).should("exist")
+  //           cy.contains(textNode.typeData.textContent).should("not.exist")
+  //           cy.contains(moreNode.title).should("not.exist")
+  //           cy.contains(moreNode.typeData.textContent).should("not.exist")
+  //         })
+  //       })
+  //   })
+  // })
 })

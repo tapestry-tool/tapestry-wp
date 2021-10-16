@@ -17,8 +17,9 @@
           :key="parentNode.id"
           class="nav-item modal-header-link"
           :data-qa="
-            (index =
-              multiContentChildParents.length - 1 ? 'node-modal-header-back' : '')
+            index == multiContentChildParents.length - 1
+              ? 'node-modal-header-back'
+              : ''
           "
           @click="gotoEdit(parentNode.id)"
         >
