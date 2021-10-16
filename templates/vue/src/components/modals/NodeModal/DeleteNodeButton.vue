@@ -100,6 +100,7 @@ export default {
       this.$emit("setLoading", false)
     },
     removeNode() {
+      this.$emit("complete")
       if (!this.isRoot) {
         const neighbour = this.neighbour
         this.deleteLink({
@@ -117,7 +118,6 @@ export default {
         this.$router.push({ path: "/", query: this.$route.query })
       }
       this.deleteNode(this.nodeId)
-      this.$emit("complete")
     },
   },
 }
