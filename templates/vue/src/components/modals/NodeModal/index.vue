@@ -689,7 +689,8 @@ export default {
     handleDeleteComplete() {
       this.node = this.parent
       this.loading = false
-      this.close()
+      this.keepOpen = true
+      this.close("delete")
     },
     handleClose(event) {
       if (
@@ -741,6 +742,7 @@ export default {
           this.$route.query.nav === "modal"
         ) {
           // Prevent NodeModal from closing
+
           if (event) event.preventDefault()
 
           // Return to modal of parent node
