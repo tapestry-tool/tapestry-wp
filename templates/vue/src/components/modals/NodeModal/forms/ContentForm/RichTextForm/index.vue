@@ -209,7 +209,7 @@ export default {
         new OrderedList(),
         new TodoItem(),
         new TodoList(),
-        new Link({ target: "_blank" }),
+        new Link(),
         new Bold(),
         new Code(),
         new Italic(),
