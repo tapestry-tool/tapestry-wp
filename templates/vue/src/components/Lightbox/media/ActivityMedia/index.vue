@@ -19,8 +19,9 @@
     <question
       v-else
       :question="activeQuestion"
-      :node="node"
-      @submit="handleSubmit"
+      :node="questionNode"
+      @submit="handleComplete('activity')"
+      @skipQuestion="skip"
       @back="$emit('close')"
     ></question>
     <footer v-if="!showCompletionScreen" class="question-footer">
@@ -113,17 +114,39 @@ export default {
   methods: {
     ...mapActions(["updateNodeProgress"]),
     markQuestionsComplete() {
-      for (let i = 0; i < this.questions.length; i++) {
-        const currentQuestion = this.questions[i]
-        const currentQuestionAnswer = this.getAnswers(
-          this.node.id,
-          currentQuestion.id
-        )
-        if (Object.keys(currentQuestionAnswer).length === 0) {
-          currentQuestion.completed = false
+      let numCompleted = 0
+      this.questions.forEach(question => {
+        const answer = this.getAnswers(this.questionNode.id, question.id)
+        if (Object.entries(answer).length === 0 && !question.optional) {
+          question.completed = false
         } else {
-          currentQuestion.completed = true
+          question.completed = true
+          numCompleted++
         }
+      })
+      if (numCompleted === this.questions.length && !this.node.completed) {
+        this.$emit("complete")
+      }
+    },
+    handleComplete(initiatingComponent) {
+      if (initiatingComponent === "activity") {
+        this.state = states.COMPLETION_SCREEN
+        const numberCompleted = this.questionNode.typeData.activity.questions.filter(
+          question => question.completed || question.optional
+        ).length
+        const progress =
+          numberCompleted / this.questionNode.typeData.activity.questions.length
+        this.updateNodeProgress({ id: this.questionNode.id, progress }).then(() => {
+          if (progress === 1) {
+            this.$emit("complete")
+          }
+        })
+      } else if (
+        this.initialType === states.ANSWER &&
+        initiatingComponent === "answer" &&
+        this.hasAnswers
+      ) {
+        this.$emit("complete")
       }
     },
     handleSubmit() {
@@ -153,9 +176,19 @@ export default {
       })
       this.activeQuestionIndex--
     },
+    skip() {
+      client.recordAnalyticsEvent("user", "skip", "activity", this.node.id, {
+        from: this.activeQuestionIndex,
+      })
+      this.hasNext ? this.next() : (this.state = states.COMPLETION_SCREEN)
+    },
     close() {
       client.recordAnalyticsEvent("user", "close", "activity", this.node.id)
-      this.$emit("close")
+      if (this.initialType === "activity" && this.context === "lightbox") {
+        this.$emit("close")
+      } else {
+        this.state = states.ANSWER
+      }
     },
   },
 }
@@ -164,6 +197,7 @@ export default {
 <style lang="scss" scoped>
 .activity-media {
   display: flex;
+  position: relative;
   flex-direction: column;
   align-items: flex-end;
   justify-content: space-between;
@@ -214,6 +248,10 @@ export default {
     margin: 1em auto 0;
     padding: 0;
     font-weight: 600;
+  }
+
+  i {
+    align-self: center;
   }
 }
 

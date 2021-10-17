@@ -13,6 +13,7 @@ class TapestryUserProgress implements ITapestryUserProgress
     private $_userId = null;
     private $postId;
     private $nodeMetaId;
+    private $node;
 
     /**
      * Constructor.
@@ -24,9 +25,14 @@ class TapestryUserProgress implements ITapestryUserProgress
      */
     public function __construct($postId = null, $nodeMetaId = null)
     {
-        $this->_userId = apply_filters('determine_current_user', false);
         $this->postId = $postId;
         $this->nodeMetaId = $nodeMetaId;
+
+        if ($nodeMetaId) {
+            $this->node = new TapestryNode($postId = null, $nodeMetaId = null);
+        }
+
+        $this->_userId = apply_filters('determine_current_user', false);
     }
 
     /**
@@ -42,7 +48,7 @@ class TapestryUserProgress implements ITapestryUserProgress
         $tapestry = new Tapestry($this->postId);
         $nodeIds = $tapestry->getNodeIds();
 
-        return $this->_getUserProgress($nodeIds, $this->_userId);
+        return $this->_getUserProgress($nodeIds);
     }
 
     /**
@@ -55,6 +61,7 @@ class TapestryUserProgress implements ITapestryUserProgress
     public function updateUserProgress($progressValue)
     {
         $this->_checkPostId();
+        $this->_checkProgressAbility();
 
         if (null !== $progressValue) {
             $progressValue = floatval($progressValue);
@@ -76,6 +83,7 @@ class TapestryUserProgress implements ITapestryUserProgress
     public function complete()
     {
         $this->_checkPostId();
+        $this->_checkProgressAbility();
         $this->_complete();
     }
 
@@ -90,6 +98,7 @@ class TapestryUserProgress implements ITapestryUserProgress
     public function completeQuestion($questionId, $answerType, $answerData)
     {
         $this->_checkPostId();
+        $this->_checkProgressAbility();
         $this->_completeQuestion($questionId, $answerType, $answerData);
     }
 
@@ -120,8 +129,19 @@ class TapestryUserProgress implements ITapestryUserProgress
         return $this->_getUserH5PSettings();
     }
 
-    public function isCompleted($nodeId, $userId)
+    public function isCompleted($nodeId = null, $userId = null)
     {
+        if (!$nodeId) {
+            $nodeId = $this->nodeMetaId;
+        }
+        if (!$userId) {
+            $userId = $this->_userId;
+        }
+
+        if (!$userId) {
+            return false;
+        }
+
         $nodeMetadata = get_metadata_by_mid('post', $nodeId)->meta_value;
         $completed_value = get_user_meta($userId, 'tapestry_'.$this->postId.'_node_completed_'.$nodeId, true);
         if (null !== $completed_value) {
@@ -132,25 +152,25 @@ class TapestryUserProgress implements ITapestryUserProgress
     }
 
     /**
-     * This function checks if any user has answered a question
+     * This function checks if any user has answered a question.
      *
-     * @param string $postId 
-     * @param string $nodeMetaId 
-     * @param string $questionId 
-     * 
-     * @return boolean $hasAnswer
+     * @param string $postId
+     * @param string $nodeMetaId
+     * @param string $questionId
+     *
+     * @return bool $hasAnswer
      */
     public static function questionsHasAnyAnswer($postId, $nodeMetaId, $questionId, $answerType)
     {
-        $userIds = get_users(array('fields'=> array('ID')));
+        $userIds = get_users(['fields' => ['ID']]);
         $hasAnswer = false;
-    
-        foreach($userIds as $userId) {
-           $user_answer = get_user_meta($userId->ID, 'tapestry_'.$postId.'_'.$nodeMetaId.'_question_'.$questionId.'_answers', true);
-           if($user_answer != '' && is_array($user_answer) && array_key_exists($answerType, $user_answer)) {
-               $hasAnswer = true;
-               break;
-           }
+
+        foreach ($userIds as $userId) {
+            $user_answer = get_user_meta($userId->ID, 'tapestry_'.$postId.'_'.$nodeMetaId.'_question_'.$questionId.'_answers', true);
+            if ('' != $user_answer && is_array($user_answer) && array_key_exists($answerType, $user_answer)) {
+                $hasAnswer = true;
+                break;
+            }
         }
 
         return $hasAnswer;
@@ -176,16 +196,18 @@ class TapestryUserProgress implements ITapestryUserProgress
         update_user_meta($this->_userId, 'tapestry_'.$this->postId.'_'.$this->nodeMetaId.'_question_'.$questionId.'_answers', $userAnswer);
     }
 
-    private function _getUserProgress($nodeIdArr, $userId)
+    private function _getUserProgress($nodeIdArr)
     {
         $progress = new stdClass();
         $tapestry = new Tapestry($this->postId);
 
-        $nodes = $tapestry->setUnlocked($nodeIdArr, $userId);
+        $nodes = $tapestry->setUnlocked($nodeIdArr, $this->_userId);
 
         // Build json object for frontend e.g. {0: 0.1, 1: 0.2} where 0 and 1 are the node IDs
         foreach ($nodes as $node) {
             $nodeId = $node->id;
+
+            $userId = $this->_userId;
 
             $progress_value = get_user_meta($userId, 'tapestry_'.$this->postId.'_progress_node_'.$nodeId, true);
             $progress->$nodeId = new stdClass();
@@ -272,6 +294,45 @@ class TapestryUserProgress implements ITapestryUserProgress
         update_user_meta($this->_userId, 'tapestry_favourites_'.$this->postId, $favourites);
     }
 
+    /**
+     * Get User's last selected node for a tapestry post.
+     *
+     * @return int $nodeId  node id of the last selected node in the tapestry
+     */
+    public function getLastSelectedNode()
+    {
+        $this->_isValidTapestryPost();
+        $this->_checkPostId();
+
+        $lastSelectedNode = get_user_meta($this->_userId, 'tapestry_last_selected_node_'.$this->postId, true);
+
+        return $lastSelectedNode;
+    }
+
+    /**
+     * Update User's last selected node for a tapestry post.
+     *
+     * @param int $nodeId node id of the last selected node in the tapestry
+     *
+     * @return null
+     */
+    public function updateLastSelectedNode($nodeId, $rowId, $subRowId)
+    {
+        $this->_checkPostId();
+
+        $lastSelectedNode = new stdClass();
+        $lastSelectedNode->nodeId = $nodeId;
+
+        if ($rowId) {
+            $lastSelectedNode->rowId = $rowId;
+        }
+        if ($subRowId) {
+            $lastSelectedNode->subRowId = $subRowId;
+        }
+
+        update_user_meta($this->_userId, 'tapestry_last_selected_node_'.$this->postId, $lastSelectedNode);
+    }
+
     /* Helpers */
 
     private function _checkPostId()
@@ -279,6 +340,13 @@ class TapestryUserProgress implements ITapestryUserProgress
         if (!isset($this->postId)) {
             throw new Exception('postId is invalid');
         }
+    }
+
+    // This function is not currently used in the master branch but kept to reduce
+    // conflicts with the TYDE branch and for future use.
+    private function _checkProgressAbility()
+    {
+        return true;
     }
 
     private function _isValidTapestryPost()

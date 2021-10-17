@@ -46,6 +46,7 @@
       :dimensions="dimensions"
       :node="node"
       :context="context"
+      @change:dimensions="$emit('change:dimensions', $event)"
       @load="handleLoad"
       @complete="complete"
     />
@@ -168,6 +169,7 @@ export default {
   border-radius: 15px;
   overflow: auto;
   height: 100%;
+  widows: 100%;
   padding: 0;
 
   &-no-scroll {

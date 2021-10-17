@@ -9,7 +9,7 @@ describe("Activity", () => {
       const fromBucketLabel1 = "From bucket 1"
       const toBucketLabel1 = "To bucket 1"
       const toBucketLabel2 = "To bucket 2"
-      cy.contains(/question text/i).click()
+      cy.getByTestId("question-text-0").click()
       cy.focused().type(question)
       cy.getByTestId("question-answer-dragdrop").click({ force: true })
       cy.get(".bucket-label")
@@ -64,7 +64,7 @@ describe("Activity", () => {
       const fromBucketLabel2 = "From bucket 2"
       const toBucketLabel1 = "Put red item here"
       const toBucketLabel2 = "Put blue item here"
-      cy.contains(/question text/i).click()
+      cy.getByTestId("question-text-0").click()
       cy.focused().type(question)
       cy.getByTestId("question-answer-dragdrop").click({ force: true })
       cy.get(".bucket-label")
@@ -168,7 +168,7 @@ describe("Activity", () => {
       const fromBucketLabel2 = "From bucket 2"
       const toBucketLabel1 = "Put red item here"
       const toBucketLabel2 = "Put blue item here"
-      cy.contains(/question text/i).click()
+      cy.getByTestId("question-text-0").click()
       cy.focused().type(question)
       cy.getByTestId("question-answer-dragdrop").click({ force: true })
       cy.get(".bucket-label")
@@ -241,7 +241,8 @@ describe("Activity", () => {
       cy.openModal("edit", node.id)
       cy.changeMediaType("activity")
       const question = `Select all numbers less than 3`
-      cy.contains(/question text/i).click()
+
+      cy.getByTestId("question-text-0").click()
       cy.focused().type(question)
       cy.getByTestId("question-answer-multipleChoice-0").click({ force: true })
       cy.getByTestId("question-answer-multipleChoice-multipleAnswer").click({
@@ -287,7 +288,8 @@ describe("Activity", () => {
       cy.openModal("edit", node.id)
       cy.changeMediaType("activity")
       const question = `What is 5 + 5?`
-      cy.contains(/question text/i).click()
+
+      cy.getByTestId("question-text-0").click()
       cy.focused().type(question)
       cy.getByTestId("question-answer-multipleChoice-0").click({ force: true })
       cy.getByTestId(`choice-row-0`)
@@ -330,7 +332,8 @@ describe("Activity", () => {
       const placeholder = "placeholder"
       const answer = "Tapestry"
       cy.contains(/add question/i).click()
-      cy.contains(/question text/i).click()
+
+      cy.getByTestId("question-text-0").click()
       cy.focused().type(question)
       cy.getByTestId("question-answer-text-0").click({ force: true })
       cy.getByTestId("question-answer-text-single-0").click({ force: true })
@@ -371,7 +374,8 @@ describe("Activity", () => {
       const question = `What's your name?`
       const placeholder = "placeholder"
       const answer = "Tapestry"
-      cy.contains(/question text/i).click()
+
+      cy.getByTestId("question-text-0").click()
       cy.focused().type(question)
       cy.getByTestId("question-answer-text-0").click({ force: true })
       cy.getByTestId("question-answer-text-single-0").click({ force: true })
@@ -392,7 +396,7 @@ describe("Activity", () => {
       cy.openModal("edit", node.id)
       const question2 = ` and what's your favorite color?`
       const answer2 = " and my favorite color is blue"
-      cy.contains(/question text/i).click()
+      cy.getByTestId("question-text-0").click()
       cy.focused().type(question2)
       cy.getByTestId("question-answer-text-multi-0").click({ force: true })
       cy.submitModal()
@@ -418,7 +422,8 @@ describe("Activity", () => {
       const question = `What's your name?`
       const placeholder = "placeholder"
       const answer = "Tapestry"
-      cy.contains(/question text/i).click()
+
+      cy.getByTestId("question-text-0").click()
       cy.focused().type(question)
       cy.getByTestId("question-answer-text-0").click({ force: true })
       cy.getByTestId("question-answer-text-single-0").click({ force: true })
@@ -447,7 +452,7 @@ describe("Activity", () => {
 
       const question = `What's your name?`
 
-      cy.contains(/question text/i).click()
+      cy.getByTestId("question-text-0").click()
       cy.focused().type(question)
       cy.getByTestId("question-answer-audio-0").click({ force: true })
 
@@ -488,7 +493,7 @@ describe("Activity", () => {
       const listQuestion = `Name 3 provinces of Canada.`
       const listPlaceholder = "Enter answer here"
 
-      cy.contains(/question text/i).click()
+      cy.getByTestId("question-text-0").click()
       cy.focused().type(listQuestion)
       cy.getByTestId("question-answer-text-0").click({ force: true })
       cy.getByTestId("question-answer-text-single-placeholder-0").type(
@@ -537,7 +542,8 @@ describe("Activity", () => {
       const listPlaceholder = "Thing:"
       const minFieldsValue = "5"
       const maxFieldsValue = "10"
-      cy.contains(/question text/i).click()
+
+      cy.getByTestId("question-text-0").click()
       cy.focused().type(listQuestion)
       cy.getByTestId("question-answer-text-0").click({ force: true })
       cy.getByTestId("question-answer-text-single-placeholder-0").type(
@@ -578,6 +584,35 @@ describe("Activity", () => {
           .should("have.length", 10)
         cy.getByTestId("close-lightbox").click()
       })
+      cy.lightbox().should("not.exist")
+    })
+  })
+  it("should be able to add optional question", () => {
+    cy.fixture("one-node.json").as("oneNode")
+    cy.setup("@oneNode")
+    cy.getSelectedNode().then(node => {
+      cy.openModal("edit", node.id)
+      cy.changeMediaType("activity")
+      const question = `What's your name?`
+      const placeholder = "placeholder"
+
+      cy.getByTestId("question-optional-checkbox").click({ force: true })
+      cy.getByTestId("question-text-0").click()
+      cy.focused().type(question)
+      cy.getByTestId("question-answer-text-0").click({ force: true })
+      cy.getByTestId("question-answer-text-single-0").click({ force: true })
+      cy.getByTestId("question-answer-text-single-placeholder-0").type(placeholder)
+      cy.submitModal()
+
+      cy.openLightbox(node.id)
+      cy.route("POST", "/users/activity/**").as("submit")
+
+      cy.lightbox().within(() => {
+        cy.contains(/skip/i).click()
+        cy.contains("Thanks!").should("be.visible")
+        cy.contains(/done/i).click()
+      })
+      cy.getByTestId("progress-bar").should("have.css", "color", "rgb(44, 62, 80)")
       cy.lightbox().should("not.exist")
     })
   })

@@ -32,6 +32,7 @@
               <locked-content
                 v-if="disableRow(index, row.node)"
                 :node="row.node"
+                :condition-node="index > 0 ? nonPopupRows[index - 1].node : {}"
               ></locked-content>
             </button>
             <a
@@ -197,7 +198,7 @@ export default {
   },
   methods: {
     ...mapMutations(["updateNode"]),
-    ...mapActions(["completeNode", "toggleFavourite"]),
+    ...mapActions(["toggleFavourite"]),
     handleLoad(el) {
       this.$emit("load", el)
     },
@@ -258,9 +259,5 @@ button[disabled] {
   border-radius: 4px;
   padding: 8px 16px;
   margin-bottom: 8px;
-
-  &:last-child {
-    margin-bottom: 0;
-  }
 }
 </style>

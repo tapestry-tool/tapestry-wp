@@ -247,6 +247,7 @@ class Tapestry implements ITapestry
 
         return $link;
     }
+
     /**
      * Reverse a link from links array.
      *
@@ -255,10 +256,9 @@ class Tapestry implements ITapestry
      * @return array $links     Tapestry links
      */
     public function reverseLink($newLink)
-    {        
+    {
         foreach ($this->links as $linkIndex => $link) {
             if ($link->target == $newLink->target && $link->source == $newLink->source) {
-                
                 $this->links[$linkIndex]->source = $newLink->target;
                 $this->links[$linkIndex]->target = $newLink->source;
                 break;
@@ -342,9 +342,9 @@ class Tapestry implements ITapestry
         return empty($this->rootId);
     }
 
-    public function setUnlocked($nodeIds, $userId = 0)
+    public function setUnlocked($nodeIds)
     {
-        $nodes = $this->_setAccessibleStatus($nodeIds, $userId);
+        $nodes = $this->_setAccessibleStatus($nodeIds);
 
         return array_map(
             function ($nodeData) {
@@ -408,16 +408,16 @@ class Tapestry implements ITapestry
         ];
     }
 
-    private function _setAccessibleStatus($nodes, $userId)
+    private function _setAccessibleStatus($nodes)
     {
         $newNodes = array_map(
-            function ($nodeId) use ($userId) {
+            function ($nodeId) {
                 $node = new TapestryNode($this->postId, $nodeId);
                 $data = new stdClass();
                 $data->id = $nodeId;
                 $data->accessible = false;
-                $data->unlocked = !$node->isLocked($userId);
-                $data->conditions = $node->getLockedState($userId);
+                $data->unlocked = !$node->isLocked();
+                $data->conditions = $node->getLockedState();
 
                 return $data;
             },
@@ -468,12 +468,13 @@ class Tapestry implements ITapestry
         }
     }
 
-    private function _getNeighbours($node)
+    private function _getNeighbours($node, $from = 'both')
     {
         $neighbourIds = [];
 
         foreach ($this->links as $link) {
-            if ($link->source === $node->id || $link->target === $node->id) {
+            if ((in_array($from, ['both', 'source']) && $link->source === $node->id) ||
+                (in_array($from, ['both', 'target']) && $link->target === $node->id)) {
                 array_push(
                     $neighbourIds,
                     $link->source === $node->id ? $link->target : $link->source
