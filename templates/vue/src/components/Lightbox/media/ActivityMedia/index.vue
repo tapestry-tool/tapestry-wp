@@ -46,7 +46,7 @@
           Show previous answers
         </b-button>
         <b-button
-          v-else-if="canChangeAnswer"
+          v-else-if="canChangeAnswer && state === 'answer'"
           variant="info"
           class="mr-auto"
           @click="state = 'activity'"
@@ -158,6 +158,12 @@ export default {
         this.getAnswers(this.questionNode.id, this.activeQuestion.id)
       ).length
     },
+    canChangeAnswer() {
+      if (this.initialType === states.ANSWER) {
+        return this.node.typeData.isEditable
+      }
+      return true
+    },
     currentQuestionTypeData() {
       return this.initialType === states.ACTIVITY
         ? {
@@ -165,15 +171,6 @@ export default {
             questionId: this.activeQuestion.id,
           }
         : {}
-    },
-    canChangeAnswer() {
-      if (this.state === states.ANSWER) {
-        if (this.initialType === states.ANSWER) {
-          return this.node.typeData.isEditable
-        }
-        return true
-      }
-      return false
     },
   },
   watch: {
