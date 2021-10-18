@@ -41,6 +41,9 @@
         description="If empty, will default to the original question text"
       ></b-form-input>
     </b-form-group>
+    <b-form-checkbox v-model="node.typeData.isEditable">
+      Allow user to edit this answer
+    </b-form-checkbox>
   </div>
 </template>
 

@@ -11,28 +11,28 @@
     @hide="handleClose"
   >
     <template #modal-title>
-      <b-link
-        v-if="isMultiContentNodeChild"
-        class="nav-item modal-header-link"
-        data-qa="node-modal-header-back"
-        @click="handleClose"
-      >
-        <i class="fas fa-chevron-left fa-xs" />
-        Back to "{{ parent.title }}"
-      </b-link>
-      <div v-else data-qa="node-modal-header">
+      <span v-if="isMultiContentNodeChild">
+        <b-link
+          v-for="(parentNode, index) in multiContentChildParents"
+          :key="parentNode.id"
+          class="nav-item modal-header-link"
+          :data-qa="
+            index == multiContentChildParents.length - 1
+              ? 'node-modal-header-back'
+              : ''
+          "
+          @click="gotoEdit(parentNode.id)"
+        >
+          {{ parentNode.title }}
+          <i class="fas fa-chevron-right fa-xs mx-2" />
+        </b-link>
+      </span>
+      <span data-qa="node-modal-header">
         {{ title }}
-      </div>
+      </span>
     </template>
     <b-container fluid class="px-0" data-qa="node-modal">
       <b-overlay :show="loading" variant="white">
-        <h4
-          v-if="isMultiContentNodeChild"
-          data-qa="node-modal-title"
-          class="modal-header"
-        >
-          {{ title }}
-        </h4>
         <div v-if="hasSubmissionError" class="error-wrapper">
           <h5>Operation failed due to the following error(s):</h5>
           <ul>
@@ -158,7 +158,7 @@
               @submit="loading = true"
               @setLoading="setLoading"
               @message="setDisabledMessage"
-              @complete="loading = false"
+              @complete="handleDeleteComplete"
             ></delete-node-button>
             <span style="flex-grow:1;"></span>
             <b-button
@@ -324,7 +324,14 @@ export default {
       "getNode",
       "getNeighbours",
     ]),
-    ...mapState(["nodes", "rootId", "settings", "visibleNodes", "apiError"]),
+    ...mapState([
+      "nodes",
+      "rootId",
+      "settings",
+      "visibleNodes",
+      "apiError",
+      "returnRoute",
+    ]),
     parent() {
       const parent = this.getNode(
         this.type === "add" ? this.nodeId : this.getParent(this.nodeId)
@@ -440,6 +447,17 @@ export default {
         !!this.isMultiContentNodeChild && this.parent?.presentationStyle === "page"
       )
     },
+    multiContentChildParents() {
+      let parents = []
+      let parentId
+      let parent = this.parent
+      while (parent != null) {
+        parents.unshift(parent)
+        parentId = this.getParent(parent.id)
+        parent = parentId ? this.getNode(parentId) : null
+      }
+      return parents
+    },
     isMultipleChoiceValueValid() {
       const questionsWithMultipleChoiceEnabled = this.node.typeData.activity.questions.filter(
         question => {
@@ -550,7 +568,7 @@ export default {
     this.initialize()
   },
   methods: {
-    ...mapMutations(["updateRootNode"]),
+    ...mapMutations(["updateRootNode", "setReturnRoute"]),
     ...mapActions([
       "addNode",
       "addLink",
@@ -668,6 +686,12 @@ export default {
         })
       }
     },
+    handleDeleteComplete() {
+      this.node = this.parent
+      this.loading = false
+      this.keepOpen = true
+      this.close("delete")
+    },
     handleClose(event) {
       if (
         this.hasUnsavedChanges &&
@@ -697,6 +721,8 @@ export default {
       if (this.show) {
         if (Object.keys(this.nodes).length === 0) {
           this.$router.push({ path: "/", query: this.$route.query })
+        } else if (this.returnRoute) {
+          this.$router.push(this.returnRoute)
         } else if (this.keepOpen) {
           // Switch to edit mode if multi-content just added
           this.$router.push({
@@ -716,6 +742,7 @@ export default {
           this.$route.query.nav === "modal"
         ) {
           // Prevent NodeModal from closing
+
           if (event) event.preventDefault()
 
           // Return to modal of parent node
@@ -734,6 +761,31 @@ export default {
       }
       this.keepOpen = false
       this.setTapestryErrorReporting(true)
+      this.setReturnRoute(null)
+    },
+    gotoEdit(nodeId) {
+      if (this.hasUnsavedChanges) {
+        this.$bvModal
+          .msgBoxConfirm("All unsaved changes will be lost.", {
+            modalClass: "node-modal-confirmation",
+            title: "Are you sure you want to continue?",
+            okTitle: "Close",
+          })
+          .then(close => {
+            if (close) {
+              this.$router.push({
+                name: names.MODAL,
+                params: { nodeId, type: "edit", tab: "content" },
+              })
+            }
+          })
+          .catch(err => console.log(err))
+      } else {
+        this.$router.push({
+          name: names.MODAL,
+          params: { nodeId, type: "edit", tab: "content" },
+        })
+      }
     },
     async handleSubmit() {
       this.errors = this.validateNode()
@@ -1258,7 +1310,6 @@ table {
 }
 
 .modal-header-link {
-  font-weight: normal;
   font-size: 16px;
 }
 

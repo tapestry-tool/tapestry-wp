@@ -1,18 +1,23 @@
 <template>
   <li :class="{ disabled: disabled }">
-    <div @mouseover="hovered = true" @mouseleave="hovered = false">
+    <div
+      class="page-menu-item-wrapper"
+      @mouseover="hovered = true"
+      @mouseleave="hovered = false"
+      @click="handleTitleClick"
+    >
       <span class="page-menu-item-title fa-li">
         <i
           :class="
             disabled
               ? 'fas fa-lock'
-              : hovered || contentHovered
+              : hovered || contentSelected
               ? 'fas fa-circle'
               : 'far fa-circle'
           "
         />
       </span>
-      <span class="page-nav-title" @click="handleTitleClick">
+      <span class="page-nav-title">
         {{ node.typeData.menuTitle ? node.typeData.menuTitle : node.title }}
       </span>
     </div>
@@ -24,6 +29,7 @@
         :depth="depth + 1"
         :lockRows="lockRows"
         :disabled="disabled || disableRow(row.node)"
+        @selected="handleChildSelected"
         @scroll-to="scrollToRow"
       />
     </ul>
@@ -64,6 +70,7 @@ export default {
     return {
       showChildren: false,
       hovered: false,
+      childrenSelected: [],
     }
   },
   computed: {
@@ -80,11 +87,16 @@ export default {
         })
         .filter(row => !row.node.popup)
     },
-    contentHovered() {
-      return this.node.id === this.$route.query.row
+    contentSelected() {
+      return this.node.id === this.$route.query.row || this.childrenSelected.length
     },
     disabledFrom() {
       return this.rows.findIndex(row => !row.node.completed)
+    },
+  },
+  watch: {
+    contentSelected(selected) {
+      this.$emit("selected", { nodeId: this.node.id, selected })
     },
   },
   methods: {
@@ -97,6 +109,14 @@ export default {
     },
     handleTitleClick() {
       this.scrollToRow()
+    },
+    handleChildSelected({ nodeId, selected }) {
+      const childIndex = this.childrenSelected.findIndex(el => el === nodeId)
+      if (selected && childIndex < 0) {
+        this.childrenSelected.push(nodeId)
+      } else if (!selected && childIndex >= 0) {
+        this.childrenSelected.splice(childIndex, 1)
+      }
     },
     scrollToRow(nodeId) {
       if (!nodeId) {
@@ -113,6 +133,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.page-menu-item-wrapper {
+  cursor: pointer;
+}
 .page-menu-item {
   &.fa-ul {
     margin-top: 1.5em;
@@ -129,9 +152,6 @@ export default {
         vertical-align: middle;
         font-size: 0.5rem;
       }
-    }
-    .page-nav-title {
-      cursor: pointer;
     }
   }
 }

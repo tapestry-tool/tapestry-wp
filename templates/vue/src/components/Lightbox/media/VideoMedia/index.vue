@@ -1,17 +1,12 @@
 <template>
   <div>
     <h1 v-if="showTitle" class="video-title">{{ node.title }}</h1>
-    <div
-      :style="{
-        height: `${dimensions.height}px`,
-        width: '100%',
-      }"
-    >
+    <div :class="'video-wrapper context-' + context" :style="{ height: heightCss }">
       <loading v-if="state === states.Loading" />
       <component
         :is="videoComponent"
         ref="video"
-        :style="{ opacity: showVideo ? 1 : 0 }"
+        :style="{ opacity: state === states.Loading ? 0 : 1 }"
         :node="node"
         :dimensions="dimensions"
         :playing="state === states.Playing"
@@ -26,48 +21,27 @@
         @timeupdate="transition(events.Timeupdate, $event)"
         @seeked="handleSeek"
       />
-      <div v-if="state === states.Popup" class="popup" :style="popupStyle">
-        <tapestry-media
-          v-if="getNode(activePopupId).mediaType !== 'multi-content'"
-          :dimensions="dimensions"
-          :node-id="activePopupId"
-          :context="context"
-          @complete="handlePopupComplete"
-          @close="transition(events.Continue)"
-        />
-        <multi-content-media
-          v-if="getNode(activePopupId).mediaType === 'multi-content'"
-          :dimensions="dimensions"
-          :context="context"
-          :node="getNode(activePopupId)"
-          @complete="handlePopupComplete"
-          @close="transition(events.Continue)"
-        />
-      </div>
-      <div v-if="completing" class="aside">
-        <b-spinner></b-spinner>
-      </div>
-      <button
-        v-else-if="isPopupComplete"
-        class="aside"
-        @click="transition(events.Continue)"
+      <div
+        v-if="[states.Popup, states.Finished].includes(state)"
+        class="video-layover"
       >
-        Continue
-      </button>
-      <play-screen
-        v-if="state === states.Paused && showPlayScreen"
-        class="screen"
-        :hide-video="hideVideo"
-        @play="transition(events.Play)"
-      />
-      <end-screen
-        v-if="state === states.Finished"
-        class="screen"
-        :node="node"
-        :context="context"
-        @rewatch="transition(events.Rewatch)"
-        @close="transition(events.Close)"
-      />
+        <end-screen
+          v-if="state === states.Finished"
+          class="endscreen-container"
+          :node="node"
+          :context="context"
+          @rewatch="transition(events.Rewatch)"
+          @close="transition(events.Close)"
+        />
+        <popup
+          v-if="activePopup"
+          class="popup-container"
+          :node="activePopup"
+          :dimensions="dimensions"
+          :context="context"
+          @continue="transition(events.Continue)"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -78,8 +52,8 @@ import { mapGetters, mapActions } from "vuex"
 import UrlVideoMedia from "./UrlVideoMedia"
 import H5PVideoMedia from "./H5PVideoMedia"
 import YouTubeMedia from "./YouTubeMedia"
+import Popup from "./Popup"
 import EndScreen from "./EndScreen"
-import PlayScreen from "./PlayScreen"
 import { COMPLETION_THRESHOLD } from "./video.config"
 import Loading from "@/components/common/Loading"
 import client from "@/services/TapestryAPI"
@@ -118,8 +92,8 @@ export default {
     "youtube-media": YouTubeMedia,
     "h5p-video-media": H5PVideoMedia,
     UrlVideoMedia,
+    Popup,
     EndScreen,
-    PlayScreen,
     Loading,
     MultiContentMedia: () => import("../MultiContentMedia/index"),
   },
@@ -140,15 +114,9 @@ export default {
   data() {
     return {
       state: VideoStates.Loading,
-      showPlayScreen: true,
       hideVideo: false,
-      activePopupId: null,
+      activePopup: null,
       progressLastUpdated: 0,
-      /**
-       * Completing a node is done asynchronously, and we want to show a small
-       * spinner on the bottom right of the node when this is currently in progress.
-       */
-      completing: false,
     }
   },
   computed: {
@@ -174,6 +142,13 @@ export default {
           throw new Error(`Unknown video type: ${this.node.mediaFormat}`)
       }
     },
+    heightCss() {
+      if (this.context == "page" && this.videoComponent !== "youtube-media") {
+        return "auto"
+      } else {
+        return this.dimensions.height + "px"
+      }
+    },
     popups() {
       const popups = this.getDirectChildren(this.node.id)
         .map(this.getNode)
@@ -186,38 +161,11 @@ export default {
       popups.sort((a, b) => a.time - b.time)
       return popups
     },
-    isPopupComplete() {
-      const popup = this.getNode(this.activePopupId)
-      if (popup) {
-        return popup.completed
-      }
-      return false
-    },
-    popupStyle() {
-      return this.isPopupComplete ? "height: calc(100% - 80px)" : ""
-    },
-    showVideo() {
-      return [VideoStates.H5P, VideoStates.Paused, VideoStates.Playing].includes(
-        this.state
-      )
-    },
     showTitle() {
       return this.context === "page" && this.node.typeData.showTitle !== false
     },
     autoplay() {
       return this.context == "lightbox"
-    },
-  },
-  watch: {
-    /**
-     * Since the completing function is done in the parent lightbox container, the
-     * only way we know if the popup is successfully completed is if the
-     * `isPopupComplete` computed property changes.
-     */
-    isPopupComplete(isComplete) {
-      if (isComplete && this.completing) {
-        this.completing = false
-      }
     },
   },
   methods: {
@@ -227,9 +175,6 @@ export default {
      * name, as well as perform any necessary side effects.
      */
     transition(eventName, context) {
-      if (eventName == VideoEvents.Play) {
-        this.showPlayScreen = this.node.mediaType !== "h5p"
-      }
       switch (this.state) {
         case VideoStates.Loading: {
           switch (eventName) {
@@ -248,9 +193,8 @@ export default {
                       time: context.currentTime,
                     }
                   )
-                  this.showPlayScreen = this.node.mediaType !== "h5p"
                 }
-              } else {
+              } else if (this.node.mediaType === "h5p") {
                 this.state = VideoStates.H5P
               }
               this.$emit("load", context)
@@ -282,7 +226,8 @@ export default {
               )
               if (activePopup) {
                 this.state = VideoStates.Popup
-                this.activePopupId = activePopup.id
+                this.$refs.video.pauseVideo()
+                this.activePopup = this.getNode(activePopup.id)
               } else {
                 if (amountViewed >= COMPLETION_THRESHOLD) {
                   this.handleVideoComplete()
@@ -291,7 +236,6 @@ export default {
                 // End of video
                 if (amountViewed >= 1) {
                   this.state = VideoStates.Finished
-                  this.showPlayScreen = true
                 }
               }
 
@@ -314,8 +258,8 @@ export default {
           switch (eventName) {
             case VideoEvents.Continue:
               this.state = VideoStates.Playing
-              this.activePopupId = null
-              this.completing = false
+              this.$refs.video.playVideo()
+              this.activePopup = null
           }
           break
         }
@@ -345,12 +289,6 @@ export default {
     getLoadState() {
       return this.autoplay ? VideoStates.Playing : VideoStates.Paused
     },
-    handlePopupComplete() {
-      if (!this.isPopupComplete) {
-        this.completing = true
-      }
-      this.completeNode(this.activePopupId)
-    },
     handleVideoComplete(nodeId) {
       if (
         !this.node.completed &&
@@ -365,6 +303,15 @@ export default {
 </script>
 
 <style scoped lang="scss">
+.video-wrapper {
+  width: 100%;
+
+  &.context-page {
+    border-radius: 15px;
+    overflow: hidden;
+  }
+}
+
 .video-title {
   text-align: left;
   margin-bottom: 0.9em;
@@ -381,31 +328,28 @@ div {
   position: relative;
 }
 
-.aside {
-  height: auto;
-  position: absolute;
-  border-radius: 0.5rem;
-  right: 1rem;
-  bottom: 1rem;
-  z-index: 50;
-}
-
 button {
   &:hover {
     background: var(--tapestry-light-gray);
   }
 }
 
-.screen {
-  border-radius: 15px;
-}
-
-.popup {
+.video-layover {
   position: absolute;
   top: 0;
   left: 0;
   bottom: 0;
   right: 0;
-  transition: height 0.5s;
+  height: 100%;
+  background: #000000aa;
+  border-radius: 15px;
+  > * {
+    background: #ddd;
+    height: calc(100% - 2em);
+    width: calc(100% - 2em);
+    margin: 1em;
+    padding: 1em;
+    border-radius: 15px;
+  }
 }
 </style>
