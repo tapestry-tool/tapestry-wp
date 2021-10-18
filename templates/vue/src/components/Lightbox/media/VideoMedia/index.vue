@@ -42,24 +42,6 @@
           @continue="transition(events.Continue)"
         />
       </div>
-      <div v-if="completing" class="aside">
-        <b-spinner></b-spinner>
-      </div>
-      <button
-        v-else-if="isPopupComplete"
-        class="aside"
-        @click="transition(events.Continue)"
-      >
-        Continue
-      </button>
-      <end-screen
-        v-if="state === states.Finished"
-        class="screen"
-        :node="node"
-        :context="context"
-        @rewatch="transition(events.Rewatch)"
-        @close="transition(events.Close)"
-      />
     </div>
   </div>
 </template>
@@ -278,7 +260,6 @@ export default {
               this.state = VideoStates.Playing
               this.$refs.video.playVideo()
               this.activePopup = null
-              this.completing = false
           }
           break
         }
