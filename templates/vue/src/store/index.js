@@ -23,6 +23,7 @@ export const store = {
     apiError: null,
     displayErrors: false,
     userAnswers: {},
+    returnRoute: null,
   },
   getters,
   mutations,

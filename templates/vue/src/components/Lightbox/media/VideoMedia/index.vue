@@ -6,7 +6,7 @@
       <component
         :is="videoComponent"
         ref="video"
-        :style="{ opacity: showVideo ? 1 : 0 }"
+        :style="{ opacity: state === states.Loading ? 0 : 1 }"
         :node="node"
         :dimensions="dimensions"
         :playing="state === states.Playing"
@@ -21,22 +21,25 @@
         @timeupdate="transition(events.Timeupdate, $event)"
         @seeked="handleSeek"
       />
-      <div v-if="state === states.Popup" class="popup" :style="popupStyle">
-        <tapestry-media
-          v-if="getNode(activePopupId).mediaType !== 'multi-content'"
-          :dimensions="dimensions"
-          :node-id="activePopupId"
+      <div
+        v-if="[states.Popup, states.Finished].includes(state)"
+        class="video-layover"
+      >
+        <end-screen
+          v-if="state === states.Finished"
+          class="endscreen-container"
+          :node="node"
           :context="context"
-          @complete="handlePopupComplete"
-          @close="transition(events.Continue)"
+          @rewatch="transition(events.Rewatch)"
+          @close="transition(events.Close)"
         />
-        <multi-content-media
-          v-if="getNode(activePopupId).mediaType === 'multi-content'"
+        <popup
+          v-if="activePopup"
+          class="popup-container"
+          :node="activePopup"
           :dimensions="dimensions"
           :context="context"
-          :node="getNode(activePopupId)"
-          @complete="handlePopupComplete"
-          @close="transition(events.Continue)"
+          @continue="transition(events.Continue)"
         />
       </div>
       <div v-if="completing" class="aside">
@@ -67,6 +70,7 @@ import { mapGetters, mapActions } from "vuex"
 import UrlVideoMedia from "./UrlVideoMedia"
 import H5PVideoMedia from "./H5PVideoMedia"
 import YouTubeMedia from "./YouTubeMedia"
+import Popup from "./Popup"
 import EndScreen from "./EndScreen"
 import { COMPLETION_THRESHOLD } from "./video.config"
 import Loading from "@/components/common/Loading"
@@ -106,6 +110,7 @@ export default {
     "youtube-media": YouTubeMedia,
     "h5p-video-media": H5PVideoMedia,
     UrlVideoMedia,
+    Popup,
     EndScreen,
     Loading,
     MultiContentMedia: () => import("../MultiContentMedia/index"),
@@ -128,13 +133,8 @@ export default {
     return {
       state: VideoStates.Loading,
       hideVideo: false,
-      activePopupId: null,
+      activePopup: null,
       progressLastUpdated: 0,
-      /**
-       * Completing a node is done asynchronously, and we want to show a small
-       * spinner on the bottom right of the node when this is currently in progress.
-       */
-      completing: false,
     }
   },
   computed: {
@@ -179,38 +179,11 @@ export default {
       popups.sort((a, b) => a.time - b.time)
       return popups
     },
-    isPopupComplete() {
-      const popup = this.getNode(this.activePopupId)
-      if (popup) {
-        return popup.completed
-      }
-      return false
-    },
-    popupStyle() {
-      return this.isPopupComplete ? "height: calc(100% - 80px)" : ""
-    },
-    showVideo() {
-      return [VideoStates.H5P, VideoStates.Paused, VideoStates.Playing].includes(
-        this.state
-      )
-    },
     showTitle() {
       return this.context === "page" && this.node.typeData.showTitle !== false
     },
     autoplay() {
       return this.context == "lightbox"
-    },
-  },
-  watch: {
-    /**
-     * Since the completing function is done in the parent lightbox container, the
-     * only way we know if the popup is successfully completed is if the
-     * `isPopupComplete` computed property changes.
-     */
-    isPopupComplete(isComplete) {
-      if (isComplete && this.completing) {
-        this.completing = false
-      }
     },
   },
   methods: {
@@ -272,7 +245,7 @@ export default {
               if (activePopup) {
                 this.state = VideoStates.Popup
                 this.$refs.video.pauseVideo()
-                this.activePopupId = activePopup.id
+                this.activePopup = this.getNode(activePopup.id)
               } else {
                 if (amountViewed >= COMPLETION_THRESHOLD) {
                   this.handleVideoComplete()
@@ -304,7 +277,7 @@ export default {
             case VideoEvents.Continue:
               this.state = VideoStates.Playing
               this.$refs.video.playVideo()
-              this.activePopupId = null
+              this.activePopup = null
               this.completing = false
           }
           break
@@ -334,12 +307,6 @@ export default {
     },
     getLoadState() {
       return this.autoplay ? VideoStates.Playing : VideoStates.Paused
-    },
-    handlePopupComplete() {
-      if (!this.isPopupComplete) {
-        this.completing = true
-      }
-      this.completeNode(this.activePopupId)
     },
     handleVideoComplete(nodeId) {
       if (
@@ -380,31 +347,28 @@ div {
   position: relative;
 }
 
-.aside {
-  height: auto;
-  position: absolute;
-  border-radius: 0.5rem;
-  right: 1rem;
-  bottom: 1rem;
-  z-index: 50;
-}
-
 button {
   &:hover {
     background: var(--tapestry-light-gray);
   }
 }
 
-.screen {
-  border-radius: 15px;
-}
-
-.popup {
+.video-layover {
   position: absolute;
   top: 0;
   left: 0;
   bottom: 0;
   right: 0;
-  transition: height 0.5s;
+  height: 100%;
+  background: #000000aa;
+  border-radius: 15px;
+  > * {
+    background: #ddd;
+    height: calc(100% - 2em);
+    width: calc(100% - 2em);
+    margin: 1em;
+    padding: 1em;
+    border-radius: 15px;
+  }
 }
 </style>
