@@ -53,7 +53,7 @@ describe("Answers", () => {
     cy.getNodeByTitle("Answer Node").then(answer => {
       cy.getNodeById(answer.id).click()
       cy.openLightbox(answer.id).within(() => {
-        //cy.contains("Answer Node").should("exist")
+        cy.contains("Answer Node").should("exist")
         cy.contains("Name: ").should("be.visible")
         cy.contains("Tapestry").should("be.visible")
       })
