@@ -193,6 +193,13 @@ export default {
       }
     },
   },
+  watch: {
+    node() {
+      this.$nextTick(() => {
+        this.$root.$emit("observe-rows", this.$refs.rowRefs)
+      })
+    },
+  },
   mounted() {
     this.$root.$emit("observe-rows", this.$refs.rowRefs)
   },
