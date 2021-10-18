@@ -172,6 +172,10 @@ export function setTapestryErrorReporting(state, isEnabled) {
   state.displayErrors = isEnabled
 }
 
+export function setReturnRoute(state, route) {
+  state.returnRoute = route
+}
+
 // avatar
 
 export function addAvatar(state, newAvatar) {

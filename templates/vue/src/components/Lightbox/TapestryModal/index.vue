@@ -18,7 +18,14 @@
             :icon-color="isFavourite ? 'red' : ''"
             :bg-color="isFavourite ? '#fff' : ''"
             :bg-hover-color="isFavourite ? '#fff' : 'red'"
-            @clicked="toggleFavourite(nodeId)"
+            @clicked="toggleFavourite(node.id)"
+          />
+          <modal-button
+            v-if="canEditNode"
+            icon="pencil-alt"
+            icon-size="sm"
+            title="Edit Node"
+            @clicked="editNode"
           />
         </div>
         <slot></slot>
@@ -28,8 +35,10 @@
 </template>
 
 <script>
-import { mapActions, mapState } from "vuex"
+import { mapActions, mapState, mapMutations } from "vuex"
 import ModalButton from "./ModalButton"
+import { names } from "@/config/routes"
+import Helpers from "@/utils/Helpers"
 
 const defaultStyles = {
   top: "150px",
@@ -50,10 +59,12 @@ export default {
     ModalButton,
   },
   props: {
-    nodeId: {
-      type: [String, Number],
+    node: {
+      type: Object,
       required: false,
-      default: 0,
+      default: () => {
+        null
+      },
     },
     contentContainerStyle: {
       type: Object,
@@ -79,7 +90,10 @@ export default {
   computed: {
     ...mapState(["favourites"]),
     isFavourite() {
-      return this.favourites.find(id => id == this.nodeId)
+      return this.favourites.find(id => id == this.node.id)
+    },
+    canEditNode() {
+      return Helpers.hasPermission(this.node, "edit")
     },
   },
   mounted() {
@@ -87,6 +101,14 @@ export default {
   },
   methods: {
     ...mapActions(["toggleFavourite"]),
+    ...mapMutations(["setReturnRoute"]),
+    editNode() {
+      this.setReturnRoute(this.$route)
+      this.$router.push({
+        name: names.MODAL,
+        params: { nodeId: this.node.id, type: "edit", tab: "content" },
+      })
+    },
   },
 }
 </script>
