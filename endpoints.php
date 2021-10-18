@@ -317,6 +317,13 @@ $REST_API_ENDPOINTS = [
             'permission_callback' => 'TapestryPermissions::putTapestrySettings',
         ],
     ],
+    'KALTURA_TEST' => (object) [
+        'ROUTE' => '/kaltura',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_POST_METHOD,
+            'callback' => 'upload_videos_to_kaltura',
+        ],
+    ],
 ];
 
 /*
@@ -1500,4 +1507,65 @@ function getQuestionHasAnswers($request)
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
     
+}
+
+function upload_videos_to_kaltura()
+{
+    if (LOAD_KALTURA) {
+        $upload_folder = wp_upload_dir()['path'];
+    
+        $current_date = date('Y/m/d');
+
+        $tapestries = get_posts(['post_type' => 'tapestry',]);
+        $video_nodes = array();
+
+        $kalturaApi = new KalturaApi();
+
+        foreach ($tapestries as $value) {
+            $tapestry = new Tapestry($value->ID);
+
+            foreach ($tapestry->getNodeIds() as $node_id) {
+                $node = new TapestryNode($value->ID, $node_id);
+                $nodeMeta = $node->getMeta();
+
+                if ($nodeMeta->mediaType == "video") {
+                    $media_url = $node->getTypeData()->mediaURL;
+                    if (strpos($media_url, "/wp-content/uploads/")) {
+                        $offset = strlen("/wp-content/uploads/");
+
+                        $file_name = pathinfo($media_url)['basename'];
+
+                        $file_obj = new StdClass();
+                        $file_obj->file_path = $upload_folder."/".$file_name;
+                        $file_obj->name = $file_name;
+
+                        $kaltura_data = null;
+                        try {
+                            $kaltura_data = $kalturaApi->uploadKalturaVideo($file_obj, $current_date);
+                        } catch (Exception $e){
+                            error_log("Unable to upload video - ".$file_obj->file_path." to kaltura, ".$e);
+                            return;
+                        }
+
+                        $typeData = $node->getTypeData();
+                        $typeData->mediaURL = $kaltura_data->dataUrl."?.mp4";
+                        $typeData->kalturaData = array(
+                            "id" => $kaltura_data->id,
+                            "partnerId" => $kaltura_data->partnerId,
+                        );
+
+                        $node->set($typeData);
+                        $node->save();
+
+                        wp_delete_file($file_obj->file_path);
+                        
+                        
+                       
+                    }
+                }
+            }
+        }
+
+
+    }
 }
