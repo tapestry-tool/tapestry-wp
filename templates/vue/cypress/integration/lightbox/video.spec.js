@@ -4,20 +4,20 @@ describe("Video", () => {
     cy.setup("@oneNode")
   })
 
-  // it("adding a youtube video should also set a thumbnail", () => {
-  //   const url = "https://www.youtube.com/watch?v=cbuZfY2S2UQ"
+  it("adding a youtube video should also set a thumbnail", () => {
+    const url = "https://www.youtube.com/watch?v=cbuZfY2S2UQ"
 
-  //   cy.getSelectedNode().then(node => {
-  //     cy.openModal("edit", node.id)
-  //     cy.changeMediaType("video")
-  //     cy.getByTestId(`node-video-url`).type(url)
-  //     cy.submitModal() // automatically confirms
+    cy.getSelectedNode().then(node => {
+      cy.openModal("edit", node.id)
+      cy.changeMediaType("video")
+      cy.getByTestId(`node-video-url`).type(url)
+      cy.submitModal() // automatically confirms
 
-  //     cy.getNodeById(node.id).within(() => {
-  //       cy.get("image").should("have.attr", "href")
-  //     })
-  //   })
-  // })
+      cy.getNodeById(node.id).within(() => {
+        cy.get("image").should("have.attr", "href")
+      })
+    })
+  })
 
   it("should be able to add a video node via url", () => {
     const url =
@@ -55,18 +55,18 @@ describe("Video", () => {
     })
   })
 
-  // it("should be able to add a video node via youtube", () => {
-  //   const url = "https://www.youtube.com/watch?v=wAPCSnAhhC8"
+  it("should be able to add a video node via youtube", () => {
+    const url = "https://www.youtube.com/watch?v=wAPCSnAhhC8"
 
-  //   cy.getSelectedNode().then(node => {
-  //     cy.openModal("edit", node.id)
-  //     cy.changeMediaType("video")
-  //     cy.getByTestId(`node-video-url`).type(url)
-  //     cy.submitModal()
+    cy.getSelectedNode().then(node => {
+      cy.openModal("edit", node.id)
+      cy.changeMediaType("video")
+      cy.getByTestId(`node-video-url`).type(url)
+      cy.submitModal()
 
-  //     cy.openLightbox(node.id).within(() => {
-  //       cy.get("iframe[id^=youtube]").should("be.visible")
-  //     })
-  //   })
-  // })
+      cy.openLightbox(node.id).within(() => {
+        cy.get("iframe[id^=youtube]").should("be.visible")
+      })
+    })
+  })
 })
