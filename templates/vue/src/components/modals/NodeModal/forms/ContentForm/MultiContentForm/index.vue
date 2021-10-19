@@ -48,14 +48,23 @@ export default {
       type: String,
       required: true,
     },
+    isUnitChild: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
-  data() {
-    return {
-      presentationStyles: [
+  computed: {
+    presentationStyles() {
+      if (this.isUnitChild) {
+        return [{ value: "page", text: "Page" }]
+      }
+      return [
         { value: "accordion", text: "Accordion" },
         { value: "page", text: "Page" },
-      ],
-    }
+        { value: "unit", text: "Unit (collection of pages)" },
+      ]
+    },
   },
   mounted() {
     // set node defaults

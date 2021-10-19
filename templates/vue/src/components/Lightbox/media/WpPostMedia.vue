@@ -2,7 +2,7 @@
   <div>
     <h1 v-if="showTitle" class="wp-media-title">{{ node.title }}</h1>
     <loading v-if="loading" />
-    <div v-else class="article">
+    <div v-else class="article" :class="'context-' + context">
       <h1 class="article-title" v-html="title"></h1>
       <article v-html="content"></article>
     </div>
@@ -58,8 +58,15 @@ export default {
 <style lang="scss" scoped>
 .article {
   color: #111;
-  padding: 25px;
   text-align: left;
+
+  &.context-lightbox {
+    padding: 25px;
+
+    .wp-media-title {
+      padding-left: 25px;
+    }
+  }
 
   &-title {
     font-size: 1.75rem;
@@ -79,7 +86,7 @@ export default {
 
 .wp-media-title {
   text-align: left;
-  margin: 0.9em 0 0.5em 25px;
+  margin: 0.9em 0 0.5em 0;
   font-weight: 500;
   font-size: 1.75rem;
 

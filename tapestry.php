@@ -16,6 +16,18 @@ $TAPESTRY_VERSION_NUMBER = '2.50.0-beta';
 // Set this to false if you want to use the Vue build instead of npm dev
 $TAPESTRY_USE_DEV_MODE = true;
 
+// TYDE settings
+$TYDE_YOUTH_ROLES = [
+    'youth' => 'Youth',
+    'youth_l2' => 'Youth (Level 2)',
+    'youth_l3' => 'Youth (Level 3)',
+];
+$TYDE_DYAD_ROLES = [
+    'dyad' => 'Dyad',
+    'dyad_l2' => 'Dyad (Level 2)',
+    'dyad_l3' => 'Dyad (Level 3)',
+];
+
 /**
  * Register endpoints.
  */
@@ -132,6 +144,16 @@ function tapestry_enqueue_vue_app()
         global $TAPESTRY_VERSION_NUMBER;
         global $TAPESTRY_USE_DEV_MODE;
 
+        global $TYDE_DYAD_ROLES;
+        $isDyad = wp_get_current_user() && array_intersect(wp_get_current_user()->roles, array_keys($TYDE_DYAD_ROLES));
+        $dyadLinkedUser = null;
+        if ($isDyad) {
+            $dyadLinkedUserId = get_the_author_meta('linked_dyad_user_id', wp_get_current_user()->ID);
+            if ($dyadLinkedUserId) {
+                $dyadLinkedUser = get_user_by('id', $dyadLinkedUserId)->data;
+            }
+        }
+
         // register the Vue build script.
         $vueUrl = $TAPESTRY_USE_DEV_MODE ? 'http://localhost:8080/dist' : plugin_dir_url(__FILE__).'templates/vue/dist';
 
@@ -162,6 +184,7 @@ function tapestry_enqueue_vue_app()
                 ]),
                 'nonce' => wp_create_nonce('wp_rest'),
                 'wpUserId' => apply_filters('determine_current_user', false),
+                'dyadLinkedWpUser' => $dyadLinkedUser,
                 'adminAjaxUrl' => admin_url('admin-ajax.php'),
                 'file_upload_nonce' => wp_create_nonce('media-form'),
                 'upload_url' => admin_url('async-upload.php'),
@@ -322,20 +345,70 @@ function tapestry_tool_log_event()
 register_activation_hook(__FILE__, 'add_tyde_roles');
 function add_tyde_roles()
 {
-    add_role(
-        'dyad',
-        'Dyad',
-        [
-            'read' => true,
-            'edit_posts' => true,
-        ]
-    );
-    add_role(
-        'youth',
-        'Youth',
-        [
-            'read' => true,
-            'edit_posts' => true,
-        ]
-    );
+    global $TYDE_DYAD_ROLES;
+    foreach ($TYDE_DYAD_ROLES as $key => $label) {
+        add_role(
+            $key,
+            $label,
+            [
+                'read' => true,
+                'edit_posts' => true,
+            ]
+        );
+    }
+    global $TYDE_YOUTH_ROLES;
+    foreach ($TYDE_YOUTH_ROLES as $key => $label) {
+        add_role(
+            $key,
+            $label,
+            [
+                'read' => true,
+                'edit_posts' => true,
+            ]
+        );
+    }
 }
+
+/**
+ * Show the youth user id input if the user is a dyad.
+ */
+function add_dyad_youth_user_field($user)
+{
+    global $TYDE_DYAD_ROLES;
+    $isDyadUser = array_intersect($user->roles, array_keys($TYDE_DYAD_ROLES));
+
+    if ($isDyadUser) : ?>
+        <table class="form-table">
+            <tr>
+                <th><label for="linked_dyad_user_id"><?php _e('Linked Youth User ID'); ?></label></th>
+                <td>
+                    <input type="text" name="linked_dyad_user_id" id="linked_dyad_user_id" value="<?php echo esc_attr(get_the_author_meta('linked_dyad_user_id', $user->ID)); ?>" class="regular-text" /><br />
+                    <span class="description"><?php _e("Please enter the user ID for the linked youth user."); ?></span>
+                </td>
+            </tr>
+        </table>
+<?php endif;
+}
+add_action('show_user_profile', 'add_dyad_youth_user_field');
+add_action('edit_user_profile', 'add_dyad_youth_user_field');
+
+/**
+ * Save the youth user id input when updated (if the user is a dyad).
+ */
+function save_dyad_youth_user_field($user_id)
+{
+    if (!current_user_can('edit_user', $user_id)) {
+        return false;
+    }
+    $user = get_user_by('id', $user_id);
+
+    global $TYDE_DYAD_ROLES;
+    $isDyadUser = array_intersect($user->roles, array_keys($TYDE_DYAD_ROLES));
+    
+    if ($isDyadUser) {
+        $linked_dyad_user_id = intval($_POST['linked_dyad_user_id']);
+        update_user_meta($user_id, 'linked_dyad_user_id', $linked_dyad_user_id);
+    }
+}
+add_action('personal_options_update', 'save_dyad_youth_user_field');
+add_action('edit_user_profile_update', 'save_dyad_youth_user_field');

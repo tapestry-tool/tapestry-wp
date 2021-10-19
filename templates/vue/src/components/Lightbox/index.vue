@@ -2,11 +2,11 @@
   <tapestry-modal
     id="lightbox"
     data-qa="lightbox"
-    :node-id="currentNodeId"
     :class="{
       'full-screen': node.fullscreen || tydeModeEnabled,
       'content-text': node.mediaType === 'text' || node.mediaType === 'wp-post',
     }"
+    :node="node"
     :content-container-style="lightboxContentStyles"
     :allow-close="canSkip && !tydeModeEnabled"
     :show-fav="!tydeModeEnabled"
@@ -53,7 +53,7 @@
         @change:dimensions="updateDimensions"
       />
     </div>
-    <circle-of-support v-if="selectedTab === 'cos'" />
+    <circle-of-support v-show="selectedTab === 'cos'" />
   </tapestry-modal>
 </template>
 
@@ -111,11 +111,11 @@ export default {
   },
   computed: {
     ...mapState(["h5pSettings", "rootId", "settings"]),
-    ...mapGetters(["getNode", "isMultiContent", "isMultiContentRow"]),
+    ...mapGetters(["getNode", "getParent", "isMultiContent", "isMultiContentRow"]),
     currentNodeId() {
       /*
           Default tyde node is currently the only node to be directly pushed to the router
-          thus nodeId will always store the values of the default(tyde icon) node
+          thus nodeId will always store the values of the default (tyde icon) node
        */
       if (this.settings.tydeModeEnabled) {
         if (this.selectedTab === "profile") {
@@ -130,6 +130,10 @@ export default {
     node() {
       const node = this.getNode(this.currentNodeId)
       return node
+    },
+    parentNode() {
+      const parentNodeId = this.getParent(this.node.id)
+      return this.getNode(parentNodeId)
     },
     canSkip() {
       return this.node.completed || this.node.skippable !== false
@@ -242,7 +246,7 @@ export default {
             query: this.$route.query,
           })
         } else {
-          this.applyDimensions()
+          this.handleNodeChanged()
         }
       },
     },
@@ -281,11 +285,7 @@ export default {
   mounted() {
     document.querySelector("body").classList.add("tapestry-lightbox-open")
     DragSelectModular.removeDragSelectListener()
-    if (this.node.mediaType === "multi-content") {
-      this.$root.$on("observe-rows", refs => {
-        this.rowRefs = this.rowRefs.concat(refs)
-      })
-    }
+    this.handleNodeChanged()
   },
   beforeDestroy() {
     document.querySelector("body").classList.remove("tapestry-lightbox-open")
@@ -296,11 +296,14 @@ export default {
     })
   },
   methods: {
-    ...mapActions(["completeNode"]),
+    ...mapActions(["completeNode", "updateNodeProgress"]),
     complete(nodeId) {
       const node = this.getNode(nodeId || this.nodeId)
       if (!node.completed) {
-        this.completeNode(nodeId || this.nodeId)
+        this.completeNode(node.id)
+      }
+      if (node.progress !== 1) {
+        this.updateNodeProgress({ id: node.id, progress: 1 })
       }
     },
     handleUserClose() {
@@ -312,9 +315,16 @@ export default {
       this.close()
     },
     close() {
+      let selectedNode = this.nodeId
+      if (
+        this.parentNode?.mediaType === "multi-content" &&
+        this.parentNode?.presentationStyle === "unit"
+      ) {
+        selectedNode = this.parentNode.id
+      }
       this.$router.push({
         name: names.APP,
-        params: { nodeId: this.currentNodeId },
+        params: { nodeId: selectedNode },
         query: this.$route.query,
       })
     },
@@ -342,6 +352,38 @@ export default {
     },
     handleTabChange(newTab) {
       this.selectedTab = newTab
+    },
+    handleNodeChanged() {
+      if (
+        this.node.mediaType === "multi-content" &&
+        this.node.presentationStyle === "unit" &&
+        this.node.childOrdering?.length
+      ) {
+        const pageNode = this.getNode(this.node.childOrdering[0])
+        this.$root.$emit("open-node", pageNode.id)
+      } else {
+        this.applyDimensions()
+        if (this.node.mediaType === "multi-content") {
+          this.$root.$on("observe-rows", newRefs => {
+            if (Array.isArray(newRefs)) {
+              newRefs.forEach(newRef => {
+                if (newRef) {
+                  // We need to remove the old ref because it references
+                  // an element that has potentially been destroyed
+                  const existingRefIndex = this.rowRefs.findIndex(
+                    ref => ref && ref.id === newRef.id
+                  )
+                  if (existingRefIndex !== -1) {
+                    this.rowRefs.splice(existingRefIndex, 1)
+                  }
+                  // Add the new ref, pointing to the current ref
+                  this.rowRefs.push(newRef)
+                }
+              })
+            }
+          })
+        }
+      }
     },
   },
 }

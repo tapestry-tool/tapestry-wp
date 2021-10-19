@@ -46,6 +46,7 @@ class TapestryNode implements ITapestryNode
     private $license;
     private $references;
     private $mapCoordinates;
+    private $isDyad;
     private $popup;
 
     /**
@@ -98,6 +99,7 @@ class TapestryNode implements ITapestryNode
             'lat' => '',
             'lng' => '',
         ];
+        $this->isDyad = false;
         $this->popup = null;
 
         if (TapestryHelpers::isValidTapestryNode($this->nodeMetaId)) {
@@ -206,6 +208,9 @@ class TapestryNode implements ITapestryNode
         if (isset($node->hideTitle) && is_bool($node->hideTitle)) {
             $this->hideTitle = $node->hideTitle;
         }
+        if (isset($node->isDyad) && is_bool($node->isDyad)) {
+            $this->isDyad = $node->isDyad;
+        }
         if (isset($node->hideProgress) && is_bool($node->hideProgress)) {
             $this->hideProgress = $node->hideProgress;
         }
@@ -299,7 +304,7 @@ class TapestryNode implements ITapestryNode
         }
     }
 
-    public function getLockedState($userId = 0)
+    public function getLockedState()
     {
         $conditions = $this->conditions;
         $userProgress = new TapestryUserProgress($this->tapestryPostId, $this->nodeMetaId);
@@ -311,7 +316,8 @@ class TapestryNode implements ITapestryNode
         foreach ($conditions as $condition) {
             switch ($condition->type) {
                 case ConditionTypes::NODE_COMPLETED:
-                    if ($userId && $userProgress->isCompleted($condition->nodeId, $userId)) {
+                    $conditionProgress = new TapestryUserProgress($this->tapestryPostId, $condition->nodeId);
+                    if ($conditionProgress->isCompleted()) {
                         $condition->fulfilled = true;
                     }
                     break;
@@ -333,9 +339,9 @@ class TapestryNode implements ITapestryNode
         return $conditions;
     }
 
-    public function isLocked($userId = 0)
+    public function isLocked()
     {
-        $conditions = $this->getLockedState($userId);
+        $conditions = $this->getLockedState();
 
         $numFulfilled = 0;
         foreach ($conditions as $condition) {
@@ -381,6 +387,11 @@ class TapestryNode implements ITapestryNode
         $nodeMeta = $this->getMeta();
 
         return $nodeMeta->author->id == $userId;
+    }
+
+    public function isDyad()
+    {
+        return $this->isDyad;
     }
 
     public function addReview($comments)
@@ -577,6 +588,7 @@ class TapestryNode implements ITapestryNode
             'license' => $this->license,
             'references' => $this->references,
             'mapCoordinates' => $this->mapCoordinates,
+            'isDyad' => $this->isDyad,
             'popup' => $this->popup,
         ];
     }

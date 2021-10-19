@@ -211,6 +211,11 @@ export default class Helpers {
       return wp.canEditTapestry()
     }
 
+    // Public users never have any permissions other than read
+    if (action !== userActions.READ && !wp.isLoggedIn()) {
+      return false
+    }
+
     // Checks related to draft nodes
     /**
      * If node is a draft:
@@ -384,9 +389,15 @@ export default class Helpers {
       unlocked: true,
       accessible: true,
       reviewComments: [],
+      isDyad: false,
       popup: null,
     }
     return Helpers.deepMerge(baseNode, overrides)
+  }
+
+  static nodeAndUserAreDyad(node) {
+    let roles = wp.getCurrentUser().roles
+    return !node.isDyad ? false : roles.includes("dyad")
   }
   /**
    * Positions the tooltip to the given target.

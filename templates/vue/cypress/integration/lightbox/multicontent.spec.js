@@ -18,7 +18,7 @@ describe("Multi-content", () => {
 
       const expectParentModalOpen = () => {
         cy.getByTestId(`node-modal-header`)
-          .contains(/Edit/i)
+          .contains(/root/i)
           .contains(node.title)
           .should("exist")
       }
