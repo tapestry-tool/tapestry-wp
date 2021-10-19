@@ -22,25 +22,24 @@
                     v-if="disableRow(index, row.node)"
                     class="fas fa-lock fa-sm"
                   ></i>
-                  <a
-                    v-else
-                    class="favourite-btn"
-                    :class="{ 'is-favourite': isFavourite(row.node.id) }"
-                  >
-                    <i
-                      v-if="canEditNode(row.node)"
-                      class="fas fa-pencil-alt fa-sm pr-2"
-                      :style="{
-                        opacity: '0.25',
-                        cursor: 'pointer',
-                      }"
-                      @click="editNode(row.node.id)"
-                    ></i>
-                    <i
-                      class="fas fa-heart fa-sm"
-                      @click="toggleFavourite(row.node.id)"
-                    ></i>
-                  </a>
+                  <span v-else>
+                    <a>
+                      <i
+                        v-if="canEditNode(row.node)"
+                        class="fas fa-pencil-alt fa-sm pr-2"
+                        @click="editNode(row.node.id)"
+                      ></i>
+                    </a>
+                    <a
+                      class="favourite-btn"
+                      :class="{ 'is-favourite': isFavourite(row.node.id) }"
+                    >
+                      <i
+                        class="fas fa-heart fa-sm"
+                        @click="toggleFavourite(row.node.id)"
+                      ></i>
+                    </a>
+                  </span>
                 </div>
                 <div v-if="disableRow(index, row.node)" class="row-content">
                   <h1 class="title">
@@ -159,13 +158,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters([
-      "getDirectChildren",
-      "getNode",
-      "isFavourite",
-      "isMultiContent",
-      "getTheme",
-    ]),
+    ...mapGetters(["getDirectChildren", "getNode", "isFavourite", "isMultiContent"]),
     ...mapState(["favourites"]),
     rows() {
       return this.node.childOrdering.map(id => {
@@ -276,6 +269,9 @@ button[disabled] {
     position: absolute;
     right: 12px;
     text-align: right;
+    a {
+      text-decoration: none !important;
+    }
   }
 
   .row-content {
@@ -283,7 +279,16 @@ button[disabled] {
   }
 
   i {
+    cursor: pointer;
     color: var(--text-color);
+    opacity: 0.25;
+  }
+
+  a:hover,
+  a:active {
+    i {
+      opacity: 1;
+    }
   }
 
   .favourite-btn {

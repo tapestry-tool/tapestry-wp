@@ -11,11 +11,10 @@
           :key="row.node.id"
           ref="rowRefs"
           class="accordion-row"
-          :style="rowBackground"
         >
           <div class="button-row">
             <button
-              class="button-row-trigger  primary-text"
+              class="trigger-row-btn"
               :disabled="disableRow(index, row.node)"
               @click="toggle(row.node.id)"
             >
@@ -32,24 +31,15 @@
               ></locked-content>
             </button>
             <a v-if="canEditNode(row.node)" @click="editNode(row.node.id)">
-              <i
-                class="fas fa-pencil-alt fa-sm pr-2"
-                :style="{
-                  opacity: '0.25',
-                  cursor: 'pointer',
-                }"
-              ></i>
+              <i class="fas fa-pencil-alt fa-sm pr-2"></i>
             </a>
             <a
               v-if="!disableRow(index, row.node)"
+              class="favourite-btn"
+              :class="{ 'is-favourite': isFavourite(row.node.id) }"
               @click="toggleFavourite(row.node.id)"
             >
-              <i
-                v-if="isFavourite(row.node.id)"
-                class="fas fa-heart fa-sm"
-                style="color:red;"
-              ></i>
-              <i v-else class="fas fa-heart fa-sm primary-text"></i>
+              <i class="fas fa-heart fa-sm"></i>
             </a>
           </div>
           <div v-if="isVisible(row.node.id)" :data-qa="`row-content-${row.node.id}`">
@@ -187,18 +177,6 @@ export default {
         this.context === "accordion"
       )
     },
-    rowBackground() {
-      if (this.isMultiContentContext) {
-        let rgb = 187
-        let colorOffset = this.level * 10
-        rgb = colorOffset > rgb ? 0 : rgb - colorOffset
-        return {
-          background: `rgb(${rgb}, ${rgb}, ${rgb})`,
-        }
-      } else {
-        return null
-      }
-    },
   },
   mounted() {
     this.$root.$emit("observe-rows", this.$refs.rowRefs)
@@ -263,16 +241,38 @@ button[disabled] {
   }
 }
 
-.button-row-trigger {
-  background: none;
-  width: 100%;
-  text-align: left;
-}
-
 .accordion-row {
   border-radius: 4px;
   padding: 8px 16px;
   margin-bottom: 8px;
   background: var(--layered-background-color);
+
+  i {
+    cursor: pointer;
+    color: var(--text-color);
+    opacity: 0.25;
+  }
+  a:hover,
+  a:active {
+    i {
+      opacity: 1;
+    }
+  }
+
+  .trigger-row-btn {
+    background: none;
+    width: 100%;
+    text-align: left;
+    i {
+      opacity: 1;
+    }
+  }
+
+  .favourite-btn {
+    &.is-favourite > i {
+      color: red;
+      opacity: 1;
+    }
+  }
 }
 </style>

@@ -130,7 +130,7 @@ export default {
   .content {
     position: absolute;
     z-index: 100;
-    background: var(--primary-background-color);
+    background: var(--secondary-background-color);
     color: var(--text-color);
     background-position: 0 0;
     background-size: cover;
@@ -150,6 +150,7 @@ export default {
 
   &.full-screen {
     .content {
+      background: var(--primary-background-color);
       border-radius: 0;
 
       .buttons-container {
