@@ -12,11 +12,7 @@
     :show-fav="!tydeModeEnabled"
     @close="handleUserClose"
   >
-    <navbar
-      v-if="tydeModeEnabled"
-      :selectedTab="selectedTab"
-      @change-tab="handleTabChange"
-    ></navbar>
+    <navbar v-if="tydeModeEnabled"></navbar>
     <div
       v-show="selectedTab !== 'cos'"
       class="node-container"
@@ -43,7 +39,7 @@
       />
       <tapestry-media
         v-if="node.mediaType !== 'multi-content'"
-        :node-id="currentNodeId"
+        :node-id="nodeId"
         :dimensions="dimensions"
         context="lightbox"
         :class="{ 'has-navbar': tydeModeEnabled }"
@@ -106,29 +102,13 @@ export default {
       },
       showCompletionScreen: false,
       rowRefs: [],
-      selectedTab: "default",
     }
   },
   computed: {
     ...mapState(["h5pSettings", "rootId", "settings"]),
     ...mapGetters(["getNode", "getParent", "isMultiContent", "isMultiContentRow"]),
-    currentNodeId() {
-      /*
-          Default tyde node is currently the only node to be directly pushed to the router
-          thus nodeId will always store the values of the default (tyde icon) node
-       */
-      if (this.settings.tydeModeEnabled) {
-        if (this.selectedTab === "profile") {
-          return this.settings.tydeModeTabs.profile
-        } else if (this.selectedTab === "goals") {
-          return this.settings.tydeModeTabs.goals
-        }
-      }
-
-      return this.nodeId
-    },
     node() {
-      const node = this.getNode(this.currentNodeId)
+      const node = this.getNode(this.nodeId)
       return node
     },
     parentNode() {
@@ -140,6 +120,12 @@ export default {
     },
     tydeModeEnabled() {
       return !canEditTapestry() && this.settings.tydeModeEnabled
+    },
+    selectedTab() {
+      if (this.$route.query.tab) {
+        return this.$route.query.tab
+      }
+      return "default"
     },
     lightboxContentStyles() {
       const styles = {
@@ -235,7 +221,7 @@ export default {
     },
   },
   watch: {
-    currentNodeId: {
+    nodeId: {
       immediate: true,
       handler() {
         if (!this.node) {
@@ -255,12 +241,12 @@ export default {
       handler(rowId) {
         if (rowId) {
           if (
-            !this.isMultiContent(this.currentNodeId) ||
-            !this.isMultiContentRow(rowId, this.currentNodeId)
+            !this.isMultiContent(this.nodeId) ||
+            !this.isMultiContentRow(rowId, this.nodeId)
           ) {
             this.$router.replace({
               name: names.LIGHTBOX,
-              params: { nodeId: this.currentNodeId },
+              params: { nodeId: this.nodeId },
               query: this.$route.query,
             })
           }
@@ -274,7 +260,7 @@ export default {
           if (!this.isMultiContentRow(subRowId, this.rowId)) {
             this.$router.replace({
               name: names.ACCORDION,
-              params: { nodeId: this.currentNodeId, rowId: this.rowId },
+              params: { nodeId: this.nodeId, rowId: this.rowId },
               query: this.$route.query,
             })
           }
@@ -307,11 +293,11 @@ export default {
       }
     },
     handleUserClose() {
-      client.recordAnalyticsEvent("user", "close", "lightbox", this.currentNodeId)
+      client.recordAnalyticsEvent("user", "close", "lightbox", this.nodeId)
       this.close()
     },
     handleAutoClose() {
-      client.recordAnalyticsEvent("app", "close", "lightbox", this.currentNodeId)
+      client.recordAnalyticsEvent("app", "close", "lightbox", this.nodeId)
       this.close()
     },
     close() {
@@ -349,9 +335,6 @@ export default {
         width: this.lightboxDimensions.width,
         height: this.lightboxDimensions.height,
       }
-    },
-    handleTabChange(newTab) {
-      this.selectedTab = newTab
     },
     handleNodeChanged() {
       if (

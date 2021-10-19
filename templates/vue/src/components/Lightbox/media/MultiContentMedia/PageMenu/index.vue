@@ -37,7 +37,7 @@
             {{ page.title }}
           </b-dropdown-item>
         </b-dropdown>
-        <h5 class="pl-2 py-1 mb-4">{{ currentPageTitle }}</h5>
+        <h5 class="pl-2 py-1 mb-4">{{ node.title }}</h5>
       </div>
       <div
         :class="[

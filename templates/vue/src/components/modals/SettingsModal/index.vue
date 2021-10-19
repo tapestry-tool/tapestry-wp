@@ -235,58 +235,68 @@
             </b-form-checkbox>
           </b-form-group>
           <b-form-group v-if="tydeModeEnabled">
-            <b-row v-for="role in roles" :key="role" style="margin: 17px 0;">
-              <b-col class="text-capitalize">{{ role }}</b-col>
-              <b-col>
-                <combobox
-                  v-model="tydeModeTabs.default[role]"
-                  :options="nodesValues"
-                  :placeholder="nodesValues[0].title"
-                  item-text="title"
-                  item-value="id"
-                >
-                  <template v-slot="slotProps">
-                    <p>
-                      {{ slotProps.option.title }}
-                    </p>
-                  </template>
-                </combobox>
+            <b-row>
+              <b-col cols="6" cols-md="12">
+                <p class="text-center">Default tab nodes (by role):</p>
+                <b-row v-for="role in roles" :key="role" class="my-3 mx-0">
+                  <b-col class="text-capitalize text-muted text-right">
+                    {{ role }}
+                  </b-col>
+                  <b-col>
+                    <combobox
+                      v-model="tydeModeTabs.default[role]"
+                      :options="nodesValues"
+                      :placeholder="nodesValues[0].title"
+                      item-text="title"
+                      item-value="id"
+                    >
+                      <template v-slot="slotProps">
+                        <p>
+                          {{ slotProps.option.title }}
+                        </p>
+                      </template>
+                    </combobox>
+                  </b-col>
+                </b-row>
               </b-col>
-            </b-row>
-            <b-row style="margin: 17px 0;">
-              <b-col class="text-capitalize">Profile Tab</b-col>
-              <b-col>
-                <combobox
-                  v-model="tydeModeTabs.profile"
-                  :options="nodesValues"
-                  :placeholder="nodesValues[0].title"
-                  item-text="title"
-                  item-value="id"
-                >
-                  <template v-slot="slotProps">
-                    <p>
-                      {{ slotProps.option.title }}
-                    </p>
-                  </template>
-                </combobox>
-              </b-col>
-            </b-row>
-            <b-row style="margin: 17px 0;">
-              <b-col class="text-capitalize">Goals Tab</b-col>
-              <b-col>
-                <combobox
-                  v-model="tydeModeTabs.goals"
-                  :options="nodesValues"
-                  :placeholder="nodesValues[0].title"
-                  item-text="title"
-                  item-value="id"
-                >
-                  <template v-slot="slotProps">
-                    <p>
-                      {{ slotProps.option.title }}
-                    </p>
-                  </template>
-                </combobox>
+              <b-col cols="6" cols-md="12">
+                <p class="text-center">Other tab nodes (for all roles):</p>
+                <b-row class="my-3 mx-0">
+                  <b-col class="text-muted text-right">Profile Tab</b-col>
+                  <b-col>
+                    <combobox
+                      v-model="tydeModeTabs.profile"
+                      :options="nodesValues"
+                      :placeholder="nodesValues[0].title"
+                      item-text="title"
+                      item-value="id"
+                    >
+                      <template v-slot="slotProps">
+                        <p>
+                          {{ slotProps.option.title }}
+                        </p>
+                      </template>
+                    </combobox>
+                  </b-col>
+                </b-row>
+                <b-row class="my-3 mx-0">
+                  <b-col class="text-muted text-right">Goals Tab</b-col>
+                  <b-col>
+                    <combobox
+                      v-model="tydeModeTabs.goals"
+                      :options="nodesValues"
+                      :placeholder="nodesValues[0].title"
+                      item-text="title"
+                      item-value="id"
+                    >
+                      <template v-slot="slotProps">
+                        <p>
+                          {{ slotProps.option.title }}
+                        </p>
+                      </template>
+                    </combobox>
+                  </b-col>
+                </b-row>
               </b-col>
             </b-row>
           </b-form-group>
@@ -558,13 +568,12 @@ export default {
         if (!profileTabNode || !this.nodes[profileTabNode]) {
           this.tydeModeTabs.profile = this.rootId
         }
-        const gaolsTabNode = this.tydeModeTabs.goals
-        if (!gaolsTabNode || !this.nodes[gaolsTabNode]) {
+        const goalsTabNode = this.tydeModeTabs.goals
+        if (!goalsTabNode || !this.nodes[goalsTabNode]) {
           this.tydeModeTabs.goals = this.rootId
         }
       }
 
-      console.log(this.tydeModeTabs)
       const settings = Object.assign(this.settings, {
         backgroundUrl: this.backgroundUrl,
         autoLayout: this.autoLayout,

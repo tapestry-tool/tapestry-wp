@@ -191,7 +191,7 @@ export default {
         this.$router.push({
           name: names.LIGHTBOX,
           params: { nodeId: defaultNodeId },
-          query: this.$route.query,
+          query: { ...this.$route.query, tab: "default" },
         })
       }
     },
