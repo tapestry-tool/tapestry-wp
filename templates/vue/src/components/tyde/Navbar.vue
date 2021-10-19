@@ -30,6 +30,8 @@
 import { mapState } from "vuex"
 import TydeIcon from "./TydeIcon.vue"
 import UserSettingsButton from "../Toolbar/UserSettingsButton"
+import { names } from "@/config/routes"
+import { getCurrentUser } from "@/services/wp"
 
 export default {
   name: "navbar",
@@ -39,19 +41,59 @@ export default {
   },
   data() {
     return {
-      selectedTab: "default",
+      defaultTabNodeId: null,
     }
   },
   computed: {
-    ...mapState(["settings"]),
+    ...mapState(["settings", "rootId"]),
+    selectedTab() {
+      if (this.$route.query.tab && this.tabs.includes(this.$route.query.tab)) {
+        return this.$route.query.tab
+      }
+      return "default"
+    },
     tabs() {
       return ["default", "profile", "goals", "cos"]
     },
+    defaultTabBaseNodeId() {
+      let defaultNodeId = this.rootId
+      if (this.settings.tydeModeTabs.default) {
+        let userMainRole = getCurrentUser().roles[0]
+        if (!userMainRole || !(userMainRole in this.settings.tydeModeTabs.default)) {
+          userMainRole = "public"
+        }
+        defaultNodeId = this.settings.tydeModeTabs.default[userMainRole]
+      }
+      return defaultNodeId
+    },
+  },
+  mounted() {
+    if (this.selectedTab === "default") {
+      this.defaultTabNodeId = this.$route.params.nodeId
+    } else {
+      this.defaultTabNodeId = this.defaultTabBaseNodeId
+    }
+    this.handleTabChange(this.selectedTab)
   },
   methods: {
     handleTabChange(tab) {
-      this.$emit("change-tab", tab)
-      this.selectedTab = tab
+      let selectedNodeId = this.defaultTabNodeId
+      if (tab !== "default") {
+        if (this.selectedTab === "default") {
+          this.defaultTabNodeId = this.$route.params.nodeId
+        }
+        if (tab !== "cos") {
+          selectedNodeId = this.settings.tydeModeTabs[tab]
+        }
+      }
+
+      if (selectedNodeId) {
+        this.$router.replace({
+          name: names.LIGHTBOX,
+          params: { nodeId: selectedNodeId },
+          query: { ...this.$route.query, tab },
+        })
+      }
     },
     isSelectedTab(tab) {
       return this.selectedTab === tab

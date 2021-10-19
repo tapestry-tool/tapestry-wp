@@ -12,13 +12,9 @@
     :show-fav="!tydeModeEnabled"
     @close="handleUserClose"
   >
-    <navbar
-      v-if="tydeModeEnabled"
-      :selectedTab="selectedTab"
-      @change-tab="handleTabChange"
-    ></navbar>
+    <navbar v-if="tydeModeEnabled"></navbar>
     <div
-      v-show="selectedTab === 'default'"
+      v-show="selectedTab !== 'cos'"
       class="node-container"
       :class="{
         'multi-content': node.mediaType === 'multi-content',
@@ -106,7 +102,6 @@ export default {
       },
       showCompletionScreen: false,
       rowRefs: [],
-      selectedTab: "default",
     }
   },
   computed: {
@@ -125,6 +120,12 @@ export default {
     },
     tydeModeEnabled() {
       return !canEditTapestry() && this.settings.tydeModeEnabled
+    },
+    selectedTab() {
+      if (this.$route.query.tab) {
+        return this.$route.query.tab
+      }
+      return "default"
     },
     lightboxContentStyles() {
       const styles = {
@@ -334,9 +335,6 @@ export default {
         width: this.lightboxDimensions.width,
         height: this.lightboxDimensions.height,
       }
-    },
-    handleTabChange(newTab) {
-      this.selectedTab = newTab
     },
     handleNodeChanged() {
       if (

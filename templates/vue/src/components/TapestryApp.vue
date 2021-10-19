@@ -177,21 +177,21 @@ export default {
 
         let defaultNodeId = this.rootId
 
-        if (this.settings.tydeModeDefaultNodes) {
+        if (this.settings.tydeModeTabs.default) {
           let userMainRole = getCurrentUser().roles[0]
           if (
             !userMainRole ||
-            !(userMainRole in this.settings.tydeModeDefaultNodes)
+            !(userMainRole in this.settings.tydeModeTabs.default)
           ) {
             userMainRole = "public"
           }
-          defaultNodeId = this.settings.tydeModeDefaultNodes[userMainRole]
+          defaultNodeId = this.settings.tydeModeTabs.default[userMainRole]
         }
 
         this.$router.push({
           name: names.LIGHTBOX,
           params: { nodeId: defaultNodeId },
-          query: this.$route.query,
+          query: { ...this.$route.query, tab: "default" },
         })
       }
     },

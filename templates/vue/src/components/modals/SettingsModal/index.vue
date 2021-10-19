@@ -235,22 +235,68 @@
             </b-form-checkbox>
           </b-form-group>
           <b-form-group v-if="tydeModeEnabled">
-            <b-row v-for="role in roles" :key="role" style="margin: 17px 0;">
-              <b-col class="text-capitalize">{{ role }}</b-col>
-              <b-col>
-                <combobox
-                  v-model="tydeModeDefaultNodes[role]"
-                  :options="nodesValues"
-                  :placeholder="nodesValues[0].title"
-                  item-text="title"
-                  item-value="id"
-                >
-                  <template v-slot="slotProps">
-                    <p>
-                      {{ slotProps.option.title }}
-                    </p>
-                  </template>
-                </combobox>
+            <b-row>
+              <b-col cols="6" cols-md="12">
+                <p class="text-center">Default tab nodes (by role):</p>
+                <b-row v-for="role in roles" :key="role" class="my-3 mx-0">
+                  <b-col class="text-capitalize text-muted text-right">
+                    {{ role }}
+                  </b-col>
+                  <b-col>
+                    <combobox
+                      v-model="tydeModeTabs.default[role]"
+                      :options="nodesValues"
+                      :placeholder="nodesValues[0].title"
+                      item-text="title"
+                      item-value="id"
+                    >
+                      <template v-slot="slotProps">
+                        <p>
+                          {{ slotProps.option.title }}
+                        </p>
+                      </template>
+                    </combobox>
+                  </b-col>
+                </b-row>
+              </b-col>
+              <b-col cols="6" cols-md="12">
+                <p class="text-center">Other tab nodes (for all roles):</p>
+                <b-row class="my-3 mx-0">
+                  <b-col class="text-muted text-right">Profile Tab</b-col>
+                  <b-col>
+                    <combobox
+                      v-model="tydeModeTabs.profile"
+                      :options="nodesValues"
+                      :placeholder="nodesValues[0].title"
+                      item-text="title"
+                      item-value="id"
+                    >
+                      <template v-slot="slotProps">
+                        <p>
+                          {{ slotProps.option.title }}
+                        </p>
+                      </template>
+                    </combobox>
+                  </b-col>
+                </b-row>
+                <b-row class="my-3 mx-0">
+                  <b-col class="text-muted text-right">Goals Tab</b-col>
+                  <b-col>
+                    <combobox
+                      v-model="tydeModeTabs.goals"
+                      :options="nodesValues"
+                      :placeholder="nodesValues[0].title"
+                      item-text="title"
+                      item-value="id"
+                    >
+                      <template v-slot="slotProps">
+                        <p>
+                          {{ slotProps.option.title }}
+                        </p>
+                      </template>
+                    </combobox>
+                  </b-col>
+                </b-row>
               </b-col>
             </b-row>
           </b-form-group>
@@ -394,7 +440,7 @@ export default {
       renderImages: true,
       analyticsEnabled: false,
       tydeModeEnabled: false,
-      tydeModeDefaultNodes: {},
+      tydeModeTabs: { default: {}, goals: "", profile: "" },
       draftNodesEnabled: true,
       submitNodesEnabled: true,
       renderMap: false,
@@ -480,7 +526,7 @@ export default {
         renderImages = true,
         renderMap = false,
         tydeModeEnabled = false,
-        tydeModeDefaultNodes = {},
+        tydeModeTabs = { default: {}, goals: "", profile: "" },
         analyticsEnabled = false,
         draftNodesEnabled = true,
         submitNodesEnabled = true,
@@ -497,11 +543,15 @@ export default {
       this.renderImages = renderImages
       this.renderMap = renderMap
       this.tydeModeEnabled = tydeModeEnabled
-      this.tydeModeDefaultNodes = tydeModeDefaultNodes
+      this.tydeModeTabs = tydeModeTabs
       this.analyticsEnabled = analyticsEnabled
       this.draftNodesEnabled = draftNodesEnabled
       this.submitNodesEnabled = submitNodesEnabled
       this.mapBounds = mapBounds
+
+      if (!this.tydeModeTabs.default) {
+        this.tydeModeTabs.default = {}
+      }
     },
     async updateSettings() {
       /* NOTE: this functionallity sets the root node as the defualt tyde mode node
@@ -509,11 +559,19 @@ export default {
         */
       if (this.tydeModeEnabled) {
         this.roles.forEach(role => {
-          const rolesDefaultNode = this.tydeModeDefaultNodes[role]
+          const rolesDefaultNode = this.tydeModeTabs.default[role]
           if (!rolesDefaultNode || !this.nodes[rolesDefaultNode]) {
-            this.tydeModeDefaultNodes[role] = this.rootId
+            this.tydeModeTabs.default[role] = this.rootId
           }
         })
+        const profileTabNode = this.tydeModeTabs.profile
+        if (!profileTabNode || !this.nodes[profileTabNode]) {
+          this.tydeModeTabs.profile = this.rootId
+        }
+        const goalsTabNode = this.tydeModeTabs.goals
+        if (!goalsTabNode || !this.nodes[goalsTabNode]) {
+          this.tydeModeTabs.goals = this.rootId
+        }
       }
 
       const settings = Object.assign(this.settings, {
@@ -528,7 +586,7 @@ export default {
         renderImages: this.renderImages,
         renderMap: this.renderMap,
         tydeModeEnabled: this.tydeModeEnabled,
-        tydeModeDefaultNodes: this.tydeModeDefaultNodes,
+        tydeModeTabs: this.tydeModeTabs,
         analyticsEnabled: this.analyticsEnabled,
         draftNodesEnabled: this.draftNodesEnabled,
         submitNodesEnabled: this.submitNodesEnabled,
