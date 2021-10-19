@@ -105,6 +105,7 @@ export default {
 </style>
 <style lang="scss" scoped>
 .answer-container {
+  color: var(--text-color);
   width: 100%;
   margin-top: 16px;
 
