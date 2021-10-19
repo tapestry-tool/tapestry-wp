@@ -34,7 +34,7 @@ describe("Video", () => {
 
         cy.get("video").should($el => {
           const video = $el.get(0)
-          expect(video.paused).to.be.false
+          expect(video.paused).to.be.true
         })
         cy.get("video").then($el => $el.get(0).pause())
 
@@ -46,7 +46,9 @@ describe("Video", () => {
 
       cy.openLightbox(node.id).within(() => {
         cy.getByTestId("end-screen").should("be.visible")
-        cy.contains(/rewatch/i).should("be.visible")
+        cy.contains(/rewatch/i)
+          .scrollIntoView()
+          .should("be.visible")
         cy.contains(/close/i).click()
       })
       cy.lightbox().should("not.exist")

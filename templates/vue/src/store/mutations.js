@@ -169,8 +169,10 @@ export function setTapestryErrorReporting(state, isEnabled) {
   state.displayErrors = isEnabled
 }
 
-// theme
-
 export function changeTheme(state, newTheme) {
   state.theme = newTheme
+}
+
+export function setReturnRoute(state, route) {
+  state.returnRoute = route
 }

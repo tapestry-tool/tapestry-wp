@@ -28,6 +28,15 @@
                     :class="{ 'is-favourite': isFavourite(row.node.id) }"
                   >
                     <i
+                      v-if="canEditNode(row.node)"
+                      class="fas fa-pencil-alt fa-sm pr-2"
+                      :style="{
+                        opacity: '0.25',
+                        cursor: 'pointer',
+                      }"
+                      @click="editNode(row.node.id)"
+                    ></i>
+                    <i
                       class="fas fa-heart fa-sm"
                       @click="toggleFavourite(row.node.id)"
                     ></i>
@@ -103,6 +112,8 @@ import TapestryMedia from "../TapestryMedia"
 import HeadlessMultiContent from "./HeadlessMultiContent"
 import AccordionRows from "./AccordionRows"
 import LockedContent from "./common/LockedContent"
+import { names } from "@/config/routes"
+import Helpers from "@/utils/Helpers"
 
 export default {
   name: "page-rows",
@@ -179,11 +190,18 @@ export default {
       )
     },
   },
+  watch: {
+    node() {
+      this.$nextTick(() => {
+        this.$root.$emit("observe-rows", this.$refs.rowRefs)
+      })
+    },
+  },
   mounted() {
     this.$root.$emit("observe-rows", this.$refs.rowRefs)
   },
   methods: {
-    ...mapMutations(["updateNode"]),
+    ...mapMutations(["updateNode", "setReturnRoute"]),
     ...mapActions(["toggleFavourite"]),
     handleLoad(el) {
       this.$emit("load", el)
@@ -205,6 +223,16 @@ export default {
     },
     areAllPopup(nodes) {
       return nodes.every(node => node.popup !== null)
+    },
+    canEditNode(node) {
+      return Helpers.hasPermission(node, "edit")
+    },
+    editNode(id) {
+      this.setReturnRoute(this.$route)
+      this.$router.push({
+        name: names.MODAL,
+        params: { nodeId: id, type: "edit", tab: "content" },
+      })
     },
   },
 }

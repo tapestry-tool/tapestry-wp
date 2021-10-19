@@ -24,6 +24,7 @@ export const store = {
     displayErrors: false,
     theme: "",
     userAnswers: {},
+    returnRoute: null,
   },
   getters,
   mutations,
