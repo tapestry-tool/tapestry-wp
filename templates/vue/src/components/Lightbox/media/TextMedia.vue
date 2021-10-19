@@ -21,7 +21,13 @@ export default {
   },
   computed: {
     content() {
-      return this.node.typeData.textContent
+      const htmlContent = document.createElement("div")
+      htmlContent.innerHTML += this.node.typeData.textContent
+
+      htmlContent.querySelectorAll("a").forEach(link => {
+        link.target = "_blank"
+      })
+      return String(htmlContent.innerHTML)
     },
     showTitle() {
       return (
