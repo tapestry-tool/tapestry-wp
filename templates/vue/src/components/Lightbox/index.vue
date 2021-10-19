@@ -6,7 +6,7 @@
       'full-screen': node.fullscreen,
       'content-text': node.mediaType === 'text' || node.mediaType === 'wp-post',
     }"
-    :node-id="nodeId"
+    :node="node"
     :content-container-style="lightboxContentStyles"
     :allow-close="canSkip"
     @close="handleUserClose"
@@ -86,10 +86,14 @@ export default {
   },
   computed: {
     ...mapState(["h5pSettings", "rootId"]),
-    ...mapGetters(["getNode", "isMultiContent", "isMultiContentRow"]),
+    ...mapGetters(["getNode", "getParent", "isMultiContent", "isMultiContentRow"]),
     node() {
       const node = this.getNode(this.nodeId)
       return node
+    },
+    parentNode() {
+      const parentNodeId = this.getParent(this.node.id)
+      return this.getNode(parentNodeId)
     },
     canSkip() {
       return this.node.completed || this.node.skippable !== false
@@ -199,7 +203,7 @@ export default {
             query: this.$route.query,
           })
         } else {
-          this.applyDimensions()
+          this.handleNodeChanged()
         }
       },
     },
@@ -238,11 +242,7 @@ export default {
   mounted() {
     document.querySelector("body").classList.add("tapestry-lightbox-open")
     DragSelectModular.removeDragSelectListener()
-    if (this.node.mediaType === "multi-content") {
-      this.$root.$on("observe-rows", refs => {
-        this.rowRefs = this.rowRefs.concat(refs)
-      })
-    }
+    this.handleNodeChanged()
   },
   beforeDestroy() {
     document.querySelector("body").classList.remove("tapestry-lightbox-open")
@@ -253,9 +253,15 @@ export default {
     })
   },
   methods: {
-    ...mapActions(["completeNode"]),
+    ...mapActions(["completeNode", "updateNodeProgress"]),
     complete(nodeId) {
-      this.completeNode(nodeId || this.nodeId)
+      const node = this.getNode(nodeId || this.nodeId)
+      if (!node.completed) {
+        this.completeNode(node.id)
+      }
+      if (node.progress !== 1) {
+        this.updateNodeProgress({ id: node.id, progress: 1 })
+      }
     },
     handleUserClose() {
       client.recordAnalyticsEvent("user", "close", "lightbox", this.nodeId)
@@ -266,9 +272,16 @@ export default {
       this.close()
     },
     close() {
+      let selectedNode = this.nodeId
+      if (
+        this.parentNode?.mediaType === "multi-content" &&
+        this.parentNode?.presentationStyle === "unit"
+      ) {
+        selectedNode = this.parentNode.id
+      }
       this.$router.push({
         name: names.APP,
-        params: { nodeId: this.nodeId },
+        params: { nodeId: selectedNode },
         query: this.$route.query,
       })
     },
@@ -279,9 +292,11 @@ export default {
       }
     },
     updateDimensions(dimensions) {
-      this.dimensions = {
-        ...this.dimensions,
-        ...dimensions,
+      if (dimensions.height <= this.lightboxDimensions.height) {
+        this.dimensions = {
+          ...this.dimensions,
+          ...dimensions,
+        }
       }
     },
     applyDimensions() {
@@ -290,6 +305,38 @@ export default {
         left: (Helpers.getBrowserWidth() - this.lightboxDimensions.width) / 2,
         width: this.lightboxDimensions.width,
         height: this.lightboxDimensions.height,
+      }
+    },
+    handleNodeChanged() {
+      if (
+        this.node.mediaType === "multi-content" &&
+        this.node.presentationStyle === "unit" &&
+        this.node.childOrdering?.length
+      ) {
+        const pageNode = this.getNode(this.node.childOrdering[0])
+        this.$root.$emit("open-node", pageNode.id)
+      } else {
+        this.applyDimensions()
+        if (this.node.mediaType === "multi-content") {
+          this.$root.$on("observe-rows", newRefs => {
+            if (Array.isArray(newRefs)) {
+              newRefs.forEach(newRef => {
+                if (newRef) {
+                  // We need to remove the old ref because it references
+                  // an element that has potentially been destroyed
+                  const existingRefIndex = this.rowRefs.findIndex(
+                    ref => ref && ref.id === newRef.id
+                  )
+                  if (existingRefIndex !== -1) {
+                    this.rowRefs.splice(existingRefIndex, 1)
+                  }
+                  // Add the new ref, pointing to the current ref
+                  this.rowRefs.push(newRef)
+                }
+              })
+            }
+          })
+        }
       }
     },
   },

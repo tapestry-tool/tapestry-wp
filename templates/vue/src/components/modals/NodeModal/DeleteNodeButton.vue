@@ -14,7 +14,6 @@
 <script>
 import { mapActions, mapGetters, mapMutations, mapState } from "vuex"
 import { nodeStatus } from "@/utils/constants"
-import { names } from "@/config/routes"
 
 export default {
   props: {
@@ -34,16 +33,13 @@ export default {
     },
   },
   computed: {
-    ...mapGetters(["getNode", "getNeighbours", "getNeighbouringLinks", "getParent"]),
+    ...mapGetters(["getNode", "getNeighbours", "getNeighbouringLinks"]),
     ...mapState(["nodes", "rootId"]),
     neighbourLink() {
       return this.getNeighbouringLinks(this.nodeId)[0]
     },
     neighbour() {
       return this.getNode(this.getNeighbours(this.nodeId)[0])
-    },
-    parent() {
-      return this.getParent(this.nodeId)
     },
     isRoot() {
       return this.nodeId === this.rootId
@@ -104,9 +100,9 @@ export default {
       this.$emit("setLoading", false)
     },
     removeNode() {
+      this.$emit("complete")
       if (!this.isRoot) {
         const neighbour = this.neighbour
-        const parent = this.parent
         this.deleteLink({
           source: this.neighbourLink.source,
           target: this.neighbourLink.target,
@@ -118,24 +114,10 @@ export default {
             childOrdering: neighbour.childOrdering.filter(id => id !== this.nodeId),
           },
         })
-        if (this.isMultiContentNodeChild) {
-          this.$router.push({
-            name: names.MODAL,
-            params: { nodeId: parent, type: "edit", tab: "content" },
-            query: this.$route.query,
-          })
-        } else {
-          this.$router.push({
-            name: names.APP,
-            params: { nodeId: neighbour.id },
-            query: this.$route.query,
-          })
-        }
       } else {
         this.$router.push({ path: "/", query: this.$route.query })
       }
       this.deleteNode(this.nodeId)
-      this.$emit("complete")
     },
   },
 }

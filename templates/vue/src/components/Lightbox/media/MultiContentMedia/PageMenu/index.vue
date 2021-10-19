@@ -9,6 +9,7 @@
           lightbox: !node.fullscreen,
           fullscreen: node.fullscreen,
           closed: !opened,
+          'is-unit-child': unitsMenuVisible,
         },
       ]"
       :style="{ height: node.fullscreen ? '100vh' : dimensions.height + 'px' }"
@@ -26,6 +27,18 @@
         <i v-if="!opened" class="fas fa-bars fa-lg" style="color: black;"></i>
         <i v-else class="fas fa-times fa-lg"></i>
       </button>
+      <div v-if="unitsMenuVisible">
+        <b-dropdown class="unit-switch-dropdown" block split :text="parentNodeTitle">
+          <b-dropdown-item
+            v-for="page in pages"
+            :key="page.id"
+            @click="changePage(page.id)"
+          >
+            {{ page.title }}
+          </b-dropdown-item>
+        </b-dropdown>
+        <h5 class="pl-2 py-1 mb-4">{{ currentPageTitle }}</h5>
+      </div>
       <div
         :class="[
           'page-nav-content',
@@ -35,7 +48,7 @@
           },
         ]"
       >
-        <ul class="page-menu-item fa-ul">
+        <ul class="page-menu-items fa-ul">
           <page-menu-item
             v-for="row in rows"
             :key="row.node.id"
@@ -77,14 +90,26 @@ export default {
   },
   data() {
     return {
-      opened: false || this.browserWidth > 800,
-      browserWidth: Helpers.getBrowserWidth(),
+      opened: false,
+      selectedPage: this.node.id,
     }
   },
   computed: {
-    ...mapGetters(["getDirectChildren", "getNode", "isMultiContent"]),
+    ...mapGetters(["getDirectChildren", "getNode", "isMultiContent", "getParent"]),
     nodeId() {
       return parseInt(this.$route.params.nodeId, 10)
+    },
+    parentNode() {
+      const parentNodeId = this.getParent(this.node.id)
+      return this.getNode(parentNodeId)
+    },
+    parentNodeTitle() {
+      return this.parentNode?.title ? this.parentNode.title : ""
+    },
+    currentPageTitle() {
+      return this.pages[this.selectedPage]?.title
+        ? this.pages[this.selectedPage]?.title
+        : ""
     },
     rows() {
       return this.node.childOrdering
@@ -106,6 +131,31 @@ export default {
     },
     rowOrder() {
       return this.getRowOrder(this.node)
+    },
+    pages() {
+      if (
+        this.parentNode?.mediaType === "multi-content" &&
+        this.parentNode?.presentationStyle === "unit"
+      ) {
+        return this.parentNode.childOrdering.reduce((pages, nodeId) => {
+          const node = this.getNode(nodeId)
+          pages[nodeId] = {
+            id: node.id,
+            title: node.title,
+          }
+          return pages
+        }, {})
+      }
+      return {}
+    },
+    browserWidth() {
+      return Helpers.getBrowserWidth()
+    },
+    unitsMenuVisible() {
+      if (!this.pages) {
+        return false
+      }
+      return this.opened || (this.browserWidth > 800 && this.node.fullscreen)
     },
   },
   mounted() {
@@ -143,6 +193,10 @@ export default {
       }
       return nodes
     },
+    changePage(pageNodeId) {
+      this.selectedPage = pageNodeId
+      this.$root.$emit("open-node", pageNodeId)
+    },
     scrollToRef(nodeId) {
       this.$nextTick(() => {
         if (this.rowRefs) {
@@ -162,7 +216,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .page-nav-wrapper {
   .page-nav {
     position: relative;
@@ -204,6 +258,11 @@ export default {
       }
     }
 
+    &.is-unit-child {
+      width: 250px;
+      max-width: 25vw;
+    }
+
     @media screen and (min-width: 960px) {
       font-size: calc(14px + (2 * (100vw - 960px) / 1280px - 960px));
     }
@@ -224,10 +283,6 @@ export default {
       }
     }
 
-    .page-nav-title {
-      margin-bottom: 1em;
-    }
-
     .page-nav-container {
       text-align: left;
     }
@@ -244,9 +299,59 @@ export default {
           }
         }
       }
-
       &.closed {
         display: none;
+      }
+
+      .page-menu-items {
+        margin-left: 2em;
+        margin-right: -0.5em;
+      }
+    }
+  }
+}
+</style>
+
+<style lang="scss">
+.unit-switch-dropdown {
+  margin: 1.2rem -24px !important;
+  button {
+    border-radius: 0;
+    background: #fff2;
+    border-color: #fff1;
+    &:hover {
+      background: transparent;
+      border-color: transparent;
+    }
+    &:first-child {
+      text-align: left;
+      padding-left: 30px;
+      font-size: 1.6em;
+      font-weight: bold;
+    }
+  }
+  .dropdown-menu {
+    width: calc(100% - 10px);
+    margin-top: 5px;
+
+    &::after {
+      content: "";
+      position: absolute;
+      width: 0;
+      height: 0;
+      border: solid 7px #fff;
+      border-bottom-width: 8px;
+      border-left-color: transparent;
+      border-right-color: transparent;
+      border-top-color: transparent;
+      top: -15px;
+      right: 2px;
+    }
+
+    > li {
+      line-height: 1.75em !important;
+      a {
+        white-space: normal !important;
       }
     }
   }

@@ -18,7 +18,7 @@ describe("Multi-content", () => {
 
       const expectParentModalOpen = () => {
         cy.getByTestId(`node-modal-header`)
-          .contains(/Edit/i)
+          .contains(/root/i)
           .contains(node.title)
           .should("exist")
       }
@@ -48,7 +48,7 @@ describe("Multi-content", () => {
 
       cy.getByTestId(`add-subitem`).should("not.be.disabled")
       cy.getByTestId(`add-subitem`)
-        .click()
+        .click({ force: true })
         .then(() => {
           cy.getByTestId(`node-modal-header-back`)
             .contains(node.title)

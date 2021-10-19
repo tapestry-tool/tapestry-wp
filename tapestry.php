@@ -6,12 +6,12 @@ require_once __DIR__.'/classes/class.tapestry-analytics.php';
  * Plugin Name: Tapestry
  * Plugin URI: https://www.tapestry-tool.com
  * Description: Custom post type - Tapestry
- * Version: 2.41.0-beta
+ * Version: 2.50.0-beta
  * Author: Tapestry Team, University of British Coloumbia.
  */
 
 // Used to force-refresh assets
-$TAPESTRY_VERSION_NUMBER = '2.44.0-beta';
+$TAPESTRY_VERSION_NUMBER = '2.50.0-beta';
 
 // Set this to false if you want to use the Vue build instead of npm dev
 $TAPESTRY_USE_DEV_MODE = true;

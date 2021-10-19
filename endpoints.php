@@ -255,6 +255,20 @@ $REST_API_ENDPOINTS = [
             'callback' => 'updateUserFavourites',
         ],
     ],
+    'GET_TAPESTRY_USER_LAST_SELECTED_NODE' => (object) [
+        'ROUTE' => 'users/lastSelectedNode',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => 'getLastSelectedNode',
+        ],
+    ],
+    'UPDATE_TAPESTRY_USER_LAST_SELECTED_NODE' => (object) [
+        'ROUTE' => 'users/lastSelectedNode',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_POST_METHOD,
+            'callback' => 'updateLastSelectedNode',
+        ],
+    ],
     'LOGIN' => (object) [
         'ROUTE' => '/login',
         'ARGUMENTS' => [
@@ -1421,6 +1435,41 @@ function updateUserFavourites($request)
         $userProgress = new TapestryUserProgress($postId);
 
         return $userProgress->updateFavourites($favourites);
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+/**
+ * Get User's last selected node for a tapestry post.
+ *
+ * @return int $nodeId  node id of the last selected node in the tapestry
+ */
+function getLastSelectedNode($request)
+{
+    $postId = $request['post_id'];
+    try {
+        $userProgress = new TapestryUserProgress($postId);
+
+        return $userProgress->getLastSelectedNode();
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+/**
+ * Update last selected node for the current user by passing in post id and node id
+ *
+ * @param object $request HTTP request
+ */
+function updateLastSelectedNode($request)
+{
+    $postId = $request['post_id'];
+    $body = json_decode($request->get_body());
+    try {
+        $userProgress = new TapestryUserProgress($postId);
+
+        return $userProgress->updateLastSelectedNode($body->nodeId, $body->rowId, $body->subRowId);
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
