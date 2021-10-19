@@ -7,12 +7,12 @@ describe("User Settings", () => {
   it(`should be able to open user settings modal and change theme settings`, () => {
     cy.getByTestId("user-settings-button").click({ force: true })
 
-    cy.contains(/light mode/i).click()
-    cy.contains(/save theme/i).click()
+    cy.contains(/light mode/i).click({ force: true })
+    cy.contains(/save theme/i).click({ force: true })
 
     cy.getByTestId("user-settings-button").click({ force: true })
 
-    cy.contains(/dark mode/i).click()
-    cy.contains(/save theme/i).click()
+    cy.contains(/dark mode/i).click({ force: true })
+    cy.contains(/save theme/i).click({ force: true })
   })
 })
