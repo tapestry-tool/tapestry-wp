@@ -1,9 +1,13 @@
 <template>
-  <b-row>
-    <b-col v-for="bucket in buckets" :key="bucket.id" cols="4">
-      <bucket :bucket="bucket" :items="getItems(bucket.id)" :hide-text="hideText" />
-    </b-col>
-  </b-row>
+  <div>
+    <bucket
+      v-for="bucket in buckets"
+      :key="bucket.id"
+      :bucket="bucket"
+      :items="getItems(bucket.id)"
+      :hide-text="hideText"
+    />
+  </div>
 </template>
 
 <script>
@@ -54,10 +58,3 @@ export default {
   },
 }
 </script>
-
-<style lang="scss" scoped>
-ul {
-  display: flex;
-  list-style-type: none;
-}
-</style>

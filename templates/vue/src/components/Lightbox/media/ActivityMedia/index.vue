@@ -26,8 +26,14 @@
         <p>Next question</p>
       </button>
       <button v-else class="button-completion" @click="close">
-        <i class="far fa-times-circle fa-4x"></i>
-        <p>Done</p>
+        <template v-if="context === 'lightbox'">
+          <i class="fas fa-times-circle fa-4x"></i>
+          <p>Done</p>
+        </template>
+        <template v-else>
+          <i class="fas fa-arrow-circle-right fa-4x"></i>
+          <p>Continue</p>
+        </template>
       </button>
     </completion-screen>
     <question
