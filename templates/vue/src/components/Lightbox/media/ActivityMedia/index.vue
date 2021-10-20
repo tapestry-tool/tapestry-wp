@@ -15,8 +15,14 @@
         <p>Next question</p>
       </button>
       <button v-else class="button-completion" @click="close">
-        <i class="far fa-times-circle fa-4x"></i>
-        <p>Done</p>
+        <template v-if="context === 'lightbox'">
+          <i class="fas fa-times-circle fa-4x"></i>
+          <p>Done</p>
+        </template>
+        <template v-else>
+          <i class="fas fa-arrow-circle-right fa-4x"></i>
+          <p>Continue</p>
+        </template>
       </button>
     </completion-screen>
     <question
@@ -46,7 +52,7 @@
           Show previous answers
         </b-button>
         <b-button
-          v-else-if="state === 'answer'"
+          v-else-if="!isDyadNodeAndUser && canChangeAnswer && state === 'answer'"
           variant="info"
           class="mr-auto"
           @click="state = 'activity'"
@@ -158,6 +164,12 @@ export default {
         this.getAnswers(this.questionNode.id, this.activeQuestion.id)
       ).length
     },
+    canChangeAnswer() {
+      if (this.initialType === states.ANSWER) {
+        return this.node.typeData.isEditable
+      }
+      return true
+    },
     currentQuestionTypeData() {
       return this.initialType === states.ACTIVITY
         ? {
@@ -172,7 +184,7 @@ export default {
       if (this.initialType === states.ACTIVITY) {
         if (this.hasAnswers && this.state === states.ACTIVITY) {
           this.state = states.ANSWER
-        } else if (!this.hasAnswers) {
+        } else if (!this.hasAnswers && this.node.typeData.isEditable) {
           this.state = states.ACTIVITY
         }
       }

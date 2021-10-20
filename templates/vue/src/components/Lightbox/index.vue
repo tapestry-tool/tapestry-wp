@@ -2,23 +2,19 @@
   <tapestry-modal
     id="lightbox"
     data-qa="lightbox"
-    :node-id="nodeId"
     :class="{
       'full-screen': node.fullscreen || tydeModeEnabled,
       'content-text': node.mediaType === 'text' || node.mediaType === 'wp-post',
     }"
+    :node="node"
     :content-container-style="lightboxContentStyles"
     :allow-close="canSkip && !tydeModeEnabled"
     :show-fav="!tydeModeEnabled"
     @close="handleUserClose"
   >
-    <navbar
-      v-if="tydeModeEnabled"
-      :selectedTab="selectedTab"
-      @change-tab="handleTabChange"
-    ></navbar>
+    <navbar v-if="tydeModeEnabled"></navbar>
     <div
-      v-show="selectedTab === 'default'"
+      v-show="selectedTab !== 'cos'"
       class="node-container"
       :class="{
         'multi-content': node.mediaType === 'multi-content',
@@ -106,7 +102,6 @@ export default {
       },
       showCompletionScreen: false,
       rowRefs: [],
-      selectedTab: "default",
     }
   },
   computed: {
@@ -121,6 +116,12 @@ export default {
     },
     tydeModeEnabled() {
       return !canEditTapestry() && this.settings.tydeModeEnabled
+    },
+    selectedTab() {
+      if (this.$route.query.tab) {
+        return this.$route.query.tab
+      }
+      return "default"
     },
     lightboxContentStyles() {
       const styles = {
@@ -227,7 +228,7 @@ export default {
             query: this.$route.query,
           })
         } else {
-          this.applyDimensions()
+          this.handleNodeChanged()
         }
       },
     },
@@ -266,11 +267,7 @@ export default {
   mounted() {
     document.querySelector("body").classList.add("tapestry-lightbox-open")
     DragSelectModular.removeDragSelectListener()
-    if (this.node.mediaType === "multi-content") {
-      this.$root.$on("observe-rows", refs => {
-        this.rowRefs = this.rowRefs.concat(refs)
-      })
-    }
+    this.handleNodeChanged()
   },
   beforeDestroy() {
     document.querySelector("body").classList.remove("tapestry-lightbox-open")
@@ -328,8 +325,37 @@ export default {
         height: this.lightboxDimensions.height,
       }
     },
-    handleTabChange(newTab) {
-      this.selectedTab = newTab
+    handleNodeChanged() {
+      if (
+        this.node.mediaType === "multi-content" &&
+        this.node.presentationStyle === "unit" &&
+        this.node.childOrdering?.length
+      ) {
+        const pageNode = this.getNode(this.node.childOrdering[0])
+        this.$root.$emit("open-node", pageNode.id)
+      } else {
+        this.applyDimensions()
+        if (this.node.mediaType === "multi-content") {
+          this.$root.$on("observe-rows", newRefs => {
+            if (Array.isArray(newRefs)) {
+              newRefs.forEach(newRef => {
+                if (newRef) {
+                  // We need to remove the old ref because it references
+                  // an element that has potentially been destroyed
+                  const existingRefIndex = this.rowRefs.findIndex(
+                    ref => ref && ref.id === newRef.id
+                  )
+                  if (existingRefIndex !== -1) {
+                    this.rowRefs.splice(existingRefIndex, 1)
+                  }
+                  // Add the new ref, pointing to the current ref
+                  this.rowRefs.push(newRef)
+                }
+              })
+            }
+          })
+        }
+      }
     },
   },
 }

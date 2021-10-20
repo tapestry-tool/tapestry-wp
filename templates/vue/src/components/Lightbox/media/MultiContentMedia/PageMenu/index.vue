@@ -9,6 +9,7 @@
           lightbox: !isFullScreen,
           fullscreen: isFullScreen,
           closed: !opened,
+          'is-unit-child': unitsMenuVisible,
         },
       ]"
       :style="{ height: isFullScreen ? '100vh' : dimensions.height + 'px' }"
@@ -26,6 +27,18 @@
         <i v-if="!opened" class="fas fa-bars fa-lg" style="color: black;"></i>
         <i v-else class="fas fa-times fa-lg"></i>
       </button>
+      <div v-if="unitsMenuVisible">
+        <b-dropdown class="unit-switch-dropdown" block split :text="parentNodeTitle">
+          <b-dropdown-item
+            v-for="page in pages"
+            :key="page.id"
+            @click="changePage(page.id)"
+          >
+            {{ page.title }}
+          </b-dropdown-item>
+        </b-dropdown>
+        <h5 class="pl-2 py-1 mb-4">{{ node.title }}</h5>
+      </div>
       <div
         :class="[
           'page-nav-content',
@@ -82,8 +95,8 @@ export default {
   },
   data() {
     return {
-      opened: false || this.browserWidth > 800,
-      browserWidth: Helpers.getBrowserWidth(),
+      opened: false,
+      selectedPage: this.node.id,
     }
   },
   computed: {
@@ -114,6 +127,31 @@ export default {
     },
     isFullScreen() {
       return this.fullScreen || this.node.fullscreen
+    },
+    pages() {
+      if (
+        this.parentNode?.mediaType === "multi-content" &&
+        this.parentNode?.presentationStyle === "unit"
+      ) {
+        return this.parentNode.childOrdering.reduce((pages, nodeId) => {
+          const node = this.getNode(nodeId)
+          pages[nodeId] = {
+            id: node.id,
+            title: node.title,
+          }
+          return pages
+        }, {})
+      }
+      return {}
+    },
+    browserWidth() {
+      return Helpers.getBrowserWidth()
+    },
+    unitsMenuVisible() {
+      if (!this.pages) {
+        return false
+      }
+      return this.opened || (this.browserWidth > 800 && this.node.fullscreen)
     },
   },
   mounted() {

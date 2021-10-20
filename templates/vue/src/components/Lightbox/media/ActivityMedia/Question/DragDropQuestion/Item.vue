@@ -68,7 +68,7 @@ export default {
   background-position: center;
   background-repeat: no-repeat;
   text-align: center;
-  padding: 40px 0;
+  padding: 10px 0;
   margin: auto;
 }
 </style>
