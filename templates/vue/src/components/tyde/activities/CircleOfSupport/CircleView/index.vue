@@ -7,15 +7,16 @@
       :communities="communities"
       :toolTipPositioned="toolTipPositioned"
       :draggable="!dragDisabled"
-      @back="handleBack"
-      @add-connection="handleConnectionOpen"
-      @edit-connection="handleEditConnection"
+      @connection-submitted="$emit('connection-submitted')"
       @add-community="$emit('add-community', $event)"
       @delete-connection="$emit('delete-connection', $event)"
+      @back="handleBack"
+      @add-connection="handleAddConnection"
+      @connection-opened="handleConnectionOpened"
+      @edit-connection="handleEditConnection"
       @drag:start="handleDragStart"
       @drag:move="handleDragMove"
       @drag:end="handleDragEnd"
-      @connection-submitted="$emit('connection-submitted')"
       @connection-closed="handleConnectionClosed"
     />
     <li
@@ -97,6 +98,7 @@
     <onboarding
       :communities="communities"
       :connections="connections"
+      :circles="circles"
       :has-connection-in-circles="hasConnectionInCircles"
       :parent-state="state"
       :activeView="activeView"
@@ -132,6 +134,7 @@ const States = {
   ConnectionClosed: 4,
   AddConnection: 5,
   MoveConnection: 6,
+  ConnectionOpened: 7,
 }
 
 export default {
@@ -422,9 +425,12 @@ export default {
         )
       )
     },
-    handleConnectionOpen(event) {
+    handleAddConnection(event) {
       this.state = States.AddConnection
       this.$emit("add-connection", event)
+    },
+    handleConnectionOpened() {
+      this.state = States.ConnectionOpened
     },
     handleConnectionClosed() {
       if (this.state === States.ConnectionClosed) {

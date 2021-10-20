@@ -2,11 +2,16 @@ import { createMachine } from "xstate"
 
 export const OnboardingStates = {
   Welcome: "Welcome",
-  MoveConnections: "MoveConnections",
-  AddMoreConfirmation: "AddMoreConfirmation",
   AddLaterTooltip: "AddLaterTooltip",
   AddAnotherTooltip: "AddAnotherTooltip",
   ToggleRingsTooltip: "ToggleRingsTooltip",
+  MoveConnections: "MoveConnections",
+  LetsAddConnections: "LetsAddConnections",
+  WaitToOpenConnectionsTab: "WaitToOpenConnectionsTab",
+  WaitForConnectionTabToClose: "WaitForConnectionTabToClose",
+  MoveConnectionToCirclesFinish: "MoveConnectionToCirclesFinish",
+  MoveBetweenCircles: "MoveBetweenCircles",
+  AddMoreConfirmation: "AddMoreConfirmation",
   Form: "Form",
   FormClosed: "FormClosed",
   Finish: "Finish",
@@ -125,37 +130,40 @@ const onboardingMachine = createMachine({
       states: {
         Welcome: {
           on: {
-            [Events.Continue]: OnboardingStates.MoveConnections,
+            [Events.Continue]: OnboardingStates.LetsAddConnections,
           },
         },
-        MoveConnections: {
+        LetsAddConnections: {
           on: {
             [Events.Continue]: OnboardingStates.AddAnotherTooltip,
           },
         },
         AddAnotherTooltip: {
           on: {
-            [Events.Add]: OnboardingStates.Form,
-            [Events.Added]: OnboardingStates.FormClosed,
+            [Events.Continue]: OnboardingStates.WaitToOpenConnectionsTab,
           },
         },
-        Form: {
+        WaitToOpenConnectionsTab: {
           on: {
-            [Events.Added]: OnboardingStates.FormClosed,
+            [Events.Continue]: OnboardingStates.MoveConnections,
           },
         },
-        FormClosed: {
+        MoveConnections: {
           on: {
-            [Events.Continue]: OnboardingStates.AddMoreConfirmation,
+            [Events.Continue]: OnboardingStates.WaitForConnectionTabToClose,
           },
         },
-        AddMoreConfirmation: {
+        WaitForConnectionTabToClose: {
           on: {
-            [Events.AddAnother]: OnboardingStates.Form,
-            [Events.AddLater]: OnboardingStates.AddLaterTooltip,
+            [Events.Continue]: OnboardingStates.MoveConnectionToCirclesFinish,
           },
         },
-        AddLaterTooltip: {
+        MoveConnectionToCirclesFinish: {
+          on: {
+            [Events.Continue]: OnboardingStates.MoveBetweenCircles,
+          },
+        },
+        MoveBetweenCircles: {
           on: {
             [Events.Continue]: OnboardingStates.ToggleRingsTooltip,
           },
