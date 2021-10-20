@@ -342,9 +342,9 @@ class Tapestry implements ITapestry
         return empty($this->rootId);
     }
 
-    public function setUnlocked($nodeIds)
+    public function setUnlocked($nodeIds, $userId = 0)
     {
-        $nodes = $this->_setAccessibleStatus($nodeIds);
+        $nodes = $this->_setAccessibleStatus($nodeIds, $userId);
 
         return array_map(
             function ($nodeData) {
@@ -354,7 +354,6 @@ class Tapestry implements ITapestry
                 $data->accessible = $nodeData->accessible;
                 $data->conditions = $nodeData->conditions;
                 $data->unlocked = $nodeData->unlocked;
-                $data->isDyad = $nodeData->isDyad;
 
                 return $data;
             },
@@ -409,17 +408,16 @@ class Tapestry implements ITapestry
         ];
     }
 
-    private function _setAccessibleStatus($nodes)
+    private function _setAccessibleStatus($nodes, $userId)
     {
         $newNodes = array_map(
-            function ($nodeId) {
+            function ($nodeId) use ($userId) {
                 $node = new TapestryNode($this->postId, $nodeId);
                 $data = new stdClass();
                 $data->id = $nodeId;
                 $data->accessible = false;
-                $data->unlocked = !$node->isLocked();
-                $data->conditions = $node->getLockedState();
-                $data->isDyad = $node->isDyad();
+                $data->unlocked = !$node->isLocked($userId);
+                $data->conditions = $node->getLockedState($userId);
 
                 return $data;
             },
@@ -433,14 +431,13 @@ class Tapestry implements ITapestry
                     break;
                 }
             }
-            $this->_recursivelySetAccessibleAndDyad($root, [], [], $newNodes);
+            $this->_recursivelySetAccessible($root, [], $newNodes);
         }
 
         return $newNodes;
     }
 
-    // Note: This also sets the isDyad node recursively
-    private function _recursivelySetAccessibleAndDyad($node, $visited, $dyadNodes, $nodeList)
+    private function _recursivelySetAccessible($node, $visited, $nodeList)
     {
         if (!isset($node)) {
             return;
@@ -448,25 +445,6 @@ class Tapestry implements ITapestry
         if (!in_array($node, $visited)) {
             array_push($visited, $node);
         }
-
-        // If this node is in the list of dyadNodes, mark it as dyad
-        if (in_array($node->id, $dyadNodes)) {
-            $node->isDyad = true;
-            if (($key = array_search($node->id, $dyadNodes)) !== false) {
-                unset($dyadNodes[$key]);
-            }
-        }
-
-        // If this node is dyad, save its children to be marked as dyad too
-        if ($node->isDyad) {
-            $childNodes = $this->_getNeighbours($node, 'source');
-            foreach ($childNodes as $childNode) {
-                if (!in_array($childNode, $dyadNodes)) {
-                    array_push($dyadNodes, $childNode);
-                }
-            }
-        }
-
         $node->accessible = $node->unlocked;
         if ($node->accessible) {
             $neighbourIds = $this->_getNeighbours($node);
@@ -484,19 +462,18 @@ class Tapestry implements ITapestry
             foreach ($neighbours as $neighbour) {
                 if (!in_array($neighbour, $visited)) {
                     array_push($visited, $neighbour);
-                    $this->_recursivelySetAccessibleAndDyad($neighbour, $visited, $dyadNodes, $nodeList);
+                    $this->_recursivelySetAccessible($neighbour, $visited, $nodeList);
                 }
             }
         }
     }
 
-    private function _getNeighbours($node, $from = 'both')
+    private function _getNeighbours($node)
     {
         $neighbourIds = [];
 
         foreach ($this->links as $link) {
-            if ((in_array($from, ['both', 'source']) && $link->source === $node->id) ||
-                (in_array($from, ['both', 'target']) && $link->target === $node->id)) {
+            if ($link->source === $node->id || $link->target === $node->id) {
                 array_push(
                     $neighbourIds,
                     $link->source === $node->id ? $link->target : $link->source

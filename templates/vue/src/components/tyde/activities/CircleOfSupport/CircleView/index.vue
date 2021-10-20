@@ -5,15 +5,19 @@
       class="tab"
       :connections="connections"
       :communities="communities"
+      :toolTipPositioned="toolTipPositioned"
       :draggable="!dragDisabled"
-      @back="handleBack"
-      @add-connection="$emit('add-connection', $event)"
-      @edit-connection="handleEditConnection"
+      @connection-submitted="$emit('connection-submitted')"
       @add-community="$emit('add-community', $event)"
       @delete-connection="$emit('delete-connection', $event)"
+      @back="handleBack"
+      @add-connection="handleAddConnection"
+      @connection-opened="handleConnectionOpened"
+      @edit-connection="handleEditConnection"
       @drag:start="handleDragStart"
       @drag:move="handleDragMove"
       @drag:end="handleDragEnd"
+      @connection-closed="handleConnectionClosed"
     />
     <li
       v-for="(circle, index) in circlesWithData"
@@ -91,6 +95,16 @@
       :topType="currentAvatar.topType"
       :topColor="currentAvatar.topColor"
     ></avataaars>
+    <onboarding
+      :communities="communities"
+      :connections="connections"
+      :circles="circles"
+      :has-connection-in-circles="hasConnectionInCircles"
+      :parent-state="state"
+      :activeView="activeView"
+      @tooltip-positioned="handleToolTipPositioned"
+      @tooltip-removed="handleTooltipRemoved"
+    />
   </ul>
 </template>
 
@@ -99,6 +113,7 @@ import Twemoji from "twemoji"
 import avatarOptions from "@/components/modals/UserSettingsModal/avatarOptions.js"
 import Helpers from "@/utils/Helpers"
 import client from "@/services/TapestryAPI"
+import OnBoarding from "../onboarding/index.vue"
 import ConnectionsTab from "../ConnectionsTab"
 import ConnectionTooltip from "../ConnectionTooltip"
 import SingleConnection from "../SingleConnection"
@@ -116,6 +131,10 @@ const USER_AVATAR_SPACE = 20
 const States = {
   Home: 0,
   EditConnection: 1,
+  ConnectionClosed: 4,
+  AddConnection: 5,
+  MoveConnection: 6,
+  ConnectionOpened: 7,
 }
 
 export default {
@@ -124,6 +143,7 @@ export default {
     CircleToggle,
     ConnectionTooltip,
     SingleConnection,
+    onboarding: OnBoarding,
     Avataaars,
   },
   model: {
@@ -143,14 +163,24 @@ export default {
       type: Array,
       required: true,
     },
+    activeView: {
+      type: Number,
+      required: true,
+    },
+    hasConnectionInCircles: {
+      type: Boolean,
+      required: true,
+    },
   },
   data() {
     return {
       activeCircle: CircleStates.All,
       activeCircleOrig: null,
       state: States.Home,
+      lastState: States.Home,
       activeConnectionId: null,
       draggingConnection: null,
+      toolTipPositioned: false,
       dragDisabled: false,
     }
   },
@@ -203,6 +233,11 @@ export default {
       })
     },
   },
+  watch: {
+    state(_, lastState) {
+      this.lastState = lastState
+    },
+  },
   methods: {
     getCircleBackground(index) {
       if (this.activeCircle === index) {
@@ -227,6 +262,7 @@ export default {
       }, 150)
     },
     handleDragMove({ x, y }) {
+      this.state = States.MoveConnection
       const connectionRef = this.$refs["dragging-connection"]
       connectionRef.style.setProperty("--x", `${x}px`)
       connectionRef.style.setProperty("--y", `${y}px`)
@@ -254,7 +290,6 @@ export default {
         connectionRef.style.setProperty("--x", `0px`)
         connectionRef.style.setProperty("--y", `0px`)
         this.draggingConnection = null
-
         setTimeout(() => this.$refs.connectionsTab.show(), 300)
       } else {
         this.activeCircle = this.activeCircleOrig
@@ -389,6 +424,26 @@ export default {
           document.getElementById("cos")
         )
       )
+    },
+    handleAddConnection(event) {
+      this.state = States.AddConnection
+      this.$emit("add-connection", event)
+    },
+    handleConnectionOpened() {
+      this.state = States.ConnectionOpened
+    },
+    handleConnectionClosed() {
+      if (this.state === States.ConnectionClosed) {
+        this.state === States.Home
+      } else {
+        this.state = States.ConnectionClosed
+      }
+    },
+    handleToolTipPositioned() {
+      this.toolTipPositioned = true
+    },
+    handleTooltipRemoved() {
+      this.toolTipPositioned = false
     },
   },
 }

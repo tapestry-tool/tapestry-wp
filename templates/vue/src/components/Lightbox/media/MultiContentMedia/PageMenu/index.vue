@@ -48,7 +48,7 @@
           },
         ]"
       >
-        <ul class="page-menu-items fa-ul">
+        <ul class="page-menu-item fa-ul">
           <page-menu-item
             v-for="row in rows"
             :key="row.node.id"
@@ -100,21 +100,9 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getDirectChildren", "getNode", "isMultiContent", "getParent"]),
+    ...mapGetters(["getDirectChildren", "getNode", "isMultiContent"]),
     nodeId() {
       return parseInt(this.$route.params.nodeId, 10)
-    },
-    parentNode() {
-      const parentNodeId = this.getParent(this.node.id)
-      return this.getNode(parentNodeId)
-    },
-    parentNodeTitle() {
-      return this.parentNode?.title ? this.parentNode.title : ""
-    },
-    currentPageTitle() {
-      return this.pages[this.selectedPage]?.title
-        ? this.pages[this.selectedPage]?.title
-        : ""
     },
     rows() {
       return this.node.childOrdering
@@ -201,10 +189,6 @@ export default {
       }
       return nodes
     },
-    changePage(pageNodeId) {
-      this.selectedPage = pageNodeId
-      this.$root.$emit("open-node", pageNodeId)
-    },
     scrollToRef(nodeId) {
       this.$nextTick(() => {
         if (this.rowRefs) {
@@ -270,11 +254,6 @@ export default {
       }
     }
 
-    &.is-unit-child {
-      width: 250px;
-      max-width: 25vw;
-    }
-
     @media screen and (min-width: 960px) {
       font-size: calc(14px + (2 * (100vw - 960px) / 1280px - 960px));
     }
@@ -295,6 +274,10 @@ export default {
       }
     }
 
+    .page-nav-title {
+      margin-bottom: 1em;
+    }
+
     .page-nav-container {
       text-align: left;
     }
@@ -311,59 +294,9 @@ export default {
           }
         }
       }
+
       &.closed {
         display: none;
-      }
-
-      .page-menu-items {
-        margin-left: 2em;
-        margin-right: -0.5em;
-      }
-    }
-  }
-}
-</style>
-
-<style lang="scss">
-.unit-switch-dropdown {
-  margin: 1.2rem -24px !important;
-  button {
-    border-radius: 0;
-    background: #fff2;
-    border-color: #fff1;
-    &:hover {
-      background: transparent;
-      border-color: transparent;
-    }
-    &:first-child {
-      text-align: left;
-      padding-left: 30px;
-      font-size: 1.6em;
-      font-weight: bold;
-    }
-  }
-  .dropdown-menu {
-    width: calc(100% - 10px);
-    margin-top: 5px;
-
-    &::after {
-      content: "";
-      position: absolute;
-      width: 0;
-      height: 0;
-      border: solid 7px #fff;
-      border-bottom-width: 8px;
-      border-left-color: transparent;
-      border-right-color: transparent;
-      border-top-color: transparent;
-      top: -15px;
-      right: 2px;
-    }
-
-    > li {
-      line-height: 1.75em !important;
-      a {
-        white-space: normal !important;
       }
     }
   }

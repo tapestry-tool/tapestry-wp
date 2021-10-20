@@ -110,6 +110,8 @@ export default {
         if (this.isOpen) {
           this.state = States.Home
           this.$emit("connection-closed")
+        } else {
+          this.$emit("connection-opened")
         }
         this.isOpen = !this.isOpen
       }

@@ -34,6 +34,8 @@
       :communities="communities"
       :connections="connections"
       :parent-state="state"
+      :active-view="activeView"
+      :has-connection-in-circles="hasConnectionInCircles"
       @tooltip-positioned="handleToolTipPositioned"
       @tooltip-removed="handleTooltipRemoved"
       @add-community="$emit('add-community', $event)"
@@ -42,7 +44,7 @@
 </template>
 
 <script>
-import OnBoarding from "./onboarding/index.vue"
+import OnBoarding from "../onboarding/index.vue"
 import AddCommunityTab from "./AddCommunityTab"
 import ConnectionsTab from "../ConnectionsTab"
 import CommunitiesList from "./CommunitiesList"
@@ -69,6 +71,14 @@ export default {
     },
     communities: {
       type: Object,
+      required: true,
+    },
+    activeView: {
+      type: Number,
+      required: true,
+    },
+    hasConnectionInCircles: {
+      type: Boolean,
       required: true,
     },
   },

@@ -389,15 +389,9 @@ export default class Helpers {
       unlocked: true,
       accessible: true,
       reviewComments: [],
-      isDyad: false,
       popup: null,
     }
     return Helpers.deepMerge(baseNode, overrides)
-  }
-
-  static nodeAndUserAreDyad(node) {
-    let roles = wp.getCurrentUser().roles
-    return !node.isDyad ? false : roles.includes("dyad")
   }
   /**
    * Positions the tooltip to the given target.

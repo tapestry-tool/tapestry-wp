@@ -265,12 +265,11 @@ button[disabled] {
   }
 }
 
-.col-lg-6,
+.col-6,
 .page-rows {
   margin-right: -15px;
-  overflow-x: hidden;
 }
-.col-lg-12 {
+.col-12 {
   max-width: calc(100% - 15px);
 }
 

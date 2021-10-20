@@ -106,14 +106,10 @@ export default {
   },
   computed: {
     ...mapState(["h5pSettings", "rootId", "settings"]),
-    ...mapGetters(["getNode", "getParent", "isMultiContent", "isMultiContentRow"]),
+    ...mapGetters(["getNode", "isMultiContent", "isMultiContentRow"]),
     node() {
       const node = this.getNode(this.nodeId)
       return node
-    },
-    parentNode() {
-      const parentNodeId = this.getParent(this.node.id)
-      return this.getNode(parentNodeId)
     },
     canSkip() {
       return this.node.completed || this.node.skippable !== false
@@ -301,16 +297,9 @@ export default {
       this.close()
     },
     close() {
-      let selectedNode = this.nodeId
-      if (
-        this.parentNode?.mediaType === "multi-content" &&
-        this.parentNode?.presentationStyle === "unit"
-      ) {
-        selectedNode = this.parentNode.id
-      }
       this.$router.push({
         name: names.APP,
-        params: { nodeId: selectedNode },
+        params: { nodeId: this.nodeId },
         query: this.$route.query,
       })
     },
