@@ -2,17 +2,20 @@
   <tapestry-modal
     id="lightbox"
     data-qa="lightbox"
-    :class="{
-      'full-screen': node.fullscreen || tydeModeEnabled,
-      'content-text': node.mediaType === 'text' || node.mediaType === 'wp-post',
-    }"
+    :class="[
+      'node-' + node.id,
+      {
+        'full-screen': node.fullscreen || settings.tydeModeEnabled,
+        'content-text': node.mediaType === 'text' || node.mediaType === 'wp-post',
+      },
+    ]"
     :node="node"
     :content-container-style="lightboxContentStyles"
-    :allow-close="canSkip && !tydeModeEnabled"
-    :show-fav="!tydeModeEnabled"
+    :allow-close="canSkip && (!settings.tydeModeEnabled || canEditTapestry)"
+    :show-fav="!settings.tydeModeEnabled"
     @close="handleUserClose"
   >
-    <navbar v-if="tydeModeEnabled"></navbar>
+    <navbar v-if="settings.tydeModeEnabled"></navbar>
     <div
       v-show="selectedTab !== 'cos'"
       class="node-container"
@@ -25,7 +28,7 @@
         v-if="node.mediaType === 'multi-content'"
         :node="node"
         :row-id="rowId"
-        :class="{ 'has-navbar': tydeModeEnabled }"
+        :class="{ 'has-navbar': settings.tydeModeEnabled }"
         :sub-row-id="subRowId"
         @close="handleAutoClose"
         @complete="complete"
@@ -35,14 +38,14 @@
         :node="node"
         :rowRefs="rowRefs"
         :dimensions="dimensions"
-        :full-screen="tydeModeEnabled"
+        :full-screen="settings.tydeModeEnabled"
       />
       <tapestry-media
         v-if="node.mediaType !== 'multi-content'"
         :node-id="nodeId"
         :dimensions="dimensions"
         context="lightbox"
-        :class="{ 'has-navbar': tydeModeEnabled }"
+        :class="{ 'has-navbar': settings.tydeModeEnabled }"
         @load="handleLoad"
         @close="handleAutoClose"
         @complete="complete"
@@ -118,8 +121,8 @@ export default {
     canSkip() {
       return this.node.completed || this.node.skippable !== false
     },
-    tydeModeEnabled() {
-      return !canEditTapestry() && this.settings.tydeModeEnabled
+    canEditTapestry() {
+      return canEditTapestry()
     },
     selectedTab() {
       if (this.$route.query.tab) {
@@ -135,7 +138,7 @@ export default {
         height: this.dimensions.height + "px",
       }
 
-      if (this.node.fullscreen || this.tydeModeEnabled) {
+      if (this.node.fullscreen || this.settings.tydeModeEnabled) {
         styles.top = "auto"
         styles.left = "auto"
         styles.width = "100vw"

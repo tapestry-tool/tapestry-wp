@@ -20,6 +20,7 @@
       </b-navbar-nav>
     </b-navbar>
     <user-settings-button
+      v-if="!canEditTapestry"
       icon-class="fas fa-cog fa-s"
       class="user-settings-button"
     ></user-settings-button>
@@ -31,7 +32,7 @@ import { mapState } from "vuex"
 import TydeIcon from "./TydeIcon.vue"
 import UserSettingsButton from "../Toolbar/UserSettingsButton"
 import { names } from "@/config/routes"
-import { getCurrentUser } from "@/services/wp"
+import { getCurrentUser, canEditTapestry } from "@/services/wp"
 
 export default {
   name: "navbar",
@@ -65,6 +66,9 @@ export default {
         defaultNodeId = this.settings.tydeModeTabs.default[userMainRole]
       }
       return defaultNodeId
+    },
+    canEditTapestry() {
+      return canEditTapestry()
     },
   },
   mounted() {
@@ -104,11 +108,11 @@ export default {
 
 <style lang="scss" scoped>
 .nav-container {
-  width: 100vw;
   z-index: 9999;
   position: fixed !important;
   top: 40px;
-  left: 0;
+  left: 50%;
+  transform: translateX(-50%);
 
   .navbar {
     min-width: 250px;
