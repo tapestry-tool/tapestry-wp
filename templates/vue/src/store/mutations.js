@@ -176,8 +176,12 @@ export function setReturnRoute(state, route) {
   state.returnRoute = route
 }
 
-// avatar
+// TYDE
 
 export function addAvatar(state, newAvatar) {
   state.avatar = newAvatar
+}
+
+export function addCos(state, cos) {
+  state.cos = cos
 }

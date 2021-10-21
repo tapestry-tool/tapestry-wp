@@ -77,34 +77,38 @@ export default {
       client.getUserProgress(),
       client.getLastSelectedNode(),
       client.getAvatar(),
+      client.cos.getActivity(),
     ]
-    Promise.all(data).then(([dataset, progress, selectedNode, savedAvatar]) => {
-      this.init({ dataset, progress })
-      this.addAvatar(savedAvatar.data)
-      this.loading = false
-      if (!this.$route.params.nodeId && dataset.nodes.length > 0) {
-        let path = `/nodes/${dataset.rootId}`
-        if (selectedNode) {
-          path = `/nodes/${selectedNode.nodeId}`
-          if (selectedNode.rowId) {
-            path = `${path}/view/${selectedNode.rowId}`
-            if (selectedNode.subRowId) {
-              path = `${path}/rows/${selectedNode.subRowId}`
+    Promise.all(data).then(
+      ([dataset, progress, selectedNode, savedAvatar, savedCos]) => {
+        this.init({ dataset, progress })
+        this.addAvatar(savedAvatar)
+        this.addCos(savedCos)
+        this.loading = false
+        if (!this.$route.params.nodeId && dataset.nodes.length > 0) {
+          let path = `/nodes/${dataset.rootId}`
+          if (selectedNode) {
+            path = `/nodes/${selectedNode.nodeId}`
+            if (selectedNode.rowId) {
+              path = `${path}/view/${selectedNode.rowId}`
+              if (selectedNode.subRowId) {
+                path = `${path}/rows/${selectedNode.subRowId}`
+              }
             }
           }
+          this.$router.replace({
+            path,
+            query: this.$route.query,
+          })
         }
-        this.$router.replace({
-          path,
-          query: this.$route.query,
-        })
       }
-    })
+    )
   },
   beforeDestroy() {
     window.removeEventListener("click", this.recordAnalytics)
   },
   methods: {
-    ...mapMutations(["init", "addAvatar"]),
+    ...mapMutations(["init", "addAvatar", "addCos"]),
     refresh() {
       this.$router.go()
     },

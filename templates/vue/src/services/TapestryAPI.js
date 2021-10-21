@@ -218,7 +218,7 @@ class TapestryApi {
   async getAvatar() {
     const url = `/users/userSettings/avatar`
     const response = await this.client.get(url)
-    return response
+    return response.data
   }
 
   async updateUserSettings(userSettings) {

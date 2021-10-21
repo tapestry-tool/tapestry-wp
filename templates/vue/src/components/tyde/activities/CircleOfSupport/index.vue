@@ -42,7 +42,7 @@
 </template>
 
 <script>
-import client from "@/services/TapestryAPI"
+import { mapState } from "vuex"
 import Loading from "@/components/common/Loading"
 import CommunityView from "./CommunityView"
 import CircleView from "./CircleView"
@@ -62,30 +62,28 @@ export default {
     return {
       isLoading: true,
       view: CosView.Community,
-      cos: {
-        circles: [],
-        communities: {},
-        connections: {},
-      },
     }
   },
   computed: {
+    ...mapState(["cos"]),
     views() {
       return CosView
     },
   },
   async mounted() {
-    const { circles, communities, connections } = await client.cos.getActivity()
+    this.$nextTick(() => {
+      const { circles, communities, connections } = this.cos
 
-    circles.forEach(circle => this.cos.circles.push(circle))
-    Object.entries(communities).forEach(([id, community]) =>
-      this.$set(this.cos.communities, id, community)
-    )
-    Object.entries(connections).forEach(([id, connection]) =>
-      this.$set(this.cos.connections, id, connection)
-    )
+      circles.forEach(circle => this.cos.circles.push(circle))
+      Object.entries(communities).forEach(([id, community]) =>
+        this.$set(this.cos.communities, id, community)
+      )
+      Object.entries(connections).forEach(([id, connection]) =>
+        this.$set(this.cos.connections, id, connection)
+      )
 
-    this.isLoading = false
+      this.isLoading = false
+    })
   },
   methods: {
     addConnection({ communities, ...newConnection }) {
