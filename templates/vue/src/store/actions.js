@@ -105,9 +105,14 @@ export async function updateLockedStatus({ commit, getters, dispatch }) {
   }
 }
 
-export async function updateNodeProgress({ commit, dispatch }, payload) {
+export async function updateNodeProgress({ commit, dispatch, getters }, payload) {
   try {
     const { id, progress } = payload
+
+    const node = getters.getNode(id)
+    if (node.completed || node.progress === progress) {
+      return
+    }
 
     if (!wp.isLoggedIn()) {
       const progressObj = JSON.parse(localStorage.getItem(LOCAL_PROGRESS_ID))
@@ -142,6 +147,11 @@ export async function updateNodeCoordinates(
 export async function completeNode(context, nodeId) {
   const { commit, dispatch, getters } = context
   try {
+    const node = getters.getNode(nodeId)
+    if (node.completed) {
+      return
+    }
+
     if (!wp.isLoggedIn()) {
       const progressObj = JSON.parse(localStorage.getItem(LOCAL_PROGRESS_ID))
       const nodeProgress = progressObj[nodeId] || {}
@@ -155,7 +165,6 @@ export async function completeNode(context, nodeId) {
       newNode: { completed: true },
     })
 
-    const node = getters.getNode(nodeId)
     if (node.mediaType !== "video") {
       await dispatch("updateNodeProgress", {
         id: nodeId,

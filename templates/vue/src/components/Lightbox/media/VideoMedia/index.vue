@@ -47,7 +47,7 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from "vuex"
+import { mapGetters } from "vuex"
 
 import UrlVideoMedia from "./UrlVideoMedia"
 import H5PVideoMedia from "./H5PVideoMedia"
@@ -169,7 +169,6 @@ export default {
     },
   },
   methods: {
-    ...mapActions(["completeNode"]),
     /**
      * This function calculates the next state given the current state and the event
      * name, as well as perform any necessary side effects.
