@@ -73,7 +73,7 @@ export default {
       this.$emit("close")
     },
     saveTheme() {
-      this.$refs.ThemeForm.saveTheme()
+      this.$refs.themeForm.saveTheme()
       this.$emit("close")
     },
   },
