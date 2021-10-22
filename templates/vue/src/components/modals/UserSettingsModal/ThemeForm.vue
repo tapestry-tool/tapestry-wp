@@ -48,13 +48,3 @@ export default {
   },
 }
 </script>
-
-<style scoped>
-.title {
-  text-align: center;
-}
-
-.customizer {
-  margin-top: 50px;
-}
-</style>
