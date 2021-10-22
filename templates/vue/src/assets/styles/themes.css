@@ -1,7 +1,6 @@
 [data-theme="dark"] {
-    --bg-color-primary: #111;
-    --bg-color-secondary: #262626;
-    --bg-color-tertiary: #383838;
+    --bg-color-primary: #262626;
+    --bg-color-secondary: #444;
     --bg-color-layered: #ffffff11;
     --text-color-primary: #eee;
     --text-color-secondary: #ccc;
@@ -12,7 +11,6 @@
 [data-theme="light"] {
     --bg-color-primary: #eee;
     --bg-color-secondary: #ddd;
-    --bg-color-tertiary: #c3c3c3;
     --bg-color-layered: #00000011;
     --text-color-primary: #111;
     --text-color-secondary: #262626;
