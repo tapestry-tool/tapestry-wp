@@ -261,6 +261,7 @@ button[disabled] {
 
   .trigger-row-btn {
     background: none;
+    color: var(--text-color-primary);
     width: 100%;
     text-align: left;
     i {

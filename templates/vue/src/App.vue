@@ -157,6 +157,10 @@ html {
     .site-title a:visited {
       color: var(--text-color-secondary);
     }
+    a:link,
+    a:visited {
+      color: var(--highlight-color);
+    }
   }
 
   #app {
