@@ -16,7 +16,7 @@
           :active="tab === 'theme'"
           @click="$emit('change:tab', 'theme')"
         ></b-tab>
-        <theme-form ref="ThemeForm"></theme-form>
+        <theme-form ref="themeForm"></theme-form>
       </b-tabs>
     </b-container>
     <template slot="modal-footer">
