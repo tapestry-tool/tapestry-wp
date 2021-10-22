@@ -1,6 +1,6 @@
 <template>
   <loading v-if="loading" data-qa="tapestry-loading" style="height: 75vh;"></loading>
-  <div v-else id="app" class="primary-text">
+  <div v-else id="app">
     <tapestry-app></tapestry-app>
     <router-view name="lightbox"></router-view>
     <router-view name="linkmodal"></router-view>
@@ -84,7 +84,25 @@ export default {
     ]
     Promise.all(data).then(([dataset, progress, selectedNode, theme]) => {
       this.changeTheme(theme.data)
-      document.documentElement.setAttribute("data-theme", this.getTheme)
+      if (this.getTheme == "system") {
+        const isDarkMode =
+          window.matchMedia &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches
+        document.documentElement.setAttribute(
+          "data-theme",
+          isDarkMode ? "dark" : "light"
+        )
+        window
+          .matchMedia("(prefers-color-scheme: dark)")
+          .addEventListener("change", e => {
+            document.documentElement.setAttribute(
+              "data-theme",
+              e.matches ? "dark" : "light"
+            )
+          })
+      } else {
+        document.documentElement.setAttribute("data-theme", this.getTheme)
+      }
 
       this.init({ dataset, progress })
       this.loading = false
@@ -133,7 +151,16 @@ export default {
 html {
   font-size: 100%;
 
+  body.single-tapestry {
+    background: var(--bg-color-primary);
+    .site-title a:link,
+    .site-title a:visited {
+      color: var(--text-color-secondary);
+    }
+  }
+
   #app {
+    color: var(--text-color-primary);
     font-family: "Avenir", Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;

@@ -42,7 +42,7 @@ export default {
     fillColor: {
       type: String,
       required: false,
-      default: "#11a6d8",
+      default: "var(--highlight-color)",
     },
     draft: {
       type: Boolean,

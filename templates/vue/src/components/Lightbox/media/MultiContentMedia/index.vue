@@ -320,7 +320,7 @@ button[disabled] {
   margin: 0 auto;
   overflow: auto;
   overflow-x: hidden;
-  scrollbar-color: auto var(--text-color);
+  scrollbar-color: auto var(--text-color-primary);
   scrollbar-width: none;
 
   ::-webkit-scrollbar-track {
@@ -354,7 +354,7 @@ button[disabled] {
   }
 
   &:hover {
-    color: #11a6d8;
+    color: var(--highlight-color);
   }
 
   p {

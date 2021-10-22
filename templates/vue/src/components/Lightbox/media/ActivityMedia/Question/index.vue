@@ -286,8 +286,8 @@ export default {
     border-radius: 50%;
     width: 80px;
     height: 80px;
-    background: var(--text-color);
-    color: var(--primary-background-color);
+    background: var(--text-color-primary);
+    color: var(--bg-color-primary);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -302,7 +302,7 @@ export default {
     z-index: 20;
 
     &:hover {
-      background: #11a6d8;
+      background: var(--highlight-color);
       opacity: 1;
     }
 

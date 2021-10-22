@@ -88,23 +88,31 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
 .toolbar {
   display: flex;
   justify-content: space-between;
   padding: 0 5vw;
   transition: all 0.2s ease-out;
-}
-.slider-wrapper {
-  background: #fbfbfb;
-  box-shadow: 0 0 7px 0 #ddd;
-  display: flex;
-  align-items: center;
-  border-radius: 4px;
-  border-bottom-right-radius: 0;
-  border-bottom-left-radius: 0;
-  padding: 8px 6px 8px 12px;
-  margin-left: auto;
-  position: relative;
+
+  .slider-wrapper {
+    background: var(--bg-color-secondary);
+    box-shadow: 0 0 7px 0 var(--bg-color-primary);
+    display: flex;
+    align-items: center;
+    border-radius: 4px;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+    padding: 8px 6px 8px 12px;
+    margin-left: auto;
+    position: relative;
+
+    button {
+      color: var(--text-color-tertiary);
+      &:hover {
+        color: var(--highlight-color);
+      }
+    }
+  }
 }
 </style>

@@ -27,6 +27,7 @@ export default {
       options: [
         { text: "Light Mode", value: "light" },
         { text: "Dark Mode", value: "dark" },
+        { text: "System", value: "system" },
       ],
     }
   },

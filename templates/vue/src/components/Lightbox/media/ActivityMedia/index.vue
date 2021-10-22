@@ -334,7 +334,7 @@ export default {
   }
 
   &:hover {
-    color: #11a6d8;
+    color: var(--highlight-color);
   }
 
   p {
@@ -352,8 +352,8 @@ export default {
   border-radius: 50%;
   height: 56px;
   width: 56px;
-  background: var(--text-color);
-  color: var(--primary-background-color);
+  background: var(--text-color-primary);
+  color: var(--bg-color-primary);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -364,7 +364,7 @@ export default {
   transition: all 0.1s ease-out;
 
   &:hover {
-    background: #11a6d8;
+    background: var(--highlight-color);
   }
 
   &:disabled {

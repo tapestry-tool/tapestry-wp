@@ -357,7 +357,7 @@ body.tapestry-lightbox-open {
 
 #lightbox {
   &.full-screen {
-    background: var(--primary-background-color);
+    background: var(--bg-color-primary);
 
     .close-btn {
       position: fixed;

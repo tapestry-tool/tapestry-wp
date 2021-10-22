@@ -66,8 +66,8 @@ export default {
 button,
 button:active,
 button:focus {
-  background: var(--text-color);
-  color: var(--primary-background-color);
+  background: var(--text-color-primary);
+  color: var(--bg-color-primary);
   padding: 0;
   margin: 0;
   margin-right: 24px;
@@ -94,7 +94,7 @@ button:focus {
   }
 
   &:hover {
-    background-color: #11a6d8;
+    background-color: var(--highlight-color);
   }
 
   > * {

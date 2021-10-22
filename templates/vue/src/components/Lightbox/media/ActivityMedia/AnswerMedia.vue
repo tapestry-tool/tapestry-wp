@@ -97,15 +97,15 @@ export default {
 </script>
 <style lang="scss">
 .nav-tablist a {
-  color: var(--text-color);
+  color: var(--text-color-primary);
   &.active {
-    color: var(--text-color);
+    color: var(--text-color-primary);
   }
 }
 </style>
 <style lang="scss" scoped>
 .answer-container {
-  color: var(--text-color);
+  color: var(--text-color-primary);
   width: 100%;
   margin-top: 16px;
 

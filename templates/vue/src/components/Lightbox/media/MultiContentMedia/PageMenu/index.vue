@@ -27,7 +27,7 @@
         <i
           v-if="!opened"
           class="fas fa-bars fa-lg"
-          style="color: var(--text-color);"
+          style="color: var(--text-color-primary);"
         ></i>
         <i v-else class="fas fa-times fa-lg"></i>
       </button>

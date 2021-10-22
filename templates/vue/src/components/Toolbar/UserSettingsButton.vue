@@ -84,7 +84,7 @@ export default {
 }
 .user-settings-button:hover {
   background: none;
-  color: #11a6d8;
+  color: var(--highlight-color);
   transform: scale(1.1);
 }
 </style>

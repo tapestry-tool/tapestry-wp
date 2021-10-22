@@ -36,8 +36,8 @@ export default {
 
 <style lang="scss" scoped>
 .bucket-container {
-  background-color: var(--layered-background-color);
-  color: var(--text-color);
+  background-color: var(--bg-color-layered);
+  color: var(--text-color-primary);
   display: inline-flex;
   flex-direction: column;
   border-radius: 15px;

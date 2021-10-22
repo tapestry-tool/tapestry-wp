@@ -22,7 +22,7 @@
       ></i>
     </button>
     <div class="w-100">
-      <code v-if="state !== states.SAVED" class="primary-text">
+      <code v-if="state !== states.SAVED" class="duration-text">
         {{ durationText }}
       </code>
     </div>
@@ -275,11 +275,11 @@ export default {
 
     &.btn-link {
       background: none !important;
-      color: var(--text-color);
+      color: var(--text-color-primary);
     }
 
     &:not(:disabled):hover {
-      background-color: #11a6d8 !important;
+      background-color: var(--highlight-color) !important;
     }
 
     &:disabled {
@@ -287,6 +287,10 @@ export default {
       opacity: 0.7;
       pointer-events: none;
     }
+  }
+
+  .duration-text {
+    color: var(--text-color-primary);
   }
 
   i {

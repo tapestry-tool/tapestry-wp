@@ -245,11 +245,11 @@ button[disabled] {
   border-radius: 4px;
   padding: 8px 16px;
   margin-bottom: 8px;
-  background: var(--layered-background-color);
+  background: var(--bg-color-layered);
 
   i {
     cursor: pointer;
-    color: var(--text-color);
+    color: var(--text-color-primary);
     opacity: 0.25;
   }
   a:hover,
