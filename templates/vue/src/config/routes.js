@@ -65,6 +65,7 @@ const settings = {
 const userAnswers = {
   path: `${ROOT_PATH}/user-answers/:tab`,
   name: "userAnswers",
+}
 
 const userSettings = {
   path: `${ROOT_PATH}/user-settings/:tab`,
@@ -108,6 +109,7 @@ const redirects = [
     path: `${ROOT_PATH}/user-answers`,
     redirect: `${ROOT_PATH}/user-answers/answers`,
   },
+  {
     path: `${ROOT_PATH}/user-settings`,
     redirect: `${ROOT_PATH}/user-settings/theme`,
   },
