@@ -22,7 +22,7 @@
       ></i>
     </button>
     <div class="w-100">
-      <code v-if="state !== states.SAVED" id="duration-text">
+      <code v-if="state !== states.SAVED" class="duration-text">
         {{ durationText }}
       </code>
     </div>
@@ -251,9 +251,6 @@ export default {
 
 <style lang="scss" scoped>
 .recorder {
-  #duration-text {
-    color: #111;
-  }
   h1 {
     margin-bottom: 32px;
   }
@@ -263,7 +260,6 @@ export default {
   }
 
   button {
-    background-color: rgba(26, 26, 26, 0.8);
     border-radius: 30px;
     font-size: 24px;
     height: 56px;
@@ -279,11 +275,11 @@ export default {
 
     &.btn-link {
       background: none !important;
-      color: rgba(26, 26, 26, 0.8);
+      color: var(--text-color-primary);
     }
 
     &:not(:disabled):hover {
-      background-color: #11a6d8;
+      background-color: var(--highlight-color) !important;
     }
 
     &:disabled {
@@ -291,6 +287,10 @@ export default {
       opacity: 0.7;
       pointer-events: none;
     }
+  }
+
+  .duration-text {
+    color: var(--text-color-primary);
   }
 
   i {
