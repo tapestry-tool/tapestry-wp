@@ -57,7 +57,6 @@ export default {
 
 <style lang="scss" scoped>
 .article {
-  color: #111;
   text-align: left;
 
   &.context-lightbox {

@@ -45,7 +45,7 @@ const defaultStyles = {
   transform: "translateX(-50%)",
   width: "600px",
   height: "400px",
-  color: "#eee",
+  color: "#eeeeee",
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
@@ -130,9 +130,10 @@ export default {
   .content {
     position: absolute;
     z-index: 100;
+    background: var(--bg-color-secondary);
+    color: var(--text-color-primary);
     background-position: 0 0;
     background-size: cover;
-    background-color: #eee;
     box-shadow: 0 0 100px -40px #000;
     border-radius: 15px;
     height: 100%;
@@ -149,6 +150,8 @@ export default {
 
   &.full-screen {
     .content {
+      border-radius: 0;
+
       .buttons-container {
         top: 20px;
         right: 30px;

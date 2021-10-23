@@ -1,5 +1,5 @@
 <template>
-  <div class="bucket-container p-2" :data-qa="`user-from-bucket-${bucket.id}`">
+  <div class="bucket-container p-2 mx-2" :data-qa="`user-from-bucket-${bucket.id}`">
     <b style="font-size: 1rem">{{ bucket.text }}</b>
     <item
       v-for="item in items"
@@ -36,11 +36,10 @@ export default {
 
 <style lang="scss" scoped>
 .bucket-container {
-  background-color: #eee;
-  color: #555;
+  background-color: var(--bg-color-layered);
+  color: var(--text-color-primary);
   display: inline-flex;
   flex-direction: column;
-  min-height: 250px;
   border-radius: 15px;
   overflow-wrap: break-word;
 }

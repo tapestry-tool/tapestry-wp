@@ -65,6 +65,10 @@ const settings = {
 const userAnswers = {
   path: `${ROOT_PATH}/user-answers/:tab`,
   name: "userAnswers",
+
+const userSettings = {
+  path: `${ROOT_PATH}/user-settings/:tab`,
+  name: "userSettings",
 }
 
 const linkmodal = {
@@ -104,6 +108,9 @@ const redirects = [
     path: `${ROOT_PATH}/user-answers`,
     redirect: `${ROOT_PATH}/user-answers/answers`,
   },
+    path: `${ROOT_PATH}/user-settings`,
+    redirect: `${ROOT_PATH}/user-settings/theme`,
+  },
 ]
 
 const routes = {
@@ -115,6 +122,7 @@ const routes = {
   linkmodal,
   nestedMultiContent,
   redirects,
+  userSettings,
   help,
   userAnswers,
 }

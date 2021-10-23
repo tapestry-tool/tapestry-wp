@@ -271,14 +271,14 @@ export default {
           return this.node.backgroundColor
         }
       } else if (this.selected) {
-        return "#11a6d8"
+        return "var(--highlight-color)"
       } else {
         return TinyColor(this.node.backgroundColor)
       }
     },
     overlayFill() {
       if (this.selected) {
-        return "#11a6d88a"
+        return "var(--highlight-color)8a"
       } else if (!this.node.accessible) {
         return "#8a8a8cb3"
       }

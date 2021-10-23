@@ -281,8 +281,8 @@ export default {
       background-color: #2c3e50;
 
       &:hover {
-        border-color: #11a6d8;
-        background-color: #11a6d8;
+        border-color: var(--highlight-color);
+        background-color: var(--highlight-color);
       }
     }
 
