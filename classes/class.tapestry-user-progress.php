@@ -269,7 +269,7 @@ class TapestryUserProgress implements ITapestryUserProgress
         return $allUsersAnswers;
     }
 
-    private function _getUserProgress($nodeIdArr, $userId)
+    private function _getUserProgress($nodeIdArr, $userId = null)
     {
         $progress = new stdClass();
         $tapestry = new Tapestry($this->postId);
