@@ -238,7 +238,8 @@ describe("Activity", () => {
       cy.openModal("edit", node.id)
       cy.changeMediaType("activity")
       const question = `Select all numbers less than 3`
-      cy.getByTestId("question-text-0").type(question)
+      cy.getByTestId("question-text-0").click()
+      cy.focused().type(question)
       cy.getByTestId("question-answer-multipleChoice-0").click({ force: true })
       cy.getByTestId("question-answer-multipleChoice-multipleAnswer").click({
         force: true,
@@ -280,7 +281,8 @@ describe("Activity", () => {
       cy.openModal("edit", node.id)
       cy.changeMediaType("activity")
       const question = `What is 5 + 5?`
-      cy.getByTestId("question-text-0").type(question)
+      cy.getByTestId("question-text-0").click()
+      cy.focused().type(question)
       cy.getByTestId("question-answer-multipleChoice-0").click({ force: true })
       cy.getByTestId(`choice-row-0`)
         .getByTestId(`choice-row-input-0`)
@@ -319,9 +321,8 @@ describe("Activity", () => {
       const placeholder = "placeholder"
       const answer = "Tapestry"
       cy.contains(/add question/i).click()
-      cy.getByTestId("question-text-0")
-        .first()
-        .type(question)
+      cy.getByTestId("question-text-0").click()
+      cy.focused().type(question)
       cy.getByTestId("question-answer-text-0").click({ force: true })
       cy.getByTestId("question-answer-text-single-0").click({ force: true })
       cy.getByTestId("question-answer-text-single-placeholder-0").type(placeholder)
@@ -358,9 +359,8 @@ describe("Activity", () => {
       const question = `What's your name?`
       const placeholder = "placeholder"
       const answer = "Tapestry"
-      cy.getByTestId("question-text-0")
-        .first()
-        .type(question)
+      cy.getByTestId("question-text-0").click()
+      cy.focused().type(question)
       cy.getByTestId("question-answer-text-0").click({ force: true })
       cy.getByTestId("question-answer-text-single-0").click({ force: true })
       cy.getByTestId("question-answer-text-single-placeholder-0").type(placeholder)
@@ -404,9 +404,8 @@ describe("Activity", () => {
       const question = `What's your name?`
       const placeholder = "placeholder"
       const answer = "Tapestry"
-      cy.getByTestId("question-text-0")
-        .first()
-        .type(question)
+      cy.getByTestId("question-text-0").click()
+      cy.focused().type(question)
       cy.getByTestId("question-answer-text-0").click({ force: true })
       cy.getByTestId("question-answer-text-single-0").click({ force: true })
       cy.getByTestId("question-answer-text-single-placeholder-0").type(placeholder)
@@ -430,7 +429,8 @@ describe("Activity", () => {
       cy.openModal("edit", node.id)
       cy.changeMediaType("activity")
       const question = `What's your name?`
-      cy.getByTestId("question-text-0").type(question)
+      cy.getByTestId("question-text-0").click()
+      cy.focused().type(question)
       cy.getByTestId("question-answer-audio-0").click({ force: true })
       cy.submitModal()
       cy.openLightbox(node.id)
@@ -459,7 +459,8 @@ describe("Activity", () => {
       cy.changeMediaType("Activity")
       const listQuestion = `Name 3 provinces of Canada.`
       const listPlaceholder = "Enter answer here"
-      cy.getByTestId("question-text-0").type(listQuestion)
+      cy.getByTestId("question-text-0").click()
+      cy.focused().type(listQuestion)
       cy.getByTestId("question-answer-text-0").click({ force: true })
       cy.getByTestId("question-answer-text-single-placeholder-0").type(
         listPlaceholder
@@ -503,7 +504,8 @@ describe("Activity", () => {
       const listPlaceholder = "Thing:"
       const minFieldsValue = "5"
       const maxFieldsValue = "10"
-      cy.getByTestId("question-text-0").type(listQuestion)
+      cy.getByTestId("question-text-0").click()
+      cy.focused().type(listQuestion)
       cy.getByTestId("question-answer-text-0").click({ force: true })
       cy.getByTestId("question-answer-text-single-placeholder-0").type(
         listPlaceholder
@@ -518,7 +520,9 @@ describe("Activity", () => {
       cy.route("POST", "/users/activity/**").as("submit")
       cy.lightbox().within(() => {
         cy.get(`[placeholder="${listPlaceholder}"]`).should("be.visible")
-        cy.get(`[class="media-wrapper"]`).scrollTo("bottom")
+        cy.get(`[class='activity-media']`).scrollTo("bottom", {
+          ensureScrollable: false,
+        })
         cy.getByTestId("list-add-4").click()
         cy.getByTestId("list-add-5").click()
         cy.getByTestId("list-add-6").click()
@@ -551,6 +555,10 @@ describe("Activity", () => {
     cy.fixture("one-node.json").as("oneNode")
     cy.setup("@oneNode")
     cy.getSelectedNode().then(node => {
+      cy.getByTestId("user-settings-button").click()
+      cy.contains(/light mode/i).click()
+      cy.contains(/save theme/i).click()
+
       cy.openModal("edit", node.id)
       cy.changeMediaType("activity")
       const question = `What's your name?`
@@ -568,7 +576,7 @@ describe("Activity", () => {
         cy.contains("Thanks!").should("be.visible")
         cy.contains(/done/i).click()
       })
-      cy.getByTestId("progress-bar").should("have.css", "color", "rgb(44, 62, 80)")
+      cy.getByTestId("progress-bar").should("have.css", "color", "rgb(17, 17, 17)")
       cy.lightbox().should("not.exist")
     })
   })

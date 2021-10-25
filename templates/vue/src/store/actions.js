@@ -29,6 +29,7 @@ export async function updateUserSettings({ commit, dispatch }, userSettings) {
   try {
     await client.updateUserSettings(JSON.stringify(userSettings))
     commit("addAvatar", userSettings.avatar)
+    commit("changeTheme", userSettings.theme)
   } catch (error) {
     dispatch("addApiError", error)
   }

@@ -12,11 +12,22 @@
     <b-container fluid class="px-0">
       <b-tabs card>
         <b-tab
+          v-if="settings.tydeModeEnabled"
           title="Avatar"
           :active="tab === 'avatar'"
           @click="$emit('change:tab', 'avatar')"
         ></b-tab>
-        <avatar-form ref="AvatarForm" :preferences="avatar"></avatar-form>
+        <avatar-form
+          v-if="settings.tydeModeEnabled"
+          ref="avatarForm"
+          :preferences="avatar"
+        ></avatar-form>
+        <b-tab
+          title="Theme"
+          :active="tab === 'theme'"
+          @click="$emit('change:tab', 'theme')"
+        ></b-tab>
+        <theme-form ref="themeForm"></theme-form>
       </b-tabs>
     </b-container>
     <template slot="modal-footer">
@@ -25,12 +36,12 @@
       </b-button>
       <b-button
         id="save-button"
-        data-qa="avatar-submit-button"
+        data-qa="user-settings-submit-button"
         size="sm"
         variant="primary"
-        @click="saveAvatar"
+        @click="saveSettings"
       >
-        Save Avatar
+        Save
       </b-button>
     </template>
   </b-modal>
@@ -38,12 +49,14 @@
 
 <script>
 import DragSelectModular from "@/utils/dragSelectModular"
+import ThemeForm from "./ThemeForm"
 import AvatarForm from "./AvatarForm"
 import { mapState } from "vuex"
 
 export default {
   name: "user-settings-modal",
   components: {
+    ThemeForm,
     AvatarForm,
   },
   props: {
@@ -58,7 +71,7 @@ export default {
     },
   },
   computed: {
-    ...mapState(["avatar"]),
+    ...mapState(["avatar", "settings"]),
   },
   mounted() {
     this.$root.$on("bv::modal::show", (_, modalId) => {
@@ -77,8 +90,9 @@ export default {
     closeModal() {
       this.$emit("close")
     },
-    saveAvatar() {
-      this.$refs.AvatarForm.saveAvatar()
+    saveSettings() {
+      this.$refs.themeForm.saveTheme()
+      this.$refs.avatarForm.saveAvatar()
       this.$emit("close")
     },
   },
@@ -88,12 +102,10 @@ export default {
 <style lang="scss" scoped>
 #save-button {
   position: relative;
-
   &:disabled {
     pointer-events: none;
     cursor: not-allowed;
   }
-
   > span {
     position: absolute;
     height: 1.5em;

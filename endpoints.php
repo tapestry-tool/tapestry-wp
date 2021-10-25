@@ -228,6 +228,13 @@ $REST_API_ENDPOINTS = [
             'callback' => 'getUserAvatar',
         ],
     ],
+    'GET_USER_THEME' => (object) [
+        'ROUTE' => '/users/userSettings/theme',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => 'getUserTheme',
+        ],
+    ],
     'UPDATE_USER_SETTINGS' => (object) [
         'ROUTE' => '/users/userSettings',
         'ARGUMENTS' => [
@@ -1315,12 +1322,21 @@ function updateUserSettings($request)
     }
 }
 
-
 function getUserAvatar($request)
 {
     try {
         $userProgress = new TapestryUserProgress();
         return $userProgress->getAvatar();
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+function getUserTheme($request)
+{
+    try {
+        $userProgress = new TapestryUserProgress();
+        return $userProgress->getTheme();
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }

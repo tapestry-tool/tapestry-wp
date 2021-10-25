@@ -331,7 +331,7 @@ export default {
     text-align: left;
     font-size: 1.75rem;
     font-weight: 500;
-    margin-bottom: 0.9em;
+    margin-bottom: 0.9em 0 0.5em 25px;
     width: 100%;
 
     :before {
@@ -363,7 +363,7 @@ export default {
   }
 
   &:hover {
-    color: #11a6d8;
+    color: var(--highlight-color);
   }
 
   p {
@@ -381,19 +381,19 @@ export default {
   border-radius: 50%;
   height: 56px;
   width: 56px;
-  background: #262626;
+  background: var(--text-color-primary);
+  color: var(--bg-color-primary);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 40px;
-  color: white;
   margin: 0;
   margin-right: 12px;
   opacity: 1;
   transition: all 0.1s ease-out;
 
   &:hover {
-    background: #11a6d8;
+    background: var(--highlight-color);
   }
 
   &:disabled {

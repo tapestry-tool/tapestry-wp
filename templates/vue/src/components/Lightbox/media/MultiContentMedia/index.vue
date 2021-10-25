@@ -310,7 +310,6 @@ button[disabled] {
 }
 
 .title {
-  color: #111;
   margin-bottom: 1em;
 }
 
@@ -325,7 +324,7 @@ button[disabled] {
   margin: 0 auto;
   overflow: auto;
   overflow-x: hidden;
-  scrollbar-color: auto black;
+  scrollbar-color: auto var(--text-color-primary);
   scrollbar-width: none;
 
   ::-webkit-scrollbar-track {
@@ -337,7 +336,7 @@ button[disabled] {
   text-align: left;
   font-size: 1.75rem;
   font-weight: 500;
-  margin-bottom: 0.9em;
+  margin-bottom: 0.9em 0 0.5em 25px;
 
   :before {
     display: none;
@@ -359,7 +358,7 @@ button[disabled] {
   }
 
   &:hover {
-    color: #11a6d8;
+    color: var(--highlight-color);
   }
 
   p {

@@ -37,7 +37,7 @@ export default {
     bgHoverColor: {
       type: String,
       required: false,
-      default: "#11a6d8",
+      default: "var(--highlight-color)",
     },
   },
   data() {

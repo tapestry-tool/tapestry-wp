@@ -48,7 +48,7 @@ export default {
       immediate: true,
       handler(requestedTab) {
         if (this.settingsModalOpen) {
-          const acceptedTabs = ["avatar"]
+          const acceptedTabs = ["avatar", "theme"]
           if (!acceptedTabs.includes(requestedTab)) {
             this.$router.replace({
               name: names.USERSETTINGS,
@@ -93,7 +93,7 @@ export default {
 
   &:hover {
     background: none;
-    color: #11a6d8;
+    color: var(--highlight-color);
     transform: scale(1.1);
   }
 

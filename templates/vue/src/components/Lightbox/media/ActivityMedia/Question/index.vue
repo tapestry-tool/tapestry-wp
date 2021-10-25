@@ -286,15 +286,15 @@ export default {
     border-radius: 50%;
     width: 80px;
     height: 80px;
-    background: #262626;
+    background: var(--text-color-primary);
+    color: var(--bg-color-primary);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 56px;
-    color: white;
     margin: 0;
     margin-right: 12px;
-    opacity: 1;
+    opacity: 0.9;
     transition: all 0.1s ease-out;
     position: absolute;
     top: 74px;
@@ -302,11 +302,12 @@ export default {
     z-index: 20;
 
     &:hover {
-      background: #11a6d8;
+      background: var(--highlight-color);
+      opacity: 1;
     }
 
     &:disabled {
-      opacity: 0.6;
+      opacity: 0.4;
       pointer-events: none;
       cursor: not-allowed;
     }
@@ -317,7 +318,6 @@ export default {
   }
 
   .loading {
-    background: #eee;
     position: absolute;
     top: 0;
     left: 0;

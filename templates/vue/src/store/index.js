@@ -23,6 +23,7 @@ export const store = {
     apiError: null,
     displayErrors: false,
     avatar: {},
+    theme: "",
     cos: {},
     userAnswers: {},
     returnRoute: null,

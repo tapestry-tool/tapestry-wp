@@ -144,9 +144,9 @@ class TapestryUserProgress implements ITapestryUserProgress
     }
 
     /**
-     * Update the user's avatar.
+     * Update the user's theme and avatar.
      *
-     * @param string $userSettings stores avatar
+     * @param string $userSettings stores theme
      *
      * @return null
      */
@@ -163,6 +163,16 @@ class TapestryUserProgress implements ITapestryUserProgress
     public function getAvatar()
     {
         return $this->_getAvatar();
+    }
+
+    /**
+     * Get the user's Theme.
+     *
+     * @return object theme $theme
+     */
+    public function getTheme()
+    {
+        return $this->_getTheme();
     }
 
     public function isCompleted($nodeId = null, $userId = null)
@@ -320,6 +330,15 @@ class TapestryUserProgress implements ITapestryUserProgress
         $avatar = $userSettingsObject->avatar;
 
         return $avatar ? $avatar : (object) [];
+    }
+
+    private function _getTheme()
+    {
+        $userSettings = get_user_meta($this->_userId, 'user_settings', true);
+        $userSettingsObject = json_decode($userSettings);
+        $theme = $userSettingsObject->theme;
+
+        return $theme ? $theme : '';
     }
 
     /**

@@ -57,10 +57,9 @@ interface ITapestryUserProgress
     public function getH5PSettings();
 
     /**
-
      * Update the user's user settings.
      *
-     * @param string $userSettings stores avatar
+     * @param string $userSettings stores user settings
      *
      *
      * @return null
@@ -73,6 +72,13 @@ interface ITapestryUserProgress
      * @return object avatar $avatar
      */
     public function getAvatar();
+
+    /**
+     * Get the user's theme.
+     *
+     * @return object theme $theme
+     */
+    public function getTheme();
 
     /**
      * Get User's favourite nodes from a tapestry post.

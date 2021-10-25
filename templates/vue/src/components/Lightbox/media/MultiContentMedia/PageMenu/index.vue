@@ -24,7 +24,11 @@
         data-qa="page-nav-toggle"
         @click="opened = !opened"
       >
-        <i v-if="!opened" class="fas fa-bars fa-lg" style="color: black;"></i>
+        <i
+          v-if="!opened"
+          class="fas fa-bars fa-lg"
+          style="color: var(--text-color-primary);"
+        ></i>
         <i v-else class="fas fa-times fa-lg"></i>
       </button>
       <div v-if="unitsMenuVisible">

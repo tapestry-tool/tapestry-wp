@@ -161,8 +161,7 @@ export default {
 
       if (this.node.mediaType === "text" || this.node.mediaType === "wp-post") {
         return Object.assign(styles, {
-          background: "#eee",
-          color: "#333",
+          background: "var(--background-color);",
           padding: "1em",
         })
       }
@@ -389,10 +388,8 @@ body.tapestry-lightbox-open {
 }
 
 #lightbox {
-  color: #111;
-
   &.full-screen {
-    background: #eee;
+    background: var(--bg-color-primary);
 
     .close-btn {
       position: fixed;
