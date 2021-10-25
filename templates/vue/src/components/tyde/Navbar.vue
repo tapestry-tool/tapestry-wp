@@ -15,6 +15,7 @@
             :selected="isSelectedTab(tab)"
             :icon="tab"
             :is-last="index === tabs.length - 1"
+            :inline-tooltips="!isCompact"
           />
         </b-nav-item>
       </b-navbar-nav>
@@ -32,6 +33,7 @@ import { mapState } from "vuex"
 import TydeIcon from "./TydeIcon.vue"
 import UserSettingsButton from "../Toolbar/UserSettingsButton"
 import { names } from "@/config/routes"
+import Helpers from "@/utils/Helpers"
 import { getCurrentUser, canEditTapestry } from "@/services/wp"
 
 export default {
@@ -69,6 +71,9 @@ export default {
     },
     canEditTapestry() {
       return canEditTapestry()
+    },
+    isCompact() {
+      return Helpers.getBrowserWidth() < 550 + this.tabs.length * 150
     },
   },
   mounted() {
@@ -116,9 +121,9 @@ export default {
 
   .navbar {
     min-width: 250px;
-    max-width: 900px;
+    max-width: 750px;
     margin: 0 auto;
-    width: 75vw;
+    width: calc(100vw - 550px);
     border-radius: 30px;
     border: solid 2px #c4e4ea;
     background-color: whitesmoke;
@@ -140,7 +145,7 @@ export default {
   .user-settings-button {
     position: absolute;
     top: 3px;
-    right: 2em;
+    right: -4em;
     background: #fff !important;
     padding: 0.5em 0.75em !important;
     border-radius: 100%;

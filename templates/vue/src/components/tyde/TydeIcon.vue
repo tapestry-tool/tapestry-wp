@@ -2,11 +2,10 @@
   <div>
     <img :id="'tyde-icon-' + icon" :src="url" :width="size" svg />
     <b-tooltip
-      v-if="windowWidth > 700"
       :target="'tyde-icon-' + icon"
       triggers="hover"
-      :placement="isLast && windowWidth < 1100 ? 'left' : 'right'"
-      custom-class="nav-item-tooltip text-capitalize"
+      :placement="!inlineTooltips ? 'bottom' : isLast ? 'left' : 'right'"
+      :custom-class="inlineTooltips ? 'inline-tooltip' : ''"
       no-fade
       :delay="0"
     >
@@ -46,6 +45,11 @@ export default {
       type: Boolean,
       required: false,
       default: false,
+    },
+    inlineTooltips: {
+      type: Boolean,
+      required: false,
+      default: true,
     },
   },
   data() {
@@ -115,19 +119,20 @@ export default {
 }
 </script>
 
-<style>
-.nav-item-tooltip .tooltip-inner {
-  background: transparent !important;
-  color: black !important;
-  font-family: "Source Sans Pro", sans-serif !important;
-  font-size: 1rem;
-  font-weight: 500;
-  max-width: 100px;
-  padding: 0.25rem 0 0.25rem 0.5rem !important;
-  line-height: 100% !important;
-  text-align: left;
-}
-.nav-item-tooltip > .arrow {
-  display: none !important;
+<style lang="scss">
+.inline-tooltip {
+  .tooltip-inner {
+    background: transparent !important;
+    color: black !important;
+    font-family: "Source Sans Pro", sans-serif !important;
+    font-size: 1rem;
+    font-weight: 500;
+    max-width: 100px;
+    padding: 0.25rem 0 0.25rem 0.5rem !important;
+    line-height: 100% !important;
+  }
+  > .arrow {
+    display: none !important;
+  }
 }
 </style>
