@@ -156,7 +156,7 @@ export default {
       return Helpers.getBrowserWidth()
     },
     unitsMenuVisible() {
-      if (!this.pages) {
+      if (!this.pages || this.parentNode.childOrdering.length <= 1) {
         return false
       }
       return this.opened || (this.browserWidth > 800 && this.node.fullscreen)

@@ -143,7 +143,7 @@ export default {
       }
     },
     heightCss() {
-      if (this.context == "page" && this.videoComponent !== "youtube-media") {
+      if (this.context !== "lightbox" && this.videoComponent !== "youtube-media") {
         return "auto"
       } else {
         return this.dimensions.height + "px"
