@@ -1,5 +1,5 @@
 <template>
-  <div class="px-3 mt-n2">
+  <div>
     <b-overlay variant="white">
       <h6 class="mb-3">Customize your avatar</h6>
       <b-row>

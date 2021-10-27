@@ -1,18 +1,16 @@
 <template>
-  <b-container>
-    <b-form-group v-slot="{ ariaDescribedby }" label="Select your theme">
-      <b-form-radio-group
-        id="theme-radio"
-        v-model="userTheme"
-        :options="options"
-        :aria-describedby="ariaDescribedby"
-        button-variant="outline-dark"
-        data-qa="theme-settings"
-        name="radio-btn-outline"
-        buttons
-      ></b-form-radio-group>
-    </b-form-group>
-  </b-container>
+  <b-form-group v-slot="{ ariaDescribedby }" label="Select your theme">
+    <b-form-radio-group
+      id="theme-radio"
+      v-model="userTheme"
+      :options="options"
+      :aria-describedby="ariaDescribedby"
+      button-variant="outline-dark"
+      data-qa="theme-settings"
+      name="radio-btn-outline"
+      buttons
+    ></b-form-radio-group>
+  </b-form-group>
 </template>
 
 <script>

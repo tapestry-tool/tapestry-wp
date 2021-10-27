@@ -16,18 +16,16 @@
           title="Avatar"
           :active="tab === 'avatar'"
           @click="$emit('change:tab', 'avatar')"
-        ></b-tab>
-        <avatar-form
-          v-if="settings.tydeModeEnabled"
-          ref="avatarForm"
-          :preferences="avatar"
-        ></avatar-form>
+        >
+          <avatar-form ref="avatarForm" :preferences="avatar"></avatar-form>
+        </b-tab>
         <b-tab
           title="Theme"
           :active="tab === 'theme'"
           @click="$emit('change:tab', 'theme')"
-        ></b-tab>
-        <theme-form ref="themeForm"></theme-form>
+        >
+          <theme-form ref="themeForm"></theme-form>
+        </b-tab>
       </b-tabs>
     </b-container>
     <template slot="modal-footer">
