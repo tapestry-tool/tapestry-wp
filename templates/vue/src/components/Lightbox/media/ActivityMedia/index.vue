@@ -5,16 +5,7 @@
       v-if="state === 'completion-screen'"
       :question="activeQuestion"
     >
-      <button
-        v-if="hasNext"
-        class="button-completion"
-        data-qa="completion-next-button"
-        @click="next"
-      >
-        <i class="fas fa-arrow-circle-right fa-4x"></i>
-        <p>Next question</p>
-      </button>
-      <button v-else class="button-completion" @click="close">
+      <button class="button-completion" @click="close">
         <template v-if="context === 'lightbox'">
           <i class="fas fa-times-circle fa-4x"></i>
           <p>Done</p>
@@ -233,12 +224,18 @@ export default {
     },
     handleComplete(initiatingComponent) {
       if (initiatingComponent === "activity") {
-        this.state = states.COMPLETION_SCREEN
         const numberCompleted = this.questionNode.typeData.activity.questions.filter(
           question => question.completed || question.optional
         ).length
         const progress =
           numberCompleted / this.questionNode.typeData.activity.questions.length
+
+        if (!this.hasNext) {
+          this.state = states.COMPLETION_SCREEN
+        } else {
+          this.next()
+        }
+
         this.updateNodeProgress({ id: this.questionNode.id, progress }).then(() => {
           if (progress === 1) {
             this.$emit("complete")
