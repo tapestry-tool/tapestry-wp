@@ -157,15 +157,15 @@ class TapestryNode implements ITapestryNode
         if (isset($node->typeData) && is_object($node->typeData)) {
             $this->typeData = $node->typeData;
             
-            if(isset($node->typeData->kalturaId) && is_string($node->typeData->kalturaId)) {
+            if (isset($node->typeData->kalturaId) && is_string($node->typeData->kalturaId)) {
                 $kaltura_api = new KalturaApi();
                 $result = $kaltura_api->getVideo($node->typeData->kalturaId);
-                error_log(print_r($result,true));
+                error_log(print_r($result, true));
                 
                 if ($result != null) {
                     $this->typeData->mediaURL = $result->dataUrl;
                     $this->mediaDuration = $result->duration;
-                } 
+                }
             }
         }
         if (isset($node->imageURL) && is_string($node->imageURL)) {

@@ -1,6 +1,10 @@
 <?php
-    (defined("LOAD_KALTURA") && LOAD_KALTURA != false) or exit();
-    require_once plugin_dir_path(dirname(__FILE__)) . 'vendor/autoload.php';
+
+    if (defined("LOAD_KALTURA") && LOAD_KALTURA) {
+        require_once plugin_dir_path(dirname(__FILE__)) . 'vendor/autoload.php';
+    } else {
+        return false;
+    }
 
     use Kaltura\Client\Client;
     use Kaltura\Client\Configuration;
@@ -14,7 +18,6 @@
     use Kaltura\Client\Type\UploadToken;
     use Kaltura\Client\ApiException;
 
-
     class KalturaApi
     {
 
@@ -25,7 +28,6 @@
          */
         public function getKClient($type = SessionType::USER)
         {
-
             $user = wp_get_current_user()->ID;
             $kconf = new Configuration(KALTURA_PARTNER_ID);
             $kconf->setServiceUrl(KALTURA_SERVICE_URL);
@@ -122,8 +124,7 @@
             try {
                 $result = $client->media->get($entryId, -1);
                 return $result;
-            }
-            catch(ApiException $e) {
+            } catch (ApiException $e) {
                 error_log("Kaltura Client Error: " . $e);
                 return null;
             }

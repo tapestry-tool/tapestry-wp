@@ -1,5 +1,5 @@
 <template>
-  <b-container class="completed-activity-media">
+  <div class="completed-activity-media">
     <b-row align-v="center" style="min-height:150px;">
       <b-col v-if="type === 'text' && !isListTextType" align-self="center">
         <div class="text">
@@ -7,7 +7,13 @@
         </div>
       </b-col>
       <b-col v-if="type === 'text' && isListTextType">
-        <ol>
+        <ol
+          :class="{
+            text:
+              answerData.length === 1 &&
+              !question.answerTypes.multipleChoice.useImages,
+          }"
+        >
           <li v-for="answer in answerData" :key="answer.index">
             {{ answer }}
           </li>
@@ -16,14 +22,19 @@
       <b-col v-if="type === 'audio'" align-self="center">
         <audio controls :src="urlAnswer"></audio>
       </b-col>
-      <b-col v-if="type === 'dragDrop'" align-self="center">
-        <drag-drop
-          :answer-data="answerData"
-          :drag-drop="question.answerTypes.dragDrop"
-        />
-      </b-col>
+      <drag-drop
+        v-if="type === 'dragDrop'"
+        :answer-data="answerData"
+        :drag-drop="question.answerTypes.dragDrop"
+      />
       <b-col v-if="type === 'multipleChoice'" align-self="center">
-        <ul>
+        <ul
+          :class="{
+            text:
+              answerData.length === 1 &&
+              !question.answerTypes.multipleChoice.useImages,
+          }"
+        >
           <li v-for="answer in answerData" :key="answer.index">
             <completed-multiple-choice-item
               :item="getMultipleChoiceAnswerItem(answer)"
@@ -33,7 +44,7 @@
         </ul>
       </b-col>
     </b-row>
-  </b-container>
+  </div>
 </template>
 
 <script>
@@ -86,14 +97,21 @@ export default {
 
 <style lang="scss" scoped>
 .completed-activity-media {
-  background: #dcdcdc;
   border-radius: 8px;
   margin-bottom: 8px;
-  padding: 8px 16px 8px 16px;
-  .text {
+  padding: 10px 16px 10px 16px;
+  display: inline-flex;
+  ol li {
     text-align: left;
-    padding-left: 1em;
-    border-left: solid 1px #666;
+  }
+  .text {
+    padding: 0.5em 1em;
+    background: #ffffff6b;
+    display: inline-flex;
+    border-radius: 5px;
+    box-shadow: 0 0 5px inset #0000003b;
+    margin: 0;
+    list-style-type: none;
   }
 }
 </style>

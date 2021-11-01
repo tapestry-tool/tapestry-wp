@@ -177,7 +177,7 @@ export default {
   }
 
   &-embed {
-    background: white;
+    background: var(--background-color);
   }
 }
 </style>

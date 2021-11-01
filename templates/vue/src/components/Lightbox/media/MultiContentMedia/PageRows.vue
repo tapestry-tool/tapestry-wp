@@ -16,25 +16,32 @@
               cols="12"
               :lg="row.node.typeData.halfWidth ? 6 : 12"
             >
-              <div class="page-row" :style="rowBackground">
+              <div class="page-row">
                 <div class="title-row-icon">
                   <i
                     v-if="disableRow(index, row.node)"
                     class="fas fa-lock fa-sm"
                   ></i>
-                  <a v-else>
-                    <i
-                      class="fas fa-heart fa-sm"
-                      :style="{
-                        color: isFavourite(row.node.id) ? 'red' : 'black',
-                        opacity: isFavourite(row.node.id) ? '1' : '0.25',
-                        cursor: 'pointer',
-                      }"
-                      @click="toggleFavourite(row.node.id)"
-                    ></i>
-                  </a>
+                  <span v-else>
+                    <a>
+                      <i
+                        v-if="canEditNode(row.node)"
+                        class="fas fa-pencil-alt fa-sm pr-2"
+                        @click="editNode(row.node.id)"
+                      ></i>
+                    </a>
+                    <a
+                      class="favourite-btn"
+                      :class="{ 'is-favourite': isFavourite(row.node.id) }"
+                    >
+                      <i
+                        class="fas fa-heart fa-sm"
+                        @click="toggleFavourite(row.node.id)"
+                      ></i>
+                    </a>
+                  </span>
                 </div>
-                <div v-if="disableRow(index, row.node)">
+                <div v-if="disableRow(index, row.node)" class="row-content">
                   <h1 class="title">
                     {{ row.node.title }}
                   </h1>
@@ -43,7 +50,11 @@
                     :condition-node="index > 0 ? rows[index - 1].node : {}"
                   ></locked-content>
                 </div>
-                <div v-else :data-qa="`row-content-${row.node.id}`">
+                <div
+                  v-else
+                  :data-qa="`row-content-${row.node.id}`"
+                  class="row-content"
+                >
                   <div v-if="row.node.mediaType !== 'multi-content'">
                     <tapestry-media
                       :node-id="row.node.id"
@@ -100,6 +111,8 @@ import TapestryMedia from "../TapestryMedia"
 import HeadlessMultiContent from "./HeadlessMultiContent"
 import AccordionRows from "./AccordionRows"
 import LockedContent from "./common/LockedContent"
+import { names } from "@/config/routes"
+import Helpers from "@/utils/Helpers"
 
 export default {
   name: "page-rows",
@@ -169,24 +182,19 @@ export default {
         this.context === "accordion"
       )
     },
-    rowBackground() {
-      if (this.isMultiContentContext) {
-        let rgb = 187
-        let colorOffset = this.level * 10
-        rgb = colorOffset > rgb ? 0 : rgb + colorOffset
-        return {
-          background: `rgb(${rgb}, ${rgb}, ${rgb})`,
-        }
-      } else {
-        return null
-      }
+  },
+  watch: {
+    node() {
+      this.$nextTick(() => {
+        this.$root.$emit("observe-rows", this.$refs.rowRefs)
+      })
     },
   },
   mounted() {
     this.$root.$emit("observe-rows", this.$refs.rowRefs)
   },
   methods: {
-    ...mapMutations(["updateNode"]),
+    ...mapMutations(["updateNode", "setReturnRoute"]),
     ...mapActions(["toggleFavourite"]),
     handleLoad(el) {
       this.$emit("load", el)
@@ -209,6 +217,16 @@ export default {
     areAllPopup(nodes) {
       return nodes.every(node => node.popup !== null)
     },
+    canEditNode(node) {
+      return Helpers.hasPermission(node, "edit")
+    },
+    editNode(id) {
+      this.setReturnRoute(this.$route)
+      this.$router.push({
+        name: names.MODAL,
+        params: { nodeId: id, type: "edit", tab: "content" },
+      })
+    },
   },
 }
 </script>
@@ -219,16 +237,10 @@ button[disabled] {
   cursor: not-allowed;
 }
 
-.title-row-icon {
-  flex: 1;
-  text-align: right;
-}
-
 .title {
   background: none;
   width: 100%;
   text-align: left;
-  color: #111;
   font-size: 1.75rem;
   font-weight: 500;
 
@@ -247,9 +259,47 @@ button[disabled] {
 }
 
 .page-row {
-  background: #ddd;
+  position: relative;
   border-radius: 4px;
   padding: 8px 16px;
   margin-bottom: 16px;
+  background: var(--bg-color-layered);
+
+  .title-row-icon {
+    position: absolute;
+    right: 12px;
+    text-align: right;
+    a {
+      text-decoration: none !important;
+    }
+  }
+
+  .row-content {
+    padding-top: 5px;
+  }
+
+  i {
+    cursor: pointer;
+    color: var(--text-color-primary);
+    opacity: 0.25;
+  }
+
+  a:hover,
+  a:active {
+    i {
+      opacity: 1;
+    }
+  }
+
+  .favourite-btn {
+    i {
+      opacity: 0.25;
+      cursor: pointer;
+    }
+    &.is-favourite > i {
+      color: red;
+      opacity: 1;
+    }
+  }
 }
 </style>

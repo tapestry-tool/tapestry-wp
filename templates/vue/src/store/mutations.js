@@ -172,3 +172,11 @@ export function setTapestryErrorReporting(state, isEnabled) {
 export function setKalturaStatus(state, status) {
   state.kalturaStatus = status
 }
+
+export function changeTheme(state, newTheme) {
+  state.theme = newTheme
+}
+
+export function setReturnRoute(state, route) {
+  state.returnRoute = route
+}

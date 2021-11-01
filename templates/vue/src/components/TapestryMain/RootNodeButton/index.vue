@@ -194,7 +194,7 @@ export default {
     &:hover,
     &:active {
       transform: scale(1.1);
-      color: #11a6d8;
+      color: var(--highlight-color);
     }
 
     > div {
@@ -218,7 +218,7 @@ export default {
   z-index: 10;
 
   &:hover {
-    background-color: #11a6d8;
+    background-color: var(--highlight-color);
   }
 }
 

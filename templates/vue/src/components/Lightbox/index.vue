@@ -6,7 +6,7 @@
       'full-screen': node.fullscreen,
       'content-text': node.mediaType === 'text' || node.mediaType === 'wp-post',
     }"
-    :node-id="nodeId"
+    :node="node"
     :content-container-style="lightboxContentStyles"
     :allow-close="canSkip"
     @close="handleUserClose"
@@ -129,8 +129,7 @@ export default {
 
       if (this.node.mediaType === "text" || this.node.mediaType === "wp-post") {
         return Object.assign(styles, {
-          background: "#eee",
-          color: "#333",
+          background: "var(--background-color);",
           padding: "1em",
         })
       }
@@ -318,8 +317,23 @@ export default {
       } else {
         this.applyDimensions()
         if (this.node.mediaType === "multi-content") {
-          this.$root.$on("observe-rows", refs => {
-            this.rowRefs = this.rowRefs.concat(refs)
+          this.$root.$on("observe-rows", newRefs => {
+            if (Array.isArray(newRefs)) {
+              newRefs.forEach(newRef => {
+                if (newRef) {
+                  // We need to remove the old ref because it references
+                  // an element that has potentially been destroyed
+                  const existingRefIndex = this.rowRefs.findIndex(
+                    ref => ref && ref.id === newRef.id
+                  )
+                  if (existingRefIndex !== -1) {
+                    this.rowRefs.splice(existingRefIndex, 1)
+                  }
+                  // Add the new ref, pointing to the current ref
+                  this.rowRefs.push(newRef)
+                }
+              })
+            }
           })
         }
       }
@@ -342,10 +356,8 @@ body.tapestry-lightbox-open {
 }
 
 #lightbox {
-  color: #111;
-
   &.full-screen {
-    background: #eee;
+    background: var(--bg-color-primary);
 
     .close-btn {
       position: fixed;

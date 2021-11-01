@@ -1,7 +1,10 @@
 <template>
   <div ref="activity" class="activity-media">
     <h1 v-if="showTitle" class="media-title">{{ node.title }}</h1>
-    <completion-screen v-if="showCompletionScreen" :question="activeQuestion">
+    <completion-screen
+      v-if="state === 'completion-screen'"
+      :question="activeQuestion"
+    >
       <button
         v-if="hasNext"
         class="button-completion"
@@ -12,36 +15,70 @@
         <p>Next question</p>
       </button>
       <button v-else class="button-completion" @click="close">
-        <i class="far fa-times-circle fa-4x"></i>
-        <p>Done</p>
+        <template v-if="context === 'lightbox'">
+          <i class="fas fa-times-circle fa-4x"></i>
+          <p>Done</p>
+        </template>
+        <template v-else>
+          <i class="fas fa-arrow-circle-right fa-4x"></i>
+          <p>Continue</p>
+        </template>
       </button>
     </completion-screen>
     <question
-      v-else
+      v-else-if="state === 'activity'"
       :question="activeQuestion"
       :node="questionNode"
       @submit="handleComplete('activity')"
       @skipQuestion="skip"
       @back="$emit('close')"
     ></question>
-    <footer v-if="!showCompletionScreen" class="question-footer">
-      <p class="question-step">{{ currentQuestionText }}</p>
-      <button
-        v-if="questions.length > 1"
-        class="button-nav"
-        :disabled="!hasPrev"
-        @click="prev"
-      >
-        <i class="fas fa-arrow-left"></i>
-      </button>
-      <button
-        v-if="questions.length > 1"
-        class="button-nav"
-        :disabled="!hasNext"
-        @click="next"
-      >
-        <i class="fas fa-arrow-right"></i>
-      </button>
+    <answer-media
+      v-else-if="state === 'answer'"
+      :node="node"
+      :type-data="currentQuestionTypeData"
+      @complete="handleComplete('answer')"
+      @close="$emit('close')"
+      @load="$emit('load', $event)"
+    ></answer-media>
+    <footer class="question-footer">
+      <template v-if="state !== 'completion-screen'">
+        <b-button
+          v-if="hasAnswers && state === 'activity'"
+          variant="info"
+          class="mr-auto"
+          @click="state = 'answer'"
+        >
+          Show previous answers
+        </b-button>
+        <b-button
+          v-else-if="canChangeAnswer && state === 'answer'"
+          variant="info"
+          class="mr-auto"
+          @click="state = 'activity'"
+        >
+          Change answers
+        </b-button>
+        <template v-if="initialType === 'activity'">
+          <p class="question-step">{{ currentQuestionText }}</p>
+          <button
+            v-if="questions.length > 1"
+            class="button-nav"
+            :disabled="!hasPrev"
+            @click="prev"
+          >
+            <i class="fas fa-arrow-left"></i>
+          </button>
+          <button
+            v-if="questions.length > 1"
+            class="button-nav"
+            :disabled="!hasNext"
+            @click="next"
+          >
+            <i class="fas fa-arrow-right"></i>
+          </button>
+        </template>
+      </template>
     </footer>
   </div>
 </template>
@@ -51,12 +88,20 @@ import client from "@/services/TapestryAPI"
 import Question from "./Question"
 import CompletionScreen from "./CompletionScreen"
 import { mapActions, mapGetters } from "vuex"
+import AnswerMedia from "./AnswerMedia.vue"
+
+const states = {
+  ACTIVITY: "activity",
+  ANSWER: "answer",
+  COMPLETION_SCREEN: "completion-screen",
+}
 
 export default {
   name: "activity-media",
   components: {
     CompletionScreen,
     Question,
+    AnswerMedia,
   },
   props: {
     node: {
@@ -72,20 +117,35 @@ export default {
       required: false,
       default: "",
     },
+    initialType: {
+      type: String,
+      required: true,
+    },
   },
   data() {
     return {
       activeQuestionIndex: 0,
-      showCompletionScreen: false,
+      state: "",
     }
   },
   computed: {
-    ...mapGetters(["getAnswers"]),
+    ...mapGetters(["getAnswers", "getQuestion", "getNode"]),
+    questionNode() {
+      return this.initialType === states.ACTIVITY
+        ? this.node
+        : this.getNode(this.node.typeData.activityId)
+    },
     showTitle() {
       return this.context === "page" && this.node.typeData.showTitle !== false
     },
     questions() {
-      return this.node.typeData.activity.questions
+      /* NOTE: If this is an answer node we retreive the single question
+       *       that is stored in the answer node.
+       */
+
+      return this.initialType === states.ACTIVITY
+        ? this.node.typeData.activity.questions
+        : [this.getQuestion(this.node.typeData.questionId)]
     },
     activeQuestion() {
       return this.questions[this.activeQuestionIndex]
@@ -99,8 +159,51 @@ export default {
     hasPrev() {
       return this.activeQuestionIndex !== 0
     },
+    hasAnswers() {
+      return !!Object.entries(
+        this.getAnswers(this.questionNode.id, this.activeQuestion.id)
+      ).length
+    },
+    canChangeAnswer() {
+      if (this.initialType === states.ANSWER) {
+        return this.node.typeData.isEditable
+      }
+      return true
+    },
+    currentQuestionTypeData() {
+      return this.initialType === states.ACTIVITY
+        ? {
+            activityId: this.node.id,
+            questionId: this.activeQuestion.id,
+          }
+        : {}
+    },
+  },
+  watch: {
+    activeQuestion() {
+      if (this.initialType === states.ACTIVITY) {
+        if (this.hasAnswers && this.state === states.ACTIVITY) {
+          this.state = states.ANSWER
+        } else if (!this.hasAnswers && this.node.typeData.isEditable) {
+          this.state = states.ACTIVITY
+        }
+      }
+    },
   },
   mounted() {
+    switch (this.initialType) {
+      case states.ACTIVITY:
+        if (this.hasAnswers) {
+          this.state = states.ANSWER
+        } else {
+          this.state = states.ACTIVITY
+        }
+        break
+      case states.ANSWER:
+        this.state = states.ANSWER
+        break
+    }
+
     this.$emit("change:dimensions", {
       width: this.dimensions.width,
       height:
@@ -149,19 +252,8 @@ export default {
         this.$emit("complete")
       }
     },
-    handleSubmit() {
-      this.showCompletionScreen = true
-      const numberCompleted = this.questions.filter(question => question.completed)
-        .length
-      const progress = numberCompleted / this.node.typeData.activity.questions.length
-      this.updateNodeProgress({ id: this.node.id, progress }).then(() => {
-        if (progress === 1) {
-          this.$emit("complete")
-        }
-      })
-    },
     next() {
-      this.showCompletionScreen = false
+      this.state = states.ACTIVITY
       client.recordAnalyticsEvent("user", "next", "activity", this.node.id, {
         from: this.activeQuestionIndex,
         to: this.activeQuestionIndex + 1,
@@ -169,7 +261,7 @@ export default {
       this.activeQuestionIndex++
     },
     prev() {
-      this.showCompletionScreen = false
+      this.state = states.ACTIVITY
       client.recordAnalyticsEvent("user", "prev", "activity", this.node.id, {
         from: this.activeQuestionIndex,
         to: this.activeQuestionIndex - 1,
@@ -210,7 +302,7 @@ export default {
     text-align: left;
     font-size: 1.75rem;
     font-weight: 500;
-    margin-bottom: 0.9em;
+    margin-bottom: 0.9em 0 0.5em 25px;
     width: 100%;
 
     :before {
@@ -224,6 +316,7 @@ export default {
   display: flex;
   justify-content: flex-end;
   align-items: center;
+  width: 100%;
 }
 
 .button-completion {
@@ -241,7 +334,7 @@ export default {
   }
 
   &:hover {
-    color: #11a6d8;
+    color: var(--highlight-color);
   }
 
   p {
@@ -259,19 +352,19 @@ export default {
   border-radius: 50%;
   height: 56px;
   width: 56px;
-  background: #262626;
+  background: var(--text-color-primary);
+  color: var(--bg-color-primary);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 40px;
-  color: white;
   margin: 0;
   margin-right: 12px;
   opacity: 1;
   transition: all 0.1s ease-out;
 
   &:hover {
-    background: #11a6d8;
+    background: var(--highlight-color);
   }
 
   &:disabled {

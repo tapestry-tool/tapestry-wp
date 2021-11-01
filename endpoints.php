@@ -1,11 +1,5 @@
 <?php
 
-define('LOAD_KALTURA',
-    (defined('KALTURA_ADMIN_SECRET') && !empty(KALTURA_ADMIN_SECRET)) && 
-    (defined('KALTURA_PARTNER_ID') && !empty(KALTURA_PARTNER_ID)) && 
-    (defined('KALTURA_SERVICE_URL') && !empty(KALTURA_SERVICE_URL)) &&
-    (defined('KALTURA_UNIQUE_CONFIG') && !empty(KALTURA_UNIQUE_CONFIG)));
-
 /**
  * Tapestry Endpoints.
  */
@@ -17,11 +11,8 @@ require_once __DIR__.'/classes/class.tapestry-user-progress.php';
 require_once __DIR__.'/classes/class.tapestry-audio.php';
 require_once __DIR__.'/classes/class.tapestry-h5p.php';
 require_once __DIR__.'/classes/class.constants.php';
+require_once __DIR__.'/classes/class.kaltura-api.php';
 require_once __DIR__.'/utilities/class.tapestry-user.php';
-
-if (LOAD_KALTURA) {
-    require_once __DIR__.'/services/class.kaltura-api.php';
-}
 
 $REST_API_NAMESPACE = 'tapestry-tool/v1';
 
@@ -228,6 +219,20 @@ $REST_API_ENDPOINTS = [
         'ARGUMENTS' => [
             'methods' => $REST_API_POST_METHOD,
             'callback' => 'updateUserH5PSettingsByPostId',
+        ],
+    ],
+    'GET_USER_THEME' => (object) [
+        'ROUTE' => '/users/userSettings/theme',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => 'getUserTheme',
+        ],
+    ],
+    'UPDATE_USER_SETTINGS' => (object) [
+        'ROUTE' => '/users/userSettings',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_PUT_METHOD,
+            'callback' => 'updateUserSettings',
         ],
     ],
     'POST_USER_AUDIO' => (object) [
@@ -733,7 +738,7 @@ function reverseTapestryLink($request)
         if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
             throw new TapestryError('INVALID_POST_ID');
         }
-        if (!TapestryHelpers::userIsAllowed('ADD', $newLink->source, $postId) 
+        if (!TapestryHelpers::userIsAllowed('ADD', $newLink->source, $postId)
             || !TapestryHelpers::userIsAllowed('ADD', $newLink->target, $postId)) {
             throw new TapestryError('ADD_LINK_PERMISSION_DENIED');
         }
@@ -1318,6 +1323,28 @@ function getUserH5PSettingsByPostId($request)
     }
 }
 
+function updateUserSettings($request)
+{
+    $userSettings = $request->get_body();
+    try {
+        $userProgress = new TapestryUserProgress();
+        $userProgress->updateUserSettings($userSettings);
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+
+function getUserTheme($request)
+{
+    try {
+        $userProgress = new TapestryUserProgress();
+        return $userProgress->getTheme();
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
 /**
  * Update the user's h5p settings by post id.
  *
@@ -1521,10 +1548,9 @@ function getQuestionHasAnswers($request)
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
-    
 }
 
-function kalturaStatus($request) 
+function kalturaStatus($request)
 {
     return LOAD_KALTURA;
 }

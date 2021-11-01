@@ -19,15 +19,18 @@ To get started with developing locally:
 - Setup your local dev environment. You have 2 options for your local development:
   1. *Using LAMP/MAMP/WAMP:* Follow the detailed instruction for [Mac, Windows](https://github.com/wynnset/tapestry-wp/wiki/Getting-Started-(Mac-&-Windows)), or [Linux](https://github.com/wynnset/tapestry-wp/wiki/Getting-Started-on-Arch-Linux).
   2. *Using Docker:* Follow the detailed [Docker Installation & Usage](https://github.com/wynnset/tapestry-wp/wiki/Docker-Installation-&-Usage) wiki page.
+- Edit your Wordpress `wp-config.php` file and add the following line right above the comment "That's all, stop editing!":
+    ```
+    define('TAPESTRY_USE_DEV_MODE', true);
+    ```
 - Follow the steps below under "Getting external links to work"
-- Make sure `$TAPESTRY_USE_DEV_MODE` is set to `TRUE` in `tapestry.php`
 - In the `templates/vue` directory, run `npm start` to serve with hot reload at localhost:8080
 
 ### Build & Deployment
 
 To build a new plugin zip file with your local edits:
 - CD into the `templates/vue` directory and run: `npm install && npm run build`
-- Open up `tapestry.php` and set `$TAPESTRY_USE_DEV_MODE` to `FALSE`
+- Edit your Wordpress `wp-config.php` file and set `TAPESTRY_USE_DEV_MODE` to false if it exists (no action needed if that setting doesn't exist)
 - You can safely delete:
   - All hidden files in the root directory
   - All files and directories in the `templates/vue` directory except the `dist` folder
@@ -52,6 +55,7 @@ If you complete these steps before running `npm run build`, you will have link p
 You may optionally set uploaded videos in Tapestry to upload to Kaltura (if you have access to the Kaltura platform) by following these instructions:
 
 1. In your wordpress root directory, run `composer install`. If successful, you will be able to see a `vendor` folder containing `kaltura`.
+
 2. Edit your Wordpress `wp-config.php` file and add the following lines right above the comment "That's all, stop editing! Happy publishing":
     ```
     define('KALTURA_ADMIN_SECRET', '');
@@ -59,15 +63,9 @@ You may optionally set uploaded videos in Tapestry to upload to Kaltura (if you 
     define('KALTURA_SERVICE_URL', '');
     define('KALTURA_UNIQUE_CONFIG', '');
     ```
-The Kaltura Admininstrator Secret and Partner ID can be found by going to your Kaltura Settings > Integration tab in the Kaltura admin. The service URL is simply the main domain where your Kaltura videos are hosted on.
+The Kaltura Admininstrator Secret and Partner ID can be found by going to your Kaltura Settings > Integration tab in the Kaltura admin. The service URL is simply the main domain where your Kaltura videos are hosted on. The Kaltura Unique Configuration sets the media player design. It can be found in the Studio tab. 
 
-The Kaltura Unique Configuration sets the media player design. It can be found in the Studio tab. 
-
-3. On wordpress admin, open Settings->Media and make sure `Organize my uploads into month- and year-based folders` is un-checked
-
-3. Note the following wp variables as they can effect file uploading and HTTP request execution time limits in the WordPress server. This might be relevant for Kaltura and regular file upload as well.
-  File: `php.ini` or `php.conf.ini`
-  Variables of interest:
+3. Note the following PHP configurations affect file uploading and HTTP request execution time limits on the server. This might be relevant for Kaltura and regular file upload as well. We recommend you find your active `php.ini` file and edit the following configurations:
     ```
     post_max_size = 
     upload_max_filesize =
