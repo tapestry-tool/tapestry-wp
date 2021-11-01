@@ -129,6 +129,28 @@ class TapestryUserProgress implements ITapestryUserProgress
         return $this->_getUserH5PSettings();
     }
 
+    /**
+     * Update the user's theme.
+     *
+     * @param string $userSettings stores theme
+     *
+     * @return null
+     */
+    public function updateUserSettings($userSettings)
+    {
+        $this->_updateUserSettings($userSettings);
+    }
+
+    /**
+     * Get the user's Theme.
+     *
+     * @return object theme $theme
+     */
+    public function getTheme()
+    {
+        return $this->_getTheme();
+    }
+
     public function isCompleted($nodeId = null, $userId = null)
     {
         if (!$nodeId) {
@@ -261,6 +283,20 @@ class TapestryUserProgress implements ITapestryUserProgress
         $settings = get_user_meta($this->_userId, 'tapestry_h5p_setting_'.$this->postId, true);
 
         return $settings ? json_decode($settings) : (object) [];
+    }
+
+    private function _updateUserSettings($userSettings)
+    {
+        update_user_meta($this->_userId, 'user_settings', $userSettings);
+    }
+
+    private function _getTheme()
+    {
+        $userSettings = get_user_meta($this->_userId, 'user_settings', true);
+        $userSettingsObject = json_decode($userSettings);
+        $theme = $userSettingsObject->theme;
+
+        return $theme ? $theme : '';
     }
 
     /**

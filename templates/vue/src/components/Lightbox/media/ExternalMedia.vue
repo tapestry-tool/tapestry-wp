@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="h-100">
     <h1 v-if="showTitle" class="external-media-title external-page-style">
       {{ node.title }}
     </h1>
