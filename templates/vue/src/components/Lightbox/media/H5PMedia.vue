@@ -57,7 +57,7 @@ export default {
       } else return "auto"
     },
     hasMultiContentContext() {
-      return this.context === "multi-content" || this.context === "page"
+      return this.context === "multi-content"
     },
     iframeHeight() {
       if (this.frameHeight) {

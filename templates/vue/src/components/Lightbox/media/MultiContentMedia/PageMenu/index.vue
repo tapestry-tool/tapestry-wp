@@ -166,13 +166,14 @@ export default {
     if (this.rowRefs) {
       this.$router.push({
         ...this.$route,
-        query: {
-          ...this.$route.query,
-          row:
+        params: {
+          ...this.$route.params,
+          rowId:
             this.node.childOrdering.length > 0
               ? this.node.childOrdering[0]
               : undefined,
         },
+        query: this.$route.query,
       })
     }
   },

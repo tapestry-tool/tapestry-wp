@@ -1,5 +1,8 @@
 <template>
-  <li :class="{ disabled: disabled }">
+  <li
+    v-if="(node.typeData.menuTitle || node.title).trim().length"
+    :class="{ disabled: disabled }"
+  >
     <div
       class="page-menu-item-wrapper"
       @mouseover="hovered = true"
@@ -88,7 +91,7 @@ export default {
         .filter(row => !row.node.popup)
     },
     contentSelected() {
-      return this.node.id === this.$route.query.row || this.childrenSelected.length
+      return this.node.id === this.$route.params.row || this.childrenSelected.length
     },
     disabledFrom() {
       return this.rows.findIndex(row => !row.node.completed)
@@ -125,7 +128,8 @@ export default {
       this.$emit("scroll-to", nodeId)
       this.$router.push({
         ...this.$route,
-        query: { ...this.$route.query, row: nodeId },
+        params: { ...this.$route.params, rowId: nodeId },
+        query: this.$route.query,
       })
     },
   },

@@ -31,8 +31,8 @@ export default {
     },
     showTitle() {
       return (
-        this.context !== "page" ||
-        (this.context === "page" && this.node.typeData.showTitle !== false)
+        this.context !== "multi-content" ||
+        (this.context === "multi-content" && this.node.typeData.showTitle !== false)
       )
     },
   },

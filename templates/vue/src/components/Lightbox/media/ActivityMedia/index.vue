@@ -136,7 +136,9 @@ export default {
         : this.getNode(this.node.typeData.activityId)
     },
     showTitle() {
-      return this.context === "page" && this.node.typeData.showTitle !== false
+      return (
+        this.context === "multi-content" && this.node.typeData.showTitle !== false
+      )
     },
     questions() {
       /* NOTE: If this is an answer node we retreive the single question

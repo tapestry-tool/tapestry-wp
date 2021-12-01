@@ -24,7 +24,7 @@
 </template>
 
 <script>
-import { mapActions, mapState } from "vuex"
+import { mapGetters, mapActions, mapState } from "vuex"
 import client from "@/services/TapestryAPI"
 import { SEEK_THRESHOLD } from "./video.config"
 import Helpers from "@/utils/Helpers"
@@ -68,8 +68,13 @@ export default {
   },
   computed: {
     ...mapState(["h5pSettings"]),
+    ...mapGetters(["getDirectParents", "getNode"]),
+    parent() {
+      const parentId = this.getDirectParents(this.node.id)[0]
+      return parentId && this.getNode(parentId)
+    },
     hasMultiContentContext() {
-      return this.context === "multi-content" || this.context === "page"
+      return this.context === "multi-content"
     },
   },
   watch: {
@@ -370,7 +375,11 @@ export default {
          * cut off. To work around this, we refresh the h5p content window and
          * wait for that to load.
          */
-        if (this.context === "accordion" && !this.refreshed) {
+        if (
+          this.context === "multi-content" &&
+          this.parent.presentationStyle === "accordion" &&
+          !this.refreshed
+        ) {
           this.$refs.h5p.contentWindow.location.reload()
           this.refreshed = true
         } else {

@@ -1475,7 +1475,7 @@ function updateLastSelectedNode($request)
     try {
         $userProgress = new TapestryUserProgress($postId);
 
-        return $userProgress->updateLastSelectedNode($body->nodeId, $body->rowId, $body->subRowId);
+        return $userProgress->updateLastSelectedNode($body->nodeId, $body->rowId);
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }

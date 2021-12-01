@@ -256,7 +256,10 @@ export default {
           if (el.hasOwnProperty("$el")) {
             el = el.$el
           }
-          this.$refs.content.scroll(0, el.offsetTop - PADDING_OFFSET)
+          if (el) {
+            console.error("Cannot scroll to non-existing element ", el)
+            this.$refs.content.scroll(0, el.offsetTop - PADDING_OFFSET)
+          }
         })
       }
     },

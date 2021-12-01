@@ -352,7 +352,7 @@ class TapestryUserProgress implements ITapestryUserProgress
      *
      * @return null
      */
-    public function updateLastSelectedNode($nodeId, $rowId, $subRowId)
+    public function updateLastSelectedNode($nodeId, $rowId)
     {
         $this->_checkPostId();
 
@@ -361,9 +361,6 @@ class TapestryUserProgress implements ITapestryUserProgress
 
         if ($rowId) {
             $lastSelectedNode->rowId = $rowId;
-        }
-        if ($subRowId) {
-            $lastSelectedNode->subRowId = $subRowId;
         }
 
         update_user_meta($this->_userId, 'tapestry_last_selected_node_'.$this->postId, $lastSelectedNode);

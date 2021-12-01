@@ -60,11 +60,6 @@ function parseToStore(dataset) {
     multiContentRowIds.forEach(multiContentRowId => {
       const multiContentRow = getNode(dataset, multiContentRowId)
       multiContentRow.isMultiContentChild = true
-      const subRows = getChildIds({ links: dataset.links }, multiContentRowId)
-      subRows.forEach(id => {
-        const subRow = getNode(dataset, id)
-        subRow.isMultiContentChild = true
-      })
     })
   }
 

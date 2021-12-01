@@ -50,9 +50,6 @@
     <div v-else class="text-right mt-n3 mb-n2">
       <a href="#" class="small" @click="addDesc = true">Add Description</a>
     </div>
-    <b-form-group v-if="node.hasSubAccordion" label="Subaccordion Text">
-      <b-form-input v-model="node.typeData.subAccordionText"></b-form-input>
-    </b-form-group>
     <b-form-group v-show="isPopupCandidate" label="Popup">
       <popup-form :node="node" :is-candidate="isPopupCandidate" />
     </b-form-group>

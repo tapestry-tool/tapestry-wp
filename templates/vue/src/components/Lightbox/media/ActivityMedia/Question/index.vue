@@ -53,7 +53,7 @@
             :id="question.id"
             :node="node"
             :question="question"
-            :answer="answer"
+            :answer="answer || ''"
             @skipQuestion="$emit('skipQuestion')"
             @submit="handleSubmit"
           ></component>

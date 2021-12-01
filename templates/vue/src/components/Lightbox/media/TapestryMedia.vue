@@ -108,6 +108,7 @@ export default {
   data() {
     return {
       timeSinceLastSaved: new Date(),
+      lastHoveredRowId: null,
     }
   },
   computed: {
@@ -135,11 +136,13 @@ export default {
     setHovered() {
       this.$router.push({
         ...this.$route,
-        query: {
-          ...this.$route.query,
-          row: this.nodeId,
+        params: {
+          ...this.$route.params,
+          rowId: this.nodeId,
         },
+        query: this.$route.query,
       })
+      this.lastHoveredRowId = this.nodeId
     },
     handleLoad(args) {
       this.$emit("load", args)

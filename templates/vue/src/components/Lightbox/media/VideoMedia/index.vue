@@ -162,7 +162,9 @@ export default {
       return popups
     },
     showTitle() {
-      return this.context === "page" && this.node.typeData.showTitle !== false
+      return (
+        this.context === "multi-content" && this.node.typeData.showTitle !== false
+      )
     },
     autoplay() {
       return this.context == "lightbox"
@@ -306,7 +308,7 @@ export default {
 .video-wrapper {
   width: 100%;
 
-  &.context-page {
+  &.context-multi-content {
     border-radius: 15px;
     overflow: hidden;
   }

@@ -93,7 +93,9 @@ export default {
       return {}
     },
     showTitle() {
-      return this.context === "page" && this.node.typeData.showTitle !== false
+      return (
+        this.context === "multi-content" && this.node.typeData.showTitle !== false
+      )
     },
     showVertically() {
       return this.node.typeData.halfWidth && this.context !== "lightbox"
