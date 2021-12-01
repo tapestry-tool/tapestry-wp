@@ -366,7 +366,6 @@ export default class Helpers {
         mediaURL: "",
         mediaWidth: 960, //TODO: This needs to be flexible with H5P
         mediaHeight: 600,
-        subAccordionText: "More content:",
       },
       hideTitle: false,
       hideProgress: false,

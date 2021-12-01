@@ -294,7 +294,7 @@ class TapestryUserProgress implements ITapestryUserProgress
     {
         $userSettings = get_user_meta($this->_userId, 'user_settings', true);
         $userSettingsObject = json_decode($userSettings);
-        $theme = $userSettingsObject->theme;
+        $theme = isset($userSettingsObject->theme) ? $userSettingsObject->theme : '';
 
         return $theme ? $theme : '';
     }

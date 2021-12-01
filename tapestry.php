@@ -16,6 +16,8 @@ $TAPESTRY_VERSION_NUMBER = '2.50.0-beta';
 // Set this to false if you want to use the Vue build instead of npm dev
 $TAPESTRY_USE_DEV_MODE = true;
 
+error_reporting(E_ERROR | E_PARSE);
+
 /**
  * Register endpoints.
  */

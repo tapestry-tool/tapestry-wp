@@ -437,6 +437,7 @@ class Tapestry implements ITapestry
         return $newNodes;
     }
 
+    // TODO: Optimize this algorithm and make sure it doesn't go into infinite loop
     private function _recursivelySetAccessible($node, $visited, $nodeList)
     {
         if (!isset($node)) {
