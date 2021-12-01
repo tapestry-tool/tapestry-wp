@@ -1,5 +1,6 @@
 <template>
   <tapestry-modal
+    v-if="node"
     id="lightbox"
     data-qa="lightbox"
     :class="[
@@ -29,7 +30,6 @@
         :node="node"
         :row-id="rowId"
         :class="{ 'has-navbar': settings.tydeModeEnabled }"
-        :sub-row-id="subRowId"
         @close="handleAutoClose"
         @complete="complete"
       />
@@ -83,15 +83,10 @@ export default {
   },
   props: {
     nodeId: {
-      type: Number,
+      type: [Number, String],
       required: true,
     },
     rowId: {
-      type: Number,
-      required: false,
-      default: 0,
-    },
-    subRowId: {
       type: Number,
       required: false,
       default: 0,
@@ -255,20 +250,6 @@ export default {
         }
       },
     },
-    subRowId: {
-      immediate: true,
-      handler(subRowId) {
-        if (subRowId) {
-          if (!this.isMultiContentRow(subRowId, this.rowId)) {
-            this.$router.replace({
-              name: names.ACCORDION,
-              params: { nodeId: this.nodeId, rowId: this.rowId },
-              query: this.$route.query,
-            })
-          }
-        }
-      },
-    },
   },
   mounted() {
     document.querySelector("body").classList.add("tapestry-lightbox-open")
@@ -280,7 +261,8 @@ export default {
     DragSelectModular.addDragSelectListener()
     this.$router.push({
       ...this.$route,
-      query: { ...this.$route.query, row: undefined },
+      params: { ...this.$route.params, rowId: undefined },
+      query: this.$route.query,
     })
   },
   methods: {

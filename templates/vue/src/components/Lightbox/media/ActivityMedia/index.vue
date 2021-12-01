@@ -148,7 +148,9 @@ export default {
         : this.getNode(this.node.typeData.activityId)
     },
     showTitle() {
-      return this.context === "page" && this.node.typeData.showTitle !== false
+      return (
+        this.context === "multi-content" && this.node.typeData.showTitle !== false
+      )
     },
     isDyadNodeAndUser() {
       return !!this.linkedDyadUserName && this.node.isDyad

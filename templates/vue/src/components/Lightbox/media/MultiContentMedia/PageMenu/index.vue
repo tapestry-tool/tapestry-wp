@@ -164,7 +164,7 @@ export default {
       return Helpers.getBrowserWidth()
     },
     unitsMenuVisible() {
-      if (!this.pages) {
+      if (!this.pages || this.parentNode.childOrdering.length <= 1) {
         return false
       }
       return this.opened || (this.browserWidth > 800 && this.node.fullscreen)
@@ -174,13 +174,14 @@ export default {
     if (this.rowRefs) {
       this.$router.push({
         ...this.$route,
-        query: {
-          ...this.$route.query,
-          row:
+        params: {
+          ...this.$route.params,
+          rowId:
             this.node.childOrdering.length > 0
               ? this.node.childOrdering[0]
               : undefined,
         },
+        query: this.$route.query,
       })
     }
   },

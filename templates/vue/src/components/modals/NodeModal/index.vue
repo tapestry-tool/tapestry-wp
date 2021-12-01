@@ -420,11 +420,12 @@ export default {
       return false
     },
     nodeId() {
+      const rowId = this.$route.params.rowId
       const nodeId = this.$route.params.nodeId
-      return nodeId || Number(nodeId)
+      return rowId || nodeId || Number(nodeId)
     },
     show() {
-      return this.$route.name === names.MODAL
+      return [names.MODAL, names.MULTICONTENTMODAL].includes(this.$route.name)
     },
     tab() {
       return this.$route.params.tab || ""

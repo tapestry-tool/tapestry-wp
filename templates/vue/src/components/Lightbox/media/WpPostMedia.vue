@@ -41,7 +41,9 @@ export default {
       return this.node.typeData.mediaURL
     },
     showTitle() {
-      return this.context === "page" && this.node.typeData.showTitle !== false
+      return (
+        this.context === "multi-content" && this.node.typeData.showTitle !== false
+      )
     },
   },
   async mounted() {

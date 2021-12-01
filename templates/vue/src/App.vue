@@ -2,9 +2,9 @@
   <loading v-if="loading" data-qa="tapestry-loading" style="height: 75vh;"></loading>
   <div v-else id="app">
     <tapestry-app></tapestry-app>
-    <router-view name="lightbox"></router-view>
-    <router-view name="linkmodal"></router-view>
+    <router-view></router-view>
     <node-modal></node-modal>
+    <lightbox v-if="viewingNode" :node-id="nodeId"></lightbox>
     <sidebar v-if="!isEmpty"></sidebar>
     <tapestry-error></tapestry-error>
     <b-modal
@@ -24,6 +24,8 @@
 
 <script>
 import { mapState, mapMutations, mapGetters } from "vuex"
+import { names } from "@/config/routes"
+import Lightbox from "@/components/Lightbox"
 import NodeModal from "@/components/modals/NodeModal"
 import TapestryApp from "@/components/TapestryApp"
 import Sidebar from "@/components/Sidebar"
@@ -37,6 +39,7 @@ export default {
   name: "app",
   components: {
     Loading,
+    Lightbox,
     NodeModal,
     TapestryApp,
     Sidebar,
@@ -53,6 +56,12 @@ export default {
     ...mapGetters(["getTheme"]),
     isEmpty() {
       return Object.keys(this.nodes).length === 0
+    },
+    nodeId() {
+      return this.$route.params.nodeId
+    },
+    viewingNode() {
+      return this.$route.name !== names.APP
     },
   },
   watch: {
@@ -116,12 +125,9 @@ export default {
             path = `/nodes/${selectedNode.nodeId}`
             if (selectedNode.rowId) {
               path = `${path}/view/${selectedNode.rowId}`
-              if (selectedNode.subRowId) {
-                path = `${path}/rows/${selectedNode.subRowId}`
-              }
             }
           }
-          this.$router.replace({
+          this.$router.push({
             path,
             query: this.$route.query,
           })
