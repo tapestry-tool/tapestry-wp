@@ -32,7 +32,6 @@
         "mediaURL":"",
         "mediaWidth":960,
         "mediaHeight":600,
-        "subAccordionText":"More content:",
         "textContent":""
       },
       "coordinates":{
@@ -124,7 +123,6 @@
         "mediaURL":"https://youtu.be/d63DL-Erz50",
         "mediaWidth":960,
         "mediaHeight":600,
-        "subAccordionText":"More content:",
         "textContent":"",
         "youtubeID":"d63DL-Erz50"
       },
@@ -200,7 +198,6 @@
         "mediaURL":"",
         "mediaWidth":960,
         "mediaHeight":600,
-        "subAccordionText":"More content:",
         "textContent":"XYZ"
       },
       "coordinates":{
@@ -288,7 +285,6 @@
         "mediaURL":"",
         "mediaWidth":960,
         "mediaHeight":600,
-        "subAccordionText":"More content:",
         "textContent":"More!"
       },
       "coordinates":{

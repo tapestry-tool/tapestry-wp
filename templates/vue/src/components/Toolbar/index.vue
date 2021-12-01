@@ -24,6 +24,7 @@
             </b-col>
           </template>
           <tapestry-depth-slider
+            v-if="!settings.tydeModeEnabled"
             v-show="!showMap && hasDepth"
             @change="updateViewBox"
             @change:max-depth="maxDepth = $event"

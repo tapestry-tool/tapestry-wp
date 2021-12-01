@@ -6,7 +6,11 @@
       :is-sidebar-open="isSidebarOpen"
       data-qa="tapestry-map"
     />
-    <tapestry-main v-else-if="!tydeModeEnabled" ref="graph" :viewBox="viewBox" />
+    <tapestry-main
+      v-else-if="!tydeModeEnabled && viewingTapestry"
+      ref="graph"
+      :viewBox="viewBox"
+    />
   </div>
 </template>
 
@@ -36,6 +40,9 @@ export default {
     ...mapState(["nodes", "links", "selection", "settings", "rootId", "avatar"]),
     isSidebarOpen() {
       return Boolean(this.$route.query.sidebar)
+    },
+    viewingTapestry() {
+      return !this.$route.name || this.$route.name === "app"
     },
     analyticsEnabled() {
       return this.settings.analyticsEnabled

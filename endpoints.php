@@ -344,7 +344,7 @@ foreach ($REST_API_ENDPOINTS as $ENDPOINT) {
             register_rest_route(
                 $REST_API_NAMESPACE,
                 $ENDPOINT->ROUTE,
-                $ENDPOINT->ARGUMENTS
+                array_merge(array('permission_callback' => '__return_true') ,$ENDPOINT->ARGUMENTS)
             );
         }
     );

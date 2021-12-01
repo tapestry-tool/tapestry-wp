@@ -28,6 +28,8 @@ $TYDE_DYAD_ROLES = [
     'dyad_l3' => 'Dyad (Level 3)',
 ];
 
+error_reporting(E_ERROR | E_PARSE);
+
 /**
  * Register endpoints.
  */

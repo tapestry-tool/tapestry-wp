@@ -416,7 +416,8 @@ class Tapestry implements ITapestry
                 $node = new TapestryNode($this->postId, $nodeId);
                 $data = new stdClass();
                 $data->id = $nodeId;
-                $data->accessible = false;
+                // TEMPORARY FIX! This next line should be reverted to false
+                $data->accessible = true;
                 $data->unlocked = !$node->isLocked();
                 $data->conditions = $node->getLockedState();
                 $data->isDyad = $node->isDyad();
@@ -433,13 +434,15 @@ class Tapestry implements ITapestry
                     break;
                 }
             }
-            $this->_recursivelySetAccessibleAndDyad($root, [], [], $newNodes);
+            // TEMPORARY FIX! This line should be uncommented
+            // $this->_recursivelySetAccessibleAndDyad($root, [], [], $newNodes);
         }
 
         return $newNodes;
     }
 
     // Note: This also sets the isDyad node recursively
+    // TODO: Optimize this algorithm and make sure it doesn't go into infinite loop
     private function _recursivelySetAccessibleAndDyad($node, $visited, $dyadNodes, $nodeList)
     {
         if (!isset($node)) {
