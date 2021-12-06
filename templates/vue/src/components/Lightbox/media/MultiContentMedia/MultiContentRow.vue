@@ -1,20 +1,13 @@
 <template>
-  <b-col
-    :id="`row-${row.node.id}`"
-    :key="row.node.id"
-    ref="rowRefs"
-    class="col multi-content-row-wrapper"
-    cols="12"
-    :lg="row.node.typeData.halfWidth ? 6 : 12"
-  >
+  <b-col :class="htmlClass" cols="12" :lg="node.typeData.halfWidth ? 6 : 12">
     <div v-if="presentationStyle === 'accordion'" class="button-row">
       <button class="trigger-row-btn" :disabled="disabled" @click="toggle">
         <i v-if="!disabled" :class="isVisible ? 'fas fa-minus' : 'fas fa-plus'"></i>
         <i v-else class="fas fa-lock fa-sm title-row-ico"></i>
-        {{ row.node.title }}
+        {{ node.title }}
         <locked-content
           v-if="disabled"
-          :node="row.node"
+          :node="node"
           :condition-node="conditionNode"
         ></locked-content>
       </button>
@@ -24,14 +17,14 @@
       <a
         v-if="!disabled"
         class="favourite-btn"
-        :class="{ 'is-favourite': isFavourite(row.node.id) }"
-        @click="toggleFavourite(row.node.id)"
+        :class="{ 'is-favourite': isFavourite(node.id) }"
+        @click="toggleFavourite(node.id)"
       >
         <i class="fas fa-heart fa-sm"></i>
       </a>
     </div>
     <div v-if="isVisible" class="multi-content-row">
-      <div v-if="presentationStyle === 'accordion'" class="title-row-icon">
+      <div v-if="presentationStyle !== 'accordion'" class="title-row-icon">
         <i v-if="disabled" class="fas fa-lock fa-sm"></i>
         <span v-else>
           <a>
@@ -42,36 +35,38 @@
             ></i>
           </a>
           <a
+            v-if="node.typeData.showTitle !== false"
             class="favourite-btn"
-            :class="{ 'is-favourite': isFavourite(row.node.id) }"
+            :class="{ 'is-favourite': isFavourite(node.id) }"
           >
-            <i class="fas fa-heart fa-sm" @click="toggleFavourite(row.node.id)"></i>
+            <i class="fas fa-heart fa-sm" @click="toggleFavourite(node.id)"></i>
           </a>
         </span>
       </div>
-      <div v-if="disabled" class="row-content">
+      <div v-if="disabled && presentationStyle !== 'accordion'" class="row-content">
         <h1 class="title">
-          {{ row.node.title }}
+          {{ node.title }}
         </h1>
         <locked-content
-          :node="row.node"
-          :condition-node="index > 0 ? rows[index - 1].node : {}"
+          :node="node"
+          :condition-node="conditionNode"
         ></locked-content>
       </div>
-      <div v-else :data-qa="`row-content-${row.node.id}`" class="row-content">
-        <div v-if="row.node.mediaType !== 'multi-content'">
+      <div v-else :data-qa="`row-content-${node.id}`" class="row-content">
+        <div v-if="node.mediaType !== 'multi-content'">
           <tapestry-media
-            :node-id="row.node.id"
+            :node-id="node.id"
             :dimensions="dimensions"
             context="multi-content"
+            :hide-title="presentationStyle === 'accordion'"
             style="margin-bottom: 24px;"
             @complete="updateProgress"
-            @load="handleLoad($refs.rowRefs[index])"
+            @load="handleLoad(null)"
           />
           <multi-content-rows
-            v-if="row.children.length > 0"
+            v-if="children.length > 0"
             :dimensions="dimensions"
-            :node="row.node"
+            :node="node"
             context="multi-content"
             :level="level + 1"
             @load="handleLoad"
@@ -79,10 +74,11 @@
           />
         </div>
         <multi-content-media
-          v-else-if="row.children.length > 0"
-          :node="getNode(row.node.id)"
+          v-else-if="children.length > 0"
+          :node="getNode(node.id)"
           context="multi-content"
           :level="level + 1"
+          :hide-title="presentationStyle === 'accordion'"
           @close="handleAutoClose"
           @complete="updateProgress"
         />
@@ -108,8 +104,12 @@ export default {
   },
 
   props: {
-    row: {
+    node: {
       type: Object,
+      required: true,
+    },
+    children: {
+      type: Array,
       required: true,
     },
     parent: {
@@ -157,19 +157,19 @@ export default {
     ...mapGetters(["isFavourite", "getNode"]),
     ...mapState(["favourites"]),
     canEditNode() {
-      return Helpers.hasPermission(this.row.node, "edit")
+      return Helpers.hasPermission(this.node, "edit")
     },
-  },
-  watch: {
-    node() {
-      this.$nextTick(() => {
-        this.$root.$emit("observe-rows", this.$refs.rowRefs)
-      })
+    htmlClass() {
+      return [
+        "col",
+        "multi-content-row-wrapper",
+        "presentation-style-" + this.presentationStyle,
+        (this.presentationStyle === "page" ? "pr" : "pl") + "-0",
+      ]
     },
   },
   mounted() {
     this.isVisible = this.presentationStyle === "page"
-    this.$root.$emit("observe-rows", this.$refs.rowRefs)
   },
   methods: {
     ...mapActions(["toggleFavourite"]),
@@ -180,17 +180,18 @@ export default {
     editNode() {
       this.setReturnRoute(this.$route)
       this.$router.push({
-        name: names.MULTICONTENTMODAL,
+        name: names.MODAL,
         params: {
-          nodeId: this.parent.id,
+          nodeId: this.$route.params.nodeId,
           type: "edit",
-          rowId: this.row.node.id,
+          rowId: this.node.id,
           tab: "content",
         },
+        query: { from: "lightbox" },
       })
     },
     updateProgress() {
-      this.$emit("updateProgress", this.row.node.id)
+      this.$emit("updateProgress", this.node.id)
     },
     handleLoad(el) {
       this.$emit("load", el)
@@ -202,11 +203,17 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
-.multi-content-row-wrapper {
-  background: var(--bg-color-layered);
+<style lang="scss">
+.multi-content-row-wrapper.presentation-style-accordion
+  > .multi-content-row
+  > .row-content
+  > .media-container
+  > header {
+  display: none;
 }
+</style>
 
+<style lang="scss" scoped>
 button[disabled] {
   opacity: 0.6;
   cursor: not-allowed;
@@ -230,6 +237,7 @@ button[disabled] {
 }
 
 .multi-content-row {
+  background: var(--bg-color-layered);
   border-radius: 4px;
   padding: 8px 16px;
   margin-bottom: 8px;
@@ -238,6 +246,7 @@ button[disabled] {
     position: absolute;
     right: 12px;
     text-align: right;
+    z-index: 100;
     a {
       text-decoration: none !important;
     }

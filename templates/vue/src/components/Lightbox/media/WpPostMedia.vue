@@ -28,6 +28,11 @@ export default {
       required: false,
       default: "",
     },
+    hideTitle: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   data() {
     return {
@@ -42,7 +47,9 @@ export default {
     },
     showTitle() {
       return (
-        this.context === "multi-content" && this.node.typeData.showTitle !== false
+        !this.hideTitle &&
+        this.context === "multi-content" &&
+        this.node.typeData.showTitle !== false
       )
     },
   },

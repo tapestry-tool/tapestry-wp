@@ -37,7 +37,11 @@ export default {
       return Boolean(this.$route.query.sidebar)
     },
     viewingTapestry() {
-      return !this.$route.name || this.$route.name === "app"
+      return (
+        !this.$route.name ||
+        this.$route.name !== names.LIGHTBOX ||
+        !this.nodes[this.$route.params.nodeId].fullscreen
+      )
     },
     analyticsEnabled() {
       return this.settings.analyticsEnabled
