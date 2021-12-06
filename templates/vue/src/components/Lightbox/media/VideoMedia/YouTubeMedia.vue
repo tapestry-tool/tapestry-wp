@@ -256,15 +256,4 @@ export default {
   max-height: calc(100vh - 120px);
   height: 100%;
 }
-
-.video-title {
-  text-align: left;
-  margin-bottom: 0.9em 0 0.5em 25px;
-  font-weight: 500;
-  font-size: 1.75rem;
-
-  :before {
-    display: none;
-  }
-}
 </style>

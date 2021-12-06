@@ -82,10 +82,6 @@ export default {
       type: Object,
       required: true,
     },
-    rowRefs: {
-      type: Array,
-      required: true,
-    },
     dimensions: {
       type: Object,
       required: false,
@@ -100,6 +96,7 @@ export default {
   data() {
     return {
       opened: false,
+      pages: false,
       selectedPage: this.node.id,
     }
   },
@@ -114,11 +111,6 @@ export default {
     },
     parentNodeTitle() {
       return this.parentNode?.title ? this.parentNode.title : ""
-    },
-    currentPageTitle() {
-      return this.pages[this.selectedPage]?.title
-        ? this.pages[this.selectedPage]?.title
-        : ""
     },
     rows() {
       return this.node.childOrdering
@@ -144,22 +136,6 @@ export default {
     isFullScreen() {
       return this.fullScreen || this.node.fullscreen
     },
-    pages() {
-      if (
-        this.parentNode?.mediaType === "multi-content" &&
-        this.parentNode?.presentationStyle === "unit"
-      ) {
-        return this.parentNode.childOrdering.reduce((pages, nodeId) => {
-          const node = this.getNode(nodeId)
-          pages[nodeId] = {
-            id: node.id,
-            title: node.title,
-          }
-          return pages
-        }, {})
-      }
-      return {}
-    },
     browserWidth() {
       return Helpers.getBrowserWidth()
     },
@@ -170,22 +146,25 @@ export default {
       return this.opened || (this.browserWidth > 800 && this.node.fullscreen)
     },
   },
+  watch: {
+    parentNode() {
+      this.updatePages()
+    },
+  },
   mounted() {
-    if (this.rowRefs) {
-      this.$router.push({
-        ...this.$route,
-        params: {
-          ...this.$route.params,
-          rowId:
-            this.node.childOrdering.length > 0
-              ? this.node.childOrdering[0]
-              : undefined,
-        },
-        query: this.$route.query,
-      })
-    }
+    this.updatePages()
   },
   methods: {
+    updatePages() {
+      if (
+        this.parentNode?.mediaType === "multi-content" &&
+        this.parentNode?.presentationStyle === "unit"
+      ) {
+        this.pages = this.parentNode.childOrdering.map(this.getNode)
+      } else {
+        this.pages = false
+      }
+    },
     disabledRow(node) {
       const index = this.rows.findIndex(row => row.node.id === node.id)
       return (
@@ -212,17 +191,15 @@ export default {
     },
     scrollToRef(nodeId) {
       this.$nextTick(() => {
-        if (this.rowRefs) {
-          let el = this.rowRefs.find(ref => ref && ref.id === `row-${nodeId}`)
-          if (el && el.hasOwnProperty("$el")) {
-            el = el.$el
-          }
-          if (el) {
-            el.scrollIntoView({
-              behavior: "smooth",
-            })
-          }
-        }
+        const container = document.getElementById(`multicontent-container`)
+        const yOffset = -50
+        const element = document.getElementById(`row-${nodeId}`)
+        const y =
+          element.getBoundingClientRect().top -
+          container.getBoundingClientRect().top +
+          container.scrollTop +
+          yOffset
+        container.scrollTo({ top: y, behavior: "smooth" })
       })
     },
   },
@@ -298,6 +275,10 @@ export default {
           display: none;
         }
       }
+    }
+
+    .page-nav-toggle + .page-nav-content {
+      margin-top: 9em;
     }
 
     .page-nav-container {

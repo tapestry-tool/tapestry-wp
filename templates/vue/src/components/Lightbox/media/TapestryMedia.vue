@@ -16,6 +16,7 @@
       v-if="node.mediaType === 'text'"
       :node="node"
       :context="context"
+      :hide-title="hideTitle"
       @complete="complete"
       @load="handleLoad"
     />
@@ -24,6 +25,7 @@
       :dimensions="dimensions"
       :context="context"
       :node-id="nodeId"
+      :hide-title="hideTitle"
       @change:dimensions="$emit('change:dimensions', $event)"
       @load="handleLoad"
       @update-progress="updateProgress"
@@ -35,6 +37,7 @@
       :dimensions="dimensions"
       :context="context"
       :node="node"
+      :hide-title="hideTitle"
       @change:dimensions="$emit('change:dimensions', $event)"
       @load="handleLoad"
       @complete="complete"
@@ -45,6 +48,7 @@
       :dimensions="dimensions"
       :node="node"
       :context="context"
+      :hide-title="hideTitle"
       @change:dimensions="$emit('change:dimensions', $event)"
       @load="handleLoad"
       @complete="complete"
@@ -53,6 +57,7 @@
       v-if="node.mediaType === 'wp-post'"
       :node="node"
       :context="context"
+      :hide-title="hideTitle"
       @complete="complete"
       @load="handleLoad"
     ></wp-post-media>
@@ -62,6 +67,7 @@
       :node="node"
       :context="context"
       :initial-type="node.mediaType"
+      :hide-title="hideTitle"
       @change:dimensions="$emit('change:dimensions', $event)"
       @complete="complete"
       @close="$emit('close')"
@@ -103,6 +109,11 @@ export default {
       type: String,
       required: false,
       default: "lightbox",
+    },
+    hideTitle: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   data() {

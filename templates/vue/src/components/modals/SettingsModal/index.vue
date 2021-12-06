@@ -554,7 +554,7 @@ export default {
       }
     },
     async updateSettings() {
-      /* NOTE: this functionallity sets the root node as the defualt tyde mode node
+      /* NOTE: this functionallity sets the root node as the default tyde mode node
                for every role
         */
       if (this.tydeModeEnabled) {

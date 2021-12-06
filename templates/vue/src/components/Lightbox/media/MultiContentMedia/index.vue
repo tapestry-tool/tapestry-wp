@@ -82,6 +82,11 @@ export default {
       required: false,
       default: 0,
     },
+    hideTitle: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   data() {
     return {
@@ -127,7 +132,10 @@ export default {
       return this.rows.findIndex(row => !row.node.completed)
     },
     showTitle() {
-      return this.level == 0 || this.node.typeData.showTitle !== false
+      return (
+        !this.hideTitle &&
+        (this.level == 0 || this.node.typeData.showTitle !== false)
+      )
     },
   },
   mounted() {

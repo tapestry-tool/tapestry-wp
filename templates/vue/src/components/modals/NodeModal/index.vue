@@ -425,7 +425,7 @@ export default {
       return rowId || nodeId || Number(nodeId)
     },
     show() {
-      return [names.MODAL, names.MULTICONTENTMODAL].includes(this.$route.name)
+      return this.$route.name === names.MODAL
     },
     tab() {
       return this.$route.params.tab || ""

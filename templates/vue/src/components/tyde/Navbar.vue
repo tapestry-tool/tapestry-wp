@@ -53,21 +53,17 @@ export default {
       if (this.$route.query.tab && this.tabs.includes(this.$route.query.tab)) {
         return this.$route.query.tab
       }
+      const currentNodeId = this.$route.params.nodeId
+      if (currentNodeId && this.settings.tydeModeTabs) {
+        const tabName = Object.keys(this.settings.tydeModeTabs).find(
+          key => this.settings.tydeModeTabs[key] === currentNodeId
+        )
+        return tabName || "default"
+      }
       return "default"
     },
     tabs() {
       return ["default", "profile", "goals", "cos"]
-    },
-    defaultTabBaseNodeId() {
-      let defaultNodeId = this.rootId
-      if (this.settings.tydeModeTabs.default) {
-        let userMainRole = getCurrentUser().roles[0]
-        if (!userMainRole || !(userMainRole in this.settings.tydeModeTabs.default)) {
-          userMainRole = "public"
-        }
-        defaultNodeId = this.settings.tydeModeTabs.default[userMainRole]
-      }
-      return defaultNodeId
     },
     canEditTapestry() {
       return canEditTapestry()
@@ -75,14 +71,6 @@ export default {
     isCompact() {
       return Helpers.getBrowserWidth() < 550 + this.tabs.length * 150
     },
-  },
-  mounted() {
-    if (this.selectedTab === "default") {
-      this.defaultTabNodeId = this.$route.params.nodeId
-    } else {
-      this.defaultTabNodeId = this.defaultTabBaseNodeId
-    }
-    this.handleTabChange(this.selectedTab)
   },
   methods: {
     handleTabChange(tab) {
@@ -97,10 +85,10 @@ export default {
       }
 
       if (selectedNodeId) {
-        this.$router.replace({
+        this.$router.push({
           name: names.LIGHTBOX,
           params: { nodeId: selectedNodeId },
-          query: { ...this.$route.query, tab },
+          query: { ...this.$route.query, tab: tab === "cos" ? tab : undefined },
         })
       }
     },
