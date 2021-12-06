@@ -1,15 +1,19 @@
 <template>
   <div data-qa="multi-content-rows" class="multi-content-rows">
-    <b-row class="mr-0">
+    <b-row :class="(node.presentationStyle === 'page' ? 'mr' : 'ml') + '-0'">
       <multi-content-row
         v-for="(row, index) in rows"
+        :id="`row-${row.node.id}`"
         :key="row.node.id"
-        class="mb-2"
-        :row="row"
+        class="my-2 mb-1"
+        :node="row.node"
+        :children="row.children"
         :parent="node"
         :index="index"
-        :condition-node="index > 0 ? nonPopupRows[index - 1].node : {}"
-        :presentation-style="node.presentationStyle"
+        :condition-node="
+          index > 0 && nonPopupRows[index - 1] ? nonPopupRows[index - 1].node : {}
+        "
+        :presentation-style="node.presentationStyle || 'accordion'"
         :disabled="disableRow(index, row.node)"
         :dimensions="dimensions"
         :context="context"

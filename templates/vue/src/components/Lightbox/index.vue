@@ -14,6 +14,7 @@
   >
     <multi-content-media
       v-if="node.mediaType === 'multi-content'"
+      id="multicontent-container"
       :node="node"
       :row-id="rowId"
       @close="handleAutoClose"
@@ -22,7 +23,6 @@
     <page-menu
       v-if="node.typeData.showNavBar && node.presentationStyle === 'page'"
       :node="node"
-      :rowRefs="rowRefs"
       :dimensions="dimensions"
     />
     <tapestry-media
@@ -76,7 +76,6 @@ export default {
         left: 50,
       },
       showCompletionScreen: false,
-      rowRefs: [],
     }
   },
   computed: {
@@ -298,26 +297,6 @@ export default {
         this.$root.$emit("open-node", pageNode.id)
       } else {
         this.applyDimensions()
-        if (this.node.mediaType === "multi-content") {
-          this.$root.$on("observe-rows", newRefs => {
-            if (Array.isArray(newRefs)) {
-              newRefs.forEach(newRef => {
-                if (newRef) {
-                  // We need to remove the old ref because it references
-                  // an element that has potentially been destroyed
-                  const existingRefIndex = this.rowRefs.findIndex(
-                    ref => ref && ref.id === newRef.id
-                  )
-                  if (existingRefIndex !== -1) {
-                    this.rowRefs.splice(existingRefIndex, 1)
-                  }
-                  // Add the new ref, pointing to the current ref
-                  this.rowRefs.push(newRef)
-                }
-              })
-            }
-          })
-        }
       }
     },
   },

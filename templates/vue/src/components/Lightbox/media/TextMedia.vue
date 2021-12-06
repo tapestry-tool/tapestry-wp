@@ -18,6 +18,11 @@ export default {
       required: false,
       default: "",
     },
+    hideTitle: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   computed: {
     content() {
@@ -31,8 +36,10 @@ export default {
     },
     showTitle() {
       return (
-        this.context !== "multi-content" ||
-        (this.context === "multi-content" && this.node.typeData.showTitle !== false)
+        !this.hideTitle &&
+        (this.context !== "multi-content" ||
+          (this.context === "multi-content" &&
+            this.node.typeData.showTitle !== false))
       )
     },
   },

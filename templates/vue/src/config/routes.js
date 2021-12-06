@@ -1,5 +1,3 @@
-import LinkModal from "@/components/modals/LinkModal"
-
 const parseParams = route => {
   const parsedParams = {}
   for (const key in route.params) {
@@ -13,7 +11,6 @@ export const names = {
   APP: "app",
   LIGHTBOX: "lightbox",
   MODAL: "modal",
-  MULTICONTENTMODAL: "multicontenmodal",
   SETTINGS: "settings",
   LINKMODAL: "linkmodal",
   USERSETTINGS: "userSettings",
@@ -33,34 +30,22 @@ export default [
         props: {
           lightbox: parseParams,
         },
-        children: [
-          {
-            path: `:type(add|edit)`,
-            redirect: `${ROOT_PATH}/view/:rowId/:type/content`,
-          },
-          {
-            path: `:type(add|edit)/:tab`,
-            name: names.MULTICONTENTMODAL,
-          },
-        ],
       },
       {
         path: `:type(add|edit)`,
         redirect: `${ROOT_PATH}/:type/content`,
       },
       {
-        path: `:type(add|edit)/:tab`,
+        path: `:type(add|edit)/:rowId(\\d+)`,
+        redirect: `${ROOT_PATH}/:type/:rowId(\\d+)/content`,
+      },
+      {
+        path: `:type(add|edit)/:rowId(\\d+)?/:tab`,
         name: names.MODAL,
       },
       {
-        path: `link`,
+        path: `link/:source/:target`,
         name: names.LINKMODAL,
-        components: {
-          linkmodal: LinkModal,
-        },
-        props: {
-          linkmodal: parseParams,
-        },
       },
       {
         path: `settings`,

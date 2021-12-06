@@ -4,6 +4,7 @@
     <tapestry-app></tapestry-app>
     <router-view></router-view>
     <node-modal></node-modal>
+    <link-modal></link-modal>
     <lightbox v-if="viewingNode" :node-id="nodeId"></lightbox>
     <sidebar v-if="!isEmpty"></sidebar>
     <tapestry-error></tapestry-error>
@@ -26,6 +27,7 @@
 import { mapState, mapMutations, mapGetters } from "vuex"
 import { names } from "@/config/routes"
 import Lightbox from "@/components/Lightbox"
+import LinkModal from "@/components/modals/LinkModal"
 import NodeModal from "@/components/modals/NodeModal"
 import TapestryApp from "@/components/TapestryApp"
 import Sidebar from "@/components/Sidebar"
@@ -41,6 +43,7 @@ export default {
     Loading,
     Lightbox,
     NodeModal,
+    LinkModal,
     TapestryApp,
     Sidebar,
     TapestryError,
@@ -61,7 +64,9 @@ export default {
       return this.$route.params.nodeId
     },
     viewingNode() {
-      return this.$route.name !== names.APP
+      return (
+        this.$route.name === names.LIGHTBOX || this.$route.query.from === "lightbox"
+      )
     },
   },
   watch: {
