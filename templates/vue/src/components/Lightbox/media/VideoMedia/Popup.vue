@@ -24,6 +24,15 @@
       />
     </div>
     <div v-if="completing || isComplete" class="popup-footer">
+      <b-alert
+        v-if="isComplete && node.mediaType === 'activity'"
+        show
+        variant="info"
+        class="popup-completed-alert"
+      >
+        You've already completed this activity. Press continue to go back to the
+        video.
+      </b-alert>
       <div v-if="completing" class="aside">
         <b-spinner></b-spinner>
       </div>
@@ -36,6 +45,7 @@
 
 <script>
 import { mapActions, mapGetters, mapMutations } from "vuex"
+import { canEditTapestry } from "@/services/wp"
 import { names } from "@/config/routes"
 import Helpers from "@/utils/Helpers"
 
@@ -70,6 +80,9 @@ export default {
   computed: {
     ...mapGetters(["getNode"]),
     isComplete() {
+      if (canEditTapestry()) {
+        return true
+      }
       const popup = this.getNode(this.node.id)
       if (popup) {
         return popup.completed
@@ -140,6 +153,12 @@ button {
 }
 .popup-footer {
   height: 80px;
+  .popup-completed-alert {
+    position: absolute;
+    left: 1.5em;
+    bottom: -16px;
+    height: 3em;
+  }
   .aside {
     height: auto;
     position: absolute;

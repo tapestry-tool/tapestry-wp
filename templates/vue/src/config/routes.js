@@ -59,7 +59,7 @@ export default [
       },
       {
         path: `user-settings`,
-        redirect: `${ROOT_PATH}/user-settings/avatar`,
+        redirect: `${ROOT_PATH}/user-settings/theme`,
         children: [
           {
             path: `:tab`,

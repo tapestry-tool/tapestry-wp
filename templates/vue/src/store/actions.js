@@ -119,7 +119,7 @@ export async function updateLockedStatus({ commit, getters, dispatch }) {
 export async function updateNodeProgress({ commit, dispatch }, payload) {
   // Tapestry editors and admins don't need this feature. We disable this to
   // improve performance for editors and admins by reducing requests.
-  if (wp.canEditTapestry) {
+  if (wp.canEditTapestry()) {
     return
   }
   try {
@@ -158,7 +158,7 @@ export async function updateNodeCoordinates(
 export async function completeNode(context, nodeId) {
   // Tapestry editors and admins don't need this feature. We disable this to
   // improve performance for editors and admins by reducing requests.
-  if (wp.canEditTapestry) {
+  if (wp.canEditTapestry()) {
     return
   }
   const { commit, dispatch, getters } = context

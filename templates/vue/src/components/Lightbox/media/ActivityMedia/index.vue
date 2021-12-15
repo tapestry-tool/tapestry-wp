@@ -190,6 +190,23 @@ export default {
   },
   watch: {
     activeQuestion() {
+      const nodeId = this.$route.params.rowId
+      if (nodeId) {
+        this.$nextTick(() => {
+          const container = document.getElementById(`multicontent-container`)
+          const yOffset = -50
+          const element = document.getElementById(`row-${nodeId}`)
+          const y =
+            element.getBoundingClientRect().top -
+            container.getBoundingClientRect().top +
+            container.scrollTop +
+            yOffset
+          container.scrollTo({ top: y, behavior: "smooth" })
+          client.recordAnalyticsEvent("app", "scroll", "multi-content", nodeId, {
+            to: y,
+          })
+        })
+      }
       if (this.initialType === states.ACTIVITY) {
         if (this.hasAnswers && this.state === states.ACTIVITY) {
           this.state = states.ANSWER
@@ -242,7 +259,6 @@ export default {
     },
     handleComplete(initiatingComponent) {
       if (initiatingComponent === "activity") {
-        this.state = states.COMPLETION_SCREEN
         const numberCompleted = this.questionNode.typeData.activity.questions.filter(
           question => question.completed || question.optional
         ).length
@@ -253,6 +269,15 @@ export default {
             this.$emit("complete")
           }
         })
+        if (!this.activeQuestion.confirmation.message && this.hasNext) {
+          if (this.questions[this.activeQuestionIndex + 1].completed) {
+            this.state = states.ANSWER
+          } else {
+            this.next()
+          }
+        } else {
+          this.state = states.COMPLETION_SCREEN
+        }
       } else if (
         this.initialType === states.ANSWER &&
         initiatingComponent === "answer" &&
@@ -285,9 +310,13 @@ export default {
     },
     close() {
       client.recordAnalyticsEvent("user", "close", "activity", this.node.id)
-      if (this.initialType === "activity" && this.context === "lightbox") {
+      if (
+        this.node.popup ||
+        (this.initialType === "activity" && this.context === "lightbox")
+      ) {
         this.$emit("close")
       } else {
+        this.activeQuestionIndex = 0
         this.state = states.ANSWER
       }
     },

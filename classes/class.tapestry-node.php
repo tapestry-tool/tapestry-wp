@@ -299,6 +299,11 @@ class TapestryNode implements ITapestryNode
         }
     }
 
+    public function getId()
+    {
+        return $this->nodeMetaId;
+    }
+
     public function getLockedState()
     {
         $conditions = $this->conditions;

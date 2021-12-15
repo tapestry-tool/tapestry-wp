@@ -92,11 +92,10 @@ export default {
 
     const data = [
       client.getTapestry(),
-      client.getUserProgress(),
       client.getLastSelectedNode(),
       client.getTheme(),
     ]
-    Promise.all(data).then(([dataset, progress, selectedNode, theme]) => {
+    Promise.all(data).then(([tapestryData, selectedNode, theme]) => {
       this.changeTheme(theme.data)
       if (this.getTheme == "system") {
         const isDarkMode =
@@ -118,10 +117,10 @@ export default {
         document.documentElement.setAttribute("data-theme", this.getTheme)
       }
 
-      this.init({ dataset, progress })
+      this.init(tapestryData)
       this.loading = false
-      if (!this.$route.params.nodeId && dataset.nodes.length > 0) {
-        let path = `/nodes/${dataset.rootId}`
+      if (!this.$route.params.nodeId && tapestryData.nodes.length > 0) {
+        let path = `/nodes/${tapestryData.rootId}`
         if (selectedNode) {
           path = `/nodes/${selectedNode.nodeId}`
           if (selectedNode.rowId) {

@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import { mapActions, mapState } from "vuex"
+import { mapState } from "vuex"
 
 export default {
   name: "theme-form",
@@ -36,12 +36,29 @@ export default {
     this.userTheme = this.theme ? this.theme : "light"
   },
   methods: {
-    ...mapActions(["updateUserSettings"]),
-    saveTheme() {
-      this.updateUserSettings({
-        theme: this.userTheme,
-      })
-      document.documentElement.setAttribute("data-theme", this.userTheme)
+    getTheme() {
+      return this.userTheme
+    },
+    applyTheme() {
+      if (this.userTheme == "system") {
+        const isDarkMode =
+          window.matchMedia &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches
+        document.documentElement.setAttribute(
+          "data-theme",
+          isDarkMode ? "dark" : "light"
+        )
+        window
+          .matchMedia("(prefers-color-scheme: dark)")
+          .addEventListener("change", e => {
+            document.documentElement.setAttribute(
+              "data-theme",
+              e.matches ? "dark" : "light"
+            )
+          })
+      } else {
+        document.documentElement.setAttribute("data-theme", this.userTheme)
+      }
     },
   },
 }
