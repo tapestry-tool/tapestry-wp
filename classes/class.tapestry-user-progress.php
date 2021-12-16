@@ -54,15 +54,12 @@ class TapestryUserProgress implements ITapestryUserProgress
      *
      * @return string progress   of each node in json format
      */
-    public function get()
+    public function get($tapestry = null)
     {
         $this->_isValidTapestryPost();
         $this->_checkPostId();
 
-        $tapestry = new Tapestry($this->postId);
-        $nodeIds = $tapestry->getNodeIds();
-
-        return $this->_getUserProgress($nodeIds);
+        return $this->_getUserProgress($tapestry);
     }
 
     /**
@@ -242,19 +239,23 @@ class TapestryUserProgress implements ITapestryUserProgress
         update_user_meta($this->_userId, 'tapestry_'.$this->postId.'_'.$this->nodeMetaId.'_question_'.$questionId.'_answers', $userAnswer);
     }
 
-    private function _getUserProgress($nodeIdArr)
+    private function _getUserProgress($tapestry = null)
     {
         $progress = new stdClass();
-        $tapestry = new Tapestry($this->postId);
 
-        $nodes = $tapestry->setUnlocked($nodeIdArr, $this->_userId);
+        if (!$tapestry) {
+            $tapestry = new Tapestry($this->postId);
+            $tapestry = $tapestry->get();
+        }
+
+        $nodes = $tapestry->nodes;
 
         // Build json object for frontend e.g. {0: 0.1, 1: 0.2} where 0 and 1 are the node IDs
         foreach ($nodes as $node) {
             $nodeId = $node->id;
 
             $userId = $this->_userId;
-            
+
             // Use linked user's progress if the user is a dyad and this node is a dyad node
             if ($node->isDyad && $this->_dyadLinkedUserId) {
                 $userId = $this->_dyadLinkedUserId;

@@ -4,10 +4,16 @@ require_once dirname(__FILE__).'/../utilities/class.tapestry-errors.php';
 require_once dirname(__FILE__).'/../utilities/class.tapestry-helpers.php';
 require_once dirname(__FILE__).'/../utilities/class.tapestry-user.php';
 require_once dirname(__FILE__).'/../utilities/class.tapestry-node-permissions.php';
+require_once dirname(__FILE__).'/../classes/class.tapestry-user-progress.php';
 require_once dirname(__FILE__).'/../classes/class.tapestry-h5p.php';
 require_once dirname(__FILE__).'/../classes/class.constants.php';
 require_once dirname(__FILE__).'/../interfaces/interface.tapestry.php';
 require_once dirname(__FILE__).'/class.constants.php';
+
+/**
+ * TODO: Implement group functionality. Currently all the group-related
+ * functionality code is commented out.
+ */
 
 /**
  * Add/update/retrieve a Tapestry.
@@ -16,11 +22,14 @@ class Tapestry implements ITapestry
 {
     private $postId;
     private $author;
-    private $groups;
+    // private $groups;
     private $links;
     private $settings;
     private $rootId;
     private $nodes;
+
+    private $nodeObjects; // Used only in the set up so we don't have to retrieve the nodes from the db multiple times
+    private $visitedNodeIds; // Used in _recursivelySetAccessible function
 
     private $updateTapestryPost = true;
 
@@ -38,7 +47,7 @@ class Tapestry implements ITapestry
 
         $this->nodes = [];
         $this->links = [];
-        $this->groups = [];
+        // $this->groups = [];
         $this->rootId = 0;
         $this->settings = $this->_getDefaultSettings();
 
@@ -87,9 +96,9 @@ class Tapestry implements ITapestry
         if (isset($tapestry->nodes) && is_array($tapestry->nodes)) {
             $this->nodes = $tapestry->nodes;
         }
-        if (isset($tapestry->groups) && is_array($tapestry->groups)) {
-            $this->groups = $tapestry->groups;
-        }
+        // if (isset($tapestry->groups) && is_array($tapestry->groups)) {
+        //     $this->groups = $tapestry->groups;
+        // }
         if (isset($tapestry->links) && is_array($tapestry->links)) {
             $this->links = $tapestry->links;
         }
@@ -110,7 +119,7 @@ class Tapestry implements ITapestry
      *
      * @return object $tapestry
      */
-    public function get($filterUserId)
+    public function get($filterUserId = -1)
     {
         if (!$this->postId) {
             throw new TapestryError('INVALID_POST_ID');
@@ -298,14 +307,14 @@ class Tapestry implements ITapestry
      */
     public function addGroup($group)
     {
-        $tapestryGroup = new TapestryGroup($this->postId);
-        $tapestryGroup->set($group);
-        $group = $tapestryGroup->save();
+        //     $tapestryGroup = new TapestryGroup($this->postId);
+        //     $tapestryGroup->set($group);
+        //     $group = $tapestryGroup->save();
 
-        array_push($this->groups, $group->id);
-        $this->_saveToDatabase();
+        //     array_push($this->groups, $group->id);
+        //     $this->_saveToDatabase();
 
-        return $group;
+        //     return $group;
     }
 
     /**
@@ -329,7 +338,7 @@ class Tapestry implements ITapestry
      */
     public function getGroup($groupMetaId)
     {
-        return new TapestryNode($this->postId, $groupMetaId);
+        // return new TapestryNode($this->postId, $groupMetaId);
     }
 
     /**
@@ -342,24 +351,83 @@ class Tapestry implements ITapestry
         return empty($this->rootId);
     }
 
-    public function setUnlocked($nodeIds)
+    public function getNodesDataForRender()
     {
-        $nodes = $this->_setAccessibleStatus($nodeIds);
+        $nodesData = [];
 
-        return array_map(
-            function ($nodeData) {
-                $node = new TapestryNode($this->postId, $nodeData->id);
-                $user = new TapestryUser();
-                $data = $user->canEdit($this->postId) || $nodeData->accessible ? $node->get() : $node->getMeta();
-                $data->accessible = $nodeData->accessible;
-                $data->conditions = $nodeData->conditions;
-                $data->unlocked = $nodeData->unlocked;
-                $data->isDyad = $nodeData->isDyad;
+        foreach ($this->nodeObjects as $i => $nodeObject) {
+            $nodeId = $nodeObject->getId();
 
-                return $data;
-            },
-            $nodes
-        );
+            $nodesData[$nodeId] = new stdClass();
+            $nodesData[$nodeId]->id = $nodeId;
+            $nodesData[$nodeId]->accessible = true;
+            $nodesData[$nodeId]->permitted = false;
+            $nodesData[$nodeId]->unlocked = !$nodeObject->isLocked();
+            $nodesData[$nodeId]->conditions = $nodeObject->getLockedState();
+            $nodesData[$nodeId]->isDyad = $nodeObject->isDyad();
+        }
+
+        if (count($nodesData)) {
+            // First set nodes accessible according to their unlocked status
+            // Since we are doing a non-bidirectional traversal, we have to loop through all the
+            // nodes (unless they have already been visited)
+            // Efficiency: N^2
+            $traversedNodeIds = [];
+            foreach ($nodesData as $node) {
+                if ($node->unlocked && !in_array($node->id, $traversedNodeIds)) {
+                    $this->_traverseNodesAndApplyFunction($nodesData, $node, false,
+                        function ($n) {
+                            $n->accessible = $n->unlocked;
+                        },
+                        function ($n) {
+                            return $n->unlocked;
+                        }
+                    );
+                    $traversedNodeIds = array_merge($traversedNodeIds, $this->visitedNodeIds);
+                }
+            }
+
+            // Then for each dyad node, mark all of their descendents to dyad as well
+            // Since we are doing a non-bidirectional traversal, we have to loop through all the
+            // nodes (unless they have already been visited)
+            // Efficiency: N^2
+            foreach ($nodesData as $node) {
+                if ($node->isDyad) {
+                    $this->_traverseNodesAndApplyFunction($nodesData, $node, false,
+                        function ($n) {
+                            $n->isDyad = true;
+                        },
+                        function ($n) {
+                            return $n->unlocked;
+                        }
+                    );
+                }
+            }
+
+            // Finally we get the remainder of the node data
+            // Here we only return node metadata if not accessible (unless user is an editor)
+            // Efficiency: N
+            $user = new TapestryUser();
+            $nodesData = array_map(
+                function ($nodeAccessibleData) use ($user) {
+                    $nodeId = $nodeAccessibleData->id;
+
+                    $data = $user->canEdit($this->postId) || $nodeAccessibleData->accessible ? $this->nodeObjects[$nodeId]->get() : $this->nodeObjects[$nodeId]->getMeta();
+
+                    $data->accessible = $nodeAccessibleData->accessible;
+                    $data->conditions = $nodeAccessibleData->conditions;
+                    $data->unlocked = $nodeAccessibleData->unlocked;
+                    $data->isDyad = $nodeAccessibleData->isDyad;
+
+                    return $data;
+                },
+                $nodesData
+            );
+
+            $nodesData = $this->_addH5PMeta($nodesData);
+        }
+
+        return $nodesData;
     }
 
     public function getAllContributors()
@@ -390,10 +458,10 @@ class Tapestry implements ITapestry
             }
             $nodes[] = $temp;
         }
-        $groups = [];
-        foreach ($this->groups as $group) {
-            $groups[] = (new TapestryGroup($this->postId, $$group))->get();
-        }
+        // $groups = [];
+        // foreach ($this->groups as $group) {
+        //     $groups[] = (new TapestryGroup($this->postId, $$group))->get();
+        // }
         $parsedUrl = parse_url($this->settings->permalink);
         unset($this->settings->permalink);
         unset($this->settings->tapestrySlug);
@@ -402,92 +470,57 @@ class Tapestry implements ITapestry
 
         return (object) [
             'nodes' => $nodes,
-            'groups' => $groups,
+            // 'groups' => $groups,
             'links' => $this->links,
             'settings' => $this->settings,
             'site-url' => $parsedUrl['scheme'].'://'.$parsedUrl['host'],
         ];
     }
 
-    private function _setAccessibleStatus($nodes)
+    /**
+     * Traverses through the nodes in one direction or bi-directioanlly and applies
+     * the given function to each node. Notes:
+     * - Nodes needs to be an array of objects, each object representing a node (at least with an id)
+     * - Not all nodes may get traversed if it's not a bi-directional traversal
+     * - Non-accessible (locked) nodes and their children do not get traversed
+     * - $func is the function to run takes a single parameter for node
+     * - $condition is the evaluation function needed to move further and it also takes a single
+     *    parameter for node (must return a truthy value).
+     */
+    private function _traverseNodesAndApplyFunction($nodes, $startingNode, $bidirectional, $func, $condition)
     {
-        $newNodes = array_map(
-            function ($nodeId) {
-                $node = new TapestryNode($this->postId, $nodeId);
-                $data = new stdClass();
-                $data->id = $nodeId;
-                // TEMPORARY FIX! This next line should be reverted to false
-                $data->accessible = true;
-                $data->unlocked = !$node->isLocked();
-                $data->conditions = $node->getLockedState();
-                $data->isDyad = $node->isDyad();
+        $this->visitedNodeIds = [];
 
-                return $data;
-            },
-            $nodes
-        );
-        if (count($newNodes)) {
-            $root = null;
-            foreach ($newNodes as $newNode) {
-                if ($this->rootId === $newNode->id) {
-                    $root = $newNode;
-                    break;
-                }
-            }
-            // TEMPORARY FIX! This line should be uncommented
-            // $this->_recursivelySetAccessibleAndDyad($root, [], [], $newNodes);
-        }
-
-        return $newNodes;
+        return $this->_recursivelyTraverseNodes($nodes, $startingNode, $bidirectional, $func, $condition);
     }
 
-    // Note: This also sets the isDyad node recursively
-    // TODO: Optimize this algorithm and make sure it doesn't go into infinite loop
-    private function _recursivelySetAccessibleAndDyad($node, $visited, $dyadNodes, $nodeList)
+    private function _recursivelyTraverseNodes($nodes, $startingNode, $bidirectional, $func, $condition)
     {
+        $node = $startingNode;
         if (!isset($node)) {
             return;
         }
-        if (!in_array($node, $visited)) {
-            array_push($visited, $node);
+        if (!in_array($node->id, $this->visitedNodeIds)) {
+            array_push($this->visitedNodeIds, $node->id);
         }
 
-        // If this node is in the list of dyadNodes, mark it as dyad
-        if (in_array($node->id, $dyadNodes)) {
-            $node->isDyad = true;
-            if (($key = array_search($node->id, $dyadNodes)) !== false) {
-                unset($dyadNodes[$key]);
-            }
-        }
+        $func($node, $nodes);
 
-        // If this node is dyad, save its children to be marked as dyad too
-        if ($node->isDyad) {
-            $childNodes = $this->_getNeighbours($node, 'source');
-            foreach ($childNodes as $childNode) {
-                if (!in_array($childNode, $dyadNodes)) {
-                    array_push($dyadNodes, $childNode);
-                }
-            }
-        }
-
-        $node->accessible = $node->unlocked;
-        if ($node->accessible) {
-            $neighbourIds = $this->_getNeighbours($node);
+        if ($condition($node)) {
+            $neighbourIds = $this->_getNeighbours($node, $bidirectional ? 'both' : 'source');
 
             $neighbours = [];
-
-            foreach ($neighbourIds as $nodeId) {
-                foreach ($nodeList as $otherNode) {
-                    if ($otherNode->id === $nodeId) {
+            foreach ($neighbourIds as $neighbourNodeId) {
+                foreach ($nodes as $otherNode) {
+                    if ($otherNode->id === $neighbourNodeId) {
                         array_push($neighbours, $otherNode);
                     }
                 }
             }
 
             foreach ($neighbours as $neighbour) {
-                if (!in_array($neighbour, $visited)) {
-                    array_push($visited, $neighbour);
-                    $this->_recursivelySetAccessibleAndDyad($neighbour, $visited, $dyadNodes, $nodeList);
+                if (!in_array($neighbour->id, $this->visitedNodeIds)) {
+                    $this->_recursivelyTraverseNodes($nodes, $neighbour, $bidirectional, $func, $condition);
                 }
             }
         }
@@ -525,7 +558,7 @@ class Tapestry implements ITapestry
         $tapestry = new stdClass();
         $tapestry->nodes = [];
         $tapestry->links = [];
-        $tapestry->groups = [];
+        // $tapestry->groups = [];
         $tapestry->rootId = 0;
         $tapestry->settings = $this->_getDefaultSettings();
 
@@ -568,7 +601,7 @@ class Tapestry implements ITapestry
     {
         return (object) [
             'nodes' => $this->nodes,
-            'groups' => $this->groups,
+            // 'groups' => $this->groups,
             'links' => $this->links,
             'settings' => $this->settings,
             'rootId' => $this->rootId,
@@ -594,47 +627,40 @@ class Tapestry implements ITapestry
 
     private function _getTapestry($filterUserId)
     {
+        // Get all the nodes from the database (we will need this info and only want to do it once)
+        foreach ($this->nodes as $nodeId) {
+            $this->nodeObjects[$nodeId] = new TapestryNode($this->postId, $nodeId);
+        }
+
         $tapestry = $this->_filterTapestry($this->_formTapestry(), $filterUserId);
 
-        $tapestry->nodes = $this->setUnlocked($tapestry->nodes);
+        $nodeIds = $tapestry->nodes;
 
-        $tapestry->groups = array_map(
-            function ($groupMetaId) {
-                $tapestryGroup = new TapestryGroup($this->postId, $groupMetaId);
+        $this->nodeObjects = array_filter($this->nodeObjects, function ($nodeId) use ($nodeIds) {
+            return in_array($nodeId, $nodeIds);
+        }, ARRAY_FILTER_USE_KEY);
 
-                return $tapestryGroup->get();
-            },
-            $tapestry->groups
-        );
+        $tapestry->nodes = $this->getNodesDataForRender();
 
-        $tapestry->nodes = $this->_addH5PMeta($tapestry->nodes);
+        // $tapestry->groups = array_map(
+        //     function ($groupMetaId) {
+        //         $tapestryGroup = new TapestryGroup($this->postId, $groupMetaId);
+
+        //         return $tapestryGroup->get();
+        //     },
+        //     $tapestry->groups
+        // );
+
+        $userProgress = new TapestryUserProgress($this->postId);
+        $tapestry->userProgress = $userProgress->get($tapestry);
 
         return $tapestry;
     }
 
     private function _filterTapestry($tapestry, $filterUserId)
     {
-        $user = new TapestryUser();
-
-        if (!isset($tapestry->settings->superuserOverridePermissions)) {
-            $tapestry->settings->superuserOverridePermissions = true;
-        }
-        $tapestry->nodes = $this->_filterNodesMetaIdsByStatus($tapestry->nodes);
-
-        if ($tapestry->settings->superuserOverridePermissions && $user->canEdit($this->postId)) {
-            $tapestry->links = $this->_filterLinksByNodeMetaIds($tapestry->links, $tapestry->nodes);
-        } else {
-            $tapestry->nodes = array_intersect(
-                $tapestry->nodes,
-                $this->_filterNodeMetaIdsByPermissions(
-                    $tapestry->rootId,
-                    $tapestry->settings->superuserOverridePermissions,
-                    $filterUserId
-                )
-            );
-            $tapestry->links = $this->_filterLinksByNodeMetaIds($tapestry->links, $tapestry->nodes);
-            $tapestry->groups = TapestryHelpers::getGroupIdsOfUser(wp_get_current_user()->ID, $this->postId);
-        }
+        $tapestry->nodes = $this->_filterNodesMetaIdsByAccess();
+        $tapestry->links = $this->_filterLinksByNodeMetaIds($tapestry->links, $tapestry->nodes);
 
         return $tapestry;
     }
@@ -652,20 +678,6 @@ class Tapestry implements ITapestry
         }
 
         return $newLinks;
-    }
-
-    private function _filterNodeMetaIdsByPermissions($rootId, $superuser_override, $secondaryUserId)
-    {
-        if (0 == $rootId) {
-            return [];
-        }
-
-        $currentUserId = wp_get_current_user()->ID;
-        $checked = [];
-        $nodesPermitted = [];
-        $this->_traverseNodes($rootId, $checked, $nodesPermitted, $superuser_override, $currentUserId, $secondaryUserId);
-
-        return $nodesPermitted;
     }
 
     private function _addH5PMeta($nodes)
@@ -688,49 +700,65 @@ class Tapestry implements ITapestry
         return $nodes;
     }
 
-    private function _filterNodesMetaIdsByStatus($nodeMetaIds)
+    private function _filterNodesMetaIdsByAccess()
     {
+        $currentUser = new TapestryUser();
+        $currentUserId = $currentUser->getID();
+
+        // First filter by node status
+
         if (!isset($this->settings->showRejected)) {
             $this->settings->showRejected = false;
         }
-        $currentUser = new TapestryUser();
-        $currentUserId = wp_get_current_user()->ID;
-        $nodesPermitted = [];
-        foreach ($nodeMetaIds as $nodeId) {
-            $node = new TapestryNode($this->postId, $nodeId);
+
+        $nodes = [];
+        foreach ($this->nodeObjects as $node) {
+            $nodeId = $node->getId();
             $nodeMeta = $node->getMeta();
             // draft nodes should only be visible to node authors
             // the exception is that the node is submitted in which case it should also be viewable to reviewers
             if (NodeStatus::DRAFT == $nodeMeta->status) {
                 if ($nodeMeta->author->id == $currentUserId) {
-                    array_push($nodesPermitted, $nodeId);
+                    array_push($nodes, $nodeId);
                 } elseif ((NodeStatus::SUBMIT == $nodeMeta->reviewStatus || (NodeStatus::REJECT == $nodeMeta->reviewStatus && $this->settings->showRejected)) && $currentUser->canEdit($this->postId)) {
-                    array_push($nodesPermitted, $nodeId);
+                    array_push($nodes, $nodeId);
                 }
             } else {
-                array_push($nodesPermitted, $nodeId);
+                array_push($nodes, $nodeId);
             }
         }
 
-        return $nodesPermitted;
-    }
+        // Then filter by access (i.e. node-level permissions)
 
-    private function _traverseNodes($node, &$checked, &$nodesPermitted, $superuser_override, $currentUserId, $secondaryUserId)
-    {
-        $checked[] = $node;
+        if (!isset($this->settings->superuserOverridePermissions)) {
+            $this->settings->superuserOverridePermissions = true;
+        }
 
-        if ($this->_userIsAllowed($node, $superuser_override, $currentUserId)
-            || $this->_userIsAllowed($node, $superuser_override, $secondaryUserId)) {
-            $nodesPermitted[] = $node;
+        $superuserOverridePermissions = $this->settings->superuserOverridePermissions;
 
-            foreach ($this->links as $link) {
-                if ($link->target == $node && $link->source && !in_array($link->source, $checked)) {
-                    $this->_traverseNodes($link->source, $checked, $nodesPermitted, $superuser_override, $currentUserId, $secondaryUserId);
-                } elseif ($link->source == $node && $link->target && !in_array($link->target, $checked)) {
-                    $this->_traverseNodes($link->target, $checked, $nodesPermitted, $superuser_override, $currentUserId, $secondaryUserId);
+        if (!$currentUser->canEdit($this->postId) || !$superuserOverridePermissions) {
+            $nodesPermitted = [];
+            foreach ($nodes as $nodeId) {
+                $nodesPermitted[$nodeId] = new stdClass();
+                $nodesPermitted[$nodeId]->id = $nodeId;
+                $nodesPermitted[$nodeId]->permitted = false;
+            }
+
+            $this->_traverseNodesAndApplyFunction($nodesPermitted, $nodesPermitted[$this->rootId], false,
+                function ($n) use ($superuserOverridePermissions, $currentUserId, $filterUserId) {
+                    $n->permitted = $this->_userIsAllowed($n->id, $superuserOverridePermissions, $currentUserId) ||
+                    (-1 !== $filterUserId && $this->_userIsAllowed($n->id, $superuserOverridePermissions, $filterUserId));
+                }, function ($n) {
+                    return $n->permitted;
                 }
-            }
+            );
+
+            $nodes = array_filter($nodes, function ($nodeId) use ($nodesPermitted) {
+                return $nodesPermitted[$nodeId]->permitted;
+            });
         }
+
+        return $nodes;
     }
 
     private function _userIsAllowed($node, $superuser_override, $userId)

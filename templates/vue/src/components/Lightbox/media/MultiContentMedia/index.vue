@@ -145,20 +145,26 @@ export default {
   methods: {
     ...mapMutations(["updateNode"]),
     ...mapActions(["completeNode", "toggleFavourite"]),
-    handleLoad(el) {
+    handleLoad() {
       this.$nextTick(() => {
-        if (this.activeIndex >= 0 && el) {
-          client.recordAnalyticsEvent(
-            "app",
-            "scroll",
-            "multi-content",
-            this.node.id,
-            {
-              to: el.offsetTop - 12,
-            }
-          )
-          this.$refs.container.scrollTop = el.offsetTop - 12
+        const nodeId = this.$route.params.rowId
+        const container = document.getElementById(`multicontent-container`)
+        const yOffset = -50
+        let y
+        if (nodeId) {
+          const element = document.getElementById(`row-${nodeId}`)
+          y =
+            element.getBoundingClientRect().top -
+            container.getBoundingClientRect().top +
+            container.scrollTop +
+            yOffset
+        } else {
+          y = container.getBoundingClientRect().top + yOffset
         }
+        container.scrollTo({ top: y, behavior: "smooth" })
+        client.recordAnalyticsEvent("app", "scroll", "multi-content", nodeId, {
+          to: y,
+        })
       })
     },
     handleClose(evt) {

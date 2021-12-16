@@ -10,9 +10,7 @@
         :children="row.children"
         :parent="node"
         :index="index"
-        :condition-node="
-          index > 0 && nonPopupRows[index - 1] ? nonPopupRows[index - 1].node : {}
-        "
+        :condition-node="index > 0 && rows[index - 1] ? rows[index - 1].node : {}"
         :presentation-style="node.presentationStyle || 'accordion'"
         :disabled="disableRow(index, row.node)"
         :dimensions="dimensions"
@@ -57,6 +55,7 @@ export default {
   data() {
     return {
       showCompletion: false,
+      numRowsLoaded: 0,
     }
   },
   computed: {
@@ -68,14 +67,12 @@ export default {
         const children = this.isMultiContent(node.id)
           ? node.childOrdering.map(this.getNode)
           : this.getDirectChildren(id).map(this.getNode)
-        return { node, children }
+        const nonPopupChildren = children.filter(childNode => !childNode.popup)
+        return { node, children: nonPopupChildren }
       })
     },
     lockRows() {
       return this.node.typeData.lockRows
-    },
-    nonPopupRows() {
-      return this.rows.filter(row => row.node.popup === null)
     },
     disabledFrom() {
       return this.rows.findIndex(row => !row.node.completed)
@@ -83,7 +80,10 @@ export default {
   },
   methods: {
     handleLoad(el) {
-      this.$emit("load", el)
+      this.numRowsLoaded++
+      if (this.numRowsLoaded == this.rows.length) {
+        this.$emit("load", el)
+      }
     },
     disableRow(index, node) {
       return (

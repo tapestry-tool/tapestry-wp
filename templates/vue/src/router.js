@@ -29,15 +29,19 @@ router.beforeEach((to, from, next) => {
 })
 
 let userLastSelectedNodeTimeout = null
+let userLastSelectedNodeNodeId = null
+let userLastSelectedNodeRowId = null
 
 router.afterEach((to, from) => {
   if (
     from.matched.length > 0 &&
     to.matched.length > 0 &&
-    (from.params.nodeId !== to.params.nodeId ||
-      from.params.rowId !== to.params.rowId)
+    (userLastSelectedNodeNodeId !== to.params.nodeId ||
+      userLastSelectedNodeRowId !== to.params.rowId)
   ) {
     clearTimeout(userLastSelectedNodeTimeout)
+    userLastSelectedNodeNodeId = to.params.nodeId
+    userLastSelectedNodeRowId = to.params.rowId
     userLastSelectedNodeTimeout = setTimeout(() => {
       client.updateUserLastSelectedNode(to.params.nodeId, to.params.rowId)
     }, 5000)

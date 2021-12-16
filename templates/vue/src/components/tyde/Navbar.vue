@@ -34,7 +34,7 @@ import TydeIcon from "./TydeIcon.vue"
 import UserSettingsButton from "../Toolbar/UserSettingsButton"
 import { names } from "@/config/routes"
 import Helpers from "@/utils/Helpers"
-import { getCurrentUser, canEditTapestry } from "@/services/wp"
+import { canEditTapestry } from "@/services/wp"
 
 export default {
   name: "navbar",

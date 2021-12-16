@@ -17,7 +17,7 @@
           :active="tab === 'avatar'"
           @click="$emit('change:tab', 'avatar')"
         >
-          <avatar-form ref="avatarForm" :preferences="avatar"></avatar-form>
+          <avatar-form ref="avatarForm"></avatar-form>
         </b-tab>
         <b-tab
           title="Theme"
@@ -49,7 +49,7 @@
 import DragSelectModular from "@/utils/dragSelectModular"
 import ThemeForm from "./ThemeForm"
 import AvatarForm from "./AvatarForm"
-import { mapState } from "vuex"
+import { mapState, mapActions } from "vuex"
 
 export default {
   name: "user-settings-modal",
@@ -85,12 +85,18 @@ export default {
     })
   },
   methods: {
+    ...mapActions(["updateUserSettings"]),
     closeModal() {
       this.$emit("close")
     },
     saveSettings() {
-      this.$refs.themeForm.saveTheme()
-      this.$refs.avatarForm.saveAvatar()
+      const theme = this.$refs.themeForm.getTheme()
+      this.$refs.themeForm.applyTheme()
+      let avatar = this.avatar
+      if (this.settings.tydeModeEnabled) {
+        avatar = this.$refs.avatarForm.getAvatar()
+      }
+      this.updateUserSettings({ theme, avatar })
       this.$emit("close")
     },
   },

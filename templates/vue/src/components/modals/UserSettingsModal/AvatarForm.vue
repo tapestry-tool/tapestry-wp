@@ -155,19 +155,12 @@
 <script>
 import Avataaars from "vuejs-avataaars"
 import avatarOptions from "./avatarOptions"
-import { mapActions } from "vuex"
+import { mapState } from "vuex"
 
 export default {
   name: "avatar-form",
   components: {
     Avataaars,
-  },
-  props: {
-    preferences: {
-      type: Object,
-      required: false,
-      default: () => {},
-    },
   },
   data() {
     return {
@@ -176,21 +169,21 @@ export default {
     }
   },
   computed: {
+    ...mapState(["avatar"]),
     hasAvatar() {
       return !(!this.userAvatar || Object.keys(this.userAvatar).length === 0)
     },
   },
   created() {
-    if (!this.preferences || Object.keys(this.preferences).length === 0) {
+    if (!this.avatar || Object.keys(this.avatar).length === 0) {
       this.userAvatar = avatarOptions.defaultAvatar
     } else {
-      this.userAvatar = { ...this.preferences }
+      this.userAvatar = { ...this.avatar }
     }
   },
   methods: {
-    ...mapActions(["updateUserSettings"]),
-    saveAvatar() {
-      this.updateUserSettings({ avatar: this.userAvatar })
+    getAvatar() {
+      return this.userAvatar
     },
   },
 }

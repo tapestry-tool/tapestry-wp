@@ -304,6 +304,11 @@ class TapestryNode implements ITapestryNode
         }
     }
 
+    public function getId()
+    {
+        return $this->nodeMetaId;
+    }
+
     public function getLockedState()
     {
         $conditions = $this->conditions;
@@ -389,9 +394,17 @@ class TapestryNode implements ITapestryNode
         return $nodeMeta->author->id == $userId;
     }
 
-    public function isDyad()
+    /**
+     * Set isDyad to the truthy parameter if a parameter is passed in
+     * Get isDyad if called with no params.
+     */
+    public function isDyad($set = null)
     {
-        return $this->isDyad;
+        if (null === $set) {
+            return $this->isDyad;
+        } else {
+            $this->isDyad = (bool) $set;
+        }
     }
 
     public function addReview($comments)
