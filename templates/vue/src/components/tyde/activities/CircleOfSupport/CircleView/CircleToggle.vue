@@ -68,8 +68,7 @@ button {
 }
 
 .circle {
-  border: var(--border-width, 2px) solid
-    var(--border-color, var(--cos-color-tertiary));
+  border: var(--border-width, 2px) solid var(--cos-bg-tertiary);
   width: calc(var(--radius) * 2);
   height: calc(var(--radius) * 2);
   border-radius: 50%;
@@ -77,7 +76,7 @@ button {
 
   &.active {
     --border-width: 4px;
-    --border-color: var(--cos-color-secondary);
+    --border-color: var(--cos-text-secondary);
   }
 
   &:first-child {

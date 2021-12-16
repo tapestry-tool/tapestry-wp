@@ -18,7 +18,7 @@
     </cos-popup-button>
     <div
       v-if="state === states.Add || state === states.Edit"
-      class="content-wrapper"
+      :class="{ 'content-wrapper': isOpen }"
     >
       <b-overlay class="form" :show="isSubmitting">
         <add-connection-form
@@ -262,11 +262,11 @@ ul {
   height: 100%;
 }
 .content-wrapper {
-  background: white;
+  background: var(--cos-bg-secondary);
   position: relative;
   z-index: 10;
   height: 100%;
-  border-top: 1px solid var(--cos-color-tertiary);
+  // border-top: 1px solid var(--cos-bg-tertiary);
   flex-grow: 1;
 }
 </style>

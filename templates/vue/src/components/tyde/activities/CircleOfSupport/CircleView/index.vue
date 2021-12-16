@@ -21,7 +21,6 @@
       :key="index"
       :style="{
         '--index': index,
-        '--border-width': circle.borderWidth,
         '--order': circle.order,
         '--radius': circle.radius,
         '--background': getCircleBackground(index),
@@ -170,7 +169,7 @@ export default {
           communities: [
             {
               id: "placeholder",
-              color: "var(--cos-color-secondary)",
+              color: "var(--cos-bg-secondary)",
             },
           ],
         }
@@ -189,7 +188,6 @@ export default {
         const radius = this.getRadius(index)
         return {
           order,
-          borderWidth: `${order}px`,
           connections: connections.map((connectionId, index) => ({
             ...this.connections[connectionId],
             ...this.getPosition({
@@ -206,9 +204,9 @@ export default {
   methods: {
     getCircleBackground(index) {
       if (this.activeCircle === index) {
-        return `hsl(0, 0%, 93%)`
+        return `var(--bg-color-layered)`
       }
-      return "white"
+      return "var(--cos-bg-tertiary)"
     },
     getEmojiImgFromUnicode(unicode) {
       let div = document.createElement("div")
@@ -411,7 +409,7 @@ ul {
 
 .circle {
   position: absolute;
-  border: var(--border-width, 2px) solid var(--cos-color-secondary);
+  border: 3px solid var(--cos-bg-secondary);
   width: calc(var(--radius) * 2);
   height: calc(var(--radius) * 2);
   border-radius: 50%;

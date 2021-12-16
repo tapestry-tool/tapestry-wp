@@ -97,6 +97,13 @@ class CircleOfSupportEndpoints
                     'callback' => 'CircleOfSupportEndpoints::deleteConnection'
                 ]
             ],
+            'DELETE_COS_COMMUNITY' => (object) [
+                'ROUTE' => '/activities/cos/communities/(?P<communityId>[a-zA-Z0-9]+)',
+                'ARGUMENTS' => [
+                    'methods' => $REST_API_DELETE_METHOD,
+                    'callback' => 'CircleOfSupportEndpoints::deleteCommunity'
+                ]
+            ],
         ];
     }
 
@@ -213,6 +220,20 @@ class CircleOfSupportEndpoints
             $cos->deleteConnection($connectionId);
             $cos->save();
             return $connectionId;
+        } catch (TapestryError $e) {
+            return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+        }
+    }
+
+    public static function deleteCommunity($request)
+    {
+        try {
+            $communityId = $request['communityId'];
+            
+            $cos = new CircleOfSupport();
+            $cos->deleteCommunity($communityId);
+            $cos->save();
+            return $communityId;
         } catch (TapestryError $e) {
             return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
         }

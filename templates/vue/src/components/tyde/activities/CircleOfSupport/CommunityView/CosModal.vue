@@ -44,7 +44,7 @@ export default {
 .content {
   position: relative;
   padding: 2rem;
-  background: white;
+  background: var(--cos-bg-secondary);
   border: var(--cos-border);
   border-radius: 1rem;
   max-width: 700px;

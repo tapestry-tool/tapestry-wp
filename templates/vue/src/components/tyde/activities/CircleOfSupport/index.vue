@@ -1,7 +1,6 @@
 <template>
   <div id="cos" class="cos">
-    <loading v-if="isLoading" />
-    <div v-else class="contents">
+    <div class="contents">
       <community-view
         v-if="view === views.Community"
         :connections="cos.connections"
@@ -10,6 +9,7 @@
         @edit-connection="editConnection"
         @delete-connection="handleDeleteConnection"
         @add-community="addCommunity"
+        @delete-community="handleDeleteCommunity"
       />
       <circle-view
         v-if="view === views.Circle"
@@ -20,22 +20,28 @@
         @edit-connection="editConnection"
         @delete-connection="handleDeleteConnection"
         @add-community="addCommunity"
+        @delete-community="handleDeleteCommunity"
       />
-      <div class="switch">
-        <button
-          :class="['change-view', { active: view === views.Community }]"
-          aria-label="Community view"
-          @click="view = views.Community"
-        >
-          <div class="community-view"></div>
-        </button>
-        <button
-          :class="['change-view', { active: view === views.Circle }]"
-          aria-label="Circle view"
-          @click="view = views.Circle"
-        >
-          <div class="circle-view"></div>
-        </button>
+      <div class="header">
+        <div class="switch">
+          <button
+            :class="['change-view', { active: view === views.Community }]"
+            aria-label="Community view"
+            @click="view = views.Community"
+          >
+            <div class="community-view"></div>
+          </button>
+          <button
+            :class="['change-view', { active: view === views.Circle }]"
+            aria-label="Circle view"
+            @click="view = views.Circle"
+          >
+            <div class="circle-view"></div>
+          </button>
+        </div>
+        <h5 class="mt-3">
+          {{ view === views.Circle ? "Circle" : "Community" }} View
+        </h5>
       </div>
     </div>
   </div>
@@ -43,7 +49,7 @@
 
 <script>
 import { mapState } from "vuex"
-import Loading from "@/components/common/Loading"
+import client from "@/services/TapestryAPI"
 import CommunityView from "./CommunityView"
 import CircleView from "./CircleView"
 
@@ -56,11 +62,9 @@ export default {
   components: {
     CommunityView,
     CircleView,
-    Loading,
   },
   data() {
     return {
-      isLoading: true,
       view: CosView.Community,
     }
   },
@@ -69,21 +73,6 @@ export default {
     views() {
       return CosView
     },
-  },
-  async mounted() {
-    this.$nextTick(() => {
-      const { circles, communities, connections } = this.cos
-
-      circles.forEach(circle => this.cos.circles.push(circle))
-      Object.entries(communities).forEach(([id, community]) =>
-        this.$set(this.cos.communities, id, community)
-      )
-      Object.entries(connections).forEach(([id, connection]) =>
-        this.$set(this.cos.connections, id, connection)
-      )
-
-      this.isLoading = false
-    })
   },
   methods: {
     addConnection({ communities, ...newConnection }) {
@@ -115,6 +104,14 @@ export default {
       const community = this.cos.communities[communityId]
       community.connections = community.connections.filter(id => id !== connectionId)
     },
+    removeCommunityFromConnection(connectionId, communityId) {
+      const connection = this.cos.connections[connectionId]
+      if (connection.communities) {
+        connection.communities = connection.communities.filter(
+          id => id !== communityId
+        )
+      }
+    },
     async handleDeleteConnection(connectionId) {
       delete this.cos.connections[connectionId]
 
@@ -129,18 +126,37 @@ export default {
       })
       this.cos.circles = newCircles
     },
+    async handleDeleteCommunity(communityId) {
+      await client.cos.deleteCommunity(communityId)
+
+      delete this.cos.communities[communityId]
+
+      Object.values(this.cos.connections).forEach(connection => {
+        this.removeCommunityFromConnection(connection.id, communityId)
+      })
+    },
   },
 }
 </script>
 
 <style scoped lang="scss">
+[data-theme="light"] .cos {
+  --cos-bg-primary: #f8f8f8;
+  --cos-text-tertiary: #aaa;
+  --cos-hover: #4bb0f9;
+}
+[data-theme="dark"] .cos {
+  --cos-bg-primary: #111;
+  --cos-text-tertiary: #666;
+}
 .cos {
-  --cos-color-primary: #000;
-  --cos-color-secondary: #c4c4c4;
-  --cos-color-tertiary: #d8d8d8;
-  --cos-border: 3px solid var(--cos-color-secondary);
+  --cos-bg-secondary: var(--bg-color-primary);
+  --cos-bg-tertiary: var(--bg-color-secondary);
+  --cos-text-primary: var(--text-color-primary);
+  --cos-text-secondary: var(--text-color-tertiary);
+  --cos-border: 3px solid var(--cos-bg-tertiary);
+  --cos-hover: #4bb0f9;
 
-  border: var(--cos-border);
   height: calc(100vh - 150px);
   width: 98vw;
   min-height: 250px;
@@ -154,20 +170,31 @@ export default {
 }
 
 .contents {
+  position: relative;
+  background: var(--cos-bg-primary);
   height: 100%;
-}
-
-.switch {
-  position: absolute;
-  top: 1rem;
-  left: 1rem;
-  display: flex;
+  border-radius: 25px;
+  border: var(--cos-border);
+  overflow: hidden;
+  .header {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    .switch {
+      display: flex;
+    }
+    h5 {
+      color: var(--cos-text-secondary);
+      position: absolute;
+      width: 120px;
+    }
+  }
 }
 
 .change-view {
   width: 50%;
-  background: white;
-  border: 2px solid var(--cos-color-tertiary);
+  background: var(--cos-bg-secondary);
+  border: 2px solid var(--cos-bg-tertiary);
 
   --icon-size: 1.5rem;
 
@@ -178,7 +205,7 @@ export default {
   }
 
   &.active {
-    background: var(--cos-color-tertiary);
+    background: var(--cos-bg-tertiary);
 
     > div {
       transform: scale(1.5);
@@ -199,7 +226,7 @@ export default {
 .community-view {
   width: var(--icon-size);
   height: var(--icon-size);
-  border: 2px solid var(--cos-color-tertiary);
+  border: 2px solid var(--cos-bg-tertiary);
   border-top-left-radius: 9999px;
   border-top-right-radius: 9999px;
   background: white;
@@ -209,7 +236,7 @@ export default {
   width: var(--icon-size);
   height: var(--icon-size);
   border-radius: 50%;
-  border: 2px solid var(--cos-color-tertiary);
+  border: 2px solid var(--cos-bg-tertiary);
   background: white;
 }
 </style>

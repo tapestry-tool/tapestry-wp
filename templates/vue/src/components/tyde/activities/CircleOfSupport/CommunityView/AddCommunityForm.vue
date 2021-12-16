@@ -40,6 +40,15 @@
           </div>
           <div class="controls">
             <button @click="$emit('back')">Cancel</button>
+            <b-button
+              v-if="community.id"
+              tag="div"
+              variant="danger"
+              class="delete-button"
+              @click="handleDelete"
+            >
+              Delete community
+            </b-button>
             <button
               class="submit"
               :disabled="validationState"
@@ -213,6 +222,11 @@ export default {
         this.$emit("add-community", community)
       })
     },
+    handleDelete() {
+      if (confirm("Are you sure you want to delete this community?")) {
+        this.$emit("delete", this.community.id)
+      }
+    },
     /**
      * Clean up the community properties to only those that match the schema in the
      * README.
@@ -337,7 +351,7 @@ button {
 }
 
 .community-preview {
-  background: var(--color, var(--cos-color-secondary));
+  background: var(--color, var(--bg-color-layered));
   margin-bottom: -3rem;
   border-top-left-radius: 9999px;
   border-top-right-radius: 9999px;
@@ -353,7 +367,10 @@ button {
   color: #757575;
   display: flex;
   column-gap: 1rem;
-  font-size: 1.2em;
+}
+
+.delete-button {
+  font-weight: bold;
 }
 
 .submit {
@@ -361,15 +378,14 @@ button {
   color: white;
   border-radius: 0.5rem;
   padding: 0.5rem;
-}
 
-.submit:disabled {
-  cursor: not-allowed;
-  background: var(--cos-color-tertiary);
-}
+  &:disabled {
+    cursor: not-allowed;
+    background: var(--cos-bg-tertiary);
+  }
 
-.submit:hover:not(:disabled) {
-  background: var(--cos-color-secondary);
-  color: white;
+  &:hover:not(:disabled) {
+    background: var(--cos-hover);
+  }
 }
 </style>

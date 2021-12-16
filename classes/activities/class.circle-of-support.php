@@ -86,6 +86,29 @@ class CircleOfSupport
         return $community;
     }
 
+    public function removeCommunityFromConnection($communityId, $connectionId)
+    {
+        // Check if connection exists
+        if (!isset($this->current['connections']->$connectionId)) {
+            return;
+        }
+
+        // Check if community exists
+        if (!isset($this->current['communities']->$communityId)) {
+            return;
+        }
+
+        $connection = $this->current['connections']->$connectionId;
+        $index = array_search($communityId, $connection->communities);
+        if (!is_numeric($index)) {
+            return;
+        }
+
+        array_splice($connection->communities, $index, 1);
+
+        return $community;
+    }
+
     public function deleteConnection($connectionId)
     {
         if (!isset($this->current['connections']->$connectionId)) {
@@ -101,6 +124,19 @@ class CircleOfSupport
         }
 
         unset($this->current['connections']->$connectionId);
+    }
+
+    public function deleteCommunity($communityId)
+    {
+        if (!isset($this->current['communities']->$communityId)) {
+            return;
+        }
+
+        foreach ($this->current['connections'] as $connectionId => $value) {
+            $this->removeCommunityFromConnection($communityId, $connectionId);
+        }
+
+        unset($this->current['communities']->$communityId);
     }
 
     public function updateConnection($id, $connection)

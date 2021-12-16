@@ -31,6 +31,7 @@
         :key="visibleConnection.id"
         :connection="visibleConnection"
         :draggable="draggable"
+        clickable
         @click="$emit('edit-connection', visibleConnection)"
         @drag:start="$emit('drag:start', $event)"
         @drag:move="$emit('drag:move', $event)"
@@ -104,11 +105,11 @@ export default {
 }
 
 .content-wrapper {
-  background: white;
+  background: var(--cos-bg-secondary);
   position: relative;
   z-index: 10;
   height: 100%;
-  border-top: 1px solid var(--cos-color-tertiary);
+  border-top: 1px solid var(--cos-bg-tertiary);
   flex-grow: 1;
   overflow: hidden;
 }
@@ -125,16 +126,15 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--cos-color-secondary);
+  color: var(--cos-text-tertiary);
   margin: 0;
   padding: 0;
   border-radius: 1rem;
   font-size: 3rem;
-  background: white;
+  background: var(--cos-bg-secondary);
 
   &:hover {
-    background: var(--cos-color-tertiary);
-    color: white;
+    background: var(--cos-bg-tertiary);
   }
 }
 

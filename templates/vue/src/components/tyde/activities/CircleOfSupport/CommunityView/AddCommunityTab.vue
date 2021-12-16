@@ -20,6 +20,7 @@
             ref="form"
             :community="community"
             @change="handleChange"
+            @delete="handleDelete"
             @back="$emit('back')"
             @add-community="handleAddCommunity"
           />
@@ -96,6 +97,10 @@ export default {
       this.wasEdited = true
       this.$emit("change", evt)
     },
+    async handleDelete() {
+      this.$emit("back")
+      this.$emit("delete-community", this.community.id)
+    },
     togglePopup() {
       if (this.show && this.wasEdited) {
         this.showModal = true
@@ -135,11 +140,11 @@ export default {
 }
 
 .content-wrapper {
-  background: white;
+  background: var(--cos-bg-secondary);
   position: relative;
   z-index: 10;
   height: 100%;
-  border-top: 1px solid var(--cos-color-tertiary);
+  border-top: 1px solid var(--cos-bg-tertiary);
 }
 
 .controls {
@@ -155,7 +160,7 @@ export default {
   }
 
   button {
-    --border-color: var(--cos-color-secondary);
+    --border-color: var(--cos-text-secondary);
 
     width: 100%;
     display: flex;

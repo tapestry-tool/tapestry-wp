@@ -58,7 +58,7 @@ export default {
   border-radius: 1.5rem;
   padding: 1rem 0.5rem;
   display: flex;
-  background: white;
+  background: var(--cos-bg-secondary);
   z-index: 20;
   opacity: 0;
   pointer-events: none;
@@ -108,7 +108,7 @@ export default {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    color: var(--cos-color-secondary);
+    color: var(--cos-text-primary);
   }
 
   .community-list {
@@ -125,7 +125,7 @@ export default {
       height: 1rem;
       width: 1rem;
       border-radius: 50%;
-      background-color: var(--community-color, var(--cos-color-secondary));
+      background-color: var(--community-color, var(--cos-bg-secondary));
     }
   }
 }

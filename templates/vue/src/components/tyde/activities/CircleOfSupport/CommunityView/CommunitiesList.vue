@@ -140,7 +140,7 @@ export default {
           communities: [
             {
               id: "placeholder",
-              color: "var(--cos-color-secondary)",
+              color: "var(--cos-bg-secondary)",
             },
           ],
         }
@@ -456,7 +456,7 @@ ul {
   height: 100%;
   max-width: 100%;
   max-height: 100%;
-  background: var(--color, var(--cos-color-secondary));
+  background: var(--color, var(--cos-bg-secondary));
   position: relative;
   pointer-events: all;
 
@@ -658,8 +658,8 @@ ul {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  border: 1px solid var(--cos-color-secondary);
-  background: white;
+  border: 1px solid var(--cos-bg-secondary);
+  background: var(--cos-bg-secondary);
   padding: 0.2rem 1rem;
   z-index: 20;
 
@@ -678,7 +678,7 @@ ul {
   button {
     background: none;
     padding: 0;
-    color: var(--cos-color-secondary);
+    color: var(--cos-text-primary);
   }
 }
 </style>

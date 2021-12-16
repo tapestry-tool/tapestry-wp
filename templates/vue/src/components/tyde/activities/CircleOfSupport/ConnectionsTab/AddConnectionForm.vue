@@ -48,6 +48,7 @@
             v-if="connection.id"
             tag="div"
             variant="danger"
+            class="delete-button"
             @click="handleDelete"
           >
             Delete connection
@@ -75,7 +76,9 @@
               :style="`--color: ${existingCommunity.color}`"
               @click="toggleCommunity(existingCommunity.id)"
             >
-              <span class="community-color"></span>
+              <span class="community-color">
+                <i class="fa fa-check"></i>
+              </span>
               <span class="community-name">
                 {{ existingCommunity.name }}
               </span>
@@ -83,10 +86,16 @@
           </li>
           <li v-if="Object.keys(communities).length < maxCommunitiesCount">
             <button class="community-item" @click="showCommunityForm = true">
-              <span class="community-color" style="color: var(--cos-color-tertiary)">
+              <span
+                class="community-color"
+                style="color: var(--cos-text-primary-tertiary)"
+              >
                 <tapestry-icon icon="plus" />
               </span>
-              <span class="community-name" style="color: var(--cos-color-tertiary)">
+              <span
+                class="community-name"
+                style="color: var(--cos-text-primary-tertiary)"
+              >
                 Add new
               </span>
             </button>
@@ -286,6 +295,7 @@ button {
 }
 
 .community {
+  background: var(--cos-bg-primary);
   border: var(--cos-border);
   border-radius: 1.5rem;
   padding: 1rem 2rem 1rem 0;
@@ -316,7 +326,7 @@ button {
   width: 100%;
   height: 100%;
   column-gap: 1.5rem;
-  color: var(--color, var(--cos-color-secondary));
+  color: var(--color, var(--cos-bg-secondary));
 }
 
 .community-item:hover .community-color {
@@ -325,6 +335,10 @@ button {
 
 .community-item.selected .community-color {
   background: currentColor;
+  i {
+    display: inline-block;
+    color: white;
+  }
 }
 
 .community-color {
@@ -336,11 +350,14 @@ button {
   width: 4rem;
   border-top-right-radius: 2rem;
   border-bottom-right-radius: 2rem;
+  i {
+    display: none;
+  }
 }
 
 .community-name {
   display: block;
-  border: 1px solid var(--cos-color-tertiary);
+  border: 1px solid var(--cos-bg-tertiary);
   width: 100%;
   padding-top: 0.25rem;
   padding-bottom: 0.25rem;
@@ -371,21 +388,24 @@ button {
   column-gap: 1rem;
 }
 
+.delete-button {
+  font-weight: bold;
+}
+
 .submit {
   background: #757575;
   color: white;
   border-radius: 0.5rem;
   padding: 0.5rem;
-}
 
-.submit:disabled {
-  cursor: not-allowed;
-  background: var(--cos-color-tertiary);
-}
+  &:disabled {
+    cursor: not-allowed;
+    background: var(--cos-bg-tertiary);
+  }
 
-.submit:hover:not(:disabled) {
-  background: var(--cos-color-secondary);
-  color: white;
+  &:hover:not(:disabled) {
+    background: var(--cos-hover);
+  }
 }
 </style>
 

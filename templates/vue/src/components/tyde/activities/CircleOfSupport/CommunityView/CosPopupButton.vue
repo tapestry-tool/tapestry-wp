@@ -29,7 +29,7 @@ export default {
 
   width: var(--size);
   height: var(--size);
-  background: var(--cos-color-tertiary);
+  background: var(--cos-bg-tertiary);
   position: absolute;
   top: calc(-1 * var(--size));
   border-top-left-radius: var(--size);

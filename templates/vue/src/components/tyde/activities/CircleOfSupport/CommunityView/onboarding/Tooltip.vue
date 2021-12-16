@@ -35,7 +35,7 @@ export default {
 .tooltip-container {
   position: absolute;
   padding: 2rem;
-  background: white;
+  background: var(--cos-bg-secondary);
   border: var(--cos-border);
   border-radius: 1rem;
   z-index: 100;

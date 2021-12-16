@@ -26,6 +26,7 @@
       :disabled="!canAddCommunity"
       @back="state = lastState"
       @add-community="$emit('add-community', $event)"
+      @delete-community="$emit('delete-community', $event)"
       @toggle="toggleCommunityTab"
     />
 

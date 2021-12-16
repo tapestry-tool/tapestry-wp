@@ -5,17 +5,14 @@
     :style="{
       opacity: isDragging ? 0.2 : 1,
       '--size': fontSize,
-      cursor: draggable ? 'move' : 'default',
+      cursor,
     }"
     @click="$emit('click')"
   >
-    <p class="ob-connection" :style="{ cursor: draggable ? 'move' : 'default' }">
+    <p class="ob-connection" :style="{ cursor }">
       {{ connection.name }}
     </p>
-    <h1
-      :style="{ cursor: draggable ? 'move' : 'default' }"
-      v-html="getEmojiImgFromUnicode(connection.avatar)"
-    ></h1>
+    <h1 :style="{ cursor }" v-html="getEmojiImgFromUnicode(connection.avatar)"></h1>
     <ul v-if="variant !== 'name'" class="community-list">
       <li
         v-for="community in connection.communities"
@@ -36,6 +33,11 @@ export default {
       required: true,
     },
     draggable: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    clickable: {
       type: Boolean,
       required: false,
       default: false,
@@ -64,6 +66,11 @@ export default {
         base: "1rem",
       }
       return sizes[this.size]
+    },
+    cursor() {
+      if (this.clickable !== false) return "pointer"
+      else if (this.draggable !== false) return "move"
+      else return "default"
     },
   },
   watch: {
@@ -131,20 +138,20 @@ export default {
   p {
     position: relative;
     padding: 0.25em;
-    border: 1px solid currentColor;
+    border: 1px solid var(--cos-border-color);
     text-transform: uppercase;
     cursor: default;
     text-overflow: ellipsis;
     overflow: hidden;
     max-width: 100%;
-    background: white;
+    background: var(--cos-bg-tertiary);
   }
   h1 {
     font-size: 3em;
     cursor: default;
   }
   &:hover {
-    background: #f0f0f0;
+    background: var(--bg-color-layered);
   }
 }
 .community-list {
@@ -161,7 +168,7 @@ export default {
     height: 1em;
     width: 1em;
     border-radius: 50%;
-    background-color: var(--community-color, var(--cos-color-secondary));
+    background-color: var(--community-color, var(--cos-bg-secondary));
   }
 }
 </style>
