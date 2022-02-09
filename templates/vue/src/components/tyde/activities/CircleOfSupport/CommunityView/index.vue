@@ -3,10 +3,12 @@
     <communities-list
       :communities="communities"
       :connections="connections"
+      :is-read-only="isReadOnly"
       @edit-connection="editConnection"
       @edit-community="editCommunity"
     />
     <connections-tab
+      v-if="!isReadOnly"
       ref="connections"
       class="tab"
       :toolTipPositioned="toolTipPositioned"
@@ -21,6 +23,7 @@
       @connection-closed="handleConnectionClosed"
     />
     <add-community-tab
+      v-if="!isReadOnly"
       v-model="community"
       :show="isCommunityTabOpen"
       :disabled="!canAddCommunity"
@@ -31,7 +34,7 @@
     />
 
     <onboarding
-      v-if="initiateOnboarding"
+      v-if="initiateOnboarding && !isReadOnly"
       :communities="communities"
       :connections="connections"
       :parent-state="state"
@@ -72,6 +75,11 @@ export default {
       type: Object,
       required: true,
     },
+    isReadOnly: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   data() {
     return {
@@ -94,7 +102,9 @@ export default {
       return [States.EditCommunity, States.AddCommunity].includes(this.state)
     },
     canAddCommunity() {
-      return Object.keys(this.communities).length < MAX_COMMUNITIES
+      return (
+        Object.keys(this.communities).length < MAX_COMMUNITIES && !this.isReadOnly
+      )
     },
   },
   watch: {

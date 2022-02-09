@@ -5,6 +5,7 @@
         v-if="view === views.Community"
         :connections="cos.connections"
         :communities="cos.communities"
+        :is-read-only="isReadOnly"
         @add-connection="addConnection"
         @edit-connection="editConnection"
         @delete-connection="handleDeleteConnection"
@@ -16,6 +17,7 @@
         v-model="cos.circles"
         :connections="cos.connections"
         :communities="cos.communities"
+        :is-read-only="isReadOnly"
         @add-connection="addConnection"
         @edit-connection="editConnection"
         @delete-connection="handleDeleteConnection"
@@ -50,6 +52,7 @@
 <script>
 import { mapState } from "vuex"
 import client from "@/services/TapestryAPI"
+import { dyadLinkedUser } from "@/services/wp"
 import CommunityView from "./CommunityView"
 import CircleView from "./CircleView"
 
@@ -72,6 +75,9 @@ export default {
     ...mapState(["cos"]),
     views() {
       return CosView
+    },
+    isReadOnly() {
+      return !!dyadLinkedUser()
     },
   },
   methods: {

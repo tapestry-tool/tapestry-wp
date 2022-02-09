@@ -1,5 +1,5 @@
 <template>
-  <div class="nav-container">
+  <div id="tapestry-navbar" class="nav-container">
     <b-navbar tyde="light" class="navbar">
       <b-navbar-nav class="mx-auto" fill style="width:100%;">
         <b-nav-item
@@ -34,7 +34,7 @@ import TydeIcon from "./TydeIcon.vue"
 import UserSettingsButton from "../Toolbar/UserSettingsButton"
 import { names } from "@/config/routes"
 import Helpers from "@/utils/Helpers"
-import { canEditTapestry } from "@/services/wp"
+import { getCurrentUser, canEditTapestry } from "@/services/wp"
 
 export default {
   name: "navbar",
@@ -53,14 +53,17 @@ export default {
       if (this.$route.query.tab && this.tabs.includes(this.$route.query.tab)) {
         return this.$route.query.tab
       }
-      const currentNodeId = this.$route.params.nodeId
+
+      const currentNodeId = Number(this.$route.params.nodeId)
+      let selectedTab = "default"
       if (currentNodeId && this.settings.tydeModeTabs) {
-        const tabName = Object.keys(this.settings.tydeModeTabs).find(
-          key => this.settings.tydeModeTabs[key] === currentNodeId
-        )
-        return tabName || "default"
+        this.tabs.forEach(tab => {
+          if (this.settings.tydeModeTabs[tab] == currentNodeId) {
+            selectedTab = tab
+          }
+        })
       }
-      return "default"
+      return selectedTab
     },
     tabs() {
       return ["default", "profile", "goals", "cos"]
@@ -74,13 +77,30 @@ export default {
   },
   methods: {
     handleTabChange(tab) {
+      // Save TYDE Program node Id to go back to later if clicked on
+      if (this.selectedTab === "default") {
+        this.defaultTabNodeId = this.$route.params.nodeId
+      }
+
       let selectedNodeId = this.defaultTabNodeId
-      if (tab !== "default") {
-        if (this.selectedTab === "default") {
-          this.defaultTabNodeId = this.$route.params.nodeId
-        }
-        if (tab !== "cos") {
-          selectedNodeId = this.settings.tydeModeTabs[tab]
+
+      // Goals and Profile have their own node IDs which we can use here
+      if (["goals", "profile"].includes(tab)) {
+        selectedNodeId = this.settings.tydeModeTabs[tab]
+      }
+
+      // Since COS doesn't have a node ID, we need default node Id for the route
+      if (!selectedNodeId) {
+        selectedNodeId = this.rootId
+        if (this.settings.tydeModeTabs.default) {
+          let userMainRole = getCurrentUser().roles[0]
+          if (
+            !userMainRole ||
+            !(userMainRole in this.settings.tydeModeTabs.default)
+          ) {
+            userMainRole = "public"
+          }
+          selectedNodeId = this.settings.tydeModeTabs.default[userMainRole]
         }
       }
 

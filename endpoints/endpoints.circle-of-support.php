@@ -18,93 +18,118 @@ class CircleOfSupportEndpoints
                 'ARGUMENTS' => [
                     'methods' => $REST_API_GET_METHOD,
                     'callback' => 'CircleOfSupportEndpoints::get',
+                    'permission_callback' => '__return_true'
                 ]
             ],
             'POST_CIRCLE_OF_SUPPORT' => (object) [
                 'ROUTE' => '/activities/cos',
                 'ARGUMENTS' => [
                     'methods' => $REST_API_POST_METHOD,
-                    'callback' => 'CircleOfSupportEndpoints::save'
+                    'callback' => 'CircleOfSupportEndpoints::save',
+                    'permission_callback' => 'CircleOfSupportEndpoints::canWriteToCos'
                 ]
             ],
             'DELETE_CIRCLE_OF_SUPPORT' => (object) [
                 'ROUTE' => '/activities/cos',
                 'ARGUMENTS' => [
                     'methods' => $REST_API_DELETE_METHOD,
-                    'callback' => 'CircleOfSupportEndpoints::delete'
+                    'callback' => 'CircleOfSupportEndpoints::delete',
+                    'permission_callback' => 'CircleOfSupportEndpoints::canWriteToCos'
                 ]
             ],
             'POST_CIRCLE_OF_SUPPORT_CONNECTIONS' => (object) [
                 'ROUTE' => '/activities/cos/connections',
                 'ARGUMENTS' => [
                     'methods' => $REST_API_POST_METHOD,
-                    'callback' => 'CircleOfSupportEndpoints::addConnection'
+                    'callback' => 'CircleOfSupportEndpoints::addConnection',
+                    'permission_callback' => 'CircleOfSupportEndpoints::canWriteToCos'
                 ]
             ],
             'PUT_CIRCLE_OF_SUPPORT_CONNECTION' => (object) [
                 'ROUTE' => '/activities/cos/connections/(?P<connectionId>[a-zA-Z0-9]+)',
                 'ARGUMENTS' => [
                     'methods' => $REST_API_PUT_METHOD,
-                    'callback' => 'CircleOfSupportEndpoints::updateConnection'
+                    'callback' => 'CircleOfSupportEndpoints::updateConnection',
+                    'permission_callback' => 'CircleOfSupportEndpoints::canWriteToCos'
                 ]
             ],
             'POST_CIRCLE_OF_SUPPORT_COMMUNITIES' => (object) [
                 'ROUTE' => '/activities/cos/communities',
                 'ARGUMENTS' => [
                     'methods' => $REST_API_POST_METHOD,
-                    'callback' => 'CircleOfSupportEndpoints::addCommunity'
+                    'callback' => 'CircleOfSupportEndpoints::addCommunity',
+                    'permission_callback' => 'CircleOfSupportEndpoints::canWriteToCos'
                 ]
             ],
             'PUT_CIRCLE_OF_SUPPORT_COMMUNITIES' => (object) [
                 'ROUTE' => '/activities/cos/communities/(?P<communityId>[a-zA-Z0-9]+)',
                 'ARGUMENTS' => [
                     'methods' => $REST_API_PUT_METHOD,
-                    'callback' => 'CircleOfSupportEndpoints::updateCommunity'
+                    'callback' => 'CircleOfSupportEndpoints::updateCommunity',
+                    'permission_callback' => 'CircleOfSupportEndpoints::canWriteToCos'
                 ]
             ],
             'POST_CIRCLE_OF_SUPPORT_COMMUNITIES_CONNECTION' => (object) [
                 'ROUTE' => '/activities/cos/communities/(?P<communityId>[a-zA-Z0-9]+)',
                 'ARGUMENTS' => [
                     'methods' => $REST_API_POST_METHOD,
-                    'callback' => 'CircleOfSupportEndpoints::addConnectionToCommunity'
+                    'callback' => 'CircleOfSupportEndpoints::addConnectionToCommunity',
+                    'permission_callback' => 'CircleOfSupportEndpoints::canWriteToCos'
                 ]
             ],
             'DELETE_CIRCLE_OF_SUPPORT_COMMUNITIES_CONNECTION' => (object) [
                 'ROUTE' => '/activities/cos/communities/(?P<communityId>[a-zA-Z0-9]+)/connections/(?P<connectionId>[a-zA-Z0-9]+)',
                 'ARGUMENTS' => [
                     'methods' => $REST_API_DELETE_METHOD,
-                    'callback' => 'CircleOfSupportEndpoints::removeConnectionFromCommunity'
+                    'callback' => 'CircleOfSupportEndpoints::removeConnectionFromCommunity',
+                    'permission_callback' => 'CircleOfSupportEndpoints::canWriteToCos'
                 ]
             ],
             'COS_ADD_CONNECTION_TO_CIRCLE' => (object) [
                 'ROUTE' => '/activities/cos/circles/(?P<circleIndex>[0-2])',
                 'ARGUMENTS' => [
                     'methods' => $REST_API_POST_METHOD,
-                    'callback' => 'CircleOfSupportEndpoints::addConnectionToCircle'
+                    'callback' => 'CircleOfSupportEndpoints::addConnectionToCircle',
+                    'permission_callback' => 'CircleOfSupportEndpoints::canWriteToCos'
                 ]
             ],
             'COS_REMOVE_CONNECTION_FROM_CIRCLES' => (object) [
                 'ROUTE' => '/activities/cos/circles/connections/(?P<connectionId>[a-zA-Z0-9]+)',
                 'ARGUMENTS' => [
                     'methods' => $REST_API_DELETE_METHOD,
-                    'callback' => 'CircleOfSupportEndpoints::removeConnectionFromCircles'
+                    'callback' => 'CircleOfSupportEndpoints::removeConnectionFromCircles',
+                    'permission_callback' => 'CircleOfSupportEndpoints::canWriteToCos'
                 ]
             ],
             'DELETE_COS_CONNECTION' => (object) [
                 'ROUTE' => '/activities/cos/connections/(?P<connectionId>[a-zA-Z0-9]+)',
                 'ARGUMENTS' => [
                     'methods' => $REST_API_DELETE_METHOD,
-                    'callback' => 'CircleOfSupportEndpoints::deleteConnection'
+                    'callback' => 'CircleOfSupportEndpoints::deleteConnection',
+                    'permission_callback' => 'CircleOfSupportEndpoints::canWriteToCos'
                 ]
             ],
             'DELETE_COS_COMMUNITY' => (object) [
                 'ROUTE' => '/activities/cos/communities/(?P<communityId>[a-zA-Z0-9]+)',
                 'ARGUMENTS' => [
                     'methods' => $REST_API_DELETE_METHOD,
-                    'callback' => 'CircleOfSupportEndpoints::deleteCommunity'
+                    'callback' => 'CircleOfSupportEndpoints::deleteCommunity',
+                    'permission_callback' => 'CircleOfSupportEndpoints::canWriteToCos'
                 ]
             ],
         ];
+    }
+
+    public static function canWriteToCos() {
+        $isDyadUser = false;
+
+        $userId = wp_get_current_user()->ID;
+        if ($userId) {
+            global $TYDE_DYAD_ROLES;
+            $isDyadUser = array_intersect(get_userdata($userId)->roles, array_keys($TYDE_DYAD_ROLES));
+        }
+
+        return !$isDyadUser;
     }
 
     public static function get($request)

@@ -60,7 +60,7 @@
             context="multi-content"
             :hide-title="presentationStyle === 'accordion'"
             style="margin-bottom: 24px;"
-            @complete="updateProgress"
+            @complete="complete"
             @load="handleLoad(null)"
           />
           <multi-content-rows
@@ -70,7 +70,7 @@
             context="multi-content"
             :level="level + 1"
             @load="handleLoad"
-            @updateProgress="updateProgress"
+            @complete="complete"
           />
         </div>
         <multi-content-media
@@ -79,8 +79,9 @@
           context="multi-content"
           :level="level + 1"
           :hide-title="presentationStyle === 'accordion'"
+          @load="handleLoad(null)"
           @close="handleAutoClose"
-          @complete="updateProgress"
+          @complete="complete"
         />
       </div>
     </div>
@@ -92,6 +93,7 @@ import { mapState, mapGetters, mapActions, mapMutations } from "vuex"
 import TapestryMedia from "../TapestryMedia"
 import LockedContent from "./common/LockedContent"
 import { names } from "@/config/routes"
+import { dyadLinkedUser } from "@/services/wp"
 import Helpers from "@/utils/Helpers"
 
 export default {
@@ -165,7 +167,11 @@ export default {
         "multi-content-row-wrapper",
         "presentation-style-" + this.presentationStyle,
         (this.presentationStyle === "page" ? "pr" : "pl") + "-0",
+        this.isDyadNodeAndUser ? "is-dyad-node" : "",
       ]
+    },
+    isDyadNodeAndUser() {
+      return dyadLinkedUser() && this.node.isDyad
     },
   },
   mounted() {
@@ -190,8 +196,8 @@ export default {
         query: { from: "lightbox" },
       })
     },
-    updateProgress() {
-      this.$emit("updateProgress", this.node.id)
+    complete() {
+      this.$emit("complete", this.node.id)
     },
     handleLoad(el) {
       this.$emit("load", el)
@@ -217,6 +223,11 @@ export default {
 button[disabled] {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.is-dyad-node .button-row,
+.is-dyad-node .multi-content-row {
+  background: var(--bg-color-layered-dyad);
 }
 
 .button-row {

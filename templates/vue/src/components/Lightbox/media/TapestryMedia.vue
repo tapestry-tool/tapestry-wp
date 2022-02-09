@@ -2,6 +2,7 @@
   <div
     :class="[
       'media-wrapper',
+      `context-${context}`,
       { 'media-wrapper-embed': node.mediaFormat === 'embed' },
       {
         'media-wrapper-no-scroll':
@@ -171,11 +172,14 @@ export default {
 <style lang="scss" scoped>
 .media-wrapper {
   outline: none;
-  border-radius: 15px;
   overflow: auto;
   height: 100%;
   widows: 100%;
   padding: 0;
+
+  &:not(.context-multi-content) {
+    border-radius: 15px;
+  }
 
   &-no-scroll {
     overflow: hidden;

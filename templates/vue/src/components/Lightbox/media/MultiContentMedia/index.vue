@@ -14,6 +14,7 @@
         }"
       >
         {{ node.title }}
+        <completed-icon :node="node" class="mx-2" />
       </h1>
     </header>
     <multi-content-rows
@@ -23,9 +24,9 @@
       :rowId="rowId"
       :context="context"
       :level="level"
-      @load="handleLoad"
-      @changeRow="changeRow"
-      @updateProgress="updateProgress"
+      @load="$emit('load')"
+      @change-row="changeRow"
+      @complete="complete"
     />
     <tapestry-modal
       v-if="showCompletion"
@@ -52,6 +53,7 @@
 <script>
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex"
 import client from "@/services/TapestryAPI"
+import CompletedIcon from "@/components/common/CompletedIcon"
 import TapestryModal from "../../TapestryModal"
 import MultiContentRows from "./MultiContentRows"
 import { names } from "@/config/routes"
@@ -59,6 +61,7 @@ import { names } from "@/config/routes"
 export default {
   name: "multi-content-media",
   components: {
+    CompletedIcon,
     TapestryModal,
     MultiContentRows,
   },
@@ -141,32 +144,16 @@ export default {
   mounted() {
     this.isMounted = true
     this.activeIndex = this.node.presentationStyle === "page" ? -1 : 0
+
+    // if all children are completed, mark this as completed too
+    // this is just in case it hasn't done this properly before
+    if (!this.node.completed && this.rows.every(row => row.node.completed)) {
+      this.$emit("complete", this.node.id)
+    }
   },
   methods: {
     ...mapMutations(["updateNode"]),
     ...mapActions(["completeNode", "toggleFavourite"]),
-    handleLoad() {
-      this.$nextTick(() => {
-        const nodeId = this.$route.params.rowId
-        const container = document.getElementById(`multicontent-container`)
-        const yOffset = -50
-        let y
-        if (nodeId) {
-          const element = document.getElementById(`row-${nodeId}`)
-          y =
-            element.getBoundingClientRect().top -
-            container.getBoundingClientRect().top +
-            container.scrollTop +
-            yOffset
-        } else {
-          y = container.getBoundingClientRect().top + yOffset
-        }
-        container.scrollTo({ top: y, behavior: "smooth" })
-        client.recordAnalyticsEvent("app", "scroll", "multi-content", nodeId, {
-          to: y,
-        })
-      })
-    },
     handleClose(evt) {
       client.recordAnalyticsEvent("user", "close", "multi-content", this.node.id, {
         x: evt.clientX,
@@ -190,12 +177,23 @@ export default {
     disableRow(index) {
       return this.lockRows && this.disabledFrom >= 0 && index > this.disabledFrom
     },
-    updateProgress(rowId) {
-      this.completeNode(rowId).then(() => {
-        if (this.rows.every(row => row.node.completed)) {
+    complete(rowId) {
+      const completeMultiContentNode = () => {
+        if (
+          !this.node.completed &&
+          this.rows.every(
+            row => row.node.completed || row.node.title === "Resources"
+          )
+        ) {
           this.$emit("complete", this.node.id)
         }
-      })
+      }
+      const rowIndex = this.rows.findIndex(row => row.node.id == rowId)
+      if (!this.rows[rowIndex].node.completed) {
+        this.completeNode(rowId).then(completeMultiContentNode)
+      } else {
+        completeMultiContentNode()
+      }
     },
     changeRow(rowInfo) {
       const { rowId } = rowInfo
@@ -251,10 +249,6 @@ button[disabled] {
   font-size: 1.75rem;
   font-weight: 500;
   margin-bottom: 0.9em 0 0.5em 25px;
-
-  :before {
-    display: none;
-  }
 }
 
 .button-completion {

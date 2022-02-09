@@ -87,7 +87,7 @@ export default {
   methods: {
     ...mapActions(["updateUserSettings"]),
     closeModal() {
-      this.$emit("close")
+      this.$root.$emit("bv::hide::modal", "user-settings-modal")
     },
     saveSettings() {
       const theme = this.$refs.themeForm.getTheme()
@@ -97,7 +97,7 @@ export default {
         avatar = this.$refs.avatarForm.getAvatar()
       }
       this.updateUserSettings({ theme, avatar })
-      this.$emit("close")
+      this.$root.$emit("bv::hide::modal", "user-settings-modal")
     },
   },
 }

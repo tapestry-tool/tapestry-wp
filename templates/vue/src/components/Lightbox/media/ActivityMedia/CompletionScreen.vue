@@ -4,10 +4,7 @@
       <h1>
         {{ question.confirmation.title ? question.confirmation.title : randomTitle }}
       </h1>
-      <p
-        v-if="question.confirmation.message"
-        v-html="question.confirmation.message"
-      />
+      <p v-if="content" v-html="content" />
       <p v-else>
         You can press the button below to continue.
       </p>
@@ -29,6 +26,15 @@ export default {
     },
   },
   computed: {
+    content() {
+      const htmlContent = document.createElement("div")
+      htmlContent.innerHTML += this.question.confirmation.message
+
+      htmlContent.querySelectorAll("a").forEach(link => {
+        link.target = "_blank"
+      })
+      return String(htmlContent.innerHTML)
+    },
     randomTitle() {
       const titles = [
         "Thanks!",

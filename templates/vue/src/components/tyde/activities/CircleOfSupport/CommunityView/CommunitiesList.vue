@@ -65,6 +65,7 @@
       ref="connection-tooltip"
       :connection="activeConnection"
       :show="isTooltipVisible"
+      :is-read-only="isReadOnly"
       @edit="editConnection"
       @close="activeConnectionId = null"
     />
@@ -76,7 +77,7 @@
       <h1>
         {{ activeCommunityTooltip.name }}
       </h1>
-      <button @click="editCommunity(activeCommunityTooltip)">
+      <button v-if="!isReadOnly" @click="editCommunity(activeCommunityTooltip)">
         <tapestry-icon icon="pencil-alt" />
       </button>
       <button @click="toggleCommunityTooltip(activeCommunityTooltip.id)">
@@ -105,6 +106,11 @@ export default {
     connections: {
       type: Object,
       required: true,
+    },
+    isReadOnly: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   data() {

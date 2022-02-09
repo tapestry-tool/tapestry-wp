@@ -373,7 +373,7 @@ button {
   flex-direction: column;
   align-items: center;
   position: relative;
-  justify-content: space-between;
+  justify-content: flex-start;
 }
 
 .preview {

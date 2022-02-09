@@ -12,7 +12,7 @@
       </ul>
     </div>
     <div class="controls">
-      <button @click="$emit('edit')">
+      <button v-if="!isReadOnly" @click="$emit('edit')">
         <tapestry-icon icon="pencil-alt" />
       </button>
       <button @click="$emit('close')">
@@ -38,6 +38,11 @@ export default {
     show: {
       type: Boolean,
       required: true,
+    },
+    isReadOnly: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   methods: {

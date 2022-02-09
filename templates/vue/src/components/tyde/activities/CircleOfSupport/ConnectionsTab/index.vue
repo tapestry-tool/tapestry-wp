@@ -266,7 +266,6 @@ ul {
   position: relative;
   z-index: 10;
   height: 100%;
-  // border-top: 1px solid var(--cos-bg-tertiary);
   flex-grow: 1;
 }
 </style>

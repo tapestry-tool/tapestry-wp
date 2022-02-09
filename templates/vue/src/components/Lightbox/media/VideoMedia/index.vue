@@ -1,6 +1,9 @@
 <template>
   <div>
-    <h1 v-if="showTitle" class="video-title">{{ node.title }}</h1>
+    <h1 v-if="showTitle" class="video-title">
+      {{ node.title }}
+      <completed-icon :node="node" class="mx-2" />
+    </h1>
     <div :class="'video-wrapper context-' + context" :style="{ height: heightCss }">
       <loading v-if="state === states.Loading" />
       <component
@@ -47,13 +50,14 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from "vuex"
+import { mapGetters } from "vuex"
 
 import UrlVideoMedia from "./UrlVideoMedia"
 import H5PVideoMedia from "./H5PVideoMedia"
 import YouTubeMedia from "./YouTubeMedia"
 import Popup from "./Popup"
 import EndScreen from "./EndScreen"
+import CompletedIcon from "@/components/common/CompletedIcon"
 import { COMPLETION_THRESHOLD } from "./video.config"
 import Loading from "@/components/common/Loading"
 import client from "@/services/TapestryAPI"
@@ -94,6 +98,7 @@ export default {
     UrlVideoMedia,
     Popup,
     EndScreen,
+    CompletedIcon,
     Loading,
     MultiContentMedia: () => import("../MultiContentMedia/index"),
   },
@@ -171,7 +176,6 @@ export default {
     },
   },
   methods: {
-    ...mapActions(["completeNode"]),
     /**
      * This function calculates the next state given the current state and the event
      * name, as well as perform any necessary side effects.
@@ -316,13 +320,9 @@ export default {
 
 .video-title {
   text-align: left;
-  margin: 0.5em 0;
+  margin-bottom: 0.5em;
   font-weight: 500;
   font-size: 1.75rem;
-
-  :before {
-    display: none;
-  }
 }
 
 div {
@@ -346,7 +346,7 @@ button {
   background: #000000aa;
   border-radius: 15px;
   > * {
-    background: #ddd;
+    background: var(--bg-color-secondary);
     height: calc(100% - 2em);
     width: calc(100% - 2em);
     margin: 1em;

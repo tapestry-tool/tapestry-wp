@@ -79,6 +79,12 @@
           @load="$emit('load')"
           @unload="$emit('unload')"
         ></component>
+        <sub-item-table
+          v-if="node.mediaType === 'video'"
+          :node="node"
+          :action-type="actionType"
+          :is-popups="true"
+        ></sub-item-table>
       </b-card>
     </b-form-group>
   </div>
@@ -96,6 +102,7 @@ import UrlEmbedForm from "./UrlEmbedForm"
 import VideoForm from "./VideoForm"
 import WpPostForm from "./WpPostForm"
 import AnswerForm from "./AnswerForm"
+import SubItemTable from "./MultiContentForm/SubItemTable"
 
 export default {
   components: {
@@ -109,6 +116,7 @@ export default {
     VideoForm,
     WpPostForm,
     AnswerForm,
+    SubItemTable,
   },
   props: {
     node: {

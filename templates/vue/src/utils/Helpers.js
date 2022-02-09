@@ -394,6 +394,25 @@ export default class Helpers {
     return Helpers.deepMerge(baseNode, overrides)
   }
 
+  /**
+   * Return the X, Y position of an element within another given element
+   * @param {DOM Element} element
+   * @param {DOM Element} container
+   * @returns {Object} {x, y}
+   */
+  static getPositionOfElementInElement(element, container) {
+    var xPosition = 0
+    var yPosition = 0
+
+    while (element && !element.isSameNode(container)) {
+      xPosition += element.offsetLeft - element.scrollLeft + element.clientLeft
+      yPosition += element.offsetTop - element.scrollTop + element.clientTop
+      element = element.offsetParent
+    }
+
+    return { x: xPosition, y: yPosition }
+  }
+
   static nodeAndUserAreDyad(node) {
     let roles = wp.getCurrentUser().roles
     return !node.isDyad ? false : roles.includes("dyad")

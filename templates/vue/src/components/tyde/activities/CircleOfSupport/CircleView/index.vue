@@ -1,11 +1,12 @@
 <template>
   <ul class="circle-container">
     <connections-tab
+      v-if="!isReadOnly"
       ref="connectionsTab"
       class="tab"
       :connections="connections"
       :communities="communities"
-      :draggable="!dragDisabled"
+      :draggable="!dragDisabled && !isReadOnly"
       @back="handleBack"
       @add-connection="$emit('add-connection', $event)"
       @edit-connection="handleEditConnection"
@@ -23,9 +24,9 @@
         '--index': index,
         '--order': circle.order,
         '--radius': circle.radius,
-        '--background': getCircleBackground(index),
       }"
       class="circle"
+      :class="{ active: activeCircle === index }"
     >
       <ul
         v-show="activeCircle > 2 || activeCircle === index"
@@ -40,7 +41,7 @@
           class="connection"
           size="sm"
           variant="name"
-          :draggable="!dragDisabled"
+          :draggable="!dragDisabled && !isReadOnly"
           @click="toggleConnectionTooltip(connection.id)"
           @drag:start="handleDragStart"
           @drag:move="handleDragMove"
@@ -54,6 +55,7 @@
       class="connection-tooltip"
       :connection="activeConnection"
       :show="activeConnectionId != null"
+      :is-read-only="isReadOnly"
       @edit="editConnection(activeConnection)"
       @close="activeConnectionId = null"
     />
@@ -142,6 +144,11 @@ export default {
       type: Array,
       required: true,
     },
+    isReadOnly: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   data() {
     return {
@@ -202,12 +209,6 @@ export default {
     },
   },
   methods: {
-    getCircleBackground(index) {
-      if (this.activeCircle === index) {
-        return `var(--bg-color-layered)`
-      }
-      return "var(--cos-bg-tertiary)"
-    },
     getEmojiImgFromUnicode(unicode) {
       let div = document.createElement("div")
       div.textContent = unicode
@@ -266,6 +267,10 @@ export default {
       return circle
     },
     addConnectionToCircle(circle, connectionId) {
+      if (this.isReadOnly) {
+        return
+      }
+
       this.dragDisabled = true
 
       // First do it locally, for responsive UX
@@ -288,6 +293,10 @@ export default {
         })
     },
     removeConnectionFromCircles(connectionId) {
+      if (this.isReadOnly) {
+        return
+      }
+
       this.dragDisabled = true
 
       // First do it locally, for responsive UX
@@ -356,6 +365,10 @@ export default {
       }
     },
     editConnection(connection) {
+      if (this.isReadOnly) {
+        return
+      }
+
       this.activeConnectionId = null
       this.state = States.EditConnection
       this.$refs.connectionsTab.editConnection(connection)
@@ -367,6 +380,10 @@ export default {
       }
     },
     handleEditConnection(event) {
+      if (this.isReadOnly) {
+        return
+      }
+
       this.handleBack()
       this.$emit("edit-connection", event)
     },
@@ -409,12 +426,15 @@ ul {
 
 .circle {
   position: absolute;
-  border: 3px solid var(--cos-bg-secondary);
+  border: 3px solid var(--cos-bg-tertiary);
   width: calc(var(--radius) * 2);
   height: calc(var(--radius) * 2);
   border-radius: 50%;
-  background: var(--background);
+  background: var(--cos-bg-primary);
   z-index: calc(var(--order) * 10);
+  &.active {
+    background: var(--cos-text-tertiary);
+  }
 }
 
 .controls {

@@ -7,6 +7,8 @@ class CircleOfSupport
     private $versions;
     private $current;
 
+    public $isDyadUser = false;
+
     public const META_KEY = 'tyde_circle_of_support';
     public const MAX_COMMUNITIES = 10;
 
@@ -14,6 +16,15 @@ class CircleOfSupport
     {
         if (!$userId) {
             $userId = wp_get_current_user()->ID;
+        }
+
+        if ($userId) {
+            global $TYDE_DYAD_ROLES;
+            $this->isDyadUser = !!array_intersect(get_userdata($userId)->roles, array_keys($TYDE_DYAD_ROLES));
+            $linkedUserId = get_the_author_meta('linked_dyad_user_id', $userId);
+            if ($this->isDyadUser && $linkedUserId) {
+                $userId = $linkedUserId;
+            }
         }
 
         $this->userId = $userId;

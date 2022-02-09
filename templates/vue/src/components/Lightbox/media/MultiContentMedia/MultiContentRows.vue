@@ -16,7 +16,7 @@
         :dimensions="dimensions"
         :context="context"
         :level="level"
-        @update-progress="updateProgress"
+        @complete="complete"
         @load="handleLoad"
         @close="handleAutoClose"
       />
@@ -91,11 +91,11 @@ export default {
         !node.unlocked
       )
     },
-    updateProgress(rowId) {
-      this.$emit("updateProgress", rowId)
+    complete(rowId) {
+      this.$emit("complete", rowId)
     },
     changeRow(rowInfo) {
-      this.$emit("changeRow", { context: this.context, ...rowInfo })
+      this.$emit("change-row", { context: this.context, ...rowInfo })
     },
     areAllPopup(nodes) {
       return nodes.every(node => node.popup !== null)

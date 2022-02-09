@@ -11,6 +11,13 @@
       ref="graph"
       :viewBox="viewBox"
     />
+    <p v-else-if="tydeModeEnabled">
+      If your page doesn't load within a few seconds,
+      <a class="mt-4" :href="`#/nodes/${defaultNodeId}/view`">
+        click here
+      </a>
+      to continue.
+    </p>
   </div>
 </template>
 
@@ -32,7 +39,6 @@ export default {
   },
   data() {
     return {
-      loading: true,
       viewBox: "2200 2700 1600 1100",
     }
   },
@@ -56,6 +62,18 @@ export default {
     },
     tydeModeEnabled() {
       return !canEditTapestry() && this.settings.tydeModeEnabled
+    },
+    defaultNodeId() {
+      let defaultNodeId = this.rootId
+
+      if (this.settings.tydeModeTabs.default) {
+        let userMainRole = getCurrentUser().roles[0]
+        if (!userMainRole || !(userMainRole in this.settings.tydeModeTabs.default)) {
+          userMainRole = "public"
+        }
+        defaultNodeId = this.settings.tydeModeTabs.default[userMainRole]
+      }
+      return defaultNodeId
     },
   },
   watch: {
@@ -179,29 +197,18 @@ export default {
       })
     },
     setupTydeView() {
-      if (this.tydeModeEnabled) {
+      if (
+        this.tydeModeEnabled &&
+        (!this.$route.params.nodeId || this.$route.name !== names.LIGHTBOX)
+      ) {
         /* NOTE: Opening the default Node for a specific role 
              in fullscreen only if this role cannot edit the 
              default node, otherwise the regular tapestry will
              open
         */
-
-        let defaultNodeId = this.rootId
-
-        if (this.settings.tydeModeTabs.default) {
-          let userMainRole = getCurrentUser().roles[0]
-          if (
-            !userMainRole ||
-            !(userMainRole in this.settings.tydeModeTabs.default)
-          ) {
-            userMainRole = "public"
-          }
-          defaultNodeId = this.settings.tydeModeTabs.default[userMainRole]
-        }
-
         this.$router.push({
           name: names.LIGHTBOX,
-          params: { nodeId: defaultNodeId },
+          params: { nodeId: this.defaultNodeId },
           query: { ...this.$route.query },
         })
       }

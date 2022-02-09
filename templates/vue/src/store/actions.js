@@ -117,7 +117,10 @@ export async function updateLockedStatus({ commit, getters, dispatch }) {
   }
 }
 
-export async function updateNodeProgress({ commit, getters, dispatch }, payload) {
+export async function updateNodeProgress(
+  { commit, state, getters, dispatch },
+  payload
+) {
   // Tapestry editors and admins don't need this feature. We disable this to
   // improve performance for editors and admins by reducing requests.
   if (wp.canEditTapestry()) {
@@ -134,7 +137,10 @@ export async function updateNodeProgress({ commit, getters, dispatch }, payload)
         const nodeProgress = progressObj[id] || {}
         nodeProgress.progress = progress
         localStorage.setItem(LOCAL_PROGRESS_ID, JSON.stringify(progressObj))
-      } else {
+      } else if (
+        !state.userProgress[id] ||
+        state.userProgress[id].progress !== progress
+      ) {
         await client.updateUserProgress(id, progress)
       }
       commit("updateNodeProgress", { id, progress })
@@ -196,9 +202,10 @@ export async function completeNode(context, nodeId) {
   }
 }
 
-async function unlockNodes({ commit, getters, dispatch }) {
+async function unlockNodes({ commit, getters, state, dispatch }) {
   try {
-    const progress = await client.getUserProgress()
+    let { userProgress } = state
+    const progress = userProgress ? userProgress : await client.getUserProgress()
     for (const [id, nodeProgress] of Object.entries(progress)) {
       const currentNode = getters.getNode(id)
       if (

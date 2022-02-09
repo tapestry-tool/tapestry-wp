@@ -1,6 +1,9 @@
 <template>
-  <div ref="activity" class="activity-media">
-    <h1 v-if="showTitle" class="media-title">{{ node.title }}</h1>
+  <div ref="activity" class="activity-media" :class="`context-${context}`">
+    <h1 v-if="showTitle" class="media-title">
+      {{ node.title }}
+      <completed-icon :node="node" class="mx-2" />
+    </h1>
     <b-alert
       v-if="isDyadNodeAndUser"
       show
@@ -96,9 +99,11 @@
 import client from "@/services/TapestryAPI"
 import Question from "./Question"
 import CompletionScreen from "./CompletionScreen"
+import CompletedIcon from "@/components/common/CompletedIcon"
 import { mapActions, mapGetters } from "vuex"
 import AnswerMedia from "./AnswerMedia.vue"
 import { dyadLinkedUser } from "@/services/wp"
+import Helpers from "@/utils/Helpers"
 
 const states = {
   ACTIVITY: "activity",
@@ -110,6 +115,7 @@ export default {
   name: "activity-media",
   components: {
     CompletionScreen,
+    CompletedIcon,
     Question,
     AnswerMedia,
   },
@@ -175,6 +181,9 @@ export default {
     activeQuestion() {
       return this.questions[this.activeQuestionIndex]
     },
+    activeQuestionId() {
+      return this.activeQuestion.id
+    },
     currentQuestionText() {
       return `${this.activeQuestionIndex + 1}/${this.questions.length}`
     },
@@ -205,22 +214,29 @@ export default {
     },
   },
   watch: {
-    activeQuestion() {
-      const nodeId = this.$route.params.rowId
-      if (nodeId) {
+    activeQuestionId() {
+      if (this.node.id) {
         this.$nextTick(() => {
           const container = document.getElementById(`multicontent-container`)
-          const yOffset = -50
-          const element = document.getElementById(`row-${nodeId}`)
-          const y =
-            element.getBoundingClientRect().top -
-            container.getBoundingClientRect().top +
-            container.scrollTop +
-            yOffset
-          container.scrollTo({ top: y, behavior: "smooth" })
-          client.recordAnalyticsEvent("app", "scroll", "multi-content", nodeId, {
-            to: y,
-          })
+          const element = document.getElementById(`row-${this.node.id}`)
+          if (element) {
+            // We add spacing to scroll past the navbar
+            const navbar = document.getElementById(`tapestry-navbar`)
+            const yOffset =
+              (navbar ? -navbar.getBoundingClientRect().bottom : 0) + 10
+            const y =
+              Helpers.getPositionOfElementInElement(element, container).y + yOffset
+            container.scrollTo({ top: y, behavior: "smooth" })
+            client.recordAnalyticsEvent(
+              "app",
+              "scroll",
+              "multi-content",
+              this.node.id,
+              {
+                to: y,
+              }
+            )
+          }
         })
       }
       if (this.isDyadNodeAndUser) {
@@ -281,17 +297,22 @@ export default {
       }
     },
     handleComplete(initiatingComponent) {
+      client.recordAnalyticsEvent("user", "submit", "activity", this.node.id, {
+        question: this.activeQuestionIndex,
+      })
+
+      const numberCompleted = this.questionNode.typeData.activity.questions.filter(
+        question => question.completed || question.optional
+      ).length
+      const progress =
+        numberCompleted / this.questionNode.typeData.activity.questions.length
+      this.updateNodeProgress({ id: this.questionNode.id, progress }).then(() => {
+        if (progress === 1) {
+          this.$emit("complete")
+        }
+      })
+
       if (initiatingComponent === "activity") {
-        const numberCompleted = this.questionNode.typeData.activity.questions.filter(
-          question => question.completed || question.optional
-        ).length
-        const progress =
-          numberCompleted / this.questionNode.typeData.activity.questions.length
-        this.updateNodeProgress({ id: this.questionNode.id, progress }).then(() => {
-          if (progress === 1) {
-            this.$emit("complete")
-          }
-        })
         if (!this.activeQuestion.confirmation.message && this.hasNext) {
           if (this.questions[this.activeQuestionIndex + 1].completed) {
             this.state = states.ANSWER
@@ -301,12 +322,6 @@ export default {
         } else {
           this.state = states.COMPLETION_SCREEN
         }
-      } else if (
-        this.initialType === states.ANSWER &&
-        initiatingComponent === "answer" &&
-        this.hasAnswers
-      ) {
-        this.$emit("complete")
       }
     },
     next() {
@@ -357,7 +372,10 @@ export default {
   width: 100%;
   min-height: 100%;
   z-index: 10;
-  padding: 24px;
+
+  &:not(.context-multi-content) {
+    padding: 24px;
+  }
 
   .activity-alert {
     max-width: 500px;
@@ -367,12 +385,8 @@ export default {
     text-align: left;
     font-size: 1.75rem;
     font-weight: 500;
-    margin-bottom: 0.9em 0 0.5em 25px;
+    margin-bottom: 1em;
     width: 100%;
-
-    :before {
-      display: none;
-    }
   }
 }
 

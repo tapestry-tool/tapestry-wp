@@ -98,6 +98,23 @@ export default {
   },
   mounted() {
     this.load = true
+
+    if (this.node.mediaType === "multi-content") {
+      setTimeout(() => {
+        const rowId = this.$route.params.rowId
+        const container = document.getElementById(`multicontent-container`)
+        const navbar = document.getElementById(`tapestry-navbar`)
+        let y = navbar ? -navbar.getBoundingClientRect().bottom : 0
+        if (rowId) {
+          const element = document.getElementById(`row-${rowId}`)
+          y += Helpers.getPositionOfElementInElement(element, container).y
+        }
+        container.scrollTo({ top: y, behavior: "smooth" })
+        // client.recordAnalyticsEvent("app", "scroll", "multi-content", rowId, {
+        //   to: y,
+        // })
+      }, 2000)
+    }
   },
   methods: {
     ...mapActions(["toggleFavourite"]),
