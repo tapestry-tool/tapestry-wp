@@ -60,7 +60,7 @@
             context="multi-content"
             :hide-title="presentationStyle === 'accordion'"
             style="margin-bottom: 24px;"
-            @complete="updateProgress"
+            @complete="complete"
             @load="handleLoad(null)"
           />
           <multi-content-rows
@@ -70,7 +70,7 @@
             context="multi-content"
             :level="level + 1"
             @load="handleLoad"
-            @updateProgress="updateProgress"
+            @complete="complete"
           />
         </div>
         <multi-content-media
@@ -79,8 +79,9 @@
           context="multi-content"
           :level="level + 1"
           :hide-title="presentationStyle === 'accordion'"
+          @load="handleLoad(null)"
           @close="handleAutoClose"
-          @complete="updateProgress"
+          @complete="complete"
         />
       </div>
     </div>
@@ -190,8 +191,8 @@ export default {
         query: { from: "lightbox" },
       })
     },
-    updateProgress() {
-      this.$emit("updateProgress", this.node.id)
+    complete() {
+      this.$emit("complete", this.node.id)
     },
     handleLoad(el) {
       this.$emit("load", el)

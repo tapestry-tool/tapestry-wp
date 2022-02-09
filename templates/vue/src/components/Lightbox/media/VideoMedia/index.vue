@@ -1,6 +1,8 @@
 <template>
   <div>
-    <h1 v-if="showTitle" class="video-title">{{ node.title }}</h1>
+    <h1 v-if="showTitle" class="video-title">
+      {{ node.title }}
+    </h1>
     <div :class="'video-wrapper context-' + context" :style="{ height: heightCss }">
       <loading v-if="state === states.Loading" />
       <component
@@ -47,7 +49,7 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from "vuex"
+import { mapGetters } from "vuex"
 
 import UrlVideoMedia from "./UrlVideoMedia"
 import H5PVideoMedia from "./H5PVideoMedia"
@@ -171,7 +173,6 @@ export default {
     },
   },
   methods: {
-    ...mapActions(["completeNode"]),
     /**
      * This function calculates the next state given the current state and the event
      * name, as well as perform any necessary side effects.
@@ -320,7 +321,7 @@ export default {
   font-weight: 500;
   font-size: 1.75rem;
 
-  :before {
+  > :before {
     display: none;
   }
 }
@@ -346,7 +347,7 @@ button {
   background: #000000aa;
   border-radius: 15px;
   > * {
-    background: #ddd;
+    background: var(--bg-color-secondary);
     height: calc(100% - 2em);
     width: calc(100% - 2em);
     margin: 1em;

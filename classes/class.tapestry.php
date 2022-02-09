@@ -730,7 +730,7 @@ class Tapestry implements ITapestry
                     $n->permitted = $this->_userIsAllowed($n->id, $superuserOverridePermissions, $currentUserId) ||
                     (-1 !== $filterUserId && $this->_userIsAllowed($n->id, $superuserOverridePermissions, $filterUserId));
                 }, function ($n) {
-                    return $n->permitted;
+                    return true;
                 }
             );
 

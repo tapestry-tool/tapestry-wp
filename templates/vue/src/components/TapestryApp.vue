@@ -27,7 +27,6 @@ export default {
   },
   data() {
     return {
-      loading: true,
       viewBox: "2200 2700 1600 1100",
     }
   },

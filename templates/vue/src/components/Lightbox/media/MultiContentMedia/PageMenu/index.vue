@@ -41,11 +41,12 @@
             {{ page.title }}
           </b-dropdown-item>
         </b-dropdown>
-        <h5 class="pl-2 py-1 mb-4">{{ currentPageTitle }}</h5>
+        <h5 class="pl-2 py-1 mb-4">{{ node.title }}</h5>
       </div>
       <div
         :class="[
           'page-nav-content',
+          'mb-auto',
           {
             fullscreen: node.fullscreen,
             closed: !opened,
@@ -63,6 +64,14 @@
           />
         </ul>
       </div>
+      <a
+        v-if="isLoggedIn"
+        :href="logoutUrl"
+        class="mt-auto ml-3 pt-4"
+        style="color: var(--text-color-primary);"
+      >
+        Logout
+      </a>
     </aside>
   </div>
 </template>
@@ -70,6 +79,7 @@
 <script>
 import { mapGetters } from "vuex"
 import PageMenuItem from "./PageMenuItem"
+import { isLoggedIn, data as wpData } from "@/services/wp"
 import Helpers from "@/utils/Helpers"
 
 export default {
@@ -139,6 +149,12 @@ export default {
         return false
       }
       return this.opened || (this.browserWidth > 800 && this.node.fullscreen)
+    },
+    isLoggedIn() {
+      return isLoggedIn()
+    },
+    logoutUrl() {
+      return wpData.logoutUrl
     },
   },
   watch: {
@@ -215,6 +231,8 @@ export default {
     z-index: 0;
     overflow-y: auto;
     min-width: 200px;
+    display: flex;
+    flex-direction: column;
 
     &.lightbox {
       position: absolute;

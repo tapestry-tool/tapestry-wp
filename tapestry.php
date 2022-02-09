@@ -6,12 +6,12 @@ require_once __DIR__.'/classes/class.tapestry-analytics.php';
  * Plugin Name: Tapestry
  * Plugin URI: https://www.tapestry-tool.com
  * Description: Custom post type - Tapestry
- * Version: 2.53.0-beta
+ * Version: 2.54.0-beta
  * Author: Tapestry Team, University of British Coloumbia.
  */
 
 // Used to force-refresh assets
-$TAPESTRY_VERSION_NUMBER = '2.53.0-beta';
+$TAPESTRY_VERSION_NUMBER = '2.54.0-beta';
 
 // Set this to false if you want to use the Vue build instead of npm dev
 $TAPESTRY_USE_DEV_MODE = true;
@@ -167,6 +167,7 @@ function tapestry_enqueue_vue_app()
                 'vue_uri' => $vueUrl, // path to vue
                 'rest_url' => untrailingslashit(esc_url_raw(rest_url())), // URL to the REST endpoint.
                 'wpUrl' => get_bloginfo('url'),
+                'logoutUrl' => wp_logout_url(get_permalink()),
                 'app_path' => $post->post_name, // page where the custom page template is loaded.
                 'post_categories' => get_terms([
                     'taxonomy' => 'category', // default post categories.

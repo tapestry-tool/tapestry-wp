@@ -74,13 +74,13 @@ export default {
   methods: {
     ...mapActions(["updateUserSettings"]),
     closeModal() {
-      this.$emit("close")
+      this.$root.$emit("bv::hide::modal", "user-settings-modal")
     },
     saveSettings() {
       const theme = this.$refs.themeForm.getTheme()
       this.$refs.themeForm.applyTheme()
       this.updateUserSettings({ theme })
-      this.$emit("close")
+      this.$root.$emit("bv::hide::modal", "user-settings-modal")
     },
   },
 }

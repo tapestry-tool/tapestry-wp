@@ -89,6 +89,7 @@ import Question from "./Question"
 import CompletionScreen from "./CompletionScreen"
 import { mapActions, mapGetters } from "vuex"
 import AnswerMedia from "./AnswerMedia.vue"
+import Helpers from "@/utils/Helpers"
 
 const states = {
   ACTIVITY: "activity",
@@ -190,21 +191,23 @@ export default {
   },
   watch: {
     activeQuestion() {
-      const nodeId = this.$route.params.rowId
-      if (nodeId) {
+      if (this.node.id) {
         this.$nextTick(() => {
           const container = document.getElementById(`multicontent-container`)
-          const yOffset = -50
-          const element = document.getElementById(`row-${nodeId}`)
-          const y =
-            element.getBoundingClientRect().top -
-            container.getBoundingClientRect().top +
-            container.scrollTop +
-            yOffset
-          container.scrollTo({ top: y, behavior: "smooth" })
-          client.recordAnalyticsEvent("app", "scroll", "multi-content", nodeId, {
-            to: y,
-          })
+          const element = document.getElementById(`row-${this.node.id}`)
+          if (element) {
+            const y = Helpers.getPositionOfElementInElement(element, container).y
+            container.scrollTo({ top: y, behavior: "smooth" })
+            client.recordAnalyticsEvent(
+              "app",
+              "scroll",
+              "multi-content",
+              this.node.id,
+              {
+                to: y,
+              }
+            )
+          }
         })
       }
       if (this.initialType === states.ACTIVITY) {
@@ -258,17 +261,22 @@ export default {
       }
     },
     handleComplete(initiatingComponent) {
+      client.recordAnalyticsEvent("user", "submit", "activity", this.node.id, {
+        question: this.activeQuestionIndex,
+      })
+
+      const numberCompleted = this.questionNode.typeData.activity.questions.filter(
+        question => question.completed || question.optional
+      ).length
+      const progress =
+        numberCompleted / this.questionNode.typeData.activity.questions.length
+      this.updateNodeProgress({ id: this.questionNode.id, progress }).then(() => {
+        if (progress === 1) {
+          this.$emit("complete")
+        }
+      })
+
       if (initiatingComponent === "activity") {
-        const numberCompleted = this.questionNode.typeData.activity.questions.filter(
-          question => question.completed || question.optional
-        ).length
-        const progress =
-          numberCompleted / this.questionNode.typeData.activity.questions.length
-        this.updateNodeProgress({ id: this.questionNode.id, progress }).then(() => {
-          if (progress === 1) {
-            this.$emit("complete")
-          }
-        })
         if (!this.activeQuestion.confirmation.message && this.hasNext) {
           if (this.questions[this.activeQuestionIndex + 1].completed) {
             this.state = states.ANSWER
@@ -278,12 +286,6 @@ export default {
         } else {
           this.state = states.COMPLETION_SCREEN
         }
-      } else if (
-        this.initialType === states.ANSWER &&
-        initiatingComponent === "answer" &&
-        this.hasAnswers
-      ) {
-        this.$emit("complete")
       }
     },
     next() {
