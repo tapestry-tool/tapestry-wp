@@ -1,6 +1,9 @@
 <template>
-  <div ref="activity" class="activity-media">
-    <h1 v-if="showTitle" class="media-title">{{ node.title }}</h1>
+  <div ref="activity" class="activity-media" :class="`context-${context}`">
+    <h1 v-if="showTitle" class="media-title">
+      {{ node.title }}
+      <completed-icon :node="node" class="mx-2" />
+    </h1>
     <completion-screen
       v-if="state === 'completion-screen'"
       :question="activeQuestion"
@@ -87,6 +90,7 @@
 import client from "@/services/TapestryAPI"
 import Question from "./Question"
 import CompletionScreen from "./CompletionScreen"
+import CompletedIcon from "@/components/common/CompletedIcon"
 import { mapActions, mapGetters } from "vuex"
 import AnswerMedia from "./AnswerMedia.vue"
 import Helpers from "@/utils/Helpers"
@@ -101,6 +105,7 @@ export default {
   name: "activity-media",
   components: {
     CompletionScreen,
+    CompletedIcon,
     Question,
     AnswerMedia,
   },
@@ -160,6 +165,9 @@ export default {
     activeQuestion() {
       return this.questions[this.activeQuestionIndex]
     },
+    activeQuestionId() {
+      return this.activeQuestion.id
+    },
     currentQuestionText() {
       return `${this.activeQuestionIndex + 1}/${this.questions.length}`
     },
@@ -190,7 +198,7 @@ export default {
     },
   },
   watch: {
-    activeQuestion() {
+    activeQuestionId() {
       if (this.node.id) {
         this.$nextTick(() => {
           const container = document.getElementById(`multicontent-container`)
@@ -336,18 +344,17 @@ export default {
   width: 100%;
   min-height: 100%;
   z-index: 10;
-  padding: 24px;
+
+  &:not(.context-multi-content) {
+    padding: 24px;
+  }
 
   .media-title {
     text-align: left;
     font-size: 1.75rem;
     font-weight: 500;
-    margin-bottom: 0.9em 0 0.5em 25px;
+    margin-bottom: 1em;
     width: 100%;
-
-    :before {
-      display: none;
-    }
   }
 }
 

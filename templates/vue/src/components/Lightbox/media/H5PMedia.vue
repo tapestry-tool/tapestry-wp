@@ -1,32 +1,43 @@
 <template>
-  <div
-    ref="h5pMediaIFrameContainer"
-    class="h5p-media-iframe-container"
-    :class="{
-      'context-multi-content': hasMultiContentContext,
-    }"
-    :style="{
-      height: frameHeight ? `${iframeHeight}px` : iframeHeight,
-      width: '100%',
-    }"
-  >
-    <iframe
-      id="h5p"
-      ref="h5p"
-      :height="iframeHeight"
-      width="100%"
-      frameborder="0"
-      :src="node.typeData && node.typeData.mediaURL"
-      :scrolling="scrollingValue"
-      @load="handleLoad"
-      @close="$emit('close')"
-    ></iframe>
+  <div>
+    <h1 v-if="showTitle" class="wp-h5p-title">
+      {{ node.title }}
+      <completed-icon :node="node" class="mx-2" />
+    </h1>
+    <div
+      ref="h5pMediaIFrameContainer"
+      class="h5p-media-iframe-container"
+      :class="{
+        'context-multi-content': hasMultiContentContext,
+      }"
+      :style="{
+        height: frameHeight ? `${iframeHeight}px` : iframeHeight,
+        width: '100%',
+      }"
+    >
+      <iframe
+        id="h5p"
+        ref="h5p"
+        :height="iframeHeight"
+        width="100%"
+        frameborder="0"
+        :src="node.typeData && node.typeData.mediaURL"
+        :scrolling="scrollingValue"
+        @load="handleLoad"
+        @close="$emit('close')"
+      ></iframe>
+    </div>
   </div>
 </template>
 
 <script>
+import CompletedIcon from "@/components/common/CompletedIcon"
+
 export default {
   name: "h5p-media",
+  components: {
+    CompletedIcon,
+  },
   props: {
     node: {
       type: Object,
@@ -39,6 +50,11 @@ export default {
     context: {
       type: String,
       required: true,
+    },
+    hideTitle: {
+      type: Boolean,
+      required: false,
+      default: true,
     },
   },
   data() {
@@ -69,6 +85,13 @@ export default {
       } else {
         return "100%"
       }
+    },
+    showTitle() {
+      return (
+        !this.hideTitle &&
+        this.context === "multi-content" &&
+        this.node.typeData.showTitle !== false
+      )
     },
   },
   methods: {
@@ -135,6 +158,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+h1 {
+  font-size: 1.75rem;
+  font-weight: 500;
+  text-align: left;
+  margin-bottom: 0.5em;
+}
+
 .container {
   position: relative;
   width: 100%;

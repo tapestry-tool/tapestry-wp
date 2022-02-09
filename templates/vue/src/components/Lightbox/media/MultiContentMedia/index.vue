@@ -14,6 +14,7 @@
         }"
       >
         {{ node.title }}
+        <completed-icon :node="node" class="mx-2" />
       </h1>
     </header>
     <multi-content-rows
@@ -52,6 +53,7 @@
 <script>
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex"
 import client from "@/services/TapestryAPI"
+import CompletedIcon from "@/components/common/CompletedIcon"
 import TapestryModal from "../../TapestryModal"
 import MultiContentRows from "./MultiContentRows"
 import { names } from "@/config/routes"
@@ -59,6 +61,7 @@ import { names } from "@/config/routes"
 export default {
   name: "multi-content-media",
   components: {
+    CompletedIcon,
     TapestryModal,
     MultiContentRows,
   },
@@ -242,10 +245,6 @@ button[disabled] {
   font-size: 1.75rem;
   font-weight: 500;
   margin-bottom: 0.9em 0 0.5em 25px;
-
-  :before {
-    display: none;
-  }
 }
 
 .button-completion {
