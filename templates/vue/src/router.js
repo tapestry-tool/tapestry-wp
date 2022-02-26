@@ -2,23 +2,10 @@ import Vue from "vue"
 import VueRouter from "vue-router"
 import client from "./services/TapestryAPI"
 
-import routeConfig, { names } from "./config/routes"
+import routes, { names } from "./config/routes"
 import store from "./store"
 
 Vue.use(VueRouter)
-
-export const routes = [
-  routeConfig.app,
-  routeConfig.lightbox,
-  routeConfig.multiContent,
-  routeConfig.nestedMultiContent,
-  routeConfig.settings,
-  routeConfig.userSettings,
-  routeConfig.linkmodal,
-  ...routeConfig.redirects,
-  routeConfig.modal,
-  routeConfig.help,
-]
 
 const router = new VueRouter({
   routes,
@@ -42,23 +29,21 @@ router.beforeEach((to, from, next) => {
 })
 
 let userLastSelectedNodeTimeout = null
+let userLastSelectedNodeNodeId = null
+let userLastSelectedNodeRowId = null
 
 router.afterEach((to, from) => {
   if (
     from.matched.length > 0 &&
     to.matched.length > 0 &&
-    (from.params.nodeId !== to.params.nodeId ||
-      from.params.rowId !== to.params.rowId ||
-      from.query.row !== to.query.row ||
-      from.params.subRowId !== to.params.subRowId)
+    (userLastSelectedNodeNodeId !== to.params.nodeId ||
+      userLastSelectedNodeRowId !== to.params.rowId)
   ) {
     clearTimeout(userLastSelectedNodeTimeout)
+    userLastSelectedNodeNodeId = to.params.nodeId
+    userLastSelectedNodeRowId = to.params.rowId
     userLastSelectedNodeTimeout = setTimeout(() => {
-      client.updateUserLastSelectedNode(
-        to.params.nodeId,
-        to.params.rowId ? to.params.rowId : to.query.row,
-        to.params.subRowId
-      )
+      client.updateUserLastSelectedNode(to.params.nodeId, to.params.rowId)
     }, 5000)
   }
 })

@@ -174,8 +174,8 @@ describe("Multi-content", () => {
         }
 
         cy.openLightbox(node.id).within(() => {
-          cy.getByTestId("accordion-rows")
-            .find("div.accordion-row")
+          cy.getByTestId("multi-content-rows")
+            .find("div.multi-content-row")
             .each(($el, index) => {
               const row = rows[index]
               cy.wrap($el)
@@ -228,8 +228,8 @@ describe("Multi-content", () => {
         })
 
         cy.openLightbox(node.id).within(() => {
-          cy.getByTestId("accordion-rows")
-            .find("div.accordion-row")
+          cy.getByTestId("multi-content-rows")
+            .find("div.multi-content-row")
             .each(($el, index) => {
               const row = newOrdering[index]
               cy.store()

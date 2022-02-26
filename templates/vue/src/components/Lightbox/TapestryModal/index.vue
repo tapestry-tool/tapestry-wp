@@ -106,6 +106,7 @@ export default {
       this.$router.push({
         name: names.MODAL,
         params: { nodeId: this.node.id, type: "edit", tab: "content" },
+        query: { from: "lightbox" },
       })
     },
   },

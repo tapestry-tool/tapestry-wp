@@ -1,13 +1,21 @@
 <template>
   <article :class="'article context-' + context">
-    <h1 v-if="showTitle">{{ node.title }}</h1>
+    <h1 v-if="showTitle">
+      {{ node.title }}
+      <completed-icon :node="node" class="mx-2" />
+    </h1>
     <div v-html="content"></div>
   </article>
 </template>
 
 <script>
+import CompletedIcon from "@/components/common/CompletedIcon"
+
 export default {
   name: "text-media",
+  components: {
+    CompletedIcon,
+  },
   props: {
     node: {
       type: Object,
@@ -17,6 +25,11 @@ export default {
       type: String,
       required: false,
       default: "",
+    },
+    hideTitle: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   computed: {
@@ -31,8 +44,10 @@ export default {
     },
     showTitle() {
       return (
-        this.context !== "page" ||
-        (this.context === "page" && this.node.typeData.showTitle !== false)
+        !this.hideTitle &&
+        (this.context !== "multi-content" ||
+          (this.context === "multi-content" &&
+            this.node.typeData.showTitle !== false))
       )
     },
   },
@@ -57,10 +72,6 @@ export default {
     font-weight: 500;
     text-align: left;
     margin-bottom: 1em;
-
-    :before {
-      display: none;
-    }
   }
 
   div {

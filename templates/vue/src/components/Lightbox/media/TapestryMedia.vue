@@ -2,6 +2,7 @@
   <div
     :class="[
       'media-wrapper',
+      `context-${context}`,
       { 'media-wrapper-embed': node.mediaFormat === 'embed' },
       {
         'media-wrapper-no-scroll':
@@ -16,6 +17,7 @@
       v-if="node.mediaType === 'text'"
       :node="node"
       :context="context"
+      :hide-title="hideTitle"
       @complete="complete"
       @load="handleLoad"
     />
@@ -24,6 +26,7 @@
       :dimensions="dimensions"
       :context="context"
       :node-id="nodeId"
+      :hide-title="hideTitle"
       @change:dimensions="$emit('change:dimensions', $event)"
       @load="handleLoad"
       @update-progress="updateProgress"
@@ -35,6 +38,7 @@
       :dimensions="dimensions"
       :context="context"
       :node="node"
+      :hide-title="hideTitle"
       @change:dimensions="$emit('change:dimensions', $event)"
       @load="handleLoad"
       @complete="complete"
@@ -45,6 +49,7 @@
       :dimensions="dimensions"
       :node="node"
       :context="context"
+      :hide-title="hideTitle"
       @change:dimensions="$emit('change:dimensions', $event)"
       @load="handleLoad"
       @complete="complete"
@@ -53,6 +58,7 @@
       v-if="node.mediaType === 'wp-post'"
       :node="node"
       :context="context"
+      :hide-title="hideTitle"
       @complete="complete"
       @load="handleLoad"
     ></wp-post-media>
@@ -62,6 +68,7 @@
       :node="node"
       :context="context"
       :initial-type="node.mediaType"
+      :hide-title="hideTitle"
       @change:dimensions="$emit('change:dimensions', $event)"
       @complete="complete"
       @close="$emit('close')"
@@ -104,10 +111,16 @@ export default {
       required: false,
       default: "lightbox",
     },
+    hideTitle: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   data() {
     return {
       timeSinceLastSaved: new Date(),
+      lastHoveredRowId: null,
     }
   },
   computed: {
@@ -135,11 +148,13 @@ export default {
     setHovered() {
       this.$router.push({
         ...this.$route,
-        query: {
-          ...this.$route.query,
-          row: this.nodeId,
+        params: {
+          ...this.$route.params,
+          rowId: this.nodeId,
         },
+        query: this.$route.query,
       })
+      this.lastHoveredRowId = this.nodeId
     },
     handleLoad(args) {
       this.$emit("load", args)
@@ -157,11 +172,14 @@ export default {
 <style lang="scss" scoped>
 .media-wrapper {
   outline: none;
-  border-radius: 15px;
   overflow: auto;
   height: 100%;
   widows: 100%;
   padding: 0;
+
+  &:not(.context-multi-content) {
+    border-radius: 15px;
+  }
 
   &-no-scroll {
     overflow: hidden;

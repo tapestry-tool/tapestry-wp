@@ -334,7 +334,7 @@ foreach ($REST_API_ENDPOINTS as $ENDPOINT) {
             register_rest_route(
                 $REST_API_NAMESPACE,
                 $ENDPOINT->ROUTE,
-                $ENDPOINT->ARGUMENTS
+                array_merge(array('permission_callback' => '__return_true') ,$ENDPOINT->ARGUMENTS)
             );
         }
     );
@@ -1475,7 +1475,7 @@ function updateLastSelectedNode($request)
     try {
         $userProgress = new TapestryUserProgress($postId);
 
-        return $userProgress->updateLastSelectedNode($body->nodeId, $body->rowId, $body->subRowId);
+        return $userProgress->updateLastSelectedNode($body->nodeId, $body->rowId);
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }

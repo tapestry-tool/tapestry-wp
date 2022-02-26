@@ -10,36 +10,24 @@
         v-if="showTitle"
         :class="{
           title: true,
-          'nested-media-title': isMultiContentContext,
+          'nested-media-title': context === 'multi-content',
         }"
       >
         {{ node.title }}
+        <completed-icon :node="node" class="mx-2" />
       </h1>
     </header>
-    <accordion-rows
-      v-if="node.presentationStyle === 'accordion'"
+    <multi-content-rows
+      v-if="node.presentationStyle"
       :dimensions="dimensions"
       :node="node"
       :rowId="rowId"
-      :subRowId="subRowId"
       :context="context"
       :level="level"
-      @load="handleLoad"
-      @changeRow="changeRow"
-      @updateProgress="updateProgress"
-    ></accordion-rows>
-    <page-rows
-      v-else-if="node.presentationStyle === 'page'"
-      :dimensions="dimensions"
-      :node="node"
-      :rowId="rowId"
-      :subRowId="subRowId"
-      :context="context"
-      :level="level"
-      @load="handleLoad"
-      @changeRow="changeRow"
-      @updateProgress="updateProgress"
-    ></page-rows>
+      @load="$emit('load')"
+      @change-row="changeRow"
+      @complete="complete"
+    />
     <tapestry-modal
       v-if="showCompletion"
       :node-id="node.id"
@@ -65,17 +53,17 @@
 <script>
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex"
 import client from "@/services/TapestryAPI"
+import CompletedIcon from "@/components/common/CompletedIcon"
 import TapestryModal from "../../TapestryModal"
-import AccordionRows from "./AccordionRows"
-import PageRows from "./PageRows"
+import MultiContentRows from "./MultiContentRows"
 import { names } from "@/config/routes"
 
 export default {
   name: "multi-content-media",
   components: {
+    CompletedIcon,
     TapestryModal,
-    AccordionRows,
-    PageRows,
+    MultiContentRows,
   },
   props: {
     node: {
@@ -83,11 +71,6 @@ export default {
       required: true,
     },
     rowId: {
-      type: Number,
-      required: false,
-      default: 0,
-    },
-    subRowId: {
       type: Number,
       required: false,
       default: 0,
@@ -101,6 +84,11 @@ export default {
       type: Number,
       required: false,
       default: 0,
+    },
+    hideTitle: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   data() {
@@ -148,37 +136,24 @@ export default {
     },
     showTitle() {
       return (
-        this.level == 0 ||
-        (this.context !== "accordion" && this.node.typeData.showTitle !== false)
+        !this.hideTitle &&
+        (this.level == 0 || this.node.typeData.showTitle !== false)
       )
-    },
-    isMultiContentContext() {
-      return this.isNestedMultiContent(this.context)
     },
   },
   mounted() {
     this.isMounted = true
     this.activeIndex = this.node.presentationStyle === "page" ? -1 : 0
+
+    // if all children are completed, mark this as completed too
+    // this is just in case it hasn't done this properly before
+    if (!this.node.completed && this.rows.every(row => row.node.completed)) {
+      this.$emit("complete", this.node.id)
+    }
   },
   methods: {
     ...mapMutations(["updateNode"]),
     ...mapActions(["completeNode", "toggleFavourite"]),
-    handleLoad(el) {
-      this.$nextTick(() => {
-        if (this.activeIndex >= 0) {
-          client.recordAnalyticsEvent(
-            "app",
-            "scroll",
-            "multi-content",
-            this.node.id,
-            {
-              to: el.offsetTop - 12,
-            }
-          )
-          this.$refs.container.scrollTop = el.offsetTop - 12
-        }
-      })
-    },
     handleClose(evt) {
       client.recordAnalyticsEvent("user", "close", "multi-content", this.node.id, {
         x: evt.clientX,
@@ -202,101 +177,38 @@ export default {
     disableRow(index) {
       return this.lockRows && this.disabledFrom >= 0 && index > this.disabledFrom
     },
-    updateProgress(rowId) {
-      this.completeNode(rowId).then(() => {
-        if (this.rows.every(row => row.node.completed)) {
+    complete(rowId) {
+      const completeMultiContentNode = () => {
+        if (
+          !this.node.completed &&
+          this.rows.every(
+            row => row.node.completed || row.node.title === "Resources"
+          )
+        ) {
           this.$emit("complete", this.node.id)
         }
-      })
+      }
+      const rowIndex = this.rows.findIndex(row => row.node.id == rowId)
+      if (!this.rows[rowIndex].node.completed) {
+        this.completeNode(rowId).then(completeMultiContentNode)
+      } else {
+        completeMultiContentNode()
+      }
     },
     changeRow(rowInfo) {
-      const { rowId, context } = rowInfo
-      if (this.isNestedMultiContent(context)) {
-        if (rowId) {
-          this.$router.push({
-            name: names.NESTEDMULTICONTENT,
-            params: {
-              nodeId: this.$route.params.nodeId,
-              ...this.getRouteToParent(
-                rowId,
-                this.$route.params.rowId || this.node.id
-              ),
-            },
-            query: this.$route.query,
-          })
-        } else {
-          if (this.$route.params.subRowId) {
-            let updatedSubRowIds = this.$route.params.subRowId.split(",")
-            updatedSubRowIds.pop()
-            this.$router.push({
-              name: names.NESTEDMULTICONTENT,
-              params: {
-                nodeId: this.$route.params.nodeId,
-                rowId: this.$route.params.rowId,
-                subRowId: updatedSubRowIds.join(","),
-              },
-              query: this.$route.query,
-            })
-          }
-        }
+      const { rowId } = rowInfo
+      if (rowId) {
+        this.$router.push({
+          name: names.LIGHTBOX,
+          params: { nodeId: this.node.id, rowId },
+          query: this.$route.query,
+        })
       } else {
-        if (rowId) {
-          this.$router.push({
-            name: names.MULTICONTENT,
-            params: { nodeId: this.node.id, rowId },
-            query: this.$route.query,
-          })
-        } else {
-          this.$router.push({
-            name: names.LIGHTBOX,
-            params: { nodeId: this.node.id },
-            query: this.$route.query,
-          })
-        }
-      }
-    },
-    isNestedMultiContent(context) {
-      return (
-        context === "multi-content" || context === "page" || context === "accordion"
-      )
-    },
-    getRouteToParent(childId, parentId) {
-      let path = [childId]
-      let subRowIds = []
-
-      if (this.$route.params.subRowId) {
-        const subRowIdString = this.$route.params.subRowId.toString()
-        subRowIds = subRowIdString.split(",")
-      }
-
-      while (childId !== this.rootId) {
-        const pid = this.getParent(childId)
-
-        // Handling shared parent in subRowIds
-        if (subRowIds.includes(pid.toString())) {
-          const sharedPath = subRowIds.slice(
-            0,
-            subRowIds.indexOf(pid.toString()) + 1
-          )
-          return {
-            rowId: parentId,
-            subRowId: sharedPath.concat(path).join(","),
-          }
-        }
-        if (pid == this.$route.params.nodeId) {
-          const rowId = path[0]
-          path.shift()
-          return {
-            rowId: rowId,
-            subRowId: path.join(","),
-          }
-        }
-        path.unshift(pid)
-        childId = pid
-      }
-      return {
-        rowId: parentId,
-        subRowId: path.join(","),
+        this.$router.push({
+          name: names.LIGHTBOX,
+          params: { nodeId: this.node.id },
+          query: this.$route.query,
+        })
       }
     },
   },
@@ -333,10 +245,6 @@ button[disabled] {
   font-size: 1.75rem;
   font-weight: 500;
   margin-bottom: 0.9em 0 0.5em 25px;
-
-  :before {
-    display: none;
-  }
 }
 
 .button-completion {

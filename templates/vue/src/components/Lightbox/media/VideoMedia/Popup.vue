@@ -1,8 +1,12 @@
 <template>
-  <div>
+  <div class="popup-wrapper" :class="{ fullscreen }">
     <div class="popup-header">
       <a v-if="canEditNode(node)" @click="editNode(node.id)">
         <i class="fas fa-pencil-alt fa-sm"></i>
+      </a>
+      <a @click="fullscreen = !fullscreen">
+        <i v-if="fullscreen" class="fas fa-compress"></i>
+        <i v-else class="fas fa-expand"></i>
       </a>
     </div>
     <div class="popup" :style="style">
@@ -24,6 +28,15 @@
       />
     </div>
     <div v-if="completing || isComplete" class="popup-footer">
+      <b-alert
+        v-if="isComplete && node.mediaType === 'activity'"
+        show
+        variant="info"
+        class="popup-completed-alert"
+      >
+        You have either already completed this activity or it's optional. You may
+        press continue to go back to the video.
+      </b-alert>
       <div v-if="completing" class="aside">
         <b-spinner></b-spinner>
       </div>
@@ -36,6 +49,7 @@
 
 <script>
 import { mapActions, mapGetters, mapMutations } from "vuex"
+import { canEditTapestry } from "@/services/wp"
 import { names } from "@/config/routes"
 import Helpers from "@/utils/Helpers"
 
@@ -65,11 +79,15 @@ export default {
        * spinner on the bottom right of the node when this is currently in progress.
        */
       completing: false,
+      fullscreen: false,
     }
   },
   computed: {
     ...mapGetters(["getNode"]),
     isComplete() {
+      if (canEditTapestry()) {
+        return true
+      }
       const popup = this.getNode(this.node.id)
       if (popup) {
         return popup.completed
@@ -127,6 +145,14 @@ button {
   }
 }
 
+.popup-wrapper.fullscreen {
+  position: fixed;
+  top: 30px;
+  left: 0;
+  z-index: 10000;
+  height: calc(100% - 60px);
+}
+
 .popup-header {
   position: absolute;
   z-index: 100;
@@ -140,6 +166,12 @@ button {
 }
 .popup-footer {
   height: 80px;
+  .popup-completed-alert {
+    position: absolute;
+    left: 1.5em;
+    bottom: -16px;
+    height: 3em;
+  }
   .aside {
     height: auto;
     position: absolute;
