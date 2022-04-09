@@ -33,7 +33,7 @@
     "dragselect": "^1.13.1",
     "leaflet": "^1.7.1",
     "match-sorter": "^5.0.0",
-    "moment": "^2.25.3",
+    "moment": "^2.29.2",
     "moment-timezone": "^0.5.28",
     "tinycolor2": "^1.4.2",
     "tiptap": "^1.29.1",
