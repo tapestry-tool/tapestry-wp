@@ -27,8 +27,11 @@ To get link previews working for the "External Link" content type, you will need
 
 1. Navigate to [linkpreview.net](https://www.linkpreview.net/) and sign up to get an API Key
 2. Once logged in, press "Generate new access key" on the top right corner and copy the key
-3. In this directory (vue), make a copy of the `config-sample.js` file and rename it to `config.js` (if it doesn't exist yet)
-4. Open the `config.js` file and paste the API key as the value of the `LINK_PREVIEW_API_KEY` variable
+3. In the `templates/vue` directory, create a `.env` file containing the following line:
+    ```
+    LINK_PREVIEW_API_KEY=<key>
+    ```
+    where `<key>` is the key you generated.
 
 ## Git Config
 
