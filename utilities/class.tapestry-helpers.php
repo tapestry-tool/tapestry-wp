@@ -7,7 +7,7 @@ require_once dirname(__FILE__).'/class.tapestry-node-permissions.php';
  */
 class TapestryHelpers
 {
-    const POST_TYPES = [
+    public const POST_TYPES = [
         'TAPESTRY' => 'tapestry',
         'TAPESTRY_NODE' => 'tapestry_node',
     ];
@@ -208,7 +208,7 @@ class TapestryHelpers
     {
         $options = TapestryNodePermissions::getNodePermissions();
         $nodePostId = get_metadata_by_mid('post', $nodeMetaId)->meta_value->post_id;
-       
+
         $tapestry = new Tapestry($tapestryPostId);
         $node = $tapestry->getNode($nodeMetaId);
 

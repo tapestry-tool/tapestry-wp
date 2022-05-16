@@ -2,22 +2,22 @@
 
 class ConditionTypes
 {
-    const NODE_COMPLETED = 'node_completed';
-    const DATE_NOT_PASSED = 'date_not_passed';
-    const DATE_PASSED = 'date_passed';
+    public const NODE_COMPLETED = 'node_completed';
+    public const DATE_NOT_PASSED = 'date_not_passed';
+    public const DATE_PASSED = 'date_passed';
 }
 
 class NodeStatus
 {
-    const PUBLISH = 'publish';
-    const DRAFT = 'draft';
-    const SUBMIT = 'submitted';
-    const REJECT = 'rejected';
-    const ACCEPT = 'accepted';
+    public const PUBLISH = 'publish';
+    public const DRAFT = 'draft';
+    public const SUBMIT = 'submitted';
+    public const REJECT = 'rejected';
+    public const ACCEPT = 'accepted';
 }
 
 class CommentTypes
 {
-    const COMMENT = 'Comment';
-    const STATUS_CHANGE = 'StatusChange';
+    public const COMMENT = 'Comment';
+    public const STATUS_CHANGE = 'StatusChange';
 }
