@@ -47,7 +47,9 @@ describe("Activity", () => {
           .last()
           .trigger("drop", { dataTransfer })
         cy.contains(/submit/i).click()
-        cy.contains("Thanks!").should("be.visible")
+        cy.contains("You can press the button below to continue.").should(
+          "be.visible"
+        )
         cy.contains(/done/i).click()
       })
       cy.lightbox().should("not.exist")
@@ -151,7 +153,9 @@ describe("Activity", () => {
           .first()
           .trigger("drop", { dataTransfer })
         cy.contains(/submit/i).click()
-        cy.contains("Thanks!").should("be.visible")
+        cy.contains("You can press the button below to continue.").should(
+          "be.visible"
+        )
         cy.contains(/done/i).click()
       })
       cy.lightbox().should("not.exist")
@@ -228,7 +232,9 @@ describe("Activity", () => {
           .last()
           .trigger("drop", { dataTransfer })
         cy.contains(/submit/i).click()
-        cy.contains("Thanks!").should("be.visible")
+        cy.contains("You can press the button below to continue.").should(
+          "be.visible"
+        )
         cy.contains(/done/i).click()
       })
       cy.lightbox().should("not.exist")
@@ -271,7 +277,9 @@ describe("Activity", () => {
           .getByTestId(`multiple-choice-question-item-1-checked`)
           .click({ force: true })
         cy.contains(/submit/i).click()
-        cy.contains("Thanks!").should("be.visible")
+        cy.contains("You can press the button below to continue.").should(
+          "be.visible"
+        )
         cy.contains(/done/i).click()
       })
       cy.lightbox().should("not.exist")
@@ -308,7 +316,9 @@ describe("Activity", () => {
           .getByTestId(`multiple-choice-question-item-2-checked`)
           .click({ force: true })
         cy.contains(/submit/i).click()
-        cy.contains("Thanks!").should("be.visible")
+        cy.contains("You can press the button below to continue.").should(
+          "be.visible"
+        )
         cy.contains(/done/i).click()
       })
       cy.lightbox().should("not.exist")
@@ -344,11 +354,15 @@ describe("Activity", () => {
         cy.get(`[placeholder="${placeholder}"]`).should("be.visible")
         cy.get("input").type(answer)
         cy.contains(/submit/i).click()
-        cy.contains("Thanks!").should("be.visible")
+        cy.contains("You can press the button below to continue.").should(
+          "be.visible"
+        )
         cy.getByTestId("completion-next-button").click()
         cy.get("input").type(answer2)
         cy.contains(/submit/i).click()
-        cy.contains("Thanks!").should("be.visible")
+        cy.contains("You can press the button below to continue.").should(
+          "be.visible"
+        )
         cy.contains(/done/i).click()
       })
       cy.lightbox().should("not.exist")
@@ -375,7 +389,9 @@ describe("Activity", () => {
         cy.get(`[placeholder="${placeholder}"]`).should("be.visible")
         cy.get("input").type(answer)
         cy.contains(/submit/i).click()
-        cy.contains("Thanks!").should("be.visible")
+        cy.contains("You can press the button below to continue.").should(
+          "be.visible"
+        )
         cy.contains(/done/i).click()
       })
       cy.lightbox().should("not.exist")
@@ -394,7 +410,9 @@ describe("Activity", () => {
       cy.lightbox().within(() => {
         cy.get("textarea").type(answer2)
         cy.contains(/submit/i).click()
-        cy.contains("Thanks!").should("be.visible")
+        cy.contains("You can press the button below to continue.").should(
+          "be.visible"
+        )
         cy.contains(/done/i).click()
       })
       cy.lightbox().should("not.exist")
@@ -421,7 +439,9 @@ describe("Activity", () => {
         cy.get(`[placeholder="${placeholder}"]`).should("be.visible")
         cy.get("input").type(answer)
         cy.contains(/submit/i).click()
-        cy.contains("Thanks!").should("be.visible")
+        cy.contains("You can press the button below to continue.").should(
+          "be.visible"
+        )
         cy.contains(/done/i).click()
       })
       cy.lightbox().should("not.exist")
@@ -452,7 +472,7 @@ describe("Activity", () => {
       cy.contains("1:00:05").should("be.visible")
       cy.getByTestId("done-button-audio").click()
       cy.getByTestId("submit-button-audio").click()
-      cy.contains("Thanks!").should("be.visible")
+      cy.contains("You can press the button below to continue.").should("be.visible")
       cy.contains(/done/i).click()
     })
   })
@@ -562,7 +582,7 @@ describe("Activity", () => {
     cy.getSelectedNode().then(node => {
       cy.getByTestId("user-settings-button").click()
       cy.contains(/light mode/i).click()
-      cy.contains(/save theme/i).click()
+      cy.contains(/save/i).click()
 
       cy.openModal("edit", node.id)
       cy.changeMediaType("activity")
@@ -579,7 +599,9 @@ describe("Activity", () => {
       cy.route("POST", "/users/activity/**").as("submit")
       cy.lightbox().within(() => {
         cy.contains(/skip/i).click()
-        cy.contains("Thanks!").should("be.visible")
+        cy.contains("You can press the button below to continue.").should(
+          "be.visible"
+        )
         cy.contains(/done/i).click()
       })
       cy.getByTestId("progress-bar").should("have.css", "color", "rgb(17, 17, 17)")
