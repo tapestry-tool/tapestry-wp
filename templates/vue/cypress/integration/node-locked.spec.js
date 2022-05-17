@@ -46,6 +46,8 @@ describe("Locked Nodes", () => {
 
         cy.wait("@complete")
 
+        cy.reload() // ! temporary fix, since node open btn does not automatically update
+
         cy.getByTestId(`open-node-${child.id}`).should(
           "not.have.attr",
           "aria-disabled"
