@@ -352,12 +352,17 @@ describe("Activity", () => {
       cy.route("POST", "/users/activity/**").as("submit")
       cy.lightbox().within(() => {
         cy.get(`[placeholder="${placeholder}"]`).should("be.visible")
+        cy.getByTestId("question-prev-button").should("be.disabled")
+        cy.getByTestId("question-next-button")
+          .should("not.be.disabled")
+          .click()
+        cy.get(`[placeholder="${placeholder2}"]`).should("be.visible")
+        cy.getByTestId("question-prev-button")
+          .should("not.be.disabled")
+          .click()
+        cy.get(`[placeholder="${placeholder}"]`).should("be.visible")
         cy.get("input").type(answer)
         cy.contains(/submit/i).click()
-        cy.contains("You can press the button below to continue.").should(
-          "be.visible"
-        )
-        cy.getByTestId("completion-next-button").click()
         cy.get("input").type(answer2)
         cy.contains(/submit/i).click()
         cy.contains("You can press the button below to continue.").should(
@@ -504,7 +509,9 @@ describe("Activity", () => {
         cy.getByTestId("list-add-2").click()
         cy.getByTestId("list-input-3").type("Manitoba")
         cy.contains(/submit/i).click()
-        cy.contains(/thanks/i).should("be.visible")
+        cy.contains("You can press the button below to continue.").should(
+          "be.visible"
+        )
         cy.contains(/done/i).click()
       })
       cy.openLightbox(node.id)
@@ -545,7 +552,7 @@ describe("Activity", () => {
       cy.route("POST", "/users/activity/**").as("submit")
       cy.lightbox().within(() => {
         cy.get(`[placeholder="${listPlaceholder}"]`).should("be.visible")
-        cy.get(`[class='activity-media']`).scrollTo("bottom", {
+        cy.get(`.activity-media`).scrollTo("bottom", {
           ensureScrollable: false,
         })
         cy.getByTestId("list-add-4").click()
@@ -558,7 +565,9 @@ describe("Activity", () => {
           cy.getByTestId(`list-input-${index}`).type(`Thing ${index}`)
           if (index === 9) {
             cy.contains(/submit/i).click()
-            cy.contains(/thanks/i).should("be.visible")
+            cy.contains("You can press the button below to continue.").should(
+              "be.visible"
+            )
             cy.contains(/done/i).click()
             return false
           }
