@@ -2,8 +2,8 @@ import Vue from "vue"
 import * as getters from "./getters"
 import { parse } from "@/utils/dataset"
 
-export function init(state, { dataset, progress = {} }) {
-  const datasetWithProgress = parse(dataset, progress)
+export function init(state, dataset) {
+  const datasetWithProgress = parse(dataset, dataset["userProgress"])
   Object.entries(datasetWithProgress).forEach(([key, value]) => {
     if (key === "nodes") {
       state.nodes = {}
@@ -167,6 +167,10 @@ export function addApiError(state, error) {
 
 export function setTapestryErrorReporting(state, isEnabled) {
   state.displayErrors = isEnabled
+}
+
+export function changeTheme(state, newTheme) {
+  state.theme = newTheme
 }
 
 export function setReturnRoute(state, route) {

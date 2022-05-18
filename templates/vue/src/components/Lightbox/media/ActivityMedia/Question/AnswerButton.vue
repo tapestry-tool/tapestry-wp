@@ -1,9 +1,6 @@
 <template>
   <button class="button" :disabled="disabled" @click="$emit('click')">
-    <i
-      class="fas fa-check-circle m-1 mb-3"
-      :class="completed ? 'visible' : 'invisible'"
-    ></i>
+    <i class="fas fa-check-circle" :class="completed ? 'visible' : 'invisible'"></i>
     <div v-if="isFaIcon" class="icon">
       <i :class="`fas fa-${faIcon} icon-fa`"></i>
     </div>
@@ -13,16 +10,11 @@
       width="56"
       height="56"
     />
-    <img v-else :src="textIcon" class="icon" />
-    <div>
-      <slot></slot>
-    </div>
+    <slot></slot>
   </button>
 </template>
 
 <script>
-import TextIcon from "@/assets/Aa.svg"
-import { data } from "@/services/wp"
 import DragDropIcon from "@/components/common/TapestryIcon/DragDropIcon.vue"
 
 export default {
@@ -50,30 +42,35 @@ export default {
       switch (this.icon) {
         case "multipleChoice":
           return "tasks"
-
         case "audio":
           return "microphone"
-
+        case "text":
+          return "keyboard"
         default:
           return this.icon
       }
     },
     isFaIcon() {
-      return this.faIcon === "tasks" || this.faIcon === "microphone"
-    },
-    textIcon() {
-      return `${data.vue_uri}/${TextIcon.split("dist")[1]}`
+      return (
+        this.faIcon === "tasks" ||
+        this.faIcon === "microphone" ||
+        this.faIcon === "keyboard" ||
+        this.faIcon === "font"
+      )
     },
   },
 }
 </script>
 
 <style lang="scss" scoped>
-button {
+button,
+button:active,
+button:focus {
+  background: var(--text-color-primary);
+  color: var(--bg-color-primary);
   padding: 0;
   margin: 0;
   margin-right: 24px;
-  background: black;
   &:last-child,
   &:only-child {
     margin-right: 0;
@@ -82,8 +79,7 @@ button {
 
 .button {
   padding: 0;
-  background-color: #262626;
-  color: white;
+  padding-bottom: 20px;
   width: 136px;
   border-radius: 6px;
   display: flex;
@@ -93,15 +89,13 @@ button {
   transition: all 0.1s ease-out;
 
   i {
-    color: white;
-
     &:first-of-type {
       align-self: flex-end;
     }
   }
 
   &:hover {
-    background-color: #11a6d8;
+    background-color: var(--highlight-color);
   }
 
   > * {
@@ -115,10 +109,6 @@ button {
   &-fa {
     font-size: 56px;
   }
-}
-
-.drag-drop-icon {
-  fill: transparent;
 }
 
 .container {

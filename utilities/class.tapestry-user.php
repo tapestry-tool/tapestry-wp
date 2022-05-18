@@ -24,7 +24,12 @@ class TapestryUser
 
     public function canEdit($postId = 0)
     {
-        return $this->user->has_cap('edit_posts', $postId);
+        return user_can($this->getID(), 'edit_post', $postId);
+    }
+
+    public function getID()
+    {
+        return $this->user->ID;
     }
 
     /**

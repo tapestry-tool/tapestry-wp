@@ -1,6 +1,9 @@
 <template>
   <div>
-    <h1 v-if="showTitle" class="video-title">{{ node.title }}</h1>
+    <h1 v-if="showTitle" class="video-title">
+      {{ node.title }}
+      <completed-icon :node="node" class="mx-2" />
+    </h1>
     <div :class="'video-wrapper context-' + context" :style="{ height: heightCss }">
       <loading v-if="state === states.Loading" />
       <component
@@ -54,6 +57,7 @@ import H5PVideoMedia from "./H5PVideoMedia"
 import YouTubeMedia from "./YouTubeMedia"
 import Popup from "./Popup"
 import EndScreen from "./EndScreen"
+import CompletedIcon from "@/components/common/CompletedIcon"
 import { COMPLETION_THRESHOLD } from "./video.config"
 import Loading from "@/components/common/Loading"
 import client from "@/services/TapestryAPI"
@@ -94,6 +98,7 @@ export default {
     UrlVideoMedia,
     Popup,
     EndScreen,
+    CompletedIcon,
     Loading,
     MultiContentMedia: () => import("../MultiContentMedia/index"),
   },
@@ -143,7 +148,7 @@ export default {
       }
     },
     heightCss() {
-      if (this.context == "page" && this.videoComponent !== "youtube-media") {
+      if (this.context !== "lightbox" && this.videoComponent !== "youtube-media") {
         return "auto"
       } else {
         return this.dimensions.height + "px"
@@ -162,7 +167,9 @@ export default {
       return popups
     },
     showTitle() {
-      return this.context === "page" && this.node.typeData.showTitle !== false
+      return (
+        this.context === "multi-content" && this.node.typeData.showTitle !== false
+      )
     },
     autoplay() {
       return this.context == "lightbox"
@@ -305,7 +312,7 @@ export default {
 .video-wrapper {
   width: 100%;
 
-  &.context-page {
+  &.context-multi-content {
     border-radius: 15px;
     overflow: hidden;
   }
@@ -313,12 +320,16 @@ export default {
 
 .video-title {
   text-align: left;
-  margin-bottom: 0.9em;
+  margin-bottom: 0.5em;
   font-weight: 500;
   font-size: 1.75rem;
 
-  :before {
+  > :before {
     display: none;
+  }
+
+  .text-green {
+    color: green;
   }
 }
 
@@ -343,7 +354,7 @@ button {
   background: #000000aa;
   border-radius: 15px;
   > * {
-    background: #ddd;
+    background: var(--bg-color-secondary);
     height: calc(100% - 2em);
     width: calc(100% - 2em);
     margin: 1em;

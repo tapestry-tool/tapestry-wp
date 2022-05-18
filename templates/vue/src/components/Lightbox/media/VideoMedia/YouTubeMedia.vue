@@ -40,7 +40,7 @@ const YouTubeStates = {
 }
 
 export default {
-  name: "video-media",
+  name: "youtube-video-media",
   props: {
     node: {
       type: Object,
@@ -94,10 +94,9 @@ export default {
       }
     },
     showTitle() {
-      return this.context === "page" && this.node.typeData.showTitle !== false
-    },
-    isMultiContentContext() {
-      return this.context === "page" || this.context === "multi-content"
+      return (
+        this.context === "multi-content" && this.node.typeData.showTitle !== false
+      )
     },
     origin() {
       return wpData.wpUrl
@@ -256,16 +255,5 @@ export default {
 .embed-responsive {
   max-height: calc(100vh - 120px);
   height: 100%;
-}
-
-.video-title {
-  text-align: left;
-  margin-bottom: 0.9em;
-  font-weight: 500;
-  font-size: 1.75rem;
-
-  :before {
-    display: none;
-  }
 }
 </style>

@@ -24,7 +24,11 @@
         data-qa="page-nav-toggle"
         @click="opened = !opened"
       >
-        <i v-if="!opened" class="fas fa-bars fa-lg" style="color: black;"></i>
+        <i
+          v-if="!opened"
+          class="fas fa-bars fa-lg"
+          style="color: var(--text-color-primary);"
+        ></i>
         <i v-else class="fas fa-times fa-lg"></i>
       </button>
       <div v-if="unitsMenuVisible">
@@ -37,11 +41,12 @@
             {{ page.title }}
           </b-dropdown-item>
         </b-dropdown>
-        <h5 class="pl-2 py-1 mb-4">{{ currentPageTitle }}</h5>
+        <h5 class="pl-2 py-1 mb-4">{{ node.title }}</h5>
       </div>
       <div
         :class="[
           'page-nav-content',
+          'mb-auto',
           {
             fullscreen: node.fullscreen,
             closed: !opened,
@@ -59,6 +64,14 @@
           />
         </ul>
       </div>
+      <a
+        v-if="isLoggedIn"
+        :href="logoutUrl"
+        class="mt-auto ml-3 pt-4"
+        style="color: var(--text-color-primary);"
+      >
+        Logout
+      </a>
     </aside>
   </div>
 </template>
@@ -66,6 +79,7 @@
 <script>
 import { mapGetters } from "vuex"
 import PageMenuItem from "./PageMenuItem"
+import { isLoggedIn, data as wpData } from "@/services/wp"
 import Helpers from "@/utils/Helpers"
 
 export default {
@@ -78,10 +92,6 @@ export default {
       type: Object,
       required: true,
     },
-    rowRefs: {
-      type: Array,
-      required: true,
-    },
     dimensions: {
       type: Object,
       required: false,
@@ -91,6 +101,7 @@ export default {
   data() {
     return {
       opened: false,
+      pages: false,
       selectedPage: this.node.id,
     }
   },
@@ -105,11 +116,6 @@ export default {
     },
     parentNodeTitle() {
       return this.parentNode?.title ? this.parentNode.title : ""
-    },
-    currentPageTitle() {
-      return this.pages[this.selectedPage]?.title
-        ? this.pages[this.selectedPage]?.title
-        : ""
     },
     rows() {
       return this.node.childOrdering
@@ -132,47 +138,44 @@ export default {
     rowOrder() {
       return this.getRowOrder(this.node)
     },
-    pages() {
-      if (
-        this.parentNode?.mediaType === "multi-content" &&
-        this.parentNode?.presentationStyle === "unit"
-      ) {
-        return this.parentNode.childOrdering.reduce((pages, nodeId) => {
-          const node = this.getNode(nodeId)
-          pages[nodeId] = {
-            id: node.id,
-            title: node.title,
-          }
-          return pages
-        }, {})
-      }
-      return {}
+    isFullScreen() {
+      return this.fullScreen || this.node.fullscreen
     },
     browserWidth() {
       return Helpers.getBrowserWidth()
     },
     unitsMenuVisible() {
-      if (!this.pages) {
+      if (!this.pages || this.parentNode.childOrdering.length <= 1) {
         return false
       }
       return this.opened || (this.browserWidth > 800 && this.node.fullscreen)
     },
+    isLoggedIn() {
+      return isLoggedIn()
+    },
+    logoutUrl() {
+      return wpData.logoutUrl
+    },
+  },
+  watch: {
+    parentNode() {
+      this.updatePages()
+    },
   },
   mounted() {
-    if (this.rowRefs) {
-      this.$router.push({
-        ...this.$route,
-        query: {
-          ...this.$route.query,
-          row:
-            this.node.childOrdering.length > 0
-              ? this.node.childOrdering[0]
-              : undefined,
-        },
-      })
-    }
+    this.updatePages()
   },
   methods: {
+    updatePages() {
+      if (
+        this.parentNode?.mediaType === "multi-content" &&
+        this.parentNode?.presentationStyle === "unit"
+      ) {
+        this.pages = this.parentNode.childOrdering.map(this.getNode)
+      } else {
+        this.pages = false
+      }
+    },
     disabledRow(node) {
       const index = this.rows.findIndex(row => row.node.id === node.id)
       return (
@@ -199,17 +202,15 @@ export default {
     },
     scrollToRef(nodeId) {
       this.$nextTick(() => {
-        if (this.rowRefs) {
-          let el = this.rowRefs.find(ref => ref && ref.id === `row-${nodeId}`)
-          if (el && el.hasOwnProperty("$el")) {
-            el = el.$el
-          }
-          if (el) {
-            el.scrollIntoView({
-              behavior: "smooth",
-            })
-          }
-        }
+        const container = document.getElementById(`multicontent-container`)
+        const yOffset = -50
+        const element = document.getElementById(`row-${nodeId}`)
+        const y =
+          element.getBoundingClientRect().top -
+          container.getBoundingClientRect().top +
+          container.scrollTop +
+          yOffset
+        container.scrollTo({ top: y, behavior: "smooth" })
       })
     },
   },
@@ -230,6 +231,8 @@ export default {
     z-index: 0;
     overflow-y: auto;
     min-width: 200px;
+    display: flex;
+    flex-direction: column;
 
     &.lightbox {
       position: absolute;
@@ -281,6 +284,10 @@ export default {
           display: none;
         }
       }
+    }
+
+    .page-nav-toggle + .page-nav-content {
+      margin-top: 9em;
     }
 
     .page-nav-container {

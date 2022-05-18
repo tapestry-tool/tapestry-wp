@@ -746,7 +746,6 @@
       "fx": 1802.8187255859375,
       "fy": 1410.2223815917969,
       "completed": true,
-      "presentationStyle": "accordion-row",
       "accordionProgress": [],
       "mayUnlockNodes": [],
       "permissionsOrder": [
@@ -838,7 +837,6 @@
       "fx": 1642.0430908203125,
       "fy": 1710.9467468261719,
       "completed": true,
-      "presentationStyle": "accordion-row",
       "accordionProgress": [],
       "mayUnlockNodes": [],
       "permissionsOrder": [
@@ -929,7 +927,6 @@
       "fx": 1324.94287109375,
       "fy": 1865.9029235839844,
       "completed": true,
-      "presentationStyle": "accordion-row",
       "accordionProgress": [],
       "mayUnlockNodes": [],
       "permissionsOrder": [
@@ -1021,7 +1018,6 @@
       "fx": 1790.173095703125,
       "fy": 1042.6906433105469,
       "completed": true,
-      "presentationStyle": "accordion-row",
       "accordionProgress": [],
       "mayUnlockNodes": [],
       "permissionsOrder": [

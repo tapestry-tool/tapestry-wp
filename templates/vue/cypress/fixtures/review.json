@@ -26,7 +26,6 @@
         "mediaURL": "",
         "mediaWidth": 960,
         "mediaHeight": 600,
-        "subAccordionText": "More content:",
         "textContent": "<p>I am root...</p>"
       },
       "coordinates": {
@@ -106,7 +105,6 @@
         "mediaURL": "",
         "mediaWidth": 960,
         "mediaHeight": 600,
-        "subAccordionText": "More content:",
         "textContent": "<p>I am review node.</p>"
       },
       "coordinates": {
@@ -186,7 +184,6 @@
         "mediaURL": "",
         "mediaWidth": 960,
         "mediaHeight": 600,
-        "subAccordionText": "More content:",
         "textContent": "<p>I am review child node.</p>"
       },
       "coordinates": {

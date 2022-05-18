@@ -68,7 +68,7 @@ export default {
     }
 
     &:hover {
-      color: #11a6d8;
+      color: var(--highlight-color);
     }
 
     p {

@@ -220,6 +220,20 @@ $REST_API_ENDPOINTS = [
             'callback' => 'updateUserH5PSettingsByPostId',
         ],
     ],
+    'GET_USER_THEME' => (object) [
+        'ROUTE' => '/users/userSettings/theme',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => 'getUserTheme',
+        ],
+    ],
+    'UPDATE_USER_SETTINGS' => (object) [
+        'ROUTE' => '/users/userSettings',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_PUT_METHOD,
+            'callback' => 'updateUserSettings',
+        ],
+    ],
     'POST_USER_AUDIO' => (object) [
         'ROUTE' => 'users/activity/audio/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)',
         'ARGUMENTS' => [
@@ -320,7 +334,7 @@ foreach ($REST_API_ENDPOINTS as $ENDPOINT) {
             register_rest_route(
                 $REST_API_NAMESPACE,
                 $ENDPOINT->ROUTE,
-                $ENDPOINT->ARGUMENTS
+                array_merge(array('permission_callback' => '__return_true') ,$ENDPOINT->ARGUMENTS)
             );
         }
     );
@@ -1287,6 +1301,28 @@ function getUserH5PSettingsByPostId($request)
     }
 }
 
+function updateUserSettings($request)
+{
+    $userSettings = $request->get_body();
+    try {
+        $userProgress = new TapestryUserProgress();
+        $userProgress->updateUserSettings($userSettings);
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+
+function getUserTheme($request)
+{
+    try {
+        $userProgress = new TapestryUserProgress();
+        return $userProgress->getTheme();
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
 /**
  * Update the user's h5p settings by post id.
  *
@@ -1439,7 +1475,7 @@ function updateLastSelectedNode($request)
     try {
         $userProgress = new TapestryUserProgress($postId);
 
-        return $userProgress->updateLastSelectedNode($body->nodeId, $body->rowId, $body->subRowId);
+        return $userProgress->updateLastSelectedNode($body->nodeId, $body->rowId);
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }

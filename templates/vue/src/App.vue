@@ -2,9 +2,10 @@
   <loading v-if="loading" data-qa="tapestry-loading" style="height: 75vh;"></loading>
   <div v-else id="app">
     <tapestry-app></tapestry-app>
-    <router-view name="lightbox"></router-view>
-    <router-view name="linkmodal"></router-view>
+    <router-view></router-view>
     <node-modal></node-modal>
+    <link-modal></link-modal>
+    <lightbox v-if="viewingNode" :node-id="nodeId"></lightbox>
     <sidebar v-if="!isEmpty"></sidebar>
     <tapestry-error></tapestry-error>
     <b-modal
@@ -23,7 +24,10 @@
 </template>
 
 <script>
-import { mapState, mapMutations } from "vuex"
+import { mapState, mapMutations, mapGetters } from "vuex"
+import { names } from "@/config/routes"
+import Lightbox from "@/components/Lightbox"
+import LinkModal from "@/components/modals/LinkModal"
 import NodeModal from "@/components/modals/NodeModal"
 import TapestryApp from "@/components/TapestryApp"
 import Sidebar from "@/components/Sidebar"
@@ -31,12 +35,15 @@ import TapestryError from "@/components/TapestryError"
 import Loading from "@/components/common/Loading"
 import client from "@/services/TapestryAPI"
 import { isLoggedIn } from "./services/wp"
+import "@/assets/styles/themes.css"
 
 export default {
   name: "app",
   components: {
     Loading,
+    Lightbox,
     NodeModal,
+    LinkModal,
     TapestryApp,
     Sidebar,
     TapestryError,
@@ -49,8 +56,17 @@ export default {
   },
   computed: {
     ...mapState(["nodes"]),
+    ...mapGetters(["getTheme"]),
     isEmpty() {
       return Object.keys(this.nodes).length === 0
+    },
+    nodeId() {
+      return this.$route.params.nodeId
+    },
+    viewingNode() {
+      return (
+        this.$route.name === names.LIGHTBOX || this.$route.query.from === "lightbox"
+      )
     },
   },
   watch: {
@@ -73,26 +89,45 @@ export default {
     }
 
     window.addEventListener("click", this.recordAnalytics)
+
     const data = [
       client.getTapestry(),
-      client.getUserProgress(),
       client.getLastSelectedNode(),
+      client.getTheme(),
     ]
-    Promise.all(data).then(([dataset, progress, selectedNode]) => {
-      this.init({ dataset, progress })
+    Promise.all(data).then(([tapestryData, selectedNode, theme]) => {
+      this.changeTheme(theme.data)
+      if (this.getTheme == "system") {
+        const isDarkMode =
+          window.matchMedia &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches
+        document.documentElement.setAttribute(
+          "data-theme",
+          isDarkMode ? "dark" : "light"
+        )
+        window
+          .matchMedia("(prefers-color-scheme: dark)")
+          .addEventListener("change", e => {
+            document.documentElement.setAttribute(
+              "data-theme",
+              e.matches ? "dark" : "light"
+            )
+          })
+      } else {
+        document.documentElement.setAttribute("data-theme", this.getTheme)
+      }
+
+      this.init(tapestryData)
       this.loading = false
-      if (!this.$route.params.nodeId && dataset.nodes.length > 0) {
-        let path = `/nodes/${dataset.rootId}`
+      if (!this.$route.params.nodeId && tapestryData.nodes.length > 0) {
+        let path = `/nodes/${tapestryData.rootId}`
         if (selectedNode) {
           path = `/nodes/${selectedNode.nodeId}`
           if (selectedNode.rowId) {
             path = `${path}/view/${selectedNode.rowId}`
-            if (selectedNode.subRowId) {
-              path = `${path}/rows/${selectedNode.subRowId}`
-            }
           }
         }
-        this.$router.replace({
+        this.$router.push({
           path,
           query: this.$route.query,
         })
@@ -103,7 +138,7 @@ export default {
     window.removeEventListener("click", this.recordAnalytics)
   },
   methods: {
-    ...mapMutations(["init"]),
+    ...mapMutations(["init", "changeTheme"]),
     refresh() {
       this.$router.go()
     },
@@ -126,12 +161,24 @@ export default {
 html {
   font-size: 100%;
 
+  body.single-tapestry {
+    background: var(--bg-color-primary);
+    .site-title a:link,
+    .site-title a:visited {
+      color: var(--text-color-secondary);
+    }
+    a:link,
+    a:visited {
+      color: var(--highlight-color);
+    }
+  }
+
   #app {
+    color: var(--text-color-primary);
     font-family: "Avenir", Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-align: center;
-    color: #2c3e50;
 
     li {
       line-height: initial;
