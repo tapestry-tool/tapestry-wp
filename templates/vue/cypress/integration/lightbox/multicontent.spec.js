@@ -174,8 +174,16 @@ describe("Multi-content", () => {
         }
 
         cy.openLightbox(node.id).within(() => {
+          cy.getByTestId("multi-content-rows")
+            .find("div.multi-content-row")
+            .each(($el, index) => {
+              const row = rows[index]
+              cy.wrap($el)
+                .contains(row.title)
+                .should("exist")
+            })
+
           for (const row of rows) {
-            cy.contains(row.typeData.textContent).should("not.be.visible")
             cy.contains(row.title).click()
             cy.contains(row.typeData.textContent).should("be.visible")
           }
@@ -220,15 +228,18 @@ describe("Multi-content", () => {
         })
 
         cy.openLightbox(node.id).within(() => {
-          for (const row of newOrdering) {
-            cy.store()
-              .its(`state.nodes.${row}`)
-              .then(rowNode => {
-                cy.getByTestId("multi-content-rows")
-                  .contains(rowNode.title)
-                  .should("exist")
-              })
-          }
+          cy.getByTestId("multi-content-rows")
+            .find("div.multi-content-row")
+            .each(($el, index) => {
+              const row = newOrdering[index]
+              cy.store()
+                .its(`state.nodes.${row}`)
+                .then(rowNode => {
+                  cy.wrap($el)
+                    .contains(rowNode.title)
+                    .should("exist")
+                })
+            })
         })
       })
     })
