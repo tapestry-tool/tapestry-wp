@@ -116,7 +116,10 @@ export async function updateLockedStatus({ commit, getters, dispatch }) {
   }
 }
 
-export async function updateNodeProgress({ commit, state, dispatch, getters }, payload) {
+export async function updateNodeProgress(
+  { commit, state, dispatch, getters },
+  payload
+) {
   // Tapestry editors and admins don't need this feature. We disable this to
   // improve performance for editors and admins by reducing requests.
   if (wp.canEditTapestry()) {
