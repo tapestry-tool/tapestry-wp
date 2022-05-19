@@ -16,7 +16,7 @@ define(
     (defined('KALTURA_ADMIN_SECRET') && !empty(KALTURA_ADMIN_SECRET)) &&
     (defined('KALTURA_PARTNER_ID') && !empty(KALTURA_PARTNER_ID)) &&
     (defined('KALTURA_SERVICE_URL') && !empty(KALTURA_SERVICE_URL)) &&
-    file_exists(plugin_dir_path(dirname(__FILE__)) . 'vendor/autoload.php')
+    file_exists(plugin_dir_path(__FILE__) . 'vendor/autoload.php')
 );
 
 error_reporting(E_ERROR | E_PARSE);
@@ -137,7 +137,7 @@ function tapestry_enqueue_vue_app()
     global $post;
     if ('tapestry' == get_post_type($post) && !post_password_required($post)) {
         global $TAPESTRY_VERSION_NUMBER;
-        global $TAPESTRY_USE_DEV_MODE;
+        $TAPESTRY_USE_DEV_MODE = defined('TAPESTRY_USE_DEV_MODE') && !empty(TAPESTRY_USE_DEV_MODE);
 
         $use_dev = $TAPESTRY_USE_DEV_MODE || isset($_GET['debug']);
 
