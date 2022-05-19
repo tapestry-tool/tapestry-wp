@@ -1,7 +1,7 @@
 <?php
 
-    if (defined("LOAD_KALTURA") && LOAD_KALTURA) {
-        require_once plugin_dir_path(dirname(__FILE__)) . 'vendor/autoload.php';
+    if (defined('LOAD_KALTURA') && LOAD_KALTURA) {
+        require_once plugin_dir_path(dirname(__FILE__)).'vendor/autoload.php';
     } else {
         return false;
     }
@@ -19,7 +19,6 @@
 
     class KalturaApi
     {
-
         /**
          * Creates Kaltura Client and starts Kaltura Session.
          *
@@ -34,14 +33,15 @@
             try {
                 $ksession = $kclient->session->start(KALTURA_ADMIN_SECRET, $user, $type, KALTURA_PARTNER_ID);
             } catch (Exception $e) {
-                error_log("Kaltura Client Error: " . $e);
+                error_log('Kaltura Client Error: '.$e);
             }
 
             if (!isset($ksession)) {
-                throw new TapestryError("Unable to establish Kaltura session.");
+                throw new TapestryError('Unable to establish Kaltura session.');
             }
 
             $kclient->setKs($ksession);
+
             return $kclient;
         }
 
@@ -66,13 +66,13 @@
 
             $categories = $kclient->category->listAction($filter, null);
             $parentCategoryIndex = array_search($parentCategoryName, array_column($categories->objects, 'fullName'));
-            $parentCategory = ($parentCategoryIndex !== false ? $categories->objects[$parentCategoryIndex] : null);
+            $parentCategory = (false !== $parentCategoryIndex ? $categories->objects[$parentCategoryIndex] : null);
 
             $videoCategoryIndex = array_search($categoryName, array_column($categories->objects, 'name'));
             $videoCategory = null;
 
             if ($videoCategoryIndex) {
-                $videoCategory = ($videoCategoryIndex !== false ? $categories->objects[$videoCategoryIndex] : null);
+                $videoCategory = (false !== $videoCategoryIndex ? $categories->objects[$videoCategoryIndex] : null);
             } else {
                 $category = new Category();
                 $category->parentId = $parentCategory->id;
@@ -86,17 +86,16 @@
              * 1. Create upload token
              * 2. Upload the file data
              * 3. Create Kaltura Media Entry
-             * 4. Attach the video
+             * 4. Attach the video.
              */
             $uploadToken = new UploadToken();
             $token = $kclient->uploadToken->add($uploadToken);
-
 
             $resume = false;
             $finalChunk = true;
             $resumeAt = -1;
             $upload = $kclient->uploadToken->upload($token->id, $filepath, $resume, $finalChunk, $resumeAt);
-            
+
             $mediaEntry = new MediaEntry();
             $mediaEntry->name = $filename;
             $mediaEntry->mediaType = MediaType::VIDEO;
@@ -108,11 +107,12 @@
             $result = $kclient->media->addContent($entry->id, $resource);
             $status = $result->status;
 
-            while ($status != FlavorAssetStatus::READY && $status != FlavorAssetStatus::ERROR) {
+            while (FlavorAssetStatus::READY != $status && FlavorAssetStatus::ERROR != $status) {
                 sleep(5);
                 $result = $kclient->media->get($entry->id);
                 $status = $result->status;
             }
+
             return $result;
         }
     }

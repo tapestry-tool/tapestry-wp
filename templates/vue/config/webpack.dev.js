@@ -16,5 +16,7 @@ module.exports = merge(baseConfig, {
     hot: true,
   },
   devtool: "inline-source-map",
-  plugins: [new BundleAnalyzerPlugin()],
+  plugins: [new BundleAnalyzerPlugin({
+    analyzerPort: 9000
+  })],
 })

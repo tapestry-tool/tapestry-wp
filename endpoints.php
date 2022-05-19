@@ -334,7 +334,7 @@ foreach ($REST_API_ENDPOINTS as $ENDPOINT) {
             register_rest_route(
                 $REST_API_NAMESPACE,
                 $ENDPOINT->ROUTE,
-                array_merge(array('permission_callback' => '__return_true') ,$ENDPOINT->ARGUMENTS)
+                array_merge(array('permission_callback' => '__return_true'), $ENDPOINT->ARGUMENTS)
             );
         }
     );
@@ -357,12 +357,12 @@ function exportTapestry($request)
 function get_all_user_roles($request)
 {
     global $wp_roles;
-    
+
     $roles = $wp_roles->roles;
-    
+
     return $roles;
 }
-  
+
 
 function login($request)
 {
@@ -1074,7 +1074,7 @@ function optimizeTapestryNodeThumbnails($request)
             $node = $tapestry->getNode($nodeMetaId);
             $nodeData = $node->get();
             $protocol = is_ssl() ? "https:" : "http:";
-    
+
             if ($nodeData->imageURL) {
                 $urlPrepend = substr($nodeData->imageURL, 0, 4) === "http" ? "" : $protocol;
                 $attachmentId = TapestryHelpers::attachImageByURL($urlPrepend . $nodeData->imageURL);
@@ -1510,7 +1510,7 @@ function getQuestionHasAnswers($request)
     $nodeMetaId = $request['nodeMetaId'];
     $questionId = $request['question_id'];
     $answerType = $request['answer_type'];
-    
+
     try {
         if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
             throw new TapestryError('INVALID_POST_ID');
