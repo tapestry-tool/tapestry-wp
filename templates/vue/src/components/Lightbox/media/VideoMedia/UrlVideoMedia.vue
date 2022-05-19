@@ -19,6 +19,7 @@
 </template>
 
 <script>
+import { mapMutations } from "vuex"
 import client from "@/services/TapestryAPI"
 import { SEEK_THRESHOLD } from "./video.config"
 import PlayScreen from "./PlayScreen"
@@ -95,6 +96,7 @@ export default {
     this.updateVideoProgress()
   },
   methods: {
+    ...mapMutations(["updateNode"]),
     playVideo() {
       const video = this.$refs.video
       if (video) {
@@ -153,7 +155,7 @@ export default {
       if (this.$refs.video.error.code === 4) {
         const fetchedNode = await client.getNode(this.node.id)
         if (fetchedNode.typeData.mediaURL !== this.node.typeData.mediaURL) {
-          this.this.updateNode({
+          this.updateNode({
             id: this.node.id,
             newNode: fetchedNode,
           })
