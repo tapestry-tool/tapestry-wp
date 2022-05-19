@@ -338,7 +338,7 @@ function tapestry_tool_log_event()
 
 
 // Kaltura
-add_action('upload_videos_to_kalture', 'upload_videos_to_kalture');
+add_action('upload_videos_to_kaltura', 'upload_videos_to_kaltura');
 function upload_videos_to_kaltura()
 {
     if (LOAD_KALTURA) {
