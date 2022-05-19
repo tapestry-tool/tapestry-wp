@@ -254,13 +254,12 @@ class TapestryApi {
     return response.data
   }
 
-  async updateUserLastSelectedNode(nodeId, rowId, subRowId) {
+  async updateUserLastSelectedNode(nodeId, rowId) {
     const url = `/users/lastSelectedNode?post_id=${this.postId}`
     const response = await this.client.post(url, {
       post_id: this.postId,
       nodeId,
       rowId,
-      subRowId,
     })
     return response
   }

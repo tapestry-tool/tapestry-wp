@@ -40,15 +40,12 @@ class TapestryUserProgress implements ITapestryUserProgress
      *
      * @return string progress   of each node in json format
      */
-    public function get()
+    public function get($tapestry = null)
     {
         $this->_isValidTapestryPost();
         $this->_checkPostId();
 
-        $tapestry = new Tapestry($this->postId);
-        $nodeIds = $tapestry->getNodeIds();
-
-        return $this->_getUserProgress($nodeIds);
+        return $this->_getUserProgress($tapestry);
     }
 
     /**
@@ -269,12 +266,16 @@ class TapestryUserProgress implements ITapestryUserProgress
         return $allUsersAnswers;
     }
 
-    private function _getUserProgress($nodeIdArr, $userId = null)
+    private function _getUserProgress($tapestry = null)
     {
         $progress = new stdClass();
-        $tapestry = new Tapestry($this->postId);
 
-        $nodes = $tapestry->setUnlocked($nodeIdArr, $this->_userId);
+        if (!$tapestry) {
+            $tapestry = new Tapestry($this->postId);
+            $tapestry = $tapestry->get();
+        }
+
+        $nodes = $tapestry->nodes;
 
         // Build json object for frontend e.g. {0: 0.1, 1: 0.2} where 0 and 1 are the node IDs
         foreach ($nodes as $node) {
@@ -345,7 +346,7 @@ class TapestryUserProgress implements ITapestryUserProgress
     {
         $userSettings = get_user_meta($this->_userId, 'user_settings', true);
         $userSettingsObject = json_decode($userSettings);
-        $theme = $userSettingsObject->theme;
+        $theme = isset($userSettingsObject->theme) ? $userSettingsObject->theme : '';
 
         return $theme ? $theme : '';
     }
@@ -403,7 +404,7 @@ class TapestryUserProgress implements ITapestryUserProgress
      *
      * @return null
      */
-    public function updateLastSelectedNode($nodeId, $rowId, $subRowId)
+    public function updateLastSelectedNode($nodeId, $rowId)
     {
         $this->_checkPostId();
 
@@ -412,9 +413,6 @@ class TapestryUserProgress implements ITapestryUserProgress
 
         if ($rowId) {
             $lastSelectedNode->rowId = $rowId;
-        }
-        if ($subRowId) {
-            $lastSelectedNode->subRowId = $subRowId;
         }
 
         update_user_meta($this->_userId, 'tapestry_last_selected_node_'.$this->postId, $lastSelectedNode);

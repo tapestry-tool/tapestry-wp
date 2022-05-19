@@ -50,9 +50,6 @@
     <div v-else class="text-right mt-n3 mb-n2">
       <a href="#" class="small" @click="addDesc = true">Add Description</a>
     </div>
-    <b-form-group v-if="node.hasSubAccordion" label="Subaccordion Text">
-      <b-form-input v-model="node.typeData.subAccordionText"></b-form-input>
-    </b-form-group>
     <b-form-group v-show="isPopupCandidate" label="Popup">
       <popup-form :node="node" :is-candidate="isPopupCandidate" />
     </b-form-group>
@@ -82,6 +79,12 @@
           @load="$emit('load')"
           @unload="$emit('unload')"
         ></component>
+        <sub-item-table
+          v-if="node.mediaType === 'video'"
+          :node="node"
+          :action-type="actionType"
+          :is-popups="true"
+        ></sub-item-table>
       </b-card>
     </b-form-group>
   </div>
@@ -99,6 +102,7 @@ import UrlEmbedForm from "./UrlEmbedForm"
 import VideoForm from "./VideoForm"
 import WpPostForm from "./WpPostForm"
 import AnswerForm from "./AnswerForm"
+import SubItemTable from "./MultiContentForm/SubItemTable"
 
 export default {
   components: {
@@ -112,6 +116,7 @@ export default {
     VideoForm,
     WpPostForm,
     AnswerForm,
+    SubItemTable,
   },
   props: {
     node: {

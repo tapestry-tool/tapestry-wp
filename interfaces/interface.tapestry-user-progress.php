@@ -111,5 +111,5 @@ interface ITapestryUserProgress
      *
      * @return null
      */
-    public function updateLastSelectedNode($nodeId, $rowId, $subRowId);
+    public function updateLastSelectedNode($nodeId, $rowId);
 }

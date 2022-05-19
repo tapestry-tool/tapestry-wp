@@ -79,6 +79,7 @@ button:focus {
 
 .button {
   padding: 0;
+  padding-bottom: 20px;
   width: 136px;
   border-radius: 6px;
   display: flex;
