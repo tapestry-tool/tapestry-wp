@@ -116,7 +116,7 @@ export async function updateLockedStatus({ commit, getters, dispatch }) {
   }
 }
 
-export async function updateNodeProgress({ commit, state, dispatch }, payload) {
+export async function updateNodeProgress({ commit, state, dispatch, getters }, payload) {
   // Tapestry editors and admins don't need this feature. We disable this to
   // improve performance for editors and admins by reducing requests.
   if (wp.canEditTapestry()) {
@@ -124,6 +124,11 @@ export async function updateNodeProgress({ commit, state, dispatch }, payload) {
   }
   try {
     const { id, progress } = payload
+
+    const node = getters.getNode(id)
+    if (node.completed || node.progress === progress) {
+      return
+    }
 
     if (!wp.isLoggedIn()) {
       const progressObj = JSON.parse(localStorage.getItem(LOCAL_PROGRESS_ID))
@@ -166,6 +171,11 @@ export async function completeNode(context, nodeId) {
   }
   const { commit, dispatch, getters } = context
   try {
+    const node = getters.getNode(nodeId)
+    if (node.completed) {
+      return
+    }
+
     if (!wp.isLoggedIn()) {
       const progressObj = JSON.parse(localStorage.getItem(LOCAL_PROGRESS_ID))
       const nodeProgress = progressObj[nodeId] || {}
@@ -179,7 +189,6 @@ export async function completeNode(context, nodeId) {
       newNode: { completed: true },
     })
 
-    const node = getters.getNode(nodeId)
     if (node.mediaType !== "video") {
       await dispatch("updateNodeProgress", {
         id: nodeId,
