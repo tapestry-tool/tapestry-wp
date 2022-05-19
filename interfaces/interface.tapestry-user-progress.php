@@ -80,7 +80,7 @@ interface ITapestryUserProgress
      */
     public function getTheme();
 
-    
+
     /**
      * Get User's favourite nodes from a tapestry post.
      *

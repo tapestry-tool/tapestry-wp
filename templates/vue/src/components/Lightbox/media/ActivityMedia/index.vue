@@ -68,6 +68,7 @@
             v-if="questions.length > 1"
             class="button-nav"
             :disabled="!hasPrev"
+            data-qa="question-prev-button"
             @click="prev"
           >
             <i class="fas fa-arrow-left"></i>
@@ -76,6 +77,7 @@
             v-if="questions.length > 1"
             class="button-nav"
             :disabled="!hasNext"
+            data-qa="question-next-button"
             @click="next"
           >
             <i class="fas fa-arrow-right"></i>
