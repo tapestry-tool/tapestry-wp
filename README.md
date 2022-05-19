@@ -17,7 +17,7 @@ The Vue application is loaded in the tapestry post type template under `template
 To get started with developing locally:
 - Clone this repo into a directory called `tapestry` under your Wordpress directory in the plugins folder (`wp-content/plugins`)
 - Setup your local dev environment. You have 2 options for your local development:
-  1. *Using LAMP/MAMP/WAMP:* Follow the detailed instruction for [Mac, Windows](https://github.com/wynnset/tapestry-wp/wiki/Getting-Started-(Mac-&-Windows)), or [Linux](https://github.com/wynnset/tapestry-wp/wiki/Getting-Started-on-Arch-Linux).
+  1. *Using LAMP/MAMP/WAMP:* Follow the detailed instruction for [Mac, Windows](https://github.com/tapestry-tool/tapestry-wp/wiki/Local-Dev-with-MAMP-or-WAMP), or [Linux](https://github.com/tapestry-tool/tapestry-wp/wiki/Local-Dev-with-LAMP-setup).
   2. *Using Docker:* Follow the detailed [Docker Installation & Usage](https://github.com/wynnset/tapestry-wp/wiki/Docker-Installation-&-Usage) wiki page.
 - Follow the steps below under "Getting external links to work"
 - Make sure `$TAPESTRY_USE_DEV_MODE` is set to `TRUE` in `tapestry.php`
