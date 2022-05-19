@@ -236,11 +236,11 @@ export default {
     ...mapActions(["completeNode", "updateNodeProgress"]),
     complete(nodeId) {
       const node = this.getNode(nodeId || this.nodeId)
-      if (!node.completed) {
-        this.completeNode(node.id)
-      }
       if (node.progress !== 1) {
         this.updateNodeProgress({ id: node.id, progress: 1 })
+      }
+      if (!node.completed) {
+        this.completeNode(node.id)
       }
     },
     handleUserClose() {
