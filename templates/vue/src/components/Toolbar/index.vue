@@ -1,6 +1,5 @@
 <template>
   <div class="toolbar">
-
     <tapestry-filter v-if="!showMap" style="z-index: 10" />
     <div
       v-show="isLoggedIn"
@@ -24,10 +23,10 @@
               <settings-modal-button :max-depth="maxDepth"></settings-modal-button>
             </b-col>
           </template>
-           <user-answers-button
-              v-if="isAdmin"
-              data-qa="user-answers-button"
-            ></user-answers-button>
+          <user-answers-button
+            v-if="isAdmin"
+            data-qa="user-answers-button"
+          ></user-answers-button>
           <tapestry-depth-slider
             v-show="!showMap && hasDepth"
             @change="updateViewBox"

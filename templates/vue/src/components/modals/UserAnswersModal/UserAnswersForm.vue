@@ -131,7 +131,13 @@ export default {
         .flatMap(node => node.typeData.activity.questions)
     },
     fields() {
-      return Object.keys(this.allAnswers[this.activityId][this.questionId][0])
+      let fields = new Set()
+      for (const response of this.allAnswers[this.activityId][this.questionId]) {
+        for (const key of Object.keys(response)) {
+          fields.add(key)
+        }
+      }
+      return [...fields]
     },
     questionAnswers() {
       return this.allAnswers[this.activityId][this.questionId]
