@@ -12,11 +12,12 @@ class TapestryPermissions
      */
     public static function postTapestry()
     {
+        return true;
         // if (defined('TAPESTRY_USE_DEV_MODE') && !empty(TAPESTRY_USE_DEV_MODE)) {
         //     return true;
         // }
 
-        return current_user_can('publish_posts');
+        // return current_user_can('publish_posts');
     }
 
     /**
