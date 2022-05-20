@@ -13,6 +13,7 @@ export const names = {
   MODAL: "modal",
   SETTINGS: "settings",
   LINKMODAL: "linkmodal",
+  USERANSWERS: "userAnswers",
   USERSETTINGS: "userSettings",
   HELP: "help",
 }
@@ -54,6 +55,16 @@ export default [
           {
             path: `/:tab`,
             name: names.SETTINGS,
+          },
+        ],
+      },
+      {
+        path: `user-answers`,
+        redirect: `${ROOT_PATH}/user-answers/answers`,
+        children: [
+          {
+            path: `/:tab`,
+            name: names.USERANSWERS,
           },
         ],
       },
