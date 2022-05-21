@@ -341,52 +341,77 @@ function tapestry_tool_log_event()
 add_action('upload_videos_to_kaltura', 'upload_videos_to_kaltura');
 function upload_videos_to_kaltura()
 {
+    $in_progress_option = 'tapestry_kaltura_upload_in_progress';
+    $yes_value = 'yes';
+    $no_value = 'no';
+
     if (LOAD_KALTURA) {
-        $upload_folder = wp_upload_dir()['path'];
+        $is_upload_in_progress = get_option($in_progress_option);
+
+        if ($is_upload_in_progress === false) {
+            // False return value means option does not exist in database yet
+            add_option($in_progress_option, $no_value);
+
+        } else if ($is_upload_in_progress !== $no_value) {
+            return;
+        }
+
+        update_option($in_progress_option, $yes_value);
+
+        try {
+            perform_upload_to_kaltura();
+        } catch (Exception $e) {
+            error_log($e->getMessage());
+        } finally {
+            update_option($in_progress_option, $no_value);
+        }
+    }
+}
+
+function perform_upload_to_kaltura() {
+    $upload_folder = wp_upload_dir()['path'];
     
-        $current_date = date('Y/m/d');
+    $current_date = date('Y/m/d');
 
-        $tapestries = get_posts(['post_type' => 'tapestry',]);
-        $video_nodes = array();
+    $tapestries = get_posts(['post_type' => 'tapestry',]);
+    $video_nodes = array();
 
-        $kalturaApi = new KalturaApi();
+    $kalturaApi = new KalturaApi();
 
-        foreach ($tapestries as $value) {
-            $tapestry = new Tapestry($value->ID);
+    foreach ($tapestries as $value) {
+        $tapestry = new Tapestry($value->ID);
 
-            foreach ($tapestry->getNodeIds() as $node_id) {
-                $node = new TapestryNode($value->ID, $node_id);
-                $nodeMeta = $node->getMeta();
+        foreach ($tapestry->getNodeIds() as $node_id) {
+            $node = new TapestryNode($value->ID, $node_id);
+            $nodeMeta = $node->getMeta();
 
-                if ($nodeMeta->mediaType == "video") {
-                    $media_url = $node->getTypeData()->mediaURL;
-                    if (strpos($media_url, "/wp-content/uploads/")) {
-                        $file_name = pathinfo($media_url)['basename'];
+            if ($nodeMeta->mediaType == "video") {
+                $media_url = $node->getTypeData()->mediaURL;
+                if (strpos($media_url, "/wp-content/uploads/")) {
+                    $file_name = pathinfo($media_url)['basename'];
 
-                        $file_obj = new StdClass();
-                        $file_obj->file_path = $upload_folder."/".$file_name;
-                        $file_obj->name = $file_name;
+                    $file_obj = new StdClass();
+                    $file_obj->file_path = $upload_folder."/".$file_name;
+                    $file_obj->name = $file_name;
 
-                        $kaltura_data = null;
-                        try {
-                            $kaltura_data = $kalturaApi->uploadKalturaVideo($file_obj, $current_date);
-                        } catch (Exception $e) {
-                            error_log("Unable to upload video - ".$file_obj->file_path." to kaltura, ".$e);
-                            return;
-                        }
-
-                        $typeData = $node->getTypeData();
-                        $typeData->mediaURL = $kaltura_data->dataUrl."?.mp4";
-                        $typeData->kalturaData = array(
-                            "id" => $kaltura_data->id,
-                            "partnerId" => $kaltura_data->partnerId,
-                        );
-
-                        $node->set($typeData);
-                        $node->save();
-
-                        wp_delete_file($file_obj->file_path);
+                    $kaltura_data = null;
+                    try {
+                        $kaltura_data = $kalturaApi->uploadKalturaVideo($file_obj, $current_date);
+                    } catch (Exception $e) {
+                        throw new Exception("Unable to upload video - ".$file_obj->file_path." to kaltura, ".$e);
                     }
+
+                    $typeData = $node->getTypeData();
+                    $typeData->mediaURL = $kaltura_data->dataUrl."?.mp4";
+                    $typeData->kalturaData = array(
+                        "id" => $kaltura_data->id,
+                        "partnerId" => $kaltura_data->partnerId,
+                    );
+
+                    $node->set($typeData);
+                    $node->save();
+
+                    wp_delete_file($file_obj->file_path);
                 }
             }
         }
