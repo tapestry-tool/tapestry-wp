@@ -134,7 +134,7 @@ function tapestry_enqueue_vue_app()
         global $TAPESTRY_VERSION_NUMBER;
         global $TAPESTRY_USE_DEV_MODE;
 
-		$use_dev = $TAPESTRY_USE_DEV_MODE || isset($_GET['debug']);
+        $use_dev = $TAPESTRY_USE_DEV_MODE || isset($_GET['debug']);
 
         // register the Vue build script.
         $vueUrl = $use_dev ? 'http://localhost:8080/dist' : plugin_dir_url(__FILE__).'templates/vue/dist';

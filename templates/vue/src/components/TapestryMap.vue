@@ -287,7 +287,7 @@ export default {
     }
 
     + .map-content {
-      width: calc(100% -280px);
+      width: calc(100% - 280px);
     }
   }
 

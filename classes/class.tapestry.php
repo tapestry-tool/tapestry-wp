@@ -374,7 +374,10 @@ class Tapestry implements ITapestry
             $traversedNodeIds = [];
             foreach ($nodesData as $node) {
                 if ($node->unlocked && !in_array($node->id, $traversedNodeIds)) {
-                    $this->_traverseNodesAndApplyFunction($nodesData, $node, false,
+                    $this->_traverseNodesAndApplyFunction(
+                        $nodesData,
+                        $node,
+                        false,
                         function ($n) {
                             $n->accessible = $n->unlocked;
                         },
@@ -725,11 +728,15 @@ class Tapestry implements ITapestry
                 $nodesPermitted[$nodeId]->permitted = false;
             }
 
-            $this->_traverseNodesAndApplyFunction($nodesPermitted, $nodesPermitted[$this->rootId], false,
+            $this->_traverseNodesAndApplyFunction(
+                $nodesPermitted,
+                $nodesPermitted[$this->rootId],
+                false,
                 function ($n) use ($superuserOverridePermissions, $currentUserId, $filterUserId) {
                     $n->permitted = $this->_userIsAllowed($n->id, $superuserOverridePermissions, $currentUserId) ||
                     (-1 !== $filterUserId && $this->_userIsAllowed($n->id, $superuserOverridePermissions, $filterUserId));
-                }, function ($n) {
+                },
+                function ($n) {
                     return true;
                 }
             );
