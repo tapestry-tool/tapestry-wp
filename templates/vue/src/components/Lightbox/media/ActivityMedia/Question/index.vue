@@ -1,14 +1,10 @@
 <template>
   <div class="question">
-    <button
-      v-if="formOpened && enabledAnswerTypes.length > 1"
-      class="button-nav m-auto"
-      @click="back"
-    >
+    <button v-if="showBackBtn" class="button-nav m-auto" @click="back">
       <i class="fas fa-arrow-left"></i>
     </button>
     <loading v-if="submitting" label="Submitting..." />
-    <div v-else>
+    <div v-else class="question-wrapper" :class="{ 'with-back-btn': showBackBtn }">
       <div v-if="question.followUp.enabled" class="follow-up">
         <div
           v-if="previousQuestionAnswers.length"
@@ -17,13 +13,23 @@
           <h3 class="mb-4">
             {{ question.followUp.text || "Previously, you said:" }}
           </h3>
-          <completed-activity-media
-            v-for="previousAnswer in previousQuestionAnswers"
-            :key="previousAnswer[0]"
-            :type="previousAnswer[0]"
-            :answerData="previousAnswer[1]"
-            :question="getQuestion(question.followUp.questionId)"
-          ></completed-activity-media>
+          <b-tabs vertical no-nav-style nav-class="nav-tablist">
+            <b-tab
+              v-for="previousAnswer in previousQuestionAnswers"
+              :key="previousAnswer[0]"
+            >
+              <template #title>
+                <div class="icon">
+                  <tapestry-icon :icon="getIcon(previousAnswer[0])" />
+                </div>
+              </template>
+              <completed-activity-media
+                :type="previousAnswer[0]"
+                :answerData="previousAnswer[1]"
+                :question="getQuestion(question.followUp.questionId)"
+              ></completed-activity-media>
+            </b-tab>
+          </b-tabs>
         </div>
         <div v-else>
           <p>You haven't done the previous activity yet.</p>
@@ -47,7 +53,8 @@
             :id="question.id"
             :node="node"
             :question="question"
-            :answer="answer"
+            :answer="answer || ''"
+            @skipQuestion="$emit('skipQuestion')"
             @submit="handleSubmit"
           ></component>
         </div>
@@ -82,6 +89,7 @@ import DragDropQuestion from "./DragDropQuestion"
 import MultipleChoiceQuestion from "./MultipleChoiceQuestion"
 import Loading from "@/components/common/Loading"
 import CompletedActivityMedia from "../../common/CompletedActivityMedia"
+import TapestryIcon from "@/components/common/TapestryIcon"
 import * as wp from "@/services/wp"
 
 export default {
@@ -94,6 +102,7 @@ export default {
     MultipleChoiceQuestion,
     Loading,
     CompletedActivityMedia,
+    TapestryIcon,
   },
   props: {
     question: {
@@ -157,6 +166,9 @@ export default {
         default:
           return null
       }
+    },
+    showBackBtn() {
+      return this.formOpened && this.enabledAnswerTypes.length > 1
     },
   },
   watch: {
@@ -245,6 +257,12 @@ export default {
       return !!this.userAnswers?.[this.node.id]?.activity?.[this.question.id]
         ?.answers?.[type]
     },
+    getIcon(answerType) {
+      if (answerType == "multipleChoice") {
+        return "tasks"
+      }
+      return answerType
+    },
   },
 }
 </script>
@@ -260,34 +278,35 @@ export default {
   justify-content: center;
   height: 100%;
   width: 100%;
-  max-width: 600px;
+  max-width: 800px;
   margin: auto;
 
   .button-nav {
     border-radius: 50%;
     width: 80px;
     height: 80px;
-    background: #262626;
+    background: var(--text-color-primary);
+    color: var(--bg-color-primary);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 56px;
-    color: white;
     margin: 0;
     margin-right: 12px;
-    opacity: 1;
+    opacity: 0.9;
     transition: all 0.1s ease-out;
     position: absolute;
-    top: 24px;
+    top: 74px;
     left: 24px;
     z-index: 20;
 
     &:hover {
-      background: #11a6d8;
+      background: var(--highlight-color);
+      opacity: 1;
     }
 
     &:disabled {
-      opacity: 0.6;
+      opacity: 0.4;
       pointer-events: none;
       cursor: not-allowed;
     }
@@ -298,7 +317,6 @@ export default {
   }
 
   .loading {
-    background: #eee;
     position: absolute;
     top: 0;
     left: 0;
@@ -320,6 +338,10 @@ export default {
     + .recorder {
       margin-top: 4em;
     }
+  }
+
+  &-wrapper.with-back-btn {
+    margin: 0 100px;
   }
 
   &-body {

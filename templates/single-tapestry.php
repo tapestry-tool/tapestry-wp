@@ -13,7 +13,15 @@ get_header();
 ?>
 
 <div id="primary" class="content-area col-md-12">
-    <main id="main" class="site-main post-wrap <?php echo current_user_can('edit_post', get_the_ID()) ? 'is-editor' : ''; ?>" role="main">
+    <?php
+    $main_classes = implode(" ", array_map(function ($role) {
+        return "role-" . $role;
+    }, wp_get_current_user()->roles));
+    if (current_user_can("edit_post", get_the_ID())) {
+        $main_classes .= " is-editor";
+    }
+    ?>
+    <main id="main" class="site-main post-wrap <?php echo $main_classes; ?>" role="main">
 
 <?php
 

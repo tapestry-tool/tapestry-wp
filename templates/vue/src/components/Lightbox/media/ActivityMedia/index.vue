@@ -1,6 +1,9 @@
 <template>
-  <div ref="activity" class="activity-media">
-    <h1 v-if="showTitle" class="media-title">{{ node.title }}</h1>
+  <div ref="activity" class="activity-media" :class="`context-${context}`">
+    <h1 v-if="showTitle" class="media-title">
+      {{ node.title }}
+      <completed-icon :node="node" class="mx-2" />
+    </h1>
     <completion-screen
       v-if="state === 'completion-screen'"
       :question="activeQuestion"
@@ -15,8 +18,14 @@
         <p>Next question</p>
       </button>
       <button v-else class="button-completion" @click="close">
-        <i class="far fa-times-circle fa-4x"></i>
-        <p>Done</p>
+        <template v-if="context === 'lightbox'">
+          <i class="fas fa-times-circle fa-4x"></i>
+          <p>Done</p>
+        </template>
+        <template v-else>
+          <i class="fas fa-arrow-circle-right fa-4x"></i>
+          <p>Continue</p>
+        </template>
       </button>
     </completion-screen>
     <question
@@ -24,6 +33,7 @@
       :question="activeQuestion"
       :node="questionNode"
       @submit="handleComplete('activity')"
+      @skipQuestion="skip"
       @back="$emit('close')"
     ></question>
     <answer-media
@@ -45,7 +55,7 @@
           Show previous answers
         </b-button>
         <b-button
-          v-else-if="state === 'answer'"
+          v-else-if="canChangeAnswer && state === 'answer'"
           variant="info"
           class="mr-auto"
           @click="state = 'activity'"
@@ -80,8 +90,10 @@
 import client from "@/services/TapestryAPI"
 import Question from "./Question"
 import CompletionScreen from "./CompletionScreen"
+import CompletedIcon from "@/components/common/CompletedIcon"
 import { mapActions, mapGetters } from "vuex"
 import AnswerMedia from "./AnswerMedia.vue"
+import Helpers from "@/utils/Helpers"
 
 const states = {
   ACTIVITY: "activity",
@@ -93,6 +105,7 @@ export default {
   name: "activity-media",
   components: {
     CompletionScreen,
+    CompletedIcon,
     Question,
     AnswerMedia,
   },
@@ -114,6 +127,11 @@ export default {
       type: String,
       required: true,
     },
+    hideTitle: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   data() {
     return {
@@ -129,7 +147,11 @@ export default {
         : this.getNode(this.node.typeData.activityId)
     },
     showTitle() {
-      return this.context === "page" && this.node.typeData.showTitle !== false
+      return (
+        !this.hideTitle &&
+        this.context === "multi-content" &&
+        this.node.typeData.showTitle !== false
+      )
     },
     questions() {
       /* NOTE: If this is an answer node we retreive the single question
@@ -142,6 +164,9 @@ export default {
     },
     activeQuestion() {
       return this.questions[this.activeQuestionIndex]
+    },
+    activeQuestionId() {
+      return this.activeQuestion.id
     },
     currentQuestionText() {
       return `${this.activeQuestionIndex + 1}/${this.questions.length}`
@@ -157,6 +182,12 @@ export default {
         this.getAnswers(this.questionNode.id, this.activeQuestion.id)
       ).length
     },
+    canChangeAnswer() {
+      if (this.initialType === states.ANSWER) {
+        return this.node.typeData.isEditable
+      }
+      return true
+    },
     currentQuestionTypeData() {
       return this.initialType === states.ACTIVITY
         ? {
@@ -167,11 +198,30 @@ export default {
     },
   },
   watch: {
-    activeQuestion() {
+    activeQuestionId() {
+      if (this.node.id) {
+        this.$nextTick(() => {
+          const container = document.getElementById(`multicontent-container`)
+          const element = document.getElementById(`row-${this.node.id}`)
+          if (element) {
+            const y = Helpers.getPositionOfElementInElement(element, container).y
+            container.scrollTo({ top: y, behavior: "smooth" })
+            client.recordAnalyticsEvent(
+              "app",
+              "scroll",
+              "multi-content",
+              this.node.id,
+              {
+                to: y,
+              }
+            )
+          }
+        })
+      }
       if (this.initialType === states.ACTIVITY) {
         if (this.hasAnswers && this.state === states.ACTIVITY) {
           this.state = states.ANSWER
-        } else if (!this.hasAnswers) {
+        } else if (!this.hasAnswers && this.node.typeData.isEditable) {
           this.state = states.ACTIVITY
         }
       }
@@ -204,34 +254,46 @@ export default {
   methods: {
     ...mapActions(["updateNodeProgress"]),
     markQuestionsComplete() {
+      let numCompleted = 0
       this.questions.forEach(question => {
         const answer = this.getAnswers(this.questionNode.id, question.id)
-        if (Object.entries(answer).length === 0) {
+        if (Object.entries(answer).length === 0 && !question.optional) {
           question.completed = false
         } else {
           question.completed = true
+          numCompleted++
         }
       })
+      if (numCompleted === this.questions.length && !this.node.completed) {
+        this.$emit("complete")
+      }
     },
     handleComplete(initiatingComponent) {
+      client.recordAnalyticsEvent("user", "submit", "activity", this.node.id, {
+        question: this.activeQuestionIndex,
+      })
+
+      const numberCompleted = this.questionNode.typeData.activity.questions.filter(
+        question => question.completed || question.optional
+      ).length
+      const progress =
+        numberCompleted / this.questionNode.typeData.activity.questions.length
+      this.updateNodeProgress({ id: this.questionNode.id, progress }).then(() => {
+        if (progress === 1) {
+          this.$emit("complete")
+        }
+      })
+
       if (initiatingComponent === "activity") {
-        this.state = states.COMPLETION_SCREEN
-        const numberCompleted = this.questionNode.typeData.activity.questions.filter(
-          question => question.completed
-        ).length
-        const progress =
-          numberCompleted / this.questionNode.typeData.activity.questions.length
-        this.updateNodeProgress({ id: this.questionNode.id, progress }).then(() => {
-          if (progress === 1) {
-            this.$emit("complete")
+        if (!this.activeQuestion.confirmation.message && this.hasNext) {
+          if (this.questions[this.activeQuestionIndex + 1].completed) {
+            this.state = states.ANSWER
+          } else {
+            this.next()
           }
-        })
-      } else if (
-        this.initialType === states.ANSWER &&
-        initiatingComponent === "answer" &&
-        this.hasAnswers
-      ) {
-        this.$emit("complete")
+        } else {
+          this.state = states.COMPLETION_SCREEN
+        }
       }
     },
     next() {
@@ -250,11 +312,21 @@ export default {
       })
       this.activeQuestionIndex--
     },
+    skip() {
+      client.recordAnalyticsEvent("user", "skip", "activity", this.node.id, {
+        from: this.activeQuestionIndex,
+      })
+      this.hasNext ? this.next() : (this.state = states.COMPLETION_SCREEN)
+    },
     close() {
       client.recordAnalyticsEvent("user", "close", "activity", this.node.id)
-      if (this.initialType === "activity") {
+      if (
+        this.node.popup ||
+        (this.initialType === "activity" && this.context === "lightbox")
+      ) {
         this.$emit("close")
       } else {
+        this.activeQuestionIndex = 0
         this.state = states.ANSWER
       }
     },
@@ -265,24 +337,24 @@ export default {
 <style lang="scss" scoped>
 .activity-media {
   display: flex;
+  position: relative;
   flex-direction: column;
   align-items: flex-end;
   justify-content: space-between;
   width: 100%;
   min-height: 100%;
   z-index: 10;
-  padding: 24px;
+
+  &:not(.context-multi-content) {
+    padding: 24px;
+  }
 
   .media-title {
     text-align: left;
     font-size: 1.75rem;
     font-weight: 500;
-    margin-bottom: 0.9em;
+    margin-bottom: 1em;
     width: 100%;
-
-    :before {
-      display: none;
-    }
   }
 }
 
@@ -309,7 +381,7 @@ export default {
   }
 
   &:hover {
-    color: #11a6d8;
+    color: var(--highlight-color);
   }
 
   p {
@@ -317,25 +389,29 @@ export default {
     padding: 0;
     font-weight: 600;
   }
+
+  i {
+    align-self: center;
+  }
 }
 
 .button-nav {
   border-radius: 50%;
   height: 56px;
   width: 56px;
-  background: #262626;
+  background: var(--text-color-primary);
+  color: var(--bg-color-primary);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 40px;
-  color: white;
   margin: 0;
   margin-right: 12px;
   opacity: 1;
   transition: all 0.1s ease-out;
 
   &:hover {
-    background: #11a6d8;
+    background: var(--highlight-color);
   }
 
   &:disabled {

@@ -234,7 +234,7 @@ export default {
 .slider {
   -webkit-appearance: none;
   outline: none;
-  background: #d3d3d3;
+  background: var(--bg-color-primary);
   height: 10px;
   opacity: 0.8;
   transition: opacity 0.2s;
@@ -248,11 +248,11 @@ export default {
     content: "";
     width: 30px;
     height: 30px;
-    background: var(--zoomInBg);
+    background: #fff var(--zoomInBg);
     background-size: 20px;
     background-position: center;
     background-repeat: no-repeat;
-    border: 1px solid #dfdfdf;
+    border: 1px solid var(--bg-color-primary);
     border-radius: 50%;
     left: -30px;
     bottom: -9px;
@@ -271,7 +271,7 @@ export default {
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    background: #ed7565;
+    background: var(--highlight-color);
     cursor: pointer;
   }
 
@@ -281,7 +281,7 @@ export default {
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    background: #ed7565;
+    background: var(--highlight-color);
   }
 
   /* internet explorer support */
@@ -290,7 +290,7 @@ export default {
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    background: #ed7565;
+    background: var(--highlight-color);
   }
 
   &:hover {
@@ -308,9 +308,10 @@ export default {
   width: 100%;
   top: calc(100% - 1px);
   right: 0;
-  box-shadow: 0 7px 7px 0 #ddd;
+  color: var(--text-color-primary);
+  box-shadow: 0 7px 7px 0 var(--bg-color-primary);
   border-top-right-radius: 0;
   border-top-left-radius: 0;
-  background-color: #fbfbfb;
+  background-color: var(--bg-color-secondary);
 }
 </style>

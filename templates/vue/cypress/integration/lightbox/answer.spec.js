@@ -13,7 +13,7 @@ describe("Answers", () => {
       const question = `What's your name?`
       const placeholder = "placeholder"
       const answer = "Tapestry"
-      cy.contains(/question text/i).click()
+      cy.getByTestId("question-text-0").click()
       cy.focused().type(question)
       cy.getByTestId("question-answer-text-0").click({ force: true })
       cy.getByTestId("question-answer-text-single-0").click({ force: true })
@@ -53,7 +53,6 @@ describe("Answers", () => {
     cy.getNodeByTitle("Answer Node").then(answer => {
       cy.getNodeById(answer.id).click()
       cy.openLightbox(answer.id).within(() => {
-        cy.contains("Answer Node").should("exist")
         cy.contains("Name: ").should("be.visible")
         cy.contains("Tapestry").should("be.visible")
       })

@@ -1,32 +1,43 @@
 <template>
-  <div
-    ref="h5pMediaIFrameContainer"
-    class="h5p-media-iframe-container"
-    :class="{
-      'context-multi-content': hasMultiContentContext,
-    }"
-    :style="{
-      height: frameHeight ? `${iframeHeight}px` : iframeHeight,
-      width: '100%',
-    }"
-  >
-    <iframe
-      id="h5p"
-      ref="h5p"
-      :height="iframeHeight"
-      width="100%"
-      frameborder="0"
-      :src="node.typeData && node.typeData.mediaURL"
-      :scrolling="scrollingValue"
-      @load="handleLoad"
-      @close="$emit('close')"
-    ></iframe>
+  <div>
+    <h1 v-if="showTitle" class="wp-h5p-title">
+      {{ node.title }}
+      <completed-icon :node="node" class="mx-2" />
+    </h1>
+    <div
+      ref="h5pMediaIFrameContainer"
+      class="h5p-media-iframe-container"
+      :class="{
+        'context-multi-content': hasMultiContentContext,
+      }"
+      :style="{
+        height: frameHeight ? `${iframeHeight}px` : iframeHeight,
+        width: '100%',
+      }"
+    >
+      <iframe
+        id="h5p"
+        ref="h5p"
+        :height="iframeHeight"
+        width="100%"
+        frameborder="0"
+        :src="node.typeData && node.typeData.mediaURL"
+        :scrolling="scrollingValue"
+        @load="handleLoad"
+        @close="$emit('close')"
+      ></iframe>
+    </div>
   </div>
 </template>
 
 <script>
+import CompletedIcon from "@/components/common/CompletedIcon"
+
 export default {
   name: "h5p-media",
+  components: {
+    CompletedIcon,
+  },
   props: {
     node: {
       type: Object,
@@ -40,6 +51,11 @@ export default {
       type: String,
       required: true,
     },
+    hideTitle: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
   },
   data() {
     return {
@@ -52,15 +68,30 @@ export default {
   computed: {
     scrollingValue() {
       const noscroll = ["H5P.ThreeImage"]
-      if (noscroll.includes(this.library)) {
+      if (noscroll.includes(this.library) || this.context !== "lightbox") {
         return "no"
       } else return "auto"
     },
     hasMultiContentContext() {
-      return this.context === "multi-content" || this.context === "page"
+      return this.context === "multi-content"
     },
     iframeHeight() {
-      return this.frameHeight ? this.frameHeight : "100%"
+      if (this.frameHeight) {
+        if (this.context === "lightbox") {
+          return Math.min(this.frameHeight, this.dimensions.height)
+        } else {
+          return this.frameHeight
+        }
+      } else {
+        return "100%"
+      }
+    },
+    showTitle() {
+      return (
+        !this.hideTitle &&
+        this.context === "multi-content" &&
+        this.node.typeData.showTitle !== false
+      )
     },
   },
   methods: {
@@ -84,6 +115,21 @@ export default {
 
       this.frameHeight = this.$refs.h5p.contentWindow.document.activeElement.children[0].clientHeight
       this.$emit("change:dimensions", { height: this.frameHeight })
+
+      // Watch for changes in the body of the iframe and update dimensions to match that
+      const h5pBodyContent = this.$refs.h5p.contentWindow.document.body.children[0]
+      let that = this
+      let heightChangeTimeout
+      var ro = new ResizeObserver(entries => {
+        for (let entry of entries) {
+          clearTimeout(heightChangeTimeout)
+          that.frameHeight = entry.contentRect.height
+          heightChangeTimeout = setTimeout(() => {
+            this.$emit("change:dimensions", { height: that.frameHeight })
+          }, 1000)
+        }
+      })
+      ro.observe(h5pBodyContent)
 
       switch (this.library) {
         case "H5P.ThreeImage":
@@ -112,6 +158,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+h1 {
+  font-size: 1.75rem;
+  font-weight: 500;
+  text-align: left;
+  margin-bottom: 0.5em;
+}
+
 .container {
   position: relative;
   width: 100%;

@@ -1,6 +1,6 @@
 import { render as r } from "@testing-library/vue"
 import { store as defaultStore } from "@/store"
-import { routes } from "@/router"
+import router from "@/router"
 import { parse, makeMockProgress } from "./dataset"
 import Helpers from "./Helpers"
 
@@ -41,7 +41,7 @@ export function render(
           ...parseFixture(fixture, settings),
         },
       },
-      routes,
+      routes: router,
       ...options,
     },
     callback

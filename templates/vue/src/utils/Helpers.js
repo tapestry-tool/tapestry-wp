@@ -211,6 +211,11 @@ export default class Helpers {
       return wp.canEditTapestry()
     }
 
+    // Public users never have any permissions other than read
+    if (action !== userActions.READ && !wp.isLoggedIn()) {
+      return false
+    }
+
     // Checks related to draft nodes
     /**
      * If node is a draft:
@@ -361,7 +366,6 @@ export default class Helpers {
         mediaURL: "",
         mediaWidth: 960, //TODO: This needs to be flexible with H5P
         mediaHeight: 600,
-        subAccordionText: "More content:",
       },
       hideTitle: false,
       hideProgress: false,
@@ -383,5 +387,24 @@ export default class Helpers {
       popup: null,
     }
     return Helpers.deepMerge(baseNode, overrides)
+  }
+
+  /**
+   * Return the X, Y position of an element within another given element
+   * @param {DOM Element} element
+   * @param {DOM Element} container
+   * @returns {Object} {x, y}
+   */
+  static getPositionOfElementInElement(element, container) {
+    var xPosition = 0
+    var yPosition = 0
+
+    while (element && !element.isSameNode(container)) {
+      xPosition += element.offsetLeft - element.scrollLeft + element.clientLeft
+      yPosition += element.offsetTop - element.scrollTop + element.clientTop
+      element = element.offsetParent
+    }
+
+    return { x: xPosition, y: yPosition }
   }
 }

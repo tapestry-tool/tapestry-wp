@@ -50,9 +50,6 @@
     <div v-else class="text-right mt-n3 mb-n2">
       <a href="#" class="small" @click="addDesc = true">Add Description</a>
     </div>
-    <b-form-group v-if="node.hasSubAccordion" label="Subaccordion Text">
-      <b-form-input v-model="node.typeData.subAccordionText"></b-form-input>
-    </b-form-group>
     <b-form-group v-show="isPopupCandidate" label="Popup">
       <popup-form :node="node" :is-candidate="isPopupCandidate" />
     </b-form-group>
@@ -77,10 +74,17 @@
           :is="activeForm"
           v-if="activeForm"
           :node="node"
-          :actionType="actionType"
+          :action-type="actionType"
+          :is-unit-child="isUnitChild"
           @load="$emit('load')"
           @unload="$emit('unload')"
         ></component>
+        <sub-item-table
+          v-if="node.mediaType === 'video'"
+          :node="node"
+          :action-type="actionType"
+          :is-popups="true"
+        ></sub-item-table>
       </b-card>
     </b-form-group>
   </div>
@@ -98,6 +102,7 @@ import UrlEmbedForm from "./UrlEmbedForm"
 import VideoForm from "./VideoForm"
 import WpPostForm from "./WpPostForm"
 import AnswerForm from "./AnswerForm"
+import SubItemTable from "./MultiContentForm/SubItemTable"
 
 export default {
   components: {
@@ -111,6 +116,7 @@ export default {
     VideoForm,
     WpPostForm,
     AnswerForm,
+    SubItemTable,
   },
   props: {
     node: {
@@ -135,31 +141,44 @@ export default {
   data() {
     return {
       addDesc: false,
-      mediaTypes: [
-        { value: "", text: "Select content type" },
-        {
-          label: "Basic",
-          options: [
-            { value: "text", text: "Text" },
-            { value: "video", text: "Video" },
-            { value: "h5p", text: "H5P" },
-            { value: "url-embed", text: "External Link" },
-            { value: "wp-post", text: "Wordpress Post" },
-            { value: "activity", text: "Activity" },
-            { value: "multi-content", text: "Multi-Content" },
-          ],
-        },
-        {
-          label: "Advanced",
-          options: [{ value: "answer", text: "Answer" }],
-        },
-      ],
       shouldShowTitle: this.node.typeData.showTitle !== false,
       addMenuTitle: false,
     }
   },
+
   computed: {
     ...mapGetters(["isMultiContentRow"]),
+    mediaTypes() {
+      if (this.isUnitChild) {
+        return [{ value: "multi-content", text: "Multi-Content" }]
+      } else {
+        return [
+          { value: "", text: "Select content type" },
+          {
+            label: "Basic",
+            options: [
+              { value: "text", text: "Text" },
+              { value: "video", text: "Video" },
+              { value: "h5p", text: "H5P" },
+              { value: "url-embed", text: "External Link" },
+              { value: "wp-post", text: "Wordpress Post" },
+              { value: "activity", text: "Activity" },
+              { value: "multi-content", text: "Multi-Content" },
+            ],
+          },
+          {
+            label: "Advanced",
+            options: [{ value: "answer", text: "Answer" }],
+          },
+        ]
+      }
+    },
+    isUnitChild() {
+      return (
+        this.parent?.mediaType === "multi-content" &&
+        this.parent?.presentationStyle === "unit"
+      )
+    },
     activeForm() {
       return this.node.mediaType ? this.node.mediaType + "-form" : null
     },
@@ -194,6 +213,12 @@ export default {
     shouldShowTitle(shouldShowTitle) {
       this.node.typeData.showTitle = shouldShowTitle
     },
+    mediaTypes() {
+      this.selectUnitChild()
+    },
+  },
+  created() {
+    this.selectUnitChild()
   },
   methods: {
     handleTypeChange(evt) {
@@ -203,6 +228,12 @@ export default {
         this.node.mediaFormat = evt === "video" ? "mp4" : "h5p"
       }
       this.$emit("type-changed", evt)
+    },
+    selectUnitChild() {
+      if (this.isUnitChild) {
+        this.node.mediaType = "multi-content"
+        this.node.presentationStyle = "page"
+      }
     },
   },
 }

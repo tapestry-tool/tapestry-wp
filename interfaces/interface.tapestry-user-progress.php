@@ -57,6 +57,24 @@ interface ITapestryUserProgress
     public function getH5PSettings();
 
     /**
+     * Update the user's user settings.
+     *
+     * @param string $userSettings stores user settings
+     *
+     *
+     * @return null
+     */
+    public function updateUserSettings($userSettings);
+
+    /**
+     * Get the user's theme.
+     *
+     * @return object theme $theme
+     */
+    public function getTheme();
+
+
+    /**
      * Get User's favourite nodes from a tapestry post.
      *
      * @return array $nodes  node ids which are favourites
@@ -71,4 +89,20 @@ interface ITapestryUserProgress
      * @return null
      */
     public function updateFavourites($favourites);
+
+    /**
+     * Get User's last selected node for a tapestry post.
+     *
+     * @return int $nodeId  node id of the last selected node in the tapestry
+     */
+    public function getLastSelectedNode();
+
+    /**
+     * Update User's last selected node for a tapestry post.
+     *
+     * @param int $nodeId node id of the last selected node in the tapestry
+     *
+     * @return null
+     */
+    public function updateLastSelectedNode($nodeId, $rowId);
 }

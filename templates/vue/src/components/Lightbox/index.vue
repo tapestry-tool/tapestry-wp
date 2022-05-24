@@ -1,28 +1,28 @@
 <template>
   <tapestry-modal
+    v-if="node"
     id="lightbox"
     data-qa="lightbox"
     :class="{
       'full-screen': node.fullscreen,
       'content-text': node.mediaType === 'text' || node.mediaType === 'wp-post',
     }"
-    :node-id="nodeId"
+    :node="node"
     :content-container-style="lightboxContentStyles"
     :allow-close="canSkip"
     @close="handleUserClose"
   >
     <multi-content-media
       v-if="node.mediaType === 'multi-content'"
+      id="multicontent-container"
       :node="node"
       :row-id="rowId"
-      :sub-row-id="subRowId"
       @close="handleAutoClose"
       @complete="complete"
     />
     <page-menu
       v-if="node.typeData.showNavBar && node.presentationStyle === 'page'"
       :node="node"
-      :rowRefs="rowRefs"
       :dimensions="dimensions"
     />
     <tapestry-media
@@ -60,15 +60,10 @@ export default {
   },
   props: {
     nodeId: {
-      type: Number,
+      type: [Number, String],
       required: true,
     },
     rowId: {
-      type: Number,
-      required: false,
-      default: 0,
-    },
-    subRowId: {
       type: Number,
       required: false,
       default: 0,
@@ -81,15 +76,18 @@ export default {
         left: 50,
       },
       showCompletionScreen: false,
-      rowRefs: [],
     }
   },
   computed: {
     ...mapState(["h5pSettings", "rootId"]),
-    ...mapGetters(["getNode", "isMultiContent", "isMultiContentRow"]),
+    ...mapGetters(["getNode", "getParent", "isMultiContent", "isMultiContentRow"]),
     node() {
       const node = this.getNode(this.nodeId)
       return node
+    },
+    parentNode() {
+      const parentNodeId = this.getParent(this.node.id)
+      return this.getNode(parentNodeId)
     },
     canSkip() {
       return this.node.completed || this.node.skippable !== false
@@ -125,8 +123,7 @@ export default {
 
       if (this.node.mediaType === "text" || this.node.mediaType === "wp-post") {
         return Object.assign(styles, {
-          background: "#eee",
-          color: "#333",
+          background: "var(--background-color);",
           padding: "1em",
         })
       }
@@ -199,7 +196,7 @@ export default {
             query: this.$route.query,
           })
         } else {
-          this.applyDimensions()
+          this.handleNodeChanged()
         }
       },
     },
@@ -220,42 +217,31 @@ export default {
         }
       },
     },
-    subRowId: {
-      immediate: true,
-      handler(subRowId) {
-        if (subRowId) {
-          if (!this.isMultiContentRow(subRowId, this.rowId)) {
-            this.$router.replace({
-              name: names.ACCORDION,
-              params: { nodeId: this.nodeId, rowId: this.rowId },
-              query: this.$route.query,
-            })
-          }
-        }
-      },
-    },
   },
   mounted() {
     document.querySelector("body").classList.add("tapestry-lightbox-open")
     DragSelectModular.removeDragSelectListener()
-    if (this.node.mediaType === "multi-content") {
-      this.$root.$on("observe-rows", refs => {
-        this.rowRefs = this.rowRefs.concat(refs)
-      })
-    }
+    this.handleNodeChanged()
   },
   beforeDestroy() {
     document.querySelector("body").classList.remove("tapestry-lightbox-open")
     DragSelectModular.addDragSelectListener()
     this.$router.push({
       ...this.$route,
-      query: { ...this.$route.query, row: undefined },
+      params: { ...this.$route.params, rowId: undefined },
+      query: this.$route.query,
     })
   },
   methods: {
-    ...mapActions(["completeNode"]),
+    ...mapActions(["completeNode", "updateNodeProgress"]),
     complete(nodeId) {
-      this.completeNode(nodeId || this.nodeId)
+      const node = this.getNode(nodeId || this.nodeId)
+      if (node.progress !== 1) {
+        this.updateNodeProgress({ id: node.id, progress: 1 })
+      }
+      if (!node.completed) {
+        this.completeNode(node.id)
+      }
     },
     handleUserClose() {
       client.recordAnalyticsEvent("user", "close", "lightbox", this.nodeId)
@@ -266,9 +252,16 @@ export default {
       this.close()
     },
     close() {
+      let selectedNode = this.nodeId
+      if (
+        this.parentNode?.mediaType === "multi-content" &&
+        this.parentNode?.presentationStyle === "unit"
+      ) {
+        selectedNode = this.parentNode.id
+      }
       this.$router.push({
         name: names.APP,
-        params: { nodeId: this.nodeId },
+        params: { nodeId: selectedNode },
         query: this.$route.query,
       })
     },
@@ -279,9 +272,11 @@ export default {
       }
     },
     updateDimensions(dimensions) {
-      this.dimensions = {
-        ...this.dimensions,
-        ...dimensions,
+      if (dimensions.height <= this.lightboxDimensions.height) {
+        this.dimensions = {
+          ...this.dimensions,
+          ...dimensions,
+        }
       }
     },
     applyDimensions() {
@@ -290,6 +285,18 @@ export default {
         left: (Helpers.getBrowserWidth() - this.lightboxDimensions.width) / 2,
         width: this.lightboxDimensions.width,
         height: this.lightboxDimensions.height,
+      }
+    },
+    handleNodeChanged() {
+      if (
+        this.node.mediaType === "multi-content" &&
+        this.node.presentationStyle === "unit" &&
+        this.node.childOrdering?.length
+      ) {
+        const pageNode = this.getNode(this.node.childOrdering[0])
+        this.$root.$emit("open-node", pageNode.id)
+      } else {
+        this.applyDimensions()
       }
     },
   },
@@ -310,10 +317,8 @@ body.tapestry-lightbox-open {
 }
 
 #lightbox {
-  color: #111;
-
   &.full-screen {
-    background: #eee;
+    background: var(--bg-color-primary);
 
     .close-btn {
       position: fixed;

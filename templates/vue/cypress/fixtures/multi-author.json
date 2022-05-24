@@ -25,7 +25,6 @@
         "mediaURL": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
         "mediaWidth": 960,
         "mediaHeight": 600,
-        "subAccordionText": "More content:",
         "textContent": "<p>qwe</p>"
       },
       "coordinates": {
@@ -99,7 +98,6 @@
         "mediaURL": "",
         "mediaWidth": 960,
         "mediaHeight": 600,
-        "subAccordionText": "More content:",
         "textContent": "<p>qwe</p>"
       },
       "coordinates": {
@@ -176,7 +174,6 @@
         "mediaURL": "",
         "mediaWidth": 960,
         "mediaHeight": 600,
-        "subAccordionText": "More content:",
         "textContent": "<p>qwe</p>"
       },
       "coordinates": {
@@ -250,7 +247,6 @@
         "mediaURL": "",
         "mediaWidth": 960,
         "mediaHeight": 600,
-        "subAccordionText": "More content:",
         "textContent": "<p>qwe</p>"
       },
       "coordinates": {

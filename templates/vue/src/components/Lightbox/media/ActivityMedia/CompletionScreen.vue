@@ -2,14 +2,11 @@
   <div class="completion-screen">
     <header>
       <h1>
-        {{ question.confirmation.title ? question.confirmation.title : "Thanks!" }}
+        {{ question.confirmation.title ? question.confirmation.title : randomTitle }}
       </h1>
-      <p
-        v-if="question.confirmation.message"
-        v-html="question.confirmation.message"
-      />
+      <p v-if="content" v-html="content" />
       <p v-else>
-        Your response has been recorded.
+        You can press the button below to continue.
       </p>
     </header>
     <div>
@@ -26,6 +23,27 @@ export default {
       type: Object,
       required: false,
       default: () => {},
+    },
+  },
+  computed: {
+    content() {
+      const htmlContent = document.createElement("div")
+      htmlContent.innerHTML += this.question.confirmation.message
+
+      htmlContent.querySelectorAll("a").forEach(link => {
+        link.target = "_blank"
+      })
+      return String(htmlContent.innerHTML)
+    },
+    randomTitle() {
+      const titles = [
+        "Thanks!",
+        "Great Job!",
+        "Fantastic!",
+        "Awesome Job!",
+        "Got It!",
+      ]
+      return titles[Math.floor(Math.random() * titles.length)]
     },
   },
 }

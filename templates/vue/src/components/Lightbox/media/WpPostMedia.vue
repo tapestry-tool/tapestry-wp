@@ -1,8 +1,11 @@
 <template>
   <div>
-    <h1 v-if="showTitle" class="wp-media-title">{{ node.title }}</h1>
+    <h1 v-if="showTitle" class="wp-media-title">
+      {{ node.title }}
+      <completed-icon :node="node" class="mx-2" />
+    </h1>
     <loading v-if="loading" />
-    <div v-else class="article">
+    <div v-else class="article" :class="'context-' + context">
       <h1 class="article-title" v-html="title"></h1>
       <article v-html="content"></article>
     </div>
@@ -11,12 +14,14 @@
 
 <script>
 import Loading from "@/components/common/Loading"
+import CompletedIcon from "@/components/common/CompletedIcon"
 import WordpressApi from "@/services/WordpressApi"
 
 export default {
   name: "wp-post-media",
   components: {
     Loading,
+    CompletedIcon,
   },
   props: {
     node: {
@@ -27,6 +32,11 @@ export default {
       type: String,
       required: false,
       default: "",
+    },
+    hideTitle: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   data() {
@@ -41,7 +51,11 @@ export default {
       return this.node.typeData.mediaURL
     },
     showTitle() {
-      return this.context === "page" && this.node.typeData.showTitle !== false
+      return (
+        !this.hideTitle &&
+        this.context === "multi-content" &&
+        this.node.typeData.showTitle !== false
+      )
     },
   },
   async mounted() {
@@ -57,9 +71,15 @@ export default {
 
 <style lang="scss" scoped>
 .article {
-  color: #111;
-  padding: 25px;
   text-align: left;
+
+  &.context-lightbox {
+    padding: 25px;
+
+    .wp-media-title {
+      padding-left: 25px;
+    }
+  }
 
   &-title {
     font-size: 1.75rem;
@@ -79,7 +99,7 @@ export default {
 
 .wp-media-title {
   text-align: left;
-  margin: 0.9em 0 0.5em 25px;
+  margin: 0.9em 0 0.5em 0;
   font-weight: 500;
   font-size: 1.75rem;
 

@@ -17,7 +17,14 @@
             :icon-color="isFavourite ? 'red' : ''"
             :bg-color="isFavourite ? '#fff' : ''"
             :bg-hover-color="isFavourite ? '#fff' : 'red'"
-            @clicked="toggleFavourite(nodeId)"
+            @clicked="toggleFavourite(node.id)"
+          />
+          <modal-button
+            v-if="canEditNode"
+            icon="pencil-alt"
+            icon-size="sm"
+            title="Edit Node"
+            @clicked="editNode"
           />
         </div>
         <slot></slot>
@@ -27,8 +34,10 @@
 </template>
 
 <script>
-import { mapActions, mapState } from "vuex"
+import { mapActions, mapState, mapMutations } from "vuex"
 import ModalButton from "./ModalButton"
+import { names } from "@/config/routes"
+import Helpers from "@/utils/Helpers"
 
 const defaultStyles = {
   top: "150px",
@@ -36,7 +45,7 @@ const defaultStyles = {
   transform: "translateX(-50%)",
   width: "600px",
   height: "400px",
-  color: "#eee",
+  color: "#eeeeee",
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
@@ -49,10 +58,12 @@ export default {
     ModalButton,
   },
   props: {
-    nodeId: {
-      type: [String, Number],
+    node: {
+      type: Object,
       required: false,
-      default: 0,
+      default: () => {
+        null
+      },
     },
     contentContainerStyle: {
       type: Object,
@@ -78,7 +89,10 @@ export default {
   computed: {
     ...mapState(["favourites"]),
     isFavourite() {
-      return this.favourites.find(id => id == this.nodeId)
+      return this.favourites.find(id => id == this.node.id)
+    },
+    canEditNode() {
+      return Helpers.hasPermission(this.node, "edit")
     },
   },
   mounted() {
@@ -86,6 +100,15 @@ export default {
   },
   methods: {
     ...mapActions(["toggleFavourite"]),
+    ...mapMutations(["setReturnRoute"]),
+    editNode() {
+      this.setReturnRoute(this.$route)
+      this.$router.push({
+        name: names.MODAL,
+        params: { nodeId: this.node.id, type: "edit", tab: "content" },
+        query: { from: "lightbox" },
+      })
+    },
   },
 }
 </script>
@@ -108,9 +131,10 @@ export default {
   .content {
     position: absolute;
     z-index: 100;
+    background: var(--bg-color-secondary);
+    color: var(--text-color-primary);
     background-position: 0 0;
     background-size: cover;
-    background-color: #eee;
     box-shadow: 0 0 100px -40px #000;
     border-radius: 15px;
     height: 100%;
@@ -127,6 +151,8 @@ export default {
 
   &.full-screen {
     .content {
+      border-radius: 0;
+
       .buttons-container {
         top: 20px;
         right: 30px;

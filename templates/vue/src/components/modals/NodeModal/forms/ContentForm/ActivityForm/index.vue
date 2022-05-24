@@ -82,6 +82,23 @@
             text-variant="dark"
             class="mb-3"
           >
+            <b-form-group class="optional-checkbox">
+              <b-form-checkbox
+                v-model="question.optional"
+                data-qa="question-optional-checkbox"
+                :value="false"
+                :unchecked-value="true"
+                switch
+              >
+                <span
+                  title="If made optional, users can skip the question without answering
+                          it. Furthermore, the completion of this question will not be
+                          used to determine completion status of the activity."
+                >
+                  {{ question.optional ? "Optional" : "Required" }}
+                </span>
+              </b-form-checkbox>
+            </b-form-group>
             <b-form-group label="Question text">
               <b-form-input
                 v-model="question.text"
@@ -125,9 +142,11 @@
                   "
                   class="mt-2 pl-4"
                 >
-                  <label for="placeholder">Placeholder (optional):</label>
+                  <label :for="`placeholder-${index}`">
+                    Placeholder (optional):
+                  </label>
                   <b-form-input
-                    id="placeholder"
+                    :id="`placeholder-${index}`"
                     v-model="question.answerTypes.text.placeholder"
                     :data-qa="`question-answer-text-single-placeholder-${index}`"
                   ></b-form-input>
@@ -255,7 +274,7 @@
 </template>
 
 <script>
-import { mapState } from "vuex"
+import { mapState, mapGetters } from "vuex"
 import Combobox from "@/components/modals/common/Combobox"
 import Helpers from "@/utils/Helpers"
 import RichTextForm from "../RichTextForm"
@@ -298,6 +317,7 @@ const defaultQuestion = {
     message: "",
   },
   completed: false,
+  optional: false,
 }
 
 export default {
@@ -321,6 +341,7 @@ export default {
   },
   computed: {
     ...mapState(["nodes"]),
+    ...mapGetters(["getQuestion"]),
   },
   watch: {
     questions(newQuestions) {
@@ -337,8 +358,12 @@ export default {
       this.addQuestion()
     }
     // This is needed for backwards compatibility as we add new question types
-    this.node.typeData.activity.questions.every(q => {
-      q.answerTypes = { ...defaultQuestion.answerTypes, ...q.answerTypes }
+    this.node.typeData.activity.questions.forEach((question, index) => {
+      question.answerTypes = {
+        ...defaultQuestion.answerTypes,
+        ...question.answerTypes,
+      }
+      this.$set(this.node.typeData.activity.questions, index, question)
     })
   },
   methods: {
@@ -365,6 +390,9 @@ export default {
       question.followUp.questionId = ""
       question.followUp.nodeId = ""
     },
+    questionOptional(q) {
+      return q.optional
+    },
     disableList(question) {
       if (!question.answerTypes.text.isMultiLine) {
         question.answerTypes.text.allowMultiple = false
@@ -378,6 +406,12 @@ export default {
 .activity {
   .icon {
     margin-right: 4px;
+  }
+
+  .optional-checkbox {
+    position: absolute;
+    right: 20px;
+    top: 10px;
   }
 
   .question-text {

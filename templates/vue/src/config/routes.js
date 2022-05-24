@@ -1,7 +1,3 @@
-import Lightbox from "@/components/Lightbox"
-import LinkModal from "@/components/modals/LinkModal"
-const ROOT_PATH = `/nodes/:nodeId`
-
 const parseParams = route => {
   const parsedParams = {}
   for (const key in route.params) {
@@ -10,107 +6,71 @@ const parseParams = route => {
   }
   return parsedParams
 }
-const linkParamParser = route => {
-  const parsedParams = {}
-  for (const key in route.params) {
-    const val = route.params[key]
-    parsedParams[key] = val
-  }
-  return parsedParams
+
+export const names = {
+  APP: "app",
+  LIGHTBOX: "lightbox",
+  MODAL: "modal",
+  SETTINGS: "settings",
+  LINKMODAL: "linkmodal",
+  USERSETTINGS: "userSettings",
+  HELP: "help",
 }
 
-const app = {
-  path: ROOT_PATH,
-  name: "app",
-}
+const ROOT_PATH = `/nodes/:nodeId(\\d+)`
 
-const lightbox = {
-  path: `${ROOT_PATH}/view`,
-  name: "lightbox",
-  components: {
-    lightbox: Lightbox,
-  },
-  props: {
-    lightbox: parseParams,
-  },
-}
-
-const multiContent = {
-  path: `${ROOT_PATH}/view/:rowId`,
-  name: "multiContent",
-  components: {
-    lightbox: Lightbox,
-  },
-  props: {
-    lightbox: parseParams,
-  },
-}
-
-const nestedMultiContent = {
-  path: `${ROOT_PATH}/view/:rowId/rows/:subRowId`,
-  name: "nested_multi_content",
-  components: {
-    lightbox: Lightbox,
-  },
-  props: {
-    lightbox: parseParams,
-  },
-}
-
-const settings = {
-  path: `${ROOT_PATH}/settings/:tab`,
-  name: "settings",
-}
-
-const linkmodal = {
-  path: `${ROOT_PATH}/link`,
-  name: "links",
-  components: {
-    linkmodal: LinkModal,
-  },
-  props: {
-    linkmodal: linkParamParser,
-  },
-}
-const help = {
-  path: `${ROOT_PATH}/help`,
-  name: "help",
-}
-
-const modal = {
-  path: `${ROOT_PATH}/:type/:tab`,
-  name: "modal",
-}
-
-const redirects = [
+export default [
   {
-    path: `${ROOT_PATH}/settings`,
-    redirect: `${ROOT_PATH}/settings/appearance`,
-  },
-  {
-    path: `${ROOT_PATH}/add`,
-    redirect: `${ROOT_PATH}/add/content`,
-  },
-  {
-    path: `${ROOT_PATH}/edit`,
-    redirect: `${ROOT_PATH}/edit/content`,
+    path: ROOT_PATH,
+    name: names.APP,
+    children: [
+      {
+        path: `view/:rowId(\\d+)?`,
+        name: names.LIGHTBOX,
+        props: {
+          lightbox: parseParams,
+        },
+      },
+      {
+        path: `:type(add|edit)`,
+        redirect: `${ROOT_PATH}/:type/content`,
+      },
+      {
+        path: `:type(add|edit)/:rowId(\\d+)`,
+        redirect: `${ROOT_PATH}/:type/:rowId(\\d+)/content`,
+      },
+      {
+        path: `:type(add|edit)/:rowId(\\d+)?/:tab`,
+        name: names.MODAL,
+      },
+      {
+        path: `link/:source/:target`,
+        name: names.LINKMODAL,
+      },
+      {
+        path: `settings`,
+        redirect: `${ROOT_PATH}/settings/appearance`,
+        children: [
+          {
+            path: `/:tab`,
+            name: names.SETTINGS,
+          },
+        ],
+      },
+      {
+        path: `user-settings`,
+        redirect: `${ROOT_PATH}/user-settings/theme`,
+        children: [
+          {
+            path: `:tab`,
+            name: names.USERSETTINGS,
+          },
+        ],
+      },
+      {
+        path: `help`,
+        name: names.HELP,
+      },
+    ],
   },
 ]
-
-const routes = {
-  app,
-  multiContent,
-  lightbox,
-  modal,
-  settings,
-  linkmodal,
-  nestedMultiContent,
-  redirects,
-  help,
-}
-
-export const names = Object.fromEntries(
-  Object.entries(routes).map(([name, route]) => [name.toUpperCase(), route.name])
-)
-
-export default routes

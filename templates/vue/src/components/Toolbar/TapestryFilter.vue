@@ -362,13 +362,13 @@ export default {
 .filter {
   display: flex;
   height: 3.5rem;
-  background: #fbfbfb;
-  box-shadow: 0 0 7px 0 #ddd;
+  background: var(--bg-color-secondary);
+  box-shadow: 0 0 7px 0 var(--bg-color-primary);
   padding: 0.5rem;
   border-radius: 8px;
 
   button {
-    color: #999;
+    color: var(--text-color-tertiary);
     padding: 0;
     background: none;
     width: 36px;
@@ -378,7 +378,7 @@ export default {
     justify-content: center;
 
     &:hover {
-      color: #11a6d8;
+      color: var(--highlight-color);
     }
   }
 
@@ -396,6 +396,7 @@ export default {
   transform: translateX(-32px);
   transition: all 0.4s ease-in;
   pointer-events: none;
+  color: var(--text-color-primary);
 
   &-show {
     opacity: 1;
@@ -447,6 +448,18 @@ export default {
   padding: 0 !important;
 }
 
+.vs__dropdown-menu {
+  background: var(--bg-color-primary);
+  color: var(--text-color-tartiary);
+  > * {
+    color: var(--text-color-tartiary);
+  }
+}
+
+.vs__selected {
+  color: var(--text-color-tartiary);
+}
+
 .vs__selected-options {
   height: 100%;
   padding: 0 !important;
@@ -454,6 +467,7 @@ export default {
 }
 
 .vs__search {
+  color: var(--text-color-primary);
   border: none !important;
   margin: 1px 0 !important;
   padding-left: 0.8rem !important;

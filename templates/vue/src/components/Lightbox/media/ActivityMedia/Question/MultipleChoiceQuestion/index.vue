@@ -23,9 +23,19 @@
     >
       Please select {{ allowSelectMultiple ? "one or more choices" : "a choice" }}.
     </b-form-invalid-feedback>
-    <b-button class="float-left mt-3" variant="primary" type="submit">
-      Submit
-    </b-button>
+
+    <div class="w-100 mt-4 text-right">
+      <b-button
+        v-if="question.optional"
+        variant="link"
+        @click="$emit('skipQuestion')"
+      >
+        Skip
+      </b-button>
+      <b-button variant="primary" type="submit">
+        Submit
+      </b-button>
+    </div>
   </b-form>
 </template>
 
@@ -109,5 +119,6 @@ export default {
 .container {
   display: flex;
   flex-direction: column;
+  text-align: left;
 }
 </style>

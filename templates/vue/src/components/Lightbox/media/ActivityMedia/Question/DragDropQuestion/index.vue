@@ -31,16 +31,18 @@
     <b-form-invalid-feedback :state="canSubmit">
       Please complete this question to continue
     </b-form-invalid-feedback>
-    <p>
+    <div class="w-100 mt-4 text-right">
       <b-button
-        v-if="canSubmit"
-        class="submit-btn mt-3"
-        variant="primary"
-        type="submit"
+        v-if="question.optional"
+        variant="link"
+        @click="$emit('skipQuestion')"
       >
+        Skip
+      </b-button>
+      <b-button v-if="canSubmit" variant="primary" type="submit">
         Submit
       </b-button>
-    </p>
+    </div>
   </b-form>
 </template>
 
@@ -62,7 +64,7 @@ export default {
     },
     answer: {
       required: true,
-      validator: prop => Array.isArray(prop) || prop === null,
+      validator: prop => Array.isArray(prop) || prop === null || prop === "",
     },
   },
   data() {
