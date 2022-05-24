@@ -1,5 +1,3 @@
-import { roles } from "../../support/roles"
-
 describe("Video", () => {
   beforeEach(() => {
     cy.fixture("one-node.json").as("oneNode")
@@ -45,8 +43,6 @@ describe("Video", () => {
       cy.closeLightbox()
 
       cy.logout().visitTapestry()
-
-      cy.login(roles.SUBSCRIBER).visitTapestry()
 
       cy.updateNodeProgress(node.id, 1)
 
