@@ -25,7 +25,9 @@ describe("Answers", () => {
         cy.get(`[placeholder="${placeholder}"]`).should("be.visible")
         cy.get("input").type(answer)
         cy.contains(/submit/i).click()
-        cy.contains("Thanks!").should("be.visible")
+        cy.contains("You can press the button below to continue.").should(
+          "be.visible"
+        )
         cy.contains(/done/i).click()
       })
       cy.lightbox().should("not.exist")

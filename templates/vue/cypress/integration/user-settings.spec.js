@@ -8,11 +8,11 @@ describe("User Settings", () => {
     cy.getByTestId("user-settings-button").click({ force: true })
 
     cy.contains(/light mode/i).click({ force: true })
-    cy.contains(/save theme/i).click({ force: true })
+    cy.contains(/save/i).click({ force: true })
 
     cy.getByTestId("user-settings-button").click({ force: true })
 
     cy.contains(/dark mode/i).click({ force: true })
-    cy.contains(/save theme/i).click({ force: true })
+    cy.contains(/save/i).click({ force: true })
   })
 })
