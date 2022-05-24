@@ -7,7 +7,7 @@
             v-if="!disabled"
             :class="isVisible ? 'fas fa-minus' : 'fas fa-plus'"
           ></i>
-          <i v-else class="fas fa-lock fa-sm title-row-ico"></i>
+          <i v-else class="fas fa-lock fa-sm title-row-icon"></i>
           {{ node.title }}
           <locked-content
             v-if="disabled"
