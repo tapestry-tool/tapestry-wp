@@ -196,7 +196,7 @@ export default {
         this.$nextTick(() => {
           const container = document.getElementById(`multicontent-container`)
           const element = document.getElementById(`row-${this.node.id}`)
-          if (element) {
+          if (container && element) {
             const y = Helpers.getPositionOfElementInElement(element, container).y
             container.scrollTo({ top: y, behavior: "smooth" })
             client.recordAnalyticsEvent(
@@ -278,7 +278,11 @@ export default {
       })
 
       if (initiatingComponent === "activity") {
-        if (!this.activeQuestion.confirmation.message && this.hasNext) {
+        if (
+          !this.activeQuestion.confirmation.title &&
+          !this.activeQuestion.confirmation.message &&
+          this.hasNext
+        ) {
           if (this.questions[this.activeQuestionIndex + 1].completed) {
             this.state = states.ANSWER
           } else {
