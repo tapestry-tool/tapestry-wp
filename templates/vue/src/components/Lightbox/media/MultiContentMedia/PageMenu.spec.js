@@ -24,7 +24,6 @@ describe("PageMenu", () => {
       fixture: pageTapestry,
       props: {
         node: node,
-        rowRefs: [],
         dimensions: {
           height: 800,
           width: 900,
@@ -46,7 +45,6 @@ describe("PageMenu", () => {
       fixture: pageTapestry,
       props: {
         node: node,
-        rowRefs: [],
         dimensions: {
           height: 800,
           width: 500,

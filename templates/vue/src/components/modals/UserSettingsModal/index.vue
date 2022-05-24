@@ -15,8 +15,9 @@
           title="Theme"
           :active="tab === 'theme'"
           @click="$emit('change:tab', 'theme')"
-        ></b-tab>
-        <theme-form ref="themeForm"></theme-form>
+        >
+          <theme-form ref="themeForm"></theme-form>
+        </b-tab>
       </b-tabs>
     </b-container>
     <template slot="modal-footer">
@@ -25,12 +26,12 @@
       </b-button>
       <b-button
         id="save-button"
-        data-qa="theme-submit-button"
+        data-qa="user-settings-submit-button"
         size="sm"
         variant="primary"
-        @click="saveTheme"
+        @click="saveSettings"
       >
-        Save theme
+        Save
       </b-button>
     </template>
   </b-modal>
@@ -39,6 +40,8 @@
 <script>
 import DragSelectModular from "@/utils/dragSelectModular"
 import ThemeForm from "./ThemeForm"
+import { mapActions } from "vuex"
+
 export default {
   name: "user-settings-modal",
   components: {
@@ -69,12 +72,15 @@ export default {
     })
   },
   methods: {
+    ...mapActions(["updateUserSettings"]),
     closeModal() {
-      this.$emit("close")
+      this.$root.$emit("bv::hide::modal", "user-settings-modal")
     },
-    saveTheme() {
-      this.$refs.themeForm.saveTheme()
-      this.$emit("close")
+    saveSettings() {
+      const theme = this.$refs.themeForm.getTheme()
+      this.$refs.themeForm.applyTheme()
+      this.updateUserSettings({ theme })
+      this.$root.$emit("bv::hide::modal", "user-settings-modal")
     },
   },
 }

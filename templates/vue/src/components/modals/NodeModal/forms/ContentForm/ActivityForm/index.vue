@@ -358,8 +358,12 @@ export default {
       this.addQuestion()
     }
     // This is needed for backwards compatibility as we add new question types
-    this.node.typeData.activity.questions.every(q => {
-      q.answerTypes = { ...defaultQuestion.answerTypes, ...q.answerTypes }
+    this.node.typeData.activity.questions.forEach((question, index) => {
+      question.answerTypes = {
+        ...defaultQuestion.answerTypes,
+        ...question.answerTypes,
+      }
+      this.$set(this.node.typeData.activity.questions, index, question)
     })
   },
   methods: {

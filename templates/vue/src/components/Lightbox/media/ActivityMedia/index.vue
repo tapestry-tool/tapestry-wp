@@ -1,6 +1,9 @@
 <template>
-  <div ref="activity" class="activity-media">
-    <h1 v-if="showTitle" class="media-title">{{ node.title }}</h1>
+  <div ref="activity" class="activity-media" :class="`context-${context}`">
+    <h1 v-if="showTitle" class="media-title">
+      {{ node.title }}
+      <completed-icon :node="node" class="mx-2" />
+    </h1>
     <completion-screen
       v-if="state === 'completion-screen'"
       :question="activeQuestion"
@@ -78,8 +81,10 @@
 import client from "@/services/TapestryAPI"
 import Question from "./Question"
 import CompletionScreen from "./CompletionScreen"
+import CompletedIcon from "@/components/common/CompletedIcon"
 import { mapActions, mapGetters } from "vuex"
 import AnswerMedia from "./AnswerMedia.vue"
+import Helpers from "@/utils/Helpers"
 
 const states = {
   ACTIVITY: "activity",
@@ -91,6 +96,7 @@ export default {
   name: "activity-media",
   components: {
     CompletionScreen,
+    CompletedIcon,
     Question,
     AnswerMedia,
   },
@@ -112,6 +118,11 @@ export default {
       type: String,
       required: true,
     },
+    hideTitle: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   data() {
     return {
@@ -127,7 +138,11 @@ export default {
         : this.getNode(this.node.typeData.activityId)
     },
     showTitle() {
-      return this.context === "page" && this.node.typeData.showTitle !== false
+      return (
+        !this.hideTitle &&
+        this.context === "multi-content" &&
+        this.node.typeData.showTitle !== false
+      )
     },
     questions() {
       /* NOTE: If this is an answer node we retreive the single question
@@ -140,6 +155,9 @@ export default {
     },
     activeQuestion() {
       return this.questions[this.activeQuestionIndex]
+    },
+    activeQuestionId() {
+      return this.activeQuestion.id
     },
     currentQuestionText() {
       return `${this.activeQuestionIndex + 1}/${this.questions.length}`
@@ -171,7 +189,26 @@ export default {
     },
   },
   watch: {
-    activeQuestion() {
+    activeQuestionId() {
+      if (this.node.id) {
+        this.$nextTick(() => {
+          const container = document.getElementById(`multicontent-container`)
+          const element = document.getElementById(`row-${this.node.id}`)
+          if (element) {
+            const y = Helpers.getPositionOfElementInElement(element, container).y
+            container.scrollTo({ top: y, behavior: "smooth" })
+            client.recordAnalyticsEvent(
+              "app",
+              "scroll",
+              "multi-content",
+              this.node.id,
+              {
+                to: y,
+              }
+            )
+          }
+        })
+      }
       if (this.initialType === states.ACTIVITY) {
         if (this.hasAnswers && this.state === states.ACTIVITY) {
           this.state = states.ANSWER
@@ -223,30 +260,31 @@ export default {
       }
     },
     handleComplete(initiatingComponent) {
-      if (initiatingComponent === "activity") {
-        const numberCompleted = this.questionNode.typeData.activity.questions.filter(
-          question => question.completed || question.optional
-        ).length
-        const progress =
-          numberCompleted / this.questionNode.typeData.activity.questions.length
+      client.recordAnalyticsEvent("user", "submit", "activity", this.node.id, {
+        question: this.activeQuestionIndex,
+      })
 
-        if (!this.hasNext) {
-          this.state = states.COMPLETION_SCREEN
-        } else {
-          this.next()
+      const numberCompleted = this.questionNode.typeData.activity.questions.filter(
+        question => question.completed || question.optional
+      ).length
+      const progress =
+        numberCompleted / this.questionNode.typeData.activity.questions.length
+      this.updateNodeProgress({ id: this.questionNode.id, progress }).then(() => {
+        if (progress === 1) {
+          this.$emit("complete")
         }
+      })
 
-        this.updateNodeProgress({ id: this.questionNode.id, progress }).then(() => {
-          if (progress === 1) {
-            this.$emit("complete")
+      if (initiatingComponent === "activity") {
+        if (!this.activeQuestion.confirmation.message && this.hasNext) {
+          if (this.questions[this.activeQuestionIndex + 1].completed) {
+            this.state = states.ANSWER
+          } else {
+            this.next()
           }
-        })
-      } else if (
-        this.initialType === states.ANSWER &&
-        initiatingComponent === "answer" &&
-        this.hasAnswers
-      ) {
-        this.$emit("complete")
+        } else {
+          this.state = states.COMPLETION_SCREEN
+        }
       }
     },
     next() {
@@ -273,9 +311,13 @@ export default {
     },
     close() {
       client.recordAnalyticsEvent("user", "close", "activity", this.node.id)
-      if (this.initialType === "activity" && this.context === "lightbox") {
+      if (
+        this.node.popup ||
+        (this.initialType === "activity" && this.context === "lightbox")
+      ) {
         this.$emit("close")
       } else {
+        this.activeQuestionIndex = 0
         this.state = states.ANSWER
       }
     },
@@ -293,18 +335,17 @@ export default {
   width: 100%;
   min-height: 100%;
   z-index: 10;
-  padding: 24px;
+
+  &:not(.context-multi-content) {
+    padding: 24px;
+  }
 
   .media-title {
     text-align: left;
     font-size: 1.75rem;
     font-weight: 500;
-    margin-bottom: 0.9em 0 0.5em 25px;
+    margin-bottom: 1em;
     width: 100%;
-
-    :before {
-      display: none;
-    }
   }
 }
 

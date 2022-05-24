@@ -32,7 +32,6 @@
         "mediaURL":"",
         "mediaWidth":960,
         "mediaHeight":600,
-        "subAccordionText":"More content:",
         "textContent":""
       },
       "coordinates":{
@@ -110,7 +109,6 @@
       "imageURL":"",
       "lockedImageURL":"",
       "mediaType":"video",
-      "presentationStyle":"accordion-row",
       "mediaFormat":"youtube",
       "mediaDuration":89,
       "description":"",
@@ -125,7 +123,6 @@
         "mediaURL":"https://youtu.be/d63DL-Erz50",
         "mediaWidth":960,
         "mediaHeight":600,
-        "subAccordionText":"More content:",
         "textContent":"",
         "youtubeID":"d63DL-Erz50"
       },
@@ -192,7 +189,6 @@
       "imageURL":"",
       "lockedImageURL":"",
       "mediaType":"text",
-      "presentationStyle":"accordion-row",
       "mediaFormat":"",
       "mediaDuration":0,
       "description":"",
@@ -202,7 +198,6 @@
         "mediaURL":"",
         "mediaWidth":960,
         "mediaHeight":600,
-        "subAccordionText":"More content:",
         "textContent":"XYZ"
       },
       "coordinates":{
@@ -281,7 +276,6 @@
       "imageURL":"",
       "lockedImageURL":"",
       "mediaType":"text",
-      "presentationStyle":"accordion-row",
       "mediaFormat":"",
       "mediaDuration":0,
       "description":"",
@@ -291,7 +285,6 @@
         "mediaURL":"",
         "mediaWidth":960,
         "mediaHeight":600,
-        "subAccordionText":"More content:",
         "textContent":"More!"
       },
       "coordinates":{

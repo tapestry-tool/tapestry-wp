@@ -116,16 +116,32 @@ export async function updateLockedStatus({ commit, getters, dispatch }) {
   }
 }
 
-export async function updateNodeProgress({ commit, dispatch }, payload) {
+export async function updateNodeProgress(
+  { commit, state, dispatch, getters },
+  payload
+) {
+  // Tapestry editors and admins don't need this feature. We disable this to
+  // improve performance for editors and admins by reducing requests.
+  if (wp.canEditTapestry()) {
+    return
+  }
   try {
     const { id, progress } = payload
+
+    const node = getters.getNode(id)
+    if (node.completed || node.progress === progress) {
+      return
+    }
 
     if (!wp.isLoggedIn()) {
       const progressObj = JSON.parse(localStorage.getItem(LOCAL_PROGRESS_ID))
       const nodeProgress = progressObj[id] || {}
       nodeProgress.progress = progress
       localStorage.setItem(LOCAL_PROGRESS_ID, JSON.stringify(progressObj))
-    } else {
+    } else if (
+      !state.userProgress[id] ||
+      state.userProgress[id].progress !== progress
+    ) {
       await client.updateUserProgress(id, progress)
     }
     commit("updateNodeProgress", { id, progress })
@@ -151,8 +167,18 @@ export async function updateNodeCoordinates(
 }
 
 export async function completeNode(context, nodeId) {
+  // Tapestry editors and admins don't need this feature. We disable this to
+  // improve performance for editors and admins by reducing requests.
+  if (wp.canEditTapestry()) {
+    return
+  }
   const { commit, dispatch, getters } = context
   try {
+    const node = getters.getNode(nodeId)
+    if (node.completed) {
+      return
+    }
+
     if (!wp.isLoggedIn()) {
       const progressObj = JSON.parse(localStorage.getItem(LOCAL_PROGRESS_ID))
       const nodeProgress = progressObj[nodeId] || {}
@@ -166,7 +192,6 @@ export async function completeNode(context, nodeId) {
       newNode: { completed: true },
     })
 
-    const node = getters.getNode(nodeId)
     if (node.mediaType !== "video") {
       await dispatch("updateNodeProgress", {
         id: nodeId,
@@ -179,9 +204,10 @@ export async function completeNode(context, nodeId) {
   }
 }
 
-async function unlockNodes({ commit, getters, dispatch }) {
+async function unlockNodes({ commit, getters, state, dispatch }) {
   try {
-    const progress = await client.getUserProgress()
+    let { userProgress } = state
+    const progress = userProgress ? userProgress : await client.getUserProgress()
     for (const [id, nodeProgress] of Object.entries(progress)) {
       const currentNode = getters.getNode(id)
       if (

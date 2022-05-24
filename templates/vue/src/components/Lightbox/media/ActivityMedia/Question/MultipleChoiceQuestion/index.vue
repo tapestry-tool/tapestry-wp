@@ -119,5 +119,6 @@ export default {
 .container {
   display: flex;
   flex-direction: column;
+  text-align: left;
 }
 </style>
