@@ -253,6 +253,7 @@ button[disabled] {
   .title-row-icon {
     position: absolute;
     right: 12px;
+    top: 8px;
     text-align: right;
     z-index: 100;
     a {
