@@ -204,10 +204,9 @@ export async function completeNode(context, nodeId) {
   }
 }
 
-async function unlockNodes({ commit, getters, state, dispatch }) {
+async function unlockNodes({ commit, getters, dispatch }) {
   try {
-    let { userProgress } = state
-    const progress = userProgress ? userProgress : await client.getUserProgress()
+    const progress = await client.getUserProgress()
     for (const [id, nodeProgress] of Object.entries(progress)) {
       const currentNode = getters.getNode(id)
       if (
