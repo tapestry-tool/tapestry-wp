@@ -1,5 +1,3 @@
-import credentials from "../../support/roles"
-
 describe("Activity", () => {
   it("should be able to complete drag and drop answer with items with background image and text ", () => {
     cy.fixture("one-node.json").as("oneNode")
@@ -667,8 +665,10 @@ describe("Activity", () => {
         .scrollIntoView()
         .should("be.visible")
         .as("answersTable")
-      cy.get("@answersTable").contains(credentials.admin.username)
-      cy.get("@answersTable").contains(credentials.subscriber.username)
+
+      cy.get("@answersTable")
+        .find("tr")
+        .should("have.length.at.least", 2)
       cy.get("@answersTable").contains(answer)
     })
   })
