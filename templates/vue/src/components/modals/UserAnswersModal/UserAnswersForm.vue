@@ -51,7 +51,13 @@
       </b-row>
       <b-row>
         <b-col v-if="questionId">
-          <b-table responsive bordered :fields="fields" :items="questionAnswers">
+          <b-table
+            responsive
+            bordered
+            :fields="fields"
+            :items="questionAnswers"
+            data-qa="question-answers-table"
+          >
             <template #cell(text)="text">
               <completed-activity-media
                 v-if="text.value"
