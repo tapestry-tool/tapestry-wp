@@ -1,5 +1,3 @@
-import { roles } from "../../support/roles"
-
 describe("Video", () => {
   beforeEach(() => {
     cy.fixture("one-node.json").as("oneNode")
