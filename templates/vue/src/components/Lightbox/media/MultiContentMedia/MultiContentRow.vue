@@ -7,7 +7,7 @@
             v-if="!disabled"
             :class="isVisible ? 'fas fa-minus' : 'fas fa-plus'"
           ></i>
-          <i v-else class="fas fa-lock fa-sm title-row-ico"></i>
+          <i v-else class="fas fa-lock fa-sm title-row-icon"></i>
           {{ node.title }}
           <locked-content
             v-if="disabled"
@@ -253,6 +253,7 @@ button[disabled] {
   .title-row-icon {
     position: absolute;
     right: 12px;
+    top: 8px;
     text-align: right;
     z-index: 100;
     a {
