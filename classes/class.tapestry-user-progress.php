@@ -252,7 +252,7 @@ class TapestryUserProgress implements ITapestryUserProgress
                 foreach ($users as $user) {
                     // Wordpress get_users returns an extra 'id' field for no reason, so we are removing it manually here:
                     unset($user->id);
-                    
+
                     $user_answer = get_user_meta($user->ID, 'tapestry_'.$this->postId.'_'.$activityId.'_question_'.$questionId.'_answers', true);
                     if ('' != $user_answer && is_array($user_answer)) {
                         $userAnswers = array_merge((array) $user, $user_answer);
