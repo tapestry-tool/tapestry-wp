@@ -42,6 +42,8 @@ describe("Video", () => {
       })
       cy.closeLightbox()
 
+      cy.logout().visitTapestry()
+
       cy.updateNodeProgress(node.id, 1)
 
       cy.openLightbox(node.id).within(() => {
