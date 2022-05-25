@@ -46,8 +46,6 @@ describe("Video", () => {
 
       cy.logout().visitTapestry()
 
-      cy.login(roles.SUBSCRIBER).visitTapestry()
-
       cy.updateNodeProgress(node.id, 1)
 
       cy.openLightbox(node.id).within(() => {
