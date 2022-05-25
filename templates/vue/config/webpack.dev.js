@@ -10,8 +10,10 @@ module.exports = merge(baseConfig, {
   },
   devServer: {
     headers: { "Access-Control-Allow-Origin": "*" },
-    contentBase: path.resolve(__dirname, "../dist"),
-    publicPath: "/dist/",
+    static: {
+      directory: path.resolve(__dirname, "../dist"),
+      publicPath: "/dist/",
+    },
     port: 8080,
     hot: true,
   },
