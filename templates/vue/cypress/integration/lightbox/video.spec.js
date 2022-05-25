@@ -71,4 +71,40 @@ describe("Video", () => {
       })
     })
   })
+
+  it("should automatically update video url when the current url becomes unavailable", () => {
+    const url =
+      "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4"
+    const nonexistentUrl = "https://streaming.video.ubc.ca/non-existent.mp4"
+
+    cy.getSelectedNode().then(selectedNode => {
+      cy.openModal("edit", selectedNode.id)
+      cy.changeMediaType("video")
+      cy.getByTestId(`node-video-url`).type(url)
+      cy.submitModal()
+    })
+
+    cy.getSelectedNode().then(selectedNode => {
+      // Simulate the file at the current url becoming unavailable
+      cy.store().then(store => {
+        store.commit("updateNode", {
+          id: selectedNode.id,
+          newNode: {
+            typeData: { ...selectedNode.typeData, mediaURL: nonexistentUrl },
+          },
+        })
+      })
+
+      // Assert that the url was changed
+      cy.openModal("edit", selectedNode.id)
+      cy.getByTestId(`node-video-url`)
+        .invoke("val")
+        .should("eq", nonexistentUrl)
+      cy.get(".close").click()
+
+      cy.openLightbox(selectedNode.id).within(() => {
+        cy.get("video").should("have.attr", "src", url)
+      })
+    })
+  })
 })
