@@ -19,6 +19,7 @@ module.exports = merge(baseConfig, {
   },
   devtool: "inline-source-map",
   plugins: [new BundleAnalyzerPlugin({
+    defaultSizes: "stat",
     analyzerPort: 9000
   })],
 })
