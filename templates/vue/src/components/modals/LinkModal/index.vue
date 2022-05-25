@@ -74,6 +74,12 @@ export default {
     target() {
       return this.nodes[this.$route.params.target]
     },
+    canDelete() {
+      return (
+        this.isConnectedToRoot(this.source.id, this.target.id) &&
+        this.isConnectedToRoot(this.target.id, this.source.id)
+      )
+    },
   },
   methods: {
     ...mapActions(["deleteLink", "reverseLink"]),
@@ -127,12 +133,6 @@ export default {
         }
       }
       return false
-    },
-    canDelete() {
-      return (
-        this.isConnectedToRoot(this.source.id, this.target.id) &&
-        this.isConnectedToRoot(this.target.id, this.source.id)
-      )
     },
   },
 }

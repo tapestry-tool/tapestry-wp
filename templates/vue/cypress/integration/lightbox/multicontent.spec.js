@@ -203,6 +203,8 @@ describe("Multi-content", () => {
           cy.contains(/lock rows/i).click()
           cy.submitModal()
 
+          cy.logout().visitTapestry()
+
           cy.openLightbox(accordion.id).within(() => {
             cy.contains(row1.title).should("not.be.disabled")
             cy.contains(row2.title).should("be.disabled")
