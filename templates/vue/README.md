@@ -55,7 +55,7 @@ Cypress is the framework we use for end-to-end (e2e) testing. For it to work, it
     "SUBSCRIBER_USERNAME": "subscriber_name",
     "SUBSCRIBER_PASSWORD": "subscriber_password"
   },
-  "baseUrl": "http://localhost:8000",
+  "baseUrl": "http://localhost:8888",
   "retries": 1
 }
 ```
