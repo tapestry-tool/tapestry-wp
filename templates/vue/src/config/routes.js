@@ -53,7 +53,7 @@ export default [
         redirect: `${ROOT_PATH}/settings/appearance`,
         children: [
           {
-            path: `/:tab`,
+            path: `:tab`,
             name: names.SETTINGS,
           },
         ],
@@ -63,7 +63,7 @@ export default [
         redirect: `${ROOT_PATH}/user-answers/answers`,
         children: [
           {
-            path: `/:tab`,
+            path: `:tab`,
             name: names.USERANSWERS,
           },
         ],
