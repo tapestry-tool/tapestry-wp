@@ -222,6 +222,8 @@ export default {
         return this.$emit("submit")
       }
 
+      this.$emit("beforeSubmit")
+
       let submittedAnswer = null
 
       switch (this.formType) {

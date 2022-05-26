@@ -23,6 +23,7 @@
       v-else-if="state === 'activity'"
       :question="activeQuestion"
       :node="questionNode"
+      @beforeSubmit="scrollToTop('instant')"
       @submit="handleComplete('activity')"
       @skipQuestion="skip"
       @back="$emit('close')"
@@ -192,25 +193,6 @@ export default {
   },
   watch: {
     activeQuestionId() {
-      if (this.node.id) {
-        this.$nextTick(() => {
-          const container = document.getElementById(`multicontent-container`)
-          const element = document.getElementById(`row-${this.node.id}`)
-          if (container && element) {
-            const y = Helpers.getPositionOfElementInElement(element, container).y
-            container.scrollTo({ top: y, behavior: "smooth" })
-            client.recordAnalyticsEvent(
-              "app",
-              "scroll",
-              "multi-content",
-              this.node.id,
-              {
-                to: y,
-              }
-            )
-          }
-        })
-      }
       if (this.initialType === states.ACTIVITY) {
         if (this.hasAnswers && this.state === states.ACTIVITY) {
           this.state = states.ANSWER
@@ -218,6 +200,10 @@ export default {
           this.state = states.ACTIVITY
         }
       }
+      this.scrollToTop()
+    },
+    state(state) {
+      this.scrollToTop(state === states.COMPLETION_SCREEN ? "instant" : "smooth")
     },
   },
   mounted() {
@@ -246,6 +232,26 @@ export default {
   },
   methods: {
     ...mapActions(["updateNodeProgress"]),
+    scrollToTop(behavior = "smooth") {
+      if (!this.node.id) return
+      this.$nextTick(() => {
+        const container = document.getElementById(`multicontent-container`)
+        const element = document.getElementById(`row-${this.node.id}`)
+        if (container && element) {
+          const y = Helpers.getPositionOfElementInElement(element, container).y
+          container.scrollTo({ top: y, behavior })
+          client.recordAnalyticsEvent(
+            "app",
+            "scroll",
+            "multi-content",
+            this.node.id,
+            {
+              to: y,
+            }
+          )
+        }
+      })
+    },
     markQuestionsComplete() {
       let numCompleted = 0
       this.questions.forEach(question => {
