@@ -230,15 +230,8 @@ export default {
       })
       answers.forEach(answer => {
         if (answer.items.length > 0) {
-          let bucketKey = Object.keys(bucketInfo).find(
-            bucketId => bucketId === answer.bucketId
-          )
-          let bucketName = bucketInfo[bucketKey]
-          let itemNames = []
-          answer.items.forEach(item => {
-            let itemKey = Object.keys(itemInfo).find(itemId => itemId === item)
-            itemNames.push(itemInfo[itemKey])
-          })
+          let bucketName = bucketInfo[answer.bucketId]
+          let itemNames = answer.items.map(item => itemInfo[item])
           let answerValue = `${bucketName}: ` + itemNames.join(",")
           answerValues.push(answerValue)
         }
