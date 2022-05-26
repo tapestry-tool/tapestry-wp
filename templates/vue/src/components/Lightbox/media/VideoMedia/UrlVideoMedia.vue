@@ -3,7 +3,6 @@
     <video
       ref="video"
       controls
-      muted
       :autoplay="autoplay"
       :src="node.typeData.mediaURL"
       :style="videoStyles"
