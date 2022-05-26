@@ -71,7 +71,7 @@ export default {
     },
     isAdmin() {
       const currentUser = wp.getCurrentUser()
-      return currentUser.roles ? currentUser.roles.includes("administrator") : false
+      return currentUser.roles && currentUser.roles.includes("administrator")
     },
     hasDepth() {
       return this.maxDepth > 1 && this.settings.defaultDepth > 0
