@@ -230,19 +230,20 @@ class TapestryUserProgress implements ITapestryUserProgress
     private function _getAllUsersAnswers()
     {
         $tapestry = new Tapestry($this->postId);
+        $tapestryNode = new TapestryNode($this->postId);
         $nodeIds = $tapestry->getNodeIds();
         $activityNodes = [];
         foreach ($nodeIds as $nodeId) {
             $node = $tapestry->getNode($nodeId);
-            if ('activity' === $node->mediaType) {
+            if ('activity' === $tapestryNode->getMediaType($node)) {
                 array_push($activityNodes, $node);
             }
         }
         $allUsersAnswers = (object) [];
         $users = get_users(['fields' => ['ID', 'display_name']]);
         foreach ($activityNodes as $activity) {
-            $activityId = $activity->nodeMetaId;
-            $typeData = $activity->typeData;
+            $activityId = $tapestryNode->getNodeId($activity);
+            $typeData = $tapestryNode->getTypeData($activity);
             $activityQuestions = $typeData->activity->questions;
             $activityAnswers = (object) [];
             foreach ($activityQuestions as $question) {
