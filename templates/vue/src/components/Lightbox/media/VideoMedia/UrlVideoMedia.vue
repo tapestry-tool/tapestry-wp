@@ -4,7 +4,7 @@
       ref="video"
       controls
       muted
-      autoplay="autoplay"
+      :autoplay="autoplay"
       :src="node.typeData.mediaURL"
       :style="videoStyles"
       preload="metadata"
