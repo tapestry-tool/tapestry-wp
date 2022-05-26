@@ -9,7 +9,9 @@
       :question="activeQuestion"
     >
       <button class="button-completion" @click="close">
-        <template v-if="context === 'lightbox'">
+        <template
+          v-if="context === 'lightbox' && nextUnansweredQuestionIndex === -1"
+        >
           <i class="fas fa-times-circle fa-4x"></i>
           <p>Done</p>
         </template>
@@ -171,6 +173,13 @@ export default {
     hasPrev() {
       return this.activeQuestionIndex !== 0
     },
+    nextUnansweredQuestionIndex() {
+      let index = this.activeQuestionIndex
+      while (index !== this.questions.length - 1) {
+        if (!this.questions[++index].completed) return index
+      }
+      return -1
+    },
     hasAnswers() {
       return !!Object.entries(
         this.getAnswers(this.questionNode.id, this.activeQuestion.id)
@@ -322,15 +331,20 @@ export default {
       this.hasNext ? this.next() : (this.state = states.COMPLETION_SCREEN)
     },
     close() {
-      client.recordAnalyticsEvent("user", "close", "activity", this.node.id)
-      if (
-        this.node.popup ||
-        (this.initialType === "activity" && this.context === "lightbox")
-      ) {
-        this.$emit("close")
+      if (this.nextUnansweredQuestionIndex !== -1) {
+        this.activeQuestionIndex = this.nextUnansweredQuestionIndex
+        this.state = states.ACTIVITY
       } else {
-        this.activeQuestionIndex = 0
-        this.state = states.ANSWER
+        client.recordAnalyticsEvent("user", "close", "activity", this.node.id)
+        if (
+          this.node.popup ||
+          (this.initialType === "activity" && this.context === "lightbox")
+        ) {
+          this.$emit("close")
+        } else {
+          this.activeQuestionIndex = 0
+          this.state = states.ANSWER
+        }
       }
     },
   },
