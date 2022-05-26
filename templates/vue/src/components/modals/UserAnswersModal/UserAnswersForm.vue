@@ -21,7 +21,7 @@
                 data-qa="choose-activity"
                 item-text="title"
                 item-value="id"
-                empty-message="Please select an activity first"
+                empty-message="There are no activities in this Tapestry."
               >
                 <template v-slot="slotProps">
                   <p>
