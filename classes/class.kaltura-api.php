@@ -48,7 +48,7 @@
         /**
          * Upload a video file to Kaltura.
          *
-         * @param object $filepath String
+         * @param object $filepath     String
          * @param object $categoryName String
          *
          * @return object $response HTTP response
