@@ -248,18 +248,37 @@
             bg-variant="light"
             text-variant="dark"
           >
-            <b-form-group label="Title">
-              <b-form-input
-                v-model="question.confirmation.title"
-                :data-testid="`question-confirmation-title-${index}`"
-                placeholder="Thanks!"
-              />
+            <b-form-group>
+              <b-form-checkbox
+                :checked="
+                  question.confirmation.title.length !== 0 ||
+                    question.confirmation.message.length !== 0
+                "
+                switch
+                @change="setCustomConfirmation(question, $event)"
+              >
+                Use custom confirmation
+              </b-form-checkbox>
             </b-form-group>
-            <rich-text-form
-              v-model="question.confirmation.message"
-              :data-testid="`question-confirmation-message-${index}`"
-              placeholder="Your response has been recorded."
-            />
+            <template
+              v-if="
+                question.confirmation.title.length !== 0 ||
+                  question.confirmation.message.length !== 0
+              "
+            >
+              <b-form-group label="Title">
+                <b-form-input
+                  v-model="question.confirmation.title"
+                  :data-testid="`question-confirmation-title-${index}`"
+                  placeholder="Thanks!"
+                />
+              </b-form-group>
+              <rich-text-form
+                v-model="question.confirmation.message"
+                :data-testid="`question-confirmation-message-${index}`"
+                placeholder="Your response has been recorded."
+              />
+            </template>
           </b-card>
         </b-collapse>
       </b-form-group>
@@ -389,6 +408,15 @@ export default {
       question.followUp.text = ""
       question.followUp.questionId = ""
       question.followUp.nodeId = ""
+    },
+    setCustomConfirmation(question, enabled) {
+      if (enabled) {
+        question.confirmation.title = ""
+        question.confirmation.message = "<p></p>"
+      } else {
+        question.confirmation.title = ""
+        question.confirmation.message = ""
+      }
     },
     questionOptional(q) {
       return q.optional
