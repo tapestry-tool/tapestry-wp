@@ -61,7 +61,7 @@
             :active="tab === 'references'"
             @click="changeTab('references')"
           >
-            <references-form v-model="node.preferences" />
+            <references-form v-model="node.references" />
           </b-tab>
           <b-tab
             title="Appearance"
@@ -520,8 +520,10 @@ export default {
         }
       },
     },
-    type() {
-      this.initialize()
+    type(type) {
+      if (type) {
+        this.initialize()
+      }
     },
     tab: {
       immediate: true,
