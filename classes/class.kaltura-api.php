@@ -72,7 +72,7 @@
             $parentCategory = (false !== $parentCategoryIndex ? $categories->objects[$parentCategoryIndex] : null);
 
             // Create the 'Tapestry' category if it doesn't exist
-            if ($parentCategory === null) {
+            if (null === $parentCategory) {
                 $createdParentCategory = new Category();
                 $createdParentCategory->name = $parentCategoryName;
                 $kAdminClient = $this->getKClient(SessionType::ADMIN);
