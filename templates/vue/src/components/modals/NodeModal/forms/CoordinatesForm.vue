@@ -8,7 +8,8 @@
     <b-row v-if="isOnMap">
       <b-col>
         <b-form-input
-          v-model="node.mapCoordinates.lat"
+          :value="mapCoordinates.lat"
+          @update="inputProperty('lat', $event)"
           data-qa="node-lat-input"
           :number="true"
           :state="isValidLat ? null : false"
@@ -17,7 +18,8 @@
       </b-col>
       <b-col>
         <b-form-input
-          v-model="node.mapCoordinates.lng"
+          :value="mapCoordinates.lng"
+          @update="inputProperty('lng', $event)"
           data-qa="node-lng-input"
           :number="true"
           :state="isValidLng ? null : false"
@@ -29,13 +31,14 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex"
-
 export default {
+  model: {
+    prop: "mapCoordinates",
+    event: "input",
+  },
   props: {
-    node: {
+    mapCoordinates: {
       type: Object,
-      required: true,
     },
   },
   data() {
@@ -44,39 +47,53 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getNode"]),
     isValidLng() {
       return (
-        this.node.mapCoordinates.lng < 181 && this.node.mapCoordinates.lng > -181
+        this.mapCoordinates.lng < 181 && this.mapCoordinates.lng > -181
       )
     },
     isValidLat() {
-      return this.node.mapCoordinates.lat < 91 && this.node.mapCoordinates.lat > -91
+      return this.mapCoordinates.lat < 91 && this.mapCoordinates.lat > -91
     },
   },
   watch: {
     isOnMap(isOnMap) {
       if (!isOnMap) {
-        this.node.mapCoordinates.lat = ""
-        this.node.mapCoordinates.lng = ""
+        this.input({
+          lat: "",
+          lng: "",
+        })
       }
     },
   },
   created() {
-    if (!this.node.mapCoordinates) {
-      this.node.mapCoordinates = {
+    if (!this.mapCoordinates) {
+      this.input({
         lat: "",
         lng: "",
-      }
+      })
     }
     const isOnMap =
-      this.node.mapCoordinates.lat !== "" && this.node.mapCoordinates.lng !== ""
+      this.mapCoordinates.lat !== "" && this.mapCoordinates.lng !== ""
 
     if (!isOnMap) {
-      this.node.mapCoordinates.lat = ""
-      this.node.mapCoordinates.lng = ""
+      this.input({
+        lat: "",
+        lng: "",
+      })
     }
     this.isOnMap = isOnMap
+  },
+  methods: {
+    input(value) {
+      this.$emit("input", value)
+    },
+    inputProperty(property, value) {
+      this.input({
+        ...this.mapCoordinates,
+        [property]: value,
+      })
+    },
   },
 }
 </script>

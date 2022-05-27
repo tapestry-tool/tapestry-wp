@@ -134,7 +134,7 @@
             :active="tab === 'coordinates'"
             @click="changeTab('coordinates')"
           >
-            <coordinates-form :node="node" />
+            <coordinates-form v-model="node.mapCoordinates" />
           </b-tab>
           <b-tab
             title="Copyright"

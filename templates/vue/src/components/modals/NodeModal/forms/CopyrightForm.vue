@@ -94,8 +94,8 @@ export default {
         ...this.license,
         [property]: value,
       })
-    }
-  }
+    },
+  },
 }
 </script>
 
