@@ -49,6 +49,7 @@
          * Upload a video file to Kaltura.
          *
          * @param object $filepath String
+         * @param object $categoryName String
          *
          * @return object $response HTTP response
          */
@@ -59,7 +60,7 @@
 
             $kclient = $this->getKClient();
 
-            // Add video category
+            // Prepare the Kaltura Categories under which the video will be organized.
             $parentCategoryName = 'Tapestry';
             $filter = new CategoryFilter();
             $filter->fullNameStartsWith = $parentCategoryName;
@@ -68,6 +69,7 @@
             $parentCategoryIndex = array_search($parentCategoryName, array_column($categories->objects, 'fullName'));
             $parentCategory = (false !== $parentCategoryIndex ? $categories->objects[$parentCategoryIndex] : null);
 
+            // Find or create the category with the desired name under ancestor category 'Tapestry'.
             $videoCategoryIndex = array_search($categoryName, array_column($categories->objects, 'name'));
             $videoCategory = null;
 
@@ -81,38 +83,36 @@
                 $videoCategory = $kAdminClient->category->add($category);
             }
 
-            /**
-             * Uploading Video Steps:
-             * 1. Create upload token
-             * 2. Upload the file data
-             * 3. Create Kaltura Media Entry
-             * 4. Attach the video.
-             */
+            // Uploading Video Steps:
+            // 1. Create upload token
             $uploadToken = new UploadToken();
             $token = $kclient->uploadToken->add($uploadToken);
 
+            // 2. Upload the file data
             $resume = false;
             $finalChunk = true;
             $resumeAt = -1;
             $upload = $kclient->uploadToken->upload($token->id, $filepath, $resume, $finalChunk, $resumeAt);
 
+            // 3. Create Kaltura Media Entry and add the above categories
             $mediaEntry = new MediaEntry();
             $mediaEntry->name = $filename;
             $mediaEntry->mediaType = MediaType::VIDEO;
             $mediaEntry->categoriesIds = $videoCategory->id.','.$parentCategory->id;
             $entry = $kclient->media->add($mediaEntry);
 
+            // 4. Attach the uploaded video to the Media Entry
             $resource = new UploadedFileTokenResource();
             $resource->token = $token->id;
-            $result = $kclient->media->addContent($entry->id, $resource);
-            $status = $result->status;
+            $response = $kclient->media->addContent($entry->id, $resource);
+            $status = $response->status;
 
             while (FlavorAssetStatus::READY != $status && FlavorAssetStatus::ERROR != $status) {
                 sleep(5);
-                $result = $kclient->media->get($entry->id);
-                $status = $result->status;
+                $response = $kclient->media->get($entry->id);
+                $status = $response->status;
             }
 
-            return $result;
+            return $response;
         }
     }
