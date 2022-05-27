@@ -351,16 +351,18 @@ function upload_videos_to_kaltura()
             // False return value means option does not exist in database yet
             add_option($in_progress_option, $no_value);
 
-        } elseif (strcmp($is_upload_in_progress, $no_value) === 0) {
-            update_option($in_progress_option, $yes_value);
+        } elseif ($is_upload_in_progress !== $no_value) {
+            return;
+        }
 
-            try {
-                perform_upload_to_kaltura();
-            } catch (Exception $e) {
-                error_log($e->getMessage());
-            } finally {
-                update_option($in_progress_option, $no_value);
-            }
+        update_option($in_progress_option, $yes_value);
+
+        try {
+            perform_upload_to_kaltura();
+        } catch (Exception $e) {
+            error_log($e->getMessage());
+        } finally {
+            update_option($in_progress_option, $no_value);
         }
     }
 }
