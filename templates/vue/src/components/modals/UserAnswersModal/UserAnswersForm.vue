@@ -56,6 +56,8 @@
             bordered
             :fields="fields"
             :items="questionAnswers"
+            show-empty
+            empty-text="This question has not been answered by any user."
             data-qa="question-answers-table"
           >
             <template #cell(text)="text">
@@ -146,7 +148,9 @@ export default {
       return [...fields]
     },
     questionAnswers() {
-      return this.allAnswers[this.activityId][this.questionId]
+      return this.allAnswers[this.activityId][this.questionId].filter(
+        row => row.text || row.audio || row.multipleChoice || row.dragDrop
+      )
     },
   },
   watch: {
