@@ -60,7 +60,9 @@
 
             $kclient = $this->getKClient();
 
-            // Prepare the Kaltura Categories under which the video will be organized.
+            /*
+            We organize uploaded videos into Kaltura Categories. The ancestor category of all videos is 'Tapestry'.
+            */
             $parentCategoryName = 'Tapestry';
             $filter = new CategoryFilter();
             $filter->fullNameStartsWith = $parentCategoryName;
@@ -69,7 +71,15 @@
             $parentCategoryIndex = array_search($parentCategoryName, array_column($categories->objects, 'fullName'));
             $parentCategory = (false !== $parentCategoryIndex ? $categories->objects[$parentCategoryIndex] : null);
 
-            // Find or create the category with the desired name under ancestor category 'Tapestry'.
+            // Create the 'Tapestry' category if it doesn't exist
+            if ($parentCategory === null) {
+                $createdParentCategory = new Category();
+                $createdParentCategory->name = $parentCategoryName;
+                $kAdminClient = $this->getKClient(SessionType::ADMIN);
+                $parentCategory = $kAdminClient->category->add($createdParentCategory);
+            }
+
+            // Find or create the category with the desired name under 'Tapestry'
             $videoCategoryIndex = array_search($categoryName, array_column($categories->objects, 'name'));
             $videoCategory = null;
 
