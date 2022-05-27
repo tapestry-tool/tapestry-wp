@@ -351,7 +351,7 @@ function upload_videos_to_kaltura()
             // False return value means option does not exist in database yet
             add_option($in_progress_option, $no_value);
 
-        } else if ($is_upload_in_progress === $no_value) {
+        } elseif (strcmp($is_upload_in_progress, $no_value) === 0) {
             update_option($in_progress_option, $yes_value);
 
             try {
