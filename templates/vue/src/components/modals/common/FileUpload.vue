@@ -230,28 +230,16 @@ export default {
   },
   data() {
     return {
+      // NOTE: compactMode cannot work without showing the image preview
+      showImagePreviewValue: this.compactMode || this.showImagePreview,
       uploadPercentage: 0,
       uploadBarInterval: null,
       uploadSource: null,
       isUploading: false,
       confirmedUpload: true,
       changeImage: false,
-      imagePatternId: "",
+      imagePatternId: (this.compactMode || this.showImagePreview) ? "thumbnail-preview-" + Math.random().toString(36).substring(9) : "",
       error: null,
-    }
-  },
-  created() {
-    // NOTE: compactMode cannot work without showing the image preview
-    if (this.compactMode) {
-      this.showImagePreview = true
-    }
-
-    if (this.showImagePreview) {
-      this.imagePatternId =
-        "thumbnail-preview-" +
-        Math.random()
-          .toString(36)
-          .substring(9)
     }
   },
   methods: {

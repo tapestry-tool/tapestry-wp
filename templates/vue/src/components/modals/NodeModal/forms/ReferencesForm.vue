@@ -3,7 +3,8 @@
     <b-form-group label="References">
       <rich-text-form
         id="node-references"
-        v-model="node.references"
+        :value="value"
+        @input="$emit('input', $event)"
         data-testid="node-references"
         placeholder="Enter your references here"
       ></rich-text-form>
@@ -19,9 +20,10 @@ export default {
     RichTextForm,
   },
   props: {
-    node: {
-      type: Object,
+    value: {
+      type: String,
       required: true,
+      default: "",
     },
   },
 }

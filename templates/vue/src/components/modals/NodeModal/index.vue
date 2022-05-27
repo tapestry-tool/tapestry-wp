@@ -61,7 +61,7 @@
             :active="tab === 'references'"
             @click="changeTab('references')"
           >
-            <references-form :node="node" />
+            <references-form v-model="node.preferences" />
           </b-tab>
           <b-tab
             title="Appearance"
@@ -141,7 +141,7 @@
             :active="tab === 'copyright'"
             @click="changeTab('copyright')"
           >
-            <copyright-form :node="node" />
+            <copyright-form v-model="node.license" />
           </b-tab>
         </b-tabs>
       </b-overlay>

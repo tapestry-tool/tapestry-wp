@@ -2,7 +2,8 @@
   <div>
     <b-form-group label="Copyright/Licensing">
       <combobox
-        v-model="node.license.type"
+        :value="license.type"
+        @input="inputProperty('type', $event)"
         item-text="name"
         item-value="type"
         :options="licenses"
@@ -19,22 +20,24 @@
         </template>
       </combobox>
       <b-form-group
-        v-if="node.license.type === licenseTypes.CUSTOM"
+        v-if="license.type === licenseTypes.CUSTOM"
         label="License link"
         class="mt-3"
       >
         <b-form-input
-          v-model="node.license.link"
+          :value="license.link"
+          @input="inputProperty('link', $event)"
           placeholder="Paste a link to your license starting with http:// or https://"
         ></b-form-input>
       </b-form-group>
       <b-form-group
-        v-if="node.license.type === licenseTypes.CUSTOM"
+        v-if="license.type === licenseTypes.CUSTOM"
         label="License description"
         class="mb-0"
       >
         <rich-text-form
-          v-model="node.license.description"
+          :value="license.description"
+          @input="inputProperty('description', $event)"
           placeholder="Describe your license"
         ></rich-text-form>
       </b-form-group>
@@ -52,8 +55,12 @@ export default {
     Combobox,
     RichTextForm,
   },
+  model: {
+    prop: "license",
+    event: "input",
+  },
   props: {
-    node: {
+    license: {
       type: Object,
       required: true,
     },
@@ -70,14 +77,25 @@ export default {
     },
   },
   mounted() {
-    if (!this.node.license) {
-      this.node.license = {
+    if (!this.license) {
+      this.input({
         ...this.licenses[0],
         link: "",
         description: "",
-      }
+      })
     }
   },
+  methods: {
+    input(value) {
+      this.$emit("input", value)
+    },
+    inputProperty(property, value) {
+      this.input({
+        ...this.license,
+        [property]: value,
+      })
+    }
+  }
 }
 </script>
 
