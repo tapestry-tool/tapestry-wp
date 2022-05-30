@@ -3,7 +3,8 @@
     <b-form-group label="Video URL">
       <file-upload
         id="node-video-media-url"
-        v-model="node.typeData.mediaURL"
+        :value="node.typeData.mediaURL"
+        @input="change('typeData.mediaURL', $event)"
         input-test-id="node-video-url"
         placeholder="Enter URL for MP4 or YouTube video"
         required
@@ -35,17 +36,20 @@ export default {
   watch: {
     youtubeId(id) {
       if (id !== null) {
-        this.node.mediaFormat = "youtube"
-        this.node.typeData.youtubeID = id
+        this.change("mediaFormat", "youtube")
+        this.change("typeData.youtubeID", id)
       } else {
-        this.node.mediaFormat = "mp4"
-        this.node.typeData.youtubeID = undefined
+        this.change("mediaFormat", "mp4")
+        this.change("typeData.youtubeID", undefined)
       }
     },
   },
   methods: {
     handleUploadChange(state) {
       this.$root.$emit("node-modal::uploading", state)
+    },
+    change(property, value) {
+      this.$emit("property-change", property, value)
     },
   },
 }

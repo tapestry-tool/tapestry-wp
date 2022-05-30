@@ -1,7 +1,8 @@
 <template>
   <b-form-group label="Post Name">
     <combobox
-      v-model="node.typeData.mediaURL"
+      :value="node.typeData.mediaURL"
+      @input="$emit('property-change', 'typeData.mediaURL', $event)"
       data-qa="wp-combobox"
       item-text="title"
       item-value="id"

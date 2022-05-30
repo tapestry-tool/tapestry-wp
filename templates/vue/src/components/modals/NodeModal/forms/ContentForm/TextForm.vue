@@ -1,7 +1,8 @@
 <template>
   <rich-text-form
     id="node-text-content"
-    v-model="node.typeData.textContent"
+    :value="node.typeData.textContent"
+    @input="$emit('property-change', 'typeData.textContent', $event)"
     data-qa="node-text-content"
     placeholder="Enter text here"
   />
@@ -22,7 +23,7 @@ export default {
   },
   created() {
     if (!this.node.typeData.textContent) {
-      this.node.typeData.textContent = ""
+      this.$emit("property-change", "typeData.textContent", "")
     }
   },
 }

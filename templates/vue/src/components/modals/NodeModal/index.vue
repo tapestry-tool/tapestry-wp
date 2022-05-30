@@ -48,6 +48,7 @@
           >
             <content-form
               :node="node"
+              @property-change="handlePropertyChange"
               :parent="parent"
               :actionType="type"
               :maxDescriptionLength="maxDescriptionLength"
@@ -581,6 +582,22 @@ export default {
     ]),
     setLoading(status) {
       this.loading = status
+    },
+    handlePropertyChange(property, value) {
+      const deep = property.includes(".")
+      // console.log('handlePropertyChange', property, value, deep)
+      if (deep) {
+        let anchor = this.node
+        const path = property.split(".")
+        const lastKey = path.pop()
+        for (const key of path) {
+          anchor = anchor[key]
+        }
+        anchor[lastKey] = value
+      }
+      else {
+        this.node[property] = value
+      }
     },
     isValid() {
       const isNodeValid = this.validateNodeRoute(this.nodeId)

@@ -2,14 +2,19 @@
   <div>
     <b-form-group label="External Link">
       <file-upload
-        v-model="node.typeData.mediaURL"
+        :value="node.typeData.mediaURL"
+        @input="$emit('property-change', 'typeData.mediaURL', $event)"
         input-test-id="node-link-url"
         placeholder="Enter embed link (starting with http)"
         @isUploading="handleUploadChange"
       />
     </b-form-group>
     <b-form-group label="Behaviour">
-      <b-form-radio-group id="external-link-behaviour" v-model="node.behaviour">
+      <b-form-radio-group
+        id="external-link-behaviour"
+        :checked="node.behaviour"
+        @input="$emit('property-change', 'behaviour', $event)"
+      >
         <b-form-radio value="new-window" data-qa="node-link-new-window">
           Open in a New Window
         </b-form-radio>

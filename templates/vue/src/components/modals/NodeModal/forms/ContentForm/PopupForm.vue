@@ -7,7 +7,7 @@
       <label for="popup-time">Popup time in seconds</label>
       <b-form-input
         id="popup-time"
-        v-model.number="node.popup.time"
+        v-model.number="popupTimeValue"
         type="number"
         required
         min="0"
@@ -33,8 +33,16 @@ export default {
       return this.node.popup != null
     },
     popupTime() {
-      return this.isPopup ? this.node.popup.time : 0
+      return this.isPopup ? this.popupTimeValue : 0
     },
+    popupTimeValue: {
+      get() {
+        return this.node.popup.time
+      },
+      set(value) {
+        this.$emit("property-change", "popup.time", value)
+      }
+    }
   },
   watch: {
     /* NOTE: This is a fix for a problem where you set a popup for a valid canidate and then change your media type 
@@ -43,16 +51,16 @@ export default {
     */
     isCandidate() {
       if (!this.isCandidate) {
-        this.$set(this.node, "popup", null)
+        this.$emit("property-change", "popup", null)
       }
     },
   },
   methods: {
     togglePopup() {
       if (this.isPopup) {
-        this.$set(this.node, "popup", null)
+        this.$emit("property-change", "popup", null)
       } else {
-        this.$set(this.node, "popup", {
+        this.$emit("property-change", "popup", {
           time: 0,
         })
       }

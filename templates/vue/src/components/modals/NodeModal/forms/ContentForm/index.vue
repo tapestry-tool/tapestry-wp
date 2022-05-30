@@ -3,7 +3,8 @@
     <b-form-group label="Title">
       <b-form-input
         id="node-title"
-        v-model="node.title"
+        :value="node.title"
+        @update="change('title', $event)"
         data-qa="node-title"
         data-testid="node-title"
         placeholder="Enter title"
@@ -26,7 +27,8 @@
       >
         <b-form-input
           id="node-nav-title"
-          v-model="node.typeData.menuTitle"
+          :value="node.typeData.menuTitle"
+          @update="change('typeData.menuTitle', $event)"
           data-qa="node-nav-title"
           placeholder="Enter custom menu title"
           autofocus
@@ -41,7 +43,8 @@
     <b-form-group v-if="addDesc || node.description.length" label="Description">
       <rich-text-form
         id="node-description"
-        v-model="node.description"
+        :value="node.description"
+        @input="change('description', $event)"
         data-qa="node-description"
         placeholder="Enter description"
         :maxLength="maxDescriptionLength"
@@ -74,6 +77,7 @@
           :is="activeForm"
           v-if="activeForm"
           :node="node"
+          @property-change="change"
           :action-type="actionType"
           :is-unit-child="isUnitChild"
           @load="$emit('load')"
@@ -211,7 +215,7 @@ export default {
       this.$emit("unload")
     },
     shouldShowTitle(shouldShowTitle) {
-      this.node.typeData.showTitle = shouldShowTitle
+      this.change("typeData.showTitle", shouldShowTitle)
     },
     mediaTypes() {
       this.selectUnitChild()
@@ -222,18 +226,18 @@ export default {
   },
   methods: {
     handleTypeChange(evt) {
-      this.node.mediaType = evt
-      this.node.mediaFormat = ""
-      if (evt === "video" || evt === "h5p") {
-        this.node.mediaFormat = evt === "video" ? "mp4" : "h5p"
-      }
+      this.change("mediaType", evt)
+      this.change("mediaFormat", evt === "video" ? "mp4" : (evt === "h5p" ? "h5p" : ""))
       this.$emit("type-changed", evt)
     },
     selectUnitChild() {
       if (this.isUnitChild) {
-        this.node.mediaType = "multi-content"
-        this.node.presentationStyle = "page"
+        this.change("mediaType", "multi-content")
+        this.change("presentationStyle", "page")
       }
+    },
+    change(property, value) {
+      this.$emit("property-change", property, value)
     },
   },
 }
