@@ -151,21 +151,20 @@ export default {
       })
     },
     async handleError() {
-      // Error code 4 - The associated resource or media provider object has been found to be unsuitable.
-      if (this.$refs.video.error.code === 4) {
-        const fetchedNode = await client.getNode(this.node.id)
-        if (fetchedNode.typeData.mediaURL !== this.node.typeData.mediaURL) {
-          this.updateNode({
-            id: this.node.id,
-            newNode: fetchedNode,
-          })
-        } else if (
-          confirm(
-            "It seems this video cannot be loaded, would you like to refresh the page?"
-          )
-        ) {
-          location.reload()
-        }
+      // If an error occurs loading the video, first try to re-fetch the video URL from the backend
+      // Only alert user if this is unsuccessful
+      const fetchedNode = await client.getNode(this.node.id)
+      if (fetchedNode.typeData.mediaURL !== this.node.typeData.mediaURL) {
+        this.updateNode({
+          id: this.node.id,
+          newNode: fetchedNode,
+        })
+      } else if (
+        confirm(
+          "It seems this video cannot be loaded, would you like to refresh the page?"
+        )
+      ) {
+        location.reload()
       }
     },
     updateVideoProgress($event) {
