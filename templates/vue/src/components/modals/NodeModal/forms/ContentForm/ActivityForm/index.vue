@@ -410,6 +410,14 @@ export default {
       question.followUp.nodeId = ""
     },
     setCustomConfirmation(question, enabled) {
+      /**
+       * We detect the presence of a custom confirmation by checking if either
+       * title or message is non-empty. Thus, when the toggle on the interface
+       * gets turned on, an empty <p> is set as the rich text content to
+       * reflect the enabling of a custom confirmation. We do not have a boolean
+       * property for enabled, as that would break backward compatibility
+       * with existing confirmation settings.
+       */
       if (enabled) {
         question.confirmation.title = ""
         question.confirmation.message = "<p></p>"
