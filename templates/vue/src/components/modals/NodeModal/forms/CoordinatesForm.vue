@@ -1,5 +1,5 @@
 <template>
-  <div id="modal-coordinates">
+  <div id="modal-coordinates" v-if="mapCoordinates">
     <b-form-group>
       <b-form-checkbox v-model="isOnMap">
         Show on Map
@@ -39,6 +39,7 @@ export default {
   props: {
     mapCoordinates: {
       type: Object,
+      default: null,
     },
   },
   data() {

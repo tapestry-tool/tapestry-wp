@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="license">
     <b-form-group label="Copyright/Licensing">
       <combobox
         :value="license.type"
@@ -62,7 +62,7 @@ export default {
   props: {
     license: {
       type: Object,
-      required: true,
+      default: null,
     },
   },
   computed: {
@@ -76,14 +76,19 @@ export default {
       }))
     },
   },
-  mounted() {
-    if (!this.license) {
-      this.input({
-        ...this.licenses[0],
-        link: "",
-        description: "",
-      })
-    }
+  watch: {
+    license: {
+      handler(license) {
+        if (!license) {
+          this.input({
+            ...this.licenses[0],
+            link: "",
+            description: "",
+          })
+        }
+      },
+      immediate: true,
+    },
   },
   methods: {
     input(value) {
