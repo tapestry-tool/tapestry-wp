@@ -36,7 +36,6 @@ describe("Video", () => {
           const video = $el.get(0)
           expect(video.paused).to.be.true
         })
-        cy.get("video").then($el => $el.get(0).pause())
 
         cy.getByTestId("play-screen").should("exist")
       })

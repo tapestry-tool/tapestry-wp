@@ -3,6 +3,7 @@
     <video
       ref="video"
       controls
+      :autoplay="autoplay"
       :src="node.typeData.mediaURL"
       :style="videoStyles"
       preload="metadata"
@@ -158,14 +159,6 @@ export default {
           this.$emit("timeupdate", { amountViewed, currentTime })
         }
         this.lastTime = currentTime
-      }
-    },
-    mounted() {
-      const video = this.$refs.video
-      if (this.autoplay) {
-        video.play()
-      } else {
-        video.pause()
       }
     },
   },

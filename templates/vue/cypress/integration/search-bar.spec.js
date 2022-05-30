@@ -108,7 +108,7 @@ describe("Search bar", () => {
     cy.getByTestId("search-input")
       .click()
       .contains(roles.SUBSCRIBER)
-      .should("not.be.visible")
+      .should("not.exist")
   })
 })
 
