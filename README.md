@@ -72,13 +72,13 @@ The Kaltura Admininstrator Secret and Partner ID can be found by going to your K
     max_execution_time =
     ```
   In case of an HTTPS/SSL error troubleshoot with the following ([source](https://stackoverflow.com/questions/28858351/php-ssl-certificate-error-unable-to-get-local-issuer-certificate)):
-    ```
-    // Download the cacert.pem file from here: https://curl.se/docs/caextract.html and move it into C:/MAMP
-    // make sure this is uncommented
-    extension=php_openssl.dll
-    // Add these configuration lines
-    [SSL]
-    curl.cainfo="route/to/mamp/cacert.pem"
-    openssl.cafile="route/to/mamp/cacert.pem"
-    ```
+  ```
+  // Download the cacert.pem file from here: https://curl.se/docs/caextract.html and move it into C:/MAMP
+  // make sure this is uncommented
+  extension=php_openssl.dll
+  // Add these configuration lines
+  [SSL]
+  curl.cainfo="route/to/mamp/cacert.pem"
+  openssl.cafile="route/to/mamp/cacert.pem"
+  ```
 You should now be able to upload videos onto Kaltura.
