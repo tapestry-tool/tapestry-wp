@@ -40,7 +40,7 @@ const YouTubeStates = {
 }
 
 export default {
-  name: "video-media",
+  name: "youtube-video-media",
   props: {
     node: {
       type: Object,
@@ -94,10 +94,9 @@ export default {
       }
     },
     showTitle() {
-      return this.context === "page" && this.node.typeData.showTitle !== false
-    },
-    isMultiContentContext() {
-      return this.context === "page" || this.context === "multi-content"
+      return (
+        this.context === "multi-content" && this.node.typeData.showTitle !== false
+      )
     },
     origin() {
       return wpData.wpUrl

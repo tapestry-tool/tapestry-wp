@@ -7,6 +7,9 @@
 </template>
 
 <script>
+// Prevent linter warning on use of kWidget variable
+/*global kWidget*/
+
 import client from "@/services/TapestryAPI"
 import { data as wpData } from "@/services/wp"
 

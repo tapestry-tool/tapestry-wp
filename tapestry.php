@@ -4,12 +4,12 @@
  * Plugin Name: Tapestry
  * Plugin URI: https://www.tapestry-tool.com
  * Description: Custom post type - Tapestry
- * Version: 2.50.0-beta
+ * Version: 2.54.0-beta
  * Author: Tapestry Team, University of British Coloumbia.
  */
 
-// Used to force-refresh assets and run updates
-$TAPESTRY_VERSION_NUMBER = '2.50.0-beta';
+// Used to force-refresh assets
+$TAPESTRY_VERSION_NUMBER = '2.54.0-beta';
 
 define(
     'LOAD_KALTURA',
@@ -19,6 +19,8 @@ define(
     (defined('KALTURA_UNIQUE_CONFIG') && !empty(KALTURA_UNIQUE_CONFIG)) &&
     file_exists(plugin_dir_path(dirname(__FILE__)) . 'vendor/autoload.php')
 );
+
+error_reporting(E_ERROR | E_PARSE);
 
 /**
  * Register endpoints.
@@ -137,6 +139,8 @@ function tapestry_enqueue_vue_app()
     if ('tapestry' == get_post_type($post) && !post_password_required($post)) {
         global $TAPESTRY_VERSION_NUMBER;
 
+        $use_dev = $TAPESTRY_USE_DEV_MODE || isset($_GET['debug']);
+
         // register the Vue build script.
         $vueUrl = defined('TAPESTRY_USE_DEV_MODE') && !empty(TAPESTRY_USE_DEV_MODE) ? 'http://localhost:8080/dist' : plugin_dir_url(__FILE__).'templates/vue/dist';
 
@@ -159,6 +163,14 @@ function tapestry_enqueue_vue_app()
             $kaltura_unique_configuration = KALTURA_UNIQUE_CONFIG;
         }
         
+        $currentUser = wp_get_current_user();
+        $currentUser->data = (object) [
+            'ID' => $currentUser->data->ID,
+            'user_nicename'=> $currentUser->data->user_nicename,
+            'user_email'=> $currentUser->data->user_email,
+            'display_name'=> $currentUser->data->display_name
+        ];
+
         wp_localize_script(
             'tapestry_d3_vue', // vue script handle defined in wp_register_script.
             'wpData', // javascript object that will made availabe to Vue.
@@ -167,6 +179,7 @@ function tapestry_enqueue_vue_app()
                 'vue_uri' => $vueUrl, // path to vue
                 'rest_url' => untrailingslashit(esc_url_raw(rest_url())), // URL to the REST endpoint.
                 'wpUrl' => get_bloginfo('url'),
+                'logoutUrl' => wp_logout_url(get_permalink()),
                 'app_path' => $post->post_name, // page where the custom page template is loaded.
                 'post_categories' => get_terms([
                     'taxonomy' => 'category', // default post categories.
@@ -180,7 +193,7 @@ function tapestry_enqueue_vue_app()
                 'upload_url' => admin_url('async-upload.php'),
                 'roles' => $wp_roles->get_names(),
                 'wpCanEditTapestry' => current_user_can('edit_post', get_the_ID()),
-                'currentUser' => wp_get_current_user(),
+                'currentUser' => $currentUser,
                 'uploadDirArray' => wp_upload_dir(),
                 'kaltura' => array(
                     "partnerId" => $kaltura_partner_id,

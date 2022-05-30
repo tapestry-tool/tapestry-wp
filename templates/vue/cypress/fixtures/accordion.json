@@ -40,7 +40,6 @@
         "mediaURL": "",
         "mediaWidth": 960,
         "mediaHeight": 600,
-        "subAccordionText": "More content:",
         "textContent": "qwe"
       },
       "coordinates": {
@@ -121,7 +120,6 @@
         "mediaURL": "",
         "mediaWidth": 960,
         "mediaHeight": 600,
-        "subAccordionText": "More content:",
         "textContent": "qwe"
       },
       "coordinates": {
@@ -156,7 +154,6 @@
       "references": "",
       "accessible": true,
       "unlocked": true,
-      "presentationStyle": "accordion-row",
       "completed": false,
       "progress": 0,
       "nodeType": "child"
@@ -183,7 +180,6 @@
         "mediaURL": "",
         "mediaWidth": 960,
         "mediaHeight": 600,
-        "subAccordionText": "More content:",
         "textContent": "abcd"
       },
       "coordinates": {
@@ -221,7 +217,6 @@
       "references": "",
       "accessible": true,
       "unlocked": true,
-      "presentationStyle": "accordion-row",
       "completed": false,
       "progress": 0,
       "nodeType": "child"

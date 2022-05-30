@@ -73,7 +73,7 @@ interface ITapestryUserProgress
      */
     public function getTheme();
 
-    
+
     /**
      * Get User's favourite nodes from a tapestry post.
      *
@@ -104,5 +104,5 @@ interface ITapestryUserProgress
      *
      * @return null
      */
-    public function updateLastSelectedNode($nodeId, $rowId, $subRowId);
+    public function updateLastSelectedNode($nodeId, $rowId);
 }

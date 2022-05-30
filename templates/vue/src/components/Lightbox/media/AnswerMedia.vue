@@ -102,6 +102,10 @@ export default {
     color: var(--text-color-primary);
   }
 }
+.popup .question-title {
+  font-size: 18px;
+  margin-bottom: 18px;
+}
 </style>
 <style lang="scss" scoped>
 .answer-container {

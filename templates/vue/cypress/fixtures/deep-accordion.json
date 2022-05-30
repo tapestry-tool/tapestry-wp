@@ -29,7 +29,6 @@
         "mediaURL": "",
         "mediaWidth": 960,
         "mediaHeight": 600,
-        "subAccordionText": "More content:",
         "textContent": "<p>t</p>"
       },
       "coordinates": {
@@ -106,7 +105,6 @@
         "mediaURL": "",
         "mediaWidth": 960,
         "mediaHeight": 600,
-        "subAccordionText": "More content:",
         "textContent": "<p>Child</p>"
       },
       "hideTitle": false,
@@ -130,7 +128,6 @@
       "references": "",
       "unlocked": true,
       "accessible": true,
-      "hasSubAccordion": false,
       "id": 2670,
       "author": {
         "id": 1,
@@ -172,7 +169,6 @@
         "mediaURL": "",
         "mediaWidth": 960,
         "mediaHeight": 600,
-        "subAccordionText": "More content:",
         "textContent": "<p>grandchild</p>"
       },
       "hideTitle": false,
@@ -193,7 +189,6 @@
       "references": "",
       "unlocked": true,
       "accessible": true,
-      "hasSubAccordion": false,
       "id": 2672,
       "author": {
         "id": 1,

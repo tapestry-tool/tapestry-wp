@@ -2,7 +2,7 @@
   <b-modal
     v-if="target && source"
     id="links-modal"
-    visible
+    :visible="show"
     size="lg"
     title="Edit Link"
     body-class="p-0"
@@ -31,7 +31,7 @@
           variant="danger"
           style="margin-right:auto"
           data-qa="delete-link-btn"
-          :disabled="!canDeleteLink"
+          :disabled="!canDelete"
           @click="remove"
         >
           Delete Link
@@ -43,7 +43,7 @@
           Save
         </b-button>
       </b-overlay>
-      <b-form-invalid-feedback :state="canDeleteLink">
+      <b-form-invalid-feedback :state="canDelete">
         Link can only be deleted if both connected nodes have another link.
       </b-form-invalid-feedback>
     </template>
@@ -51,38 +51,35 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from "vuex"
+import { mapActions, mapGetters, mapState } from "vuex"
 import { names } from "@/config/routes"
 
 export default {
   name: "links-modal",
-  props: {
-    canDeleteLink: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
-    source: {
-      type: Object,
-      required: false,
-      default: null,
-    },
-    target: {
-      type: Object,
-      required: false,
-      default: null,
-    },
-  },
   data() {
     return {
       reverse: false,
       isLoading: false,
     }
   },
-  mounted() {
-    if (!this.source || !this.target) {
-      this.close()
-    }
+  computed: {
+    ...mapState(["nodes", "rootId"]),
+    ...mapGetters(["getNeighbours"]),
+    show() {
+      return this.$route.name === names.LINKMODAL
+    },
+    source() {
+      return this.nodes[this.$route.params.source]
+    },
+    target() {
+      return this.nodes[this.$route.params.target]
+    },
+    canDelete() {
+      return (
+        this.isConnectedToRoot(this.source.id, this.target.id) &&
+        this.isConnectedToRoot(this.target.id, this.source.id)
+      )
+    },
   },
   methods: {
     ...mapActions(["deleteLink", "reverseLink"]),
@@ -113,6 +110,29 @@ export default {
         }
       }
       this.close()
+    },
+    isConnectedToRoot(source, target) {
+      let queue = []
+      let visited = new Set()
+      queue.push(source)
+      visited.add(source)
+      while (queue.length > 0) {
+        const node = queue.shift()
+        if (node == this.rootId) {
+          return true
+        }
+        const neighbours = this.getNeighbours(node)
+        for (const neighbour of neighbours) {
+          if (
+            !visited.has(neighbour) &&
+            !(node === source && neighbour === target)
+          ) {
+            visited.add(neighbour)
+            queue.push(neighbour)
+          }
+        }
+      }
+      return false
     },
   },
 }

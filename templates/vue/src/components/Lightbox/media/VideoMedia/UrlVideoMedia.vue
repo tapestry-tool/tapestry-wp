@@ -5,6 +5,7 @@
       controls
       :src="node.typeData.mediaURL"
       :style="videoStyles"
+      preload="metadata"
       @loadeddata="handleLoad"
       @play="handlePlay"
       @pause="handlePause"

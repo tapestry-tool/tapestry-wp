@@ -64,7 +64,7 @@ export default {
     },
     answer: {
       required: true,
-      validator: prop => Array.isArray(prop) || prop === null,
+      validator: prop => Array.isArray(prop) || prop === null || prop === "",
     },
   },
   data() {
