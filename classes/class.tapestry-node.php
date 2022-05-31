@@ -7,7 +7,7 @@ require_once dirname(__FILE__).'/../classes/class.tapestry-user-progress.php';
 require_once dirname(__FILE__).'/../classes/class.constants.php';
 
 if (LOAD_KALTURA) {
-    require_once __DIR__.'/../services/class.kaltura-api.php';
+    require_once __DIR__.'/../classes/class.kaltura-api.php';
 }
 
 /**
