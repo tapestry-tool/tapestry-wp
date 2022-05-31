@@ -176,3 +176,26 @@ export function changeTheme(state, newTheme) {
 export function setReturnRoute(state, route) {
   state.returnRoute = route
 }
+
+export function setCurrentEditingNode(state, node) {
+  state.currentEditingNode = node
+}
+
+export function setCurrentEditingNodeProperty(state, { property, value }) {
+  if (state.currentEditingNode) {
+    const deep = property.includes(".")
+    // console.log('setCurrentEditingNodeProperty', property, value, deep)
+    if (deep) {
+      let anchor = state.currentEditingNode
+      const path = property.split(".")
+      const lastKey = path.pop()
+      for (const key of path) {
+        anchor = anchor[key]
+      }
+      anchor[lastKey] = value
+    }
+    else {
+      state.currentEditingNode[property] = value
+    }
+  }
+}

@@ -1,8 +1,7 @@
 <template>
   <rich-text-form
     id="node-text-content"
-    :value="node.typeData.textContent"
-    @input="$emit('property-change', 'typeData.textContent', $event)"
+    v-model="textContent"
     data-qa="node-text-content"
     placeholder="Enter text here"
   />
@@ -15,15 +14,22 @@ export default {
   components: {
     RichTextForm,
   },
-  props: {
-    node: {
-      type: Object,
-      required: true,
+  computed: {
+    textContent: {
+      get() {
+        return this.$store.state.currentEditingNode.typeData.textContent
+      },
+      set(value) {
+        this.$store.commit("setCurrentEditingNodeProperty", {
+          property: "typeData.textContent",
+          value,
+        })
+      },
     },
   },
   created() {
-    if (!this.node.typeData.textContent) {
-      this.$emit("property-change", "typeData.textContent", "")
+    if (!this.textContent) {
+      this.textContent = ""
     }
   },
 }

@@ -9,7 +9,7 @@
       <b-col>
         <b-form-input
           :value="mapCoordinates.lat"
-          @update="inputProperty('lat', $event)"
+          @update="update('mapCoordinates.lat', $event)"
           data-qa="node-lat-input"
           :number="true"
           :state="isValidLat ? null : false"
@@ -19,7 +19,7 @@
       <b-col>
         <b-form-input
           :value="mapCoordinates.lng"
-          @update="inputProperty('lng', $event)"
+          @update="update('mapCoordinates.lng', $event)"
           data-qa="node-lng-input"
           :number="true"
           :state="isValidLng ? null : false"
@@ -31,23 +31,17 @@
 </template>
 
 <script>
+import { mapMutations, mapState } from "vuex"
 export default {
-  model: {
-    prop: "mapCoordinates",
-    event: "input",
-  },
-  props: {
-    mapCoordinates: {
-      type: Object,
-      default: null,
-    },
-  },
   data() {
     return {
       isOnMap: false,
     }
   },
   computed: {
+    ...mapState({
+      mapCoordinates: state => state.currentEditingNode.mapCoordinates,
+    }),
     isValidLng() {
       return (
         this.mapCoordinates.lng < 181 && this.mapCoordinates.lng > -181
@@ -60,7 +54,7 @@ export default {
   watch: {
     isOnMap(isOnMap) {
       if (!isOnMap) {
-        this.input({
+        this.update("mapCoordinates", {
           lat: "",
           lng: "",
         })
@@ -69,7 +63,7 @@ export default {
   },
   created() {
     if (!this.mapCoordinates) {
-      this.input({
+      this.update("mapCoordinates", {
         lat: "",
         lng: "",
       })
@@ -78,7 +72,7 @@ export default {
       this.mapCoordinates.lat !== "" && this.mapCoordinates.lng !== ""
 
     if (!isOnMap) {
-      this.input({
+      this.update("mapCoordinates", {
         lat: "",
         lng: "",
       })
@@ -86,14 +80,9 @@ export default {
     this.isOnMap = isOnMap
   },
   methods: {
-    input(value) {
-      this.$emit("input", value)
-    },
-    inputProperty(property, value) {
-      this.input({
-        ...this.mapCoordinates,
-        [property]: value,
-      })
+    ...mapMutations(["setCurrentEditingNodeProperty"]),
+    update(property, value) {
+      this.setCurrentEditingNodeProperty({ property, value })
     },
   },
 }

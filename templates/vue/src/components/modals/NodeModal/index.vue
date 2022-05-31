@@ -47,8 +47,6 @@
             @click="changeTab('content')"
           >
             <content-form
-              :node="node"
-              @property-change="handlePropertyChange"
               :parent="parent"
               :actionType="type"
               :maxDescriptionLength="maxDescriptionLength"
@@ -62,7 +60,7 @@
             :active="tab === 'references'"
             @click="changeTab('references')"
           >
-            <references-form v-model="node.references" />
+            <references-form />
           </b-tab>
           <b-tab
             title="Appearance"
@@ -93,7 +91,7 @@
               <permissions-table v-model="node.permissions" />
             </b-card>
             <h6 class="mt-4 mb-3">Lock Node</h6>
-            <conditions-form :node="node" />
+            <conditions-form />
           </b-tab>
           <b-tab
             v-if="node.mediaType === 'h5p' || node.mediaType === 'video'"
@@ -135,14 +133,14 @@
             :active="tab === 'coordinates'"
             @click="changeTab('coordinates')"
           >
-            <coordinates-form v-model="node.mapCoordinates" />
+            <coordinates-form />
           </b-tab>
           <b-tab
             title="Copyright"
             :active="tab === 'copyright'"
             @click="changeTab('copyright')"
           >
-            <copyright-form v-model="node.license" />
+            <copyright-form />
           </b-tab>
         </b-tabs>
       </b-overlay>
@@ -308,7 +306,6 @@ export default {
       userId: null,
       errors: [],
       maxDescriptionLength: 2000,
-      node: null,
       videoLoaded: false,
       fileUploading: false,
       loadDuration: false,
@@ -333,6 +330,9 @@ export default {
       "apiError",
       "returnRoute",
     ]),
+    ...mapState({
+      node: "currentEditingNode",
+    }),
     parent() {
       const parent = this.getNode(
         this.type === "add" ? this.nodeId : this.getParent(this.nodeId)
@@ -572,7 +572,7 @@ export default {
     this.initialize()
   },
   methods: {
-    ...mapMutations(["updateRootNode", "setReturnRoute"]),
+    ...mapMutations(["updateRootNode", "setReturnRoute", "setCurrentEditingNode"]),
     ...mapActions([
       "addNode",
       "addLink",
@@ -582,22 +582,6 @@ export default {
     ]),
     setLoading(status) {
       this.loading = status
-    },
-    handlePropertyChange(property, value) {
-      const deep = property.includes(".")
-      // console.log('handlePropertyChange', property, value, deep)
-      if (deep) {
-        let anchor = this.node
-        const path = property.split(".")
-        const lastKey = path.pop()
-        for (const key of path) {
-          anchor = anchor[key]
-        }
-        anchor[lastKey] = value
-      }
-      else {
-        this.node[property] = value
-      }
     },
     isValid() {
       const isNodeValid = this.validateNodeRoute(this.nodeId)
@@ -651,7 +635,7 @@ export default {
           lng: "",
         }
       }
-      this.node = copy
+      this.setCurrentEditingNode(copy)
       this.setTapestryErrorReporting(false)
     },
     validateTab(requestedTab) {

@@ -81,7 +81,7 @@
 
 <script>
 import moment from "moment-timezone"
-import { mapState } from "vuex"
+import { mapMutations, mapState } from "vuex"
 import { conditionTypes } from "@/utils/constants"
 
 const baseCondition = {
@@ -94,12 +94,6 @@ const baseCondition = {
 
 export default {
   name: "conditions-form",
-  props: {
-    node: {
-      type: Object,
-      required: true,
-    },
-  },
   data() {
     return {
       lock: false,
@@ -141,23 +135,27 @@ export default {
   },
   watch: {
     conditions(val) {
-      this.node.conditions = val
+      this.update("conditions", val)
       this.lock = val.length > 0
     },
     lock(isLocked) {
       if (!isLocked) {
-        this.node.conditions = []
+        this.update("conditions", [])
       }
     },
   },
   mounted() {
-    const conditions = this.node.conditions || []
+    const conditions = this.$store.state.currentEditingNode.conditions || []
     this.conditions = conditions.map(condition => ({
       ...baseCondition,
       ...condition,
     }))
   },
   methods: {
+    ...mapMutations(["setCurrentEditingNodeProperty"]),
+    update(property, value) {
+      this.setCurrentEditingNodeProperty({ property, value })
+    },
     addCondition(e) {
       this.conditions.push({ ...baseCondition })
       e.target.blur()

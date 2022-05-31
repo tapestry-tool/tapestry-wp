@@ -2,8 +2,7 @@
   <div>
     <b-form-group label="External Link">
       <file-upload
-        :value="node.typeData.mediaURL"
-        @input="$emit('property-change', 'typeData.mediaURL', $event)"
+        v-model="mediaURL"
         input-test-id="node-link-url"
         placeholder="Enter embed link (starting with http)"
         @isUploading="handleUploadChange"
@@ -12,8 +11,7 @@
     <b-form-group label="Behaviour">
       <b-form-radio-group
         id="external-link-behaviour"
-        :checked="node.behaviour"
-        @input="$emit('property-change', 'behaviour', $event)"
+        v-model="behaviour"
       >
         <b-form-radio value="new-window" data-qa="node-link-new-window">
           Open in a New Window
@@ -23,7 +21,7 @@
         </b-form-radio>
       </b-form-radio-group>
     </b-form-group>
-    <b-alert variant="danger" :show="node.behaviour === 'embed'">
+    <b-alert variant="danger" :show="behaviour === 'embed'">
       Embedding links may not work if the site owner of your link does not allow it.
     </b-alert>
   </div>
@@ -36,10 +34,28 @@ export default {
   components: {
     FileUpload,
   },
-  props: {
-    node: {
-      type: Object,
-      required: true,
+  computed: {
+    mediaURL: {
+      get() {
+        return this.$store.state.currentEditingNode.typeData.mediaURL
+      },
+      set(value) {
+        this.$store.commit("setCurrentEditingNodeProperty", {
+          property: "typeData.mediaURL",
+          value,
+        })
+      },
+    },
+    behaviour: {
+      get() {
+        return this.$store.state.currentEditingNode.behaviour
+      },
+      set(value) {
+        this.$store.commit("setCurrentEditingNodeProperty", {
+          property: "behaviour",
+          value,
+        })
+      },
     },
   },
   methods: {

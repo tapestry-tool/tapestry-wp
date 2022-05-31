@@ -17,30 +17,30 @@
 </template>
 
 <script>
+import { mapMutations, mapState } from "vuex"
 export default {
   props: {
-    node: {
-      type: Object,
-      required: true,
-    },
     isCandidate: {
       type: Boolean,
       required: true,
     },
   },
   computed: {
+    ...mapState({
+      popup: state => state.currentEditingNode.popup
+    }),
     isPopup() {
-      return this.node.popup != null
+      return this.popup != null
     },
     popupTime() {
       return this.isPopup ? this.popupTimeValue : 0
     },
     popupTimeValue: {
       get() {
-        return this.node.popup.time
+        return this.popup.time
       },
       set(value) {
-        this.$emit("property-change", "popup.time", value)
+        this.update("popup.time", value)
       }
     }
   },
@@ -51,16 +51,20 @@ export default {
     */
     isCandidate() {
       if (!this.isCandidate) {
-        this.$emit("property-change", "popup", null)
+        this.update("popup", null)
       }
     },
   },
   methods: {
+    ...mapMutations(["setCurrentEditingNodeProperty"]),
+    update(property, value) {
+      this.setCurrentEditingNodeProperty({ property, value })
+    },
     togglePopup() {
       if (this.isPopup) {
-        this.$emit("property-change", "popup", null)
+        this.update("popup", null)
       } else {
-        this.$emit("property-change", "popup", {
+        this.update("popup", {
           time: 0,
         })
       }

@@ -4,7 +4,7 @@
       <b-form-input
         id="node-title"
         :value="node.title"
-        @update="change('title', $event)"
+        @update="update('title', $event)"
         data-qa="node-title"
         data-testid="node-title"
         placeholder="Enter title"
@@ -28,7 +28,7 @@
         <b-form-input
           id="node-nav-title"
           :value="node.typeData.menuTitle"
-          @update="change('typeData.menuTitle', $event)"
+          @update="update('typeData.menuTitle', $event)"
           data-qa="node-nav-title"
           placeholder="Enter custom menu title"
           autofocus
@@ -44,7 +44,7 @@
       <rich-text-form
         id="node-description"
         :value="node.description"
-        @input="change('description', $event)"
+        @input="update('description', $event)"
         data-qa="node-description"
         placeholder="Enter description"
         :maxLength="maxDescriptionLength"
@@ -77,7 +77,6 @@
           :is="activeForm"
           v-if="activeForm"
           :node="node"
-          @property-change="change"
           :action-type="actionType"
           :is-unit-child="isUnitChild"
           @load="$emit('load')"
@@ -95,7 +94,7 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex"
+import { mapGetters, mapMutations, mapState } from "vuex"
 import ActivityForm from "./ActivityForm"
 import MultiContentForm from "./MultiContentForm"
 import H5pForm from "./H5pForm"
@@ -123,10 +122,6 @@ export default {
     SubItemTable,
   },
   props: {
-    node: {
-      type: Object,
-      required: true,
-    },
     parent: {
       type: Object,
       required: false,
@@ -145,13 +140,23 @@ export default {
   data() {
     return {
       addDesc: false,
-      shouldShowTitle: this.node.typeData.showTitle !== false,
       addMenuTitle: false,
     }
   },
 
   computed: {
+    ...mapState({
+      node: "currentEditingNode",
+    }),
     ...mapGetters(["isMultiContentRow"]),
+    shouldShowTitle: {
+      get() {
+        return this.node.typeData.showTitle
+      },
+      set(value) {
+        this.update("typeData.showTitle", value)
+      },
+    },
     mediaTypes() {
       if (this.isUnitChild) {
         return [{ value: "multi-content", text: "Multi-Content" }]
@@ -214,9 +219,6 @@ export default {
     activeForm() {
       this.$emit("unload")
     },
-    shouldShowTitle(shouldShowTitle) {
-      this.change("typeData.showTitle", shouldShowTitle)
-    },
     mediaTypes() {
       this.selectUnitChild()
     },
@@ -225,19 +227,20 @@ export default {
     this.selectUnitChild()
   },
   methods: {
+    ...mapMutations(["setCurrentEditingNodeProperty"]),
+    update(property, value) {
+      this.setCurrentEditingNodeProperty({ property, value })
+    },
     handleTypeChange(evt) {
-      this.change("mediaType", evt)
-      this.change("mediaFormat", evt === "video" ? "mp4" : (evt === "h5p" ? "h5p" : ""))
+      this.update("mediaType", evt)
+      this.update("mediaFormat", evt === "video" ? "mp4" : (evt === "h5p" ? "h5p" : ""))
       this.$emit("type-changed", evt)
     },
     selectUnitChild() {
       if (this.isUnitChild) {
-        this.change("mediaType", "multi-content")
-        this.change("presentationStyle", "page")
+        this.update("mediaType", "multi-content")
+        this.update("presentationStyle", "page")
       }
-    },
-    change(property, value) {
-      this.$emit("property-change", property, value)
     },
   },
 }

@@ -3,7 +3,7 @@
     <b-form-group label="Copyright/Licensing">
       <combobox
         :value="license.type"
-        @input="inputProperty('type', $event)"
+        @input="update('license.type', $event)"
         item-text="name"
         item-value="type"
         :options="licenses"
@@ -26,7 +26,7 @@
       >
         <b-form-input
           :value="license.link"
-          @input="inputProperty('link', $event)"
+          @input="update('license.link', $event)"
           placeholder="Paste a link to your license starting with http:// or https://"
         ></b-form-input>
       </b-form-group>
@@ -37,7 +37,7 @@
       >
         <rich-text-form
           :value="license.description"
-          @input="inputProperty('description', $event)"
+          @input="update('license.description', $event)"
           placeholder="Describe your license"
         ></rich-text-form>
       </b-form-group>
@@ -49,23 +49,17 @@
 import Combobox from "@/components/modals/common/Combobox"
 import RichTextForm from "./ContentForm/RichTextForm"
 import { licenses, licenseTypes } from "@/utils/constants"
+import { mapMutations, mapState } from "vuex"
 
 export default {
   components: {
     Combobox,
     RichTextForm,
   },
-  model: {
-    prop: "license",
-    event: "input",
-  },
-  props: {
-    license: {
-      type: Object,
-      default: null,
-    },
-  },
   computed: {
+    ...mapState({
+      license: state => state.currentEditingNode.license,
+    }),
     licenseTypes() {
       return licenseTypes
     },
@@ -80,7 +74,7 @@ export default {
     license: {
       handler(license) {
         if (!license) {
-          this.input({
+          this.update("license", {
             ...this.licenses[0],
             link: "",
             description: "",
@@ -91,14 +85,9 @@ export default {
     },
   },
   methods: {
-    input(value) {
-      this.$emit("input", value)
-    },
-    inputProperty(property, value) {
-      this.input({
-        ...this.license,
-        [property]: value,
-      })
+    ...mapMutations(["setCurrentEditingNodeProperty"]),
+    update(property, value) {
+      this.setCurrentEditingNodeProperty({ property, value })
     },
   },
 }
