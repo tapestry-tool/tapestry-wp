@@ -53,7 +53,7 @@ describe("Map Tapestry", () => {
 
   it("if logged out, should see map without the list of nodes", () => {
     cy.logout().visitTapestry()
-    cy.get(".nodes-list").should("not.be.visible")
+    cy.get(".nodes-list").should("not.exist")
     cy.get(".vue2leaflet-map").should("be.visible")
   })
 
