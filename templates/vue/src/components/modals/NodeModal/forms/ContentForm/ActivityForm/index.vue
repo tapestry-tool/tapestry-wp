@@ -236,7 +236,7 @@
                 class="mt-2 pl-4 ml-2"
               >
                 <multiple-choice-form
-                  :multipleChoice="question.answerTypes.multipleChoice"
+                  v-model="question.answerTypes.multipleChoice"
                   data-qa="authoring-multiple-choice-form"
                 />
               </div>
@@ -348,11 +348,14 @@ export default {
     },
   },
   watch: {
-    questions(newQuestions) {
-      this.$store.commit("setCurrentEditingNodeProperty", {
-        property: "typeData.activity.questions",
-        newQuestions,
-      })
+    questions: {
+      handler(value) {
+        this.$store.commit("setCurrentEditingNodeProperty", {
+          property: "typeData.activity.questions",
+          value,
+        })
+      },
+      deep: true,
     },
   },
   created() {

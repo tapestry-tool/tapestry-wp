@@ -102,9 +102,12 @@ export default {
   },
   computed: {
     ...mapState(["nodes"]),
+    ...mapState({
+      nodeId: state => state.currentEditingNode.id,
+    }),
     nodeOptions() {
       return Object.values(this.nodes)
-        .filter(node => node.id !== this.node.id)
+        .filter(node => node.id !== this.nodeId)
         .map(node => ({
           value: node.id,
           text: node.title,
