@@ -322,6 +322,13 @@ $REST_API_ENDPOINTS = [
             'permission_callback' => 'TapestryPermissions::putTapestrySettings',
         ],
     ],
+    'UPLOAD_VIDEOS_TO_KALTURA' => (object) [
+        'ROUTE' => '/kaltura/upload_videos',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => 'uploadVideosToKaltura',
+        ],
+    ],
 ];
 
 /*
@@ -338,6 +345,10 @@ foreach ($REST_API_ENDPOINTS as $ENDPOINT) {
             );
         }
     );
+}
+
+function uploadVideosToKaltura($request) {
+    do_action('upload_videos_to_kaltura');
 }
 
 function exportTapestry($request)
