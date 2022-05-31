@@ -68,7 +68,6 @@
             @click="changeTab('appearance')"
           >
             <appearance-form
-              :node="node"
               :is-page-child="isPageMultiConentNodeChild"
             />
           </b-tab>
@@ -78,7 +77,7 @@
             title="Behaviour"
             @click="changeTab('behaviour')"
           >
-            <behaviour-form :node="node" />
+            <behaviour-form />
           </b-tab>
           <b-tab
             v-if="viewAccess"
@@ -99,7 +98,7 @@
             :active="tab === 'activity'"
             @click="changeTab('activity')"
           >
-            <activity-form :node="node" />
+            <activity-form />
           </b-tab>
           <b-tab
             v-if="node.hasMultiContentChild"
@@ -691,7 +690,7 @@ export default {
       }
     },
     handleDeleteComplete() {
-      this.node = this.parent
+      this.setCurrentEditingNode(this.parent)
       this.loading = false
       this.keepOpen = true
       this.close("delete")

@@ -2,7 +2,8 @@
   <div>
     <b-form-group data-qa="activity-combobox" label="Activity">
       <combobox
-        v-model="node.typeData.activityId"
+        :value="typeData.activityId"
+        @input="update('typeData.activityId', $event)"
         :options="activityNodes"
         data-qa="choose-activity-node"
         item-text="title"
@@ -18,7 +19,8 @@
     </b-form-group>
     <b-form-group data-qa="question-select" label="Question">
       <combobox
-        v-model="node.typeData.questionId"
+        :value="typeData.questionId"
+        @input="update('typeData.questionId', $event)"
         :options="availableQuestions"
         data-qa="choose-question"
         item-text="text"
@@ -34,46 +36,53 @@
     </b-form-group>
     <b-form-group label="Show this text first">
       <b-form-input
-        v-if="node.typeData.questionId"
-        v-model="node.typeData.precedingText"
+        v-if="typeData.questionId"
+        :value="typeData.precedingText"
+        @input="update('typeData.precedingText', $event)"
         data-qa="follow-up-text"
         :placeholder="originalQuestionText"
         description="If empty, will default to the original question text"
       ></b-form-input>
     </b-form-group>
-    <b-form-checkbox v-model="node.typeData.isEditable">
+    <b-form-checkbox
+      :checked="typeData.isEditable"
+      @input="update('typeData.isEditable', $event)"
+    >
       Allow user to edit this answer
     </b-form-checkbox>
   </div>
 </template>
 
 <script>
-import { mapState } from "vuex"
+import { mapMutations, mapState } from "vuex"
 import Combobox from "@/components/modals/common/Combobox"
 export default {
   components: {
     Combobox,
   },
-  props: {
-    node: {
-      type: Object,
-      required: true,
-    },
-  },
   computed: {
     ...mapState(["nodes"]),
+    ...mapState({
+      typeData: state => state.currentEditingNode.typeData,
+    }),
     activityNodes() {
       return Object.values(this.nodes).filter(node => node.mediaType == "activity")
     },
     availableQuestions() {
       return Object.values(this.activityNodes)
-        .filter(node => node.id == this.node.typeData.activityId)
+        .filter(node => node.id == this.typeData.activityId)
         .flatMap(node => node.typeData.activity.questions)
     },
     originalQuestionText() {
       return this.availableQuestions.find(
-        question => question.id === this.node.typeData.questionId
+        question => question.id === this.typeData.questionId
       )?.text
+    },
+  },
+  methods: {
+    ...mapMutations(["setCurrentEditingNodeProperty"]),
+    update(property, value) {
+      this.setCurrentEditingNodeProperty({ property, value })
     },
   },
 }

@@ -28,10 +28,7 @@ export default {
         return this.$store.state.currentEditingNode.typeData.mediaURL
       },
       set(value) {
-        this.$store.commit("setCurrentEditingNodeProperty", {
-          property: "typeData.mediaURL",
-          value,
-        })
+        this.update("typeData.mediaURL", value)
       },
     },
     youtubeId() {

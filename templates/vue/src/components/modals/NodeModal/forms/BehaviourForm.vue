@@ -2,8 +2,8 @@
   <div id="modal-behaviour">
     <b-form-group>
       <b-form-checkbox
-        v-if="node.mediaType !== 'multi-content'"
-        v-model="node.skippable"
+        v-if="mediaType !== 'multi-content'"
+        v-model="skippable"
         data-testid="node-behaviour-skippable"
       >
         Allow skipping video if user has not watched at least once
@@ -13,12 +13,21 @@
 </template>
 
 <script>
+import { mapState } from "vuex"
 export default {
-  props: {
-    node: {
-      type: Object,
-      required: true,
+  computed: mapState({
+    mediaType: state => state.currentEditingNode.mediaType,
+    skippable: {
+      get() {
+        return this.$store.state.currentEditingNode.skippable
+      },
+      set(value) {
+        this.$store.commit("setCurrentEditingNodeProperty", {
+          property: "skippable",
+          value,
+        })
+      },
     },
-  },
+  }),
 }
 </script>

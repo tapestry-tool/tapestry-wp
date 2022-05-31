@@ -82,16 +82,13 @@
 import Bucket from "./Bucket"
 import Helpers from "@/utils/Helpers"
 import client from "@/services/TapestryAPI"
+import { mapState } from "vuex"
 
 export default {
   components: {
     Bucket,
   },
   props: {
-    node: {
-      type: Object,
-      required: true,
-    },
     dragDrop: {
       type: Object,
       required: true,
@@ -101,6 +98,11 @@ export default {
       required: true,
     },
   },
+  computed: {
+    ...mapState({
+      nodeId: state => state.currentEditingNode.id,
+    }),
+  },
   data() {
     return {
       bucketRemovalEnabled: { to: false, from: false },
@@ -109,7 +111,7 @@ export default {
     }
   },
   created() {
-    client.questionHasAnswer(this.node.id, this.questionId, "dragDrop").then(res => {
+    client.questionHasAnswer(this.nodeId, this.questionId, "dragDrop").then(res => {
       this.hasAnswers = res.data
     })
 

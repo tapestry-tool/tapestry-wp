@@ -10,7 +10,7 @@
               label="Background color"
               :currentColor="node.backgroundColor"
               :data-qa="`node-backgroundcolor-${node.id}`"
-              @change="handleBackgroundColorChange"
+              @change="update('backgroundColor', $event)"
             />
             <b-form-group>
               <b-form-checkbox
@@ -22,7 +22,8 @@
             </b-form-group>
             <b-form-group v-if="addThumbnail">
               <file-upload
-                v-model="node.imageURL"
+                :value="node.imageURL"
+                @input="update('imageURL', $event)"
                 input-test-id="node-appearance-thumbnail-url"
                 :show-url-upload="false"
                 thumbnail-type="thumbnail"
@@ -41,7 +42,8 @@
             </b-form-group>
             <b-form-group v-if="addLockedThumbnail">
               <file-upload
-                v-model="node.lockedImageURL"
+                :value="node.lockedImageURL"
+                @input="update('lockedImageURL', $event)"
                 input-test-id="node-appearance-lockedThumbnail-url"
                 :show-url-upload="false"
                 thumbnail-type="locked"
@@ -57,11 +59,12 @@
               label="Text color"
               :currentColor="node.textColor"
               :data-qa="`node-textcolor-${node.id}`"
-              @change="handleTextColorChange"
+              @change="update('textColor', $event)"
             />
             <b-form-group>
               <b-form-checkbox
-                v-model="node.hideTitle"
+                :checked="node.hideTitle"
+                @input="update('hideTitle', $event)"
                 data-qa="node-appearance-title"
               >
                 Hide title
@@ -81,7 +84,8 @@
             <h6 class="mb-3">Other</h6>
             <b-form-group>
               <b-form-checkbox
-                v-model="node.hideProgress"
+                :checked="node.hideProgress"
+                @input="update('hideProgress', $event)"
                 data-qa="node-appearance-progress"
               >
                 Hide progress bar
@@ -89,7 +93,8 @@
             </b-form-group>
             <b-form-group>
               <b-form-checkbox
-                v-model="node.hideMedia"
+                :checked="node.hideMedia"
+                @input="update('hideMedia', $event)"
                 data-qa="node-appearance-media"
               >
                 Hide media button
@@ -103,9 +108,9 @@
     <b-card class="px-3 pt-3" bg-variant="light" no-body>
       <b-form-group>
         <b-form-checkbox
-          v-model="node.fullscreen"
+          :checked="node.fullscreen"
           data-qa="node-behaviour-fullscreen"
-          @input="node.fitWindow = true"
+          @input="handleFullscreenChange"
         >
           Open content in fullscreen
         </b-form-checkbox>
@@ -118,7 +123,7 @@
               : true
           "
           data-qa="nav-checkbox"
-          @change="node.typeData.showNavBar = $event"
+          @change="update('typeData.showNavBar', $event)"
         >
           Add navigation bar
         </b-form-checkbox>
@@ -129,16 +134,17 @@
         "
         class="indented-options"
       >
-        <b-form-radio v-model="node.fitWindow" name="fit-window" :value="true">
+        <b-form-radio :checked="node.fitWindow" @input="update('fitWindow', $event)" name="fit-window" :value="true">
           Fit whole video in window
         </b-form-radio>
-        <b-form-radio v-model="node.fitWindow" name="fit-window" :value="false">
+        <b-form-radio :checked="node.fitWindow" @input="update('fitWindow', $event)" name="fit-window" :value="false">
           Crop video to fill window (not recommended)
         </b-form-radio>
       </b-form-group>
       <b-form-group v-if="isPageChild">
         <b-form-checkbox
-          v-model="node.typeData.halfWidth"
+          :checked="node.typeData.halfWidth"
+          @input="update('typeData.halfWidth', $event)"
           data-qa="page-child-node-behaviour-half-width"
         >
           Show this node as half width
@@ -152,6 +158,7 @@
 import FileUpload from "@/components/modals/common/FileUpload"
 import ColorPicker from "@/components/modals/common/ColorPicker"
 import TinyColor from "tinycolor2"
+import { mapMutations, mapState } from "vuex"
 
 export default {
   components: {
@@ -159,10 +166,6 @@ export default {
     ColorPicker,
   },
   props: {
-    node: {
-      type: Object,
-      required: true,
-    },
     isPageChild: {
       type: Boolean,
       required: true,
@@ -175,6 +178,9 @@ export default {
     }
   },
   computed: {
+    ...mapState({
+      node: "currentEditingNode",
+    }),
     readability() {
       return Math.round(
         (Math.log(
@@ -197,14 +203,14 @@ export default {
   watch: {
     addThumbnail(addThumbnail) {
       if (!addThumbnail) {
-        this.node.imageURL = ""
-        this.node.thumbnailFileId = ""
+        this.update("imageURL", "")
+        this.update("thumbnailFileId", "")
       }
     },
     addLockedThumbnail(addLockedThumbnail) {
       if (!addLockedThumbnail) {
-        this.node.lockedImageURL = ""
-        this.node.lockedThumbnailFileId = ""
+        this.update("lockedImageURL", "")
+        this.update("lockedThumbnailFileId", "")
       }
     },
   },
@@ -214,15 +220,17 @@ export default {
       this.node.lockedImageURL && this.node.lockedImageURL.length > 0
   },
   methods: {
+    ...mapMutations(["setCurrentEditingNodeProperty"]),
+    update(property, value) {
+      this.setCurrentEditingNodeProperty({ property, value })
+    },
     handleUploadChange(state) {
       this.$root.$emit("node-modal::uploading", state)
     },
-    handleBackgroundColorChange(color) {
-      this.node.backgroundColor = color
-    },
-    handleTextColorChange(color) {
-      this.node.textColor = color
-    },
+    handleFullscreenChange(value) {
+      this.update("fullscreen", value)
+      this.update("fitWindow", true)
+    }
   },
 }
 </script>

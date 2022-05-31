@@ -48,16 +48,12 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex"
+import { mapGetters, mapState } from "vuex"
 import { names } from "@/config/routes"
 
 export default {
   name: "sub-item-table",
   props: {
-    node: {
-      type: Object,
-      required: true,
-    },
     actionType: {
       type: String,
       required: true,
@@ -69,6 +65,9 @@ export default {
     },
   },
   computed: {
+    ...mapState({
+      node: "currentEditingNode",
+    }),
     ...mapGetters(["getNode", "getDirectChildren"]),
     requiresSaving() {
       // Require saving if node is changing from non-multi-content to multi-content

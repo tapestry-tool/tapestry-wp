@@ -54,7 +54,7 @@
       <a href="#" class="small" @click="addDesc = true">Add Description</a>
     </div>
     <b-form-group v-show="isPopupCandidate" label="Popup">
-      <popup-form :node="node" :is-candidate="isPopupCandidate" />
+      <popup-form :is-candidate="isPopupCandidate" />
     </b-form-group>
     <b-form-group label="Content Type">
       <b-form-select
@@ -76,7 +76,6 @@
         <component
           :is="activeForm"
           v-if="activeForm"
-          :node="node"
           :action-type="actionType"
           :is-unit-child="isUnitChild"
           @load="$emit('load')"
@@ -84,7 +83,6 @@
         ></component>
         <sub-item-table
           v-if="node.mediaType === 'video'"
-          :node="node"
           :action-type="actionType"
           :is-popups="true"
         ></sub-item-table>
