@@ -6,7 +6,7 @@ Visit [tapestry-tool.com](https://www.tapestry-tool.com) for more info.
 
 ## How to install this plugin for Wordpress
 
-You can visit the [releases](https://github.com/wynnset/tapestry-wp/releases) page in this repository and find the plugin zip file under the "Assets" toggle for a given version. Once downloaded, you can upload this zip file to Wordpress under Plugins > Add New > Upload Plugin and activate the plugin.
+You can visit the [releases](https://github.com/tapestry-tool/tapestry-wp/releases) page in this repository and find the plugin zip file under the "Assets" toggle for a given version. Once downloaded, you can upload this zip file to Wordpress under Plugins > Add New > Upload Plugin and activate the plugin.
 
 ## Development
 
@@ -18,7 +18,7 @@ To get started with developing locally:
 - Clone this repo into a directory called `tapestry` under your Wordpress directory in the plugins folder (`wp-content/plugins`)
 - Setup your local dev environment. You have 2 options for your local development:
   1. *Using LAMP/MAMP/WAMP:* Follow the detailed instruction for [Mac, Windows](https://github.com/tapestry-tool/tapestry-wp/wiki/Local-Dev-with-MAMP-or-WAMP), or [Linux](https://github.com/tapestry-tool/tapestry-wp/wiki/Local-Dev-with-LAMP-setup).
-  2. *Using Docker:* Follow the detailed [Docker Installation & Usage](https://github.com/wynnset/tapestry-wp/wiki/Docker-Installation-&-Usage) wiki page.
+  2. *Using Docker:* Follow the detailed [Docker Installation & Usage](https://github.com/tapestry-tool/tapestry-wp/wiki/Docker-Installation-&-Usage) wiki page.
 - Follow the steps below under "Getting external links to work"
 - Make sure `$TAPESTRY_USE_DEV_MODE` is set to `TRUE` in `tapestry.php`
 - In the `templates/vue` directory, run `npm start` to serve with hot reload at localhost:8080
