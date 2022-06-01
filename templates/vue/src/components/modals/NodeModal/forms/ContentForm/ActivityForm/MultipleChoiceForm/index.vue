@@ -29,7 +29,6 @@
             class="choice-row mt-2"
             :index="index"
             :value="choice"
-            @input="choices[index] = $event"
             :use-image="useImages"
             :is-disabled="
               !allowSelectMultiple &&
@@ -37,6 +36,7 @@
                 preSelectedOptions[0] != choice.id
             "
             :is-removable="choices.length > 2"
+            @input="choices[index] = $event"
             @remove="removeChoice(index, choice)"
             @add="addChoice"
           ></choice-row>

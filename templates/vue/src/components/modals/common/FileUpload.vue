@@ -238,7 +238,13 @@ export default {
       isUploading: false,
       confirmedUpload: true,
       changeImage: false,
-      imagePatternId: (this.compactMode || this.showImagePreview) ? "thumbnail-preview-" + Math.random().toString(36).substring(9) : "",
+      imagePatternId:
+        this.compactMode || this.showImagePreview
+          ? "thumbnail-preview-" +
+            Math.random()
+              .toString(36)
+              .substring(9)
+          : "",
       error: null,
     }
   },

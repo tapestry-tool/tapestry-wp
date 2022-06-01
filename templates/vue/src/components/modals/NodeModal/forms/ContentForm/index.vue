@@ -4,12 +4,12 @@
       <b-form-input
         id="node-title"
         :value="node.title"
-        @update="update('title', $event)"
         data-qa="node-title"
         data-testid="node-title"
         placeholder="Enter title"
         autofocus
         required
+        @update="update('title', $event)"
       />
       <b-form-checkbox
         v-if="isMultiContentChild"
@@ -28,10 +28,10 @@
         <b-form-input
           id="node-nav-title"
           :value="node.typeData.menuTitle"
-          @update="update('typeData.menuTitle', $event)"
           data-qa="node-nav-title"
           placeholder="Enter custom menu title"
           autofocus
+          @update="update('typeData.menuTitle', $event)"
         />
       </b-form-group>
       <div v-else class="text-right mt-n3 mb-2">
@@ -44,10 +44,10 @@
       <rich-text-form
         id="node-description"
         :value="node.description"
-        @input="update('description', $event)"
         data-qa="node-description"
         placeholder="Enter description"
         :maxLength="maxDescriptionLength"
+        @input="update('description', $event)"
       />
     </b-form-group>
     <div v-else class="text-right mt-n3 mb-n2">
@@ -231,7 +231,10 @@ export default {
     },
     handleTypeChange(evt) {
       this.update("mediaType", evt)
-      this.update("mediaFormat", evt === "video" ? "mp4" : (evt === "h5p" ? "h5p" : ""))
+      this.update(
+        "mediaFormat",
+        evt === "video" ? "mp4" : evt === "h5p" ? "h5p" : ""
+      )
       this.$emit("type-changed", evt)
     },
     selectUnitChild() {

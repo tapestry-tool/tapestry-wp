@@ -9,10 +9,7 @@
       />
     </b-form-group>
     <b-form-group label="Behaviour">
-      <b-form-radio-group
-        id="external-link-behaviour"
-        v-model="behaviour"
-      >
+      <b-form-radio-group id="external-link-behaviour" v-model="behaviour">
         <b-form-radio value="new-window" data-qa="node-link-new-window">
           Open in a New Window
         </b-form-radio>

@@ -34,6 +34,8 @@
                 :items="getBucketsItems(bucket.id)"
                 :bucketRemovalAllowed="bucketRemovalEnabled.from"
                 :useImages="dragDrop.useImages"
+                @update-name="handleUpdateName(bucket.id, $event)"
+                @update-item="handleUpdateItem"
                 @remove-item="handleRemoveItem"
                 @remove-bucket="handleRemoveBucket"
                 @add="addItem(bucket.id)"
@@ -58,6 +60,7 @@
               <bucket
                 :bucket="bucket"
                 :bucketRemovalAllowed="bucketRemovalEnabled.to"
+                @update-name="handleUpdateName(bucket.id, $event)"
                 @remove-bucket="handleRemoveBucket"
               />
             </b-row>
@@ -89,7 +92,7 @@ export default {
     Bucket,
   },
   props: {
-    dragDrop: {
+    value: {
       type: Object,
       required: true,
     },
@@ -98,17 +101,26 @@ export default {
       required: true,
     },
   },
+  data() {
+    return {
+      dragDrop: this.value,
+      bucketRemovalEnabled: { to: false, from: false },
+      hasAnswers: false,
+      override: false,
+    }
+  },
   computed: {
     ...mapState({
       nodeId: state => state.currentEditingNode.id,
     }),
   },
-  data() {
-    return {
-      bucketRemovalEnabled: { to: false, from: false },
-      hasAnswers: false,
-      override: false,
-    }
+  watch: {
+    dragDrop: {
+      handler(val) {
+        this.$emit("input", val)
+      },
+      deep: true,
+    },
   },
   created() {
     client.questionHasAnswer(this.nodeId, this.questionId, "dragDrop").then(res => {
@@ -193,6 +205,12 @@ export default {
 
       this.dragDrop.buckets.splice(bucketIndex, 1)
       this.$forceUpdate()
+    },
+    handleUpdateName(bucketId, name) {
+      this.dragDrop.buckets.find(bucket => bucket.id === bucketId).text = name
+    },
+    handleUpdateItem({ id, property, value }) {
+      this.dragDrop.items.find(item => item.id === id)[property] = value
     },
   },
 }

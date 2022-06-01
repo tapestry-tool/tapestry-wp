@@ -218,7 +218,7 @@
               <div class="mt-2 pl-4 ml-2">
                 <drag-drop-form
                   v-if="question.answerTypes.dragDrop.enabled"
-                  :drag-drop="question.answerTypes.dragDrop"
+                  v-model="question.answerTypes.dragDrop"
                   :question-id="question.id"
                 />
               </div>
@@ -329,7 +329,8 @@ export default {
   },
   data() {
     return {
-      questions: this.$store.state.currentEditingNode.typeData.activity?.questions || [],
+      questions:
+        this.$store.state.currentEditingNode.typeData.activity?.questions || [],
     }
   },
   computed: {

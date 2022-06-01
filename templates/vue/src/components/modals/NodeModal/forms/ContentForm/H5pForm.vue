@@ -105,6 +105,6 @@ export default {
     update(property, value) {
       this.setCurrentEditingNodeProperty({ property, value })
     },
-  }
+  },
 }
 </script>

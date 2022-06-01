@@ -184,7 +184,6 @@ export function setCurrentEditingNode(state, node) {
 export function setCurrentEditingNodeProperty(state, { property, value }) {
   if (state.currentEditingNode) {
     const deep = property.includes(".")
-    // console.log('setCurrentEditingNodeProperty', property, value, deep)
     if (deep) {
       let anchor = state.currentEditingNode
       const path = property.split(".")
@@ -193,8 +192,7 @@ export function setCurrentEditingNodeProperty(state, { property, value }) {
         anchor = anchor[key]
       }
       anchor[lastKey] = value
-    }
-    else {
+    } else {
       state.currentEditingNode[property] = value
     }
   }

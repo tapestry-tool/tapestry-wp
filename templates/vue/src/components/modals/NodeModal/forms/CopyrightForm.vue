@@ -3,12 +3,12 @@
     <b-form-group label="Copyright/Licensing">
       <combobox
         :value="license.type"
-        @input="update('license.type', $event)"
         item-text="name"
         item-value="type"
         :options="licenses"
         placeholder="Please select a license"
         class="combobox mb-0"
+        @input="update('license.type', $event)"
       >
         <template v-slot="{ option }">
           <div class="license-option">
@@ -26,8 +26,8 @@
       >
         <b-form-input
           :value="license.link"
-          @input="update('license.link', $event)"
           placeholder="Paste a link to your license starting with http:// or https://"
+          @input="update('license.link', $event)"
         ></b-form-input>
       </b-form-group>
       <b-form-group
@@ -37,8 +37,8 @@
       >
         <rich-text-form
           :value="license.description"
-          @input="update('license.description', $event)"
           placeholder="Describe your license"
+          @input="update('license.description', $event)"
         ></rich-text-form>
       </b-form-group>
     </b-form-group>

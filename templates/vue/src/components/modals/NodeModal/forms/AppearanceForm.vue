@@ -23,12 +23,12 @@
             <b-form-group v-if="addThumbnail">
               <file-upload
                 :value="node.imageURL"
-                @input="update('imageURL', $event)"
                 input-test-id="node-appearance-thumbnail-url"
                 :show-url-upload="false"
                 thumbnail-type="thumbnail"
                 :show-image-preview="true"
                 file-types="image/*"
+                @input="update('imageURL', $event)"
                 @isUploading="handleUploadChange"
               />
             </b-form-group>
@@ -43,12 +43,12 @@
             <b-form-group v-if="addLockedThumbnail">
               <file-upload
                 :value="node.lockedImageURL"
-                @input="update('lockedImageURL', $event)"
                 input-test-id="node-appearance-lockedThumbnail-url"
                 :show-url-upload="false"
                 thumbnail-type="locked"
                 :show-image-preview="true"
                 file-types="image/*"
+                @input="update('lockedImageURL', $event)"
                 @isUploading="handleUploadChange"
               />
             </b-form-group>
@@ -64,8 +64,8 @@
             <b-form-group>
               <b-form-checkbox
                 :checked="node.hideTitle"
-                @input="update('hideTitle', $event)"
                 data-qa="node-appearance-title"
+                @input="update('hideTitle', $event)"
               >
                 Hide title
               </b-form-checkbox>
@@ -85,8 +85,8 @@
             <b-form-group>
               <b-form-checkbox
                 :checked="node.hideProgress"
-                @input="update('hideProgress', $event)"
                 data-qa="node-appearance-progress"
+                @input="update('hideProgress', $event)"
               >
                 Hide progress bar
               </b-form-checkbox>
@@ -94,8 +94,8 @@
             <b-form-group>
               <b-form-checkbox
                 :checked="node.hideMedia"
-                @input="update('hideMedia', $event)"
                 data-qa="node-appearance-media"
+                @input="update('hideMedia', $event)"
               >
                 Hide media button
               </b-form-checkbox>
@@ -134,18 +134,28 @@
         "
         class="indented-options"
       >
-        <b-form-radio :checked="node.fitWindow" @input="update('fitWindow', $event)" name="fit-window" :value="true">
+        <b-form-radio
+          :checked="node.fitWindow"
+          name="fit-window"
+          :value="true"
+          @input="update('fitWindow', $event)"
+        >
           Fit whole video in window
         </b-form-radio>
-        <b-form-radio :checked="node.fitWindow" @input="update('fitWindow', $event)" name="fit-window" :value="false">
+        <b-form-radio
+          :checked="node.fitWindow"
+          name="fit-window"
+          :value="false"
+          @input="update('fitWindow', $event)"
+        >
           Crop video to fill window (not recommended)
         </b-form-radio>
       </b-form-group>
       <b-form-group v-if="isPageChild">
         <b-form-checkbox
           :checked="node.typeData.halfWidth"
-          @input="update('typeData.halfWidth', $event)"
           data-qa="page-child-node-behaviour-half-width"
+          @input="update('typeData.halfWidth', $event)"
         >
           Show this node as half width
         </b-form-checkbox>
@@ -230,7 +240,7 @@ export default {
     handleFullscreenChange(value) {
       this.update("fullscreen", value)
       this.update("fitWindow", true)
-    }
+    },
   },
 }
 </script>

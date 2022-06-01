@@ -67,9 +67,7 @@
             :active="tab === 'appearance'"
             @click="changeTab('appearance')"
           >
-            <appearance-form
-              :is-page-child="isPageMultiConentNodeChild"
-            />
+            <appearance-form :is-page-child="isPageMultiConentNodeChild" />
           </b-tab>
           <b-tab
             v-if="node.mediaType === 'h5p' || node.mediaType === 'video'"

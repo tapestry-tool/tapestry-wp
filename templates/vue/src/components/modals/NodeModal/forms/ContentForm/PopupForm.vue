@@ -27,7 +27,7 @@ export default {
   },
   computed: {
     ...mapState({
-      popup: state => state.currentEditingNode.popup
+      popup: state => state.currentEditingNode.popup,
     }),
     isPopup() {
       return this.popup != null
@@ -41,8 +41,8 @@ export default {
       },
       set(value) {
         this.update("popup.time", value)
-      }
-    }
+      },
+    },
   },
   watch: {
     /* NOTE: This is a fix for a problem where you set a popup for a valid canidate and then change your media type 

@@ -11,24 +11,43 @@
     </b-form-group>
     <sub-item-table :actionType="actionType"></sub-item-table>
     <b-form-group>
-      <b-form-checkbox :checked="typeData.lockRows" @input="update('typeData.lockRows', $event)" data-qa="lock-checkbox">
+      <b-form-checkbox
+        :checked="typeData.lockRows"
+        data-qa="lock-checkbox"
+        @input="update('typeData.lockRows', $event)"
+      >
         Lock rows until previous row is completed
       </b-form-checkbox>
     </b-form-group>
     <b-form-group label="Finish button text">
-      <b-form-input :value="typeData.finishButtonText" @update="update('typeData.finishButtonText', $event)"></b-form-input>
+      <b-form-input
+        :value="typeData.finishButtonText"
+        @update="update('typeData.finishButtonText', $event)"
+      ></b-form-input>
     </b-form-group>
     <b-form-group label="Confirmation title text">
-      <b-form-input :value="typeData.confirmationTitleText" @update="update('typeData.confirmationTitleText', $event)"></b-form-input>
+      <b-form-input
+        :value="typeData.confirmationTitleText"
+        @update="update('typeData.confirmationTitleText', $event)"
+      ></b-form-input>
     </b-form-group>
     <b-form-group label="Confirmation body text">
-      <b-form-input :value="typeData.confirmationBodyText" @update="update('typeData.confirmationBodyText', $event)"></b-form-input>
+      <b-form-input
+        :value="typeData.confirmationBodyText"
+        @update="update('typeData.confirmationBodyText', $event)"
+      ></b-form-input>
     </b-form-group>
     <b-form-group label="Continue button text">
-      <b-form-input :value="typeData.continueButtonText" @update="update('typeData.continueButtonText', $event)"></b-form-input>
+      <b-form-input
+        :value="typeData.continueButtonText"
+        @update="update('typeData.continueButtonText', $event)"
+      ></b-form-input>
     </b-form-group>
     <b-form-group label="Cancel link text">
-      <b-form-input :value="typeData.cancelLinkText" @update="update('typeData.cancelLinkText', $event)"></b-form-input>
+      <b-form-input
+        :value="typeData.cancelLinkText"
+        @update="update('typeData.cancelLinkText', $event)"
+      ></b-form-input>
     </b-form-group>
   </div>
 </template>

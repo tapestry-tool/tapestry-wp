@@ -3,12 +3,12 @@
     <b-form-group data-qa="activity-combobox" label="Activity">
       <combobox
         :value="typeData.activityId"
-        @input="update('typeData.activityId', $event)"
         :options="activityNodes"
         data-qa="choose-activity-node"
         item-text="title"
         item-value="id"
         empty-message="Please select an Activity first"
+        @input="update('typeData.activityId', $event)"
       >
         <template v-slot="slotProps">
           <p>
@@ -20,12 +20,12 @@
     <b-form-group data-qa="question-select" label="Question">
       <combobox
         :value="typeData.questionId"
-        @input="update('typeData.questionId', $event)"
         :options="availableQuestions"
         data-qa="choose-question"
         item-text="text"
         item-value="id"
         empty-message="Please select an activity first."
+        @input="update('typeData.questionId', $event)"
       >
         <template v-slot="slotProps">
           <p>
@@ -38,10 +38,10 @@
       <b-form-input
         v-if="typeData.questionId"
         :value="typeData.precedingText"
-        @input="update('typeData.precedingText', $event)"
         data-qa="follow-up-text"
         :placeholder="originalQuestionText"
         description="If empty, will default to the original question text"
+        @input="update('typeData.precedingText', $event)"
       ></b-form-input>
     </b-form-group>
     <b-form-checkbox
