@@ -327,6 +327,23 @@ $REST_API_ENDPOINTS = [
         'ARGUMENTS' => [
             'methods' => $REST_API_GET_METHOD,
             'callback' => 'uploadVideosToKaltura',
+            'permission_callback' => 'TapestryPermissions::kalturaUpload',
+        ],
+    ],
+    'GET_KALTURA_UPLOAD_IN_PROGRESS' => (object) [
+        'ROUTE' => '/kaltura/upload_in_progress',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => 'getKalturaUploadInProgress',
+            'permission_callback' => 'TapestryPermissions::kalturaUpload',
+        ],
+    ],
+    'GET_KALTURA_UPLOAD_STATUS' => (object) [
+        'ROUTE' => '/kaltura/upload_status',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => 'getKalturaUploadStatus',
+            'permission_callback' => 'TapestryPermissions::kalturaUpload',
         ],
     ],
 ];
@@ -350,6 +367,16 @@ foreach ($REST_API_ENDPOINTS as $ENDPOINT) {
 function uploadVideosToKaltura($request)
 {
     do_action('upload_videos_to_kaltura');
+}
+
+function getKalturaUploadStatus($request)
+{
+    return get_option('tapestry_kaltura_upload_log');
+}
+
+function getKalturaUploadInProgress($request)
+{
+    return get_option('tapestry_kaltura_upload_in_progress') === 'yes';
 }
 
 function exportTapestry($request)
