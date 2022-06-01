@@ -191,9 +191,19 @@ export function setCurrentEditingNodeProperty(state, { property, value }) {
       for (const key of path) {
         anchor = anchor[key]
       }
-      anchor[lastKey] = value
+      if (!anchor.hasOwnProperty(lastKey)) {
+        Vue.set(anchor, lastKey, value) // for triggering view re-renders
+      }
+      else {
+        anchor[lastKey] = value
+      }
     } else {
-      state.currentEditingNode[property] = value
+      if (!state.currentEditingNode.hasOwnProperty(property)) {
+        Vue.set(state.currentEditingNode, property, value) // for triggering view re-renders
+      }
+      else {
+        state.currentEditingNode[property] = value
+      }
     }
   }
 }

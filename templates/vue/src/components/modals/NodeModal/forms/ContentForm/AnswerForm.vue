@@ -69,7 +69,7 @@ export default {
       return Object.values(this.nodes).filter(node => node.mediaType == "activity")
     },
     availableQuestions() {
-      return Object.values(this.activityNodes)
+      return this.activityNodes
         .filter(node => node.id == this.typeData.activityId)
         .flatMap(node => node.typeData.activity.questions)
     },
