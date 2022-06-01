@@ -193,15 +193,13 @@ export function setCurrentEditingNodeProperty(state, { property, value }) {
       }
       if (!anchor.hasOwnProperty(lastKey)) {
         Vue.set(anchor, lastKey, value) // for triggering view re-renders
-      }
-      else {
+      } else {
         anchor[lastKey] = value
       }
     } else {
       if (!state.currentEditingNode.hasOwnProperty(property)) {
         Vue.set(state.currentEditingNode, property, value) // for triggering view re-renders
-      }
-      else {
+      } else {
         state.currentEditingNode[property] = value
       }
     }
