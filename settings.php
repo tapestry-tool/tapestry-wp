@@ -14,6 +14,8 @@ function tapestry_settings_init()
     add_settings_section('tapestry_db_settings', 'Database Settings', 'tapestry_db_section_cb', 'tapestry_settings_page');
 
     add_settings_field('tapestry_clean_h5p_nodes', 'Clean h5p Nodes', 'tapestry_clean_h5p_nodes_cb', 'tapestry_settings_page', 'tapestry_db_settings');
+
+    add_settings_section('tapestry_kaltura_upload_dashboard', 'Kaltura Video Upload', 'tapestry_kaltura_upload_dashboard_cb', 'tapestry_settings_page');
 }
 
 function tapestry_settings_page_cb()
@@ -36,6 +38,52 @@ function tapestry_db_section_cb()
 function tapestry_clean_h5p_nodes_cb()
 {
     echo "<input type='checkbox' id='clean_h5p_nodes' name='clean_h5p_nodes'  value='1'/>";
+}
+
+function tapestry_kaltura_upload_dashboard_cb()
+{
+    $is_upload_in_progress = get_option('tapestry_kaltura_upload_in_progress') === 'yes';
+    $upload_button_attributes = $is_upload_in_progress ? 'disabled' : '';
+
+    $prefix = get_rest_url(null, 'tapestry-tool/v1');
+
+    echo "
+    <button onclick='startKalturaUpload()' {$upload_button_attributes}>
+        Start Upload
+    </button>
+    <script type='text/javascript'>
+        function startKalturaUpload() {
+            const apiUrl = '{$prefix}';
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', apiUrl + '/kaltura/upload_videos');
+            xhr.setRequestHeader(`X-WP-Nonce`, `".wp_create_nonce('wp_rest')."`);
+            xhr.send();
+        }
+    </script>
+    ";
+
+    $upload_log = get_option('tapestry_kaltura_upload_log');
+
+    echo '<table>
+            <tr>
+                <th>Tapestry ID</th>
+                <th>Node ID</th>
+                <th>Status</th>
+                <th>Additional information</th>
+            </tr>
+        ';
+
+    foreach ($upload_log as $video) {
+        echo
+            '<tr>
+                <td>'.$video->tapestryID.'</td>
+                <td>'.$video->nodeID.'</td>
+                <td>'.$video->uploadStatus.'</td>
+                <td>'.$video->additionalInfo.'</td>
+            </tr>';
+    }
+
+    echo '</table>';
 }
 
 function run_db_commands()

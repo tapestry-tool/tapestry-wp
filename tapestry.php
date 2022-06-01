@@ -137,7 +137,7 @@ function tapestry_enqueue_vue_app()
     global $post;
     if ('tapestry' == get_post_type($post) && !post_password_required($post)) {
         global $TAPESTRY_VERSION_NUMBER;
-        
+
         $use_dev = (defined('TAPESTRY_USE_DEV_MODE') && !empty(TAPESTRY_USE_DEV_MODE)) || isset($_GET['debug']);
 
         // register the Vue build script.
@@ -350,7 +350,6 @@ function upload_videos_to_kaltura()
         if ($is_upload_in_progress === false) {
             // False return value means option does not exist in database yet
             add_option($in_progress_option, $no_value);
-
         } elseif ($is_upload_in_progress !== $no_value) {
             return;
         }
@@ -367,15 +366,10 @@ function upload_videos_to_kaltura()
     }
 }
 
-function perform_upload_to_kaltura() {
-    $upload_folder = wp_upload_dir()['path'];
-    
-    $current_date = date('Y/m/d');
-
+function get_videos_to_upload()
+{
     $tapestries = get_posts(['post_type' => 'tapestry',]);
-    $video_nodes = array();
-
-    $kalturaApi = new KalturaApi();
+    $videos_to_upload = array();
 
     foreach ($tapestries as $value) {
         $tapestry = new Tapestry($value->ID);
@@ -386,33 +380,75 @@ function perform_upload_to_kaltura() {
 
             if ($nodeMeta->mediaType == "video") {
                 $media_url = $node->getTypeData()->mediaURL;
+
                 if (strpos($media_url, "/wp-content/uploads/")) {
-                    $file_name = pathinfo($media_url)['basename'];
+                    $video = (object) [
+                        'tapestryID' => $value->ID,
+                        'nodeID' => $node_id,
+                        'uploadStatus' => 'not_started',
+                        'additionalInfo' => '',
+                    ];
+                    array_push($videos_to_upload, $video);
+                }
+            }
+        }
+    }
 
-                    $file_obj = new StdClass();
-                    $file_obj->file_path = $upload_folder."/".$file_name;
-                    $file_obj->name = $file_name;
+    return $videos_to_upload;
+}
 
-                    $kaltura_data = null;
-                    try {
-                        $kaltura_data = $kalturaApi->uploadKalturaVideo($file_obj, $current_date);
-                    } catch (Exception $e) {
-                        throw new Exception("Unable to upload video - ".$file_obj->file_path." to kaltura, ".$e);
-                    }
+function perform_upload_to_kaltura()
+{
+    $upload_folder = wp_upload_dir()['path'];
 
-                    $typeData = $node->getTypeData();
-                    $typeData->mediaURL = $kaltura_data->dataUrl."?.mp4";
-                    $typeData->kalturaData = array(
+    $current_date = date('Y/m/d');
+
+    $kalturaApi = new KalturaApi();
+
+    $upload_log_option_name = 'tapestry_kaltura_upload_log';
+
+    $videos_to_upload = get_videos_to_upload();
+    
+    // This will create the option if it doesn't exist
+    update_option($upload_log_option_name, $videos_to_upload);
+
+    foreach ($videos_to_upload as $video) {
+        $video->uploadStatus = 'in_progress';
+        update_option($upload_log_option_name, $videos_to_upload);
+
+        $node = new TapestryNode($video->tapestryID, $video->nodeID);
+
+        $file_name = pathinfo($node->getTypeData()->mediaURL)['basename'];
+
+        $file_obj = new StdClass();
+        $file_obj->file_path = $upload_folder."/".$file_name;
+        $file_obj->name = $file_name;
+
+        $kaltura_data = null;
+        try {
+            $kaltura_data = $kalturaApi->uploadKalturaVideo($file_obj, $current_date);
+        } catch (Exception $e) {
+            error_log("Unable to upload video - ".$file_obj->file_path." to kaltura, ".$e);
+
+            $video->uploadStatus = 'error';
+            $video->additionalInfo = $e->getMessage();
+            update_option($upload_log_option_name, $videos_to_upload);
+            continue;
+        }
+
+        $typeData = $node->getTypeData();
+        $typeData->mediaURL = $kaltura_data->dataUrl."?.mp4";
+        $typeData->kalturaData = array(
                         "id" => $kaltura_data->id,
                         "partnerId" => $kaltura_data->partnerId,
                     );
 
-                    $node->set($typeData);
-                    $node->save();
+        $node->set($typeData);
+        $node->save();
 
-                    wp_delete_file($file_obj->file_path);
-                }
-            }
-        }
+        wp_delete_file($file_obj->file_path);
+
+        $video->uploadStatus='complete';
+        update_option($upload_log_option_name, $videos_to_upload);
     }
 }

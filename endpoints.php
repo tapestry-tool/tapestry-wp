@@ -347,7 +347,8 @@ foreach ($REST_API_ENDPOINTS as $ENDPOINT) {
     );
 }
 
-function uploadVideosToKaltura($request) {
+function uploadVideosToKaltura($request)
+{
     do_action('upload_videos_to_kaltura');
 }
 
