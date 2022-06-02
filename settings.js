@@ -5,8 +5,8 @@ window.onload = () => {
 
 function openGetRequest(endpoint) {
     const xhr = new XMLHttpRequest();
-    xhr.open('GET', apiUrl + endpoint);
-    xhr.setRequestHeader(`X-WP-Nonce`, wpNonce);
+    xhr.open('GET', WP_VARIABLES.apiUrl + endpoint);
+    xhr.setRequestHeader(`X-WP-Nonce`, WP_VARIABLES.wpNonce);
     
     return xhr;
 }

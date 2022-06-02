@@ -21,17 +21,13 @@ function load_tapestry_settings_page_scripts($hook)
 {
     // TO DO: find a better way to test the current settings page
     if (str_ends_with($hook, 'tapestry_settings_page')) {
-        $prefix = get_rest_url(null, 'tapestry-tool/v1');
-        $nonce = wp_create_nonce('wp_rest');
+        wp_enqueue_script('tapestry_settings_script_js', plugin_dir_url(__FILE__).'settings.js');
 
         // Inject REST API url and WordPress nonce for use in JavaScript scripts
-        echo "
-        <script type='text/javascript'>
-            const apiUrl = '{$prefix}';
-            const wpNonce = '{$nonce}';
-        </script>";
-
-        wp_enqueue_script('kaltura_upload_script', plugin_dir_url(__FILE__).'settings.js');
+        wp_add_inline_script('tapestry_settings_script_js', 'const WP_VARIABLES = ' . json_encode(array(
+            'apiUrl' => get_rest_url(null, 'tapestry-tool/v1'),
+            'wpNonce' => wp_create_nonce('wp_rest'),
+        )), 'before');
     }
 }
 
