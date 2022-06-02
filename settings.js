@@ -54,7 +54,7 @@ function refreshKalturaUploadStatus() {
         if (response.length === 0) {
             const placeholderRow = document.createElement('tr');
             const placeholderCell = document.createElement('td');
-            placeholderCell.innerText = "No videos uploaded.";
+            placeholderCell.innerText = "No videos to upload.";
             placeholderRow.appendChild(placeholderCell);
             tbody.appendChild(placeholderRow);
         } else {

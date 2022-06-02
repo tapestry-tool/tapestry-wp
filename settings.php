@@ -51,14 +51,18 @@ function tapestry_db_section_cb()
 
 function tapestry_kaltura_upload_dashboard_cb()
 {
-    echo '
+    ?>
     <p>Transfer all uploaded videos in your Tapestries from your local server to Kaltura.</p>
 
-    <p>
-        <button id="start_kaltura_upload" class="button-primary" onclick="startKalturaUpload()" disabled>
-            Start Upload
-        </button>
-    </p>
+    <form action="<?php htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
+        <p>
+        <?php
+            submit_button('Start Upload', 'primary', 'start_kaltura_upload', false, array(
+                'onclick' => 'startKalturaUpload()',
+                'disabled' => true
+            )); ?>
+        </p>
+    </form>
 
     <table id="upload_progress_table" class="widefat">
         <thead>
@@ -76,7 +80,7 @@ function tapestry_kaltura_upload_dashboard_cb()
             Refresh Now
         </button>
     </p>
-    ';
+    <?php
 }
 
 function run_db_commands()
@@ -109,6 +113,10 @@ function run_db_commands()
         }
         add_action('admin_notices', 'tapestry_h5p_conf_notice');
     }
+
+    if (isset($_POST['start_kaltura_upload'])) {
+        add_action('admin_notices', 'tapestry_kaltura_upload_conf_notice');
+    }
 }
 
 function tapestry_h5p_conf_notice()
@@ -116,6 +124,15 @@ function tapestry_h5p_conf_notice()
     ?>
       <div class="notice updated" >
       <p><?php _e('Clean h5p Nodes ran successfully'); ?></p>
+    </div>
+    <?php
+}
+
+function tapestry_kaltura_upload_conf_notice()
+{
+    ?>
+      <div class="notice updated" >
+      <p><?php _e('Kaltura upload started successfully. See which videos are being uploaded below.'); ?></p>
     </div>
     <?php
 }
