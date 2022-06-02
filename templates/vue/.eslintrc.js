@@ -41,5 +41,5 @@ module.exports = {
   },
   globals: {
     wp: true,
-  }
+  },
 }
