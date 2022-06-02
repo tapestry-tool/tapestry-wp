@@ -21,6 +21,11 @@
           </b-form-group>
         </b-col>
       </b-form-row>
+      <b-form-group>
+        <b-form-checkbox v-model="showInfo">
+          Show information below the iFrame
+        </b-form-checkbox>
+      </b-form-group>
       <b-form-group
         label="iFrame Code"
         description="Click to select, then copy and paste the code to your page for embedding this Tapestry."
@@ -48,6 +53,7 @@
 </template>
 
 <script>
+import { mapState } from "vuex"
 export default {
   name: "embed-modal",
   props: {
@@ -60,11 +66,21 @@ export default {
     return {
       width: 800,
       height: 600,
+      showInfo: true,
     }
   },
   computed: {
+    ...mapState(["settings"]),
     embed() {
-      return `<iframe width="${this.width}" height="${this.height}" style="border: none;" src="${location.origin}${location.pathname}?iframe" />`
+      return `<iframe width="${this.width}" height="${
+        this.height
+      }" style="border: none;" src="${this.settings.permalink}?iframe"></iframe>${
+        this.showInfo ? this.info : ""
+      }`
+    },
+    info() {
+      // ! using local path for Tapestry icon; change to hosted URL in production
+      return `<div style="margin-top:10px;display:flex;align-items:center;gap:10px;"><img height="40" width="40" src="http://localhost:8888/wp-content/plugins/tapestry-wp/templates/img/TapestryLogo.png" /><b>${this.settings.title}</b> <a href="${this.settings.permalink}" target="_blank">Open this Tapestry</a></div>`
     },
   },
   mounted() {

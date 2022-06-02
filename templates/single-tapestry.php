@@ -23,8 +23,8 @@ if ($iframe_mode):
 	<link rel="profile" href="https://gmpg.org/xfn/11" />
 	<?php wp_head(); ?>
     <style>
-        #wpadminbar {
-            display: none;
+        #wpadminbar, .sidebar-container {
+            display: none !important;
         }
     </style>
 </head>
