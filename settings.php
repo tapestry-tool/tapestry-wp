@@ -3,6 +3,7 @@
 add_action('init', 'run_db_commands');
 add_action('admin_init', 'tapestry_settings_init');
 add_action('admin_menu', 'add_tapestry_settings_page');
+add_action('admin_enqueue_scripts', 'load_tapestry_settings_page_scripts');
 
 function add_tapestry_settings_page()
 {
@@ -16,6 +17,23 @@ function tapestry_settings_init()
     add_settings_field('tapestry_clean_h5p_nodes', 'Clean h5p Nodes', 'tapestry_clean_h5p_nodes_cb', 'tapestry_settings_page', 'tapestry_db_settings');
 
     add_settings_section('tapestry_kaltura_upload_dashboard', 'Kaltura Video Upload', 'tapestry_kaltura_upload_dashboard_cb', 'tapestry_settings_page');
+}
+
+function load_tapestry_settings_page_scripts($hook) {
+    // TO DO: find a better way to test the current settings page
+    if (str_ends_with($hook, 'tapestry_settings_page')) {
+        $prefix = get_rest_url(null, 'tapestry-tool/v1');
+        $nonce = wp_create_nonce('wp_rest');
+
+        // Inject REST API url and WordPress nonce for use in JavaScript scripts
+        echo "
+        <script type='text/javascript'>
+            const apiUrl = '{$prefix}';
+            const wpNonce = '{$nonce}';
+        </script>";
+
+        wp_enqueue_script('kaltura_upload_script', plugin_dir_url(__FILE__).'settings.js');
+    }
 }
 
 function tapestry_settings_page_cb()
@@ -42,48 +60,32 @@ function tapestry_clean_h5p_nodes_cb()
 
 function tapestry_kaltura_upload_dashboard_cb()
 {
-    $is_upload_in_progress = get_option('tapestry_kaltura_upload_in_progress') === 'yes';
-    $upload_button_attributes = $is_upload_in_progress ? 'disabled' : '';
+    echo '
+    <p>Transfer all uploaded videos in your Tapestries from your local server to Kaltura.</p>
 
-    $prefix = get_rest_url(null, 'tapestry-tool/v1');
+    <p>
+        <button id="start_kaltura_upload" class="button-primary" onclick="startKalturaUpload()" disabled>
+            Start Upload
+        </button>
+    </p>
 
-    echo "
-    <button onclick='startKalturaUpload()' {$upload_button_attributes}>
-        Start Upload
-    </button>
-    <script type='text/javascript'>
-        function startKalturaUpload() {
-            const apiUrl = '{$prefix}';
-            const xhr = new XMLHttpRequest();
-            xhr.open('GET', apiUrl + '/kaltura/upload_videos');
-            xhr.setRequestHeader(`X-WP-Nonce`, `".wp_create_nonce('wp_rest')."`);
-            xhr.send();
-        }
-    </script>
-    ";
+    <table id="upload_progress_table" class="widefat">
+        <thead>
+        <tr>
+            <th>Tapestry ID</th>
+            <th>Node ID</th>
+            <th>Status</th>
+            <th>Additional information</th>
+        </tr>
+        </thead>
+    </table>
 
-    $upload_log = get_option('tapestry_kaltura_upload_log');
-
-    echo '<table>
-            <tr>
-                <th>Tapestry ID</th>
-                <th>Node ID</th>
-                <th>Status</th>
-                <th>Additional information</th>
-            </tr>
-        ';
-
-    foreach ($upload_log as $video) {
-        echo
-            '<tr>
-                <td>'.$video->tapestryID.'</td>
-                <td>'.$video->nodeID.'</td>
-                <td>'.$video->uploadStatus.'</td>
-                <td>'.$video->additionalInfo.'</td>
-            </tr>';
-    }
-
-    echo '</table>';
+    <p>
+        <button class="button-secondary" onclick="refreshKalturaUploadProgress()">
+            Refresh Progress
+        </button>
+    </p>
+    ';
 }
 
 function run_db_commands()
