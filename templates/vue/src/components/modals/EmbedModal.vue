@@ -22,6 +22,11 @@
         </b-col>
       </b-form-row>
       <b-form-group>
+        <b-form-checkbox v-model="hideSidebar">
+          Hide sidebar
+        </b-form-checkbox>
+      </b-form-group>
+      <b-form-group>
         <b-form-checkbox v-model="showInfo">
           Show information below the iFrame
         </b-form-checkbox>
@@ -67,6 +72,7 @@ export default {
       width: 800,
       height: 600,
       showInfo: true,
+      hideSidebar: false,
     }
   },
   computed: {
@@ -74,9 +80,9 @@ export default {
     embed() {
       return `<iframe width="${this.width}" height="${
         this.height
-      }" style="border: none;" src="${this.settings.permalink}?iframe"></iframe>${
-        this.showInfo ? this.info : ""
-      }`
+      }" style="border: none;" src="${this.settings.permalink}?iframe${
+        this.hideSidebar ? "&no-sidebar" : ""
+      }"></iframe>${this.showInfo ? this.info : ""}`
     },
     info() {
       // ! using local path for Tapestry icon; change to hosted URL in production

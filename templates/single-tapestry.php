@@ -11,7 +11,8 @@
 ?>
 
 <?php
-$iframe_mode = $_SERVER["QUERY_STRING"] === "iframe";
+$iframe_mode = array_key_exists('iframe', $_GET);
+$no_sidebar = array_key_exists('no-sidebar', $_GET);
 if ($iframe_mode):
 ?>
 
@@ -23,9 +24,14 @@ if ($iframe_mode):
 	<link rel="profile" href="https://gmpg.org/xfn/11" />
 	<?php wp_head(); ?>
     <style>
-        #wpadminbar, .sidebar-container {
+        #wpadminbar {
             display: none !important;
         }
+        <?php if ($no_sidebar): ?>
+        .sidebar-container {
+            display: none !important;
+        }
+        <?php endif; ?>
     </style>
 </head>
 <body <?php body_class(); ?>>

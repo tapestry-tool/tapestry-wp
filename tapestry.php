@@ -159,7 +159,7 @@ function tapestry_enqueue_vue_app()
             'display_name'=> $currentUser->data->display_name
         ];
 
-        $iframe_mode = $_SERVER["QUERY_STRING"] === "iframe";
+        $iframe_mode = array_key_exists('iframe', $_GET) ? 1 : 0;
 
         wp_localize_script(
             'tapestry_d3_vue', // vue script handle defined in wp_register_script.
