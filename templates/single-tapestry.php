@@ -8,8 +8,33 @@
  *
  * @return object null
  */
+?>
 
-get_header();
+<?php
+$iframe_mode = $_SERVER["QUERY_STRING"] === "iframe";
+if ($iframe_mode):
+?>
+
+<!doctype html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<link rel="profile" href="https://gmpg.org/xfn/11" />
+	<?php wp_head(); ?>
+    <style>
+        #wpadminbar {
+            display: none;
+        }
+    </style>
+</head>
+<body <?php body_class(); ?>>
+<div id="page" class="site">
+<div id="content" class="site-content">
+
+<?php
+else: get_header();
+endif;
 ?>
 
 <div id="primary" class="content-area col-md-12">
@@ -72,4 +97,17 @@ get_header();
     </main><!-- #main -->
 </div><!-- #primary -->
 
-<?php get_footer(); ?>
+<?php
+if ($iframe_mode):
+?>
+
+</div><!-- #content -->
+</div><!-- #page -->
+<?php wp_footer(); ?>
+</body>
+</html>
+
+<?php
+else: get_footer();
+endif;
+?>
