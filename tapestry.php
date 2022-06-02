@@ -166,6 +166,7 @@ function tapestry_enqueue_vue_app()
             'wpData', // javascript object that will made availabe to Vue.
             [ // wordpress data to be made available to the Vue app in 'wpData'
                 'iframe_mode' => $iframe_mode,
+                'image_uri' => plugin_dir_url(__FILE__).'templates/img',
                 'directory_uri' => plugin_dir_url(__FILE__).'templates/vue/dist', // child theme directory path.
                 'vue_uri' => $vueUrl, // path to vue
                 'rest_url' => untrailingslashit(esc_url_raw(rest_url())), // URL to the REST endpoint.

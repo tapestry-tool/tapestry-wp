@@ -31,10 +31,7 @@
           Show information below the iFrame
         </b-form-checkbox>
       </b-form-group>
-      <b-form-group
-        label="iFrame Code"
-        description="Click to select, then copy and paste the code to your page for embedding this Tapestry."
-      >
+      <b-form-group label="iFrame Code">
         <b-form-textarea
           ref="code"
           class="embed-code"
@@ -42,6 +39,11 @@
           :value="embed"
           @focus="handleFocus"
         ></b-form-textarea>
+      </b-form-group>
+      <b-form-group>
+        <b-button :variant="copied ? 'success' : 'primary'" @click="handleCopy">
+          {{ copied ? "Copied" : "Copy" }} to clipboard
+        </b-button>
       </b-form-group>
     </b-container>
     <template slot="modal-footer">
@@ -59,6 +61,7 @@
 
 <script>
 import { mapState } from "vuex"
+import { data } from "@/services/wp"
 export default {
   name: "embed-modal",
   props: {
@@ -72,7 +75,8 @@ export default {
       width: 800,
       height: 600,
       showInfo: true,
-      hideSidebar: false,
+      hideSidebar: true,
+      copied: false,
     }
   },
   computed: {
@@ -85,16 +89,42 @@ export default {
       }"></iframe>${this.showInfo ? this.info : ""}`
     },
     info() {
-      // ! using local path for Tapestry icon; change to hosted URL in production
-      return `<div style="margin-top:10px;display:flex;align-items:center;gap:10px;"><img height="40" width="40" src="http://localhost:8888/wp-content/plugins/tapestry-wp/templates/img/TapestryLogo.png" /><b>${this.settings.title}</b> <a href="${this.settings.permalink}" target="_blank">Open this Tapestry</a></div>`
+      return `<div style="margin-top:10px;display:flex;align-items:center;gap:10px;"><img width="40" height="40" src="${data.image_uri}/TapestryLogo.png" /><b>${this.settings.title}</b> <a href="${this.settings.permalink}" target="_blank">Open this Tapestry</a></div>`
     },
-  },
-  mounted() {
-    console.log(this.$router)
   },
   methods: {
     handleFocus() {
       this.$refs.code.select()
+    },
+    handleCopy() {
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(this.embed).then(
+          () => {
+            this.copySuccess()
+          },
+          () => {
+            this.legacyCopy()
+          }
+        )
+      } else {
+        this.legacyCopy()
+      }
+    },
+    legacyCopy() {
+      this.$refs.code.select()
+      if (document.execCommand("copy") === false) {
+        alert(
+          "Could not copy to clipboard. Please click the textarea to select, then manually copy and paste the code."
+        )
+      } else {
+        this.copySuccess()
+      }
+    },
+    copySuccess() {
+      this.copied = true
+      setTimeout(() => {
+        this.copied = false
+      }, 3000)
     },
   },
 }
