@@ -428,10 +428,12 @@ function perform_upload_to_kaltura()
         try {
             $kaltura_data = $kalturaApi->uploadKalturaVideo($file_obj, $current_date);
         } catch (Exception $e) {
-            error_log("Unable to upload video - ".$file_obj->file_path." to kaltura, ".$e);
+            $error_message = "Unable to upload video '".$file_obj->file_path."' to Kaltura due to\n".$e;
+
+            error_log($error_message);
 
             $video->uploadStatus = 'error';
-            $video->additionalInfo = $e->getMessage();
+            $video->additionalInfo = $error_message;
             update_option($upload_log_option_name, $videos_to_upload);
             continue;
         }

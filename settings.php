@@ -81,8 +81,8 @@ function tapestry_kaltura_upload_dashboard_cb()
     </table>
 
     <p>
-        <button class="button-secondary" onclick="refreshKalturaUploadProgress()">
-            Refresh Progress
+        <button type="button" class="button-secondary" onclick="refreshKalturaUploadProgress()">
+            Refresh Now
         </button>
     </p>
     ';
