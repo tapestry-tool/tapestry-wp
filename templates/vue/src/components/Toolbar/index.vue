@@ -12,6 +12,9 @@
               data-qa="user-settings-button"
             ></user-settings-button>
           </b-col>
+          <b-col class="p-0">
+            <embed-button></embed-button>
+          </b-col>
           <template v-if="canEdit || (!showMap && hasDepth)">
             <b-col v-if="canEdit" class="p-0">
               <help-button />
@@ -42,6 +45,7 @@ import UserSettingsButton from "./UserSettingsButton"
 import TapestryFilter from "./TapestryFilter"
 import ReviewNotifications from "./ReviewNotifications"
 import HelpButton from "./HelpButton"
+import EmbedButton from "./EmbedButton"
 import * as wp from "@/services/wp"
 
 export default {
@@ -52,6 +56,7 @@ export default {
     ReviewNotifications,
     UserSettingsButton,
     HelpButton,
+    EmbedButton,
   },
   data() {
     return {
@@ -90,6 +95,7 @@ export default {
 
 <style lang="scss">
 .toolbar {
+  margin-top: 20px;
   display: flex;
   justify-content: space-between;
   padding: 0 5vw;

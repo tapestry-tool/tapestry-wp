@@ -15,6 +15,7 @@ export const names = {
   LINKMODAL: "linkmodal",
   USERSETTINGS: "userSettings",
   HELP: "help",
+  EMBED: "embed",
 }
 
 const ROOT_PATH = `/nodes/:nodeId(\\d+)`
@@ -70,6 +71,10 @@ export default [
       {
         path: `help`,
         name: names.HELP,
+      },
+      {
+        path: `embed`,
+        name: names.EMBED,
       },
     ],
   },
