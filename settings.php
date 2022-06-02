@@ -51,13 +51,15 @@ function tapestry_db_section_cb()
 
 function tapestry_kaltura_upload_dashboard_cb()
 {
-    echo '<p>Transfer all uploaded videos in your Tapestries from your local server to Kaltura.</p>';
-
-    echo '<p>';
-    submit_button('Start Upload', 'primary', 'start_kaltura_upload', false, array('onclick' => 'startKalturaUpload()', 'disabled' => true));
-    echo '</p>';
-
     echo '
+    <p>Transfer all uploaded videos in your Tapestries from your local server to Kaltura.</p>
+
+    <p>
+        <button id="start_kaltura_upload" class="button-primary" onclick="startKalturaUpload()" disabled>
+            Start Upload
+        </button>
+    </p>
+
     <table id="upload_progress_table" class="widefat">
         <thead>
         <tr>
@@ -68,11 +70,13 @@ function tapestry_kaltura_upload_dashboard_cb()
         </tr>
         </thead>
     </table>
-    ';
 
-    echo '<p>';
-    submit_button('Refresh Now', 'secondary', 'refresh_kaltura_upload_progress', false, array('onclick' => 'refreshKalturaUploadProgress()'));
-    echo '</p>';
+    <p>
+        <button type="button" class="button-secondary" onclick="refreshKalturaUploadProgress()">
+            Refresh Now
+        </button>
+    </p>
+    ';
 }
 
 function run_db_commands()
