@@ -13,9 +13,12 @@ module.exports = {
     "plugin:prettier/recommended",
   ],
   rules: {
+    "vue/v-slot-style": "off",
+    "vue/multi-word-component-names": "off",
+    "vue/no-mutating-props": "off",
     "vue/attribute-hyphenation": "off",
     "vue/component-name-in-template-casing": ["error", "kebab-case"],
-    "vue/name-property-casing": ["error", "kebab-case"],
+    "vue/component-definition-name-casing": ["error", "kebab-case"],
     "vue/custom-event-name-casing": "off",
     "vue/no-v-html": "off",
     "no-console": process.env.NODE_ENV === "production" ? "error" : "off",
@@ -33,10 +36,11 @@ module.exports = {
       },
     ],
   },
+  parser: "vue-eslint-parser",
   parserOptions: {
-    parser: "babel-eslint",
+    parser: "@babel/eslint-parser",
   },
   globals: {
     wp: true,
-  }
+  },
 }
