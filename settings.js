@@ -17,27 +17,6 @@ function startKalturaUpload() {
 }
 
 function refreshKalturaUploadProgress() {
-    refreshKalturaUploadInProgress();
-    refreshKalturaUploadStatus();
-}
-
-function refreshKalturaUploadInProgress() {
-    const xhr = openGetRequest('/kaltura/upload_in_progress');
-
-    xhr.onload = () => {
-        if (xhr.status >= 200 && xhr.status < 300) {
-            response = JSON.parse(xhr.responseText);
-
-            if (response === false) {
-                document.getElementById('start_kaltura_upload').disabled = false;
-            }
-        }
-    };
-
-    xhr.send();
-}
-
-function refreshKalturaUploadStatus() {
     const xhr = openGetRequest('/kaltura/upload_status');
 
     xhr.onload = () => {
@@ -47,18 +26,22 @@ function refreshKalturaUploadStatus() {
 
         response = JSON.parse(xhr.responseText);
 
+        if (response.inProgress === false) {
+            document.getElementById('start_kaltura_upload').disabled = false;
+        }
+
         const table = document.getElementById('upload_progress_table');
         const old_tbody = table.lastChild;
         const tbody = document.createElement('tbody');
 
-        if (response.length === 0) {
+        if (response.videos.length === 0) {
             const placeholderRow = document.createElement('tr');
             const placeholderCell = document.createElement('td');
             placeholderCell.innerText = "No videos to upload.";
             placeholderRow.appendChild(placeholderCell);
             tbody.appendChild(placeholderRow);
         } else {
-            for (const video of response) {
+            for (const video of response.videos) {
                 const row = document.createElement('tr');
                         
                 for (const key in video) {
