@@ -3,11 +3,14 @@
 add_action('init', 'run_db_commands');
 add_action('admin_init', 'tapestry_settings_init');
 add_action('admin_menu', 'add_tapestry_settings_page');
-add_action('admin_enqueue_scripts', 'load_tapestry_settings_page_scripts');
 
 function add_tapestry_settings_page()
 {
-    add_options_page('tapestry_plugin_settings', 'Tapestry', 'administrator', 'tapestry_settings_page', 'tapestry_settings_page_cb');
+    $tapestry_settings_page_hook_suffix = add_options_page('tapestry_plugin_settings', 'Tapestry', 'administrator', 'tapestry_settings_page', 'tapestry_settings_page_cb');
+
+    add_action('admin_enqueue_scripts', function ($hook_suffix) use ($tapestry_settings_page_hook_suffix) {
+        load_tapestry_settings_page_scripts($hook_suffix, $tapestry_settings_page_hook_suffix);
+    });
 }
 
 function tapestry_settings_init()
@@ -17,10 +20,9 @@ function tapestry_settings_init()
     add_settings_section('tapestry_kaltura_upload_dashboard', 'Kaltura Video Upload', 'tapestry_kaltura_upload_dashboard_cb', 'tapestry_settings_page');
 }
 
-function load_tapestry_settings_page_scripts($hook)
+function load_tapestry_settings_page_scripts($hook_suffix, $tapestry_settings_page_hook_suffix)
 {
-    // TO DO: find a better way to test the current settings page
-    if (str_ends_with($hook, 'tapestry_settings_page')) {
+    if ($hook_suffix === $tapestry_settings_page_hook_suffix) {
         wp_enqueue_script('tapestry_settings_script_js', plugin_dir_url(__FILE__).'settings.js');
 
         // Inject REST API url and WordPress nonce for use in JavaScript scripts
