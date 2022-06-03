@@ -371,7 +371,7 @@ function uploadVideosToKaltura($request)
 
 function getKalturaUploadStatus($request)
 {
-    return get_option('tapestry_kaltura_upload_log');
+    return get_option('tapestry_kaltura_upload_log', []);
 }
 
 function getKalturaUploadInProgress($request)
