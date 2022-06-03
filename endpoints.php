@@ -325,7 +325,7 @@ $REST_API_ENDPOINTS = [
     'UPLOAD_VIDEOS_TO_KALTURA' => (object) [
         'ROUTE' => '/kaltura/upload_videos',
         'ARGUMENTS' => [
-            'methods' => $REST_API_GET_METHOD,
+            'methods' => $REST_API_POST_METHOD,
             'callback' => 'uploadVideosToKaltura',
             'permission_callback' => 'TapestryPermissions::kalturaUpload',
         ],

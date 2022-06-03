@@ -3,21 +3,21 @@ window.onload = () => {
     setInterval(refreshKalturaUploadProgress, 15 * 1000);
 };
 
-function openGetRequest(endpoint) {
+function openRequest(method, endpoint) {
     const xhr = new XMLHttpRequest();
-    xhr.open('GET', WP_VARIABLES.apiUrl + endpoint);
+    xhr.open(method, WP_VARIABLES.apiUrl + endpoint);
     xhr.setRequestHeader(`X-WP-Nonce`, WP_VARIABLES.wpNonce);
     
     return xhr;
 }
 
 function startKalturaUpload() {
-    const xhr = openGetRequest('/kaltura/upload_videos');
+    const xhr = openRequest('POST', '/kaltura/upload_videos');
     xhr.send();
 }
 
 function refreshKalturaUploadProgress() {
-    const xhr = openGetRequest('/kaltura/upload_status');
+    const xhr = openRequest('GET', '/kaltura/upload_status');
 
     xhr.onload = () => {
         if (xhr.status < 200 || xhr.status >= 300) {
