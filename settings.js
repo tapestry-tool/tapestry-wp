@@ -43,13 +43,13 @@ function refreshKalturaUploadProgress() {
         } else {
             for (const video of response.videos) {
                 const row = document.createElement('tr');
-                        
+
                 for (const key in video) {
                     const cell = document.createElement('td');
                     cell.innerText = video[key];
                     row.appendChild(cell);
                 }
-    
+
                 tbody.appendChild(row);
             }
         }
