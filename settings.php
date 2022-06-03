@@ -36,9 +36,12 @@ function load_tapestry_settings_page_scripts($hook_suffix, $tapestry_settings_pa
 function tapestry_settings_page_cb()
 {
     ?>
-    <h2>Tapestry Plugin Settings</h2>
+    <div class="wrap">
+        <h2>Tapestry Plugin Settings</h2>
+        <?php
+            do_settings_sections('tapestry_settings_page'); ?>
+    </div>
     <?php
-        do_settings_sections('tapestry_settings_page');
 }
 
 function tapestry_db_section_cb()
