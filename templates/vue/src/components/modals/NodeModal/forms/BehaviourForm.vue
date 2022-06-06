@@ -15,8 +15,10 @@
 <script>
 import { mapState } from "vuex"
 export default {
-  computed: mapState({
-    mediaType: state => state.currentEditingNode.mediaType,
+  computed: {
+    ...mapState({
+      mediaType: state => state.currentEditingNode.mediaType,
+    }),
     skippable: {
       get() {
         return this.$store.state.currentEditingNode.skippable
@@ -27,6 +29,8 @@ export default {
           value,
         })
       },
+    },
+  },
     },
   }),
 }
