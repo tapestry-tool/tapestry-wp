@@ -19,6 +19,10 @@ To get started with developing locally:
 - Setup your local dev environment. You have 2 options for your local development:
   1. *Using LAMP/MAMP/WAMP:* Follow the detailed instruction for [Mac, Windows](https://github.com/tapestry-tool/tapestry-wp/wiki/Local-Dev-with-MAMP-or-WAMP), or [Linux](https://github.com/tapestry-tool/tapestry-wp/wiki/Local-Dev-with-LAMP-setup).
   2. *Using Docker:* Follow the detailed [Docker Installation & Usage](https://github.com/tapestry-tool/tapestry-wp/wiki/Docker-Installation-&-Usage) wiki page.
+- Edit your Wordpress `wp-config.php` file and add the following line right above the comment "That's all, stop editing!":
+    ```
+    define('TAPESTRY_USE_DEV_MODE', true);
+    ```
 - Follow the steps below under "Getting external links to work"
 - In the `templates/vue` directory, run `npm start` to serve with hot reload at localhost:8080
 
