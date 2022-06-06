@@ -133,11 +133,6 @@ export default {
         })
       }
     })
-
-    // const kalturaScript = document.createElement("script")
-    // kalturaScript.src =
-    //   "https://admin.video.ubc.ca/p/163/sp/16300/embedIframeJs/uiconf_id/23449696/partner_id/163"
-    // document.body.appendChild(kalturaScript)
   },
   beforeDestroy() {
     window.removeEventListener("click", this.recordAnalytics)
