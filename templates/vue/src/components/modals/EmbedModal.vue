@@ -1,7 +1,6 @@
 <template>
   <b-modal
     id="embed-modal"
-    data-qa="embed-modal"
     :visible="show"
     size="lg"
     title="Create Embed"
@@ -22,12 +21,12 @@
         </b-col>
       </b-form-row>
       <b-form-group>
-        <b-form-checkbox v-model="hideSidebar">
+        <b-form-checkbox v-model="hideSidebar" data-qa="hide-sidebar-toggle">
           Hide sidebar
         </b-form-checkbox>
       </b-form-group>
       <b-form-group>
-        <b-form-checkbox v-model="showInfo">
+        <b-form-checkbox v-model="showInfo" data-qa="show-info-toggle">
           Show information below the iFrame
         </b-form-checkbox>
       </b-form-group>
@@ -35,6 +34,7 @@
         <b-form-textarea
           ref="code"
           class="embed-code"
+          data-qa="embed-code"
           readonly
           :value="embed"
           @focus="handleFocus"

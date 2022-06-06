@@ -13,7 +13,7 @@
             ></user-settings-button>
           </b-col>
           <b-col class="p-0">
-            <embed-button></embed-button>
+            <embed-button data-qa="embed-modal-button"></embed-button>
           </b-col>
           <template v-if="canEdit || (!showMap && hasDepth)">
             <b-col v-if="canEdit" class="p-0">
