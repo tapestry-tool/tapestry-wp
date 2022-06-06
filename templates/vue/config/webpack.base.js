@@ -1,8 +1,8 @@
 const path = require("path")
-const VueLoaderPlugin = require("vue-loader/lib/plugin")
+const { VueLoaderPlugin } = require('vue-loader');
 
 module.exports = {
-  entry: ["@babel/polyfill", path.resolve(__dirname, "../src/main.js")],
+  entry: path.resolve(__dirname, "../src/main.js"),
   output: {
     path: path.resolve(__dirname, "../dist"),
     publicPath: "/dist/",
@@ -32,7 +32,7 @@ module.exports = {
         test: /\.(png|jpg|gif|svg)$/,
         loader: "file-loader",
         options: {
-          name: "[name].[ext]?[hash]",
+          name: "[name].[ext]?[contentHash]",
         },
       },
     ],

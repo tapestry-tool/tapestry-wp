@@ -46,7 +46,7 @@ describe("Review Nodes", () => {
           cy.contains(/accepted/i).should("be.visible")
 
           // hide the review form once accepted
-          cy.findByRole("textbox", { name: /comment/i }).should("not.be.visible")
+          cy.findByRole("textbox", { "aria-label": /comment/i }).should("not.exist")
         })
     })
 
@@ -101,7 +101,7 @@ describe("Review Nodes", () => {
           cy.contains(/reject/i).should("be.hidden")
           cy.contains(/rejected/i).should("be.visible")
           cy.contains(comment).should("be.visible")
-          cy.findByRole("textbox", { name: /comment/i }).should("not.be.visible")
+          cy.findByRole("textbox", { "aria-label": /comment/i }).should("not.exist")
         })
       cy.getNodeById(node.id).should("not.be.visible")
     })
