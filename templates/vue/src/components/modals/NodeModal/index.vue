@@ -1099,6 +1099,15 @@ export default {
           errMsgs.push("Please select a question")
         }
       }
+
+      if (
+        this.node.mediaDuration &&
+        this.node.mediaType !== "video" &&
+        this.node.mediaType != "h5p"
+      ) {
+        this.node.mediaDuration = undefined
+      }
+
       return errMsgs
     },
     isValidVideo(typeData) {
