@@ -31,7 +31,5 @@ export default {
       },
     },
   },
-    },
-  }),
 }
 </script>
