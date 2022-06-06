@@ -452,7 +452,7 @@ export default {
       let parents = []
       let parentId
       let parent = this.parent
-      while (parent != null) {
+      while (parent != null && parent.mediaType == "multi-content") {
         parents.unshift(parent)
         parentId = this.getParent(parent.id)
         parent = parentId ? this.getNode(parentId) : null
