@@ -1,5 +1,5 @@
 <template>
-  <b-container>
+  <div>
     <b-row>
       <b-col>
         <b-overlay :show="useKaltura">
@@ -17,8 +17,8 @@
         </b-overlay>
       </b-col>
     </b-row>
-    <b-row>
-      <b-col cols="1" align-v="center" style="text-align:right;">
+    <b-row align-v="center">
+      <b-col cols="1" style="text-align:right;">
         <i id="kaltura-info" class="far fa-question-circle"></i>
         <b-tooltip v-model="useKaltura" target="kaltura-info" triggers="hover">
           Video ID can be found in the Kaltura managment console under
@@ -46,7 +46,7 @@
         />
       </b-col>
     </b-row>
-  </b-container>
+  </div>
 </template>
 
 <script>
