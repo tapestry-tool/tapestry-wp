@@ -1186,7 +1186,7 @@ export default {
       if (this.node.mediaType !== "video" && this.node.mediaType !== "h5p") {
         return false
       }
-      if (this.type === "add") {
+      if (this.type === "add" || !this.node.mediaDuration) {
         return true
       }
       const oldNode = this.getNode(this.nodeId)
