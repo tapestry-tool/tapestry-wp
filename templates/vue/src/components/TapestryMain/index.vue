@@ -5,6 +5,9 @@
       <div v-else class="empty-message">The requested Tapestry is empty.</div>
     </div>
     <svg v-else id="vue-svg" :viewBox="viewBox">
+      <filter v-for="i in 3" :key="i" :id="'shadow-'+i">
+        <feDropShadow :dx="(2**i)*3" :dy="(2**i)*3" stdDeviation="4" flood-opacity="0.2" />
+      </filter>
       <g class="links">
         <tapestry-link
           v-for="link in links"

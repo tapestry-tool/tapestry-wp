@@ -26,6 +26,9 @@
         :data-qa="`node-circle-${node.id}`"
         :fill="fill"
         :stroke="progressBackgroundColor"
+        :style="{
+          filter: `url(#shadow-${node.level})`,
+        }"
       ></circle>
       <transition name="fade">
         <circle

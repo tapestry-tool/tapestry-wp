@@ -9,7 +9,10 @@ export function init(state, dataset) {
       state.nodes = {}
       Object.values(value).forEach(node => {
         // Has to call this so `state.nodes` is reactive
-        Vue.set(state.nodes, node.id, node)
+        Vue.set(state.nodes, node.id, {
+          ...node,
+          level: Math.ceil(Math.random() * 3),
+        })
       })
     } else {
       state[key] = value
