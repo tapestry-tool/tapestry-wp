@@ -1107,7 +1107,6 @@ export default {
           errMsgs.push("Please select a question")
         }
       }
-
       return errMsgs
     },
     isValidVideo(typeData) {
