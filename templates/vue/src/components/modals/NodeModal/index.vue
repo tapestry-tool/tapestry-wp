@@ -1103,7 +1103,7 @@ export default {
       if (
         this.node.mediaDuration &&
         this.node.mediaType !== "video" &&
-        this.node.mediaType != "h5p"
+        this.node.mediaType !== "h5p"
       ) {
         this.node.mediaDuration = undefined
       }
