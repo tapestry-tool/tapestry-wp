@@ -127,6 +127,10 @@
             return $response;
         }
 
+        /**
+         * Finds the Kaltura video with the given ID if it exists.
+         * Returns null if not found.
+         */
         public function getVideo($entryId)
         {
             $client = $this->getKClient();

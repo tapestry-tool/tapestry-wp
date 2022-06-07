@@ -983,7 +983,7 @@ export default {
             this.node.typeData.kalturaId
           )
           if (!validKalturaVideo) {
-            errMsgs.push("Please enter a valid kaltura video ID")
+            errMsgs.push("Please enter a valid Kaltura video ID")
           }
         } else {
           if (!this.isValidVideo(this.node.typeData)) {

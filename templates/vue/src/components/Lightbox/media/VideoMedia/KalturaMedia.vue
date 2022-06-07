@@ -112,6 +112,7 @@ export default {
               )
             }
           })
+
           kalturaVideo.kBind("playbackComplete", () => {
             const videoDuration = kalturaVideo.evaluate("{duration}")
             this.updateVideoProgress(videoDuration, videoDuration)
