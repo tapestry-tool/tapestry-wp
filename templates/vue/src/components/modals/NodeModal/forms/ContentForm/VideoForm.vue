@@ -33,14 +33,17 @@ export default {
     },
   },
   watch: {
-    youtubeId(id) {
-      if (id !== null) {
-        this.node.mediaFormat = "youtube"
-        this.node.typeData.youtubeID = id
-      } else {
-        this.node.mediaFormat = "mp4"
-        this.node.typeData.youtubeID = undefined
-      }
+    youtubeId: {
+      handler(id) {
+        if (id !== null) {
+          this.node.mediaFormat = "youtube"
+          this.node.typeData.youtubeID = id
+        } else {
+          this.node.mediaFormat = "mp4"
+          this.node.typeData.youtubeID = undefined
+        }
+      },
+      immediate: true,
     },
   },
   methods: {
