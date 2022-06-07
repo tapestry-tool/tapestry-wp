@@ -798,6 +798,14 @@ export default {
           await this.setLinkData()
         }
 
+        if (
+          this.node.mediaDuration &&
+          this.node.mediaType !== "video" &&
+          this.node.mediaType !== "h5p"
+        ) {
+          this.node.mediaDuration = undefined
+        }
+
         if (this.shouldReloadDuration()) {
           this.loadDuration = true
         } else {
@@ -1098,14 +1106,6 @@ export default {
         if (!hasQuestionId) {
           errMsgs.push("Please select a question")
         }
-      }
-
-      if (
-        this.node.mediaDuration &&
-        this.node.mediaType !== "video" &&
-        this.node.mediaType !== "h5p"
-      ) {
-        this.node.mediaDuration = undefined
       }
 
       return errMsgs
