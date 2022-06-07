@@ -79,7 +79,13 @@
           >
             <div class="meta" :style="{ color: node.textColor }">
               <p class="title">{{ node.title }}</p>
-              <p v-if="(node.mediaType === 'video' || node.mediaType === 'h5p') && node.mediaDuration" class="timecode">
+              <p
+                v-if="
+                  (node.mediaType === 'video' || node.mediaType === 'h5p') &&
+                    node.mediaDuration
+                "
+                class="timecode"
+              >
                 {{ formatDuration() }}
               </p>
             </div>
