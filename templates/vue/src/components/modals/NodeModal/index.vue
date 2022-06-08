@@ -85,7 +85,10 @@
           >
             <h6 class="mb-3">Node Permissions</h6>
             <b-card no-body>
-              <permissions-table v-model="node.permissions" />
+              <permissions-table
+                :value="node.permissions"
+                @input="update('permissions', $event)"
+              />
             </b-card>
             <h6 class="mt-4 mb-3">Lock Node</h6>
             <conditions-form />
@@ -569,7 +572,12 @@ export default {
     this.initialize()
   },
   methods: {
-    ...mapMutations(["updateRootNode", "setReturnRoute", "setCurrentEditingNode"]),
+    ...mapMutations([
+      "updateRootNode",
+      "setReturnRoute",
+      "setCurrentEditingNode",
+      "setCurrentEditingNodeProperty",
+    ]),
     ...mapActions([
       "addNode",
       "addLink",
@@ -577,6 +585,9 @@ export default {
       "updateLockedStatus",
       "setTapestryErrorReporting",
     ]),
+    update(property, value) {
+      this.setCurrentEditingNodeProperty({ property, value })
+    },
     setLoading(status) {
       this.loading = status
     },
@@ -806,33 +817,34 @@ export default {
       }
     },
     handlePublish() {
-      this.node.status = nodeStatus.PUBLISH
+      this.update("status", nodeStatus.PUBLISH)
       this.handleSubmit()
     },
     handleDraftSubmit() {
-      this.node.status = nodeStatus.DRAFT
+      this.update("status", nodeStatus.DRAFT)
       this.handleSubmit()
     },
     handleSubmitForReview() {
       if (!this.settings.draftNodesEnabled || !this.settings.submitNodesEnabled) {
         return
       }
-      this.node.reviewStatus = nodeStatus.SUBMIT
-      this.node.status = nodeStatus.DRAFT
+      this.update("reviewStatus", nodeStatus.SUBMIT)
+      this.update("status", nodeStatus.DRAFT)
 
-      this.node.reviewComments.push(
+      this.update("reviewComments", [
+        ...this.node.reviewComments,
         Comment.createComment(Comment.types.STATUS_CHANGE, {
           from: null,
           to: nodeStatus.SUBMIT,
-        })
-      )
+        }),
+      ])
 
       this.handleSubmit()
     },
     async submitNode() {
       if (this.type === "add") {
         const id = await this.addNode(this.node)
-        this.node.id = id
+        this.update("id", id)
         if (this.parent) {
           // Add link from parent node to this node
           const newLink = {
@@ -894,50 +906,68 @@ export default {
     calculateX(yIsCalculated) {
       if (!yIsCalculated) {
         if (this.coinToss()) {
-          this.node.coordinates.x = this.getRandomNumber(
-            this.parent.coordinates.x +
-              sizes.NODE_RADIUS_SELECTED +
-              sizes.NODE_RADIUS,
-            this.parent.coordinates.x + sizes.NODE_RADIUS_SELECTED * 2
+          this.update(
+            "coordinates.x",
+            this.getRandomNumber(
+              this.parent.coordinates.x +
+                sizes.NODE_RADIUS_SELECTED +
+                sizes.NODE_RADIUS,
+              this.parent.coordinates.x + sizes.NODE_RADIUS_SELECTED * 2
+            )
           )
         } else {
-          this.node.coordinates.x = this.getRandomNumber(
-            this.parent.coordinates.x -
-              sizes.NODE_RADIUS_SELECTED -
-              sizes.NODE_RADIUS,
-            this.parent.coordinates.x - sizes.NODE_RADIUS_SELECTED * 2
+          this.update(
+            "coordinates.x",
+            this.getRandomNumber(
+              this.parent.coordinates.x -
+                sizes.NODE_RADIUS_SELECTED -
+                sizes.NODE_RADIUS,
+              this.parent.coordinates.x - sizes.NODE_RADIUS_SELECTED * 2
+            )
           )
         }
         this.calculateY(true)
       } else {
-        this.node.coordinates.x = this.getRandomNumber(
-          this.parent.coordinates.x - sizes.NODE_RADIUS_SELECTED * 2,
-          this.parent.coordinates.x + sizes.NODE_RADIUS_SELECTED * 2
+        this.update(
+          "coordinates.x",
+          this.getRandomNumber(
+            this.parent.coordinates.x - sizes.NODE_RADIUS_SELECTED * 2,
+            this.parent.coordinates.x + sizes.NODE_RADIUS_SELECTED * 2
+          )
         )
       }
     },
     calculateY(xIsCalculated) {
       if (!xIsCalculated) {
         if (this.coinToss()) {
-          this.node.coordinates.y = this.getRandomNumber(
-            this.parent.coordinates.y +
-              sizes.NODE_RADIUS_SELECTED +
-              sizes.NODE_RADIUS,
-            this.parent.coordinates.y + sizes.NODE_RADIUS_SELECTED * 2
+          this.update(
+            "coordinates.y",
+            this.getRandomNumber(
+              this.parent.coordinates.y +
+                sizes.NODE_RADIUS_SELECTED +
+                sizes.NODE_RADIUS,
+              this.parent.coordinates.y + sizes.NODE_RADIUS_SELECTED * 2
+            )
           )
         } else {
-          this.node.coordinates.y = this.getRandomNumber(
-            this.parent.coordinates.y -
-              sizes.NODE_RADIUS_SELECTED -
-              sizes.NODE_RADIUS,
-            this.parent.coordinates.y - sizes.NODE_RADIUS_SELECTED * 2
+          this.update(
+            "coordinates.y",
+            this.getRandomNumber(
+              this.parent.coordinates.y -
+                sizes.NODE_RADIUS_SELECTED -
+                sizes.NODE_RADIUS,
+              this.parent.coordinates.y - sizes.NODE_RADIUS_SELECTED * 2
+            )
           )
         }
         this.calculateX(true)
       } else {
-        this.node.coordinates.y = this.getRandomNumber(
-          this.parent.coordinates.y - sizes.NODE_RADIUS_SELECTED * 2,
-          this.parent.coordinates.y + sizes.NODE_RADIUS_SELECTED * 2
+        this.update(
+          "coordinates.y",
+          this.getRandomNumber(
+            this.parent.coordinates.y - sizes.NODE_RADIUS_SELECTED * 2,
+            this.parent.coordinates.y + sizes.NODE_RADIUS_SELECTED * 2
+          )
         )
       }
     },
@@ -1108,10 +1138,12 @@ export default {
       )
     },
     updateOrderingArray(arr) {
-      this.node.childOrdering = arr
+      this.update("childOrdering", arr)
     },
     handleTypeChange(evt) {
-      if (evt === "multi-content") this.node.presentationStyle = "accordion"
+      if (evt === "multi-content") {
+        this.update("presentationStyle", "accordion")
+      }
     },
     async setLinkData() {
       if (shouldFetch(this.node.typeData.mediaURL, this.node)) {
@@ -1119,31 +1151,31 @@ export default {
         const { data } = await getLinkMetadata(url)
 
         if (data) {
-          this.node.typeData.linkMetadata = data
+          this.update("typeData.linkMetadata", data)
           if (
             confirm(
               "Would you like to use the link preview image as the thumbnail image?"
             )
           ) {
-            this.node.imageURL = data.image
+            this.update("imageURL", data.image)
           }
           if (
             confirm(
               "Would you like to use the link preview image as the locked thumbnail image?"
             )
           ) {
-            this.node.lockedImageURL = data.image
+            this.update("lockedImageURL", data.image)
           }
         }
       }
     },
     setVideoDuration() {
-      this.node.mediaDuration = parseInt(this.$refs.video.duration)
+      this.update("mediaDuration", parseInt(this.$refs.video.duration))
       this.loadDuration = false
       return this.submitNode()
     },
     setYouTubeDuration(evt) {
-      this.node.mediaDuration = evt.target.getDuration()
+      this.update("mediaDuration", evt.target.getDuration())
       this.loadDuration = false
       return this.submitNode()
     },
@@ -1156,7 +1188,7 @@ export default {
         if (libraryName === "H5P.InteractiveVideo") {
           const h5pVideo = instance.video
           const handleH5PLoad = () => {
-            this.node.mediaDuration = parseInt(h5pVideo.getDuration())
+            this.update("mediaDuration", parseInt(h5pVideo.getDuration()))
             this.loadDuration = false
             return this.submitNode()
           }
@@ -1167,7 +1199,7 @@ export default {
           }
           return
         } else {
-          this.node.mediaDuration = 0
+          this.update("mediaDuration", 0)
         }
       }
       this.loadDuration = false
