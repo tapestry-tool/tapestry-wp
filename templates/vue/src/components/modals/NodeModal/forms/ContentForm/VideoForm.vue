@@ -17,7 +17,7 @@
         </b-overlay>
       </b-col>
     </b-row>
-    <b-row align-v="center">
+    <b-row class="mb-3">
       <b-col cols="1" style="text-align:right;">
         <i id="kaltura-info" class="far fa-question-circle"></i>
         <b-tooltip v-model="useKaltura" target="kaltura-info" triggers="hover">
@@ -36,12 +36,12 @@
           Use Kaltura Player
         </b-form-checkbox>
       </b-col>
-      <b-col cols="8">
+      <b-col cols="6" md="8">
         <b-form-input
           v-show="useKaltura"
           v-model="node.typeData.kalturaId"
           name="text-input"
-          placeholder="Enter kaltura video id"
+          placeholder="Enter Kaltura video ID"
           required
         />
       </b-col>
