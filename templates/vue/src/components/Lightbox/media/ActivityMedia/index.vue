@@ -94,7 +94,7 @@ import Question from "./Question"
 import CompletionScreen from "./CompletionScreen"
 import CompletedIcon from "@/components/common/CompletedIcon"
 import { mapActions, mapGetters } from "vuex"
-import AnswerMedia from "../AnswerMedia.vue"
+import AnswerMedia from "./AnswerMedia.vue"
 import Helpers from "@/utils/Helpers"
 
 const states = {
