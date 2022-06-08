@@ -230,6 +230,10 @@ export default {
       this.setCurrentEditingNodeProperty({ property, value })
     },
     handleTypeChange(evt) {
+      if (this.node.mediaType === "video") {
+        this.update("typeData.mediaURL", "")
+        this.update("typeData.youtubeID", undefined)
+      }
       this.update("mediaType", evt)
       this.update(
         "mediaFormat",
