@@ -47,7 +47,6 @@
             @click="changeTab('content')"
           >
             <content-form
-              :node="node"
               :parent="parent"
               :actionType="type"
               :maxDescriptionLength="maxDescriptionLength"
@@ -61,17 +60,14 @@
             :active="tab === 'references'"
             @click="changeTab('references')"
           >
-            <references-form :node="node" />
+            <references-form />
           </b-tab>
           <b-tab
             title="Appearance"
             :active="tab === 'appearance'"
             @click="changeTab('appearance')"
           >
-            <appearance-form
-              :node="node"
-              :is-page-child="isPageMultiConentNodeChild"
-            />
+            <appearance-form :is-page-child="isPageMultiConentNodeChild" />
           </b-tab>
           <b-tab
             v-if="node.mediaType === 'h5p' || node.mediaType === 'video'"
@@ -79,7 +75,7 @@
             title="Behaviour"
             @click="changeTab('behaviour')"
           >
-            <behaviour-form :node="node" />
+            <behaviour-form />
           </b-tab>
           <b-tab
             v-if="viewAccess"
@@ -92,7 +88,7 @@
               <permissions-table v-model="node.permissions" />
             </b-card>
             <h6 class="mt-4 mb-3">Lock Node</h6>
-            <conditions-form :node="node" />
+            <conditions-form />
           </b-tab>
           <b-tab
             v-if="node.mediaType === 'h5p' || node.mediaType === 'video'"
@@ -100,7 +96,7 @@
             :active="tab === 'activity'"
             @click="changeTab('activity')"
           >
-            <activity-form :node="node" />
+            <activity-form />
           </b-tab>
           <b-tab
             v-if="node.hasMultiContentChild"
@@ -134,14 +130,14 @@
             :active="tab === 'coordinates'"
             @click="changeTab('coordinates')"
           >
-            <coordinates-form :node="node" />
+            <coordinates-form />
           </b-tab>
           <b-tab
             title="Copyright"
             :active="tab === 'copyright'"
             @click="changeTab('copyright')"
           >
-            <copyright-form :node="node" />
+            <copyright-form />
           </b-tab>
         </b-tabs>
       </b-overlay>
@@ -307,7 +303,6 @@ export default {
       userId: null,
       errors: [],
       maxDescriptionLength: 2000,
-      node: null,
       videoLoaded: false,
       fileUploading: false,
       loadDuration: false,
@@ -332,6 +327,9 @@ export default {
       "apiError",
       "returnRoute",
     ]),
+    ...mapState({
+      node: "currentEditingNode",
+    }),
     parent() {
       const parent = this.getNode(
         this.type === "add" ? this.nodeId : this.getParent(this.nodeId)
@@ -520,8 +518,10 @@ export default {
         }
       },
     },
-    type() {
-      this.initialize()
+    type(type) {
+      if (type) {
+        this.initialize()
+      }
     },
     tab: {
       immediate: true,
@@ -569,7 +569,7 @@ export default {
     this.initialize()
   },
   methods: {
-    ...mapMutations(["updateRootNode", "setReturnRoute"]),
+    ...mapMutations(["updateRootNode", "setReturnRoute", "setCurrentEditingNode"]),
     ...mapActions([
       "addNode",
       "addLink",
@@ -632,7 +632,7 @@ export default {
           lng: "",
         }
       }
-      this.node = copy
+      this.setCurrentEditingNode(copy)
       this.setTapestryErrorReporting(false)
     },
     validateTab(requestedTab) {
@@ -688,7 +688,7 @@ export default {
       }
     },
     handleDeleteComplete() {
-      this.node = this.parent
+      this.setCurrentEditingNode(this.parent)
       this.loading = false
       this.keepOpen = true
       this.close("delete")

@@ -34,6 +34,8 @@
                 :items="getBucketsItems(bucket.id)"
                 :bucketRemovalAllowed="bucketRemovalEnabled.from"
                 :useImages="dragDrop.useImages"
+                @update-name="handleUpdateName(bucket.id, $event)"
+                @update-item="handleUpdateItem"
                 @remove-item="handleRemoveItem"
                 @remove-bucket="handleRemoveBucket"
                 @add="addItem(bucket.id)"
@@ -58,6 +60,7 @@
               <bucket
                 :bucket="bucket"
                 :bucketRemovalAllowed="bucketRemovalEnabled.to"
+                @update-name="handleUpdateName(bucket.id, $event)"
                 @remove-bucket="handleRemoveBucket"
               />
             </b-row>
@@ -82,17 +85,14 @@
 import Bucket from "./Bucket"
 import Helpers from "@/utils/Helpers"
 import client from "@/services/TapestryAPI"
+import { mapState } from "vuex"
 
 export default {
   components: {
     Bucket,
   },
   props: {
-    node: {
-      type: Object,
-      required: true,
-    },
-    dragDrop: {
+    value: {
       type: Object,
       required: true,
     },
@@ -103,13 +103,27 @@ export default {
   },
   data() {
     return {
+      dragDrop: this.value,
       bucketRemovalEnabled: { to: false, from: false },
       hasAnswers: false,
       override: false,
     }
   },
+  computed: {
+    ...mapState({
+      nodeId: state => state.currentEditingNode.id,
+    }),
+  },
+  watch: {
+    dragDrop: {
+      handler(val) {
+        this.$emit("input", val)
+      },
+      deep: true,
+    },
+  },
   created() {
-    client.questionHasAnswer(this.node.id, this.questionId, "dragDrop").then(res => {
+    client.questionHasAnswer(this.nodeId, this.questionId, "dragDrop").then(res => {
       this.hasAnswers = res.data
     })
 
@@ -191,6 +205,12 @@ export default {
 
       this.dragDrop.buckets.splice(bucketIndex, 1)
       this.$forceUpdate()
+    },
+    handleUpdateName(bucketId, name) {
+      this.dragDrop.buckets.find(bucket => bucket.id === bucketId).text = name
+    },
+    handleUpdateItem({ id, property, value }) {
+      this.dragDrop.items.find(item => item.id === id)[property] = value
     },
   },
 }
