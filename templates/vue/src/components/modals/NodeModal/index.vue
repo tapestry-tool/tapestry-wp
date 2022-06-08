@@ -814,7 +814,7 @@ export default {
           this.node.mediaType !== "video" &&
           this.node.mediaType !== "h5p"
         ) {
-          this.node.mediaDuration = undefined
+          this.update("mediaDuration", undefined)
         }
 
         if (this.shouldReloadDuration()) {
