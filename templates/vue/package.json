@@ -61,7 +61,7 @@
     "@babel/plugin-syntax-dynamic-import": "^7.0.0",
     "@babel/plugin-syntax-import-meta": "^7.0.0",
     "@babel/preset-env": "^7.0.0",
-    "@cypress/code-coverage": "^3.9.10",
+    "@cypress/code-coverage": "~3.9.10",
     "@testing-library/cypress": "^7.0.1",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/user-event": "^12.5.0",
