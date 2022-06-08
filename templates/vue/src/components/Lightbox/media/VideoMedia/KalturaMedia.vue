@@ -55,13 +55,15 @@ export default {
         if (this.onLoad) {
           const videoDuration = kalturaVideo.evaluate("{duration}")
           const currentTime = this.node.progress * videoDuration
-          if (this.node.completed) {
-            this.$emit("timeupdate", { amountViewed: currentTime, currentTime })
-          } else {
-            kalturaVideo.sendNotification("doSeek", currentTime)
-            this.lastTime = currentTime
-            this.onLoad = false
-          }
+
+          this.$emit("timeupdate", {
+            amountViewed: this.node.progress,
+            currentTime,
+          })
+
+          kalturaVideo.sendNotification("doSeek", currentTime)
+          this.lastTime = currentTime
+          this.onLoad = false
         }
         kalturaVideo.sendNotification("doPlay")
       }
