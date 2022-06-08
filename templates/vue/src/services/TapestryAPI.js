@@ -326,6 +326,12 @@ class TapestryApi {
     const response = await this.client.get(url)
     return response.data
   }
+
+  async getKalturaVideoUrl(entryId) {
+    const url = `/kaltura/video/mediaURL?entry_id=${entryId}`
+    const response = await this.client.get(url)
+    return response.data
+  }
 }
 
 export default new TapestryApi(postId)

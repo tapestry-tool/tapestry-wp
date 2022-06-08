@@ -801,6 +801,10 @@ export default {
           await this.setLinkData()
         }
 
+        if (this.node.mediaFormat === "kaltura") {
+          await this.updateKalturaVideoMediaURL()
+        }
+
         if (this.shouldReloadDuration()) {
           this.loadDuration = true
         } else {
@@ -1230,6 +1234,21 @@ export default {
         "The video could not be found! Please re-upload or check the URL"
       )
       this.loadDuration = false
+    },
+    async updateKalturaVideoMediaURL() {
+      // For Kaltura videos, the Kaltura ID determines the mediaURL, so let's ensure they are in sync
+
+      const oldNode = this.getNode(this.nodeId)
+      const { kalturaId: oldKalturaId, mediaURL: oldMediaURL } = oldNode.typeData
+
+      if (this.node.typeData.kalturaId !== oldKalturaId) {
+        const { mediaURL } = await client.getKalturaVideoUrl(
+          this.node.typeData.kalturaId
+        )
+        this.node.typeData.mediaURL = mediaURL
+      } else if (this.node.typeData.mediaURL !== oldMediaURL) {
+        this.node.typeData.mediaURL = oldMediaURL
+      }
     },
   },
 }

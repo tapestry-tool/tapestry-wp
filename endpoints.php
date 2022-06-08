@@ -341,7 +341,14 @@ $REST_API_ENDPOINTS = [
         'ROUTE' => '/kaltura/video/meta',
         'ARGUMENTS' => [
             'methods' => $REST_API_GET_METHOD,
-            'callback' => 'getKalturaVideMeta',
+            'callback' => 'getKalturaVideoMeta',
+        ],
+    ],
+    'GET_KALTURA_VIDEO_URL' => (object) [
+        'ROUTE' => '/kaltura/video/mediaURL',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => 'getKalturaVideoUrl',
         ],
     ],
 ];
@@ -1550,11 +1557,17 @@ function getQuestionHasAnswers($request)
     }
 }
 
+/**
+ * Returns whether Kaltura is available.
+ */
 function kalturaStatus($request)
 {
     return LOAD_KALTURA;
 }
 
+/**
+ * Checks whether a Kaltura video with given entry id exists.
+ */
 function checkKalturaVideo($request)
 {
     if (LOAD_KALTURA) {
@@ -1570,7 +1583,10 @@ function checkKalturaVideo($request)
     }
 }
 
-function getKalturaVideMeta($request)
+/**
+ * If Kaltura video with given entry id exists, returns the video metadata.
+ */
+function getKalturaVideoMeta($request)
 {
     if (LOAD_KALTURA) {
         $entryId = $request['entry_id'];
@@ -1580,6 +1596,20 @@ function getKalturaVideMeta($request)
 
         if ($result != null) {
             return array("image" => $result->thumbnailUrl, "duration" => $result->duration);
+        }
+        return false;
+    }
+}
+
+function getKalturaVideoUrl($request) {
+    if (LOAD_KALTURA) {
+        $entryId = $request['entry_id'];
+
+        $kaltura_api = new KalturaApi();
+        $result = $kaltura_api->getVideo($entryId);
+
+        if ($result != null) {
+            return array("mediaURL" => $result->dataUrl);
         }
         return false;
     }

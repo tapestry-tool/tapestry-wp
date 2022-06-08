@@ -90,9 +90,10 @@ export default {
       this.$root.$emit("node-modal::uploading", state)
     },
     handleKalturaCheck() {
+      // If Kaltura is checked or unchecked, the mediaURL should be cleared as it depends on the Kaltura ID
+      this.node.typeData.mediaURL = ""
       if (this.useKaltura) {
         this.node.mediaFormat = "kaltura"
-        this.node.typeData.mediaURL = ""
       } else {
         this.node.typeData.kalturaId = ""
         this.updateFormatType(this.youtubeId)
