@@ -222,6 +222,10 @@ export default {
   },
   methods: {
     handleTypeChange(evt) {
+      if (this.node.mediaType === "video") {
+        this.node.typeData.mediaURL = ""
+        this.node.typeData.youtubeID = undefined
+      }
       this.node.mediaType = evt
       this.node.mediaFormat = ""
       if (evt === "video" || evt === "h5p") {
