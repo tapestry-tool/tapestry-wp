@@ -305,7 +305,6 @@ export default {
         !this.node.completed &&
         this.popups.every(popUpNode => popUpNode.progress)
       ) {
-        this.node.completed = true
         this.$emit("complete", nodeId)
       }
     },
