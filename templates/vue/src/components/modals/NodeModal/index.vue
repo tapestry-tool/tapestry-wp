@@ -840,7 +840,7 @@ export default {
       }
       this.update("reviewStatus", nodeStatus.SUBMIT)
       this.update("status", nodeStatus.DRAFT)
-      this.handleSubmit()
+      this.handleSubmit(true)
     },
     async submitNode() {
       if (this.type === "add") {
