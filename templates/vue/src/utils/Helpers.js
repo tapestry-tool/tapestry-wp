@@ -214,7 +214,7 @@ export default class Helpers {
           return true
         }
       }
-      if (wp.isCurrentUser(node.author.id)) {
+      if (node.author && wp.isCurrentUser(node.author.id)) {
         return action === userActions.READ || node.reviewStatus !== nodeStatus.SUBMIT
       }
       if (wp.canEditTapestry()) {
@@ -363,7 +363,6 @@ export default class Helpers {
         y: 3000,
       },
       childOrdering: [],
-      license: "",
       references: "",
       unlocked: true,
       accessible: true,
