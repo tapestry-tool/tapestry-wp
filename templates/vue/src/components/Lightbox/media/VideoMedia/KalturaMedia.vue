@@ -133,6 +133,10 @@ export default {
             )
           })
 
+          kalturaVideo.kBind("seeked", seekedTime => {
+            this.$emit("seeked", { currentTime: seekedTime })
+          })
+
           kalturaVideo.kBind("closeFullScreen", () => {
             kalturaIframe.contentDocument.getElementsByClassName(
               "mwPlayerContainer"
@@ -158,6 +162,18 @@ export default {
       this.amountViewed = currentTime / duration
       this.$emit("timeupdate", { amountViewed: this.amountViewed, currentTime })
       this.lastTime = currentTime
+    },
+    playVideo() {
+      if (this.playerId) {
+        const kalturaVideo = document.getElementById(this.playerId)
+        kalturaVideo.sendNotification("doPlay")
+      }
+    },
+    pauseVideo() {
+      if (this.playerId) {
+        const kalturaVideo = document.getElementById(this.playerId)
+        kalturaVideo.sendNotification("doPause")
+      }
     },
     reset() {
       this.onLoad = false
