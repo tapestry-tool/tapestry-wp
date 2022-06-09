@@ -153,7 +153,11 @@ export default {
       }
     },
     heightCss() {
-      if (this.context !== "lightbox" && this.videoComponent !== "youtube-media") {
+      if (
+        this.context !== "lightbox" &&
+        this.videoComponent !== "youtube-media" &&
+        this.videoComponent !== "kaltura-video-media"
+      ) {
         return "auto"
       } else {
         return this.dimensions.height + "px"
