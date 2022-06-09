@@ -18,7 +18,7 @@
     </b-form-group>
     <b-form-group v-if="selectedH5p.library == 'H5P.ThreeImage'" label="Scene">
       <combobox
-        v-model="node.typeData.scene"
+        v-model="scene"
         item-text="scenename"
         item-value="sceneId"
         empty-message="There are no scenes in this H5P 360. Please double-check you have scenes set up in your H5P Virtual Tour (360) content."
@@ -39,16 +39,11 @@
 import Combobox from "@/components/modals/common/Combobox"
 import H5PApi from "@/services/H5PApi"
 import { data } from "@/services/wp"
+import { mapMutations, mapState } from "vuex"
 
 export default {
   components: {
     Combobox,
-  },
-  props: {
-    node: {
-      type: Object,
-      required: true,
-    },
   },
   data() {
     return {
@@ -57,6 +52,17 @@ export default {
     }
   },
   computed: {
+    ...mapState({
+      stateMediaURL: state => state.currentEditingNode.typeData.mediaURL,
+    }),
+    scene: {
+      get() {
+        return this.$store.state.currentEditingNode.typeData.scene
+      },
+      set(value) {
+        this.update("typeData.scene", value)
+      },
+    },
     mediaUrl() {
       return `${data.adminAjaxUrl}?action=h5p_embed&id=${this.selectedId}`
     },
@@ -76,23 +82,29 @@ export default {
   },
   watch: {
     mediaUrl(val) {
-      this.node.typeData.mediaURL = val
+      this.update("typeData.mediaURL", val)
     },
-    selectedH5p(selectedH5p) {
-      this.node.typeData.h5pMeta = selectedH5p
+    selectedH5p(val) {
+      this.update("typeData.h5pMeta", val)
     },
   },
   mounted() {
     H5PApi.getAllContent().then(options => {
       this.options = options
+      const id = this.stateMediaURL.split("&id=")[1]
       const defaultValue = options.find(content => {
-        const id = this.node.typeData.mediaURL.split("&id=")[1]
         return content.id == id
       })
       if (defaultValue) {
         this.selectedId = defaultValue.id
       }
     })
+  },
+  methods: {
+    ...mapMutations(["setCurrentEditingNodeProperty"]),
+    update(property, value) {
+      this.setCurrentEditingNodeProperty({ property, value })
+    },
   },
 }
 </script>

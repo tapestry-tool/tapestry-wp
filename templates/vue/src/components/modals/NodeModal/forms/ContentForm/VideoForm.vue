@@ -52,16 +52,11 @@
 <script>
 import FileUpload from "@/components/modals/common/FileUpload"
 import Helpers from "@/utils/Helpers"
+import { mapMutations, mapState } from "vuex"
 
 export default {
   components: {
     FileUpload,
-  },
-  props: {
-    node: {
-      type: Object,
-      required: true,
-    },
   },
   data() {
     return {
@@ -69,8 +64,19 @@ export default {
     }
   },
   computed: {
+    ...mapState({
+      node: "currentEditingNode",
+    }),
+    mediaURL: {
+      get() {
+        return this.$store.state.currentEditingNode.typeData.mediaURL
+      },
+      set(value) {
+        this.update("typeData.mediaURL", value)
+      },
+    },
     youtubeId() {
-      return Helpers.getYoutubeID(this.node.typeData.mediaURL)
+      return Helpers.getYoutubeID(this.mediaURL)
     },
   },
   watch: {
@@ -80,32 +86,36 @@ export default {
   },
   created() {
     if (typeof this.node.typeData.kalturaId === "undefined") {
-      this.node.typeData.kalturaId = ""
+      this.update("typeData.kalturaId", "")
     } else if (this.node.typeData.kalturaId !== "") {
       this.useKaltura = true
     }
   },
   methods: {
+    ...mapMutations(["setCurrentEditingNodeProperty"]),
+    update(property, value) {
+      this.setCurrentEditingNodeProperty({ property, value })
+    },
     handleUploadChange(state) {
       this.$root.$emit("node-modal::uploading", state)
     },
     handleKalturaCheck() {
       // If Kaltura is checked or unchecked, the mediaURL should be cleared as it depends on the Kaltura ID
-      this.node.typeData.mediaURL = ""
+      this.update("typeData.mediaURL", "")
       if (this.useKaltura) {
-        this.node.mediaFormat = "kaltura"
+        this.update("mediaFormat", "kaltura")
       } else {
-        this.node.typeData.kalturaId = ""
+        this.update("typeData.kalturaId", "")
         this.updateFormatType(this.youtubeId)
       }
     },
     updateFormatType(id) {
       if (id !== null) {
-        this.node.mediaFormat = "youtube"
-        this.node.typeData.youtubeID = id
+        this.update("mediaFormat", "youtube")
+        this.update("typeData.youtubeID", id)
       } else {
-        this.node.mediaFormat = "mp4"
-        this.node.typeData.youtubeID = undefined
+        this.update("mediaFormat", "mp4")
+        this.update("typeData.youtubeID", undefined)
       }
     },
   },

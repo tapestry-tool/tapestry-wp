@@ -3,7 +3,7 @@
     <b-form-group label="References">
       <rich-text-form
         id="node-references"
-        v-model="node.references"
+        v-model="references"
         data-testid="node-references"
         placeholder="Enter your references here"
       ></rich-text-form>
@@ -18,10 +18,17 @@ export default {
   components: {
     RichTextForm,
   },
-  props: {
-    node: {
-      type: Object,
-      required: true,
+  computed: {
+    references: {
+      get() {
+        return this.$store.state.currentEditingNode.references
+      },
+      set(value) {
+        this.$store.commit("setCurrentEditingNodeProperty", {
+          property: "references",
+          value,
+        })
+      },
     },
   },
 }
