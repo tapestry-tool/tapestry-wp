@@ -5,9 +5,20 @@
       <div v-else class="empty-message">The requested Tapestry is empty.</div>
     </div>
     <svg v-else id="vue-svg" :viewBox="viewBox">
-      <filter v-for="i in 3" :key="i" :id="'shadow-'+i">
-        <feDropShadow :dx="(2**i)*3" :dy="(2**i)*3" stdDeviation="4" flood-opacity="0.2" />
-      </filter>
+      <defs>
+        <filter v-for="i in 3" :id="'shadow-' + i" :key="i">
+          <!-- <feDropShadow :dx="(2**i)*3" :dy="(2**i)*3" stdDeviation="4" flood-opacity="0.2" /> -->
+          <feGaussianBlur in="SourceAlpha" stdDeviation="4" />
+          <feOffset :dx="4 * i" :dy="4 * i" />
+          <feComponentTransfer>
+            <feFuncA type="linear" slope="0.2" />
+          </feComponentTransfer>
+          <feMerge>
+            <feMergeNode />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
       <g class="links">
         <tapestry-link
           v-for="link in links"
