@@ -267,16 +267,20 @@ export default {
         ? this.settings.renderImages
         : true
 
+      const backgroundColor = TinyColor(this.node.backgroundColor).darken(
+        this.node.level === 1 ? 0 : 1.1 ** (this.node.level - 1) * 10
+      )
+
       if (this.node.nodeType !== "grandchild") {
         if (showImages && this.thumbnailURL) {
           return `url(#node-image-${this.node.id})`
         } else {
-          return this.node.backgroundColor
+          return backgroundColor
         }
       } else if (this.selected) {
         return "var(--highlight-color)"
       } else {
-        return TinyColor(this.node.backgroundColor)
+        return backgroundColor
       }
     },
     overlayFill() {
