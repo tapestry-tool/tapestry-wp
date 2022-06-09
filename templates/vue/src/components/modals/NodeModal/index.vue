@@ -551,9 +551,9 @@ export default {
     })
     this.$root.$on("fileID", fileId => {
       if (fileId.thumbnailType == "locked") {
-        this.node.lockedThumbnailFileId = fileId.data
+        this.update("lockedThumbnailFileId", fileId.data)
       } else if (fileId.thumbnailType == "thumbnail") {
-        this.node.thumbnailFileId = fileId.data
+        this.update("thumbnailFileId", fileId.data)
       }
     })
     this.$root.$on("add-node", () => {
@@ -562,11 +562,11 @@ export default {
     })
     this.$root.$on("remove-thumbnail", thumbnailType => {
       if (thumbnailType == "thumbnail") {
-        this.node.imageURL = ""
-        this.node.thumbnailFileId = ""
+        this.update("imageURL", "")
+        this.update("thumbnailFileId", "")
       } else {
-        this.node.lockedImageURL = ""
-        this.node.lockedThumbnailFileId = ""
+        this.update("lockedImageURL", "")
+        this.update("lockedThumbnailFileId", "")
       }
     })
     this.initialize()
@@ -1009,14 +1009,14 @@ export default {
           errMsgs.push("Please enter a valid Video URL")
         }
         if (!Helpers.onlyContainsDigits(this.node.mediaDuration)) {
-          this.node.mediaDuration = 0
+          this.update("mediaDuration", 0)
         }
       } else if (this.node.mediaType === "h5p") {
         if (this.node.typeData.mediaURL === "") {
           errMsgs.push("Please select an H5P content for this node")
         }
         if (!Helpers.onlyContainsDigits(this.node.mediaDuration)) {
-          this.node.mediaDuration = 0
+          this.update("mediaDuration", 0)
         }
       } else if (this.node.mediaType === "url-embed") {
         if (this.node.typeData.mediaURL === "") {
