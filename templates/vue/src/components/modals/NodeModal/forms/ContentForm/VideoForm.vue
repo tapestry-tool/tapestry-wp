@@ -28,6 +28,7 @@
       <b-col>
         <b-form-checkbox
           v-model="useKaltura"
+          data-qa="use-kaltura-checkbox"
           :value="true"
           :unchecked-value="false"
           style="display:inline-block;"
@@ -40,6 +41,7 @@
         <b-form-input
           v-show="useKaltura"
           v-model="node.typeData.kalturaId"
+          data-qa="node-video-kaltura-id"
           name="text-input"
           placeholder="Enter Kaltura video ID"
           required
