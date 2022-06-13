@@ -53,6 +53,8 @@ jobs:
       - name: Change content directory ownership
         working-directory: data/wp
         run: sudo chown www-data:www-data wp-content
+      - name: Install composer dependencies
+        run: composer install
       - name: Setup cypress.json
         working-directory: templates/vue
         run: cp cypress.gha.json cypress.json
