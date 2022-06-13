@@ -59,6 +59,7 @@ import TapestryLink from "./TapestryLink"
 import RootNodeButton from "./RootNodeButton"
 import LockedTooltip from "./LockedTooltip"
 import Helpers from "@/utils/Helpers"
+import PinchZoom from "@/utils/PinchZoom"
 import { names } from "@/config/routes"
 import * as wp from "@/services/wp"
 
@@ -79,6 +80,8 @@ export default {
     return {
       dragSelectReady: false,
       activeNode: null,
+      scale: 1,
+      pinchZoom: null,
     }
   },
   computed: {
@@ -102,6 +105,10 @@ export default {
       return this.nodes.length
         ? this.nodes.filter(node => this.nodeIsEditable(node))
         : this.nodes
+    },
+    debouncedUpdateScale() {
+      // * if we want to avoid returning a function for a computed property, we can create a class for the Debounce functionality
+      return Helpers.debounce(this.updateScale)
     },
   },
   watch: {
@@ -130,17 +137,50 @@ export default {
   },
   mounted() {
     if (this.dragSelectEnabled) {
-      DragSelectModular.initializeDragSelect(this.$refs.app, this, this.nodes)
+      // DragSelectModular.initializeDragSelect(this.$refs.app, this, this.nodes)
     }
     this.updateViewBox()
     this.dragSelectReady = true
+
+    // catch wheel zoom event on MacOS trackpad
+    window.addEventListener("wheel", this.wheelHandler, { passive: false })
+    // catch 2-finger pinch zoom on mobile browsers
+    this.pinchZoom = new PinchZoom(
+      "tapestry",
+      delta => {
+        console.log(delta)
+      },
+      () => {
+        // this.updateScale()
+      }
+    )
+    this.pinchZoom.register()
+  },
+  beforeDestroy() {
+    window.removeEventListener("wheel", this.wheelHandler, { passive: false })
+    this.pinchZoom.unregister()
   },
   methods: {
     ...mapMutations(["select", "unselect", "clearSelection"]),
     addRootNode() {
       this.$root.$emit("add-node", null)
     },
-
+    wheelHandler(e) {
+      if (e.ctrlKey) {
+        e.preventDefault()
+        this.scale = Math.max(this.scale - e.deltaY * 0.01, 1)
+        this.debouncedUpdateScale()
+      } else {
+        // posX -= e.deltaX * 2
+        // posY -= e.deltaY * 2
+      }
+    },
+    updateScale() {
+      this.$router.push({
+        ...this.$route,
+        query: { ...this.$route.query, scale: this.scale.toFixed(2) },
+      })
+    },
     updateSelectableNodes() {
       DragSelectModular.updateSelectableNodes()
     },
