@@ -82,6 +82,7 @@
           >
             <div class="meta" :style="{ color: node.textColor }">
               <p class="title">{{ node.title }}</p>
+              <p style="font-size: 1.2rem;">Level {{ node.level }}</p>
               <p v-if="node.mediaDuration" class="timecode">
                 {{ formatDuration() }}
               </p>
@@ -263,7 +264,7 @@ export default {
         return 0
       }
       if (this.root) {
-        return 210
+        return 210 * this.radiusModifier
       }
       if (this.node.nodeType === "grandchild") {
         return 40
