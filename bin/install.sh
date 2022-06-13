@@ -27,3 +27,8 @@ wp theme install twentynineteen --activate
 
 # Set TAPESTRY_USE_DEV_MODE to true
 wp config set TAPESTRY_USE_DEV_MODE true --raw
+
+wp config set KALTURA_ADMIN_SECRET $KALTURA_ADMIN_SECRET
+wp config set KALTURA_PARTNER_ID $KALTURA_PARTNER_ID
+wp config set KALTURA_SERVICE_URL $KALTURA_SERVICE_URL
+wp config set KALTURA_UNIQUE_CONFIG $KALTURA_UNIQUE_CONFIG
