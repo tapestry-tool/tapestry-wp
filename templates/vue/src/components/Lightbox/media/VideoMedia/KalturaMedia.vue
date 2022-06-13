@@ -65,7 +65,6 @@ export default {
           this.lastTime = currentTime
           this.onLoad = false
         }
-        kalturaVideo.sendNotification("doPlay")
       }
     },
   },
@@ -83,6 +82,9 @@ export default {
         wid: `_${partnerId}`,
         uiconf_id: uniqueConfiguration,
         entry_id: this.kalturaId,
+        flashvars: {
+          autoPlay: this.autoplay,
+        },
       })
 
       const kalturaIframe = document.querySelector(
