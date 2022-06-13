@@ -12,6 +12,7 @@ export const store = {
     groups: [],
     links: [],
     nodes: [],
+    maxLevel: 1,
     progress: {},
     rootId: null,
     settings: {},

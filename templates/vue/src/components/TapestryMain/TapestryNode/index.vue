@@ -193,7 +193,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(["selection", "settings", "visibleNodes"]),
+    ...mapState(["selection", "settings", "visibleNodes", "maxLevel"]),
     ...mapGetters(["getNode", "getDirectChildren", "isVisible", "getParent"]),
     canReview() {
       if (!this.isLoggedIn) {
@@ -251,7 +251,12 @@ export default {
       return this.isVisible(this.node.id)
     },
     radiusModifier() {
-      return Math.min(0.8 + this.node.level * 0.15, 1.3)
+      return Helpers.mapValue({
+        value: this.node.level,
+        maxValue: this.maxLevel,
+        from: 1,
+        to: Math.max(1 - this.maxLevel * 0.1, 0.5),
+      })
     },
     radius() {
       if (!this.show) {
@@ -270,11 +275,8 @@ export default {
         ? this.settings.renderImages
         : true
 
-      // const backgroundColor = TinyColor(this.node.backgroundColor).darken(
-      //   this.node.level === 1 ? 0 : 1.1 ** (this.node.level - 1) * 10
-      // )
-      const backgroundColor = TinyColor(this.node.backgroundColor).lighten(
-        this.node.level === 1 ? 0 : 1.05 ** (this.node.level - 1) * 8
+      const backgroundColor = TinyColor(this.node.backgroundColor).darken(
+        this.node.level === 1 ? 0 : 1.1 ** (this.node.level - 1) * 10
       )
 
       if (this.node.nodeType !== "grandchild") {

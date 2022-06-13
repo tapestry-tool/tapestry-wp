@@ -407,6 +407,15 @@ export default class Helpers {
     return { x: xPosition, y: yPosition }
   }
 
+  /**
+   * Map value from [minValue, maxValue] to [from, to]
+   * @param {Object} options
+   * @return {number}
+   */
+  static mapValue({ value, minValue = 1, maxValue, from, to }) {
+    return from + (to - from) * ((value - minValue) / (maxValue - minValue))
+  }
+
   static getLinePolygonPoints(source, target) {
     const x1 = source.coordinates.x,
       y1 = source.coordinates.y,
@@ -415,7 +424,7 @@ export default class Helpers {
     let width1, width2
     if (source.level === target.level) {
       width1 = width2 = 4
-    } else if (source.level > target.level) {
+    } else if (source.level < target.level) {
       width1 = 8
       width2 = 2
     } else {

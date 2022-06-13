@@ -7,13 +7,17 @@ export function init(state, dataset) {
   Object.entries(datasetWithProgress).forEach(([key, value]) => {
     if (key === "nodes") {
       state.nodes = {}
+      let maxLevel = 1
       Object.values(value).forEach(node => {
         // Has to call this so `state.nodes` is reactive
+        const level = Math.ceil(Math.random() * 3)
         Vue.set(state.nodes, node.id, {
           ...node,
-          level: Math.ceil(Math.random() * 3),
+          level: level,
         })
+        if (level > maxLevel) maxLevel = level
       })
+      state.maxLevel = maxLevel
     } else {
       state[key] = value
     }

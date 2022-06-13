@@ -6,12 +6,12 @@
     </div>
     <svg v-else id="vue-svg" :viewBox="viewBox">
       <defs>
-        <filter v-for="i in 3" :id="'shadow-' + i" :key="i">
+        <filter v-for="i in maxLevel" :id="'shadow-' + i" :key="i">
           <!-- <feDropShadow :dx="(2**i)*3" :dy="(2**i)*3" stdDeviation="4" flood-opacity="0.2" /> -->
           <feGaussianBlur in="SourceAlpha" stdDeviation="4" />
-          <feOffset :dx="4 * i" :dy="4 * i" />
+          <feOffset :dx="6 * (maxLevel - i)" :dy="6 * (maxLevel - i)" />
           <feComponentTransfer>
-            <feFuncA type="linear" :slope="0.1 + i * 0.1" />
+            <feFuncA type="linear" :slope="Math.max(0.6 - i * 0.1, 0.1)" />
           </feComponentTransfer>
           <feMerge>
             <feMergeNode />
@@ -82,7 +82,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(["nodes", "links", "selection", "settings", "rootId"]),
+    ...mapState(["nodes", "links", "selection", "settings", "rootId", "maxLevel"]),
     background() {
       return this.settings.backgroundUrl
     },
