@@ -28,7 +28,7 @@ wp theme install twentynineteen --activate
 # Set TAPESTRY_USE_DEV_MODE to true
 wp config set TAPESTRY_USE_DEV_MODE true --raw
 
-if [ -z "{$KALTURA_ADMIN_SECRET}"] || [ -z "{$KALTURA_PARTNER_ID}" ] || [ -z "{$KALTURA_SERVICE_URL}" ] || [ -z "{$KALTURA_UNIQUE_CONFIG}"]
+if [ -z "{$KALTURA_ADMIN_SECRET}" ] || [ -z "{$KALTURA_PARTNER_ID}" ] || [ -z "{$KALTURA_SERVICE_URL}" ] || [ -z "{$KALTURA_UNIQUE_CONFIG}" ]
 then
     echo  "Warning: some Kaltura variables are not set!\n"
 else
