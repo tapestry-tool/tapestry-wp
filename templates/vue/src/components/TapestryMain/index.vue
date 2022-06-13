@@ -11,7 +11,7 @@
           <feGaussianBlur in="SourceAlpha" stdDeviation="4" />
           <feOffset :dx="4 * i" :dy="4 * i" />
           <feComponentTransfer>
-            <feFuncA type="linear" slope="0.2" />
+            <feFuncA type="linear" :slope="0.1 + i * 0.1" />
           </feComponentTransfer>
           <feMerge>
             <feMergeNode />

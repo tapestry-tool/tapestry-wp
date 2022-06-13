@@ -1,5 +1,6 @@
 <template>
   <transition name="fade">
+    <!--
     <line
       v-show="show"
       :data-qa="`link-${source.id}-${target.id}`"
@@ -14,6 +15,18 @@
       :y2="target.coordinates.y"
       @click="openLinkModal"
     ></line>
+    -->
+    <polygon
+      v-show="show"
+      :data-qa="`link-${source.id}-${target.id}`"
+      :class="{
+        opaque:
+          !visibleNodes.includes(source.id) || !visibleNodes.includes(target.id),
+        disabled: !isLoggedIn,
+      }"
+      :points="polygonPoints"
+      @click="openLinkModal"
+    ></polygon>
   </transition>
 </template>
 
@@ -21,6 +34,7 @@
 import { mapGetters, mapState } from "vuex"
 import { names } from "@/config/routes"
 import * as wp from "@/services/wp"
+import Helpers from "@/utils/Helpers"
 
 export default {
   name: "tapestry-link",
@@ -43,6 +57,9 @@ export default {
     isLoggedIn() {
       return wp.isLoggedIn()
     },
+    polygonPoints() {
+      return Helpers.getLinePolygonPoints(this.source, this.target)
+    },
   },
   methods: {
     openLinkModal() {
@@ -60,6 +77,26 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+polygon {
+  fill: #999;
+
+  &:hover {
+    cursor: pointer;
+    fill: #3498db;
+  }
+
+  &.opaque {
+    opacity: 0.2;
+  }
+
+  &.disabled {
+    &:hover {
+      cursor: not-allowed;
+      fill: #999;
+    }
+  }
+}
+
 line {
   stroke: #999;
   stroke-width: 6;
@@ -68,6 +105,18 @@ line {
     cursor: pointer;
     stroke: #3498db;
     stroke-width: 11;
+  }
+
+  &.opaque {
+    opacity: 0.2;
+  }
+
+  &.disabled {
+    &:hover {
+      cursor: not-allowed;
+      stroke: #999;
+      stroke-width: 6;
+    }
   }
 }
 
@@ -79,17 +128,5 @@ line {
 .fade-enter,
 .fade-leave-to {
   opacity: 0;
-}
-
-.opaque {
-  opacity: 0.2;
-}
-
-.disabled {
-  &:hover {
-    cursor: not-allowed;
-    stroke: #999;
-    stroke-width: 6;
-  }
 }
 </style>

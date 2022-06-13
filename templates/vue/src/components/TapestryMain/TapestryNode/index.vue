@@ -250,6 +250,9 @@ export default {
     show() {
       return this.isVisible(this.node.id)
     },
+    radiusModifier() {
+      return Math.min(0.8 + this.node.level * 0.15, 1.3)
+    },
     radius() {
       if (!this.show) {
         return 0
@@ -260,15 +263,18 @@ export default {
       if (this.node.nodeType === "grandchild") {
         return 40
       }
-      return 140
+      return 140 * this.radiusModifier
     },
     fill() {
       const showImages = this.settings.hasOwnProperty("renderImages")
         ? this.settings.renderImages
         : true
 
-      const backgroundColor = TinyColor(this.node.backgroundColor).darken(
-        this.node.level === 1 ? 0 : 1.1 ** (this.node.level - 1) * 10
+      // const backgroundColor = TinyColor(this.node.backgroundColor).darken(
+      //   this.node.level === 1 ? 0 : 1.1 ** (this.node.level - 1) * 10
+      // )
+      const backgroundColor = TinyColor(this.node.backgroundColor).lighten(
+        this.node.level === 1 ? 0 : 1.05 ** (this.node.level - 1) * 8
       )
 
       if (this.node.nodeType !== "grandchild") {

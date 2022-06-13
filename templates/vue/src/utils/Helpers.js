@@ -406,4 +406,28 @@ export default class Helpers {
 
     return { x: xPosition, y: yPosition }
   }
+
+  static getLinePolygonPoints(source, target) {
+    const x1 = source.coordinates.x,
+      y1 = source.coordinates.y,
+      x2 = target.coordinates.x,
+      y2 = target.coordinates.y
+    let width1, width2
+    if (source.level === target.level) {
+      width1 = width2 = 4
+    } else if (source.level > target.level) {
+      width1 = 8
+      width2 = 2
+    } else {
+      width1 = 2
+      width2 = 8
+    }
+    const angle = Math.atan((y2 - y1) / (x2 - x1))
+    const dx1 = -1 * width1 * Math.sin(angle),
+      dy1 = width1 * Math.cos(angle),
+      dx2 = -1 * width2 * Math.sin(angle),
+      dy2 = width2 * Math.cos(angle)
+    return `${x1 + dx1},${y1 + dy1} ${x1 - dx1},${y1 - dy1} ${x2 - dx2},${y2 -
+      dy2} ${x2 + dx2},${y2 + dy2}`
+  }
 }
