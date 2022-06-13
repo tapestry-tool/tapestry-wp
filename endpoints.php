@@ -1559,6 +1559,8 @@ function getQuestionHasAnswers($request)
 
 /**
  * Returns whether Kaltura is available.
+ * 
+ * @return boolean Response: true if Kaltura is enabled, and false otherwise.
  */
 function kalturaStatus($request)
 {
@@ -1567,6 +1569,8 @@ function kalturaStatus($request)
 
 /**
  * Checks whether a Kaltura video with given entry id exists.
+ * 
+ * @return boolean Response: true if the video exists, and false otherwise.
  */
 function checkKalturaVideo($request)
 {
@@ -1584,7 +1588,15 @@ function checkKalturaVideo($request)
 }
 
 /**
- * If Kaltura video with given entry id exists, returns the video metadata.
+ * If a Kaltura video with given entry id exists, returns the video metadata.
+ * 
+ * Example response body:
+ * {
+ *  "image": "https://streaming.video.ubc.ca/p/186/sp/18600/thumbnail/entry_id/0_p5er0usa/version/100002",
+ *  "duration": 126
+ * }
+ * 
+ * @return - HTTP response: a video metadata object if the entry id is valid, and false otherwise.
  */
 function getKalturaVideoMeta($request)
 {
@@ -1601,6 +1613,16 @@ function getKalturaVideoMeta($request)
     }
 }
 
+/**
+ * If a Kaltura video with given entry id exists, returns the video's URL.
+ * 
+ * Example body:
+ * {
+ *   "mediaURL": "https://admin.video.ubc.ca/p/186/sp/18600/playManifest/entryId/0_p5er0usa/format/url/protocol/https"
+ * }
+ * 
+ * @return - HTTP response: an object containing the URL if the entry id is valid, and false otherwise.
+ */
 function getKalturaVideoUrl($request) {
     if (LOAD_KALTURA) {
         $entryId = $request['entry_id'];
