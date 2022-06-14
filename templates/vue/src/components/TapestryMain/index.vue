@@ -80,7 +80,7 @@ export default {
     return {
       dragSelectReady: false,
       activeNode: null,
-      scale: 1,
+      scale: this.$route.query.scale ? Number(this.$route.query.scale) : 1,
       pinchZoom: null,
     }
   },
@@ -137,7 +137,7 @@ export default {
   },
   mounted() {
     if (this.dragSelectEnabled) {
-      // DragSelectModular.initializeDragSelect(this.$refs.app, this, this.nodes)
+      DragSelectModular.initializeDragSelect(this.$refs.app, this, this.nodes)
     }
     this.updateViewBox()
     this.dragSelectReady = true
@@ -148,10 +148,10 @@ export default {
     this.pinchZoom = new PinchZoom(
       "tapestry",
       delta => {
-        console.log(delta)
+        this.scale = Math.max(this.scale + delta, 1)
       },
       () => {
-        // this.updateScale()
+        this.updateScale()
       }
     )
     this.pinchZoom.register()

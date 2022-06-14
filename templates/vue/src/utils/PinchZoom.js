@@ -15,51 +15,66 @@ class PinchZoom {
 
   register() {
     const elem = document.getElementById(this.targetDOMId)
-    elem.addEventListener("pointerdown", this.downHandler.bind(this))
-    elem.addEventListener("pointermove", this.moveHandler.bind(this))
-    elem.addEventListener("pointerup", this.upHandler.bind(this))
-    elem.addEventListener("pointercancel", this.upHandler.bind(this))
-    elem.addEventListener("pointerout", this.upHandler.bind(this))
-    elem.addEventListener("pointerleave", this.upHandler.bind(this))
+    elem.addEventListener("touchstart", this.startHandler.bind(this))
+    elem.addEventListener("touchmove", this.moveHandler.bind(this))
+    elem.addEventListener("touchcancel", this.endHandler.bind(this))
+    elem.addEventListener("touchend", this.endHandler.bind(this))
   }
 
   unregister() {
     const elem = document.getElementById(this.targetDOMId)
-    elem.removeEventListener("pointerdown", this.downHandler)
-    elem.removeEventListener("pointermove", this.moveHandler)
-    elem.removeEventListener("pointerup", this.upHandler)
-    elem.removeEventListener("pointercancel", this.upHandler)
-    elem.removeEventListener("pointerout", this.upHandler)
-    elem.removeEventListener("pointerleave", this.upHandler)
+    elem.removeEventListener("touchstart", this.startHandler.bind(this))
+    elem.removeEventListener("touchmove", this.moveHandler.bind(this))
+    elem.removeEventListener("touchcancel", this.endHandler.bind(this))
+    elem.removeEventListener("touchend", this.endHandler.bind(this))
   }
 
-  downHandler(e) {
-    this.cache[e.pointerId] = { x: e.clientX, y: e.clientY }
+  _calcDistance() {
+    const keys = Object.keys(this.cache)
+    if (keys.length === 2) {
+      const a = this.cache[keys[0]]
+      const b = this.cache[keys[1]]
+      return Math.hypot(a.x - b.x, a.y - b.y)
+    }
+    return null
+  }
+
+  startHandler(e) {
+    e.preventDefault()
+    if (e.targetTouches.length === 2) {
+      this.cache = {}
+      for (const touch of e.targetTouches) {
+        this.cache[touch.identifier] = { x: touch.clientX, y: touch.clientY }
+      }
+      this.lastDistance = this._calcDistance()
+    }
   }
 
   moveHandler(e) {
-    if (!this.cache[e.pointerId]) return
-    this.cache[e.pointerId] = { x: e.clientX, y: e.clientY }
-    const keys = Object.keys(this.cache)
-    if (keys.length === 2) {
-      e.preventDefault() // ! does not prevent the actual zoom !
-      const a = this.cache[keys[0]]
-      const b = this.cache[keys[1]]
-      // ! potential performance problems with taking the sqrt
-      // * however, using square of the distance means the zoom will not be natural
-      const distance = Math.hypot(a.x - b.x, a.y - b.y)
-      if (this.lastDistance !== null) {
+    e.preventDefault()
+    if (e.targetTouches.length === 2) {
+      for (const touch of e.targetTouches) {
+        if (!this.cache[touch.identifier]) {
+          return
+        }
+        this.cache[touch.identifier] = { x: touch.clientX, y: touch.clientY }
+      }
+      const distance = this._calcDistance()
+      if (distance !== null && this.lastDistance !== null) {
         const delta = distance - this.lastDistance
-        // TODO: apply a scale to the delta value to match the wheel zoom scale in TapestryMain.vue
-        this.cb(delta)
+        const scaleDelta = delta * 0.01
+        this.cb(scaleDelta)
         this.debouncedCb()
       }
       this.lastDistance = distance
     }
   }
 
-  upHandler(e) {
-    delete this.cache[e.pointerId]
+  endHandler(e) {
+    e.preventDefault()
+    if (e.targetTouches.length !== 2) {
+      this.cache = {}
+    }
     this.lastDistance = null
   }
 }
