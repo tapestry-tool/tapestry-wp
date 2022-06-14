@@ -4,7 +4,7 @@
       <root-node-button v-if="canEdit" @click="addRootNode"></root-node-button>
       <div v-else class="empty-message">The requested Tapestry is empty.</div>
     </div>
-    <svg v-else id="vue-svg" :viewBox="viewBox">
+    <svg v-else id="vue-svg" :viewBox="computedViewBox">
       <defs>
         <filter v-for="i in maxLevel" :id="'shadow-' + i" :key="i">
           <!-- <feDropShadow :dx="(2**i)*3" :dy="(2**i)*3" stdDeviation="4" flood-opacity="0.2" /> -->
@@ -32,6 +32,7 @@
           v-for="(node, id) in nodes"
           :key="id"
           :node="node"
+          :scale="scale"
           class="node"
           :class="{ selectable: true }"
           :data-id="id"
@@ -45,7 +46,7 @@
       <locked-tooltip
         v-if="activeNode"
         :node="nodes[activeNode]"
-        :viewBox="viewBox"
+        :viewBox="computedViewBox"
       ></locked-tooltip>
     </svg>
   </main>
@@ -72,7 +73,7 @@ export default {
   },
   props: {
     viewBox: {
-      type: String,
+      type: Array,
       required: true,
     },
   },
@@ -80,12 +81,25 @@ export default {
     return {
       dragSelectReady: false,
       activeNode: null,
-      scale: this.$route.query.scale ? Number(this.$route.query.scale) : 1,
+      scale:
+        this.$route.query.scale &&
+        !isNaN(Number(this.$route.query.scale)) &&
+        Number(this.$route.query.scale) >= 1
+          ? Number(this.$route.query.scale)
+          : 1,
+      offset: { x: 0, y: 0 },
+      appDimensions: null,
       pinchZoom: null,
     }
   },
   computed: {
     ...mapState(["nodes", "links", "selection", "settings", "rootId", "maxLevel"]),
+    computedViewBox() {
+      // return this.viewBox.join(" ")
+      return `${this.viewBox[0] + this.offset.x} ${this.viewBox[1] +
+        this.offset.y} ${this.viewBox[2] / this.scale} ${this.viewBox[3] /
+        this.scale}`
+    },
     background() {
       return this.settings.backgroundUrl
     },
@@ -105,10 +119,6 @@ export default {
       return this.nodes.length
         ? this.nodes.filter(node => this.nodeIsEditable(node))
         : this.nodes
-    },
-    debouncedUpdateScale() {
-      // * if we want to avoid returning a function for a computed property, we can create a class for the Debounce functionality
-      return Helpers.debounce(this.updateScale)
     },
   },
   watch: {
@@ -142,22 +152,31 @@ export default {
     this.updateViewBox()
     this.dragSelectReady = true
 
-    // catch wheel zoom event on MacOS trackpad
-    window.addEventListener("wheel", this.wheelHandler, { passive: false })
-    // catch 2-finger pinch zoom on mobile browsers
     this.pinchZoom = new PinchZoom(
       "tapestry",
-      delta => {
-        this.scale = Math.max(this.scale + delta, 1)
+      (delta, x, y) => {
+        if (!this.appDimensions) {
+          this.fetchAppDimensions()
+        }
+        const { width, height } = this.appDimensions
+        x = (x / width) * (this.viewBox[2] / this.scale)
+        y = (y / height) * (this.viewBox[3] / this.scale)
+        const newScale = Math.max(this.scale + delta, 1)
+        const scaleChange = newScale / this.scale
+        const newX = x / scaleChange
+        const newY = y / scaleChange
+        this.offset.x += x - newX
+        this.offset.y += y - newY
+        this.scale = newScale
       },
       () => {
         this.updateScale()
+        this.fetchAppDimensions()
       }
     )
     this.pinchZoom.register()
   },
   beforeDestroy() {
-    window.removeEventListener("wheel", this.wheelHandler, { passive: false })
     this.pinchZoom.unregister()
   },
   methods: {
@@ -165,14 +184,11 @@ export default {
     addRootNode() {
       this.$root.$emit("add-node", null)
     },
-    wheelHandler(e) {
-      if (e.ctrlKey) {
-        e.preventDefault()
-        this.scale = Math.max(this.scale - e.deltaY * 0.01, 1)
-        this.debouncedUpdateScale()
-      } else {
-        // posX -= e.deltaX * 2
-        // posY -= e.deltaY * 2
+    fetchAppDimensions() {
+      const { width, height } = this.$refs.app.getBoundingClientRect()
+      this.appDimensions = {
+        width,
+        height,
       }
     },
     updateScale() {

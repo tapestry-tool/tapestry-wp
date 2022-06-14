@@ -186,6 +186,10 @@ export default {
       type: Boolean,
       required: true,
     },
+    scale: {
+      type: Number,
+      required: true,
+    },
   },
   data() {
     return {
@@ -256,8 +260,8 @@ export default {
         value: this.node.level,
         maxValue: this.maxLevel,
         from: 1,
-        to: Math.max(1 - this.maxLevel * 0.1, 0.5),
-      })
+        to: Math.max(1 - this.maxLevel * 0.05, 0.6),
+      }) // * this.scale
     },
     radius() {
       if (!this.show) {

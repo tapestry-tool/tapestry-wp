@@ -27,7 +27,8 @@ export default {
   },
   data() {
     return {
-      viewBox: "2200 2700 1600 1100",
+      // viewBox: "2200 2700 1600 1100",
+      viewBox: [2200, 2700, 1600, 1100],
     }
   },
   computed: {
@@ -109,15 +110,27 @@ export default {
           const MIN_WIDTH = Helpers.getBrowserWidth() * MIN_TAPESTRY_WIDTH_FACTOR
           const MIN_HEIGHT = Helpers.getBrowserHeight() * MIN_TAPESTRY_WIDTH_FACTOR
 
-          this.viewBox = `${tapestryDimensions.startX} ${
-            tapestryDimensions.startY
-          } ${Math.max(
-            tapestryDimensions.width - tapestryDimensions.startX,
-            MIN_WIDTH
-          )} ${Math.max(
-            tapestryDimensions.height - tapestryDimensions.startY,
-            MIN_HEIGHT
-          )}`
+          this.viewBox = [
+            tapestryDimensions.startX,
+            tapestryDimensions.startY,
+            Math.max(
+              tapestryDimensions.width - tapestryDimensions.startX,
+              MIN_WIDTH
+            ),
+            Math.max(
+              tapestryDimensions.height - tapestryDimensions.startY,
+              MIN_HEIGHT
+            ),
+          ]
+          // this.viewBox = `${tapestryDimensions.startX} ${
+          //   tapestryDimensions.startY
+          // } ${Math.max(
+          //   tapestryDimensions.width - tapestryDimensions.startX,
+          //   MIN_WIDTH
+          // )} ${Math.max(
+          //   tapestryDimensions.height - tapestryDimensions.startY,
+          //   MIN_HEIGHT
+          // )}`
         }
       }
     },
