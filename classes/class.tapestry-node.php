@@ -6,10 +6,6 @@ require_once dirname(__FILE__).'/../interfaces/interface.tapestry-node.php';
 require_once dirname(__FILE__).'/../classes/class.tapestry-user-progress.php';
 require_once dirname(__FILE__).'/../classes/class.constants.php';
 
-if (LOAD_KALTURA) {
-    require_once __DIR__.'/../classes/class.kaltura-api.php';
-}
-
 /**
  * Add/update/retrieve Tapestry post and its child nodes.
  */
