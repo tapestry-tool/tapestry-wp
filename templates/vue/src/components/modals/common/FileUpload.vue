@@ -230,22 +230,27 @@ export default {
   },
   data() {
     return {
-      // NOTE: compactMode cannot work without showing the image preview
-      showImagePreviewValue: this.compactMode || this.showImagePreview,
       uploadPercentage: 0,
       uploadBarInterval: null,
       uploadSource: null,
       isUploading: false,
       confirmedUpload: true,
       changeImage: false,
-      imagePatternId:
-        this.compactMode || this.showImagePreview
-          ? "thumbnail-preview-" +
-            Math.random()
-              .toString(36)
-              .substring(9)
-          : "",
       error: null,
+    }
+  },
+  computed: {
+    showImagePreviewValue() {
+      // NOTE: compactMode cannot work without showing the image preview
+      return this.compactMode || this.showImagePreview
+    },
+    imagePatternId() {
+      return this.showImagePreviewValue
+        ? "thumbnail-preview-" +
+          Math.random()
+            .toString(36)
+            .substring(9)
+        : ""
     }
   },
   methods: {
