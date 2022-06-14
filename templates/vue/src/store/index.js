@@ -24,7 +24,6 @@ export const store = {
     displayErrors: false,
     theme: "",
     userAnswers: {},
-    kalturaStatus: false,
     returnRoute: null,
     currentEditingNode: null,
   },

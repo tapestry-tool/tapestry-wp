@@ -196,6 +196,7 @@ function tapestry_enqueue_vue_app()
                 'currentUser' => $currentUser,
                 'uploadDirArray' => wp_upload_dir(),
                 'kaltura' => array(
+                    'kalturaStatus' => LOAD_KALTURA,
                     "partnerId" => $kaltura_partner_id,
                     "uniqueConfiguration" => $kaltura_unique_configuration,
                 ),

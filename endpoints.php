@@ -323,13 +323,6 @@ $REST_API_ENDPOINTS = [
             'permission_callback' => 'TapestryPermissions::putTapestrySettings',
         ],
     ],
-    'GET_KALTURA_SERVER_STATUS' => (object) [
-        'ROUTE' => '/kaltura/status',
-        'ARGUMENTS' => [
-            'methods' => $REST_API_GET_METHOD,
-            'callback' => 'kalturaStatus',
-        ],
-    ],
     'GET_KALTURA_VIDEO_STATUS' => (object) [
         'ROUTE' => '/kaltura/video/status',
         'ARGUMENTS' => [
@@ -1555,16 +1548,6 @@ function getQuestionHasAnswers($request)
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
-}
-
-/**
- * Returns whether Kaltura is available.
- * 
- * @return boolean Response: true if Kaltura is enabled, and false otherwise.
- */
-function kalturaStatus($request)
-{
-    return LOAD_KALTURA;
 }
 
 /**

@@ -110,10 +110,6 @@ describe("Video", () => {
   it("should be able to add a video node via Kaltura", () => {
     const kalturaId = "0_55iod32r"
 
-    cy.store()
-      .its("state.kalturaStatus")
-      .should("be.true")
-
     cy.getSelectedNode().then(node => {
       cy.openModal("edit", node.id)
       cy.changeMediaType("video")

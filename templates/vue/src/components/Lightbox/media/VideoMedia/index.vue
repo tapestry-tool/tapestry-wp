@@ -50,7 +50,7 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from "vuex"
+import { mapGetters } from "vuex"
 
 import UrlVideoMedia from "./UrlVideoMedia"
 import H5PVideoMedia from "./H5PVideoMedia"
@@ -62,6 +62,7 @@ import CompletedIcon from "@/components/common/CompletedIcon"
 import { COMPLETION_THRESHOLD } from "./video.config"
 import Loading from "@/components/common/Loading"
 import client from "@/services/TapestryAPI"
+import * as wp from "@/services/wp"
 
 /**
  * Video states and events as defined by the state machine diagram on Notion.
@@ -127,7 +128,6 @@ export default {
     }
   },
   computed: {
-    ...mapState(["kalturaStatus"]),
     ...mapGetters(["getNode", "getDirectChildren"]),
     states() {
       return VideoStates
@@ -147,7 +147,7 @@ export default {
         case "h5p":
           return "h5p-video-media"
         case "kaltura":
-          return this.kalturaStatus ? "kaltura-video-media" : "url-video-media"
+          return wp.getKalturaStatus() ? "kaltura-video-media" : "url-video-media"
         default:
           throw new Error(`Unknown video type: ${this.node.mediaFormat}`)
       }

@@ -309,12 +309,6 @@ class TapestryApi {
     return response
   }
 
-  async getKalturaStatus() {
-    const url = "/kaltura/status"
-    const response = await this.client.get(url)
-    return response
-  }
-
   async checkKalturaVideo(entryId) {
     const url = `/kaltura/video/status?entry_id=${entryId}`
     const response = await this.client.get(url)
