@@ -27,13 +27,15 @@ class PinchZoom {
 
   unregister() {
     const elem = document.getElementById(this.targetDOMId)
-    elem.removeEventListener("wheel", this.wheelHandler.bind(this), {
-      passive: false,
-    })
-    elem.removeEventListener("touchstart", this.startHandler.bind(this))
-    elem.removeEventListener("touchmove", this.moveHandler.bind(this))
-    elem.removeEventListener("touchcancel", this.endHandler.bind(this))
-    elem.removeEventListener("touchend", this.endHandler.bind(this))
+    if (elem) {
+      elem.removeEventListener("wheel", this.wheelHandler.bind(this), {
+        passive: false,
+      })
+      elem.removeEventListener("touchstart", this.startHandler.bind(this))
+      elem.removeEventListener("touchmove", this.moveHandler.bind(this))
+      elem.removeEventListener("touchcancel", this.endHandler.bind(this))
+      elem.removeEventListener("touchend", this.endHandler.bind(this))
+    }
   }
 
   _calcDistance() {
