@@ -151,9 +151,6 @@ class TapestryNode implements ITapestryNode
         if (isset($node->behaviour) && is_string($node->behaviour)) {
             $this->behaviour = $node->behaviour;
         }
-        if (isset($node->mediaDuration) && is_numeric($node->mediaDuration)) {
-            $this->mediaDuration = $node->mediaDuration;
-        }
         if (isset($node->typeData) && is_object($node->typeData)) {
             $this->typeData = $node->typeData;
         }
@@ -197,6 +194,9 @@ class TapestryNode implements ITapestryNode
         }
         if (isset($node->mediaFormat) && is_string($node->mediaFormat)) {
             $this->mediaFormat = $node->mediaFormat;
+        }
+        if (isset($node->mediaDuration) && is_numeric($node->mediaDuration)) {
+            $this->mediaDuration = $node->mediaDuration;
         }
         if (isset($node->description) && is_string($node->description)) {
             $this->description = $node->description;
