@@ -140,8 +140,6 @@
 
                 return $result;
             } catch (ApiException $e) {
-                error_log('Kaltura Client Error: '.$e);
-
                 return null;
             }
         }
