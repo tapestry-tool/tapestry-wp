@@ -7,10 +7,11 @@
           <b-form-group label="Video URL">
             <file-upload
               id="node-video-media-url"
-              v-model="node.typeData.mediaURL"
+              :value="node.typeData.mediaURL"
               input-test-id="node-video-url"
               placeholder="Enter URL for MP4 or YouTube video"
               required
+              @input="update('typeData.mediaURL', $event)"
               @isUploading="handleUploadChange"
             />
           </b-form-group>
@@ -40,11 +41,12 @@
       <b-col cols="6" md="8">
         <b-form-input
           v-show="useKaltura"
-          v-model="node.typeData.kalturaId"
+          :value="node.typeData.kalturaId"
           data-qa="node-video-kaltura-id"
           name="text-input"
           placeholder="Enter Kaltura video ID"
           required
+          @input="update('typeData.kalturaId', $event)"
         />
       </b-col>
     </b-row>

@@ -1024,7 +1024,7 @@ export default {
             errMsgs.push("Please enter a valid Video URL")
           }
           if (!Helpers.onlyContainsDigits(this.node.mediaDuration)) {
-            this.node.mediaDuration = 0
+            this.update("mediaDuration", 0)
           }
         }
       } else if (this.node.mediaType === "h5p") {
@@ -1277,9 +1277,9 @@ export default {
         const { mediaURL } = await client.getKalturaVideoUrl(
           this.node.typeData.kalturaId
         )
-        this.node.typeData.mediaURL = mediaURL
+        this.update("typeData.mediaURL", mediaURL)
       } else if (this.node.typeData.mediaURL !== oldMediaURL) {
-        this.node.typeData.mediaURL = oldMediaURL
+        this.update("typeData.mediaURL", oldMediaURL)
       }
     },
   },
