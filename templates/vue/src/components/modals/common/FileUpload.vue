@@ -247,11 +247,11 @@ export default {
     imagePatternId() {
       return this.showImagePreviewValue
         ? "thumbnail-preview-" +
-          Math.random()
-            .toString(36)
-            .substring(9)
+            Math.random()
+              .toString(36)
+              .substring(9)
         : ""
-    }
+    },
   },
   methods: {
     ...mapMutations(["addApiError"]),
