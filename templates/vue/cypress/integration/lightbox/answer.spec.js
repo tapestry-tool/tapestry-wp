@@ -3,9 +3,8 @@ describe("Answers", () => {
     cy.fixture("one-node.json").as("oneNode")
     cy.setup("@oneNode")
 
-    cy.server()
-    cy.route("POST", `**/nodes`).as("addNode")
-    cy.route("PUT", `**/nodes/**`).as("editNode")
+    cy.intercept("POST", `**/nodes`).as("addNode")
+    cy.intercept("PUT", `**/nodes/**`).as("editNode")
 
     cy.getSelectedNode().then(node => {
       cy.openModal("edit", node.id)
@@ -20,7 +19,7 @@ describe("Answers", () => {
       cy.getByTestId("question-answer-text-single-placeholder-0").type(placeholder)
       cy.submitModal()
       cy.openLightbox(node.id)
-      cy.route("POST", "/users/activity/**").as("submit")
+      cy.intercept("POST", "/users/activity/**").as("submit")
       cy.lightbox().within(() => {
         cy.get(`[placeholder="${placeholder}"]`).should("be.visible")
         cy.get("input").type(answer)

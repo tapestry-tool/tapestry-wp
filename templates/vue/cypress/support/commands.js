@@ -60,8 +60,7 @@ Cypress.Commands.add("getSelectedNode", () =>
 )
 
 Cypress.Commands.add("addNode", { prevSubject: false }, (parent, node) => {
-  cy.server()
-  cy.route("POST", `**/nodes`).as("addNode")
+  cy.intercept("POST", `**/nodes`).as("addNode")
   cy.store().then(store => {
     store.dispatch("addNode", deepMerge(store.getters.createDefaultNode(), node))
     cy.wait("@addNode")
@@ -75,8 +74,7 @@ Cypress.Commands.add("addNode", { prevSubject: false }, (parent, node) => {
 })
 
 Cypress.Commands.add("editNode", { prevSubject: false }, (id, newNode) => {
-  cy.server()
-  cy.route("PUT", `**/nodes/**`).as("editNode")
+  cy.intercept("PUT", `**/nodes/**`).as("editNode")
 
   cy.store().then(store => store.dispatch("updateNode", { id, newNode }))
 
@@ -87,8 +85,7 @@ Cypress.Commands.add(
   "updateNodeProgress",
   { prevSubject: false },
   (id, progress) => {
-    cy.server()
-    cy.route("POST", `**/users/progress`).as("saveProgress")
+    cy.intercept("POST", `**/users/progress`).as("saveProgress")
 
     cy.store().then(store => store.dispatch("updateNodeProgress", { id, progress }))
 
@@ -102,8 +99,7 @@ Cypress.Commands.add(
 )
 
 Cypress.Commands.add("deleteNode", () => {
-  cy.server()
-  cy.route("DELETE", `**/nodes/**`).as("deleteNode")
+  cy.intercept("DELETE", `**/nodes/**`).as("deleteNode")
 
   cy.contains(/delete/i).click()
   cy.wait("@deleteNode")
@@ -136,8 +132,7 @@ Cypress.Commands.add("link", (source, target) =>
 )
 
 Cypress.Commands.add("addLink", (source, target) => {
-  cy.server()
-  cy.route("POST", "**/links").as("postLink")
+  cy.intercept("POST", "**/links").as("postLink")
   cy.store()
     .its("dispatch")
     .then(dispatch => dispatch("addLink", { source, target }))
@@ -160,16 +155,14 @@ Cypress.Commands.add("openModal", (type, id) => {
 })
 
 Cypress.Commands.add("submitModal", () => {
-  cy.server()
-  cy.route("PUT", `**/nodes/**/permissions`).as("editPermissions")
+  cy.intercept("PUT", `**/nodes/**/permissions`).as("editPermissions")
 
   cy.getByTestId("submit-node-modal").click()
   cy.getByTestId("node-modal", { timeout: 10000 }).should("not.exist")
 })
 
 Cypress.Commands.add("submitSettingsModal", () => {
-  cy.server()
-  cy.route("PUT", `**/settings`).as("save")
+  cy.intercept("PUT", `**/settings`).as("save")
 
   cy.getByTestId("settings-modal").within(() => {
     cy.getByTestId("submit-button").click()
