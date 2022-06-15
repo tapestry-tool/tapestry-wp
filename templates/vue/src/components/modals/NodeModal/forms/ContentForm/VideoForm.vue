@@ -7,11 +7,10 @@
           <b-form-group label="Video URL">
             <file-upload
               id="node-video-media-url"
-              :value="node.typeData.mediaURL"
+              v-model="mediaURL"
               input-test-id="node-video-url"
               placeholder="Enter URL for MP4 or YouTube video"
               required
-              @input="update('typeData.mediaURL', $event)"
               @isUploading="handleUploadChange"
             />
           </b-form-group>
@@ -41,12 +40,11 @@
       <b-col cols="6" md="8">
         <b-form-input
           v-show="useKaltura"
-          :value="node.typeData.kalturaId"
+          v-model="kalturaId"
           data-qa="node-video-kaltura-id"
           name="text-input"
           placeholder="Enter Kaltura video ID"
           required
-          @input="update('typeData.kalturaId', $event)"
         />
       </b-col>
     </b-row>
@@ -56,7 +54,7 @@
 <script>
 import FileUpload from "@/components/modals/common/FileUpload"
 import Helpers from "@/utils/Helpers"
-import { mapMutations, mapState } from "vuex"
+import { mapMutations } from "vuex"
 
 export default {
   components: {
@@ -68,15 +66,20 @@ export default {
     }
   },
   computed: {
-    ...mapState({
-      node: "currentEditingNode",
-    }),
     mediaURL: {
       get() {
         return this.$store.state.currentEditingNode.typeData.mediaURL
       },
       set(value) {
         this.update("typeData.mediaURL", value)
+      },
+    },
+    kalturaId: {
+      get() {
+        return this.$store.state.currentEditingNode.typeData.kalturaId
+      },
+      set(value) {
+        this.update("typeData.kalturaId", value)
       },
     },
     youtubeId() {
@@ -89,9 +92,9 @@ export default {
     },
   },
   created() {
-    if (typeof this.node.typeData.kalturaId === "undefined") {
+    if (typeof this.kalturaId === "undefined") {
       this.update("typeData.kalturaId", "")
-    } else if (this.node.typeData.kalturaId !== "") {
+    } else if (this.kalturaId !== "") {
       this.useKaltura = true
     }
   },
