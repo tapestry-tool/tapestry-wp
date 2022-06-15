@@ -1,21 +1,37 @@
 import Helpers from "./Helpers"
-class PinchZoom {
-  cb
-  debouncedCb
+class ZoomPanHelper {
+  onZoom
+  onZoomEnd
+  onPan
+  onPanEnd
   cache
   lastDistance
+  pinchPoint
+  isPanning
 
-  constructor(targetDOMId, callback, debouncedCallback) {
-    this.cb = callback
-    this.debouncedCb = Helpers.debounce(debouncedCallback)
+  constructor(targetDOMId, onZoom, onZoomEnd, onPan, onPanEnd) {
+    this.onZoom = onZoom
+    this.onZoomEnd = Helpers.debounce(onZoomEnd)
+    this.onPan = onPan
+    this.onPanEnd = Helpers.debounce(onPanEnd)
     this.targetDOMId = targetDOMId
+
+    this.isZooming = false
     this.cache = {}
     this.lastDistance = null
     this.pinchPoint = { x: 0, y: 0 }
+
+    this.isPanning = false
+    this.panPoint = { x: 0, y: 0 }
   }
 
   register() {
     const elem = document.getElementById(this.targetDOMId)
+    // catch panning with mouse
+    elem.addEventListener("mousedown", this.panStartHandler.bind(this))
+    elem.addEventListener("mousemove", this.panMoveHandler.bind(this))
+    elem.addEventListener("mouseup", this.panEndHandler.bind(this))
+    elem.addEventListener("mouseleave", this.panEndHandler.bind(this))
     // catch wheel zoom event for MacOS trackpad pinch zoom
     elem.addEventListener("wheel", this.wheelHandler.bind(this), { passive: false })
     // catch 2-finger pinch zoom on mobile browsers
@@ -28,6 +44,10 @@ class PinchZoom {
   unregister() {
     const elem = document.getElementById(this.targetDOMId)
     if (elem) {
+      elem.removeEventListener("mousedown", this.panStartHandler.bind(this))
+      elem.removeEventListener("mousemove", this.panMoveHandler.bind(this))
+      elem.removeEventListener("mouseup", this.panEndHandler.bind(this))
+      elem.removeEventListener("mouseleave", this.panEndHandler.bind(this))
       elem.removeEventListener("wheel", this.wheelHandler.bind(this), {
         passive: false,
       })
@@ -35,6 +55,31 @@ class PinchZoom {
       elem.removeEventListener("touchmove", this.moveHandler.bind(this))
       elem.removeEventListener("touchcancel", this.endHandler.bind(this))
       elem.removeEventListener("touchend", this.endHandler.bind(this))
+    }
+  }
+
+  panStartHandler(e) {
+    if (!this.isZooming) {
+      this.isPanning = true
+      this.panPoint = { x: e.offsetX, y: e.offsetY }
+    }
+  }
+
+  panMoveHandler(e) {
+    if (this.isPanning) {
+      const x = e.offsetX
+      const y = e.offsetY
+      this.onPan(x - this.panPoint.x, y - this.panPoint.y)
+      this.panPoint.x = x
+      this.panPoint.y = y
+      this.onPanEnd()
+    }
+  }
+
+  panEndHandler() {
+    if (this.isPanning) {
+      this.isPanning = false
+      this.panPoint = { x: 0, y: 0 }
     }
   }
 
@@ -51,8 +96,11 @@ class PinchZoom {
   wheelHandler(e) {
     if (e.ctrlKey) {
       e.preventDefault()
-      this.cb(-0.01 * e.deltaY, e.offsetX, e.offsetY)
-      this.debouncedCb()
+      // panning has higher priority than trackpad pinch zoom
+      if (!this.isPanning) {
+        this.onZoom(-0.01 * e.deltaY, e.offsetX, e.offsetY)
+        this.onZoomEnd()
+      }
     } else {
       // posX -= e.deltaX * 2
       // posY -= e.deltaY * 2
@@ -74,6 +122,9 @@ class PinchZoom {
       pinchPoint.y /= 2
       this.pinchPoint = pinchPoint
       this.lastDistance = this._calcDistance()
+      this.isZooming = true
+      // zooming has higher priority than panning
+      this.isPanning = false
     }
   }
 
@@ -82,6 +133,7 @@ class PinchZoom {
     if (e.targetTouches.length === 2) {
       for (const touch of e.targetTouches) {
         if (!this.cache[touch.identifier]) {
+          this.isZooming = false
           return
         }
         this.cache[touch.identifier] = { x: touch.clientX, y: touch.clientY }
@@ -90,8 +142,8 @@ class PinchZoom {
       if (distance !== null && this.lastDistance !== null) {
         const delta = distance - this.lastDistance
         const scaleDelta = delta * 0.01
-        this.cb(scaleDelta, this.pinchPoint.x, this.pinchPoint.y)
-        this.debouncedCb()
+        this.onZoom(scaleDelta, this.pinchPoint.x, this.pinchPoint.y)
+        this.onZoomEnd()
       }
       this.lastDistance = distance
     }
@@ -100,10 +152,11 @@ class PinchZoom {
   endHandler(e) {
     e.preventDefault()
     if (e.targetTouches.length !== 2) {
+      this.isZooming = false
       this.cache = {}
       this.pinchPoint = { x: 0, y: 0 }
     }
     this.lastDistance = null
   }
 }
-export default PinchZoom
+export default ZoomPanHelper

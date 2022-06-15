@@ -260,20 +260,20 @@ export default {
         value: this.node.level,
         maxValue: this.maxLevel,
         from: 1,
-        to: Math.max(1 - this.maxLevel * 0.05, 0.6),
-      }) // * this.scale
+        to: Math.max(1 - this.maxLevel * 0.1, 0.6),
+      })
     },
     radius() {
       if (!this.show) {
         return 0
       }
       if (this.root) {
-        return 210 * this.radiusModifier
+        return 210 * this.radiusModifier + this.scale * 2 ** this.node.level
       }
       if (this.node.nodeType === "grandchild") {
         return 40
       }
-      return 140 * this.radiusModifier
+      return 140 * this.radiusModifier + this.scale * 2 ** this.node.level
     },
     fill() {
       const showImages = this.settings.hasOwnProperty("renderImages")
