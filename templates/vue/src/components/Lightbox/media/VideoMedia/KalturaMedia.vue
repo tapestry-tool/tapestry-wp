@@ -61,7 +61,6 @@ export default {
             currentTime,
           })
 
-          // kalturaVideo.sendNotification("changeVolume", 1)
           kalturaVideo.sendNotification("doSeek", currentTime)
           this.lastTime = currentTime
           this.onLoad = false
