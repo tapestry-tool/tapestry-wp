@@ -9,9 +9,10 @@
     <template #header>
       <b-form-input
         ref="input"
-        v-model="bucket.text"
+        :value="bucket.text"
         placeholder="Enter bucket name"
         class="side bucket-label"
+        @update="$emit('update-name', $event)"
       ></b-form-input>
     </template>
     <b-form-group v-if="items">
@@ -21,6 +22,7 @@
         :item="item"
         :useImages="useImages"
         :itemRemovalAllowed="itemRemovalAllowed"
+        @update-item="$emit('update-item', $event)"
         @remove-item="$emit('remove-item', item.id)"
       />
       <b-button

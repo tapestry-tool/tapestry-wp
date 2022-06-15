@@ -25,6 +25,7 @@ export const store = {
     theme: "",
     userAnswers: {},
     returnRoute: null,
+    currentEditingNode: null,
   },
   getters,
   mutations,
