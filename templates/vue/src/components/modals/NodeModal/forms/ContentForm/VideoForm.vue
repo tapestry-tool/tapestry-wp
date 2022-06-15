@@ -3,7 +3,7 @@
     <b-form-group label="Video URL">
       <file-upload
         id="node-video-media-url"
-        v-model="node.typeData.mediaURL"
+        v-model="mediaURL"
         input-test-id="node-video-url"
         placeholder="Enter URL for MP4 or YouTube video"
         required
@@ -16,34 +16,41 @@
 <script>
 import FileUpload from "@/components/modals/common/FileUpload"
 import Helpers from "@/utils/Helpers"
+import { mapMutations } from "vuex"
 
 export default {
   components: {
     FileUpload,
   },
-  props: {
-    node: {
-      type: Object,
-      required: true,
-    },
-  },
   computed: {
+    mediaURL: {
+      get() {
+        return this.$store.state.currentEditingNode.typeData.mediaURL
+      },
+      set(value) {
+        this.update("typeData.mediaURL", value)
+      },
+    },
     youtubeId() {
-      return Helpers.getYoutubeID(this.node.typeData.mediaURL)
+      return Helpers.getYoutubeID(this.mediaURL)
     },
   },
   watch: {
     youtubeId(id) {
       if (id !== null) {
-        this.node.mediaFormat = "youtube"
-        this.node.typeData.youtubeID = id
+        this.update("mediaFormat", "youtube")
+        this.update("typeData.youtubeID", id)
       } else {
-        this.node.mediaFormat = "mp4"
-        this.node.typeData.youtubeID = undefined
+        this.update("mediaFormat", "mp4")
+        this.update("typeData.youtubeID", undefined)
       }
     },
   },
   methods: {
+    ...mapMutations(["setCurrentEditingNodeProperty"]),
+    update(property, value) {
+      this.setCurrentEditingNodeProperty({ property, value })
+    },
     handleUploadChange(state) {
       this.$root.$emit("node-modal::uploading", state)
     },

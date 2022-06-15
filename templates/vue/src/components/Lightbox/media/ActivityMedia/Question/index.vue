@@ -138,7 +138,7 @@ export default {
               this.question.followUp.questionId
             ]
           ) {
-            // eslint-disable-next-line vue/no-side-effects-in-computed-properties
+            // eslint-disable-next-line vue/no-side-effects-in-computed-properties, vue/no-mutating-props
             this.question.followUp.nodeId = tempNodeId
             // eslint-disable-next-line vue/no-side-effects-in-computed-properties
             this.prevQuestionId = this.question.followUp.questionId

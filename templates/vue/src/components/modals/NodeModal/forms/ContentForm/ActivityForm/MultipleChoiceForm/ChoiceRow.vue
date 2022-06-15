@@ -49,7 +49,7 @@ export default {
   directives: { handle: HandleDirective },
   mixins: [ElementMixin],
   props: {
-    item: {
+    value: {
       type: Object,
       required: true,
     },
@@ -70,6 +70,16 @@ export default {
       type: Boolean,
       required: false,
       default: true,
+    },
+  },
+  data() {
+    return {
+      item: this.value,
+    }
+  },
+  watch: {
+    item(val) {
+      this.$emit("input", val)
     },
   },
   methods: {
