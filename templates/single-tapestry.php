@@ -12,35 +12,13 @@
 
 <?php
 $iframe_mode = array_key_exists('iframe', $_GET);
-$no_sidebar = array_key_exists('no-sidebar', $_GET);
-if ($iframe_mode):
-?>
 
-<!doctype html>
-<html lang="en-US">
-<head>
-    <meta charset="UTF-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1" />
-	<link rel="profile" href="https://gmpg.org/xfn/11" />
-	<?php wp_head(); ?>
-    <style>
-        #wpadminbar {
-            display: none !important;
-        }
-        <?php if ($no_sidebar): ?>
-        .sidebar-container {
-            display: none !important;
-        }
-        <?php endif; ?>
-    </style>
-</head>
-<body <?php body_class(); ?>>
-<div id="page" class="site">
-<div id="content" class="site-content">
-
-<?php
-else: get_header();
-endif;
+if ($iframe_mode) {
+    load_template(__DIR__ . '/header-frameless.php');
+}
+else {
+    get_header();
+}
 ?>
 
 <div id="primary" class="content-area col-md-12">
@@ -104,16 +82,10 @@ endif;
 </div><!-- #primary -->
 
 <?php
-if ($iframe_mode):
-?>
-
-</div><!-- #content -->
-</div><!-- #page -->
-<?php wp_footer(); ?>
-</body>
-</html>
-
-<?php
-else: get_footer();
-endif;
+if ($iframe_mode) {
+    load_template(__DIR__ . '/footer-frameless.php');
+}
+else {
+    get_footer();
+}
 ?>
