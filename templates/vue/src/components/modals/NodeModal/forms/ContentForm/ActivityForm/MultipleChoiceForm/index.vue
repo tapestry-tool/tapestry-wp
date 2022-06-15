@@ -28,7 +28,7 @@
             :data-qa="`choice-row-${index}`"
             class="choice-row mt-2"
             :index="index"
-            :item="choice"
+            :value="choice"
             :use-image="useImages"
             :is-disabled="
               !allowSelectMultiple &&
@@ -36,6 +36,7 @@
                 preSelectedOptions[0] != choice.id
             "
             :is-removable="choices.length > 2"
+            @input="choices[index] = $event"
             @remove="removeChoice(index, choice)"
             @add="addChoice"
           ></choice-row>
@@ -86,13 +87,14 @@ export default {
     SortableList,
   },
   props: {
-    multipleChoice: {
+    value: {
       type: Object,
       required: true,
     },
   },
   data() {
     return {
+      multipleChoice: this.value,
       allowSelectMultiple: false,
       useImages: false,
       choices: [],
@@ -100,6 +102,12 @@ export default {
     }
   },
   watch: {
+    multipleChoice: {
+      handler(val) {
+        this.$emit("input", val)
+      },
+      deep: true,
+    },
     allowSelectMultiple(newAllowSelectMultiple) {
       this.multipleChoice.allowSelectMultiple = newAllowSelectMultiple
       if (!newAllowSelectMultiple && this.preSelectedOptions.length > 1) {

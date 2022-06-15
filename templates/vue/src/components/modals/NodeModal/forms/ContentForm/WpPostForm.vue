@@ -1,7 +1,7 @@
 <template>
   <b-form-group label="Post Name">
     <combobox
-      v-model="node.typeData.mediaURL"
+      v-model="mediaURL"
       data-qa="wp-combobox"
       item-text="title"
       item-value="id"
@@ -24,17 +24,24 @@ export default {
   components: {
     Combobox,
   },
-  props: {
-    node: {
-      type: Object,
-      required: true,
-    },
-  },
   data() {
     return {
       wpPosts: [],
       emptyMessage: "Wordpress posts are loading...",
     }
+  },
+  computed: {
+    mediaURL: {
+      get() {
+        return this.$store.state.currentEditingNode.typeData.mediaURL
+      },
+      set(value) {
+        this.$store.commit("setCurrentEditingNodeProperty", {
+          property: "typeData.mediaURL",
+          value,
+        })
+      },
+    },
   },
   mounted() {
     this.wpPosts = WordpressApi.loadCachedPosts()
