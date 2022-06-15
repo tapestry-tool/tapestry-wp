@@ -7,7 +7,7 @@
       <label for="popup-time">Popup time in seconds</label>
       <b-form-input
         id="popup-time"
-        v-model.number="node.popup.time"
+        v-model.number="popupTimeValue"
         type="number"
         required
         min="0"
@@ -17,23 +17,31 @@
 </template>
 
 <script>
+import { mapMutations, mapState } from "vuex"
 export default {
   props: {
-    node: {
-      type: Object,
-      required: true,
-    },
     isCandidate: {
       type: Boolean,
       required: true,
     },
   },
   computed: {
+    ...mapState({
+      popup: state => state.currentEditingNode.popup,
+    }),
     isPopup() {
-      return this.node.popup != null
+      return this.popup != null
     },
     popupTime() {
-      return this.isPopup ? this.node.popup.time : 0
+      return this.isPopup ? this.popupTimeValue : 0
+    },
+    popupTimeValue: {
+      get() {
+        return this.popup.time
+      },
+      set(value) {
+        this.update("popup.time", value)
+      },
     },
   },
   watch: {
@@ -43,16 +51,20 @@ export default {
     */
     isCandidate() {
       if (!this.isCandidate) {
-        this.$set(this.node, "popup", null)
+        this.update("popup", null)
       }
     },
   },
   methods: {
+    ...mapMutations(["setCurrentEditingNodeProperty"]),
+    update(property, value) {
+      this.setCurrentEditingNodeProperty({ property, value })
+    },
     togglePopup() {
       if (this.isPopup) {
-        this.$set(this.node, "popup", null)
+        this.update("popup", null)
       } else {
-        this.$set(this.node, "popup", {
+        this.update("popup", {
           time: 0,
         })
       }
