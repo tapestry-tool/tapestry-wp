@@ -36,6 +36,8 @@
           class="embed-code"
           data-qa="embed-code"
           readonly
+          rows="2"
+          max-rows="10"
           :value="embed"
           @focus="handleFocus"
         ></b-form-textarea>
