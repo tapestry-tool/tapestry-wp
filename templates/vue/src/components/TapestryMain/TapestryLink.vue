@@ -47,6 +47,11 @@ export default {
       type: Object,
       required: true,
     },
+    scale: {
+      type: Number,
+      required: false,
+      default: 1,
+    }
   },
   computed: {
     ...mapState(["visibleNodes", "rootId"]),
@@ -58,7 +63,7 @@ export default {
       return wp.isLoggedIn()
     },
     polygonPoints() {
-      return Helpers.getLinePolygonPoints(this.source, this.target)
+      return Helpers.getLinePolygonPoints(this.source, this.target, Math.max(this.scale / 2, 1))
     },
   },
   methods: {

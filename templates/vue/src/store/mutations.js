@@ -10,7 +10,7 @@ export function init(state, dataset) {
       let maxLevel = 1
       Object.values(value).forEach(node => {
         // Has to call this so `state.nodes` is reactive
-        const level = Math.ceil(Math.random() * 3)
+        const level = Math.ceil(Math.random() * 5)
         Vue.set(state.nodes, node.id, {
           ...node,
           level: level,

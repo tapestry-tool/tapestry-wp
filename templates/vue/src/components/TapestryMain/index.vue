@@ -25,6 +25,7 @@
           :key="`${link.source}-${link.target}`"
           :source="nodes[link.source]"
           :target="nodes[link.target]"
+          :scale="scale"
         ></tapestry-link>
       </g>
       <g v-if="dragSelectEnabled && dragSelectReady" class="nodes">
@@ -171,6 +172,7 @@ export default {
     this.zoomPanHelper = new ZoomPanHelper(
       "tapestry",
       (delta, x, y) => {
+        delta *= 0.8
         if (!this.appDimensions) {
           this.fetchAppDimensions()
         }

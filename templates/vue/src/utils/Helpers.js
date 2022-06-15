@@ -425,7 +425,7 @@ export default class Helpers {
     return from + (to - from) * ((value - minValue) / (maxValue - minValue))
   }
 
-  static getLinePolygonPoints(source, target) {
+  static getLinePolygonPoints(source, target, scale = 1) {
     const x1 = source.coordinates.x,
       y1 = source.coordinates.y,
       x2 = target.coordinates.x,
@@ -440,6 +440,8 @@ export default class Helpers {
       width1 = 2
       width2 = 8
     }
+    width1 /= scale
+    width2 /= scale
     const angle = Math.atan((y2 - y1) / (x2 - x1))
     const dx1 = -1 * width1 * Math.sin(angle),
       dy1 = width1 * Math.cos(angle),

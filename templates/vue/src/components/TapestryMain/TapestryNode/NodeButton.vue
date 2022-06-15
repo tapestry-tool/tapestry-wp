@@ -44,6 +44,11 @@ export default {
       required: false,
       default: "#666",
     },
+    scale: {
+      type: Number,
+      required: false,
+      default: 1,
+    }
   },
 }
 </script>

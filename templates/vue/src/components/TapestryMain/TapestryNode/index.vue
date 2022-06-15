@@ -41,7 +41,7 @@
       </transition>
       <progress-bar
         v-if="
-          node.nodeType !== 'grandchild' &&
+          !this.isGrandChild &&
             node.nodeType !== '' &&
             !node.hideProgress
         "
@@ -55,7 +55,7 @@
       ></progress-bar>
       <status-bar
         v-if="
-          node.nodeType !== 'grandchild' &&
+          !this.isGrandChild &&
             node.nodeType !== '' &&
             !node.hideProgress
         "
@@ -68,17 +68,17 @@
         :enableHighlight="highlightNode"
         :data-qa="`node-status-${node.id}`"
       ></status-bar>
-      <g v-show="node.nodeType !== 'grandchild' && node.nodeType !== ''">
+      <g v-show="!this.isGrandChild && node.nodeType !== ''">
         <transition name="fade">
           <foreignObject
             v-if="!node.hideTitle"
             v-show="!isHovered || !thumbnailURL || selected || !node.accessible"
             :data-qa="`node-title-${node.id}`"
             class="metaWrapper"
-            :width="(140 * 2 * 5) / 6"
-            :height="(140 * 2 * 5) / 6"
-            :x="-(140 * 5) / 6"
-            :y="-(140 * 5) / 6"
+            :width="(radius * 2 * 5) / 6"
+            :height="(radius * 2 * 5) / 6"
+            :x="-(radius * 5) / 6"
+            :y="-(radius * 5) / 6"
           >
             <div class="meta" :style="{ color: node.textColor }">
               <p class="title">{{ node.title }}</p>
@@ -89,7 +89,7 @@
             </div>
           </foreignObject>
         </transition>
-        <g v-show="!transitioning">
+        <g>
           <node-button
             v-if="!node.hideMedia"
             :x="0"
@@ -98,8 +98,9 @@
             :data-qa="`open-node-${node.id}`"
             :disabled="!node.accessible && !hasPermission('edit')"
             @click="handleRequestOpen"
+            :scale="scale"
           >
-            <tapestry-icon :icon="icon" svg></tapestry-icon>
+            <tapestry-icon :icon="icon" svg :scale="scale"></tapestry-icon>
           </node-button>
           <template v-if="isLoggedIn">
             <add-child-button
@@ -111,6 +112,7 @@
               :fill="buttonBackgroundColor"
               :x="canReview || hasPermission('edit') ? -35 : 0"
               :y="radius"
+              :scale="scale"
             ></add-child-button>
             <node-button
               v-if="hasPermission('edit')"
@@ -119,8 +121,9 @@
               :fill="buttonBackgroundColor"
               :data-qa="`edit-node-${node.id}`"
               @click="editNode(node.id)"
+              :scale="scale"
             >
-              <tapestry-icon icon="pen" svg></tapestry-icon>
+              <tapestry-icon icon="pen" svg :scale="scale"></tapestry-icon>
             </node-button>
             <node-button
               v-else-if="canReview"
@@ -129,8 +132,9 @@
               :fill="buttonBackgroundColor"
               :data-qa="`review-node-${node.id}`"
               @click="reviewNode"
+              :scale="scale"
             >
-              <tapestry-icon icon="comment-dots" svg></tapestry-icon>
+              <tapestry-icon icon="comment-dots" svg :scale="scale"></tapestry-icon>
             </node-button>
           </template>
         </g>
@@ -255,12 +259,15 @@ export default {
     show() {
       return this.isVisible(this.node.id)
     },
+    isGrandChild() {
+      return this.node.nodeType === "grandchild" || Math.floor(this.scale) <= this.node.level - 3
+    },
     radiusModifier() {
       return Helpers.mapValue({
         value: this.node.level,
         maxValue: this.maxLevel,
         from: 1,
-        to: Math.max(1 - this.maxLevel * 0.1, 0.6),
+        to: Math.max(1 - this.maxLevel * 0.15, 0.3),
       })
     },
     radius() {
@@ -268,12 +275,12 @@ export default {
         return 0
       }
       if (this.root) {
-        return 210 * this.radiusModifier + this.scale * 2 ** this.node.level
+        return 210 * this.radiusModifier + this.scale * 2 * this.node.level
       }
-      if (this.node.nodeType === "grandchild") {
+      if (this.isGrandChild) {
         return 40
       }
-      return 140 * this.radiusModifier + this.scale * 2 ** this.node.level
+      return 140 * this.radiusModifier + this.scale * 2 * this.node.level
     },
     fill() {
       const showImages = this.settings.hasOwnProperty("renderImages")
@@ -284,7 +291,7 @@ export default {
         this.node.level === 1 ? 0 : 1.1 ** (this.node.level - 1) * 10
       )
 
-      if (this.node.nodeType !== "grandchild") {
+      if (!this.isGrandChild) {
         if (showImages && this.thumbnailURL) {
           return `url(#node-image-${this.node.id})`
         } else {

@@ -86,6 +86,11 @@ export default {
       required: false,
       default: false,
     },
+    scale: {
+      type: Number,
+      required: false,
+      default: 1,
+    }
   },
   computed: {
     svgClass() {
