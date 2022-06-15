@@ -22,6 +22,8 @@ describe("Activity", () => {
         .first()
         .getByTestId("import-file-input")
         .attachFile("reddit.png")
+      cy.wait("@upload")
+      cy.get(".custom-file-label").contains("reddit.png")
       cy.get(".item-text")
         .first()
         .type("item 1")
@@ -36,7 +38,7 @@ describe("Activity", () => {
         .type(toBucketLabel2)
       cy.submitModal()
       cy.openLightbox(node.id)
-      cy.intercept("POST", "/users/activity/**").as("submit")
+      cy.intercept("POST", "**/users/activity?**").as("submit")
       cy.lightbox().within(() => {
         const dataTransfer = new DataTransfer()
         cy.get(".user-item")
@@ -46,6 +48,7 @@ describe("Activity", () => {
           .last()
           .trigger("drop", { dataTransfer })
         cy.contains(/submit/i).click()
+        cy.wait("@submit")
         cy.contains("You can press the button below to continue.").should(
           "be.visible"
         )
@@ -109,7 +112,7 @@ describe("Activity", () => {
         .type(toBucketLabel2)
       cy.submitModal()
       cy.openLightbox(node.id)
-      cy.intercept("POST", "/users/activity/**").as("submit")
+      cy.intercept("POST", "**/users/activity?**").as("submit")
       cy.lightbox().within(() => {
         //cy.get("input").type(answer)
         const dataTransfer = new DataTransfer()
@@ -152,6 +155,7 @@ describe("Activity", () => {
           .first()
           .trigger("drop", { dataTransfer })
         cy.contains(/submit/i).click()
+        cy.wait("@submit")
         cy.contains("You can press the button below to continue.").should(
           "be.visible"
         )
@@ -215,7 +219,7 @@ describe("Activity", () => {
         .type(toBucketLabel2)
       cy.submitModal()
       cy.openLightbox(node.id)
-      cy.intercept("POST", "**/quiz*").as("submit")
+      cy.intercept("POST", "**/users/activity?**").as("submit")
       cy.lightbox().within(() => {
         const dataTransfer = new DataTransfer()
         cy.get(".user-item")
@@ -231,6 +235,7 @@ describe("Activity", () => {
           .last()
           .trigger("drop", { dataTransfer })
         cy.contains(/submit/i).click()
+        cy.wait("@submit")
         cy.contains("You can press the button below to continue.").should(
           "be.visible"
         )
@@ -267,7 +272,7 @@ describe("Activity", () => {
         .type("3")
       cy.submitModal()
       cy.openLightbox(node.id)
-      cy.intercept("POST", "/users/activity/**").as("submit")
+      cy.intercept("POST", "**/users/activity?**").as("submit")
       cy.lightbox().within(() => {
         cy.getByTestId(`multiple-choice-question-0`)
           .getByTestId(`multiple-choice-question-item-0-checked`)
@@ -276,6 +281,7 @@ describe("Activity", () => {
           .getByTestId(`multiple-choice-question-item-1-checked`)
           .click({ force: true })
         cy.contains(/submit/i).click()
+        cy.wait("@submit")
         cy.contains("You can press the button below to continue.").should(
           "be.visible"
         )
@@ -309,12 +315,13 @@ describe("Activity", () => {
         .type("10")
       cy.submitModal()
       cy.openLightbox(node.id)
-      cy.intercept("POST", "/users/activity/**").as("submit")
+      cy.intercept("POST", "**/users/activity?**").as("submit")
       cy.lightbox().within(() => {
         cy.getByTestId(`multiple-choice-question-2`)
           .getByTestId(`multiple-choice-question-item-2-checked`)
           .click({ force: true })
         cy.contains(/submit/i).click()
+        cy.wait("@submit")
         cy.contains("You can press the button below to continue.").should(
           "be.visible"
         )
@@ -348,7 +355,7 @@ describe("Activity", () => {
       cy.getByTestId("question-answer-text-single-placeholder-1").type(placeholder2)
       cy.submitModal()
       cy.openLightbox(node.id)
-      cy.intercept("POST", "/users/activity/**").as("submit")
+      cy.intercept("POST", "**/users/activity?**").as("submit")
       cy.lightbox().within(() => {
         cy.get(`[placeholder="${placeholder}"]`).should("be.visible")
         cy.getByTestId("question-prev-button").should("be.disabled")
@@ -362,8 +369,10 @@ describe("Activity", () => {
         cy.get(`[placeholder="${placeholder}"]`).should("be.visible")
         cy.get("input").type(answer)
         cy.contains(/submit/i).click()
+        cy.wait("@submit")
         cy.get("input").type(answer2)
         cy.contains(/submit/i).click()
+        cy.wait("@submit")
         cy.contains("You can press the button below to continue.").should(
           "be.visible"
         )
@@ -388,11 +397,12 @@ describe("Activity", () => {
       cy.getByTestId("question-answer-text-single-placeholder-0").type(placeholder)
       cy.submitModal()
       cy.openLightbox(node.id)
-      cy.intercept("POST", "/users/activity/**").as("submit")
+      cy.intercept("POST", "**/users/activity?**").as("submit")
       cy.lightbox().within(() => {
         cy.get(`[placeholder="${placeholder}"]`).should("be.visible")
         cy.get("input").type(answer)
         cy.contains(/submit/i).click()
+        cy.wait("@submit")
         cy.contains("You can press the button below to continue.").should(
           "be.visible"
         )
@@ -410,10 +420,11 @@ describe("Activity", () => {
       cy.submitModal()
       cy.openLightbox(node.id)
       cy.contains(/Change answers/i).click()
-      cy.intercept("POST", "/users/activity/**").as("submit")
+      cy.intercept("POST", "**/users/activity?**").as("submit")
       cy.lightbox().within(() => {
         cy.get("textarea").type(answer2)
         cy.contains(/submit/i).click()
+        cy.wait("@submit")
         cy.contains("You can press the button below to continue.").should(
           "be.visible"
         )
@@ -438,11 +449,12 @@ describe("Activity", () => {
       cy.getByTestId("question-answer-text-single-placeholder-0").type(placeholder)
       cy.submitModal()
       cy.openLightbox(node.id)
-      cy.intercept("POST", "/users/activity/**").as("submit")
+      cy.intercept("POST", "**/users/activity?**").as("submit")
       cy.lightbox().within(() => {
         cy.get(`[placeholder="${placeholder}"]`).should("be.visible")
         cy.get("input").type(answer)
         cy.contains(/submit/i).click()
+        cy.wait("@submit")
         cy.contains("You can press the button below to continue.").should(
           "be.visible"
         )
@@ -497,7 +509,7 @@ describe("Activity", () => {
       cy.getByTestId("enable-list-checkbox").click({ force: true })
       cy.submitModal()
       cy.openLightbox(node.id)
-      cy.intercept("POST", "/users/activity/**").as("submit")
+      cy.intercept("POST", "**/users/activity?**").as("submit")
       cy.lightbox().within(() => {
         cy.get(`[placeholder="${listPlaceholder}"]`).should("be.visible")
         cy.getByTestId("list-input-0").type("British Columbia")
@@ -508,6 +520,7 @@ describe("Activity", () => {
         cy.getByTestId("list-add-2").click()
         cy.getByTestId("list-input-3").type("Manitoba")
         cy.contains(/submit/i).click()
+        cy.wait("@submit")
         cy.contains("You can press the button below to continue.").should(
           "be.visible"
         )
@@ -548,7 +561,7 @@ describe("Activity", () => {
       cy.getByTestId("max-list-fields-input").type(maxFieldsValue)
       cy.submitModal()
       cy.openLightbox(node.id)
-      cy.intercept("POST", "/users/activity/**").as("submit")
+      cy.intercept("POST", "**/users/activity?**").as("submit")
       cy.lightbox().within(() => {
         cy.get(`[placeholder="${listPlaceholder}"]`).should("be.visible")
         cy.get(`.activity-media`).scrollTo("bottom", {
@@ -564,6 +577,7 @@ describe("Activity", () => {
           cy.getByTestId(`list-input-${index}`).type(`Thing ${index}`)
           if (index === 9) {
             cy.contains(/submit/i).click()
+            cy.wait("@submit")
             cy.contains("You can press the button below to continue.").should(
               "be.visible"
             )
@@ -604,7 +618,6 @@ describe("Activity", () => {
       cy.getByTestId("question-answer-text-single-placeholder-0").type(placeholder)
       cy.submitModal()
       cy.openLightbox(node.id)
-      cy.intercept("POST", "/users/activity/**").as("submit")
       cy.lightbox().within(() => {
         cy.contains(/skip/i).click()
         cy.contains("You can press the button below to continue.").should(

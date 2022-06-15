@@ -85,8 +85,6 @@ Cypress.Commands.add(
   "updateNodeProgress",
   { prevSubject: false },
   (id, progress) => {
-    cy.intercept("POST", `**/users/progress`).as("saveProgress")
-
     cy.store().then(store => store.dispatch("updateNodeProgress", { id, progress }))
 
     cy.store()
@@ -155,8 +153,6 @@ Cypress.Commands.add("openModal", (type, id) => {
 })
 
 Cypress.Commands.add("submitModal", () => {
-  cy.intercept("PUT", `**/nodes/**/permissions`).as("editPermissions")
-
   cy.getByTestId("submit-node-modal").click()
   cy.getByTestId("node-modal", { timeout: 10000 }).should("not.exist")
 })
