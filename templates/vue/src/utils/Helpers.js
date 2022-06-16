@@ -423,6 +423,9 @@ export default class Helpers {
    * @return {number}
    */
   static mapValue({ value, minValue = 1, maxValue, from, to }) {
+    if (maxValue === minValue) {
+      return from
+    }
     return from + (to - from) * ((value - minValue) / (maxValue - minValue))
   }
 
