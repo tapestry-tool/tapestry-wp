@@ -103,7 +103,6 @@
               :fill="buttonBackgroundColor"
               :x="canReview || hasPermission('edit') ? -35 : 0"
               :y="radius"
-              :scale="scale"
             ></add-child-button>
             <node-button
               v-if="hasPermission('edit')"

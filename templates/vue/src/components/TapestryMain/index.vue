@@ -66,7 +66,7 @@
 
 <script>
 import DragSelectModular from "@/utils/dragSelectModular"
-import { mapMutations, mapState } from "vuex"
+import { mapGetters, mapMutations, mapState } from "vuex"
 import TapestryNode from "./TapestryNode"
 import TapestryLink from "./TapestryLink"
 import RootNodeButton from "./RootNodeButton"
@@ -98,6 +98,7 @@ export default {
   },
   computed: {
     ...mapState(["nodes", "links", "selection", "settings", "rootId", "maxLevel"]),
+    ...mapGetters(["getNode"]),
     computedViewBox() {
       // return this.viewBox.join(" ")
       return `${this.viewBox[0] + this.offset.x} ${this.viewBox[1] +
@@ -145,6 +146,8 @@ export default {
                 }
           )
         }
+        // this.panToNode(nodeId)
+        this.updateViewBox()
       },
     },
   },
@@ -238,6 +241,31 @@ export default {
         width,
         height,
       }
+    },
+    panToNode(nodeId) {
+      // TODO: This code is currently not working!
+      const node = this.getNode(nodeId)
+
+      const relativeX =
+        node.coordinates.x * this.scale - this.viewBox[0] - this.offset.x
+      const relativeY =
+        node.coordinates.y * this.scale - this.viewBox[1] - this.offset.y
+
+      const centerX = this.viewBox[2] / 2
+      const centerY = this.viewBox[3] / 2
+
+      console.log(relativeX, relativeY)
+      console.log(centerX, centerY)
+
+      console.log(this.viewBox[0], this.viewBox[1])
+      this.viewBox[0] += centerX - relativeX + this.offset.x
+      this.viewBox[1] += centerY - relativeY + this.offset.y
+      console.log(this.viewBox[0], this.viewBox[1])
+
+      this.offset.x = 0
+      this.offset.y = 0
+
+      this.updateOffset()
     },
     updateScale() {
       this.$router.push({
