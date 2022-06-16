@@ -6,15 +6,46 @@
     </div>
     <svg v-else id="vue-svg" :viewBox="computedViewBox">
       <defs>
-        <filter v-for="i in maxLevel" :id="'shadow-' + i" :key="i">
+        <filter
+          v-for="i in maxLevel"
+          :id="'shadow-' + i"
+          :key="i"
+          y="-10%"
+          height="150%"
+          x="-10%"
+          width="150%"
+        >
           <!-- <feDropShadow :dx="(2**i)*3" :dy="(2**i)*3" stdDeviation="4" flood-opacity="0.2" /> -->
-          <feGaussianBlur in="SourceAlpha" stdDeviation="4" />
+          <feGaussianBlur in="SourceAlpha" stdDeviation="5" />
           <feOffset
-            :dx="2 * (maxLevel - i) * scale"
-            :dy="7 * (maxLevel - i) * scale"
+            :dx="3 * (maxLevel - i) * scale"
+            :dy="6 * (maxLevel - i) * scale"
           />
           <feComponentTransfer>
-            <feFuncA type="linear" :slope="Math.max(0.5 - i * 0.05, 0.1)" />
+            <feFuncA type="linear" :slope="Math.max(0.4 - i * 0.05, 0.1)" />
+          </feComponentTransfer>
+          <feMerge>
+            <feMergeNode />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+        <filter
+          v-for="i in maxLevel"
+          :id="'line-shadow-' + i"
+          :key="maxLevel + i"
+          y="-10%"
+          height="200%"
+          x="-10%"
+          width="200%"
+        >
+          <!-- <feDropShadow :dx="(2**i)*3" :dy="(2**i)*3" stdDeviation="4" flood-opacity="0.2" /> -->
+          <feGaussianBlur in="SourceAlpha" stdDeviation="5" />
+          <feOffset
+            :dx="3 * (maxLevel - i) * scale"
+            :dy="3 * (maxLevel - i) * scale"
+          />
+          <feComponentTransfer>
+            <feFuncA type="linear" slope="0.1" />
           </feComponentTransfer>
           <feMerge>
             <feMergeNode />

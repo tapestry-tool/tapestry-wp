@@ -24,6 +24,9 @@
           !visibleNodes.includes(source.id) || !visibleNodes.includes(target.id),
         disabled: !isLoggedIn,
       }"
+      :style="{
+        filter: `url(#line-shadow-${source.level})`,
+      }"
       :points="polygonPoints"
       @click="openLinkModal"
     ></polygon>

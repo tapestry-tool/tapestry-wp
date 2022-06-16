@@ -459,11 +459,11 @@ export default class Helpers {
       width2 = Helpers.getNodeRadius(target.level, maxLevel, scale) * 0.05
     // make width differences more dramatic for better visual aid
     if (source.level < target.level) {
-      width1 *= 1.2
-      width2 *= 0.8
+      width1 *= 1.8
+      width2 *= 0.4
     } else if (source.level > target.level) {
-      width2 *= 1.2
-      width1 *= 0.8
+      width2 *= 1.8
+      width1 *= 0.4
     }
     const angle = Math.atan((y2 - y1) / (x2 - x1))
     const dx1 = -1 * width1 * Math.sin(angle),
