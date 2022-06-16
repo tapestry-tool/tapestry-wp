@@ -261,11 +261,11 @@ export default {
       return Helpers.getCurrentLevel(this.scale)
     },
     isGrandChild() {
-      return false
-      return (
-        this.node.nodeType === "grandchild" ||
-        this.node.level > this.currentLevel + 2
-      )
+      return this.node.nodeType === "grandchild"
+      // return (
+      //   this.node.nodeType === "grandchild" ||
+      //   this.node.level > this.currentLevel + 2
+      // )
     },
     radius() {
       if (!this.show) {
@@ -418,7 +418,9 @@ export default {
           }
         })
         .on("end", () => {
-          for (const [id, originalCoordinates] of Object.entries(this.dragCoordinates)) {
+          for (const [id, originalCoordinates] of Object.entries(
+            this.dragCoordinates
+          )) {
             const node = this.getNode(id)
             node.coordinates.x += d3.event.dx / this.scale
             node.coordinates.y += d3.event.dy / this.scale

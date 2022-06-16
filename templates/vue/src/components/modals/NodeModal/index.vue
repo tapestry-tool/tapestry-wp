@@ -46,9 +46,7 @@
             style="overflow: hidden;"
             @click="changeTab('content')"
           >
-            <b-form-group
-              label="Debug: Set Node Level"
-            >
+            <b-form-group label="Debug: Set Node Level">
               <b-form-input
                 :value="node.level"
                 data-qa="node-level-input"
