@@ -54,7 +54,7 @@
             :node="node"
             :question="question"
             :answer="answer || ''"
-            @skipQuestion="$emit('skipQuestion')"
+            @skip-question="$emit('skip-question')"
             @submit="handleSubmit"
           ></component>
         </div>
@@ -222,7 +222,7 @@ export default {
         return this.$emit("submit")
       }
 
-      this.$emit("beforeSubmit")
+      this.$emit("before-submit")
 
       let submittedAnswer = null
 

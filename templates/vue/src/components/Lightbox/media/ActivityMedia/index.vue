@@ -25,9 +25,9 @@
       v-else-if="state === 'activity'"
       :question="activeQuestion"
       :node="questionNode"
-      @beforeSubmit="scrollToTop('instant')"
+      @before-submit="scrollToTop('instant')"
       @submit="handleComplete('activity')"
-      @skipQuestion="skip"
+      @skip-question="skip"
       @back="$emit('close')"
     ></question>
     <answer-media
