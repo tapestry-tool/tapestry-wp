@@ -81,7 +81,7 @@
             </div>
           </foreignObject>
         </transition>
-        <g>
+        <g v-show="radius >= 80">
           <node-button
             v-if="!node.hideMedia"
             :x="0"
@@ -89,10 +89,9 @@
             :fill="buttonBackgroundColor"
             :data-qa="`open-node-${node.id}`"
             :disabled="!node.accessible && !hasPermission('edit')"
-            :scale="scale"
             @click="handleRequestOpen"
           >
-            <tapestry-icon :icon="icon" svg :scale="scale"></tapestry-icon>
+            <tapestry-icon :icon="icon" svg></tapestry-icon>
           </node-button>
           <template v-if="isLoggedIn">
             <add-child-button
@@ -112,10 +111,9 @@
               :y="radius"
               :fill="buttonBackgroundColor"
               :data-qa="`edit-node-${node.id}`"
-              :scale="scale"
               @click="editNode(node.id)"
             >
-              <tapestry-icon icon="pen" svg :scale="scale"></tapestry-icon>
+              <tapestry-icon icon="pen" svg></tapestry-icon>
             </node-button>
             <node-button
               v-else-if="canReview"
@@ -123,10 +121,9 @@
               :y="radius"
               :fill="buttonBackgroundColor"
               :data-qa="`review-node-${node.id}`"
-              :scale="scale"
               @click="reviewNode"
             >
-              <tapestry-icon icon="comment-dots" svg :scale="scale"></tapestry-icon>
+              <tapestry-icon icon="comment-dots" svg></tapestry-icon>
             </node-button>
           </template>
         </g>
