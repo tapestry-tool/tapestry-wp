@@ -48,7 +48,7 @@ export default {
       type: Number,
       required: false,
       default: 1,
-    }
+    },
   },
 }
 </script>
