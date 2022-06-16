@@ -3,25 +3,25 @@
     <tapestry-filter v-if="!showMap" style="z-index: 10" />
     <div :class="[{ 'hide-toolbar': hideToolbar }, 'slider-wrapper']">
       <b-container class="can-edit">
-        <template v-if="isLoggedIn">
-          <b-col class="p-0">
-            <user-settings-button
-              data-qa="user-settings-button"
-            ></user-settings-button>
-          </b-col>
-          <template v-if="canEdit || (!showMap && hasDepth)">
-            <b-col v-if="canEdit" class="p-0">
-              <help-button />
-            </b-col>
-            <b-col v-if="canEdit && settings.submitNodesEnabled" class="p-0">
-              <review-notifications />
-            </b-col>
-            <b-col v-if="canEdit" class="p-0">
-              <settings-modal-button :max-depth="maxDepth"></settings-modal-button>
-            </b-col>
-          </template>
-        </template>
         <b-row align-v="center">
+          <template v-if="isLoggedIn">
+            <b-col class="p-0">
+              <user-settings-button
+                data-qa="user-settings-button"
+              ></user-settings-button>
+            </b-col>
+            <template v-if="canEdit || (!showMap && hasDepth)">
+              <b-col v-if="canEdit" class="p-0">
+                <help-button />
+              </b-col>
+              <b-col v-if="canEdit && settings.submitNodesEnabled" class="p-0">
+                <review-notifications />
+              </b-col>
+              <b-col v-if="canEdit" class="p-0">
+                <settings-modal-button :max-depth="maxDepth"></settings-modal-button>
+              </b-col>
+            </template>
+          </template>
           <tapestry-depth-slider
             v-show="!showMap && hasDepth"
             @change="updateViewBox"
