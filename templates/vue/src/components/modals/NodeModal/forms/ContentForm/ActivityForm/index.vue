@@ -82,7 +82,7 @@
             text-variant="dark"
             class="mb-3"
           >
-            <b-form-group class="optional-checkbox">
+            <b-form-group class="topright-checkbox">
               <b-form-checkbox
                 v-model="question.optional"
                 data-qa="question-optional-checkbox"
@@ -247,7 +247,7 @@
             bg-variant="light"
             text-variant="dark"
           >
-            <b-form-group>
+            <b-form-group class="topright-checkbox">
               <b-form-checkbox
                 :checked="
                   question.confirmation.title.length !== 0 ||
@@ -256,7 +256,12 @@
                 switch
                 @change="setCustomConfirmation(question, $event)"
               >
-                Use custom confirmation
+                {{
+                  question.confirmation.title.length !== 0 ||
+                  question.confirmation.message.length !== 0
+                    ? "Customized"
+                    : "Default"
+                }}
               </b-form-checkbox>
             </b-form-group>
             <template
@@ -455,7 +460,7 @@ export default {
     margin-right: 4px;
   }
 
-  .optional-checkbox {
+  .topright-checkbox {
     position: absolute;
     right: 20px;
     top: 10px;
