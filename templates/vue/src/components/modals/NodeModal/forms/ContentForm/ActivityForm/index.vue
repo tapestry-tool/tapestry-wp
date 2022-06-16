@@ -218,8 +218,7 @@
               <div class="mt-2 pl-4 ml-2">
                 <drag-drop-form
                   v-if="question.answerTypes.dragDrop.enabled"
-                  :node="node"
-                  :drag-drop="question.answerTypes.dragDrop"
+                  v-model="question.answerTypes.dragDrop"
                   :question-id="question.id"
                 />
               </div>
@@ -237,7 +236,7 @@
                 class="mt-2 pl-4 ml-2"
               >
                 <multiple-choice-form
-                  :multipleChoice="question.answerTypes.multipleChoice"
+                  v-model="question.answerTypes.multipleChoice"
                   data-qa="authoring-multiple-choice-form"
                 />
               </div>
@@ -347,43 +346,55 @@ export default {
     DragDropForm,
     MultipleChoiceForm,
   },
-  props: {
-    node: {
-      type: Object,
-      required: true,
-    },
-  },
   data() {
     return {
-      questions: this.node.typeData.activity?.questions || [],
+      questions:
+        this.$store.state.currentEditingNode.typeData.activity?.questions || [],
     }
   },
   computed: {
     ...mapState(["nodes"]),
     ...mapGetters(["getQuestion"]),
+    activity: {
+      get() {
+        return this.$store.state.currentEditingNode.typeData.activity
+      },
+      set(value) {
+        this.$store.commit("setCurrentEditingNodeProperty", {
+          property: "typeData.activity",
+          value,
+        })
+      },
+    },
   },
   watch: {
-    questions(newQuestions) {
-      this.$set(this.node.typeData.activity, "questions", newQuestions)
+    questions: {
+      handler(value) {
+        this.$store.commit("setCurrentEditingNodeProperty", {
+          property: "typeData.activity.questions",
+          value,
+        })
+      },
+      deep: true,
     },
   },
   created() {
-    if (!this.node.typeData.activity) {
-      this.node.typeData.activity = {
+    if (!this.activity) {
+      this.activity = {
         questions: [],
       }
     }
-    if (!this.node.typeData.activity.questions.length) {
+    if (!this.activity?.questions.length) {
       this.addQuestion()
     }
     // This is needed for backwards compatibility as we add new question types
-    this.node.typeData.activity.questions.forEach((question, index) => {
-      question.answerTypes = {
+    this.questions = this.questions.map(question => ({
+      ...question,
+      answerTypes: {
         ...defaultQuestion.answerTypes,
         ...question.answerTypes,
-      }
-      this.$set(this.node.typeData.activity.questions, index, question)
-    })
+      },
+    }))
   },
   methods: {
     getPreviousQuestions(currentQuestion) {

@@ -62,7 +62,9 @@ export default {
   },
   data() {
     return {
-      userSelection: this.allowSelectMultiple ? [] : null,
+      userSelection: this.question.answerTypes.multipleChoice.allowSelectMultiple
+        ? []
+        : null,
       submitPressed: false,
     }
   },

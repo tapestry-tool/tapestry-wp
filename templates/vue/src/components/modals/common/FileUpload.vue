@@ -23,7 +23,7 @@
       </b-row>
     </template>
     <b-row v-if="!isUploading || compactMode">
-      <b-col v-if="showImagePreview" class="thumbnail-col">
+      <b-col v-if="showImagePreviewValue" class="thumbnail-col">
         <svg
           width="130"
           height="130"
@@ -103,7 +103,7 @@
       </b-col>
       <b-col>
         <div v-if="!compactMode">
-          <div v-if="showImagePreview && value">
+          <div v-if="showImagePreviewValue && value">
             <h6>Operations:</h6>
             <b-button
               class="mb-2"
@@ -124,7 +124,7 @@
             </b-button>
             <h6 v-else>Change image:</h6>
           </div>
-          <b-row v-if="!showImagePreview || !value || changeImage">
+          <b-row v-if="!showImagePreviewValue || !value || changeImage">
             <b-col :class="{ 'pr-0': showUrlUpload }">
               <b-form-file
                 ref="file"
@@ -145,7 +145,7 @@
               <b-col cols="1" class="divider">
                 <h6 class="text-muted">OR</h6>
               </b-col>
-              <b-col :class="{ 'pl-0': !showImagePreview }">
+              <b-col :class="{ 'pl-0': !showImagePreviewValue }">
                 <b-form-input
                   name="text-input"
                   :placeholder="placeholder"
@@ -236,23 +236,22 @@ export default {
       isUploading: false,
       confirmedUpload: true,
       changeImage: false,
-      imagePatternId: "",
       error: null,
     }
   },
-  created() {
-    // NOTE: compactMode cannot work without showing the image preview
-    if (this.compactMode) {
-      this.showImagePreview = true
-    }
-
-    if (this.showImagePreview) {
-      this.imagePatternId =
-        "thumbnail-preview-" +
-        Math.random()
-          .toString(36)
-          .substring(9)
-    }
+  computed: {
+    showImagePreviewValue() {
+      // NOTE: compactMode cannot work without showing the image preview
+      return this.compactMode || this.showImagePreview
+    },
+    imagePatternId() {
+      return this.showImagePreviewValue
+        ? "thumbnail-preview-" +
+            Math.random()
+              .toString(36)
+              .substring(9)
+        : ""
+    },
   },
   methods: {
     ...mapMutations(["addApiError"]),
