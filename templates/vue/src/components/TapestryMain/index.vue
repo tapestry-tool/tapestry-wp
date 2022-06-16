@@ -9,9 +9,12 @@
         <filter v-for="i in maxLevel" :id="'shadow-' + i" :key="i">
           <!-- <feDropShadow :dx="(2**i)*3" :dy="(2**i)*3" stdDeviation="4" flood-opacity="0.2" /> -->
           <feGaussianBlur in="SourceAlpha" stdDeviation="4" />
-          <feOffset :dx="6 * (maxLevel - i)" :dy="6 * (maxLevel - i)" />
+          <feOffset
+            :dx="2 * (maxLevel - i) * scale"
+            :dy="7 * (maxLevel - i) * scale"
+          />
           <feComponentTransfer>
-            <feFuncA type="linear" :slope="Math.max(0.6 - i * 0.1, 0.1)" />
+            <feFuncA type="linear" :slope="Math.max(0.5 - i * 0.05, 0.1)" />
           </feComponentTransfer>
           <feMerge>
             <feMergeNode />
@@ -72,16 +75,12 @@ export default {
     RootNodeButton,
     LockedTooltip,
   },
-  props: {
-    viewBox: {
-      type: Array,
-      required: true,
-    },
-  },
   data() {
     return {
       dragSelectReady: false,
       activeNode: null,
+
+      viewBox: [2200, 2700, 1600, 1100],
       scale: 1,
       offset: { x: 0, y: 0 },
       appDimensions: null,
@@ -94,8 +93,7 @@ export default {
     computedViewBox() {
       // return this.viewBox.join(" ")
       return `${this.viewBox[0] + this.offset.x} ${this.viewBox[1] +
-        this.offset.y} ${this.viewBox[2] / this.scale} ${this.viewBox[3] /
-        this.scale}`
+        this.offset.y} ${this.viewBox[2]} ${this.viewBox[3]}`
     },
     background() {
       return this.settings.backgroundUrl
@@ -173,18 +171,32 @@ export default {
       "tapestry",
       (delta, x, y) => {
         delta *= 0.8
+        const newScale = Math.max(this.scale + delta, 1)
+        const scaleChange = newScale / this.scale
+
         if (!this.appDimensions) {
           this.fetchAppDimensions()
         }
         const { width, height } = this.appDimensions
-        x = (x / width) * (this.viewBox[2] / this.scale)
-        y = (y / height) * (this.viewBox[3] / this.scale)
-        const newScale = Math.max(this.scale + delta, 1)
-        const scaleChange = newScale / this.scale
-        const newX = x / scaleChange
-        const newY = y / scaleChange
-        this.offset.x += x - newX
-        this.offset.y += y - newY
+
+        const relativeX = (x / width) * this.viewBox[2]
+        const relativeY = (y / height) * this.viewBox[3]
+        const absoluteX = relativeX + this.viewBox[0] + this.offset.x
+        const absoluteY = relativeY + this.viewBox[1] + this.offset.y
+
+        // update the viewBox to match the scaled coordinates
+        this.viewBox[0] *= scaleChange
+        this.viewBox[1] *= scaleChange
+
+        const newAbsoluteX = absoluteX * scaleChange
+        const newAbsoluteY = absoluteY * scaleChange
+        const newRelativeX = newAbsoluteX - this.viewBox[0] - this.offset.x
+        const newRelativeY = newAbsoluteY - this.viewBox[1] - this.offset.y
+
+        // update the offset so that it zooms in to the cursor position
+        this.offset.x += newRelativeX - relativeX
+        this.offset.y += newRelativeY - relativeY
+
         this.scale = newScale
       },
       () => {
@@ -199,8 +211,8 @@ export default {
           this.isPanning = true
         }
         const { width, height } = this.appDimensions
-        dx = (dx / width) * (this.viewBox[2] / this.scale)
-        dy = (dy / height) * (this.viewBox[3] / this.scale)
+        dx = (dx / width) * this.viewBox[2]
+        dy = (dy / height) * this.viewBox[3]
         this.offset.x -= dx
         this.offset.y -= dy
       },
@@ -251,7 +263,80 @@ export default {
       return wp.isLoggedIn() && Helpers.hasPermission(node, "edit")
     },
     updateViewBox() {
-      this.$parent.updateViewBox()
+      const MAX_RADIUS = 240
+      const MIN_TAPESTRY_WIDTH_FACTOR = 1.5
+      if (this.$refs.app) {
+        // check if <main> in TapestryMain has rendered
+        const { width, height } = this.$refs.app.getBoundingClientRect()
+        const { x0, y0, x, y } = this.getNodeDimensions()
+
+        const tapestryDimensions = {
+          startX: 0,
+          startY: 0,
+          width,
+          height,
+        }
+        if (x > width || y > height) {
+          tapestryDimensions.startX = x0 - MAX_RADIUS * 1.25
+          tapestryDimensions.startY = y0 - MAX_RADIUS * 1.25
+          tapestryDimensions.width = x
+          tapestryDimensions.height = y
+        }
+        const windowWidth = Helpers.getBrowserWidth()
+        // Center the nodes if there is not enough of them to fill the width of the screen
+        if (
+          tapestryDimensions.width - tapestryDimensions.startX - MAX_RADIUS * 1.25 <
+          windowWidth
+        ) {
+          tapestryDimensions.startX -=
+            (windowWidth - tapestryDimensions.width + tapestryDimensions.startX) /
+              2 +
+            MAX_RADIUS
+        }
+        tapestryDimensions.width = tapestryDimensions.width + MAX_RADIUS * 1.25
+        tapestryDimensions.height = tapestryDimensions.height + MAX_RADIUS * 1.25
+
+        const MIN_WIDTH = Helpers.getBrowserWidth() * MIN_TAPESTRY_WIDTH_FACTOR
+        const MIN_HEIGHT = Helpers.getBrowserHeight() * MIN_TAPESTRY_WIDTH_FACTOR
+
+        this.viewBox = [
+          tapestryDimensions.startX * this.scale,
+          tapestryDimensions.startY * this.scale,
+          Math.max(tapestryDimensions.width - tapestryDimensions.startX, MIN_WIDTH),
+          Math.max(
+            tapestryDimensions.height - tapestryDimensions.startY,
+            MIN_HEIGHT
+          ),
+        ]
+        // this.viewBox = `${tapestryDimensions.startX} ${
+        //   tapestryDimensions.startY
+        // } ${Math.max(
+        //   tapestryDimensions.width - tapestryDimensions.startX,
+        //   MIN_WIDTH
+        // )} ${Math.max(
+        //   tapestryDimensions.height - tapestryDimensions.startY,
+        //   MIN_HEIGHT
+        // )}`
+      }
+    },
+    getNodeDimensions() {
+      const box = {
+        x0: 30000,
+        y0: 30000,
+        x: 0,
+        y: 0,
+      }
+      for (const node of Object.values(this.nodes)) {
+        if (node.nodeType !== "") {
+          const { x, y } = node.coordinates
+          box.x0 = Math.min(x, box.x0)
+          box.y0 = Math.min(y, box.y0)
+          box.x = Math.max(x, box.x)
+          box.y = Math.max(y, box.y)
+        }
+      }
+
+      return box
     },
     handleMouseover(id) {
       const node = this.nodes[id]

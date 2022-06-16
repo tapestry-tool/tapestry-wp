@@ -6,7 +6,7 @@
       :is-sidebar-open="isSidebarOpen"
       data-qa="tapestry-map"
     />
-    <tapestry-main v-else-if="viewingTapestry" ref="graph" :viewBox="viewBox" />
+    <tapestry-main v-else-if="viewingTapestry" ref="graph" />
   </div>
 </template>
 
@@ -17,7 +17,6 @@ import Toolbar from "./Toolbar"
 import TapestryMain from "./TapestryMain"
 import { mapMutations, mapState } from "vuex"
 import TapestryMap from "./TapestryMap"
-import Helpers from "@/utils/Helpers"
 
 export default {
   components: {
@@ -26,10 +25,7 @@ export default {
     TapestryMain,
   },
   data() {
-    return {
-      // viewBox: "2200 2700 1600 1100",
-      viewBox: [2200, 2700, 1600, 1100],
-    }
+    return {}
   },
   computed: {
     ...mapState(["nodes", "links", "selection", "settings", "rootId"]),
@@ -67,91 +63,10 @@ export default {
   methods: {
     ...mapMutations(["select", "unselect", "clearSelection"]),
     updateViewBox() {
-      const MAX_RADIUS = 240
-      const MIN_TAPESTRY_WIDTH_FACTOR = 1.5
-      if (this.$refs.graph) {
-        // check if TapestryMain component has rendered
-        if (this.$refs.graph.$refs.app) {
-          // check if <main> in TapestryMain has rendered
-          const {
-            width,
-            height,
-          } = this.$refs.graph.$refs.app.getBoundingClientRect()
-          const { x0, y0, x, y } = this.getNodeDimensions()
-
-          const tapestryDimensions = {
-            startX: 0,
-            startY: 0,
-            width,
-            height,
-          }
-          if (x > width || y > height) {
-            tapestryDimensions.startX = x0 - MAX_RADIUS * 1.25
-            tapestryDimensions.startY = y0 - MAX_RADIUS * 1.25
-            tapestryDimensions.width = x
-            tapestryDimensions.height = y
-          }
-          const windowWidth = Helpers.getBrowserWidth()
-          // Center the nodes if there is not enough of them to fill the width of the screen
-          if (
-            tapestryDimensions.width -
-              tapestryDimensions.startX -
-              MAX_RADIUS * 1.25 <
-            windowWidth
-          ) {
-            tapestryDimensions.startX -=
-              (windowWidth - tapestryDimensions.width + tapestryDimensions.startX) /
-                2 +
-              MAX_RADIUS
-          }
-          tapestryDimensions.width = tapestryDimensions.width + MAX_RADIUS * 1.25
-          tapestryDimensions.height = tapestryDimensions.height + MAX_RADIUS * 1.25
-
-          const MIN_WIDTH = Helpers.getBrowserWidth() * MIN_TAPESTRY_WIDTH_FACTOR
-          const MIN_HEIGHT = Helpers.getBrowserHeight() * MIN_TAPESTRY_WIDTH_FACTOR
-
-          this.viewBox = [
-            tapestryDimensions.startX,
-            tapestryDimensions.startY,
-            Math.max(
-              tapestryDimensions.width - tapestryDimensions.startX,
-              MIN_WIDTH
-            ),
-            Math.max(
-              tapestryDimensions.height - tapestryDimensions.startY,
-              MIN_HEIGHT
-            ),
-          ]
-          // this.viewBox = `${tapestryDimensions.startX} ${
-          //   tapestryDimensions.startY
-          // } ${Math.max(
-          //   tapestryDimensions.width - tapestryDimensions.startX,
-          //   MIN_WIDTH
-          // )} ${Math.max(
-          //   tapestryDimensions.height - tapestryDimensions.startY,
-          //   MIN_HEIGHT
-          // )}`
-        }
-      }
+      this.$refs.graph && this.$refs.graph.updateViewBox()
     },
     getNodeDimensions() {
-      const box = {
-        x0: 30000,
-        y0: 30000,
-        x: 0,
-        y: 0,
-      }
-      for (const node of Object.values(this.nodes)) {
-        if (node.nodeType !== "") {
-          const { x, y } = node.coordinates
-          box.x0 = Math.min(x, box.x0)
-          box.y0 = Math.min(y, box.y0)
-          box.x = Math.max(x, box.x)
-          box.y = Math.max(y, box.y)
-        }
-      }
-
-      return box
+      this.$refs.graph && this.$refs.graph.getNodeDimensions()
     },
     openNode(id) {
       this.$router.push({

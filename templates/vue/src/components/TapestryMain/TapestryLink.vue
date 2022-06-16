@@ -51,10 +51,10 @@ export default {
       type: Number,
       required: false,
       default: 1,
-    }
+    },
   },
   computed: {
-    ...mapState(["visibleNodes", "rootId"]),
+    ...mapState(["visibleNodes", "rootId", "maxLevel"]),
     ...mapGetters(["getNeighbours", "isVisible"]),
     show() {
       return this.isVisible(this.source.id) && this.isVisible(this.target.id)
@@ -63,7 +63,12 @@ export default {
       return wp.isLoggedIn()
     },
     polygonPoints() {
-      return Helpers.getLinePolygonPoints(this.source, this.target, Math.max(this.scale / 2, 1))
+      return Helpers.getLinePolygonPoints(
+        this.source,
+        this.target,
+        this.maxLevel,
+        this.scale
+      )
     },
   },
   methods: {

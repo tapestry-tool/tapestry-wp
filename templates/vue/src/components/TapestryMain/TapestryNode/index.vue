@@ -5,7 +5,7 @@
       ref="node"
       :data-qa="`node-${node.id}`"
       :data-locked="!node.accessible"
-      :transform="`translate(${node.coordinates.x}, ${node.coordinates.y})`"
+      :transform="`translate(${coordinates.x}, ${coordinates.y})`"
       :class="{
         opaque: !visibleNodes.includes(node.id),
         'has-thumbnail': node.thumbnailURL,
@@ -40,13 +40,9 @@
         ></circle>
       </transition>
       <progress-bar
-        v-if="
-          !this.isGrandChild &&
-            node.nodeType !== '' &&
-            !node.hideProgress
-        "
-        :x="node.coordinates.x"
-        :y="node.coordinates.y"
+        v-if="!isGrandChild && node.nodeType !== '' && !node.hideProgress"
+        :x="coordinates.x"
+        :y="coordinates.y"
         :radius="radius"
         :background-color="progressBackgroundColor"
         :data-qa="`node-progress-${node.id}`"
@@ -54,13 +50,9 @@
         :locked="!node.accessible"
       ></progress-bar>
       <status-bar
-        v-if="
-          !this.isGrandChild &&
-            node.nodeType !== '' &&
-            !node.hideProgress
-        "
-        :x="node.coordinates.x"
-        :y="node.coordinates.y"
+        v-if="!isGrandChild && node.nodeType !== '' && !node.hideProgress"
+        :x="coordinates.x"
+        :y="coordinates.y"
         :radius="radius"
         :locked="!node.accessible"
         :status="node.status"
@@ -68,7 +60,7 @@
         :enableHighlight="highlightNode"
         :data-qa="`node-status-${node.id}`"
       ></status-bar>
-      <g v-show="!this.isGrandChild && node.nodeType !== ''">
+      <g v-show="!isGrandChild && node.nodeType !== ''">
         <transition name="fade">
           <foreignObject
             v-if="!node.hideTitle"
@@ -97,8 +89,8 @@
             :fill="buttonBackgroundColor"
             :data-qa="`open-node-${node.id}`"
             :disabled="!node.accessible && !hasPermission('edit')"
-            @click="handleRequestOpen"
             :scale="scale"
+            @click="handleRequestOpen"
           >
             <tapestry-icon :icon="icon" svg :scale="scale"></tapestry-icon>
           </node-button>
@@ -120,8 +112,8 @@
               :y="radius"
               :fill="buttonBackgroundColor"
               :data-qa="`edit-node-${node.id}`"
-              @click="editNode(node.id)"
               :scale="scale"
+              @click="editNode(node.id)"
             >
               <tapestry-icon icon="pen" svg :scale="scale"></tapestry-icon>
             </node-button>
@@ -131,8 +123,8 @@
               :y="radius"
               :fill="buttonBackgroundColor"
               :data-qa="`review-node-${node.id}`"
-              @click="reviewNode"
               :scale="scale"
+              @click="reviewNode"
             >
               <tapestry-icon icon="comment-dots" svg :scale="scale"></tapestry-icon>
             </node-button>
@@ -259,28 +251,35 @@ export default {
     show() {
       return this.isVisible(this.node.id)
     },
-    isGrandChild() {
-      return this.node.nodeType === "grandchild" || Math.floor(this.scale) <= this.node.level - 3
+    coordinates() {
+      return {
+        x: this.node.coordinates.x * this.scale,
+        y: this.node.coordinates.y * this.scale,
+      }
     },
-    radiusModifier() {
-      return Helpers.mapValue({
-        value: this.node.level,
-        maxValue: this.maxLevel,
-        from: 1,
-        to: Math.max(1 - this.maxLevel * 0.15, 0.3),
-      })
+    currentLevel() {
+      return Helpers.getCurrentLevel(this.scale)
+    },
+    isGrandChild() {
+      return (
+        this.node.nodeType === "grandchild" ||
+        this.node.level > this.currentLevel + 2
+      )
     },
     radius() {
       if (!this.show) {
         return 0
       }
+      // TODO: use a different indicator for currently selected node
+      /*
       if (this.root) {
-        return 210 * this.radiusModifier + this.scale * 2 * this.node.level
+        return 210 * this.radiusModifier * this.scale + this.scale * 2 * this.node.level
       }
+      */
       if (this.isGrandChild) {
         return 40
       }
-      return 140 * this.radiusModifier + this.scale * 2 * this.node.level
+      return Helpers.getNodeRadius(this.node.level, this.maxLevel, this.scale)
     },
     fill() {
       const showImages = this.settings.hasOwnProperty("renderImages")

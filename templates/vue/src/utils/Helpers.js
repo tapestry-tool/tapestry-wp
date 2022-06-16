@@ -425,23 +425,45 @@ export default class Helpers {
     return from + (to - from) * ((value - minValue) / (maxValue - minValue))
   }
 
-  static getLinePolygonPoints(source, target, scale = 1) {
-    const x1 = source.coordinates.x,
-      y1 = source.coordinates.y,
-      x2 = target.coordinates.x,
-      y2 = target.coordinates.y
-    let width1, width2
-    if (source.level === target.level) {
-      width1 = width2 = 4
-    } else if (source.level < target.level) {
-      width1 = 8
-      width2 = 2
+  static getCurrentLevel(scale) {
+    return Math.floor(scale)
+  }
+
+  static getNodeRadius(level, maxLevel, scale) {
+    const baseRadius =
+      140 *
+      Helpers.mapValue({
+        value: level,
+        maxValue: maxLevel,
+        from: 1,
+        to: Math.max(1 - maxLevel * 0.15, 0.3),
+      })
+    const currentLevel = Helpers.getCurrentLevel(scale)
+    if (level < currentLevel) {
+      // growth rate should be slow for nodes higher than current level
+      const levelBelow = level + 1
+      return baseRadius * (levelBelow + (scale - levelBelow) / 2)
+      // return baseRadius *
     } else {
-      width1 = 2
-      width2 = 8
+      return baseRadius * scale
     }
-    width1 /= scale
-    width2 /= scale
+  }
+
+  static getLinePolygonPoints(source, target, maxLevel, scale = 1) {
+    const x1 = source.coordinates.x * scale,
+      y1 = source.coordinates.y * scale,
+      x2 = target.coordinates.x * scale,
+      y2 = target.coordinates.y * scale
+    let width1 = Helpers.getNodeRadius(source.level, maxLevel, scale) * 0.05,
+      width2 = Helpers.getNodeRadius(target.level, maxLevel, scale) * 0.05
+    // make width differences more dramatic for better visual aid
+    if (source.level < target.level) {
+      width1 *= 1.2
+      width2 *= 0.8
+    } else if (source.level > target.level) {
+      width2 *= 1.2
+      width1 *= 0.8
+    }
     const angle = Math.atan((y2 - y1) / (x2 - x1))
     const dx1 = -1 * width1 * Math.sin(angle),
       dy1 = width1 * Math.cos(angle),
