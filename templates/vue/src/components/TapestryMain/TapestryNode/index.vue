@@ -261,6 +261,7 @@ export default {
       return Helpers.getCurrentLevel(this.scale)
     },
     isGrandChild() {
+      return false
       return (
         this.node.nodeType === "grandchild" ||
         this.node.level > this.currentLevel + 2
@@ -392,9 +393,9 @@ export default {
       d3
         .drag()
         .on("start", () => {
-          this.coordinates = {}
+          this.dragCoordinates = {}
           if (this.selection.length) {
-            this.coordinates = this.selection.reduce((coordinates, nodeId) => {
+            this.dragCoordinates = this.selection.reduce((coordinates, nodeId) => {
               const node = this.getNode(nodeId)
               coordinates[nodeId] = {
                 x: node.coordinates.x,
@@ -403,24 +404,24 @@ export default {
               return coordinates
             }, {})
           } else {
-            this.coordinates[this.node.id] = {
+            this.dragCoordinates[this.node.id] = {
               x: this.node.coordinates.x,
               y: this.node.coordinates.y,
             }
           }
         })
         .on("drag", () => {
-          for (const id of Object.keys(this.coordinates)) {
+          for (const id of Object.keys(this.dragCoordinates)) {
             const node = this.getNode(id)
-            node.coordinates.x += d3.event.dx
-            node.coordinates.y += d3.event.dy
+            node.coordinates.x += d3.event.dx / this.scale
+            node.coordinates.y += d3.event.dy / this.scale
           }
         })
         .on("end", () => {
-          for (const [id, originalCoordinates] of Object.entries(this.coordinates)) {
+          for (const [id, originalCoordinates] of Object.entries(this.dragCoordinates)) {
             const node = this.getNode(id)
-            node.coordinates.x += d3.event.dx
-            node.coordinates.y += d3.event.dy
+            node.coordinates.x += d3.event.dx / this.scale
+            node.coordinates.y += d3.event.dy / this.scale
             let coordinates = {
               x: node.coordinates.x,
               y: node.coordinates.y,

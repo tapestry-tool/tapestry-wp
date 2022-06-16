@@ -248,6 +248,9 @@ class TapestryNode implements ITapestryNode
         if (property_exists($node, 'popup')) {
             $this->popup = $node->popup;
         }
+        if (isset($node->level) && is_numeric($node->level)) {
+            $this->level = $node->level;
+        }
     }
 
     /**
@@ -584,6 +587,7 @@ class TapestryNode implements ITapestryNode
             'references' => $this->references,
             'mapCoordinates' => $this->mapCoordinates,
             'popup' => $this->popup,
+            'level' => $this->level,
         ];
     }
 

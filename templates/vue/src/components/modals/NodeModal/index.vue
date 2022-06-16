@@ -46,6 +46,18 @@
             style="overflow: hidden;"
             @click="changeTab('content')"
           >
+            <b-form-group
+              label="Debug: Set Node Level"
+            >
+              <b-form-input
+                :value="node.level"
+                data-qa="node-level-input"
+                type="number"
+                number
+                autofocus
+                @update="update('level', $event)"
+              />
+            </b-form-group>
             <content-form
               :parent="parent"
               :actionType="type"
@@ -329,6 +341,7 @@ export default {
       "visibleNodes",
       "apiError",
       "returnRoute",
+      "maxLevel",
     ]),
     ...mapState({
       node: "currentEditingNode",
@@ -577,6 +590,7 @@ export default {
       "setReturnRoute",
       "setCurrentEditingNode",
       "setCurrentEditingNodeProperty",
+      "setMaxLevel",
     ]),
     ...mapActions([
       "addNode",
@@ -805,6 +819,11 @@ export default {
         this.loading = true
         this.updateNodeCoordinates()
 
+        this.node.level = parseInt(this.node.level)
+        if (this.node.level > this.maxLevel) {
+          this.setMaxLevel(this.node.level)
+        }
+
         if (this.linkHasThumbnailData) {
           await this.setLinkData()
         }
@@ -978,6 +997,10 @@ export default {
     },
     validateNode() {
       const errMsgs = []
+
+      if (!this.node.level || isNaN(this.node.level) || this.node.level < 1) {
+        errMsgs.push("Please enter a valid node level value")
+      }
 
       if (this.node.title.length == 0) {
         errMsgs.push("Please enter a title")
