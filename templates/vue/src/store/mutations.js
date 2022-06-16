@@ -219,3 +219,7 @@ export function setCurrentEditingNodeProperty(state, { property, value }) {
 export function setMaxLevel(state, maxLevel) {
   state.maxLevel = maxLevel
 }
+
+export function setCurrentDepth(state, depth) {
+  state.currentDepth = depth
+}

@@ -24,24 +24,25 @@
 import { mapState, mapGetters, mapMutations } from "vuex"
 import ZoomIn from "@/assets/zoom-in.png"
 import ZoomOut from "@/assets/zoom-out.png"
-import DragSelectModular from "@/utils/dragSelectModular"
+// import DragSelectModular from "@/utils/dragSelectModular"
 import Helpers from "@/utils/Helpers"
 import client from "@/services/TapestryAPI"
 
 export default {
   computed: {
-    ...mapState(["nodes", "settings"]),
+    ...mapState(["nodes", "settings", "maxLevel"]),
     ...mapGetters(["getNeighbours", "getNode"]),
     currentDepth: {
       get() {
-        const { depth } = this.$route.query
-        if (depth) {
-          return Number(depth)
-        }
-        return this.settings.defaultDepth
+        return this.$store.state.currentDepth
       },
       set(depth) {
+        if (depth > this.maxDepth) {
+          depth = this.maxDepth
+        }
+        depth = parseInt(depth)
         if (depth !== this.currentDepth) {
+          this.setCurrentDepth(depth)
           this.$router.push({
             ...this.$route,
             query: { ...this.$route.query, depth },
@@ -53,6 +54,9 @@ export default {
       return Number(this.$route.params.nodeId)
     },
     levels() {
+      return []
+      // TODO: remove dependency on levels (using manual levels now), and safely delete code below.
+      /*
       if (!Object.keys(this.nodes).length) {
         return []
       }
@@ -84,9 +88,11 @@ export default {
         levelsArray[level] = nodesAtLevel
       })
       return levelsArray
+      */
     },
     maxDepth() {
-      return this.levels.length
+      return this.maxLevel
+      // return this.levels.length
     },
     zoomInBg() {
       return "url(" + Helpers.getImagePath(ZoomIn) + ")"
@@ -96,24 +102,13 @@ export default {
     },
   },
   watch: {
-    currentDepth: {
-      immediate: true,
-      handler: function(depth, oldDepth) {
-        if (depth > this.maxDepth) {
-          this.$router.replace({
-            ...this.$route,
-            query: { ...this.$route.query, depth: this.maxDepth },
-          })
-        } else {
-          this.updateNodeTypes()
-        }
-        if (oldDepth && depth != oldDepth) {
-          client.recordAnalyticsEvent("user", "adjust", "depth", null, {
-            from: oldDepth,
-            to: depth,
-          })
-        }
-      },
+    currentDepth(depth, oldDepth) {
+      if (oldDepth && depth != oldDepth) {
+        client.recordAnalyticsEvent("user", "adjust", "depth", null, {
+          from: oldDepth,
+          to: depth,
+        })
+      }
     },
     levels: {
       immediate: true,
@@ -128,9 +123,17 @@ export default {
       },
     },
   },
+  created() {
+    const { depth } = this.$route.query
+    if (depth && Number.isInteger(depth)) {
+      this.currentDepth = parseInt(depth)
+    }
+  },
   methods: {
-    ...mapMutations(["updateNode"]),
+    ...mapMutations(["updateNode", "setCurrentDepth"]),
     updateNodeTypes() {
+      // TODO: remove code elsewhere that is related to nodeType check, and safely delete the code below.
+      /*
       const depth = parseInt(this.currentDepth)
 
       if (depth === 0) {
@@ -197,9 +200,10 @@ export default {
         })
       })
       this.$emit("change")
+      */
     },
     pauseDragSelect() {
-      DragSelectModular.pauseDragSelect()
+      // DragSelectModular.pauseDragSelect()
     },
   },
 }
@@ -305,6 +309,8 @@ export default {
 
 .warning-text {
   position: absolute;
+  z-index: 10;
+  user-select: none;
   width: 100%;
   top: calc(100% - 1px);
   right: 0;

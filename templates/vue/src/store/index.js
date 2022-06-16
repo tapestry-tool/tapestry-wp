@@ -13,6 +13,7 @@ export const store = {
     links: [],
     nodes: [],
     maxLevel: 1,
+    currentDepth: 3,
     progress: {},
     rootId: null,
     settings: {},

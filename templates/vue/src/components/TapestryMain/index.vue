@@ -11,29 +11,6 @@
           :id="'shadow-' + i"
           :key="i"
           y="-10%"
-          height="150%"
-          x="-10%"
-          width="150%"
-        >
-          <!-- <feDropShadow :dx="(2**i)*3" :dy="(2**i)*3" stdDeviation="4" flood-opacity="0.2" /> -->
-          <feGaussianBlur in="SourceAlpha" stdDeviation="5" />
-          <feOffset
-            :dx="3 * (maxLevel - i) * scale"
-            :dy="6 * (maxLevel - i) * scale"
-          />
-          <feComponentTransfer>
-            <feFuncA type="linear" :slope="Math.max(0.4 - i * 0.05, 0.1)" />
-          </feComponentTransfer>
-          <feMerge>
-            <feMergeNode />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-        <filter
-          v-for="i in maxLevel"
-          :id="'line-shadow-' + i"
-          :key="maxLevel + i"
-          y="-10%"
           height="200%"
           x="-10%"
           width="200%"
@@ -45,7 +22,7 @@
             :dy="3 * (maxLevel - i) * scale"
           />
           <feComponentTransfer>
-            <feFuncA type="linear" slope="0.1" />
+            <feFuncA type="linear" :slope="Math.max(0.4 - i * 0.05, 0.1)" />
           </feComponentTransfer>
           <feMerge>
             <feMergeNode />
@@ -172,23 +149,15 @@ export default {
     },
   },
   created() {
-    if (this.$route.query.scale) {
-      const scale = Number(this.$route.query.scale)
-      if (!isNaN(scale) && scale >= 1) {
-        this.scale = scale
-      }
+    const { scale, x, y } = this.$route.query
+    if (scale && !isNaN(scale)) {
+      this.scale = Math.max(Number(scale), 1)
     }
-    if (this.$route.query.x) {
-      const x = Number(this.$route.query.x)
-      if (!isNaN(x)) {
-        this.offset.x = x
-      }
+    if (x && !isNaN(x)) {
+      this.offset.x = Number(x)
     }
-    if (this.$route.query.y) {
-      const y = Number(this.$route.query.y)
-      if (!isNaN(y)) {
-        this.offset.y = y
-      }
+    if (y && !isNaN(y)) {
+      this.offset.y = Number(y)
     }
   },
   mounted() {

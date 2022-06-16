@@ -1,5 +1,5 @@
 import * as wp from "@/services/wp"
-import { nodeStatus, userActions } from "./constants"
+import { nodeStatus, userActions, scaleMultipliers } from "./constants"
 
 /**
  * Helper Functions
@@ -429,8 +429,18 @@ export default class Helpers {
     return from + (to - from) * ((value - minValue) / (maxValue - minValue))
   }
 
+  static getNodeVisibility(level, scale, depth) {
+    const levelDiff = level - Helpers.getCurrentLevel(scale)
+    if (levelDiff < depth) {
+      return 1 // fully visible
+    } else if (levelDiff === depth) {
+      return 0 // grandchild visible
+    }
+    return -1 // not visible
+  }
+
   static getCurrentLevel(scale) {
-    return Math.floor(scale)
+    return Math.floor(scale * scaleMultipliers.currentLevel)
   }
 
   static getNodeRadius(level, maxLevel, scale) {
@@ -445,9 +455,8 @@ export default class Helpers {
     const currentLevel = Helpers.getCurrentLevel(scale)
     if (level < currentLevel) {
       // growth rate should be slow for nodes higher than current level
-      const levelBelow = level + 1
-      return baseRadius * (levelBelow + (scale - levelBelow) / 2)
-      // return baseRadius *
+      const baseScale = (level + 1) / scaleMultipliers.currentLevel
+      return baseRadius * (baseScale + (scale - baseScale) / 2)
     } else {
       return baseRadius * scale
     }

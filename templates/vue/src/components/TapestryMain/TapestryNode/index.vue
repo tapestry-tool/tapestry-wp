@@ -194,7 +194,13 @@ export default {
     }
   },
   computed: {
-    ...mapState(["selection", "settings", "visibleNodes", "maxLevel"]),
+    ...mapState([
+      "selection",
+      "settings",
+      "visibleNodes",
+      "maxLevel",
+      "currentDepth",
+    ]),
     ...mapGetters(["getNode", "getDirectChildren", "isVisible", "getParent"]),
     canReview() {
       if (!this.isLoggedIn) {
@@ -249,7 +255,14 @@ export default {
       }
     },
     show() {
-      return this.isVisible(this.node.id)
+      return this.isVisible(this.node.id) && this.visibility >= 0
+    },
+    visibility() {
+      return Helpers.getNodeVisibility(
+        this.node.level,
+        this.scale,
+        this.currentDepth
+      )
     },
     coordinates() {
       return {
@@ -261,11 +274,9 @@ export default {
       return Helpers.getCurrentLevel(this.scale)
     },
     isGrandChild() {
-      return this.node.nodeType === "grandchild"
-      // return (
-      //   this.node.nodeType === "grandchild" ||
-      //   this.node.level > this.currentLevel + 2
-      // )
+      // return this.node.nodeType === "grandchild"
+      // make it grandchild when not visible too, to prevent buttons showing up while transitioning to hidden
+      return this.visibility <= 0
     },
     radius() {
       if (!this.show) {

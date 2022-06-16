@@ -25,7 +25,7 @@
         disabled: !isLoggedIn,
       }"
       :style="{
-        filter: `url(#line-shadow-${source.level})`,
+        filter: `url(#shadow-${source.level})`,
       }"
       :points="polygonPoints"
       @click="openLinkModal"
@@ -52,15 +52,27 @@ export default {
     },
     scale: {
       type: Number,
-      required: false,
-      default: 1,
+      required: true,
     },
   },
   computed: {
-    ...mapState(["visibleNodes", "rootId", "maxLevel"]),
+    ...mapState(["visibleNodes", "rootId", "maxLevel", "currentDepth"]),
     ...mapGetters(["getNeighbours", "isVisible"]),
     show() {
-      return this.isVisible(this.source.id) && this.isVisible(this.target.id)
+      return (
+        this.isVisible(this.source.id) &&
+        Helpers.getNodeVisibility(
+          this.source.level,
+          this.scale,
+          this.currentDepth
+        ) >= 0 &&
+        this.isVisible(this.target.id) &&
+        Helpers.getNodeVisibility(
+          this.target.level,
+          this.scale,
+          this.currentDepth
+        ) >= 0
+      )
     },
     isLoggedIn() {
       return wp.isLoggedIn()

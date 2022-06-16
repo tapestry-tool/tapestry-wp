@@ -44,3 +44,7 @@ export const userActions = {
 }
 
 export const DEFAULT_DEPTH = 3
+
+export const scaleMultipliers = {
+  currentLevel: 1.7,
+}

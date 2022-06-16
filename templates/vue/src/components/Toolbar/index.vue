@@ -1,12 +1,9 @@
 <template>
   <div class="toolbar">
     <tapestry-filter v-if="!showMap" style="z-index: 10" />
-    <div
-      v-show="isLoggedIn"
-      :class="[{ 'hide-toolbar': hideToolbar }, 'slider-wrapper']"
-    >
+    <div :class="[{ 'hide-toolbar': hideToolbar }, 'slider-wrapper']">
       <b-container class="can-edit">
-        <b-row align-v="center">
+        <template v-if="isLoggedIn">
           <b-col class="p-0">
             <user-settings-button
               data-qa="user-settings-button"
@@ -23,6 +20,8 @@
               <settings-modal-button :max-depth="maxDepth"></settings-modal-button>
             </b-col>
           </template>
+        </template>
+        <b-row align-v="center">
           <tapestry-depth-slider
             v-show="!showMap && hasDepth"
             @change="updateViewBox"
