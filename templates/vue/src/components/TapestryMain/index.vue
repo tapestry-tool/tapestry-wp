@@ -53,6 +53,7 @@
           @mouseover="handleMouseover(id)"
           @mouseleave="activeNode = null"
           @mounted="dragSelectEnabled ? updateSelectableNodes(node) : null"
+          @grandchild-click="handleGrandchildClick"
         ></tapestry-node>
       </g>
       <locked-tooltip
@@ -75,6 +76,7 @@ import Helpers from "@/utils/Helpers"
 import ZoomPanHelper from "@/utils/ZoomPanHelper"
 import { names } from "@/config/routes"
 import * as wp from "@/services/wp"
+import { scaleMultipliers } from "@/utils/constants"
 
 export default {
   components: {
@@ -97,7 +99,15 @@ export default {
     }
   },
   computed: {
-    ...mapState(["nodes", "links", "selection", "settings", "rootId", "maxLevel"]),
+    ...mapState([
+      "nodes",
+      "links",
+      "selection",
+      "settings",
+      "rootId",
+      "maxLevel",
+      "currentDepth",
+    ]),
     ...mapGetters(["getNode"]),
     computedViewBox() {
       // return this.viewBox.join(" ")
@@ -146,7 +156,12 @@ export default {
                 }
           )
         }
-        // this.panToNode(nodeId)
+        // else if (this.$refs.app) {
+        //   const node = this.getNode(nodeId)
+        //   if (Helpers.getNodeVisibility(node.level, this.scale, this.currentDepth) <= 0) {
+        //     this.zoomToNode(node)
+        //   }
+        // }
         this.updateViewBox()
       },
     },
@@ -173,51 +188,14 @@ export default {
     this.zoomPanHelper = new ZoomPanHelper(
       "tapestry",
       (delta, x, y) => {
-        delta *= 0.8
-        const newScale = Math.max(this.scale + delta, 1)
-        const scaleChange = newScale / this.scale
-
-        if (!this.appDimensions) {
-          this.fetchAppDimensions()
-        }
-        const { width, height } = this.appDimensions
-
-        const relativeX = (x / width) * this.viewBox[2]
-        const relativeY = (y / height) * this.viewBox[3]
-        const absoluteX = relativeX + this.viewBox[0] + this.offset.x
-        const absoluteY = relativeY + this.viewBox[1] + this.offset.y
-
-        // update the viewBox to match the scaled coordinates
-        this.viewBox[0] *= scaleChange
-        this.viewBox[1] *= scaleChange
-
-        const newAbsoluteX = absoluteX * scaleChange
-        const newAbsoluteY = absoluteY * scaleChange
-        const newRelativeX = newAbsoluteX - this.viewBox[0] - this.offset.x
-        const newRelativeY = newAbsoluteY - this.viewBox[1] - this.offset.y
-
-        // update the offset so that it zooms in to the cursor position
-        this.offset.x += newRelativeX - relativeX
-        this.offset.y += newRelativeY - relativeY
-
-        this.scale = newScale
+        this.handleZoom(delta * 0.8, x, y)
       },
       () => {
         this.updateScale()
         this.fetchAppDimensions()
       },
       (dx, dy) => {
-        if (!this.appDimensions) {
-          this.fetchAppDimensions()
-        }
-        if (!this.isPanning) {
-          this.isPanning = true
-        }
-        const { width, height } = this.appDimensions
-        dx = (dx / width) * this.viewBox[2]
-        dy = (dy / height) * this.viewBox[3]
-        this.offset.x -= dx
-        this.offset.y -= dy
+        this.handlePan(dx, dy)
       },
       () => {
         this.isPanning = false
@@ -226,6 +204,13 @@ export default {
       }
     )
     this.zoomPanHelper.register()
+
+    // if (this.$refs.app) {
+    //   const node = this.getNode(this.selectedId)
+    //   if (Helpers.getNodeVisibility(node.level, this.scale, this.currentDepth) <= 0) {
+    //     this.zoomToNode(node)
+    //   }
+    // }
   },
   beforeDestroy() {
     this.zoomPanHelper.unregister()
@@ -242,30 +227,51 @@ export default {
         height,
       }
     },
-    panToNode(nodeId) {
-      // TODO: This code is currently not working!
-      const node = this.getNode(nodeId)
+    handleZoom(delta, x, y, isNode = false) {
+      const newScale = Math.max(this.scale + delta, 1)
+      const scaleChange = newScale / this.scale
 
-      const relativeX =
-        node.coordinates.x * this.scale - this.viewBox[0] - this.offset.x
-      const relativeY =
-        node.coordinates.y * this.scale - this.viewBox[1] - this.offset.y
+      if (!this.appDimensions) {
+        this.fetchAppDimensions()
+      }
+      const { width, height } = this.appDimensions
 
-      const centerX = this.viewBox[2] / 2
-      const centerY = this.viewBox[3] / 2
+      const relativeX = isNode
+        ? (x * this.scale - this.viewBox[0] - this.offset.x) / this.viewBox[2]
+        : (x / width) * this.viewBox[2]
+      const relativeY = isNode
+        ? (y * this.scale - this.viewBox[1] - this.offset.y) / this.viewBox[3]
+        : (y / height) * this.viewBox[3]
+      const absoluteX = relativeX + this.viewBox[0] + this.offset.x
+      const absoluteY = relativeY + this.viewBox[1] + this.offset.y
 
-      console.log(relativeX, relativeY)
-      console.log(centerX, centerY)
+      // update the viewBox to match the scaled coordinates
+      this.viewBox[0] *= scaleChange
+      this.viewBox[1] *= scaleChange
 
-      console.log(this.viewBox[0], this.viewBox[1])
-      this.viewBox[0] += centerX - relativeX + this.offset.x
-      this.viewBox[1] += centerY - relativeY + this.offset.y
-      console.log(this.viewBox[0], this.viewBox[1])
+      const newAbsoluteX = absoluteX * scaleChange
+      const newAbsoluteY = absoluteY * scaleChange
+      const newRelativeX = newAbsoluteX - this.viewBox[0] - this.offset.x
+      const newRelativeY = newAbsoluteY - this.viewBox[1] - this.offset.y
 
-      this.offset.x = 0
-      this.offset.y = 0
+      // update the offset so that it zooms in to the cursor position
+      this.offset.x += newRelativeX - relativeX
+      this.offset.y += newRelativeY - relativeY
 
-      this.updateOffset()
+      this.scale = newScale
+    },
+    handlePan(dx, dy) {
+      if (!this.appDimensions) {
+        this.fetchAppDimensions()
+      }
+      if (!this.isPanning) {
+        this.isPanning = true
+      }
+      const { width, height } = this.appDimensions
+      dx = (dx / width) * this.viewBox[2]
+      dy = (dy / height) * this.viewBox[3]
+      this.offset.x -= dx
+      this.offset.y -= dy
     },
     updateScale() {
       this.$router.push({
@@ -336,15 +342,6 @@ export default {
             MIN_HEIGHT
           ),
         ]
-        // this.viewBox = `${tapestryDimensions.startX} ${
-        //   tapestryDimensions.startY
-        // } ${Math.max(
-        //   tapestryDimensions.width - tapestryDimensions.startX,
-        //   MIN_WIDTH
-        // )} ${Math.max(
-        //   tapestryDimensions.height - tapestryDimensions.startY,
-        //   MIN_HEIGHT
-        // )}`
       }
     },
     getNodeDimensions() {
@@ -365,6 +362,21 @@ export default {
       }
 
       return box
+    },
+    handleGrandchildClick(evt) {
+      this.handleZoom(1 / scaleMultipliers.currentLevel, evt.offsetX, evt.offsetY)
+      this.updateScale()
+    },
+    zoomToNode(node) {
+      // TODO: This code is currently not working!
+      console.log("zoomToNode")
+      this.handleZoom(
+        node.level / scaleMultipliers.currentLevel - this.scale,
+        node.coordinates.x,
+        node.coordinates.y,
+        true
+      )
+      this.updateScale()
     },
     handleMouseover(id) {
       const node = this.nodes[id]
