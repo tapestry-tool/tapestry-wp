@@ -277,6 +277,13 @@ export default class Helpers {
     return false
   }
 
+  static hasKalturaUploadPermission() {
+    const { roles } = wp.getCurrentUser()
+    const allowedRole = "administrator"
+
+    return roles.includes(allowedRole)
+  }
+
   /**
    * Given an array of objects, return an array of unique objects
    * determined by the given label.

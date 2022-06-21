@@ -307,4 +307,63 @@ class TapestryHelpers
         }
         return false;
     }
+
+    /**
+     * Return all videos that can be uploaded to Kaltura.
+     * If Tapestry ID provided, returns only videos in that Tapestry.
+     * Otherwise, returns uploadable videos in all Tapestries.
+     * 
+     * @param int|string $tapestryPostId    Tapestry ID
+     * 
+     * @return array
+     */
+    public static function getVideosToUpload($tapestryPostId)
+    {
+        if (empty($tapestryPostId)) {
+            $tapestries = get_posts(['post_type' => 'tapestry', 'numberposts' => -1]);
+            $videos_to_upload = array();
+
+            foreach ($tapestries as $tapestry) {
+                $videos_to_upload = array_merge($videos_to_upload, self::_getVideosToUploadInTapestry($tapestry->ID));
+            }
+
+            return $videos_to_upload;
+        } else {
+            return self::_getVideosToUploadInTapestry($tapestryPostId);
+        }
+    }
+
+    /**
+     * Checks if a video can be uploaded to Kaltura.
+     * Only videos added via upload to WordPress can be transferred to Kaltura.
+     * 
+     * @return bool
+     */
+    public static function videoCanBeUploaded($node)
+    {
+        $nodeMeta = $node->getMeta();
+        $nodeTypeData = $node->getTypeData();
+
+        return $nodeMeta->mediaType == "video" && strpos($nodeTypeData->mediaURL, "/wp-content/uploads/");
+    }
+
+    private static function _getVideosToUploadInTapestry($tapestryPostId)
+    {
+        $videos_to_upload = array();
+        $tapestry = new Tapestry($tapestryPostId);
+
+        foreach ($tapestry->getNodeIds() as $nodeID) {
+            $node = new TapestryNode($tapestryPostId, $nodeID);
+            if (self::videoCanBeUploaded($node)) {
+                $video = (object) [
+                    'tapestryID' => (int) $tapestryPostId,
+                    'nodeID' => $nodeID,
+                    'nodeTitle' => $node->getTitle(),
+                ];
+                array_push($videos_to_upload, $video);
+            }
+        }
+
+        return $videos_to_upload;
+    }
 }

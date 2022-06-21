@@ -64,6 +64,7 @@ class TapestryPermissions
             return true;
         }
 
-        return current_user_can('export');
+        $user = wp_get_current_user();
+        return in_array("administrator", (array) $user->roles);
     }
 }

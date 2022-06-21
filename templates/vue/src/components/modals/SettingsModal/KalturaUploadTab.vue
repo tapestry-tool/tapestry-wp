@@ -1,0 +1,194 @@
+<template>
+  <div>
+    <b-overlay :show="videosUploading" variant="white">
+      <template #overlay><div></div></template>
+      <b-form-group
+        label="Upload Videos to Kaltura"
+        description="Select videos in this Tapestry that you would like to upload to Kaltura. Only videos
+            added as file uploads can be uploaded."
+      >
+        <b-table
+          ref="videoTable"
+          v-model="allVideos"
+          class="mb-2"
+          selectable
+          show-empty
+          empty-text="There are no videos to upload in this Tapestry."
+          selected-variant=""
+          primary-key="nodeID"
+          :fields="['selected', 'nodeID', 'nodeTitle']"
+          :items="getVideosToUpload"
+          @row-selected="handleVideoSelected"
+        >
+          <template #head(selected)="{selectAllRows, clearSelected}">
+            <b-form-checkbox
+              :checked="allVideosSelected"
+              @change="$event ? selectAllRows() : clearSelected()"
+            ></b-form-checkbox>
+          </template>
+          <template #cell(selected)="{rowSelected, selectRow, unselectRow}">
+            <b-form-checkbox
+              :checked="rowSelected"
+              @change="$event ? selectRow() : unselectRow()"
+            ></b-form-checkbox>
+          </template>
+        </b-table>
+      </b-form-group>
+      <b-form-group>
+        <b-form-checkbox v-model="useKalturaPlayer">
+          Switch uploaded videos to use Kaltura media player
+        </b-form-checkbox>
+      </b-form-group>
+    </b-overlay>
+    <b-button
+      id="start-upload-button"
+      block
+      variant="light"
+      :class="videosUploading ? 'disabled' : ''"
+      :disabled="videosUploading || !canStartUpload"
+      @click="startVideoUpload"
+    >
+      <b-spinner v-if="videosUploading" small></b-spinner>
+      <div :style="videosUploading || !canStartUpload ? 'opacity: 50%;' : ''">
+        Start Upload
+      </div>
+    </b-button>
+    <b-button
+      id="start-upload-button"
+      block
+      variant="light"
+      :class="!videosUploading ? 'disabled' : ''"
+      :disabled="!videosUploading"
+      @click="requestStopVideoUpload"
+    >
+      <div :style="!videosUploading ? 'opacity: 50%;' : ''">
+        Stop Upload
+      </div>
+    </b-button>
+    <b-alert class="mt-2" :show="hasRequestedStop" variant="success">
+      Successfully canceled the upload. Note: Videos already being processed will
+      still be uploaded to Kaltura, but no more videos will be started. Please be
+      patient as processing these videos could take some time.
+    </b-alert>
+    <b-form-group
+      class="mt-3"
+      label="Upload Status"
+      description="View the status of the latest upload. Automatically refreshes every 15 seconds; you can also manually refresh."
+    >
+      <b-table
+        ref="uploadStatusTable"
+        class="mb-2"
+        show-empty
+        empty-text="No videos were uploaded from this Tapestry."
+        primary-key="nodeID"
+        :fields="['nodeID', 'uploadStatus', 'kalturaID', 'additionalInfo']"
+        :items="getVideoUploadStatus"
+      ></b-table>
+      <div class="mb-2 text-right">
+        <b-button size="sm" @click="refreshVideoUploadStatus">
+          Refresh
+        </b-button>
+      </div>
+    </b-form-group>
+  </div>
+</template>
+
+<script>
+import client from "@/services/TapestryAPI"
+
+export default {
+  name: "kaltura-upload-tab",
+  data() {
+    return {
+      videosUploading: false,
+      useKalturaPlayer: false,
+      allVideos: [],
+      selectedVideos: [],
+      uploadStatusRefreshTimer: 0,
+      hasRequestedStop: false,
+    }
+  },
+  computed: {
+    allVideosSelected() {
+      return (
+        this.allVideos.length === this.selectedVideos.length &&
+        this.allVideos.length > 0
+      )
+    },
+    canStartUpload() {
+      return this.selectedVideos.length > 0
+    },
+  },
+  watch: {
+    videosUploading(inProgress) {
+      if (!inProgress) {
+        this.refreshVideosToUpload()
+      }
+    },
+  },
+  mounted() {
+    this.uploadStatusRefreshTimer = setInterval(
+      this.refreshVideoUploadStatus,
+      15 * 1000
+    )
+    this.refreshVideoUploadStatus()
+  },
+  beforeDestroy() {
+    this.cancelUploadStatusRefresh()
+  },
+  methods: {
+    handleVideoSelected(rows) {
+      this.selectedVideos = rows
+    },
+    cancelUploadStatusRefresh() {
+      clearInterval(this.uploadStatusRefreshTimer)
+      this.uploadStatusRefreshTimer = 0
+    },
+    startVideoUpload() {
+      console.log("Starting upload")
+      this.videosUploading = true
+      client.startKalturaUpload(this.selectedVideos, this.useKalturaPlayer)
+
+      setTimeout(this.refreshVideoUploadStatus, 500)
+    },
+    async requestStopVideoUpload() {
+      await client.requestStopKalturaUpload()
+      this.hasRequestedStop = true
+      setTimeout(() => {
+        this.hasRequestedStop = false
+      }, 10 * 1000)
+    },
+    getVideosToUpload(ctx, callback) {
+      client
+        .getVideosToUpload()
+        .then(data => {
+          callback(data)
+        })
+        .catch(() => {
+          callback([])
+        })
+
+      return null
+    },
+    getVideoUploadStatus(ctx, callback) {
+      client
+        .getKalturaUploadStatus()
+        .then(data => {
+          callback(data.videos)
+          this.videosUploading = data.inProgress
+        })
+        .catch(() => {
+          callback([])
+        })
+
+      return null
+    },
+    refreshVideosToUpload() {
+      this.$refs.videoTable.refresh()
+    },
+    refreshVideoUploadStatus() {
+      this.$refs.uploadStatusTable.refresh()
+    },
+  },
+}
+</script>

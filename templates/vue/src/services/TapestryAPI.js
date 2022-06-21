@@ -308,6 +308,32 @@ class TapestryApi {
     const response = await this.client.get(url)
     return response
   }
+
+  async getVideosToUpload() {
+    const url = `/kaltura/videos_to_upload?tapestryPostId=${this.postId}`
+    const response = await this.client.get(url)
+    return response.data
+  }
+
+  async startKalturaUpload(videos, useKalturaPlayer) {
+    const url = `/kaltura/upload_videos`
+    const response = await this.client.post(url, {
+      videos: videos,
+      useKalturaPlayer: useKalturaPlayer,
+    })
+    return response
+  }
+
+  async getKalturaUploadStatus() {
+    const url = `/kaltura/upload_status?tapestryPostId=${this.postId}`
+    const response = await this.client.get(url)
+    return response.data
+  }
+
+  async requestStopKalturaUpload() {
+    const url = `/kaltura/stop_upload`
+    await this.client.post(url)
+  }
 }
 
 export default new TapestryApi(postId)

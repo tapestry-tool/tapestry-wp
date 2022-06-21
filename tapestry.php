@@ -26,9 +26,12 @@ error_reporting(E_ERROR | E_PARSE);
  */
 require_once dirname(__FILE__).'/classes/class.tapestry-analytics.php';
 require_once dirname(__FILE__).'/classes/class.kaltura-api.php';
+require_once dirname(__FILE__).'/classes/class.constants.php';
 require_once dirname(__FILE__).'/endpoints.php';
 require_once dirname(__FILE__).'/settings.php';
 require_once dirname(__FILE__).'/plugin-updates.php';
+
+use Kaltura\Client\Enum\FlavorAssetStatus;
 
 /**
  * Register Tapestry type on initialization.
@@ -337,120 +340,226 @@ function tapestry_tool_log_event()
 
 
 // Kaltura
+
 add_action('upload_videos_to_kaltura', 'upload_videos_to_kaltura');
-function upload_videos_to_kaltura()
+
+/**
+ * Uploads given videos from local server to Kaltura.
+ * Does nothing if an upload is already in progress.
+ * 
+ * @param object $upload_request    Contains the list of video nodes to upload and other upload parameters.
+ */
+function upload_videos_to_kaltura($upload_request)
 {
-    $in_progress_option = 'tapestry_kaltura_upload_in_progress';
-    $yes_value = 'yes';
-    $no_value = 'no';
+    $videos = $upload_request->videos;
+    $use_kaltura_player = $upload_request->useKalturaPlayer;
 
     if (LOAD_KALTURA) {
-        $is_upload_in_progress = get_option($in_progress_option);
+        $is_upload_in_progress = get_option(KalturaUpload::IN_PROGRESS_OPTION);
 
         if ($is_upload_in_progress === false) {
             // False return value means option does not exist in database yet
-            add_option($in_progress_option, $no_value);
-        } elseif ($is_upload_in_progress !== $no_value) {
+            add_option(KalturaUpload::IN_PROGRESS_OPTION, KalturaUpload::NO_VALUE);
+        } elseif ($is_upload_in_progress !== KalturaUpload::NO_VALUE) {
             return;
         }
 
-        update_option($in_progress_option, $yes_value);
+        update_option(KalturaUpload::IN_PROGRESS_OPTION, KalturaUpload::YES_VALUE);
+        update_option(KalturaUpload::STOP_UPLOAD_OPTION, KalturaUpload::NO_VALUE, false);
 
         try {
-            perform_upload_to_kaltura();
+            perform_batched_upload_to_kaltura($videos, $use_kaltura_player);
         } catch (Exception $e) {
             error_log($e->getMessage());
         } finally {
-            update_option($in_progress_option, $no_value);
+            update_option(KalturaUpload::IN_PROGRESS_OPTION, KalturaUpload::NO_VALUE);
+            update_option(KalturaUpload::STOP_UPLOAD_OPTION, KalturaUpload::NO_VALUE, false);
         }
     }
 }
 
-function get_videos_to_upload()
+/**
+ * Uploads videos to Kaltura.
+ *
+ * Video files are uploaded to Kaltura up to UPLOAD_BATCH_SIZE at a time.
+ * At the end of each batch, waits synchronously for all videos in the batch to finish converting (or error),
+ * before uploading the next batch.
+ *
+ * @param array $videos     List of video nodes to upload. These should be objects with the following interface:
+ *                          [
+ *                              [tapestryID] => 123,
+ *                              [nodeID] => 123,
+ *                          ]
+ *                          Nodes are checked to be videos and to be local Wordpress uploads before being uploaded to Kaltura.
+ * @param boolean $use_kaltura_player   Whether to switch uploaded videos to use the Kaltura media player.
+ *
+ * @return int The number of videos that were successfully uploaded.
+ */
+function perform_batched_upload_to_kaltura($videos, $use_kaltura_player)
 {
-    $tapestries = get_posts(['post_type' => 'tapestry',]);
-    $videos_to_upload = array();
-
-    foreach ($tapestries as $value) {
-        $tapestry = new Tapestry($value->ID);
-
-        foreach ($tapestry->getNodeIds() as $node_id) {
-            $node = new TapestryNode($value->ID, $node_id);
-            $nodeMeta = $node->getMeta();
-
-            if ($nodeMeta->mediaType == "video") {
-                $media_url = $node->getTypeData()->mediaURL;
-
-                if (strpos($media_url, "/wp-content/uploads/")) {
-                    $video = (object) [
-                        'tapestryID' => $value->ID,
-                        'nodeID' => $node_id,
-                        'uploadStatus' => 'not_started',
-                        'additionalInfo' => '',
-                    ];
-                    array_push($videos_to_upload, $video);
-                }
-            }
-        }
-    }
-
-    return $videos_to_upload;
-}
-
-function perform_upload_to_kaltura()
-{
-    $upload_folder = wp_upload_dir()['path'];
-
     $current_date = date('Y/m/d');
+
+    $videos_to_upload = create_upload_log($videos);
+
+    update_upload_log($videos_to_upload);
 
     $kalturaApi = new KalturaApi();
 
-    $upload_log_option_name = 'tapestry_kaltura_upload_log';
+    $num_successfully_uploaded = 0;
+    $batch_start = 0;
 
-    $videos_to_upload = get_videos_to_upload();
-    
-    // This will create the option if it doesn't exist
-    update_option($upload_log_option_name, $videos_to_upload);
-
-    foreach ($videos_to_upload as $video) {
-        $video->uploadStatus = 'in_progress';
-        update_option($upload_log_option_name, $videos_to_upload);
-
-        $node = new TapestryNode($video->tapestryID, $video->nodeID);
-
-        $file_name = pathinfo($node->getTypeData()->mediaURL)['basename'];
-
-        $file_obj = new StdClass();
-        $file_obj->file_path = $upload_folder."/".$file_name;
-        $file_obj->name = $file_name;
-
-        $kaltura_data = null;
-        try {
-            $kaltura_data = $kalturaApi->uploadKalturaVideo($file_obj, $current_date);
-        } catch (Exception $e) {
-            $error_message = "Unable to upload video '".$file_obj->file_path."' to Kaltura due to\n".$e;
-
-            error_log($error_message);
-
-            $video->uploadStatus = 'error';
-            $video->additionalInfo = $error_message;
-            update_option($upload_log_option_name, $videos_to_upload);
-            continue;
+    for ($batch_start; $batch_start < count($videos); $batch_start += KalturaUpload::UPLOAD_BATCH_SIZE) {
+        // Retrieve fresh value without caching, since we expect the option value to change underneath
+        $GLOBALS['wp_object_cache']->delete(KalturaUpload::STOP_UPLOAD_OPTION, 'options');
+        $stop_requested = get_option(KalturaUpload::STOP_UPLOAD_OPTION);
+        if ($stop_requested === KalturaUpload::YES_VALUE) {
+            break;
         }
 
-        $typeData = $node->getTypeData();
-        $typeData->mediaURL = $kaltura_data->dataUrl."?.mp4";
-        $typeData->kalturaData = array(
-                        "id" => $kaltura_data->id,
-                        "partnerId" => $kaltura_data->partnerId,
-                    );
+        $batch = array_slice($videos_to_upload, $batch_start, KalturaUpload::UPLOAD_BATCH_SIZE);
 
-        $node->set($typeData);
-        $node->save();
+        foreach ($batch as $video) {
+            $video->uploadStatus = UploadStatus::UPLOADING;
+            update_upload_log($videos_to_upload);
 
-        wp_delete_file($file_obj->file_path);
+            $kaltura_data = null;
+            try {
+                $kaltura_data = $kalturaApi->uploadKalturaVideo($video->file, $current_date);
+            } catch (Exception $e) {
+                $error_start = "Unable to upload video '".$video->file->name."' to Kaltura due to: \n";
 
-        $video->uploadStatus='complete';
-        update_option($upload_log_option_name, $videos_to_upload);
+                error_log($error_start.$e);
+
+                $video->uploadStatus = UploadStatus::ERROR;
+                $video->additionalInfo = $error_start.$e->getMessage();
+                update_upload_log($videos_to_upload);
+                continue;
+            }
+
+            $video->kalturaID = $kaltura_data->id;
+            $video->uploadStatus = UploadStatus::CONVERTING;
+            update_upload_log($videos_to_upload);
+        }
+
+        // Filter out videos that did not successfully upload so we don't get an infinite loop
+        $remaining_videos = array_filter($batch, function($vid) {
+            return $vid->uploadStatus ===  UploadStatus::CONVERTING;
+        });
+
+        while (count($remaining_videos) > 0) {
+            sleep(5);
+            $videos_to_remove = array();
+
+            foreach ($remaining_videos as $video) {
+                $response = $kalturaApi->getVideoUploadStatus($video->kalturaID);
+
+                if ($response->status == FlavorAssetStatus::READY) {
+                    save_and_delete_local_video($video, $response, $use_kaltura_player);
+
+                    $video->uploadStatus = UploadStatus::COMPLETE;
+                    update_upload_log($videos_to_upload);
+
+                    array_push($videos_to_remove, $video);
+
+                    $num_successfully_uploaded++;
+                } elseif ($response->status == FlavorAssetStatus::ERROR) {
+                    $video->uploadStatus = UploadStatus::ERROR;
+                    $video->additionalInfo = 'An error occurred. Could not convert the video.';
+                    update_upload_log($videos_to_upload);
+
+                    array_push($videos_to_remove, $video);
+                }
+            }
+
+            $remaining_videos = array_udiff($remaining_videos, $videos_to_remove, function ($video1, $video2) {
+                if ($video1->tapestryID > $video2->tapestryID) {
+                    return 1;
+                } elseif ($video1->tapestryID < $video2->tapestryID) {
+                    return -1;
+                } else {
+                    return $video1->nodeID - $video2->nodeID;
+                }
+            });
+        }
     }
+
+    // Mark remaining videos as canceled, if any
+    for ($i = $batch_start; $i < count($videos); $i++) {
+        $videos_to_upload[$i]->uploadStatus = UploadStatus::CANCELED;
+    }
+    update_upload_log($videos_to_upload);
+
+    return $num_successfully_uploaded;
+}
+
+/**
+ * Initializes the list of videos to upload.
+ * Silently excludes passed videos that are not suitable for upload.
+ */
+function create_upload_log($videos)
+{
+    $upload_folder = wp_upload_dir()['path'];
+
+    $upload_log = array();
+
+    foreach ($videos as $video) {
+        $node = new TapestryNode($video->tapestryID, $video->nodeID);
+        if (TapestryHelpers::videoCanBeUploaded($node)) {
+            $file_name = pathinfo($node->getTypeData()->mediaURL)['basename'];
+            $file_obj = new StdClass();
+            $file_obj->file_path = $upload_folder."/".$file_name;
+            $file_obj->name = $file_name;
+
+            $video_info = (object) [
+                'tapestryID' => $video->tapestryID,
+                'nodeID' => $video->nodeID,
+                'nodeTitle' => $node->getTitle(),
+                'uploadStatus' => UploadStatus::NOT_STARTED,
+                'file' => $file_obj,
+                'kalturaID' => '',
+                'additionalInfo' => '',
+            ];
+            array_push($upload_log, $video_info);
+        }
+    }
+
+    return $upload_log;
+}
+
+function save_and_delete_local_video($video, $response_data, $use_kaltura_player)
+{
+    $node = new TapestryNode($video->tapestryID, $video->nodeID);
+
+    $typeData = $node->getTypeData();
+    $typeData->mediaURL = $response_data->dataUrl."?.mp4";
+    $typeData->kalturaData = array(
+                    "id" => $response_data->id,
+                    "partnerId" => $response_data->partnerId,
+                );
+    
+    if ($use_kaltura_player) {
+        $typeData->kalturaId = $response_data->id;
+    }
+
+    $node->set($typeData);
+    $node->save();
+
+    wp_delete_file($video->file->file_path);
+}
+
+function update_upload_log($videos)
+{
+    // Filter the upload log objects so that certain information (e.g. the file path of the videos) is not returned
+    $filtered_upload_log = array_map(function ($video) {
+        return (object) [
+            'tapestryID' => $video->tapestryID,
+            'nodeID' => $video->nodeID,
+            'uploadStatus' => $video->uploadStatus,
+            'kalturaID' => $video->kalturaID,
+            'additionalInfo' => $video->additionalInfo,
+        ];
+    }, $videos);
+
+    // This will create the option if it doesn't exist
+    update_option(KalturaUpload::UPLOAD_LOG_OPTION, $filtered_upload_log);
 }

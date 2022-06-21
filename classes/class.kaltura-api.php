@@ -117,11 +117,13 @@
             $response = $kclient->media->addContent($entry->id, $resource);
             $status = $response->status;
 
-            while (FlavorAssetStatus::READY != $status && FlavorAssetStatus::ERROR != $status) {
-                sleep(5);
-                $response = $kclient->media->get($entry->id);
-                $status = $response->status;
-            }
+            return $response;
+        }
+
+        public function getVideoUploadStatus($entryId)
+        {
+            $kclient = $this->getKClient();
+            $response = $kclient->media->get($entryId);
 
             return $response;
         }

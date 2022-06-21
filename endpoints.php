@@ -330,11 +330,27 @@ $REST_API_ENDPOINTS = [
             'permission_callback' => 'TapestryPermissions::kalturaUpload',
         ],
     ],
+    'GET_VIDEOS_TO_UPLOAD' => (object) [
+        'ROUTE' => '/kaltura/videos_to_upload',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => 'getVideosToUpload',
+            'permission_callback' => 'TapestryPermissions::kalturaUpload',
+        ],
+    ],
     'GET_KALTURA_UPLOAD_STATUS' => (object) [
         'ROUTE' => '/kaltura/upload_status',
         'ARGUMENTS' => [
             'methods' => $REST_API_GET_METHOD,
             'callback' => 'getKalturaUploadStatus',
+            'permission_callback' => 'TapestryPermissions::kalturaUpload',
+        ],
+    ],
+    'STOP_KALTURA_UPLOAD' => (object) [
+        'ROUTE' => '/kaltura/stop_upload',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_POST_METHOD,
+            'callback' => 'stopKalturaUpload',
             'permission_callback' => 'TapestryPermissions::kalturaUpload',
         ],
     ],
@@ -354,21 +370,6 @@ foreach ($REST_API_ENDPOINTS as $ENDPOINT) {
             );
         }
     );
-}
-
-function uploadVideosToKaltura($request)
-{
-    do_action('upload_videos_to_kaltura');
-}
-
-function getKalturaUploadStatus($request)
-{
-    $videos = get_option('tapestry_kaltura_upload_log', []);
-    $in_progress = get_option('tapestry_kaltura_upload_in_progress') === 'yes';
-    return (object) [
-        'videos' => $videos,
-        'inProgress' => $in_progress,
-    ];
 }
 
 function exportTapestry($request)
@@ -1557,4 +1558,45 @@ function getQuestionHasAnswers($request)
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
+}
+
+function uploadVideosToKaltura($request)
+{
+    do_action('upload_videos_to_kaltura', json_decode($request->get_body()));
+}
+
+function getKalturaUploadStatus($request)
+{
+    $tapestryPostId = $request['tapestryPostId'];
+
+    $videos = get_option(KalturaUpload::UPLOAD_LOG_OPTION, []);
+
+    if (!empty($tapestryPostId)) {
+        $videos = array_filter($videos, function ($video) use ($tapestryPostId) {
+            return $video->tapestryID == $tapestryPostId;
+        });
+    }
+
+    $in_progress = get_option(KalturaUpload::IN_PROGRESS_OPTION) === KalturaUpload::YES_VALUE;
+    return (object) [
+        'videos' => $videos,
+        'inProgress' => $in_progress,
+    ];
+}
+
+function getVideosToUpload($request)
+{
+    $tapestryPostId = $request['tapestryPostId'];
+    return TapestryHelpers::getVideosToUpload($tapestryPostId);
+}
+
+function stopKalturaUpload($request)
+{
+    // This will create the option if it doesn't exist
+    update_option(KalturaUpload::STOP_UPLOAD_OPTION, KalturaUpload::YES_VALUE, false);
+}
+
+function getStopUploadRequested($request)
+{
+    return get_option(KalturaUpload::STOP_UPLOAD_OPTION) === KalturaUpload::YES_VALUE;
 }
