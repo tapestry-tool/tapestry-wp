@@ -320,7 +320,7 @@ import PermissionsTable from "../common/PermissionsTable"
 import DragSelectModular from "@/utils/dragSelectModular"
 import Helpers from "@/utils/Helpers"
 import KalturaUploadTab from "./KalturaUploadTab"
-import { data as wpData } from "@/services/wp"
+import { data as wpData, getKalturaStatus } from "@/services/wp"
 import client from "@/services/TapestryAPI"
 
 const defaultPermissions = Object.fromEntries(
@@ -409,7 +409,7 @@ export default {
       return true
     },
     showKalturaTab() {
-      return Helpers.hasKalturaUploadPermission()
+      return Helpers.hasKalturaUploadPermission() && getKalturaStatus()
     },
   },
   created() {
