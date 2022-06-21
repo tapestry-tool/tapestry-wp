@@ -47,6 +47,7 @@ class TapestryNode implements ITapestryNode
     private $references;
     private $mapCoordinates;
     private $popup;
+    private $level;
 
     /**
      * Constructor.
