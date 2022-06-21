@@ -16,8 +16,6 @@ function add_tapestry_settings_page()
 function tapestry_settings_init()
 {
     add_settings_section('tapestry_db_settings', 'Database Settings', 'tapestry_db_section_cb', 'tapestry_settings_page');
-
-    add_settings_section('tapestry_kaltura_upload_dashboard', 'Kaltura Video Upload', 'tapestry_kaltura_upload_dashboard_cb', 'tapestry_settings_page');
 }
 
 function load_tapestry_settings_page_scripts($hook_suffix, $tapestry_settings_page_hook_suffix)
@@ -54,40 +52,6 @@ function tapestry_db_section_cb()
     <?php
 }
 
-function tapestry_kaltura_upload_dashboard_cb()
-{
-    ?>
-    <p>Transfer all uploaded videos in your Tapestries from your local server to Kaltura.</p>
-
-    <form action="<?php htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
-        <p>
-        <?php
-            submit_button('Start Upload', 'primary', 'start_kaltura_upload', false, array(
-                'onclick' => 'startKalturaUpload()',
-                'disabled' => true
-            )); ?>
-        </p>
-    </form>
-
-    <table id="upload_progress_table" class="widefat">
-        <thead>
-        <tr>
-            <th>Tapestry ID</th>
-            <th>Node ID</th>
-            <th>Status</th>
-            <th>Additional information</th>
-        </tr>
-        </thead>
-    </table>
-
-    <p>
-        <button type="button" class="button-secondary" onclick="refreshKalturaUploadProgress()">
-            Refresh Now
-        </button>
-    </p>
-    <?php
-}
-
 function run_db_commands()
 {
     if (isset($_POST['clean_h5p_nodes'])) {
@@ -118,10 +82,6 @@ function run_db_commands()
         }
         add_action('admin_notices', 'tapestry_h5p_conf_notice');
     }
-
-    if (isset($_POST['start_kaltura_upload'])) {
-        add_action('admin_notices', 'tapestry_kaltura_upload_conf_notice');
-    }
 }
 
 function tapestry_h5p_conf_notice()
@@ -129,15 +89,6 @@ function tapestry_h5p_conf_notice()
     ?>
       <div class="notice updated" >
       <p><?php _e('Clean h5p Nodes ran successfully'); ?></p>
-    </div>
-    <?php
-}
-
-function tapestry_kaltura_upload_conf_notice()
-{
-    ?>
-      <div class="notice updated" >
-      <p><?php _e('Kaltura upload started successfully. See which videos are being uploaded below.'); ?></p>
     </div>
     <?php
 }
