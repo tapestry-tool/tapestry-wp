@@ -7,6 +7,7 @@
       :data-locked="!node.accessible"
       :transform="`translate(${node.coordinates.x}, ${node.coordinates.y})`"
       :class="{
+        'half-opaque': !node.accessible && node.hideWhenLocked,
         opaque: !visibleNodes.includes(node.id),
         'has-thumbnail': node.thumbnailURL,
         'has-title': !node.hideTitle,
@@ -508,6 +509,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.half-opaque {
+  opacity: 0.6;
+}
+
 .opaque {
   opacity: 0.2;
 }
