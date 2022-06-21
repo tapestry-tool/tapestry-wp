@@ -21,6 +21,11 @@
         </b-col>
       </b-form-row>
       <b-form-group>
+        <b-form-checkbox v-model="expandWidth" data-qa="expand-width-toggle">
+          Expand width while preserving aspect ratio
+        </b-form-checkbox>
+      </b-form-group>
+      <b-form-group>
         <b-form-checkbox v-model="hideSidebar" data-qa="hide-sidebar-toggle">
           Hide sidebar
         </b-form-checkbox>
@@ -64,6 +69,9 @@
 <script>
 import { mapState } from "vuex"
 import { data } from "@/services/wp"
+
+const idChars = "0123456789abcdefghijklmnopqrstuvwxyz"
+
 export default {
   name: "embed-modal",
   props: {
@@ -77,6 +85,7 @@ export default {
       width: 800,
       height: 600,
       showInfo: true,
+      expandWidth: false,
       hideSidebar: true,
       copied: false,
     }
@@ -84,14 +93,27 @@ export default {
   computed: {
     ...mapState(["settings"]),
     embed() {
-      return `<iframe width="${this.width}" height="${
+      return `<iframe id="${this.iframeId}" width="${this.width}" height="${
         this.height
       }" style="border: none;" src="${this.settings.permalink}?iframe${
         this.hideSidebar ? "&no-sidebar" : ""
-      }"></iframe>${this.showInfo ? this.info : ""}`
+      }"></iframe>${this.showInfo ? this.info : ""}${
+        this.expandWidth ? this.expandScript : ""
+      }`
     },
     info() {
       return `<div style="margin-top:10px;display:flex;align-items:center;gap:10px;"><img width="40" height="40" src="${data.image_uri}/TapestryLogo.png" /><b>${this.settings.title}</b> <a href="${this.settings.permalink}" target="_blank">Open this Tapestry</a></div>`
+    },
+    iframeId() {
+      let randomId = ""
+      for (let i = 0; i < 6; i++) {
+        randomId += idChars[Math.floor(Math.random() * idChars.length)]
+      }
+      return `tapestry-iframe-${randomId}`
+    },
+    expandScript() {
+      // eslint-disable-next-line
+      return `<script>(function(){var aspectRatio=${this.height / this.width},element=document.getElementById("${this.iframeId}");if(element){var parentDimensions=element.parentElement.getBoundingClientRect(),width=parentDimensions.width,height=width*aspectRatio;element.setAttribute("width",width);element.setAttribute("height",height);}})();<\/script>`
     },
   },
   methods: {
@@ -135,5 +157,7 @@ export default {
 <style lang="scss" scoped>
 .embed-code {
   font-family: monospace;
+  word-break: break-all;
+  font-size: 0.8rem;
 }
 </style>
