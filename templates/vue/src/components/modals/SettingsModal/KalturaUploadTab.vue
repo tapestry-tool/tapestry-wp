@@ -80,7 +80,13 @@
       show-empty
       empty-text="No videos were uploaded from this Tapestry."
       primary-key="nodeID"
-      :fields="['nodeID', 'uploadStatus', 'kalturaID', 'additionalInfo']"
+      :fields="[
+        'nodeID',
+        'nodeTitle',
+        'uploadStatus',
+        'kalturaID',
+        'additionalInfo',
+      ]"
       :items="getVideoUploadStatus"
     ></b-table>
     <div class="mb-2 text-right">

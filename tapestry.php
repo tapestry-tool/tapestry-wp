@@ -568,6 +568,7 @@ function update_upload_log($videos)
         return (object) [
             'tapestryID' => $video->tapestryID,
             'nodeID' => $video->nodeID,
+            'nodeTitle' => $video->nodeTitle,
             'uploadStatus' => $video->uploadStatus,
             'kalturaID' => $video->kalturaID,
             'additionalInfo' => $video->additionalInfo,
