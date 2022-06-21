@@ -275,6 +275,7 @@ import { sizes, nodeStatus } from "@/utils/constants"
 import { getLinkMetadata } from "@/services/LinkPreviewApi"
 import DragSelectModular from "@/utils/dragSelectModular"
 import * as wp from "@/services/wp"
+import client from "@/services/TapestryAPI"
 
 const shouldFetch = (url, selectedNode) => {
   if (!selectedNode.typeData.linkMetadata) {
@@ -365,7 +366,8 @@ export default {
     linkHasThumbnailData() {
       return (
         (this.node.mediaType === "url-embed" && this.node.behaviour !== "embed") ||
-        this.node.mediaFormat === "youtube"
+        this.node.mediaFormat === "youtube" ||
+        this.node.mediaFormat === "kaltura"
       )
     },
     canPublish() {
@@ -800,13 +802,18 @@ export default {
       }
     },
     async handleSubmit() {
-      this.errors = this.validateNode()
+      this.errors = await this.validateNode()
+
       if (!this.hasSubmissionError) {
         this.loading = true
         this.updateNodeCoordinates()
 
         if (this.linkHasThumbnailData) {
           await this.setLinkData()
+        }
+
+        if (this.node.mediaFormat === "kaltura") {
+          await this.updateKalturaVideoMediaURL()
         }
 
         if (this.shouldReloadDuration()) {
@@ -976,7 +983,7 @@ export default {
         this.coinToss() ? this.calculateX(false) : this.calculateY(false)
       }
     },
-    validateNode() {
+    async validateNode() {
       const errMsgs = []
 
       if (this.node.title.length == 0) {
@@ -1005,11 +1012,20 @@ export default {
       if (!this.node.mediaType) {
         errMsgs.push("Please select a Content Type")
       } else if (this.node.mediaType === "video") {
-        if (!this.isValidVideo(this.node.typeData)) {
-          errMsgs.push("Please enter a valid Video URL")
-        }
-        if (!Helpers.onlyContainsDigits(this.node.mediaDuration)) {
-          this.update("mediaDuration", 0)
+        if (this.node.mediaFormat === "kaltura") {
+          const validKalturaVideo = await client.checkKalturaVideo(
+            this.node.typeData.kalturaId
+          )
+          if (!validKalturaVideo) {
+            errMsgs.push("Please enter a valid Kaltura video ID")
+          }
+        } else {
+          if (!this.isValidVideo(this.node.typeData)) {
+            errMsgs.push("Please enter a valid Video URL")
+          }
+          if (!Helpers.onlyContainsDigits(this.node.mediaDuration)) {
+            this.update("mediaDuration", 0)
+          }
         }
       } else if (this.node.mediaType === "h5p") {
         if (this.node.typeData.mediaURL === "") {
@@ -1147,10 +1163,22 @@ export default {
     },
     async setLinkData() {
       if (shouldFetch(this.node.typeData.mediaURL, this.node)) {
-        const url = this.node.typeData.mediaURL
-        const { data } = await getLinkMetadata(url)
+        let data
+
+        if (this.node.mediaFormat === "kaltura") {
+          data = await client.getKalturaVideoMeta(this.node.typeData.kalturaId)
+        } else {
+          const url = this.node.typeData.mediaURL
+          data = (await getLinkMetadata(url)).data
+        }
 
         if (data) {
+          if (data.duration) {
+            // setting video duration for kaltura video
+            this.update("mediaDuration", data.duration)
+            this.loadDuration = false
+          }
+
           this.update("typeData.linkMetadata", data)
           if (
             confirm(
@@ -1206,14 +1234,19 @@ export default {
       return this.submitNode()
     },
     shouldReloadDuration() {
+      if (this.node.mediaFormat === "kaltura") {
+        return false
+      }
       if (this.node.mediaType !== "video" && this.node.mediaType !== "h5p") {
         return false
       }
       if (this.type === "add") {
         return true
       }
+
       const oldNode = this.getNode(this.nodeId)
       const { youtubeID, mediaURL } = oldNode.typeData
+
       return this.node.mediaFormat === "youtube"
         ? this.node.typeData.youtubeID !== youtubeID
         : this.node.mediaURL !== mediaURL
@@ -1233,6 +1266,21 @@ export default {
         "The video could not be found! Please re-upload or check the URL"
       )
       this.loadDuration = false
+    },
+    async updateKalturaVideoMediaURL() {
+      // For Kaltura videos, the Kaltura ID determines the mediaURL, so let's ensure they are in sync
+
+      const oldNode = this.getNode(this.nodeId)
+      const { kalturaId: oldKalturaId, mediaURL: oldMediaURL } = oldNode.typeData
+
+      if (this.node.typeData.kalturaId !== oldKalturaId) {
+        const { mediaURL } = await client.getKalturaVideoUrl(
+          this.node.typeData.kalturaId
+        )
+        this.update("typeData.mediaURL", mediaURL)
+      } else if (this.node.typeData.mediaURL !== oldMediaURL) {
+        this.update("typeData.mediaURL", oldMediaURL)
+      }
     },
   },
 }

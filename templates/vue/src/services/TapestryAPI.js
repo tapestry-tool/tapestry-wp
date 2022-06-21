@@ -309,6 +309,24 @@ class TapestryApi {
     return response
   }
 
+  async checkKalturaVideo(entryId) {
+    const url = `/kaltura/video/status?entry_id=${entryId}`
+    const response = await this.client.get(url)
+    return response.data
+  }
+
+  async getKalturaVideoMeta(entryId) {
+    const url = `/kaltura/video/meta?entry_id=${entryId}`
+    const response = await this.client.get(url)
+    return response.data
+  }
+
+  async getKalturaVideoUrl(entryId) {
+    const url = `/kaltura/video/mediaURL?entry_id=${entryId}`
+    const response = await this.client.get(url)
+    return response.data
+  }
+
   async getVideosToUpload() {
     const url = `/kaltura/videos_to_upload?tapestryPostId=${this.postId}`
     const response = await this.client.get(url)

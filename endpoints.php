@@ -11,6 +11,7 @@ require_once __DIR__.'/classes/class.tapestry-user-progress.php';
 require_once __DIR__.'/classes/class.tapestry-audio.php';
 require_once __DIR__.'/classes/class.tapestry-h5p.php';
 require_once __DIR__.'/classes/class.constants.php';
+require_once __DIR__.'/classes/class.kaltura-api.php';
 require_once __DIR__.'/utilities/class.tapestry-user.php';
 
 $REST_API_NAMESPACE = 'tapestry-tool/v1';
@@ -352,6 +353,27 @@ $REST_API_ENDPOINTS = [
             'methods' => $REST_API_POST_METHOD,
             'callback' => 'stopKalturaUpload',
             'permission_callback' => 'TapestryPermissions::kalturaUpload',
+        ],
+    ],
+    'GET_KALTURA_VIDEO_STATUS' => (object) [
+        'ROUTE' => '/kaltura/video/status',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => 'checkKalturaVideo',
+        ],
+    ],
+    'GET_KALTURA_VIDEO_META' => (object) [
+        'ROUTE' => '/kaltura/video/meta',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => 'getKalturaVideoMeta',
+        ],
+    ],
+    'GET_KALTURA_VIDEO_URL' => (object) [
+        'ROUTE' => '/kaltura/video/mediaURL',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => 'getKalturaVideoUrl',
         ],
     ],
 ];
@@ -1599,4 +1621,74 @@ function stopKalturaUpload($request)
 function getStopUploadRequested($request)
 {
     return get_option(KalturaUpload::STOP_UPLOAD_OPTION) === KalturaUpload::YES_VALUE;
+}
+
+/**
+ * Checks whether a Kaltura video with given entry id exists.
+ * 
+ * @return boolean Response: true if the video exists, and false otherwise.
+ */
+function checkKalturaVideo($request)
+{
+    if (LOAD_KALTURA) {
+        $entryId = $request['entry_id'];
+
+        $kaltura_api = new KalturaApi();
+        $result = $kaltura_api->getVideo($entryId);
+
+        if ($result != null) {
+            return true;
+        }
+        return false;
+    }
+}
+
+/**
+ * If a Kaltura video with given entry id exists, returns the video metadata.
+ * 
+ * Example response body:
+ * {
+ *  "image": "https://streaming.video.ubc.ca/p/186/sp/18600/thumbnail/entry_id/0_p5er0usa/version/100002",
+ *  "duration": 126
+ * }
+ * 
+ * @return - HTTP response: a video metadata object if the entry id is valid, and false otherwise.
+ */
+function getKalturaVideoMeta($request)
+{
+    if (LOAD_KALTURA) {
+        $entryId = $request['entry_id'];
+
+        $kaltura_api = new KalturaApi();
+        $result = $kaltura_api->getVideo($entryId);
+
+        if ($result != null) {
+            return array("image" => $result->thumbnailUrl, "duration" => $result->duration);
+        }
+        return false;
+    }
+}
+
+/**
+ * If a Kaltura video with given entry id exists, returns the video's URL.
+ * 
+ * Example body:
+ * {
+ *   "mediaURL": "https://admin.video.ubc.ca/p/186/sp/18600/playManifest/entryId/0_p5er0usa/format/url/protocol/https"
+ * }
+ * 
+ * @return - HTTP response: an object containing the URL if the entry id is valid, and false otherwise.
+ */
+function getKalturaVideoUrl($request) {
+    if (LOAD_KALTURA) {
+        $entryId = $request['entry_id'];
+
+        $kaltura_api = new KalturaApi();
+        $result = $kaltura_api->getVideo($entryId);
+
+        if ($result != null) {
+            return array("mediaURL" => $result->dataUrl);
+        }
+        return false;
+    }
 }

@@ -61,8 +61,9 @@ You may optionally set uploaded videos in Tapestry to upload to Kaltura (if you 
     define('KALTURA_ADMIN_SECRET', '');
     define('KALTURA_PARTNER_ID', '');
     define('KALTURA_SERVICE_URL', '');
+    define('KALTURA_UNIQUE_CONFIG', '');
     ```
-The Kaltura Admininstrator Secret and Partner ID can be found by going to your Kaltura Settings > Integration tab in the Kaltura admin. The service URL is simply the main domain where your Kaltura videos are hosted on.
+The Kaltura Admininstrator Secret and Partner ID can be found by going to your Kaltura Settings > Integration tab in the Kaltura admin. The service URL is simply the main domain where your Kaltura videos are hosted on. The Kaltura Unique Configuration sets the media player design. It can be found in the Studio tab. 
 
 3. Note the following PHP configurations affect file uploading and HTTP request execution time limits on the server. This might be relevant for Kaltura and regular file upload as well. We recommend you find your active `php.ini` file and edit the following configurations:
     ```

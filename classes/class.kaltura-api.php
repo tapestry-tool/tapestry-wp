@@ -6,6 +6,7 @@
         return false;
     }
 
+    use Kaltura\Client\ApiException;
     use Kaltura\Client\Client;
     use Kaltura\Client\Configuration;
     use Kaltura\Client\Enum\MediaType;
@@ -125,5 +126,22 @@
             $response = $kclient->media->get($entryId);
 
             return $response;
+        }
+
+        /**
+         * Finds the Kaltura video with the given ID if it exists.
+         * Returns null if not found.
+         */
+        public function getVideo($entryId)
+        {
+            $client = $this->getKClient();
+
+            try {
+                $result = $client->media->get($entryId, -1);
+
+                return $result;
+            } catch (ApiException $e) {
+                return null;
+            }
         }
     }
