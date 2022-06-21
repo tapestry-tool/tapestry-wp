@@ -382,7 +382,7 @@ class TapestryNode implements ITapestryNode
     public function getTitle()
     {
         $node = $this->get();
-        
+
         return $node->title;
     }
 

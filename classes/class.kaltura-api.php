@@ -8,7 +8,6 @@
 
     use Kaltura\Client\Client;
     use Kaltura\Client\Configuration;
-    use Kaltura\Client\Enum\FlavorAssetStatus;
     use Kaltura\Client\Enum\MediaType;
     use Kaltura\Client\Enum\SessionType;
     use Kaltura\Client\Type\Category;
