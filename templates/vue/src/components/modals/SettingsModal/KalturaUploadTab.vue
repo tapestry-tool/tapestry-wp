@@ -2,38 +2,37 @@
   <div>
     <b-overlay :show="videosUploading" variant="white">
       <template #overlay><div></div></template>
-      <b-form-group
-        label="Upload Videos to Kaltura"
-        description="Select videos in this Tapestry that you would like to upload to Kaltura. Only videos
-            added as file uploads can be uploaded."
+      <div>Upload Videos to Kaltura</div>
+      <b-form-text>
+        Select videos in this Tapestry that you would like to upload to Kaltura. Only
+        videos added as file uploads can be uploaded.
+      </b-form-text>
+      <b-table
+        ref="videoTable"
+        v-model="allVideos"
+        class="my-3"
+        selectable
+        show-empty
+        empty-text="There are no videos to upload in this Tapestry."
+        selected-variant=""
+        primary-key="nodeID"
+        :fields="['selected', 'nodeID', 'nodeTitle']"
+        :items="getVideosToUpload"
+        @row-selected="handleVideoSelected"
       >
-        <b-table
-          ref="videoTable"
-          v-model="allVideos"
-          class="mb-2"
-          selectable
-          show-empty
-          empty-text="There are no videos to upload in this Tapestry."
-          selected-variant=""
-          primary-key="nodeID"
-          :fields="['selected', 'nodeID', 'nodeTitle']"
-          :items="getVideosToUpload"
-          @row-selected="handleVideoSelected"
-        >
-          <template #head(selected)="{selectAllRows, clearSelected}">
-            <b-form-checkbox
-              :checked="allVideosSelected"
-              @change="$event ? selectAllRows() : clearSelected()"
-            ></b-form-checkbox>
-          </template>
-          <template #cell(selected)="{rowSelected, selectRow, unselectRow}">
-            <b-form-checkbox
-              :checked="rowSelected"
-              @change="$event ? selectRow() : unselectRow()"
-            ></b-form-checkbox>
-          </template>
-        </b-table>
-      </b-form-group>
+        <template #head(selected)="{selectAllRows, clearSelected}">
+          <b-form-checkbox
+            :checked="allVideosSelected"
+            @change="$event ? selectAllRows() : clearSelected()"
+          ></b-form-checkbox>
+        </template>
+        <template #cell(selected)="{rowSelected, selectRow, unselectRow}">
+          <b-form-checkbox
+            :checked="rowSelected"
+            @change="$event ? selectRow() : unselectRow()"
+          ></b-form-checkbox>
+        </template>
+      </b-table>
       <b-form-group>
         <b-form-checkbox v-model="useKalturaPlayer">
           Switch uploaded videos to use Kaltura media player
@@ -54,7 +53,7 @@
       </div>
     </b-button>
     <b-button
-      id="start-upload-button"
+      id="stop-upload-button"
       block
       variant="light"
       :class="!videosUploading ? 'disabled' : ''"
@@ -70,26 +69,25 @@
       still be uploaded to Kaltura, but no more videos will be started. Please be
       patient as processing these videos could take some time.
     </b-alert>
-    <b-form-group
-      class="mt-3"
-      label="Upload Status"
-      description="View the status of the latest upload. Automatically refreshes every 15 seconds; you can also manually refresh."
-    >
-      <b-table
-        ref="uploadStatusTable"
-        class="mb-2"
-        show-empty
-        empty-text="No videos were uploaded from this Tapestry."
-        primary-key="nodeID"
-        :fields="['nodeID', 'uploadStatus', 'kalturaID', 'additionalInfo']"
-        :items="getVideoUploadStatus"
-      ></b-table>
-      <div class="mb-2 text-right">
-        <b-button size="sm" @click="refreshVideoUploadStatus">
-          Refresh
-        </b-button>
-      </div>
-    </b-form-group>
+    <div class="mt-3">Upload Status</div>
+    <b-form-text>
+      View the status of the latest upload. Automatically refreshes every 15 seconds;
+      you can also manually refresh.
+    </b-form-text>
+    <b-table
+      ref="uploadStatusTable"
+      class="my-3"
+      show-empty
+      empty-text="No videos were uploaded from this Tapestry."
+      primary-key="nodeID"
+      :fields="['nodeID', 'uploadStatus', 'kalturaID', 'additionalInfo']"
+      :items="getVideoUploadStatus"
+    ></b-table>
+    <div class="mb-2 text-right">
+      <b-button size="sm" @click="refreshVideoUploadStatus">
+        Refresh
+      </b-button>
+    </div>
   </div>
 </template>
 
