@@ -8,7 +8,12 @@
     @hidden="$emit('close')"
   >
     <b-container fluid class="pt-3">
-      <b-form-row>
+      <b-form-group>
+        <b-form-checkbox v-model="expandWidth" data-qa="expand-width-toggle">
+          Automatically determine width and height
+        </b-form-checkbox>
+      </b-form-group>
+      <b-form-row v-show="!expandWidth">
         <b-col>
           <b-form-group label="Width">
             <b-form-input v-model="width" type="number"></b-form-input>
@@ -20,19 +25,14 @@
           </b-form-group>
         </b-col>
       </b-form-row>
-      <b-form-group>
-        <b-form-checkbox v-model="expandWidth" data-qa="expand-width-toggle">
-          Expand width while preserving aspect ratio
-        </b-form-checkbox>
-      </b-form-group>
-      <b-form-group>
+      <b-form-group class="mt-1">
         <b-form-checkbox v-model="hideSidebar" data-qa="hide-sidebar-toggle">
           Hide sidebar
         </b-form-checkbox>
       </b-form-group>
       <b-form-group>
         <b-form-checkbox v-model="showInfo" data-qa="show-info-toggle">
-          Show information below the iFrame
+          Show Tapestry information below the iFrame
         </b-form-checkbox>
       </b-form-group>
       <b-form-group label="iFrame Code">
@@ -67,7 +67,7 @@
 </template>
 
 <script>
-import { mapState } from "vuex"
+import { mapGetters, mapState } from "vuex"
 import { data } from "@/services/wp"
 
 const idChars = "0123456789abcdefghijklmnopqrstuvwxyz"
@@ -85,13 +85,14 @@ export default {
       width: 800,
       height: 600,
       showInfo: true,
-      expandWidth: false,
+      expandWidth: true,
       hideSidebar: true,
       copied: false,
     }
   },
   computed: {
     ...mapState(["settings"]),
+    ...mapGetters(["getNodeDimensions"]),
     embed() {
       return `<iframe id="${this.iframeId}" width="${this.width}" height="${
         this.height
@@ -112,8 +113,9 @@ export default {
       return `tapestry-iframe-${randomId}`
     },
     expandScript() {
+      const { x0, y0, x, y } = this.getNodeDimensions
       // eslint-disable-next-line
-      return `<script>(function(){var aspectRatio=${this.height / this.width},element=document.getElementById("${this.iframeId}");if(element){var parentDimensions=element.parentElement.getBoundingClientRect(),width=parentDimensions.width,height=width*aspectRatio;element.setAttribute("width",width);element.setAttribute("height",height);}})();<\/script>`
+      return `<script>(function(){var aspectRatio=${(y - y0) / (x - x0)},element=document.getElementById("${this.iframeId}");if(element){var parentDimensions=element.parentElement.getBoundingClientRect(),width=parentDimensions.width,height=width*aspectRatio;element.setAttribute("width",width);element.setAttribute("height",height);}})();<\/script>`
     },
   },
   methods: {
