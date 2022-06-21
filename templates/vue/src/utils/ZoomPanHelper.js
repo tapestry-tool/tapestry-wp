@@ -4,10 +4,12 @@ class ZoomPanHelper {
   onZoomEnd
   onPan
   onPanEnd
+  isZooming
   cache
   lastDistance
   pinchPoint
   isPanning
+  panPoint
 
   constructor(targetDOMId, onZoom, onZoomEnd, onPan, onPanEnd) {
     this.onZoom = onZoom
@@ -94,7 +96,7 @@ class ZoomPanHelper {
   }
 
   wheelHandler(e) {
-    if (e.ctrlKey) {
+    if (e.ctrlKey || e.metaKey) {
       e.preventDefault()
       // panning has higher priority than trackpad pinch zoom
       if (!this.isPanning) {
