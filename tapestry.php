@@ -552,6 +552,7 @@ function save_and_delete_local_video($video, $response_data, $use_kaltura_player
     
     if ($use_kaltura_player) {
         $typeData->kalturaId = $response_data->id;
+        $node->set((object) ['mediaFormat' => "kaltura"]);
     }
 
     $node->set($typeData);
