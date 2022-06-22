@@ -337,6 +337,7 @@ class TapestryHelpers
      * Checks if a video can be uploaded to Kaltura.
      * Only videos added via upload to WordPress can be transferred to Kaltura.
      * 
+     * @param TapestryNode  $node
      * @return bool
      */
     public static function videoCanBeUploaded($node)

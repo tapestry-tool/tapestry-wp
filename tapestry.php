@@ -364,6 +364,10 @@ add_action('upload_videos_to_kaltura', 'upload_videos_to_kaltura');
  */
 function upload_videos_to_kaltura($upload_request)
 {
+    if (!is_object($upload_request) || !isset($upload_request->videos) || !isset($upload_request->useKalturaPlayer)) {
+        return;
+    }
+
     $videos = $upload_request->videos;
     $use_kaltura_player = $upload_request->useKalturaPlayer;
 
@@ -394,7 +398,7 @@ function upload_videos_to_kaltura($upload_request)
 /**
  * Uploads videos to Kaltura.
  *
- * Video files are uploaded to Kaltura up to UPLOAD_BATCH_SIZE at a time.
+ * Video files are transferred up to UPLOAD_BATCH_SIZE at a time.
  * At the end of each batch, waits synchronously for all videos in the batch to finish converting (or error),
  * before uploading the next batch.
  *
@@ -413,7 +417,6 @@ function perform_batched_upload_to_kaltura($videos, $use_kaltura_player)
     $current_date = date('Y/m/d');
 
     $videos_to_upload = create_upload_log($videos);
-
     update_upload_log($videos_to_upload);
 
     $kalturaApi = new KalturaApi();
@@ -421,7 +424,7 @@ function perform_batched_upload_to_kaltura($videos, $use_kaltura_player)
     $num_successfully_uploaded = 0;
     $batch_start = 0;
 
-    for ($batch_start; $batch_start < count($videos); $batch_start += KalturaUpload::UPLOAD_BATCH_SIZE) {
+    for ($batch_start; $batch_start < count($videos_to_upload); $batch_start += KalturaUpload::UPLOAD_BATCH_SIZE) {
         // Retrieve fresh value without caching, since we expect the option value to change underneath
         $GLOBALS['wp_object_cache']->delete(KalturaUpload::STOP_UPLOAD_OPTION, 'options');
         $stop_requested = get_option(KalturaUpload::STOP_UPLOAD_OPTION);
@@ -497,7 +500,7 @@ function perform_batched_upload_to_kaltura($videos, $use_kaltura_player)
     }
 
     // Mark remaining videos as canceled, if any
-    for ($i = $batch_start; $i < count($videos); $i++) {
+    for ($i = $batch_start; $i < count($videos_to_upload); $i++) {
         $videos_to_upload[$i]->uploadStatus = UploadStatus::CANCELED;
     }
     update_upload_log($videos_to_upload);
@@ -507,7 +510,7 @@ function perform_batched_upload_to_kaltura($videos, $use_kaltura_player)
 
 /**
  * Initializes the list of videos to upload.
- * Silently excludes passed videos that are not suitable for upload.
+ * Silently excludes provided videos that are not suitable for upload.
  */
 function create_upload_log($videos)
 {
@@ -516,6 +519,10 @@ function create_upload_log($videos)
     $upload_log = array();
 
     foreach ($videos as $video) {
+        if (!is_object($video) || !isset($video->tapestryID) || !isset($video->nodeID)) {
+            continue;
+        }
+
         $node = new TapestryNode($video->tapestryID, $video->nodeID);
         if (TapestryHelpers::videoCanBeUploaded($node)) {
             $file_name = pathinfo($node->getTypeData()->mediaURL)['basename'];

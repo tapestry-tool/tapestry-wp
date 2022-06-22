@@ -1582,11 +1582,48 @@ function getQuestionHasAnswers($request)
     }
 }
 
+/**
+ * Starts uploading a list of videos to Kaltura.
+ * 
+ * @param object $request   HTTP request
+ *                          Request body should specify the list of videos to upload and 
+ *                          whether to switch uploaded videos to the Kaltura media player.
+ * 
+ * Example request body:
+ * {
+ *  videos: [
+ *   { tapestryID: 7746, nodeID: 13004 }
+ *  ],
+ *  useKalturaPlayer: false
+ * }
+ */
 function uploadVideosToKaltura($request)
 {
     do_action('upload_videos_to_kaltura', json_decode($request->get_body()));
 }
 
+/**
+ * Gets progress of ongoing Kaltura upload.
+ * If tapestryPostId query parameter is set, only returns videos in this Tapestry.
+ * 
+ * @param object $request   HTTP request
+ * @return object
+ * 
+ * Example response body:
+ * {
+ *  videos: [
+ *   {
+ *     tapestryID: 7746,
+ *     nodeID: 13004,
+ *     nodeTitle: "Video",
+ *     uploadStatus: "Converting",
+ *     kalturaID: "0_c7syr9zv",
+ *     additionalInfo: ""
+ *   }
+ *  ]
+ *  inProgress: true
+ * }
+ */
 function getKalturaUploadStatus($request)
 {
     $tapestryPostId = $request['tapestryPostId'];
@@ -1606,21 +1643,35 @@ function getKalturaUploadStatus($request)
     ];
 }
 
+/**
+ * Gets all videos in a Tapestry that can be uploaded to Kaltura.
+ * If tapestryPostId query parameter is not set, gets uploadable videos in all Tapestries.
+ * 
+ * @param object $request   HTTP request
+ * @return array
+ * 
+ * Example response body:
+ * [
+ *  { tapestryID: 7746, nodeID: 13004, nodeTitle: "Video" }
+ * ]
+ */
 function getVideosToUpload($request)
 {
-    $tapestryPostId = $request['tapestryPostId'];
-    return TapestryHelpers::getVideosToUpload($tapestryPostId);
+    try {
+        $tapestryPostId = $request['tapestryPostId'];
+        return TapestryHelpers::getVideosToUpload($tapestryPostId);
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
 }
 
+/**
+ * Sends a signal to stop an ongoing Kaltura upload.
+ */
 function stopKalturaUpload($request)
 {
     // This will create the option if it doesn't exist
     update_option(KalturaUpload::STOP_UPLOAD_OPTION, KalturaUpload::YES_VALUE, false);
-}
-
-function getStopUploadRequested($request)
-{
-    return get_option(KalturaUpload::STOP_UPLOAD_OPTION) === KalturaUpload::YES_VALUE;
 }
 
 /**
