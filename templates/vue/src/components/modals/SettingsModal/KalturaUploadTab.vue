@@ -74,6 +74,10 @@
       View the status of the latest upload. Automatically refreshes every 15 seconds;
       you can also manually refresh.
     </b-form-text>
+    <b-form-text>
+      Once the upload has completed, please reload the page to see the updated node
+      content.
+    </b-form-text>
     <b-table
       ref="uploadStatusTable"
       class="my-3"
