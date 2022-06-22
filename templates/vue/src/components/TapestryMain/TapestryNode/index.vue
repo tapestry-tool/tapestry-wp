@@ -287,7 +287,7 @@ export default {
       // TODO: use a different indicator for currently selected node
       /*
       if (this.root) {
-        return 210 * this.radiusModifier * this.scale + this.scale * 2 * this.node.level
+        return 210
       }
       */
       if (this.isGrandChild) {

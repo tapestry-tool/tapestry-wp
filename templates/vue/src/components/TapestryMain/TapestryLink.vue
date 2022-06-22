@@ -1,21 +1,5 @@
 <template>
   <transition name="fade">
-    <!--
-    <line
-      v-show="show"
-      :data-qa="`link-${source.id}-${target.id}`"
-      :class="{
-        opaque:
-          !visibleNodes.includes(source.id) || !visibleNodes.includes(target.id),
-        disabled: !isLoggedIn,
-      }"
-      :x1="source.coordinates.x"
-      :x2="target.coordinates.x"
-      :y1="source.coordinates.y"
-      :y2="target.coordinates.y"
-      @click="openLinkModal"
-    ></line>
-    -->
     <polygon
       v-show="show"
       :data-qa="`link-${source.id}-${target.id}`"
@@ -118,29 +102,6 @@ polygon {
     &:hover {
       cursor: not-allowed;
       fill: #999;
-    }
-  }
-}
-
-line {
-  stroke: #999;
-  stroke-width: 6;
-
-  &:hover {
-    cursor: pointer;
-    stroke: #3498db;
-    stroke-width: 11;
-  }
-
-  &.opaque {
-    opacity: 0.2;
-  }
-
-  &.disabled {
-    &:hover {
-      cursor: not-allowed;
-      stroke: #999;
-      stroke-width: 6;
     }
   }
 }

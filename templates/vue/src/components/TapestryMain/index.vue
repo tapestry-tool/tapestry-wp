@@ -156,12 +156,6 @@ export default {
                 }
           )
         }
-        // else if (this.$refs.app) {
-        //   const node = this.getNode(nodeId)
-        //   if (Helpers.getNodeVisibility(node.level, this.scale, this.currentDepth) <= 0) {
-        //     this.zoomToNode(node)
-        //   }
-        // }
         this.updateViewBox()
       },
     },
@@ -180,6 +174,7 @@ export default {
   },
   mounted() {
     if (this.dragSelectEnabled) {
+      // ! disabled drag select in favor of panning
       // DragSelectModular.initializeDragSelect(this.$refs.app, this, this.nodes)
     }
     this.updateViewBox()
@@ -207,13 +202,6 @@ export default {
       }
     )
     this.zoomPanHelper.register()
-
-    // if (this.$refs.app) {
-    //   const node = this.getNode(this.selectedId)
-    //   if (Helpers.getNodeVisibility(node.level, this.scale, this.currentDepth) <= 0) {
-    //     this.zoomToNode(node)
-    //   }
-    // }
   },
   beforeDestroy() {
     this.zoomPanHelper.unregister()
@@ -230,7 +218,7 @@ export default {
         height,
       }
     },
-    handleZoom(delta, x, y, isNode = false) {
+    handleZoom(delta, x, y) {
       const newScale = Math.max(this.scale + delta, 1)
       const scaleChange = newScale / this.scale
 
@@ -239,12 +227,8 @@ export default {
       }
       const { width, height } = this.appDimensions
 
-      const relativeX = isNode
-        ? (x * this.scale - this.viewBox[0] - this.offset.x) / this.viewBox[2]
-        : (x / width) * this.viewBox[2]
-      const relativeY = isNode
-        ? (y * this.scale - this.viewBox[1] - this.offset.y) / this.viewBox[3]
-        : (y / height) * this.viewBox[3]
+      const relativeX = (x / width) * this.viewBox[2]
+      const relativeY = (y / height) * this.viewBox[3]
       const absoluteX = relativeX + this.viewBox[0] + this.offset.x
       const absoluteY = relativeY + this.viewBox[1] + this.offset.y
 
@@ -368,17 +352,6 @@ export default {
     },
     handleGrandchildClick(evt) {
       this.handleZoom(1 / scaleConstants.levelMultiplier, evt.offsetX, evt.offsetY)
-      this.updateScale()
-    },
-    zoomToNode(node) {
-      // TODO: This code is currently not working!
-      console.log("zoomToNode")
-      this.handleZoom(
-        node.level / scaleConstants.levelMultiplier - this.scale,
-        node.coordinates.x,
-        node.coordinates.y,
-        true
-      )
       this.updateScale()
     },
     handleMouseover(id) {
