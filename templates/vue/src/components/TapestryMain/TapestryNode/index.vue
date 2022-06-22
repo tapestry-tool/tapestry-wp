@@ -294,8 +294,10 @@ export default {
         ? this.settings.renderImages
         : true
 
-      const backgroundColor = TinyColor(this.node.backgroundColor).darken(
-        this.node.level === 1 ? 0 : 1.1 ** (this.node.level - 1) * 10
+      const backgroundColor = Helpers.darkenColor(
+        this.node.backgroundColor,
+        this.node.level,
+        this.maxLevel
       )
 
       if (!this.isGrandChild) {

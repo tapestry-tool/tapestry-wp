@@ -1,4 +1,5 @@
 import * as wp from "@/services/wp"
+import TinyColor from "tinycolor2"
 import { nodeStatus, userActions, scaleConstants } from "./constants"
 
 /**
@@ -427,6 +428,19 @@ export default class Helpers {
       return from
     }
     return from + (to - from) * ((value - minValue) / (maxValue - minValue))
+  }
+
+  static darkenColor(color, level, maxLevel) {
+    let hsl = TinyColor(color).toHsl()
+    const amount = Helpers.mapValue({
+      value: level,
+      maxValue: maxLevel,
+      from: 1,
+      to: Math.max(1 - maxLevel * 0.05, 0.7),
+    })
+    hsl.s = hsl.s * amount
+    hsl.l = hsl.l * amount
+    return TinyColor(hsl)
   }
 
   static getNodeVisibility(level, scale, depth) {
