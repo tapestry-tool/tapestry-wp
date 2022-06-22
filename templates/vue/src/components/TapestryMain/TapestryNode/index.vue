@@ -389,7 +389,7 @@ export default {
     radius(newRadius) {
       d3.select(this.$refs.circle)
         .transition()
-        .duration(200)
+        .duration(350)
         .ease(d3.easePolyOut)
         .on("start", () => {
           this.transitioning = true
@@ -561,7 +561,7 @@ export default {
 
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.5s;
+  transition: opacity 0.2s;
 }
 
 .fade-enter,

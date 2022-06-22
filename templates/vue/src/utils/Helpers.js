@@ -440,7 +440,7 @@ export default class Helpers {
     })
     hsl.s = hsl.s * amount
     hsl.l = hsl.l * amount
-    return TinyColor(hsl)
+    return TinyColor(hsl).toHexString()
   }
 
   static getNodeVisibility(level, scale, depth) {
