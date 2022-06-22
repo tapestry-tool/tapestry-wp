@@ -562,7 +562,6 @@ function save_and_delete_local_video($video, $response_data, $use_kaltura_player
         $node->set((object) ['mediaFormat' => "kaltura"]);
     }
 
-    $node->set($typeData);
     $node->save();
 
     wp_delete_file($video->file->file_path);
