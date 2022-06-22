@@ -381,7 +381,7 @@ export default {
     radius(newRadius) {
       d3.select(this.$refs.circle)
         .transition()
-        .duration(800)
+        .duration(200)
         .ease(d3.easePolyOut)
         .on("start", () => {
           this.transitioning = true
