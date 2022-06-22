@@ -360,7 +360,7 @@ add_action('upload_videos_to_kaltura', 'upload_videos_to_kaltura');
  * Uploads given videos from local server to Kaltura.
  * Does nothing if an upload is already in progress.
  * 
- * @param object $upload_request    Contains the list of video nodes to upload and other upload parameters.
+ * @param object $upload_request    HTTP request body
  */
 function upload_videos_to_kaltura($upload_request)
 {
@@ -408,7 +408,7 @@ function upload_videos_to_kaltura($upload_request)
  *                              [nodeID] => 123,
  *                          ]
  *                          Nodes are checked to be videos and to be local Wordpress uploads before being uploaded to Kaltura.
- * @param boolean $use_kaltura_player   Whether to switch uploaded videos to use the Kaltura media player.
+ * @param bool $use_kaltura_player   Whether to switch uploaded videos to use the Kaltura media player.
  *
  * @return int The number of videos that were successfully uploaded.
  */

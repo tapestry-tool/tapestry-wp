@@ -1677,7 +1677,7 @@ function stopKalturaUpload($request)
 /**
  * Checks whether a Kaltura video with given entry id exists.
  * 
- * @return boolean Response: true if the video exists, and false otherwise.
+ * @return bool Response: true if the video exists, and false otherwise.
  */
 function checkKalturaVideo($request)
 {
