@@ -72,9 +72,15 @@
             :x="-(radius * 5) / 6"
             :y="-(radius * 5) / 6"
           >
-            <div class="meta" :style="{ color: node.textColor }">
+            <div
+              class="meta"
+              :style="{
+                color: node.textColor,
+                fontSize: Math.min(radius * 0.25, 30) + 'px',
+              }"
+            >
               <p class="title">{{ node.title }}</p>
-              <p style="font-size: 1.2rem;">Level {{ node.level }}</p>
+              <p style="font-size: 60%;">Level {{ node.level }}</p>
               <p v-if="node.mediaDuration" class="timecode">
                 {{ formatDuration() }}
               </p>
