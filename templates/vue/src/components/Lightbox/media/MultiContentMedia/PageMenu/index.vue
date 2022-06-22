@@ -34,11 +34,18 @@
       <div v-if="unitsMenuVisible">
         <b-dropdown class="unit-switch-dropdown" block split :text="parentNodeTitle">
           <b-dropdown-item
-            v-for="page in pages"
+            v-for="page in renderedPages"
             :key="page.id"
+            :disabled="!page.accessible"
             @click="changePage(page.id)"
           >
-            {{ page.title }}
+            <div v-if="!page.accessible" class="disabled-item">
+              <div>{{ page.title }}</div>
+              <i class="fas fa-lock" />
+            </div>
+            <template v-else>
+              {{ page.title }}
+            </template>
           </b-dropdown-item>
         </b-dropdown>
         <h5 class="pl-2 py-1 mb-4">{{ node.title }}</h5>
@@ -149,6 +156,11 @@ export default {
         return false
       }
       return this.opened || (this.browserWidth > 800 && this.node.fullscreen)
+    },
+    renderedPages() {
+      return this.pages
+        ? this.pages.filter(page => page.accessible || !page.hideWhenLocked)
+        : false
     },
     isLoggedIn() {
       return isLoggedIn()
@@ -360,6 +372,14 @@ export default {
       a {
         white-space: normal !important;
       }
+    }
+
+    .disabled-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: gray;
+      cursor: not-allowed;
     }
   }
 }
