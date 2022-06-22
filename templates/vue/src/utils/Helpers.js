@@ -1,5 +1,5 @@
 import * as wp from "@/services/wp"
-import { nodeStatus, userActions, scaleMultipliers } from "./constants"
+import { nodeStatus, userActions, scaleConstants } from "./constants"
 
 /**
  * Helper Functions
@@ -440,7 +440,7 @@ export default class Helpers {
   }
 
   static getCurrentLevel(scale) {
-    return Math.floor(scale * scaleMultipliers.currentLevel)
+    return Math.floor(scale * scaleConstants.levelMultiplier)
   }
 
   static getNodeRadius(level, maxLevel, scale) {
@@ -455,8 +455,11 @@ export default class Helpers {
     const currentLevel = Helpers.getCurrentLevel(scale)
     if (level < currentLevel) {
       // growth rate should be slow for nodes higher than current level
-      const baseScale = (level + 1) / scaleMultipliers.currentLevel
-      return baseRadius * (baseScale + (scale - baseScale) / 2)
+      const baseScale = (level + 1) / scaleConstants.levelMultiplier
+      return (
+        baseRadius *
+        (baseScale + (scale - baseScale) / scaleConstants.largeNodeGrowthSupressor)
+      )
     } else {
       return baseRadius * scale
     }
@@ -467,15 +470,19 @@ export default class Helpers {
       y1 = source.coordinates.y * scale,
       x2 = target.coordinates.x * scale,
       y2 = target.coordinates.y * scale
-    let width1 = Helpers.getNodeRadius(source.level, maxLevel, scale) * 0.05,
-      width2 = Helpers.getNodeRadius(target.level, maxLevel, scale) * 0.05
+    let width1 =
+        Helpers.getNodeRadius(source.level, maxLevel, scale) *
+        scaleConstants.lineWidthRatio,
+      width2 =
+        Helpers.getNodeRadius(target.level, maxLevel, scale) *
+        scaleConstants.lineWidthRatio
     // make width differences more dramatic for better visual aid
     if (source.level < target.level) {
-      width1 *= 1.8
-      width2 *= 0.4
+      width1 *= scaleConstants.widthDifferenceEnhancer.grow
+      width2 *= scaleConstants.widthDifferenceEnhancer.shrink
     } else if (source.level > target.level) {
-      width2 *= 1.8
-      width1 *= 0.4
+      width2 *= scaleConstants.widthDifferenceEnhancer.grow
+      width1 *= scaleConstants.widthDifferenceEnhancer.shrink
     }
     const angle = Math.atan((y2 - y1) / (x2 - x1))
     const dx1 = -1 * width1 * Math.sin(angle),
