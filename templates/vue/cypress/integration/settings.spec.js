@@ -8,6 +8,17 @@ describe("Settings", () => {
   })
 
   it(`should be able to set default depth`, () => {
+    cy.store()
+      .its("state.nodes")
+      .then(nodes => {
+        const [, ...children] = Object.values(nodes)
+        children.forEach(child => {
+          cy.editNode(child.id, {
+            level: 2,
+          })
+        })
+      })
+
     // Set the default depth to 1
     cy.contains(/default depth/i).click()
     cy.focused()
