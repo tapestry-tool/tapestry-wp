@@ -62,6 +62,7 @@
         :viewBox="computedViewBox"
       ></locked-tooltip>
     </svg>
+    <tapestry-minimap :view-box="unscaledViewBox" :scale="scale"></tapestry-minimap>
   </main>
 </template>
 
@@ -70,6 +71,7 @@ import DragSelectModular from "@/utils/dragSelectModular"
 import { mapGetters, mapMutations, mapState } from "vuex"
 import TapestryNode from "./TapestryNode"
 import TapestryLink from "./TapestryLink"
+import TapestryMinimap from "./TapestryMinimap"
 import RootNodeButton from "./RootNodeButton"
 import LockedTooltip from "./LockedTooltip"
 import Helpers from "@/utils/Helpers"
@@ -82,6 +84,7 @@ export default {
   components: {
     TapestryNode,
     TapestryLink,
+    TapestryMinimap,
     RootNodeButton,
     LockedTooltip,
   },
@@ -90,6 +93,7 @@ export default {
       dragSelectReady: false,
       activeNode: null,
 
+      unscaledViewBox: [2200, 2700, 1600, 1100],
       viewBox: [2200, 2700, 1600, 1100],
       scale: 1,
       offset: { x: 0, y: 0 },
@@ -320,14 +324,20 @@ export default {
         const MIN_WIDTH = Helpers.getBrowserWidth() * MIN_TAPESTRY_WIDTH_FACTOR
         const MIN_HEIGHT = Helpers.getBrowserHeight() * MIN_TAPESTRY_WIDTH_FACTOR
 
-        this.viewBox = [
-          tapestryDimensions.startX * this.scale,
-          tapestryDimensions.startY * this.scale,
+        this.unscaledViewBox = [
+          tapestryDimensions.startX,
+          tapestryDimensions.startY,
           Math.max(tapestryDimensions.width - tapestryDimensions.startX, MIN_WIDTH),
           Math.max(
             tapestryDimensions.height - tapestryDimensions.startY,
             MIN_HEIGHT
           ),
+        ]
+        this.viewBox = [
+          this.unscaledViewBox[0] * this.scale,
+          this.unscaledViewBox[1] * this.scale,
+          this.unscaledViewBox[2],
+          this.unscaledViewBox[3],
         ]
       }
     },
@@ -394,6 +404,8 @@ export default {
     }
   }
   #tapestry {
+    position: relative;
+
     .empty-message {
       margin: 30vh auto;
     }
