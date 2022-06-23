@@ -17,17 +17,22 @@
         <completed-icon :node="node" class="mx-2" />
       </h1>
     </header>
-    <multi-content-rows
-      v-if="node.presentationStyle"
-      :dimensions="dimensions"
-      :node="node"
-      :rowId="rowId"
-      :context="context"
-      :level="level"
-      @load="$emit('load')"
-      @change-row="changeRow"
-      @complete="complete"
-    />
+    <template v-if="node.presentationStyle">
+      <div v-if="node.presentationStyle === 'unit'">
+        The content of this unit has not been unlocked yet.
+      </div>
+      <multi-content-rows
+        v-else
+        :dimensions="dimensions"
+        :node="node"
+        :rowId="rowId"
+        :context="context"
+        :level="level"
+        @load="$emit('load')"
+        @change-row="changeRow"
+        @complete="complete"
+      />
+    </template>
     <tapestry-modal
       v-if="showCompletion"
       :node-id="node.id"

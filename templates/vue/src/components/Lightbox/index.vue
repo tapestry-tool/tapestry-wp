@@ -293,8 +293,15 @@ export default {
         this.node.presentationStyle === "unit" &&
         this.node.childOrdering?.length
       ) {
-        const pageNode = this.getNode(this.node.childOrdering[0])
-        this.$root.$emit("open-node", pageNode.id)
+        const firstVisible = this.node.childOrdering.find(id => {
+          const node = this.getNode(id)
+          return node.unlocked || !node.hideWhenLocked
+        })
+        if (firstVisible) {
+          this.$root.$emit("open-node", firstVisible)
+        } else {
+          this.applyDimensions()
+        }
       } else {
         this.applyDimensions()
       }
