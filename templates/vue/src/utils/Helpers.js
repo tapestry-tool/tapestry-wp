@@ -457,8 +457,8 @@ export default class Helpers {
     return Math.floor(scale * scaleConstants.levelMultiplier)
   }
 
-  static getNodeRadius(level, maxLevel, scale) {
-    const baseRadius =
+  static getNodeBaseRadius(level, maxLevel) {
+    return (
       140 *
       Helpers.mapValue({
         value: level,
@@ -466,6 +466,11 @@ export default class Helpers {
         from: 1,
         to: Math.max(1 - maxLevel * 0.15, 0.3),
       })
+    )
+  }
+
+  static getNodeRadius(level, maxLevel, scale) {
+    const baseRadius = Helpers.getNodeBaseRadius(level, maxLevel)
     const currentLevel = Helpers.getCurrentLevel(scale)
     if (level < currentLevel) {
       // growth rate should be slow for nodes higher than current level
@@ -477,6 +482,38 @@ export default class Helpers {
     } else {
       return baseRadius * scale
     }
+  }
+
+  static getMinimapLinePoints(source, target, maxLevel) {
+    const x1 = source.coordinates.x,
+      y1 = source.coordinates.y,
+      x2 = target.coordinates.x,
+      y2 = target.coordinates.y
+    let width1 =
+        Helpers.getNodeBaseRadius(source.level, maxLevel) *
+        scaleConstants.lineWidthRatio,
+      width2 =
+        Helpers.getNodeBaseRadius(target.level, maxLevel) *
+        scaleConstants.lineWidthRatio
+    // make width differences more dramatic for better visual aid
+    if (source.level < target.level) {
+      width1 *= scaleConstants.widthDifferenceEnhancer.grow
+      width2 *= scaleConstants.widthDifferenceEnhancer.shrink
+    } else if (source.level > target.level) {
+      width2 *= scaleConstants.widthDifferenceEnhancer.grow
+      width1 *= scaleConstants.widthDifferenceEnhancer.shrink
+    }
+    const angle = Math.atan((y2 - y1) / (x2 - x1))
+    const dx1 = -1 * width1 * Math.sin(angle),
+      dy1 = width1 * Math.cos(angle),
+      dx2 = -1 * width2 * Math.sin(angle),
+      dy2 = width2 * Math.cos(angle)
+    return [
+      { x: x1 + dx1, y: y1 + dy1 },
+      { x: x1 - dx1, y: y1 - dy1 },
+      { x: x2 - dx2, y: y2 - dy2 },
+      { x: x2 + dx2, y: y2 + dy2 },
+    ]
   }
 
   static getLinePolygonPoints(source, target, maxLevel, scale = 1) {

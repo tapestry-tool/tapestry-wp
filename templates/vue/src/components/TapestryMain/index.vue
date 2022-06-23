@@ -62,7 +62,11 @@
         :viewBox="computedViewBox"
       ></locked-tooltip>
     </svg>
-    <tapestry-minimap :view-box="unscaledViewBox" :scale="scale"></tapestry-minimap>
+    <tapestry-minimap
+      :view-box="unscaledViewBox"
+      :scale="scale"
+      :offset="offset"
+    ></tapestry-minimap>
   </main>
 </template>
 
