@@ -29,18 +29,22 @@ class ZoomPanHelper {
 
   register() {
     const elem = document.getElementById(this.targetDOMId)
-    // catch panning with mouse
-    elem.addEventListener("mousedown", this.panStartHandler.bind(this))
-    elem.addEventListener("mousemove", this.panMoveHandler.bind(this))
-    elem.addEventListener("mouseup", this.panEndHandler.bind(this))
-    elem.addEventListener("mouseleave", this.panEndHandler.bind(this))
-    // catch wheel zoom event for MacOS trackpad pinch zoom
-    elem.addEventListener("wheel", this.wheelHandler.bind(this), { passive: false })
-    // catch 2-finger pinch zoom on mobile browsers
-    elem.addEventListener("touchstart", this.startHandler.bind(this))
-    elem.addEventListener("touchmove", this.moveHandler.bind(this))
-    elem.addEventListener("touchcancel", this.endHandler.bind(this))
-    elem.addEventListener("touchend", this.endHandler.bind(this))
+    if (elem) {
+      // catch panning with mouse
+      elem.addEventListener("mousedown", this.panStartHandler.bind(this))
+      elem.addEventListener("mousemove", this.panMoveHandler.bind(this))
+      elem.addEventListener("mouseup", this.panEndHandler.bind(this))
+      elem.addEventListener("mouseleave", this.panEndHandler.bind(this))
+      // catch wheel zoom event for MacOS trackpad pinch zoom
+      elem.addEventListener("wheel", this.wheelHandler.bind(this), {
+        passive: false,
+      })
+      // catch 2-finger pinch zoom on mobile browsers
+      elem.addEventListener("touchstart", this.startHandler.bind(this))
+      elem.addEventListener("touchmove", this.moveHandler.bind(this))
+      elem.addEventListener("touchcancel", this.endHandler.bind(this))
+      elem.addEventListener("touchend", this.endHandler.bind(this))
+    }
   }
 
   unregister() {
@@ -63,14 +67,14 @@ class ZoomPanHelper {
   panStartHandler(e) {
     if (!this.isZooming) {
       this.isPanning = true
-      this.panPoint = { x: e.offsetX, y: e.offsetY }
+      this.panPoint = { x: e.clientX, y: e.clientY }
     }
   }
 
   panMoveHandler(e) {
     if (this.isPanning) {
-      const x = e.offsetX
-      const y = e.offsetY
+      const x = e.clientX
+      const y = e.clientY
       this.onPan(x - this.panPoint.x, y - this.panPoint.y)
       this.panPoint.x = x
       this.panPoint.y = y
