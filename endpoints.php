@@ -515,6 +515,10 @@ function importTapestry($postId, $tapestryData)
                 }
             }
 
+            if ($node->mediaType === "answer") {
+                $oldActivityNodeId = $oldNode->typeData->activityId;
+                $node->typeData->activityId = $idMap->$oldActivityNodeId;
+            }
 
             $tapestryNode->set($node);
             $tapestryNode->save();
