@@ -222,3 +222,7 @@ export function setMaxLevel(state, maxLevel) {
 export function setCurrentDepth(state, depth) {
   state.currentDepth = depth
 }
+
+export function setScaleConstants(state, scaleConstants) {
+  state.scaleConstants = scaleConstants
+}

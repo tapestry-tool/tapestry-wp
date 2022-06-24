@@ -45,6 +45,7 @@ export const userActions = {
 
 export const DEFAULT_DEPTH = 3
 
+// * DEV: this is not used; use store.state.scaleConstants temporarily
 export const scaleConstants = {
   levelMultiplier: 1.7, // higher -> deep nodes get revealed faster
   largeNodeGrowthSupressor: 2, // [>=1] higher -> larger nodes grow slower

@@ -82,7 +82,7 @@ import Helpers from "@/utils/Helpers"
 import ZoomPanHelper from "@/utils/ZoomPanHelper"
 import { names } from "@/config/routes"
 import * as wp from "@/services/wp"
-import { scaleConstants } from "@/utils/constants"
+// import { scaleConstants } from "@/utils/constants"
 
 export default {
   components: {
@@ -115,6 +115,7 @@ export default {
       "rootId",
       "maxLevel",
       "currentDepth",
+      "scaleConstants",
     ]),
     ...mapGetters(["getNode"]),
     computedViewBox() {
@@ -191,7 +192,7 @@ export default {
     this.zoomPanHelper = new ZoomPanHelper(
       "tapestry",
       (delta, x, y) => {
-        this.handleZoom(delta * scaleConstants.zoomSensitivity, x, y)
+        this.handleZoom(delta * this.scaleConstants.zoomSensitivity, x, y)
       },
       () => {
         this.updateScale()
@@ -199,8 +200,8 @@ export default {
       },
       (dx, dy) => {
         this.handlePan(
-          dx * scaleConstants.panSensitivity,
-          dy * scaleConstants.panSensitivity
+          dx * this.scaleConstants.panSensitivity,
+          dy * this.scaleConstants.panSensitivity
         )
       },
       () => {
@@ -365,7 +366,11 @@ export default {
       return box
     },
     handleGrandchildClick(evt) {
-      this.handleZoom(1 / scaleConstants.levelMultiplier, evt.offsetX, evt.offsetY)
+      this.handleZoom(
+        1 / this.scaleConstants.levelMultiplier,
+        evt.offsetX,
+        evt.offsetY
+      )
       this.updateScale()
     },
     handleMouseover(id) {
