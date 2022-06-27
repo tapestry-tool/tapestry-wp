@@ -32,7 +32,7 @@ require_once dirname(__FILE__).'/endpoints.php';
 require_once dirname(__FILE__).'/settings.php';
 require_once dirname(__FILE__).'/plugin-updates.php';
 
-use Kaltura\Client\Enum\FlavorAssetStatus;
+use Kaltura\Client\Enum\EntryStatus;
 
 /**
  * Register Tapestry type on initialization.
@@ -165,7 +165,7 @@ function tapestry_enqueue_vue_app()
             $kaltura_partner_id = KALTURA_PARTNER_ID;
             $kaltura_unique_configuration = KALTURA_UNIQUE_CONFIG;
         }
-        
+
         $currentUser = wp_get_current_user();
         $currentUser->data = (object) [
             'ID' => $currentUser->data->ID,
@@ -359,7 +359,7 @@ add_action('upload_videos_to_kaltura', 'upload_videos_to_kaltura');
 /**
  * Uploads given videos from local server to Kaltura.
  * Does nothing if an upload is already in progress.
- * 
+ *
  * @param object $upload_request    HTTP request body
  */
 function upload_videos_to_kaltura($upload_request)
@@ -440,7 +440,7 @@ function perform_batched_upload_to_kaltura($videos, $use_kaltura_player)
 
             $kaltura_data = null;
             try {
-                $kaltura_data = $kalturaApi->uploadKalturaVideo($video->file, $current_date);
+                $kaltura_data = $kalturaApi->uploadVideo($video->file, $current_date);
             } catch (Exception $e) {
                 $error_start = "Unable to upload video '".$video->file->name."' to Kaltura due to: \n";
 
@@ -458,7 +458,7 @@ function perform_batched_upload_to_kaltura($videos, $use_kaltura_player)
         }
 
         // Filter out videos that did not successfully upload so we don't get an infinite loop
-        $remaining_videos = array_filter($batch, function($vid) {
+        $remaining_videos = array_filter($batch, function ($vid) {
             return $vid->uploadStatus ===  UploadStatus::CONVERTING;
         });
 
@@ -469,22 +469,29 @@ function perform_batched_upload_to_kaltura($videos, $use_kaltura_player)
             foreach ($remaining_videos as $video) {
                 $response = $kalturaApi->getVideoUploadStatus($video->kalturaID);
 
-                if ($response->status == FlavorAssetStatus::READY) {
-                    save_and_delete_local_video($video, $response, $use_kaltura_player);
-
-                    $video->uploadStatus = UploadStatus::COMPLETE;
-                    update_upload_log($videos_to_upload);
-
-                    array_push($videos_to_remove, $video);
-
-                    $num_successfully_uploaded++;
-                } elseif ($response->status == FlavorAssetStatus::ERROR) {
-                    $video->uploadStatus = UploadStatus::ERROR;
-                    $video->additionalInfo = 'An error occurred. Could not convert the video.';
-                    update_upload_log($videos_to_upload);
-
-                    array_push($videos_to_remove, $video);
+                if ($response->status === EntryStatus::PRECONVERT) {
+                    // Still converting
+                    error_log("Still converting");
+                    continue;
                 }
+
+                if ($response->status === EntryStatus::READY) {
+                    error_log("Ready: ".print_r($response->status));
+                    save_and_delete_local_video($video, $response, $use_kaltura_player);
+                    $video->uploadStatus = UploadStatus::COMPLETE;
+                    $num_successfully_uploaded++;
+                } elseif ($response->status === EntryStatus::ERROR_CONVERTING) {
+                    error_log("Error converting: ".print_r($response->status));
+                    $video->uploadStatus = UploadStatus::ERROR;
+                    $video->additionalInfo = 'An error occurred: Could not convert the video.';
+                } else {
+                    error_log("Other error: ".print_r($response->status));
+                    $video->uploadStatus = UploadStatus::ERROR;
+                    $video->additionalInfo = 'An error occurred: Expected the video to be converting, but it was not.';
+                }
+
+                array_push($videos_to_remove, $video);
+                update_upload_log($videos_to_upload);
             }
 
             $remaining_videos = array_udiff($remaining_videos, $videos_to_remove, function ($video1, $video2) {
@@ -556,7 +563,7 @@ function save_and_delete_local_video($video, $response_data, $use_kaltura_player
                     "id" => $response_data->id,
                     "partnerId" => $response_data->partnerId,
                 );
-    
+
     if ($use_kaltura_player) {
         $typeData->kalturaId = $response_data->id;
         $node->set((object) ['mediaFormat' => "kaltura"]);

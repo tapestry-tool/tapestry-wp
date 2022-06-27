@@ -53,7 +53,7 @@
          *
          * @return object $response HTTP response
          */
-        public function uploadKalturaVideo($file, $categoryName)
+        public function uploadVideo($file, $categoryName)
         {
             $filepath = $file->file_path;
             $filename = $file->name;
