@@ -471,21 +471,17 @@ function perform_batched_upload_to_kaltura($videos, $use_kaltura_player)
 
                 if ($response->status === EntryStatus::PRECONVERT) {
                     // Still converting
-                    error_log("Still converting");
                     continue;
                 }
 
                 if ($response->status === EntryStatus::READY) {
-                    error_log("Ready: ".print_r($response->status));
                     save_and_delete_local_video($video, $response, $use_kaltura_player);
                     $video->uploadStatus = UploadStatus::COMPLETE;
                     $num_successfully_uploaded++;
                 } elseif ($response->status === EntryStatus::ERROR_CONVERTING) {
-                    error_log("Error converting: ".print_r($response->status));
                     $video->uploadStatus = UploadStatus::ERROR;
                     $video->additionalInfo = 'An error occurred: Could not convert the video.';
                 } else {
-                    error_log("Other error: ".print_r($response->status));
                     $video->uploadStatus = UploadStatus::ERROR;
                     $video->additionalInfo = 'An error occurred: Expected the video to be converting, but it was not.';
                 }
