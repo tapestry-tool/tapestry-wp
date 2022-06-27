@@ -42,6 +42,19 @@ export default {
       required: true,
     },
   },
+  data() {
+    return {
+      viewPosition: {
+        x: 0,
+        y: 0,
+        width: 0,
+        height: 0,
+      },
+      mouseDown: false,
+      mouseMoved: false,
+      mousePos: false,
+    }
+  },
   computed: {
     ...mapState(["nodes", "links", "maxLevel"]),
     aspectRatio() {
@@ -52,6 +65,9 @@ export default {
     },
     height() {
       return 300
+    },
+    displayScale() {
+      return this.height / this.viewBox[3]
     },
   },
   watch: {
@@ -73,9 +89,26 @@ export default {
   },
   mounted() {
     this.drawMinimap()
+
+    // add event listeners
+    const elem = this.$refs.viewbox
+    if (elem) {
+      elem.addEventListener("mousedown", this.handleMousedown)
+      elem.addEventListener("mousemove", this.handleMousemove)
+      elem.addEventListener("mouseup", this.handleMouseup)
+      elem.addEventListener("mouseleave", this.handleMouseup)
+    }
+  },
+  beforeDestroy() {
+    const elem = this.$refs.viewbox
+    if (elem) {
+      elem.removeEventListener("mousedown", this.handleMousedown)
+      elem.removeEventListener("mousemove", this.handleMousemove)
+      elem.removeEventListener("mouseup", this.handleMouseup)
+      elem.removeEventListener("mouseleave", this.handleMouseup)
+    }
   },
   updated() {
-    console.log("updated")
     this.drawMinimap()
   },
   methods: {
@@ -92,11 +125,16 @@ export default {
         const viewHeight = this.viewBox[3] / this.scale
         c.strokeStyle = "#11a6d8"
         c.lineWidth = this.viewBox[2] * 0.01
+        this.viewPosition = {
+          x: viewX,
+          y: viewY,
+          width: viewWidth,
+          height: viewHeight,
+        }
         c.strokeRect(viewX, viewY, viewWidth, viewHeight)
       }
     },
     drawMinimap() {
-      console.log("drawMinimap")
       if (this.$refs.minimap) {
         const canvas = this.$refs.minimap
         const c = canvas.getContext("2d")
@@ -145,6 +183,45 @@ export default {
         x: coordinates.x - this.viewBox[0],
         y: coordinates.y - this.viewBox[1],
       }
+    },
+    handleMousedown(event) {
+      this.mouseDown = true
+      this.mouseMoved = false
+      const x = event.offsetX / this.displayScale
+      const y = event.offsetY / this.displayScale
+      const mouseInView =
+        x >= this.viewPosition.x &&
+        x < this.viewPosition.x + this.viewPosition.width &&
+        y >= this.viewPosition.y &&
+        y < this.viewPosition.y + this.viewPosition.height
+      this.mousePos = mouseInView ? { x, y } : null
+      // this.$emit("pan-to", {x: event.offsetX, y: event.offsetY})
+    },
+    handleMousemove(event) {
+      this.mouseMoved = true
+      if (this.mouseDown && this.mousePos) {
+        const x = event.offsetX / this.displayScale
+        const y = event.offsetY / this.displayScale
+        this.$emit("pan-by", {
+          dx: this.mousePos.x - x,
+          dy: this.mousePos.y - y,
+        })
+        this.mousePos.x = x
+        this.mousePos.y = y
+      }
+    },
+    handleMouseup(event) {
+      if (this.mouseDown && (!this.mouseMoved || !this.mousePos)) {
+        const x = event.offsetX / this.displayScale
+        const y = event.offsetY / this.displayScale
+        this.$emit("pan-to", {
+          x,
+          y,
+        })
+      }
+      this.mouseDown = false
+      this.mouseMoved = false
+      this.mousePos = null
     },
   },
 }

@@ -66,6 +66,8 @@
       :view-box="unscaledViewBox"
       :scale="scale"
       :offset="offset"
+      @pan-by="handleMinimapPanBy"
+      @pan-to="handleMinimapPanTo"
     ></tapestry-minimap>
   </main>
 </template>
@@ -145,6 +147,12 @@ export default {
     },
   },
   watch: {
+    empty(empty) {
+      if (!empty) {
+        this.zoomPanHelper.unregister()
+        this.zoomPanHelper.register()
+      }
+    },
     background: {
       immediate: true,
       handler(background) {
@@ -190,7 +198,7 @@ export default {
     this.dragSelectReady = true
 
     this.zoomPanHelper = new ZoomPanHelper(
-      "tapestry",
+      "vue-svg",
       (delta, x, y) => {
         this.handleZoom(delta * this.scaleConstants.zoomSensitivity, x, y)
       },
@@ -213,7 +221,7 @@ export default {
     this.zoomPanHelper.register()
   },
   beforeDestroy() {
-    this.zoomPanHelper.unregister()
+    this.zoomPanHelper && this.zoomPanHelper.unregister()
   },
   methods: {
     ...mapMutations(["select", "unselect", "clearSelection"]),
@@ -268,6 +276,19 @@ export default {
       dy = (dy / height) * this.viewBox[3]
       this.offset.x -= dx
       this.offset.y -= dy
+    },
+    handleMinimapPanBy({ dx, dy }) {
+      this.zoomPanHelper.onPan(dx, dy)
+      this.zoomPanHelper.onPanEnd()
+    },
+    handleMinimapPanTo({ x, y }) {
+      // x, y is in viewbox coordinates (before scaling)
+      // put (x, y) to the center of the view
+      const scaledX = x * this.scale
+      const scaledY = y * this.scale
+      this.offset.x = scaledX - this.viewBox[2] / 2
+      this.offset.y = scaledY - this.viewBox[3] / 2
+      this.updateOffset()
     },
     updateScale() {
       this.$router.push({
