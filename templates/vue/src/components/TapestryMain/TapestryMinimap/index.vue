@@ -20,6 +20,11 @@
         height: height + 'px',
       }"
     ></canvas>
+    <div data-qa="close-minimap" class="minimap-button">
+      <button @click="$emit('close')">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
   </div>
 </template>
 
@@ -232,5 +237,32 @@ export default {
   position: absolute;
   bottom: 0;
   right: 0;
+}
+.minimap-button {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  height: 2.5rem;
+  width: 2.5rem;
+  background: var(--bg-color-secondary);
+  box-shadow: 0 0 7px 0 var(--bg-color-primary);
+  border-radius: 8px;
+
+  button {
+    color: var(--text-color-tertiary);
+    padding: 0;
+    background: none;
+    width: 100%;
+    height: 100%;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+      color: var(--highlight-color);
+    }
+  }
 }
 </style>

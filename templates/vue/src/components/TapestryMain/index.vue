@@ -63,12 +63,18 @@
       ></locked-tooltip>
     </svg>
     <tapestry-minimap
+      v-if="showMinimap"
       :view-box="unscaledViewBox"
       :scale="scale"
       :offset="offset"
       @pan-by="handleMinimapPanBy"
       @pan-to="handleMinimapPanTo"
+      @close="showMinimap = false"
     ></tapestry-minimap>
+    <tapestry-minimap-button
+      v-else
+      @click="showMinimap = true"
+    ></tapestry-minimap-button>
   </main>
 </template>
 
@@ -77,6 +83,7 @@ import DragSelectModular from "@/utils/dragSelectModular"
 import { mapGetters, mapMutations, mapState } from "vuex"
 import TapestryNode from "./TapestryNode"
 import TapestryLink from "./TapestryLink"
+import TapestryMinimapButton from "./TapestryMinimap/TapestryMinimapButton"
 import TapestryMinimap from "./TapestryMinimap"
 import RootNodeButton from "./RootNodeButton"
 import LockedTooltip from "./LockedTooltip"
@@ -90,6 +97,7 @@ export default {
   components: {
     TapestryNode,
     TapestryLink,
+    TapestryMinimapButton,
     TapestryMinimap,
     RootNodeButton,
     LockedTooltip,
@@ -106,6 +114,8 @@ export default {
       appDimensions: null,
       zoomPanHelper: null,
       isPanning: false,
+
+      showMinimap: false,
     }
   },
   computed: {
