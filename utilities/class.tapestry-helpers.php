@@ -312,9 +312,9 @@ class TapestryHelpers
      * Return all videos that can be uploaded to Kaltura.
      * If Tapestry ID provided, returns only videos in that Tapestry.
      * Otherwise, returns uploadable videos in all Tapestries.
-     * 
+     *
      * @param int|string $tapestryPostId    Tapestry ID
-     * 
+     *
      * @return array
      */
     public static function getVideosToUpload($tapestryPostId)
@@ -336,7 +336,7 @@ class TapestryHelpers
     /**
      * Checks if a video can be uploaded to Kaltura.
      * Only videos added via upload to WordPress can be transferred to Kaltura.
-     * 
+     *
      * @param TapestryNode  $node
      * @return bool
      */
@@ -344,8 +344,9 @@ class TapestryHelpers
     {
         $nodeMeta = $node->getMeta();
         $nodeTypeData = $node->getTypeData();
+        $upload_dir_url = wp_upload_dir()['url'];
 
-        return $nodeMeta->mediaType == "video" && strpos($nodeTypeData->mediaURL, "/wp-content/uploads/");
+        return $nodeMeta->mediaType == "video" && substr($nodeTypeData->mediaURL, 0, strlen($upload_dir_url)) === $upload_dir_url;
     }
 
     private static function _getVideosToUploadInTapestry($tapestryPostId)
