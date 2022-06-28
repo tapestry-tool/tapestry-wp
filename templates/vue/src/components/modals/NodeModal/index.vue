@@ -1295,10 +1295,6 @@ table {
     position: absolute;
     top: 15px;
     right: 12px;
-
-    &:focus {
-      outline: none;
-    }
   }
 }
 
@@ -1309,10 +1305,6 @@ table {
 .modal-title {
   font-size: 1.5rem;
   font-weight: 600;
-}
-
-.nav-link:focus {
-  outline: none;
 }
 </style>
 

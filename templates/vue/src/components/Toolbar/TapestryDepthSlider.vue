@@ -237,7 +237,6 @@ export default {
 
 .slider {
   -webkit-appearance: none;
-  outline: none;
   background: var(--bg-color-primary);
   height: 10px;
   opacity: 0.8;
@@ -303,7 +302,6 @@ export default {
 
   &:focus {
     border-color: transparent !important;
-    outline: none !important;
   }
 }
 

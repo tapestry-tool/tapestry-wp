@@ -64,10 +64,6 @@ export default {
     position: absolute;
     top: 15px;
     right: 12px;
-
-    &:focus {
-      outline: none;
-    }
   }
 }
 

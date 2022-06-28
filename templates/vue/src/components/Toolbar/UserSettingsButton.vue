@@ -80,7 +80,6 @@ export default {
   color: #999;
   font-size: 1.2em;
   transition: all 0.2s ease;
-  outline: none;
 }
 .user-settings-button:hover {
   background: none;
