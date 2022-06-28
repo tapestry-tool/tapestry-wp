@@ -17,6 +17,7 @@
             ? 'pointer'
             : 'not-allowed',
       }"
+      tabindex="0"
       @click="handleClick"
       @mouseover="handleMouseover"
       @mouseleave="handleMouseleave"

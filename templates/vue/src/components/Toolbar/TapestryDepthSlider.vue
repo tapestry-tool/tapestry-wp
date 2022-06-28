@@ -7,6 +7,7 @@
     <div>
       <input
         v-model="currentDepth"
+        aria-label="Change the depth of the Tapestry view"
         class="slider"
         type="range"
         min="1"
