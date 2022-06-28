@@ -85,11 +85,26 @@
       empty-text="No videos were uploaded from this Tapestry."
       primary-key="nodeID"
       :fields="[
-        'nodeID',
-        'nodeTitle',
-        'uploadStatus',
-        'kalturaID',
-        'additionalInfo',
+        {
+          key: 'nodeID',
+          class: 'align-top',
+        },
+        {
+          key: 'nodeTitle',
+          class: 'align-top',
+        },
+        {
+          key: 'uploadStatus',
+          class: 'align-top',
+        },
+        {
+          key: 'kalturaID',
+          class: 'align-top',
+        },
+        {
+          key: 'additionalInfo',
+          class: 'align-top',
+        },
       ]"
       :items="getVideoUploadStatus"
     ></b-table>
