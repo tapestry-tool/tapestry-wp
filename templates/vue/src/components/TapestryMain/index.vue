@@ -155,6 +155,9 @@ export default {
         ? this.nodes.filter(node => this.nodeIsEditable(node))
         : this.nodes
     },
+    maxScale() {
+      return 140 / Helpers.getNodeBaseRadius(this.maxLevel, this.maxLevel)
+    },
   },
   watch: {
     empty(empty) {
@@ -190,7 +193,7 @@ export default {
   created() {
     const { scale, x, y } = this.$route.query
     if (scale && !isNaN(scale)) {
-      this.scale = Math.max(Number(scale), 1)
+      this.scale = this.clampScale(Number(scale))
     }
     if (x && !isNaN(x)) {
       this.offset.x = Number(x)
@@ -238,6 +241,9 @@ export default {
     addRootNode() {
       this.$root.$emit("add-node", null)
     },
+    clampScale(scale) {
+      return Math.max(Math.min(scale, this.maxScale), 1)
+    },
     fetchAppDimensions() {
       const { width, height } = this.$refs.app.getBoundingClientRect()
       this.appDimensions = {
@@ -246,7 +252,7 @@ export default {
       }
     },
     handleZoom(delta, x, y) {
-      const newScale = Math.max(this.scale + delta, 1)
+      const newScale = this.clampScale(this.scale + delta)
       const scaleChange = newScale / this.scale
 
       if (!this.appDimensions) {
