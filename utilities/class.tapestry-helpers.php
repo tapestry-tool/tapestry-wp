@@ -309,6 +309,66 @@ class TapestryHelpers
     }
 
     /**
+     * Update the Kaltura upload status of a video node.
+     * 
+     * @param TapestryNode      $node           Video node to update
+     * @param string            $newStatus      Upload status
+     * @param MediaEntry|null   $kalturaData    (optional) Response from Kaltura API
+     */
+    public static function saveVideoUploadStatusInNode($node, $newStatus, $kalturaData = null)
+    {
+        $typeData = $node->getTypeData();
+        $typeData->kalturaData['uploadStatus'] = $newStatus;
+
+        if ($kalturaData) {
+            $typeData->kalturaData['id'] = $kalturaData->id;
+            $typeData->kalturaData['partnerId'] = $kalturaData->partnerId;
+        }
+
+        $node->save();
+    }
+
+    /**
+     * Delete a local video after it has been uploaded to Kaltura.
+     * 
+     * @param TapestryNode  $node               Video node to update
+     * @param MediaEntry    $kalturaData        Response from Kaltura API
+     * @param boolean       $useKalturaPlayer   If true, also switch the video to use Kaltura player
+     * @param string        $videoPath          Path to the video file.
+     */
+    public static function saveAndDeleteLocalVideo($node, $kalturaData, $useKalturaPlayer, $videoPath)
+    {
+        $typeData = $node->getTypeData();
+        $typeData->mediaURL = $kalturaData->dataUrl.'?.mp4';
+
+        if ($useKalturaPlayer) {
+            $typeData->kalturaId = $kalturaData->id;
+            $node->set((object) ['mediaFormat' => 'kaltura']);
+        }
+
+        $node->save();
+
+        wp_delete_file($videoPath);
+    }
+
+    /**
+     * Assumes the node's mediaURL is a local upload, and gets its file path
+     * 
+     * @param TapestryNode  $node
+     */
+    public static function getPathToMedia($node)
+    {
+        $upload_folder = wp_upload_dir()['path'];
+
+        $file_name = pathinfo($node->getTypeData()->mediaURL)['basename'];
+        $file_obj = new StdClass();
+        $file_obj->file_path = $upload_folder.'/'.$file_name;
+        $file_obj->name = $file_name;
+
+        return $file_obj;
+    }
+
+    /**
      * Return all videos that can be uploaded to Kaltura.
      * If Tapestry ID provided, returns only videos in that Tapestry.
      * Otherwise, returns uploadable videos in all Tapestries.

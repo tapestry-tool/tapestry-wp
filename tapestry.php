@@ -451,7 +451,7 @@ function perform_batched_upload_to_kaltura($videos, $use_kaltura_player)
             }
 
             $video->kalturaID = $kaltura_data->id;
-            save_video_upload_status($video, $videos_to_upload, UploadStatus::CONVERTING);
+            save_video_upload_status($video, $videos_to_upload, UploadStatus::CONVERTING, $kaltura_data);
         }
 
         // Filter out videos that did not successfully upload so we don't get an infinite loop
@@ -472,8 +472,8 @@ function perform_batched_upload_to_kaltura($videos, $use_kaltura_player)
                 }
 
                 if ($response->status === EntryStatus::READY) {
-                    save_and_delete_local_video($video, $response, $use_kaltura_player);
-                    save_video_upload_status($video, $videos_to_upload, UploadStatus::COMPLETE);
+                    $node = save_video_upload_status($video, $videos_to_upload, UploadStatus::COMPLETE);
+                    TapestryHelpers::saveAndDeleteLocalVideo($node, $response, $use_kaltura_player, $video->file->file_path);
                     $num_successfully_uploaded++;
                 } elseif ($response->status === EntryStatus::ERROR_CONVERTING) {
                     $video->additionalInfo = 'An error occurred: Could not convert the video.';
@@ -512,8 +512,6 @@ function perform_batched_upload_to_kaltura($videos, $use_kaltura_player)
  */
 function create_upload_log($videos)
 {
-    $upload_folder = wp_upload_dir()['path'];
-
     $upload_log = array();
 
     foreach ($videos as $video) {
@@ -523,17 +521,12 @@ function create_upload_log($videos)
 
         $node = new TapestryNode($video->tapestryID, $video->nodeID);
         if (TapestryHelpers::videoCanBeUploaded($node)) {
-            $file_name = pathinfo($node->getTypeData()->mediaURL)['basename'];
-            $file_obj = new StdClass();
-            $file_obj->file_path = $upload_folder.'/'.$file_name;
-            $file_obj->name = $file_name;
-
             $video_info = (object) [
                 'tapestryID' => $video->tapestryID,
                 'nodeID' => $video->nodeID,
                 'nodeTitle' => $node->getTitle(),
                 'uploadStatus' => UploadStatus::NOT_STARTED,
-                'file' => $file_obj,
+                'file' => TapestryHelpers::getPathToMedia($node),
                 'kalturaID' => '',
                 'additionalInfo' => '',
             ];
@@ -547,35 +540,14 @@ function create_upload_log($videos)
     return $upload_log;
 }
 
-function save_and_delete_local_video($video, $response_data, $use_kaltura_player)
-{
-    $node = new TapestryNode($video->tapestryID, $video->nodeID);
-
-    $typeData = $node->getTypeData();
-    $typeData->mediaURL = $response_data->dataUrl.'?.mp4';
-    $typeData->kalturaData['id'] = $response_data->id;
-    $typeData->kalturaData['partnerId'] = $response_data->partnerId;
-
-    if ($use_kaltura_player) {
-        $typeData->kalturaId = $response_data->id;
-        $node->set((object) ['mediaFormat' => 'kaltura']);
-    }
-
-    $node->save();
-
-    wp_delete_file($video->file->file_path);
-}
-
-function save_video_upload_status($video, $videos_to_upload, $new_status)
+function save_video_upload_status($video, $videos_to_upload, $new_status, $kaltura_data = null)
 {
     $video->uploadStatus = $new_status;
     update_upload_log($videos_to_upload);
 
     $node = new TapestryNode($video->tapestryID, $video->nodeID);
-    $typeData = $node->getTypeData();
-    $typeData->kalturaData['uploadStatus'] = $new_status;
-
-    $node->save();
+    TapestryHelpers::saveVideoUploadStatusInNode($node, $new_status, $kaltura_data);
+    return $node;
 }
 
 function update_upload_log($videos)
