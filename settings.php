@@ -56,8 +56,17 @@ function tapestry_db_section_cb()
 function tapestry_kaltura_section_cb()
 {
     ?>
-    <p>If your Kaltura upload was interrupted, the complete data may not be available for videos that did not finish uploading.</p>
-    <p>You can refresh the status of any videos that are still marked "converting" below.</p>
+    <div class="notice notice-info" id="upload_in_progress_notice" style="display: none">
+        <p>
+            Note: an upload is currently in progress.
+            It is recommended to wait for the upload to complete before cleaning uploaded videos.
+        </p>
+    </div>
+    <p>
+        If your Kaltura upload was interrupted, the complete data may not be available for videos that did not finish uploading.
+        <br/>
+        You can refresh the status of any videos that are still marked "converting" below.
+    </p>
     <p>
         <b>Options:</b>
         <br/>
@@ -80,6 +89,7 @@ function tapestry_kaltura_section_cb()
             <th>Kaltura ID</th>
             <th>Previous Status</th>
             <th>Current Status</th>
+            <th>Additional Info</th>
         </tr>
         </thead>
     </table>

@@ -1,3 +1,9 @@
+refreshUploadInProgress();
+
+setInterval(function() {
+  refreshUploadInProgress();
+}, 30 * 1000);
+
 function openRequest(method, endpoint) {
   const xhr = new XMLHttpRequest();
   xhr.open(method, WP_VARIABLES.apiUrl + endpoint);
@@ -6,15 +12,32 @@ function openRequest(method, endpoint) {
   return xhr;
 }
 
+function refreshUploadInProgress() {
+  const xhr = openRequest("GET", "/kaltura/upload_status");
+
+  xhr.onload = () => {
+    if (xhr.status >= 200 && xhr.status < 300) {
+      response = JSON.parse(xhr.responseText);
+
+      inProgressNotice = document.getElementById("upload_in_progress_notice");
+      if (response.inProgress) {
+        inProgressNotice.style.display = 'block';
+      } else {
+        inProgressNotice.style.display = 'none';
+      }
+    }
+  }
+
+  xhr.send();
+}
+
 function cleanUploadedVideos() {
   const xhr = openRequest("POST", "/kaltura/videos/converting");
 
   xhr.onload = () => {
     if (xhr.status >= 200 && xhr.status < 300) {
       response = JSON.parse(xhr.responseText);
-      const videos = response.videos;
-
-      console.log(response);
+      const videos = response.processedVideos;
 
       const table = document.getElementById("cleaned_videos_table");
       const old_tbody = table.lastChild;
@@ -50,4 +73,5 @@ function cleanUploadedVideos() {
   xhr.send(JSON.stringify({
     'useKalturaPlayer': useKalturaPlayer,
   }));
+  document.getElementById('cleaned_videos_table').style.display = 'none';
 }

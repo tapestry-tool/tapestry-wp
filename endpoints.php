@@ -1677,7 +1677,6 @@ function getVideosToUpload($request)
 
 function updateConvertingVideos($request)
 {
-    // TODO: only allow this operation when upload is not in progress?
     $body = json_decode($request->get_body());
     $use_kaltura_player = $body->useKalturaPlayer;
 
@@ -1685,10 +1684,6 @@ function updateConvertingVideos($request)
 
     $tapestries = get_posts(['post_type' => 'tapestry', 'numberposts' => -1]);
     $videos = array();
-
-    $total_count = 0;
-    $ready_count = 0;
-    $error_count = 0;
 
     foreach ($tapestries as $post) {
         $tapestry = new Tapestry($post->ID);
@@ -1703,7 +1698,6 @@ function updateConvertingVideos($request)
                 && $kalturaData['uploadStatus'] === UploadStatus::CONVERTING) {
                 $kalturaID = $kalturaData['id'];
                 $response = $kaltura_api->getVideo($kalturaID);
-                $total_count++;
 
                 $video = (object) [
                     'tapestryID' => $post->ID,
@@ -1712,6 +1706,7 @@ function updateConvertingVideos($request)
                     'kalturaID' => $kalturaID,
                     'previousStatus' => UploadStatus::CONVERTING,
                     'currentStatus' => UploadStatus::CONVERTING,
+                    'additionalInfo' => '',
                 ];
 
                 if ($response->status === EntryStatus::READY) {
@@ -1721,12 +1716,14 @@ function updateConvertingVideos($request)
                     TapestryHelpers::saveAndDeleteLocalVideo($node, $response, $use_kaltura_player, $file_path);
 
                     $video->currentStatus = UploadStatus::COMPLETE;
-                    $ready_count++;
                 } else {
                     TapestryHelpers::saveVideoUploadStatusInNode($node, UploadStatus::ERROR, $response);
-
                     $video->currentStatus = UploadStatus::ERROR;
-                    $error_count++;
+                    if ($response->status === EntryStatus::ERROR_CONVERTING) {
+                        $video->additionalInfo = 'An error occurred: Could not convert the video.';
+                    } else {
+                        $video->additionalInfo = 'An error occurred: Expected the video to be converting, but it was not.';
+                    }
                 }
 
                 array_push($videos, $video);
@@ -1734,14 +1731,34 @@ function updateConvertingVideos($request)
         }
     }
 
-    // TODO: clear upload log? or update the upload log?
+    // Update the upload log so the user sees the latest statuses
+    amend_upload_log($videos);
 
     return (object) [
-        'totalCount' => $total_count,
-        'readyCount' => $ready_count,
-        'errorCount' => $error_count,
-        'videos' => $videos,
+        'processedVideos' => $videos,
     ];
+}
+
+function amend_upload_log($updatedVideos)
+{
+    $node_map = (object) [];
+
+    foreach ($updatedVideos as $video) {
+        $node_key = $video->tapestryID.'-'.$video->nodeID;
+        $node_map->{$node_key} = $video;
+    }
+
+    $upload_log = get_option(KalturaUpload::UPLOAD_LOG_OPTION, []);
+    foreach ($upload_log as $video) {
+        $node_key = $video->tapestryID.'-'.$video->nodeID;
+        $updatedNode = $node_map->{$node_key};
+
+        if ($updatedNode) {
+            $video->uploadStatus = $updatedNode->currentStatus;
+            $video->additionalInfo = $updatedNode->additionalInfo;
+        }
+    }
+    update_option(KalturaUpload::UPLOAD_LOG_OPTION, $upload_log);
 }
 
 /**
