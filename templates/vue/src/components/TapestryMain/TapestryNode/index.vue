@@ -539,9 +539,10 @@ export default {
       ) {
         this.selected ? this.unselect(this.node.id) : this.select(this.node.id)
       } else if (this.node.accessible || this.hasPermission("edit")) {
-        if (this.visibility === 0) {
-          this.$emit("grandchild-click", evt)
-        }
+        this.$emit("click", {
+          event: evt,
+          level: this.node.level,
+        })
         this.root && this.node.hideMedia
           ? this.openNode(this.node.id)
           : this.updateRootNode()

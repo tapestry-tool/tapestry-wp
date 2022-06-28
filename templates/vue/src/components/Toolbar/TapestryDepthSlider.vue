@@ -308,7 +308,7 @@ export default {
 
 .warning-text {
   position: absolute;
-  z-index: 10;
+  z-index: 8;
   user-select: none;
   width: 100%;
   top: calc(100% - 1px);

@@ -15,8 +15,8 @@ export default {
 <style lang="scss" scoped>
 .minimap-button {
   position: absolute;
-  bottom: 20px;
-  right: 20px;
+  bottom: 10px;
+  right: 10px;
   display: flex;
   height: 2.5rem;
   width: 2.5rem;

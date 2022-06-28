@@ -69,7 +69,7 @@ export default {
       return this.height * this.aspectRatio
     },
     height() {
-      return 300
+      return 150
     },
     displayScale() {
       return this.height / this.viewBox[3]
@@ -240,8 +240,8 @@ export default {
 }
 .minimap-button {
   position: absolute;
-  bottom: 20px;
-  right: 20px;
+  bottom: 10px;
+  right: 10px;
   display: flex;
   height: 2.5rem;
   width: 2.5rem;
