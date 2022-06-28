@@ -341,7 +341,7 @@ $REST_API_ENDPOINTS = [
             'permission_callback' => 'TapestryPermissions::kalturaUpload',
         ],
     ],
-    'GET_KALTURA_UPLOAD_STATUS' => (object) [ // TODO: redesign endpoints to be tapestry-specific, like OPTIMIZE_THUMBNAILS, for consistency?
+    'GET_KALTURA_UPLOAD_STATUS' => (object) [
         'ROUTE' => '/kaltura/upload_status',
         'ARGUMENTS' => [
             'methods' => $REST_API_GET_METHOD,
