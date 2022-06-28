@@ -472,12 +472,12 @@ function perform_batched_upload_to_kaltura($videos, $use_kaltura_player)
                 }
 
                 if ($response->status === EntryStatus::READY) {
-                    // $node = save_video_upload_status($video, $videos_to_upload, UploadStatus::COMPLETE);
-                    // TapestryHelpers::saveAndDeleteLocalVideo($node, $response, $use_kaltura_player, $video->file->file_path);
+                    $node = save_video_upload_status($video, $videos_to_upload, UploadStatus::COMPLETE);
+                    TapestryHelpers::saveAndDeleteLocalVideo($node, $response, $use_kaltura_player, $video->file->file_path);
                     $num_successfully_uploaded++;
                 } elseif ($response->status === EntryStatus::ERROR_CONVERTING) {
-                    // $video->additionalInfo = 'An error occurred: Could not convert the video.';
-                    // save_video_upload_status($video, $videos_to_upload, UploadStatus::ERROR);
+                    $video->additionalInfo = 'An error occurred: Could not convert the video.';
+                    save_video_upload_status($video, $videos_to_upload, UploadStatus::ERROR);
                 } else {
                     $video->additionalInfo = 'An error occurred: Expected the video to be converting, but it was not.';
                     save_video_upload_status($video, $videos_to_upload, UploadStatus::ERROR);
