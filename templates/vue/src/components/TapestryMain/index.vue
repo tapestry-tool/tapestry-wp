@@ -53,7 +53,7 @@
           @mouseover="handleMouseover(id)"
           @mouseleave="activeNode = null"
           @mounted="dragSelectEnabled ? updateSelectableNodes(node) : null"
-          @grandchild-click="handleGrandchildClick"
+          @click="handleNodeClick"
         ></tapestry-node>
       </g>
       <locked-tooltip
@@ -396,12 +396,11 @@ export default {
 
       return box
     },
-    handleGrandchildClick(evt) {
-      this.handleZoom(
-        1 / this.scaleConstants.levelMultiplier,
-        evt.offsetX,
-        evt.offsetY
-      )
+    handleNodeClick({ event, level }) {
+      const baseRadius = Helpers.getNodeBaseRadius(level, this.maxLevel)
+      const targetScale = 140 / baseRadius
+      const deltaScale = targetScale - this.scale
+      this.handleZoom(deltaScale, event.offsetX, event.offsetY)
       this.updateScale()
     },
     handleMouseover(id) {
