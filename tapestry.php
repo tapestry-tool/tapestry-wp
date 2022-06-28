@@ -403,10 +403,10 @@ function upload_videos_to_kaltura($upload_request)
  * before uploading the next batch.
  *
  * @param array $videos     List of video nodes to upload. These should be objects with the following interface:
- *                          [
+ *                          (
  *                              [tapestryID] => 123,
  *                              [nodeID] => 123,
- *                          ]
+ *                          )
  *                          Nodes are checked to be videos and to be local Wordpress uploads before being uploaded to Kaltura.
  * @param bool $use_kaltura_player   Whether to switch uploaded videos to use the Kaltura media player.
  *
@@ -472,12 +472,12 @@ function perform_batched_upload_to_kaltura($videos, $use_kaltura_player)
                 }
 
                 if ($response->status === EntryStatus::READY) {
-                    $node = save_video_upload_status($video, $videos_to_upload, UploadStatus::COMPLETE);
-                    TapestryHelpers::saveAndDeleteLocalVideo($node, $response, $use_kaltura_player, $video->file->file_path);
+                    // $node = save_video_upload_status($video, $videos_to_upload, UploadStatus::COMPLETE);
+                    // TapestryHelpers::saveAndDeleteLocalVideo($node, $response, $use_kaltura_player, $video->file->file_path);
                     $num_successfully_uploaded++;
                 } elseif ($response->status === EntryStatus::ERROR_CONVERTING) {
-                    $video->additionalInfo = 'An error occurred: Could not convert the video.';
-                    save_video_upload_status($video, $videos_to_upload, UploadStatus::ERROR);
+                    // $video->additionalInfo = 'An error occurred: Could not convert the video.';
+                    // save_video_upload_status($video, $videos_to_upload, UploadStatus::ERROR);
                 } else {
                     $video->additionalInfo = 'An error occurred: Expected the video to be converting, but it was not.';
                     save_video_upload_status($video, $videos_to_upload, UploadStatus::ERROR);

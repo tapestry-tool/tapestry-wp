@@ -14,6 +14,8 @@ require_once __DIR__.'/classes/class.constants.php';
 require_once __DIR__.'/classes/class.kaltura-api.php';
 require_once __DIR__.'/utilities/class.tapestry-user.php';
 
+use Kaltura\Client\Enum\EntryStatus;
+
 $REST_API_NAMESPACE = 'tapestry-tool/v1';
 
 $REST_API_GET_METHOD = 'GET';
@@ -332,14 +334,14 @@ $REST_API_ENDPOINTS = [
         ],
     ],
     'GET_VIDEOS_TO_UPLOAD' => (object) [
-        'ROUTE' => '/kaltura/videos_to_upload',
+        'ROUTE' => '/kaltura/videos/to_upload',
         'ARGUMENTS' => [
             'methods' => $REST_API_GET_METHOD,
             'callback' => 'getVideosToUpload',
             'permission_callback' => 'TapestryPermissions::kalturaUpload',
         ],
     ],
-    'GET_KALTURA_UPLOAD_STATUS' => (object) [
+    'GET_KALTURA_UPLOAD_STATUS' => (object) [ // TODO: redesign endpoints to be tapestry-specific, like OPTIMIZE_THUMBNAILS, for consistency?
         'ROUTE' => '/kaltura/upload_status',
         'ARGUMENTS' => [
             'methods' => $REST_API_GET_METHOD,
@@ -352,6 +354,14 @@ $REST_API_ENDPOINTS = [
         'ARGUMENTS' => [
             'methods' => $REST_API_POST_METHOD,
             'callback' => 'stopKalturaUpload',
+            'permission_callback' => 'TapestryPermissions::kalturaUpload',
+        ],
+    ],
+    'UPDATE_CONVERTING_VIDEOS' => (object) [
+        'ROUTE' => '/kaltura/videos/converting',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_POST_METHOD,
+            'callback' => 'updateConvertingVideos',
             'permission_callback' => 'TapestryPermissions::kalturaUpload',
         ],
     ],
@@ -1584,11 +1594,11 @@ function getQuestionHasAnswers($request)
 
 /**
  * Starts uploading a list of videos to Kaltura.
- * 
+ *
  * @param object $request   HTTP request
- *                          Request body should specify the list of videos to upload and 
+ *                          Request body should specify the list of videos to upload and
  *                          whether to switch uploaded videos to the Kaltura media player.
- * 
+ *
  * Example request body:
  * {
  *  videos: [
@@ -1605,10 +1615,10 @@ function uploadVideosToKaltura($request)
 /**
  * Gets progress of ongoing Kaltura upload.
  * If tapestryPostId query parameter is set, only returns videos in this Tapestry.
- * 
+ *
  * @param object $request   HTTP request
  * @return object
- * 
+ *
  * Example response body:
  * {
  *  videos: [
@@ -1646,10 +1656,10 @@ function getKalturaUploadStatus($request)
 /**
  * Gets all videos in a Tapestry that can be uploaded to Kaltura.
  * If tapestryPostId query parameter is not set, gets uploadable videos in all Tapestries.
- * 
+ *
  * @param object $request   HTTP request
  * @return array
- * 
+ *
  * Example response body:
  * [
  *  { tapestryID: 7746, nodeID: 13004, nodeTitle: "Video" }
@@ -1665,6 +1675,75 @@ function getVideosToUpload($request)
     }
 }
 
+function updateConvertingVideos($request)
+{
+    // TODO: only allow this operation when upload is not in progress?
+    $body = json_decode($request->get_body());
+    $use_kaltura_player = $body->useKalturaPlayer;
+
+    $kaltura_api = new KalturaApi();
+
+    $tapestries = get_posts(['post_type' => 'tapestry', 'numberposts' => -1]);
+    $videos = array();
+
+    $total_count = 0;
+    $ready_count = 0;
+    $error_count = 0;
+
+    foreach ($tapestries as $post) {
+        $tapestry = new Tapestry($post->ID);
+
+        foreach ($tapestry->getNodeIds() as $nodeID) {
+            $node = $tapestry->getNode($nodeID);
+            $kalturaData = $node->getTypeData()->kalturaData;
+
+            if (isset($kalturaData)
+                && is_array($kalturaData)
+                && array_key_exists('uploadStatus', $kalturaData)
+                && $kalturaData['uploadStatus'] === UploadStatus::CONVERTING) {
+                $kalturaID = $kalturaData['id'];
+                $response = $kaltura_api->getVideo($kalturaID);
+                $total_count++;
+
+                $video = (object) [
+                    'tapestryID' => $post->ID,
+                    'nodeID' => $nodeID,
+                    'nodeTitle' => $node->getTitle(),
+                    'kalturaID' => $kalturaID,
+                    'previousStatus' => UploadStatus::CONVERTING,
+                    'currentStatus' => UploadStatus::CONVERTING,
+                ];
+
+                if ($response->status === EntryStatus::READY) {
+                    TapestryHelpers::saveVideoUploadStatusInNode($node, UploadStatus::COMPLETE, $response);
+
+                    $file_path = TapestryHelpers::getPathToMedia($node)->file_path;
+                    TapestryHelpers::saveAndDeleteLocalVideo($node, $response, $use_kaltura_player, $file_path);
+
+                    $video->currentStatus = UploadStatus::COMPLETE;
+                    $ready_count++;
+                } else {
+                    TapestryHelpers::saveVideoUploadStatusInNode($node, UploadStatus::ERROR, $response);
+
+                    $video->currentStatus = UploadStatus::ERROR;
+                    $error_count++;
+                }
+
+                array_push($videos, $video);
+            }
+        }
+    }
+
+    // TODO: clear upload log? or update the upload log?
+
+    return (object) [
+        'totalCount' => $total_count,
+        'readyCount' => $ready_count,
+        'errorCount' => $error_count,
+        'videos' => $videos,
+    ];
+}
+
 /**
  * Sends a signal to stop an ongoing Kaltura upload.
  */
@@ -1676,7 +1755,7 @@ function stopKalturaUpload($request)
 
 /**
  * Checks whether a Kaltura video with given entry id exists.
- * 
+ *
  * @return bool Response: true if the video exists, and false otherwise.
  */
 function checkKalturaVideo($request)
@@ -1696,13 +1775,13 @@ function checkKalturaVideo($request)
 
 /**
  * If a Kaltura video with given entry id exists, returns the video metadata.
- * 
+ *
  * Example response body:
  * {
  *  "image": "https://streaming.video.ubc.ca/p/186/sp/18600/thumbnail/entry_id/0_p5er0usa/version/100002",
  *  "duration": 126
  * }
- * 
+ *
  * @return - HTTP response: a video metadata object if the entry id is valid, and false otherwise.
  */
 function getKalturaVideoMeta($request)
@@ -1722,15 +1801,16 @@ function getKalturaVideoMeta($request)
 
 /**
  * If a Kaltura video with given entry id exists, returns the video's URL.
- * 
+ *
  * Example body:
  * {
  *   "mediaURL": "https://admin.video.ubc.ca/p/186/sp/18600/playManifest/entryId/0_p5er0usa/format/url/protocol/https"
  * }
- * 
+ *
  * @return - HTTP response: an object containing the URL if the entry id is valid, and false otherwise.
  */
-function getKalturaVideoUrl($request) {
+function getKalturaVideoUrl($request)
+{
     if (LOAD_KALTURA) {
         $entryId = $request['entry_id'];
 

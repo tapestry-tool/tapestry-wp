@@ -16,6 +16,7 @@ function add_tapestry_settings_page()
 function tapestry_settings_init()
 {
     add_settings_section('tapestry_db_settings', 'Database Settings', 'tapestry_db_section_cb', 'tapestry_settings_page');
+    add_settings_section('tapestry_kaltura_settings', 'Kaltura Upload', 'tapestry_kaltura_section_cb', 'tapestry_settings_page');
 }
 
 function load_tapestry_settings_page_scripts($hook_suffix, $tapestry_settings_page_hook_suffix)
@@ -52,6 +53,26 @@ function tapestry_db_section_cb()
     <?php
 }
 
+function tapestry_kaltura_section_cb()
+{
+    ?>
+    <p>If your Kaltura upload was interrupted, the complete data may not be available for videos that did not finish uploading.</p>
+    <p>You can refresh the status of any videos that are still marked "converting" below.</p>
+    <form action="<?php htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
+    <p>
+        <b>Options:</b>
+        <br/>
+        <label for="use_kaltura_player">
+            <input type="checkbox" id="use_kaltura_player" name="use_kaltura_player" value="1"/>
+            Switch videos that uploaded successfully to use Kaltura media player
+        </label>
+    </p>
+    <?php
+        submit_button('Clean Uploaded Videos', 'primary', 'refresh_uploaded_videos', false); ?>
+    </form>
+    <?php
+}
+
 function run_db_commands()
 {
     if (isset($_POST['clean_h5p_nodes'])) {
@@ -82,6 +103,34 @@ function run_db_commands()
         }
         add_action('admin_notices', 'tapestry_h5p_conf_notice');
     }
+
+    if (isset($_POST['refresh_uploaded_videos'])) {
+        $use_kaltura_player = isset($_POST['use_kaltura_player']);
+        $body = array( 'useKalturaPlayer' => $use_kaltura_player, );
+
+        $response = wp_remote_post(
+            get_rest_url(null, 'tapestry-tool/v1').'/kaltura/videos/converting',
+            array(
+                'body' => wp_json_encode($body),
+            )
+        );
+        $response_body = json_decode($response['body']);
+        error_log(print_r($response_body, true));
+
+        $totalCount = $response_body->totalCount;
+        $readyCount = $response_body->readyCount;
+        $errorCount = $response_body->errorCount;
+        $remainingCount = $totalCount - $readyCount - $errorCount;
+        $text = "
+            Found $totalCount videos that were still converting.
+            Marked $readyCount as complete.
+            $errorCount failed to upload.
+            Remaining videos: $remainingCount.";
+
+        add_action('admin_notices', function () use ($text) {
+            tapestry_clean_videos_conf_notice($text);
+        });
+    }
 }
 
 function tapestry_h5p_conf_notice()
@@ -89,6 +138,15 @@ function tapestry_h5p_conf_notice()
     ?>
       <div class="notice updated" >
       <p><?php _e('Clean h5p Nodes ran successfully'); ?></p>
+    </div>
+    <?php
+}
+
+function tapestry_clean_videos_conf_notice($text)
+{
+    ?>
+      <div class="notice updated" >
+      <p><?php _e($text); ?></p>
     </div>
     <?php
 }

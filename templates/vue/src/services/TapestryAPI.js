@@ -328,7 +328,7 @@ class TapestryApi {
   }
 
   async getVideosToUpload() {
-    const url = `/kaltura/videos_to_upload?tapestryPostId=${this.postId}`
+    const url = `/kaltura/videos/to_upload?tapestryPostId=${this.postId}`
     const response = await this.client.get(url)
     return response.data
   }
