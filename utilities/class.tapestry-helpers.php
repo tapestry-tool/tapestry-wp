@@ -322,7 +322,6 @@ class TapestryHelpers
 
         if ($kalturaData) {
             $typeData->kalturaData['id'] = $kalturaData->id;
-            $typeData->kalturaData['partnerId'] = $kalturaData->partnerId;
         }
 
         $node->save();
