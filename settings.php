@@ -22,6 +22,7 @@ function tapestry_settings_init()
 function load_tapestry_settings_page_scripts($hook_suffix, $tapestry_settings_page_hook_suffix)
 {
     if ($hook_suffix === $tapestry_settings_page_hook_suffix) {
+        wp_enqueue_style( 'tapestry_settings_styles', plugin_dir_url(__FILE__).'settings.css');
         wp_enqueue_script('tapestry_settings_script_js', plugin_dir_url(__FILE__).'settings.js');
 
         // Inject REST API url and WordPress nonce for use in JavaScript scripts
@@ -56,9 +57,9 @@ function tapestry_db_section_cb()
 function tapestry_kaltura_section_cb()
 {
     ?>
-    <div class="notice notice-info" id="upload_in_progress_notice" style="display: none">
+    <div class="postbox notice-info" id="upload_in_progress_notice" style="display: none">
         <p>
-            Note: an upload is currently in progress.
+            <b>Note:</b> An upload is currently in progress.
             It is recommended to wait for the upload to complete before cleaning uploaded videos.
         </p>
     </div>
