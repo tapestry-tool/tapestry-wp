@@ -1648,12 +1648,11 @@ function uploadVideosToKaltura($request)
 
 function cleanUpKalturaUpload()
 {
+    update_option(KalturaUpload::IN_PROGRESS_OPTION, KalturaUpload::NO_VALUE);
+
     $error = error_get_last();
     if ($error['type'] === E_ERROR) {
-        // If interrupted by a fatal error, mark the upload as no longer in progress
-        update_option(KalturaUpload::IN_PROGRESS_OPTION, KalturaUpload::NO_VALUE);
-
-        // Save the error to notify the user
+        // If interrupted by a fatal error, save the error to notify the user
         update_option(KalturaUpload::UPLOAD_ERROR_OPTION, $error['message']);
     }
 }
