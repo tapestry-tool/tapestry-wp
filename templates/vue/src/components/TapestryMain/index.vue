@@ -4,7 +4,13 @@
       <root-node-button v-if="canEdit" @click="addRootNode"></root-node-button>
       <div v-else class="empty-message">The requested Tapestry is empty.</div>
     </div>
-    <svg v-else id="vue-svg" :viewBox="computedViewBox">
+    <svg
+      v-else
+      id="vue-svg"
+      role="application"
+      aria-label="Main Tapestry View"
+      :viewBox="computedViewBox"
+    >
       <defs>
         <filter
           v-for="i in maxLevel"
