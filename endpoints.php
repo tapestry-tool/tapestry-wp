@@ -1694,6 +1694,7 @@ function updateConvertingVideos($request)
 
             if (isset($kalturaData)
                 && is_array($kalturaData)
+                && array_key_exists('id', $kalturaData)
                 && array_key_exists('uploadStatus', $kalturaData)
                 && $kalturaData['uploadStatus'] === UploadStatus::CONVERTING) {
                 $kalturaID = $kalturaData['id'];

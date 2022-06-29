@@ -441,11 +441,11 @@ function perform_batched_upload_to_kaltura($videos, $use_kaltura_player)
             try {
                 $kaltura_data = $kalturaApi->uploadVideo($video->file, $current_date);
             } catch (Exception $e) {
-                $error_start = 'Unable to upload video "'.$video->file->name.'" to Kaltura due to: \n';
+                $error_msg = "Unable to upload video '".$video->file->name."' to Kaltura due to: ".$e->getMessage();
 
-                error_log($error_start.$e);
+                error_log($error_msg."\nStack trace: \n".$e->getTraceAsString());
 
-                $video->additionalInfo = $error_start.$e->getMessage();
+                $video->additionalInfo = $error_msg;
                 save_video_upload_status($video, $videos_to_upload, UploadStatus::ERROR);
                 continue;
             }

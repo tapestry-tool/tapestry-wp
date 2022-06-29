@@ -168,7 +168,6 @@ export default {
       this.uploadStatusRefreshTimer = 0
     },
     startVideoUpload() {
-      console.log("Starting upload")
       this.videosUploading = true
       client.startKalturaUpload(this.selectedVideos, this.useKalturaPlayer)
 
