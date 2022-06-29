@@ -21,6 +21,9 @@
       <div v-if="node.presentationStyle === 'unit'">
         The content of this unit has not been unlocked yet.
       </div>
+      <div v-else-if="!node.accessible">
+        <locked-content :node="node"></locked-content>
+      </div>
       <multi-content-rows
         v-else
         :dimensions="dimensions"
@@ -59,6 +62,7 @@
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex"
 import client from "@/services/TapestryAPI"
 import CompletedIcon from "@/components/common/CompletedIcon"
+import LockedContent from "./common/LockedContent"
 import TapestryModal from "../../TapestryModal"
 import MultiContentRows from "./MultiContentRows"
 import { names } from "@/config/routes"
@@ -67,6 +71,7 @@ export default {
   name: "multi-content-media",
   components: {
     CompletedIcon,
+    LockedContent,
     TapestryModal,
     MultiContentRows,
   },

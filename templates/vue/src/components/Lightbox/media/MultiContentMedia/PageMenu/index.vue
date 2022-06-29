@@ -51,6 +51,7 @@
         <h5 class="pl-2 py-1 mb-4">{{ node.title }}</h5>
       </div>
       <div
+        v-if="pageMenuVisible"
         :class="[
           'page-nav-content',
           'mb-auto',
@@ -156,6 +157,9 @@ export default {
         return false
       }
       return this.opened || (this.browserWidth > 800 && this.node.fullscreen)
+    },
+    pageMenuVisible() {
+      return this.node.accessible && this.node.typeData.showNavBar
     },
     renderedPages() {
       return this.pages

@@ -20,11 +20,7 @@
       @close="handleAutoClose"
       @complete="complete"
     />
-    <page-menu
-      v-if="node.typeData.showNavBar && node.presentationStyle === 'page'"
-      :node="node"
-      :dimensions="dimensions"
-    />
+    <page-menu v-if="showPageMenu" :node="node" :dimensions="dimensions" />
     <tapestry-media
       v-if="node.mediaType !== 'multi-content'"
       :node-id="nodeId"
@@ -89,6 +85,21 @@ export default {
       const parentNodeId = this.getParent(this.node.id)
       return this.getNode(parentNodeId)
     },
+    showPageMenu() {
+      if (
+        this.node.mediaType === "multi-content" &&
+        this.node.presentationStyle === "page" &&
+        this.node.typeData.showNavBar
+      ) {
+        return true
+      }
+      return (
+        this.parentNode &&
+        this.parentNode.mediaType === "multi-content" &&
+        this.parentNode.presentationStyle === "unit" &&
+        this.parentNode.childOrdering.length > 1
+      )
+    },
     canSkip() {
       return this.node.completed || this.node.skippable !== false
     },
@@ -135,7 +146,8 @@ export default {
         return {}
       }
 
-      const { mediaWidth: width, mediaHeight: height } = this.node.typeData
+      const width = this.node.typeData.mediaWidth ?? 960
+      const height = this.node.typeData.mediaHeight ?? 600
       const browserWidth = Helpers.getBrowserWidth()
       const browserHeight = Helpers.getBrowserHeight()
 
