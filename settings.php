@@ -57,6 +57,7 @@ function tapestry_db_section_cb()
 function tapestry_kaltura_section_cb()
 {
     ?>
+    <h4>Clean Uploaded Videos</h4>
     <div class="postbox tapestry-settings-notice" id="upload_in_progress_notice" style="display: none">
         <p>
             <b>Note:</b> An upload is currently in progress.
@@ -69,7 +70,7 @@ function tapestry_kaltura_section_cb()
         You can refresh the status of any videos that are still marked "converting" below.
     </p>
     <p>
-        <b>Options:</b>
+        <i>Options:</i>
         <br/>
         <label for="use_kaltura_player">
             <input type="checkbox" id="use_kaltura_player" name="use_kaltura_player" value="1"/>
@@ -94,6 +95,21 @@ function tapestry_kaltura_section_cb()
         </tr>
         </thead>
     </table>
+    <h4>Reset Upload Status</h4>
+    <p>
+        Forcefully mark the upload as no longer in progress.
+        This does not cancel any ongoing upload, but will allow you to try the upload again.
+        <br />
+        Please note: This action is dangerous and not recommended in most situations.
+    </p>
+    <p>
+        <button type="button" class="button button-secondary" onclick="forceResetUploadStatus()" id="reset_upload_status">
+            Reset Upload Status
+        </button>
+    </p>
+    <div class="notice" id="tapestry_reset_upload_status_notice" style="display: none">
+      <p></p>
+    </div>
     <?php
 }
 

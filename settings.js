@@ -1,6 +1,6 @@
 refreshUploadInProgress();
 
-setInterval(function() {
+setInterval(function () {
   refreshUploadInProgress();
 }, 30 * 1000);
 
@@ -21,12 +21,12 @@ function refreshUploadInProgress() {
 
       inProgressNotice = document.getElementById("upload_in_progress_notice");
       if (response.inProgress) {
-        inProgressNotice.style.display = 'block';
+        inProgressNotice.style.display = "block";
       } else {
-        inProgressNotice.style.display = 'none';
+        inProgressNotice.style.display = "none";
       }
     }
-  }
+  };
 
   xhr.send();
 }
@@ -64,14 +64,52 @@ function cleanUploadedVideos() {
       }
 
       table.replaceChild(tbody, old_tbody);
-      document.getElementById('cleaned_videos_table').style.display = 'table';
+      document.getElementById("cleaned_videos_table").style.display = "table";
     }
   };
 
-  const useKalturaPlayer = document.getElementById('use_kaltura_player').checked;
+  const useKalturaPlayer =
+    document.getElementById("use_kaltura_player").checked;
 
-  xhr.send(JSON.stringify({
-    'useKalturaPlayer': useKalturaPlayer,
-  }));
-  document.getElementById('cleaned_videos_table').style.display = 'none';
+  xhr.send(
+    JSON.stringify({
+      useKalturaPlayer: useKalturaPlayer,
+    })
+  );
+  document.getElementById("cleaned_videos_table").style.display = "none";
+}
+
+function forceResetUploadStatus() {
+  if (!confirm("Are you sure you want to force reset the upload status?")) {
+    return;
+  }
+
+  const xhr = openRequest("POST", "/kaltura/upload_status/reset");
+
+  xhr.onload = () => {
+    if (xhr.status >= 200 && xhr.status < 300) {
+      response = JSON.parse(xhr.responseText);
+
+      const noticeElement = document.getElementById(
+        "tapestry_reset_upload_status_notice"
+      );
+      const classList = noticeElement.classList;
+
+      if (response.success) {
+        classList.remove("notice-error");
+        classList.add("notice-success");
+        noticeElement.firstElementChild.textContent =
+          "Successfully reset the upload status.";
+      } else {
+        classList.remove("notice-success");
+        classList.add("notice-error");
+        noticeElement.firstElementChild.textContent =
+          "The upload status could not be reset. Please try again later.";
+      }
+
+      noticeElement.style.display = "block";
+    }
+  };
+
+  xhr.send();
 }

@@ -349,6 +349,14 @@ $REST_API_ENDPOINTS = [
             'permission_callback' => 'TapestryPermissions::kalturaUpload',
         ],
     ],
+    'RESET_UPLOAD_STATUS' => (object) [
+        'ROUTE' => '/kaltura/upload_status/reset',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_POST_METHOD,
+            'callback' => 'forceResetUploadStatus',
+            'permission_callback' => 'TapestryPermissions::kalturaUpload',
+        ],
+    ],
     'STOP_KALTURA_UPLOAD' => (object) [
         'ROUTE' => '/kaltura/stop_upload',
         'ARGUMENTS' => [
@@ -1870,6 +1878,18 @@ function getKalturaUploadStatus($request)
         'videos' => $videos,
         'inProgress' => $in_progress,
         'error' => $error,
+    ];
+}
+
+/**
+ * Forcefully sets the upload to "not in progress".
+ * Should only be used as a last resort to fix upload issues.
+ */
+function forceResetUploadStatus($request)
+{
+    update_option(KalturaUpload::IN_PROGRESS_OPTION, KalturaUpload::NO_VALUE);
+    return (object) [
+        'success' => get_option(KalturaUpload::IN_PROGRESS_OPTION) === KalturaUpload::NO_VALUE,
     ];
 }
 
