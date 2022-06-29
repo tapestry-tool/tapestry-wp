@@ -1630,6 +1630,9 @@ function uploadVideosToKaltura($request)
 
         update_option(KalturaUpload::IN_PROGRESS_OPTION, KalturaUpload::YES_VALUE);
         update_option(KalturaUpload::STOP_UPLOAD_OPTION, KalturaUpload::NO_VALUE, false);
+        update_option(KalturaUpload::UPLOAD_ERROR_OPTION, '');
+
+        add_action('shutdown', 'cleanUpKalturaUpload');
 
         try {
             perform_batched_upload_to_kaltura($videos, $use_kaltura_player);
@@ -1638,7 +1641,20 @@ function uploadVideosToKaltura($request)
         } finally {
             update_option(KalturaUpload::IN_PROGRESS_OPTION, KalturaUpload::NO_VALUE);
             update_option(KalturaUpload::STOP_UPLOAD_OPTION, KalturaUpload::NO_VALUE, false);
+            update_option(KalturaUpload::UPLOAD_ERROR_OPTION, '');
         }
+    }
+}
+
+function cleanUpKalturaUpload()
+{
+    $error = error_get_last();
+    if ($error['type'] === E_ERROR) {
+        // If interrupted by a fatal error, mark the upload as no longer in progress
+        update_option(KalturaUpload::IN_PROGRESS_OPTION, KalturaUpload::NO_VALUE);
+
+        // Save the error to notify the user
+        update_option(KalturaUpload::UPLOAD_ERROR_OPTION, $error['message']);
     }
 }
 
@@ -1850,9 +1866,11 @@ function getKalturaUploadStatus($request)
     }
 
     $in_progress = get_option(KalturaUpload::IN_PROGRESS_OPTION) === KalturaUpload::YES_VALUE;
+    $error = get_option(KalturaUpload::UPLOAD_ERROR_OPTION, null);
     return (object) [
         'videos' => $videos,
         'inProgress' => $in_progress,
+        'error' => $error,
     ];
 }
 

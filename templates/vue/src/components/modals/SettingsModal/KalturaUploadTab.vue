@@ -73,8 +73,7 @@
     <b-form-text>
       View the status of the latest upload. Automatically refreshes every 15 seconds;
       you can also manually refresh.
-    </b-form-text>
-    <b-form-text>
+      <br />
       Once the upload has completed, please reload the page to see the updated node
       content.
     </b-form-text>
@@ -108,6 +107,19 @@
       ]"
       :items="getVideoUploadStatus"
     ></b-table>
+    <b-alert :show="!!uploadError" variant="danger">
+      <p>
+        The upload did not complete due to an error in the server: "{{
+          uploadError
+        }}".
+      </p>
+      <p class="mb-1">
+        If any videos are still Converting, to avoid re-uploading them, we recommend
+        running
+        <b>Clean Uploaded Videos</b>
+        under the WordPress Settings > Tapestry.
+      </p>
+    </b-alert>
     <div class="mb-2 text-right">
       <b-button size="sm" @click="refreshVideoUploadStatus">
         Refresh
@@ -124,6 +136,7 @@ export default {
   data() {
     return {
       videosUploading: false,
+      uploadError: null,
       useKalturaPlayer: false,
       allVideos: [],
       selectedVideos: [],
@@ -198,6 +211,7 @@ export default {
         .then(data => {
           callback(data.videos)
           this.videosUploading = data.inProgress
+          this.uploadError = data.error
         })
         .catch(() => {
           callback([])

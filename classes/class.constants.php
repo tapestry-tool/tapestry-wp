@@ -30,6 +30,7 @@ class KalturaUpload
 
     public const IN_PROGRESS_OPTION = 'tapestry_kaltura_upload_in_progress';
     public const UPLOAD_LOG_OPTION = 'tapestry_kaltura_upload_log';
+    public const UPLOAD_ERROR_OPTION = 'tapestry_kaltura_upload_error';
     public const YES_VALUE = 'yes';
     public const NO_VALUE = 'no';
     public const UPLOAD_BATCH_SIZE = 10;
