@@ -57,7 +57,7 @@ function tapestry_db_section_cb()
 function tapestry_kaltura_section_cb()
 {
     ?>
-    <div class="postbox notice-info" id="upload_in_progress_notice" style="display: none">
+    <div class="postbox tapestry-settings-notice" id="upload_in_progress_notice" style="display: none">
         <p>
             <b>Note:</b> An upload is currently in progress.
             It is recommended to wait for the upload to complete before cleaning uploaded videos.
