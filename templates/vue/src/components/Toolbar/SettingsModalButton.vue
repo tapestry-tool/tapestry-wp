@@ -1,5 +1,10 @@
 <template>
-  <button data-qa="settings-button" class="settings-button" @click="open">
+  <button
+    aria-label="Open Tapestry Settings"
+    data-qa="settings-button"
+    class="settings-button"
+    @click="open"
+  >
     <tapestry-icon icon="cog"></tapestry-icon>
     <settings-modal
       :show="settingsModalOpen"
