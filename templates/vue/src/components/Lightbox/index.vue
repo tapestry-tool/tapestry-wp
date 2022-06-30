@@ -15,12 +15,13 @@
     <multi-content-media
       v-if="node.mediaType === 'multi-content'"
       id="multicontent-container"
+      context="lightbox"
       :node="node"
+      :menu-dimensions="dimensions"
       :row-id="rowId"
       @close="handleAutoClose"
       @complete="complete"
     />
-    <page-menu v-if="showPageMenu" :node="node" :dimensions="dimensions" />
     <tapestry-media
       v-if="node.mediaType !== 'multi-content'"
       :node-id="nodeId"
@@ -84,21 +85,6 @@ export default {
     parentNode() {
       const parentNodeId = this.getParent(this.node.id)
       return this.getNode(parentNodeId)
-    },
-    showPageMenu() {
-      if (
-        this.node.mediaType === "multi-content" &&
-        this.node.presentationStyle === "page" &&
-        this.node.typeData.showNavBar
-      ) {
-        return true
-      }
-      return (
-        this.parentNode &&
-        this.parentNode.mediaType === "multi-content" &&
-        this.parentNode.presentationStyle === "unit" &&
-        this.parentNode.childOrdering.length > 1
-      )
     },
     canSkip() {
       return this.node.completed || this.node.skippable !== false

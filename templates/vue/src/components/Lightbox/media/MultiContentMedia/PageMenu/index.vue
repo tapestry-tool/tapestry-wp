@@ -34,8 +34,9 @@
       <div v-if="unitsMenuVisible">
         <b-dropdown class="unit-switch-dropdown" block split :text="parentNodeTitle">
           <b-dropdown-item
-            v-for="page in renderedPages"
+            v-for="(page, pageIndex) in pages"
             :key="page.id"
+            :active="activePageIndex === pageIndex"
             :disabled="!page.accessible"
             @click="changePage(page.id)"
           >
@@ -105,12 +106,18 @@ export default {
       required: false,
       default: null,
     },
+    pages: {
+      type: [Array, Boolean],
+      required: true,
+    },
+    activePageIndex: {
+      type: Number,
+      required: true,
+    },
   },
   data() {
     return {
       opened: false,
-      pages: false,
-      selectedPage: this.node.id,
     }
   },
   computed: {
@@ -161,11 +168,6 @@ export default {
     pageMenuVisible() {
       return this.node.accessible && this.node.typeData.showNavBar
     },
-    renderedPages() {
-      return this.pages
-        ? this.pages.filter(page => page.accessible || !page.hideWhenLocked)
-        : false
-    },
     isLoggedIn() {
       return isLoggedIn()
     },
@@ -173,25 +175,7 @@ export default {
       return wpData.logoutUrl
     },
   },
-  watch: {
-    parentNode() {
-      this.updatePages()
-    },
-  },
-  mounted() {
-    this.updatePages()
-  },
   methods: {
-    updatePages() {
-      if (
-        this.parentNode?.mediaType === "multi-content" &&
-        this.parentNode?.presentationStyle === "unit"
-      ) {
-        this.pages = this.parentNode.childOrdering.map(this.getNode)
-      } else {
-        this.pages = false
-      }
-    },
     disabledRow(node) {
       const index = this.rows.findIndex(row => row.node.id === node.id)
       return (
@@ -213,8 +197,7 @@ export default {
       return nodes
     },
     changePage(pageNodeId) {
-      this.selectedPage = pageNodeId
-      this.$root.$emit("open-node", pageNodeId)
+      this.$emit("change-page", pageNodeId)
     },
     scrollToRef(nodeId) {
       this.$nextTick(() => {
@@ -376,6 +359,12 @@ export default {
       a {
         white-space: normal !important;
       }
+    }
+
+    .dropdown-item.active,
+    .dropdown-item:active {
+      color: #ffffff;
+      background-color: var(--highlight-color);
     }
 
     .disabled-item {
