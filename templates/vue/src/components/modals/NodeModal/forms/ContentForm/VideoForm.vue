@@ -36,14 +36,17 @@ export default {
     },
   },
   watch: {
-    youtubeId(id) {
-      if (id !== null) {
-        this.update("mediaFormat", "youtube")
-        this.update("typeData.youtubeID", id)
-      } else {
-        this.update("mediaFormat", "mp4")
-        this.update("typeData.youtubeID", undefined)
-      }
+    youtubeId: {
+      handler(id) {
+        if (id !== null) {
+          this.update("mediaFormat", "youtube")
+          this.update("typeData.youtubeID", id)
+        } else {
+          this.update("mediaFormat", "mp4")
+          this.update("typeData.youtubeID", undefined)
+        }
+      },
+      immediate: true,
     },
   },
   methods: {

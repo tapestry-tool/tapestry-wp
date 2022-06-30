@@ -1147,7 +1147,7 @@ export default {
     isValidVideo(typeData) {
       return (
         typeData.mediaURL !== "" &&
-        (typeData.hasOwnProperty("youtubeID") || typeData.mediaURL.endsWith(".mp4"))
+        (typeData.youtubeID !== undefined || typeData.mediaURL.endsWith(".mp4"))
       )
     },
     updateOrderingArray(arr) {
