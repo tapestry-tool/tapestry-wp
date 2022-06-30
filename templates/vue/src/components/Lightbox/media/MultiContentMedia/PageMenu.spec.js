@@ -28,6 +28,8 @@ describe("PageMenu", () => {
           height: 800,
           width: 900,
         },
+        pages: false,
+        activePageIndex: 0,
       },
     })
     for (const childName of childNames) {
@@ -49,6 +51,8 @@ describe("PageMenu", () => {
           height: 800,
           width: 500,
         },
+        pages: false,
+        activePageIndex: 0,
       },
     })
     await screen.findByTestId("page-nav-toggle")
