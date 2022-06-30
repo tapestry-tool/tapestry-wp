@@ -824,6 +824,14 @@ export default {
           ])
         }
 
+        if (
+          this.node.mediaDuration &&
+          this.node.mediaType !== "video" &&
+          this.node.mediaType !== "h5p"
+        ) {
+          this.update("mediaDuration", undefined)
+        }
+
         if (this.shouldReloadDuration()) {
           this.loadDuration = true
         } else {
@@ -1140,7 +1148,7 @@ export default {
     isValidVideo(typeData) {
       return (
         typeData.mediaURL !== "" &&
-        (typeData.hasOwnProperty("youtubeID") || typeData.mediaURL.endsWith(".mp4"))
+        (typeData.youtubeID !== undefined || typeData.mediaURL.endsWith(".mp4"))
       )
     },
     updateOrderingArray(arr) {
@@ -1163,6 +1171,7 @@ export default {
               "Would you like to use the link preview image as the thumbnail image?"
             )
           ) {
+            this.update("thumbnailFileId", "")
             this.update("imageURL", data.image)
           }
           if (
@@ -1170,6 +1179,7 @@ export default {
               "Would you like to use the link preview image as the locked thumbnail image?"
             )
           ) {
+            this.update("lockedThumbnailFileId", "")
             this.update("lockedImageURL", data.image)
           }
         }
@@ -1215,7 +1225,7 @@ export default {
       if (this.node.mediaType !== "video" && this.node.mediaType !== "h5p") {
         return false
       }
-      if (this.type === "add") {
+      if (this.type === "add" || !this.node.mediaDuration) {
         return true
       }
       const oldNode = this.getNode(this.nodeId)
