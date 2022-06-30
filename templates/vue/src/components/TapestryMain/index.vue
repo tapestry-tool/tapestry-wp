@@ -238,9 +238,12 @@ export default {
       }
     )
     this.zoomPanHelper.register()
+
+    this.$refs.app.addEventListener("keydown", this.handleKeydown)
   },
   beforeDestroy() {
     this.zoomPanHelper && this.zoomPanHelper.unregister()
+    this.$refs.app.removeEventListener("keydown", this.handleKeydown)
   },
   methods: {
     ...mapMutations(["select", "unselect", "clearSelection"]),
@@ -424,6 +427,9 @@ export default {
       ) {
         this.activeNode = id
       }
+    },
+    handleKeydown(evt) {
+      console.log(evt)
     },
   },
 }

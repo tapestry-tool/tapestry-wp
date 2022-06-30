@@ -2,6 +2,7 @@
   <transition name="fade">
     <polygon
       v-show="show"
+      aria-hidden="true"
       :data-qa="`link-${source.id}-${target.id}`"
       :class="{
         opaque:

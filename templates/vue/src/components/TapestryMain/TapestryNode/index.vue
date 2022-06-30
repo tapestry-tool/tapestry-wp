@@ -3,6 +3,7 @@
     <g
       v-show="show"
       ref="node"
+      :aria-label="`${node.title}. You are currently on a level ${node.level} node.`"
       :data-qa="`node-${node.id}`"
       :data-locked="!node.accessible"
       :transform="`translate(${coordinates.x}, ${coordinates.y})`"
