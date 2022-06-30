@@ -1170,6 +1170,7 @@ export default {
               "Would you like to use the link preview image as the thumbnail image?"
             )
           ) {
+            this.update("thumbnailFileId", "")
             this.update("imageURL", data.image)
           }
           if (
@@ -1177,6 +1178,7 @@ export default {
               "Would you like to use the link preview image as the locked thumbnail image?"
             )
           ) {
+            this.update("lockedThumbnailFileId", "")
             this.update("lockedImageURL", data.image)
           }
         }
