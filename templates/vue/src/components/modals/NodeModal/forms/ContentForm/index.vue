@@ -3,12 +3,13 @@
     <b-form-group label="Title">
       <b-form-input
         id="node-title"
-        v-model="node.title"
+        :value="node.title"
         data-qa="node-title"
         data-testid="node-title"
         placeholder="Enter title"
         autofocus
         required
+        @update="update('title', $event)"
       />
       <b-form-checkbox
         v-if="isMultiContentChild"
@@ -26,10 +27,11 @@
       >
         <b-form-input
           id="node-nav-title"
-          v-model="node.typeData.menuTitle"
+          :value="node.typeData.menuTitle"
           data-qa="node-nav-title"
           placeholder="Enter custom menu title"
           autofocus
+          @update="update('typeData.menuTitle', $event)"
         />
       </b-form-group>
       <div v-else class="text-right mt-n3 mb-2">
@@ -41,17 +43,18 @@
     <b-form-group v-if="addDesc || node.description.length" label="Description">
       <rich-text-form
         id="node-description"
-        v-model="node.description"
+        :value="node.description"
         data-qa="node-description"
         placeholder="Enter description"
         :maxLength="maxDescriptionLength"
+        @input="update('description', $event)"
       />
     </b-form-group>
     <div v-else class="text-right mt-n3 mb-n2">
       <a href="#" class="small" @click="addDesc = true">Add Description</a>
     </div>
     <b-form-group v-show="isPopupCandidate" label="Popup">
-      <popup-form :node="node" :is-candidate="isPopupCandidate" />
+      <popup-form :is-candidate="isPopupCandidate" />
     </b-form-group>
     <b-form-group label="Content Type">
       <b-form-select
@@ -73,7 +76,6 @@
         <component
           :is="activeForm"
           v-if="activeForm"
-          :node="node"
           :action-type="actionType"
           :is-unit-child="isUnitChild"
           @load="$emit('load')"
@@ -81,7 +83,6 @@
         ></component>
         <sub-item-table
           v-if="node.mediaType === 'video'"
-          :node="node"
           :action-type="actionType"
           :is-popups="true"
         ></sub-item-table>
@@ -91,7 +92,7 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex"
+import { mapGetters, mapMutations, mapState } from "vuex"
 import ActivityForm from "./ActivityForm"
 import MultiContentForm from "./MultiContentForm"
 import H5pForm from "./H5pForm"
@@ -102,7 +103,7 @@ import UrlEmbedForm from "./UrlEmbedForm"
 import VideoForm from "./VideoForm"
 import WpPostForm from "./WpPostForm"
 import AnswerForm from "./AnswerForm"
-import SubItemTable from "./MultiContentForm/SubItemTable"
+import SubItemTable from "./common/SubItemTable"
 
 export default {
   components: {
@@ -119,10 +120,6 @@ export default {
     SubItemTable,
   },
   props: {
-    node: {
-      type: Object,
-      required: true,
-    },
     parent: {
       type: Object,
       required: false,
@@ -141,13 +138,23 @@ export default {
   data() {
     return {
       addDesc: false,
-      shouldShowTitle: this.node.typeData.showTitle !== false,
       addMenuTitle: false,
     }
   },
 
   computed: {
+    ...mapState({
+      node: "currentEditingNode",
+    }),
     ...mapGetters(["isMultiContentRow"]),
+    shouldShowTitle: {
+      get() {
+        return this.node.typeData.showTitle
+      },
+      set(value) {
+        this.update("typeData.showTitle", value)
+      },
+    },
     mediaTypes() {
       if (this.isUnitChild) {
         return [{ value: "multi-content", text: "Multi-Content" }]
@@ -210,9 +217,6 @@ export default {
     activeForm() {
       this.$emit("unload")
     },
-    shouldShowTitle(shouldShowTitle) {
-      this.node.typeData.showTitle = shouldShowTitle
-    },
     mediaTypes() {
       this.selectUnitChild()
     },
@@ -221,18 +225,26 @@ export default {
     this.selectUnitChild()
   },
   methods: {
+    ...mapMutations(["setCurrentEditingNodeProperty"]),
+    update(property, value) {
+      this.setCurrentEditingNodeProperty({ property, value })
+    },
     handleTypeChange(evt) {
-      this.node.mediaType = evt
-      this.node.mediaFormat = ""
-      if (evt === "video" || evt === "h5p") {
-        this.node.mediaFormat = evt === "video" ? "mp4" : "h5p"
+      if (this.node.mediaType === "video") {
+        this.update("typeData.mediaURL", "")
+        this.update("typeData.youtubeID", undefined)
       }
+      this.update("mediaType", evt)
+      this.update(
+        "mediaFormat",
+        evt === "video" ? "mp4" : evt === "h5p" ? "h5p" : ""
+      )
       this.$emit("type-changed", evt)
     },
     selectUnitChild() {
       if (this.isUnitChild) {
-        this.node.mediaType = "multi-content"
-        this.node.presentationStyle = "page"
+        this.update("mediaType", "multi-content")
+        this.update("presentationStyle", "page")
       }
     },
   },

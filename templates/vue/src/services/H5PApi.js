@@ -16,11 +16,18 @@ export default {
 function parse(response) {
   if (response && response.length) {
     return response.map(({ id, title, library, details }) => {
+      let detailsObject = {}
+      try {
+        detailsObject = JSON.parse(details)
+      } catch (error) {
+        // ignore
+      }
+
       return {
         id,
         title: Helpers.decodeHTMLChars(title),
         library,
-        details: JSON.parse(details),
+        details: detailsObject,
       }
     })
   }

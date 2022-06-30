@@ -129,8 +129,7 @@ describe("Node Authoring", () => {
         cy.contains(/delete node/i).should("be.visible")
 
         // Expect delete to delete node
-        cy.server()
-        cy.route("DELETE", `**/nodes/**`).as("deleteNode")
+        cy.intercept("DELETE", `**/nodes/**`).as("deleteNode")
 
         cy.contains(/delete/i).click()
         cy.contains(modalTitle).should("be.visible")
