@@ -9,8 +9,7 @@ describe("Wordpress", () => {
       cy.openModal("edit", node.id)
       cy.changeMediaType("wp-post")
 
-      cy.server()
-      cy.route("GET", /posts/i).as("getPosts")
+      cy.intercept("GET", /posts/i).as("getPosts")
 
       cy.getByTestId("wp-combobox").click()
       cy.wait("@getPosts")

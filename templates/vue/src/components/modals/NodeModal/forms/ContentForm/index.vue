@@ -103,7 +103,7 @@ import UrlEmbedForm from "./UrlEmbedForm"
 import VideoForm from "./VideoForm"
 import WpPostForm from "./WpPostForm"
 import AnswerForm from "./AnswerForm"
-import SubItemTable from "./MultiContentForm/SubItemTable"
+import SubItemTable from "./common/SubItemTable"
 
 export default {
   components: {

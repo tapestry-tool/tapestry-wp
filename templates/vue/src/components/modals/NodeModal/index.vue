@@ -453,7 +453,7 @@ export default {
       let parents = []
       let parentId
       let parent = this.parent
-      while (parent != null) {
+      while (parent != null && parent.mediaType == "multi-content") {
         parents.unshift(parent)
         parentId = this.getParent(parent.id)
         parent = parentId ? this.getNode(parentId) : null
@@ -643,6 +643,11 @@ export default {
           lng: "",
         }
       }
+      if (this.$route.query.popup && this.$route.query.popup == 1) {
+        copy.popup = {
+          time: 0,
+        }
+      }
       this.setCurrentEditingNode(copy)
       this.setTapestryErrorReporting(false)
     },
@@ -767,7 +772,7 @@ export default {
           this.$router.push({
             name: names.APP,
             params: { nodeId: this.nodeId },
-            query: { ...this.$route.query, nav: undefined },
+            query: { ...this.$route.query, nav: undefined, popup: undefined },
           })
         }
       }
