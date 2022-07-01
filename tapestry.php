@@ -4,12 +4,12 @@
  * Plugin Name: Tapestry
  * Plugin URI: https://www.tapestry-tool.com
  * Description: Custom post type - Tapestry
- * Version: 2.54.0-beta
- * Author: Tapestry Team, University of British Coloumbia.
+ * Version: 2.55.0-beta
+ * Author: Tapestry Team, University of British Columbia.
  */
 
 // Used to force-refresh assets and run updates
-$TAPESTRY_VERSION_NUMBER = '2.54.0-beta';
+$TAPESTRY_VERSION_NUMBER = '2.55.0-beta';
 
 define(
     'LOAD_KALTURA',
