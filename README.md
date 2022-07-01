@@ -12,6 +12,10 @@ You can visit the [releases](https://github.com/tapestry-tool/tapestry-wp/releas
 
 The Vue application is loaded in the tapestry post type template under `templates/single-tapestry.php`. It is located in the `templates/vue` directory.
 
+### Requirements
+
+The Vue application requires node v16 (or higher). Before running any of the commands below, you must either set your node version globally or run `nvm use`.
+
 ### Local Development
 
 To get started with developing locally:
