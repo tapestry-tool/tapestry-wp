@@ -36,7 +36,7 @@ To build a new plugin zip file with your local edits:
   - All files and directories in the `templates/vue` directory except the `dist` folder
 - Zip the `tapestry` folder and upload it in your other Wordpress instance under Plugins > Add New > Upload Plugin
 
-### Getting external links to work
+### Getting external links to work (RECOMMENDED)
 
 It's strongly recommended you complete this to get link previews working for the "External Link" content type. To do this, you will need to get an API key for LinkPreview and set a config variable first by following these instructions:
 
@@ -50,11 +50,11 @@ It's strongly recommended you complete this to get link previews working for the
 
 If you complete these steps before running `npm run build`, you will have link previews working.
 
-### Changing videos to upload to Kaltura instead of localhost
+### Changing videos to upload to Kaltura instead of localhost (OPTIONAL)
 
-You may optionally set uploaded videos in Tapestry to upload to Kaltura (if you have access to the Kaltura platform) by following these instructions:
+Do you have access to Kaltura and want to offload your videos to be saved there instead of Wordpress? If so, you can follow these instructions to do so:
 
-1. In your wordpress root directory, run `composer install`. If successful, you will be able to see a `vendor` folder containing `kaltura`.
+1. Run `composer install` in the tapestry plugin root folder. If successful, you will be able to see a `vendor` folder containing `kaltura`.
 
 2. Edit your Wordpress `wp-config.php` file and add the following lines right above the comment "That's all, stop editing! Happy publishing":
     ```
