@@ -6,20 +6,12 @@
       <div>Add Root Node</div>
     </div>
     <p>Or</p>
-    <div class="d-flex">
-      <b-button class="import-button mx-1" @click="openFileBrowser">
-        <b-spinner v-if="isImporting"></b-spinner>
-        <div v-else>
-          Import a Tapestry from JSON
-        </div>
-      </b-button>
-      <b-button class="import-button mx-1" @click="openZipFileBrowser">
-        <b-spinner v-if="isImporting"></b-spinner>
-        <div v-else>
-          Import a Tapestry from ZIP
-        </div>
-      </b-button>
-    </div>
+    <b-button class="import-button mx-1" @click="openFileBrowser">
+      <b-spinner v-if="isImporting"></b-spinner>
+      <div v-else>
+        Import a Tapestry
+      </div>
+    </b-button>
     <div v-if="error" style="margin-top: 16px;">
       {{ error.message }}
       <br />
@@ -31,13 +23,6 @@
       type="file"
       style="display: none;"
       @change="handleFileChange"
-    />
-    <input
-      ref="zipFileInput"
-      data-qa="import-zip-file-input"
-      type="file"
-      style="display: none;"
-      @change="handleZipFileChange"
     />
     <div
       data-qa="import-file-drop"
@@ -87,9 +72,6 @@ export default {
     openFileBrowser() {
       this.$refs.fileInput.click()
     },
-    openZipFileBrowser() {
-      this.$refs.zipFileInput.click()
-    },
     handleDragStart(evt) {
       evt.preventDefault()
       this.error = null
@@ -104,21 +86,29 @@ export default {
       evt.preventDefault()
       evt.stopPropagation()
       const file = evt.dataTransfer.files[0]
-      if (!file.name.endsWith("json")) {
-        this.error = {
-          message: "Please upload a JSON file.",
-        }
-      } else {
-        this.importTapestry(file)
-      }
+      this.importTapestryFromFile(file)
     },
     handleFileChange() {
       const file = this.$refs.fileInput.files[0]
-      this.importTapestry(file)
+      this.importTapestryFromFile(file)
     },
-    handleZipFileChange() {
-      const file = this.$refs.zipFileInput.files[0]
-      this.importTapestryFromZip(file)
+    importTapestryFromFile(file) {
+      if (!file) return
+
+      switch (this.getFileExtension(file.name)) {
+        case "json":
+          this.error = null
+          this.importTapestry(file)
+          break
+        case "zip":
+          this.error = null
+          this.importTapestryFromZip(file)
+          break
+        default:
+          this.error = {
+            message: "Please upload a JSON file or a ZIP file.",
+          }
+      }
     },
     importTapestry(file) {
       // TODO: try to reduce duplication here
@@ -146,6 +136,7 @@ export default {
       reader.readAsText(file)
     },
     importTapestryFromZip(zipFile) {
+      this.error = ""
       this.isImporting = true
       client
         .importTapestryFromZip(zipFile)
@@ -160,6 +151,11 @@ export default {
         .finally(() => {
           this.isImporting = false
         })
+    },
+    getFileExtension(fileName) {
+      // Get extension from file name
+      // See https://stackoverflow.com/a/12900504
+      return fileName.slice(((fileName.lastIndexOf(".") - 1) >>> 0) + 2)
     },
   },
 }
