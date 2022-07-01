@@ -21,7 +21,7 @@
     "report:jest": "open coverage-jest/lcov-report/index.html",
     "report:open": "nyc report --reporter=html && open coverage/index.html",
     "report": "nyc report --reporter=text-summary",
-    "start": "npm run dev"
+    "start": "source ~/.nvm/nvm.sh && nvm use && npm run dev"
   },
   "dependencies": {
     "audio-recorder-polyfill": "^0.3.4",
