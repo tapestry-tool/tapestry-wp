@@ -314,6 +314,22 @@ $REST_API_ENDPOINTS = [
             'permission_callback' => 'TapestryPermissions::putTapestrySettings',
         ],
     ],
+    'GET_TAPESTRY_EXPORT_ZIP' => (object) [
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/export_zip',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => 'exportTapestryZip',
+            'permission_callback' => 'TapestryPermissions::putTapestrySettings',
+        ],
+    ],
+    'IMPORT_ZIP' => (object) [
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/import_zip',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_POST_METHOD,     // Ideally PUT, but can only access the uploaded file in POST
+            'callback' => 'importTapestryFromZip',
+            'permission_callback' => 'TapestryPermissions::putTapestrySettings',
+        ],
+    ],
     'OPTIMIZE_THUMBNAILS' => (object) [
         'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/optimize_thumbnails',
         'ARGUMENTS' => [
@@ -349,6 +365,92 @@ function exportTapestry($request)
         }
         $tapestry = new Tapestry($postId);
         return $tapestry->export();
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+function exportTapestryZip($request)
+{
+    $postId = $request['tapestryPostId'];
+
+    // Export tapestry to an object
+    // Open archive
+    // Go through tapestry data and add media to the archive
+    // Write tapestry data to archive as JSON file
+    // Close archive
+    // Return URL of archive
+
+    try {
+        if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+        $tapestry = new Tapestry($postId);
+        $tapestry_data = $tapestry->export();
+        $zip_url = TapestryHelpers::exportExternalMedia($tapestry_data);
+
+        return (object) [
+            'zipUrl' => $zip_url,
+        ];
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+function importTapestryFromZip($request)
+{
+    // TODO: handle error cases
+
+    // Extract archive to directory
+    // Get tapestry data from file
+    // Upload all media and change URLs/IDs in tapestry data
+    // Import tapestry as normal
+
+    $postId = $request['tapestryPostId'];
+    $file_params = $request->get_file_params();
+
+    try {
+        if (!array_key_exists('file', $file_params)) {
+            throw new TapestryError('Zip file not found');
+        }
+        $zip_path = $file_params['file']['tmp_name'];
+
+        $zip = new ZipArchive();
+        if ($zip->open($zip_path, ZipArchive::RDONLY) !== true) {
+            throw new TapestryError('Could not open zip file');
+        }
+
+        $upload_dir = wp_upload_dir();
+        $temp_path = '/tapestry_export/extracted-zip';   // TODO: generate unique directory name
+        $temp_dir = $upload_dir['path'].$temp_path;
+        $temp_url = $upload_dir['url'].$temp_path;
+        $zip->extractTo($temp_dir);
+        $zip->close();
+
+        try {
+            $contents = file_get_contents($temp_dir.'/tapestry.json');
+        } catch (Exception $e) {
+            throw new TapestryError('Could not find tapestry.json in zip file');
+        }
+
+        $tapestry_data = json_decode($contents);
+        TapestryHelpers::validateTapestryData($tapestry_data);
+
+        $changedPermissions = TapestryHelpers::prepareImport($tapestry_data);
+
+        TapestryHelpers::importExternalMedia($tapestry_data, $temp_dir, $temp_url);
+
+        // TODO: delete temporary directory
+
+        $imported_tapestry = importTapestry($postId, $tapestry_data);
+
+        return [
+            'changes' => [
+                'permissions' => $changedPermissions,
+                'noChange' => count($changedPermissions) === 0,
+            ],
+            'tapestry' => $imported_tapestry,
+        ];
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }

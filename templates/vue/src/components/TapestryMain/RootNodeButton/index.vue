@@ -6,13 +6,20 @@
       <div>Add Root Node</div>
     </div>
     <p>Or</p>
-    <b-button class="import-button" @click="openFileBrowser">
-      <b-spinner v-if="isImporting"></b-spinner>
-
-      <div v-else>
-        Import a Tapestry
-      </div>
-    </b-button>
+    <div class="d-flex">
+      <b-button class="import-button mx-1" @click="openFileBrowser">
+        <b-spinner v-if="isImporting"></b-spinner>
+        <div v-else>
+          Import a Tapestry from JSON
+        </div>
+      </b-button>
+      <b-button class="import-button mx-1" @click="openZipFileBrowser">
+        <b-spinner v-if="isImporting"></b-spinner>
+        <div v-else>
+          Import a Tapestry from ZIP
+        </div>
+      </b-button>
+    </div>
     <div v-if="error" style="margin-top: 16px;">
       {{ error.message }}
       <br />
@@ -24,6 +31,13 @@
       type="file"
       style="display: none;"
       @change="handleFileChange"
+    />
+    <input
+      ref="zipFileInput"
+      data-qa="import-zip-file-input"
+      type="file"
+      style="display: none;"
+      @change="handleZipFileChange"
     />
     <div
       data-qa="import-file-drop"
@@ -74,6 +88,9 @@ export default {
     openFileBrowser() {
       this.$refs.fileInput.click()
     },
+    openZipFileBrowser() {
+      this.$refs.zipFileInput.click()
+    },
     handleDragStart(evt) {
       evt.preventDefault()
       this.error = null
@@ -99,6 +116,10 @@ export default {
     handleFileChange() {
       const file = this.$refs.fileInput.files[0]
       this.importTapestry(file)
+    },
+    handleZipFileChange() {
+      const file = this.$refs.zipFileInput.files[0]
+      this.importTapestryFromZip(file)
     },
     importTapestry(file) {
       const reader = new FileReader()
@@ -130,7 +151,23 @@ export default {
       }
       reader.readAsText(file)
     },
+    importTapestryFromZip(zipFile) {
+      this.isImporting = true
+      client
+        .importTapestryFromZip(zipFile)
+        .then(response => {
+          console.log(response)
+          this.$bvModal.show("import-changelog")
+        })
+        .catch(err => {
+          this.error = err
+        })
+        .finally(() => {
+          this.isImporting = false
+        })
+    },
     filterImportedPerms(permissions, wp_roles) {
+      // TODO: this will need to be moved to the server side because the zip is unzipped there
       let filteredPerms = permissions
       filteredPerms = Object.keys(permissions)
         // only keep roles that exist in the current site

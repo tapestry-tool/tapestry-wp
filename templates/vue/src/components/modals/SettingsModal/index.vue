@@ -95,19 +95,29 @@
           >
             <b-row class="mb-2">
               <b-col>
-                <b-button
+                <b-dropdown
                   id="export-button"
                   block
+                  split
                   variant="light"
+                  menu-class="w-100"
                   :class="isExporting ? 'disabled' : ''"
                   :disabled="isExporting"
                   @click="exportTapestry"
                 >
-                  <b-spinner v-if="isExporting" small></b-spinner>
-                  <div :style="isExporting ? 'opacity: 50%;' : ''">
-                    Export Tapestry
-                  </div>
-                </b-button>
+                  <template #button-content>
+                    <b-spinner v-if="isExporting" small></b-spinner>
+                    <div :style="isExporting ? 'opacity: 50%;' : ''">
+                      Export Tapestry
+                    </div>
+                  </template>
+                  <b-dropdown-item-button @click="exportTapestry">
+                    Export as JSON
+                  </b-dropdown-item-button>
+                  <b-dropdown-item-button @click="exportTapestryAsZip">
+                    Export as ZIP
+                  </b-dropdown-item-button>
+                </b-dropdown>
                 <b-alert
                   v-if="apiError == null"
                   :show="hasExported"
@@ -418,7 +428,7 @@ export default {
     })
   },
   methods: {
-    ...mapActions(["getTapestryExport"]),
+    ...mapActions(["getTapestryExport", "getTapestryExportAsZip"]),
     closeModal() {
       this.$emit("close")
     },
@@ -501,6 +511,27 @@ export default {
       this.isExporting = false
       this.hasExported = true
     },
+    async exportTapestryAsZip() {
+      // TODO: try to reduce duplication here
+      this.isExporting = true
+      const exportedTapestry = await this.getTapestryExportAsZip()
+      if (!exportedTapestry) {
+        this.isExporting = false
+        this.hasExported = true
+        return
+      }
+      const fileUrl = exportedTapestry.zipUrl
+      const a = document.createElement("a")
+      a.style.display = "none"
+      a.href = fileUrl
+      a.download = `${this.settings.title}.zip`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+
+      this.isExporting = false
+      this.hasExported = true
+    },
     async optimizeThumbnails() {
       this.isOptimizing = true
       client
@@ -558,7 +589,7 @@ export default {
   justify-content: center;
 }
 
-#export-button {
+[id^="export-button"] {
   position: relative;
   > span {
     position: absolute;

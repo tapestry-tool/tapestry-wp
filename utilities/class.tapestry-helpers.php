@@ -1,6 +1,11 @@
 <?php
 
 require_once dirname(__FILE__).'/class.tapestry-node-permissions.php';
+require_once dirname(__FILE__).'/../classes/class.tapestry-h5p.php';
+require_once dirname(__FILE__).'/../classes/class.constants.php';
+require_once dirname(__FILE__).'/../../h5p/public/class-h5p-plugin.php';
+// TODO: handle case where the plugin doesn't exist
+// TODO: make the file path cleaner
 
 /**
  * Tapestry Helper Functions.
@@ -165,8 +170,6 @@ class TapestryHelpers
         }
 
         // not an image in our gallery. let's upload it.
-        include_once(ABSPATH . 'wp-admin/includes/image.php');
-
         $imagetype = end(explode('/', getimagesize($imageURL)['mime']));
         $uniq_name = date('dmY').''.(int) microtime(true);
         $filename = $uniq_name.'.'.$imagetype;
@@ -178,7 +181,15 @@ class TapestryHelpers
         fwrite($savefile, $contents);
         fclose($savefile);
 
-        $wp_filetype = wp_check_filetype(basename($filename), null);
+        return self::_createAttachment($uploadfile, true);
+    }
+
+    private static function _createAttachment($filepath, $generate_metadata = false)
+    {
+        include_once(ABSPATH . 'wp-admin/includes/image.php');
+
+        $filename = basename($filepath);
+        $wp_filetype = wp_check_filetype($filename, null);
         $attachment = array(
             'post_mime_type' => $wp_filetype['type'],
             'post_title' => $filename,
@@ -186,11 +197,14 @@ class TapestryHelpers
             'post_status' => 'inherit'
         );
 
-        $attachment_id = wp_insert_attachment($attachment, $uploadfile);
-        $imagenew = get_post($attachment_id);
-        $fullsizepath = get_attached_file($imagenew->ID);
-        $attach_data = wp_generate_attachment_metadata($attachment_id, $fullsizepath);
-        wp_update_attachment_metadata($attachment_id, $attach_data);
+        $attachment_id = wp_insert_attachment($attachment, $filepath);
+
+        if ($generate_metadata) {
+            $imagenew = get_post($attachment_id);
+            $fullsizepath = get_attached_file($imagenew->ID);
+            $attach_data = wp_generate_attachment_metadata($attachment_id, $fullsizepath);
+            wp_update_attachment_metadata($attachment_id, $attach_data);
+        }
 
         return $attachment_id;
     }
@@ -304,6 +318,298 @@ class TapestryHelpers
                 ($link->source == $nodeMetaId && !TapestryHelpers::nodeIsDraft($link->target, $tapestryPostId))) {
                 return true;
             }
+        }
+        return false;
+    }
+
+    public static function prepareImport($tapestry_data)
+    {
+        $changes = [];
+        $wp_roles = self::getAllRoles();
+        foreach ($tapestry_data->nodes as $node) {
+            $node->permissions = self::_filterImportedPerms($node->permissions, $wp_roles, $changes);
+        }
+        if ($tapestry_data->settings) {
+            $tapestry_data->settings->defaultPermissions = self::_filterImportedPerms(
+                $tapestry_data->settings->defaultPermissions,
+                $wp_roles,
+                $changes
+            );
+        }
+
+        return $changes;
+    }
+
+    private static function _filterImportedPerms($permissions, $roles, $changes)
+    {
+        $filteredRoles = array_filter(array_keys($permissions), function ($key) use ($roles) {
+            return in_array($key, $roles);
+        });
+
+        $filteredPerms = [];
+        
+        foreach ($filteredRoles as $role) {
+            $filteredPerms[$role] = $permissions[$role];
+        }
+
+        foreach ($permissions as $key => $value) {
+            if (!array_key_exists($key, $filteredPerms)) {
+                array_push($changes, $key);
+            }
+        }
+
+        return $filteredPerms;
+    }
+
+    public static function getAllRoles()
+    {
+        global $wp_roles;
+
+        $roles = array_merge(
+            $wp_roles->roles,
+            ['public' => true, 'authenticated' => true]
+        );
+        unset($roles['administrator']);
+
+        return array_keys($roles);
+    }
+
+    public static function validateTapestryData($tapestry_data)
+    {
+        if (empty($tapestry_data)) {
+            throw new TapestryError('Invalid tapestry data: Not valid JSON');
+        }
+
+        $properties = ['nodes', 'links', 'site-url'];
+        foreach ($properties as $property) {
+            if (!property_exists($tapestry_data, $property)) {
+                throw new TapestryError('Invalid tapestry data: Missing property ' . $property);
+            }
+        }
+    }
+
+    public static function exportExternalMedia($tapestry_data)
+    {
+        $result = self::_createExportZip();
+        $zip = $result['zip'];
+        $zip_url = $result['zip_url'];
+
+        $h5p_controller = new TapestryH5P();
+        foreach ($tapestry_data->nodes as $node) {
+            if ($node->mediaType === 'h5p') {
+                self::_exportH5PNode($node, $zip, $h5p_controller);
+            } elseif ($node->mediaType === 'video') {
+                self::_exportMedia($node->typeData->mediaURL, $zip);
+            } elseif ($node->mediaType === 'activity') {
+                self::_exportActivityNode($node, $zip);
+            }
+
+            self::_exportMedia($node->imageURL, $zip, $node->thumbnailFileId);
+            self::_exportMedia($node->lockedImageURL, $zip, $node->lockedThumbnailFileId);
+
+            self::_exportMedia($tapestry_data->settings->backgroundUrl, $zip);
+        }
+
+        $zip->addFromString('tapestry.json', json_encode($tapestry_data));
+        $zip->close();
+
+        return $zip_url;
+    }
+
+    private static function _createExportZip()
+    {
+        $wp_upload_dir = wp_upload_dir();
+
+        $tapestry_export_dir = $wp_upload_dir['path'].'/tapestry_export/';
+        if (!file_exists($tapestry_export_dir)) {
+            mkdir($tapestry_export_dir);
+        }
+
+        $zip = new ZipArchive();
+
+        // TODO: generate the name, maybe from the title
+        $zip_name = 'export.zip';
+
+        $zip_path = $tapestry_export_dir.$zip_name;
+        $zip_url = $wp_upload_dir['url'].'/tapestry_export/'.$zip_name;
+
+        if ($zip->open($zip_path, ZipArchive::CREATE) !== true) {
+            throw new TapestryError('Could not open zip file ' . $zip_path);
+        }
+
+        return [
+            'zip' => $zip,
+            'zip_url' => $zip_url,
+        ];
+    }
+
+    private static function _exportH5PNode($node, $zip, $h5p_controller)
+    {
+        // TODO: check the existence of these properties?
+        $h5p_id = $node->typeData->h5pMeta->id;
+        $h5p_data = $h5p_controller->getH5P($h5p_id);
+
+        if ($h5p_data !== null) {
+            $h5p_name = $h5p_data->slug.'-'.$h5p_data->id.'.h5p';       // TODO: see if we can avoid hardcoding the file name
+            $h5p_path = H5P_Plugin::get_instance()->get_h5p_path().'/exports/'.$h5p_name;
+
+            $zip->addFile($h5p_path, $h5p_name);
+
+            $node->typeData->mediaURL = $h5p_name;
+        }
+    }
+
+    private static function _exportActivityNode($node, $zip)
+    {
+        // TODO: this will result in lingering activity data not being cleared. Can/should we clear it, in case?
+
+        foreach ($node->typeData->activity->questions as $question) {
+            // TODO: check the existence of these properties?
+            $multiple_choice = $question->answerTypes->multipleChoice;
+            if ($multiple_choice->enabled && $multiple_choice->useImages && isset($multiple_choice->choices)) {
+                foreach ($multiple_choice->choices as $choice) {
+                    self::_exportMedia($choice->imageUrl, $zip);
+                }
+            }
+
+            $drag_drop = $question->answerTypes->dragDrop;
+            if ($drag_drop->enabled && $drag_drop->useImages && isset($drag_drop->items)) {
+                foreach ($drag_drop->items as $item) {
+                    self::_exportMedia($item->imageUrl, $zip);
+                }
+            }
+        }
+    }
+
+    private static function _exportMedia(&$media_url, $zip, $file_id = null)
+    {
+        if (!empty($file_id)) {
+            // Retrieve the original file, not the resized version
+            $path_to_media = get_attached_file($file_id);
+
+            // File ID no longer applies, clear it
+            $file_id = '';
+
+            if ($path_to_media !== false) {
+                $media_name = $attachment_data['file'];
+            } else {
+                // TODO: should we skip or try again?
+                // TODO: use attachment_url_to_postid?
+                // file ID not found
+                return;
+            }
+        } else {
+            $path_to_media = self::_getLocalPath($media_url);
+            if ($path_to_media) {
+                if (file_exists($path_to_media) && is_file($path_to_media)) {
+                    $media_name = basename($path_to_media);
+                } else {
+                    error_log('Warning: the URL ' . $media_url . ' is a local upload, but no file exists here.');
+                    $media_url = '';
+                    return;
+                }
+            } else {
+                // file does not exist locally; skip
+                return;
+            }
+        }
+
+        $zip->addFile($path_to_media, $media_name);
+        $media_url = $media_name;
+    }
+
+    public static function importExternalMedia($tapestry_data, $temp_dir, $temp_url)
+    {
+        foreach ($tapestry_data->nodes as $node) {
+            if ($node->mediaType === 'h5p') {
+                self::_importH5PNode($node, $temp_url);
+            } elseif ($node->mediaType === 'video') {
+                self::_importMedia($node->typeData->mediaURL, $temp_dir);
+            } elseif ($node->mediaType === 'activity') {
+                self::_importActivityNode($node, $temp_dir);
+            }
+
+            self::_importMedia($node->imageURL, $temp_dir, true, $node->thumbnailFileId);
+            self::_importMedia($node->lockedImageURL, $temp_dir, true, $node->lockedThumbnailFileId);
+
+            self::_importMedia($tapestry_data->settings->backgroundUrl, $temp_dir);
+        }
+
+        // TODO: this doesn't work, probably because we're not logged in
+        // The filtered parameters will be rebuilt upon a request to admin-ajax.php?action=h5p_embed&id=<ID>
+        // (e.g. when the H5P node is opened), but it's not guaranteed that the user will do this first
+        do_action('wp_ajax_h5p_rebuild_cache');
+
+        return $tapestry_data;
+    }
+
+    private static function _importH5PNode($node, $temp_url)
+    {
+        $filename = $node->typeData->mediaURL;
+
+        // TODO: this may be slow because it's fetching an external URL
+        // TODO: this is not creating the h5p export file or the h5p details (`filtered` column in database)
+        // TODO: the h5p author is not set
+
+        $h5p_id = H5P_Plugin::get_instance()->fetch_h5p($temp_url.'/'.$filename);
+        $node->typeData->mediaURL = admin_url('admin-ajax.php') . '?action=h5p_embed&id=' . $h5p_id;
+
+        // TODO: update h5pMeta as well?
+    }
+
+    private static function _importActivityNode($node, $temp_dir)
+    {
+        foreach ($node->typeData->activity->questions as $question) {
+            $multiple_choice = $question->answerTypes->multipleChoice;
+            if ($multiple_choice->enabled && $multiple_choice->useImages && isset($multiple_choice->choices)) {
+                foreach ($multiple_choice->choices as $choice) {
+                    self::_importMedia($choice->imageUrl, $temp_dir);
+                }
+            }
+
+            $drag_drop = $question->answerTypes->dragDrop;
+            if ($drag_drop->enabled && $drag_drop->useImages && isset($drag_drop->items)) {
+                foreach ($drag_drop->items as $item) {
+                    self::_importMedia($item->imageUrl, $temp_dir);
+                }
+            }
+        }
+    }
+
+    private static function _importMedia(&$media_url, $temp_dir, $generate_metadata = false, &$file_id = null)
+    {
+        if (empty($media_url) || filter_var($media_url, FILTER_VALIDATE_URL)) {
+            // TODO: does this catch all cases?
+            return;
+        }
+
+        $upload_dir = wp_upload_dir();
+        $new_filename = wp_unique_filename($upload_dir['path'], $media_url);
+        $new_filepath = $upload_dir['path'].'/'.$new_filename;
+
+        // Move file to uploads directory
+        rename($temp_dir.'/'.$media_url, $new_filepath);
+
+        $attachment_id = self::_createAttachment($new_filepath, $generate_metadata);
+        $media_url = wp_get_attachment_url($attachment_id);
+
+        if ($file_id !== null) {
+            $file_id = $attachment_id;
+        }
+    }
+
+    // Return the path to the local file if url is a local WordPress url, false otherwise
+    private static function _getLocalPath($url)
+    {
+        $wp_upload_dir = wp_upload_dir();
+        $wp_upload_dir_path = $wp_upload_dir['path'] . '/';
+        $wp_upload_dir_url = $wp_upload_dir['url'] . '/';
+
+        if (substr($url, 0, strlen($wp_upload_dir_url)) === $wp_upload_dir_url) {
+            // TODO: is there a less error-prone way to do this?
+            $path = $wp_upload_dir_path . substr($url, strlen($wp_upload_dir_url));
+
+            return $path;
         }
         return false;
     }

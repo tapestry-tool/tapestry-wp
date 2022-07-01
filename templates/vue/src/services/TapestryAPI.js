@@ -64,8 +64,28 @@ class TapestryApi {
     }
   }
 
+  async importTapestryFromZip(zipFile) {
+    const url = `/tapestries/${this.postId}/import_zip`
+
+    const formData = new FormData()
+    formData.append("file", zipFile)
+    const response = await this.client.post(url, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    })
+
+    return response.data
+  }
+
   async getTapestryExport() {
     const url = `/tapestries/${this.postId}/export`
+    const response = await this.client.get(url)
+    return response.data
+  }
+
+  async getTapestryExportAsZip() {
+    const url = `/tapestries/${this.postId}/export_zip`
     const response = await this.client.get(url)
     return response.data
   }
