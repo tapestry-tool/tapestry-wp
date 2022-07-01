@@ -499,14 +499,8 @@ export default {
         type: "application/json",
       })
       const fileUrl = URL.createObjectURL(blob)
-      const a = document.createElement("a")
-      a.style.display = "none"
-      a.href = fileUrl
-      a.download = `${this.settings.title}.json`
-      document.body.appendChild(a)
-      a.click()
+      this.showFileDownload(fileUrl, `${this.settings.title}.json`)
       URL.revokeObjectURL(fileUrl)
-      document.body.removeChild(a)
 
       this.isExporting = false
       this.hasExported = true
@@ -521,16 +515,19 @@ export default {
         return
       }
       const fileUrl = exportedTapestry.zipUrl
-      const a = document.createElement("a")
-      a.style.display = "none"
-      a.href = fileUrl
-      a.download = `${this.settings.title}.zip`
-      document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
+      this.showFileDownload(fileUrl, `${this.settings.title}.zip`)
 
       this.isExporting = false
       this.hasExported = true
+    },
+    showFileDownload(fileUrl, fileName) {
+      const a = document.createElement("a")
+      a.style.display = "none"
+      a.href = fileUrl
+      a.download = fileName
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
     },
     async optimizeThumbnails() {
       this.isOptimizing = true
