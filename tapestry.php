@@ -22,7 +22,7 @@ define(
 error_reporting(E_ERROR | E_PARSE);
 
 /**
- * Register endpoints.
+ * Register endpoints and perform other includes
  */
 require_once dirname(__FILE__).'/classes/class.tapestry-analytics.php';
 require_once dirname(__FILE__).'/classes/class.kaltura-api.php';
@@ -137,7 +137,7 @@ function tapestry_enqueue_vue_app()
     global $post;
     if ('tapestry' == get_post_type($post) && !post_password_required($post)) {
         global $TAPESTRY_VERSION_NUMBER;
-        
+
         $use_dev = (defined('TAPESTRY_USE_DEV_MODE') && !empty(TAPESTRY_USE_DEV_MODE)) || isset($_GET['debug']);
 
         // register the Vue build script.
