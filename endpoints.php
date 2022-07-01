@@ -436,20 +436,24 @@ function importTapestryFromZip($request)
         $tapestry_data = json_decode($contents);
         TapestryHelpers::validateTapestryData($tapestry_data);
 
-        $changedPermissions = TapestryHelpers::prepareImport($tapestry_data);
+        $changedPermissions = [];
+        $wpUrl = get_bloginfo('url');
+        if ($tapestry_data->{'site-url'} !== $wpUrl) {
+            $changedPermissions = TapestryHelpers::prepareImport($tapestry_data);
+        }
 
         TapestryHelpers::importExternalMedia($tapestry_data, $temp_dir, $temp_url);
 
         // TODO: delete temporary directory
 
-        $imported_tapestry = importTapestry($postId, $tapestry_data);
+        $importedTapestry = importTapestry($postId, $tapestry_data);
 
         return [
             'changes' => [
                 'permissions' => $changedPermissions,
                 'noChange' => count($changedPermissions) === 0,
             ],
-            'tapestry' => $imported_tapestry,
+            'tapestry' => $importedTapestry,
         ];
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
@@ -568,7 +572,23 @@ function putTapestry($request)
     $postId = $request['tapestryPostId'];
     $tapestryData = json_decode($request->get_body());
     try {
-        return importTapestry($postId, $tapestryData);
+        TapestryHelpers::validateTapestryData($tapestryData);
+
+        $changedPermissions = [];
+        $wpUrl = get_bloginfo('url');
+        if ($tapestryData->{'site-url'} !== $wpUrl) {
+            $changedPermissions = TapestryHelpers::prepareImport($tapestryData);
+        }
+
+        $importedTapestry = importTapestry($postId, $tapestryData);
+
+        return [
+            'changes' => [
+                'permissions' => $changedPermissions,
+                'noChange' => count($changedPermissions) === 0,
+            ],
+            'tapestry' => $importedTapestry,
+        ];
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }

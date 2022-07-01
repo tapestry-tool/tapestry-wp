@@ -55,7 +55,6 @@
 import { names } from "@/config/routes"
 import client from "@/services/TapestryAPI"
 import ImportChangelog from "./ImportChangelog"
-import { data as wpData } from "@/services/wp"
 
 export default {
   name: "root-node-button",
@@ -122,31 +121,26 @@ export default {
       this.importTapestryFromZip(file)
     },
     importTapestry(file) {
+      // TODO: try to reduce duplication here
+
       const reader = new FileReader()
       reader.onload = async e => {
         this.error = ""
 
         this.isImporting = true
-        let upload
-        try {
-          upload = JSON.parse(e.target.result)
-          this.validateTapestryJSON(upload)
-        } catch (err) {
-          this.error = err
-          this.isImporting = false
-          return
-        }
-        if (!(upload["site-url"] == wpData.wpUrl)) {
-          await this.prepareImport(upload)
-        }
+        const upload = e.target.result
         client
           .importTapestry(upload)
-          .then(() => {
-            this.isImporting = false
+          .then(response => {
+            this.changes.permissions = new Set(response.changes.permissions)
+            this.changes.noChange = response.changes.noChange
             this.$bvModal.show("import-changelog")
           }) // TODO: Change this so a refresh isn't required
           .catch(err => {
             this.error = err
+          })
+          .finally(() => {
+            this.isImporting = false
           })
       }
       reader.readAsText(file)
@@ -156,7 +150,8 @@ export default {
       client
         .importTapestryFromZip(zipFile)
         .then(response => {
-          console.log(response)
+          this.changes.permissions = new Set(response.changes.permissions)
+          this.changes.noChange = response.changes.noChange
           this.$bvModal.show("import-changelog")
         })
         .catch(err => {
@@ -165,48 +160,6 @@ export default {
         .finally(() => {
           this.isImporting = false
         })
-    },
-    filterImportedPerms(permissions, wp_roles) {
-      // TODO: this will need to be moved to the server side because the zip is unzipped there
-      let filteredPerms = permissions
-      filteredPerms = Object.keys(permissions)
-        // only keep roles that exist in the current site
-        .filter(key => wp_roles.has(key))
-        // create new permissiones object with filtered roles
-        .reduce((obj, key) => {
-          return {
-            ...obj,
-            [key]: permissions[key],
-          }
-        }, {})
-      // if permissions modified, add the role to changes
-      for (let key in permissions) {
-        if (!Object.keys(filteredPerms).includes(key)) {
-          this.changes.permissions.add(key)
-          this.changes.noChange = false
-        }
-      }
-      return filteredPerms
-    },
-    async prepareImport(data) {
-      let wp_roles = await client.getAllRoles()
-      for (let node of data.nodes) {
-        node.permissions = this.filterImportedPerms(node.permissions, wp_roles)
-      }
-      if (data.settings && data.settings.defaultPermissions) {
-        data.settings.defaultPermissions = this.filterImportedPerms(
-          data.settings.defaultPermissions,
-          wp_roles
-        )
-      }
-    },
-    validateTapestryJSON(upload) {
-      const properties = ["nodes", "links", "site-url"]
-      properties.forEach(property => {
-        if (!upload.hasOwnProperty(property)) {
-          throw new Error(`Invalid Tapestry JSON: Missing property ${property}`)
-        }
-      })
     },
   },
 }

@@ -340,18 +340,20 @@ class TapestryHelpers
         return $changes;
     }
 
-    private static function _filterImportedPerms($permissions, $roles, $changes)
+    private static function _filterImportedPerms($permissions, $roles, &$changes)
     {
-        $filteredRoles = array_filter(array_keys($permissions), function ($key) use ($roles) {
-            return in_array($key, $roles);
+        // only keep roles that exist in the current site
+        $filteredRoles = array_filter($roles, function ($role) use ($permissions) {
+            return property_exists($permissions, $role);
         });
 
+        // create new permissions object with filtered roles
         $filteredPerms = [];
-        
         foreach ($filteredRoles as $role) {
-            $filteredPerms[$role] = $permissions[$role];
+            $filteredPerms[$role] = $permissions->{$role};
         }
 
+        // if permissions modified, add the role to changes
         foreach ($permissions as $key => $value) {
             if (!array_key_exists($key, $filteredPerms)) {
                 array_push($changes, $key);
