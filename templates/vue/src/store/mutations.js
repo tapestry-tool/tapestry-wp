@@ -215,6 +215,10 @@ export function setCurrentEditingNodeProperty(state, { property, value }) {
   }
 }
 
+export function setNodeNavigation(state, nav) {
+  state.nodeNavigation = nav
+}
+
 export function setMaxLevel(state, maxLevel) {
   state.maxLevel = maxLevel
 }

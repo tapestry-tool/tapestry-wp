@@ -28,6 +28,11 @@ export const store = {
     userAnswers: {},
     returnRoute: null,
     currentEditingNode: null,
+    nodeNavigation: {
+      stack: [],
+      siblings: [],
+      siblingPosition: -1,
+    },
     // * DEV: temporarily allow editing constants.js/scaleConstants
     scaleConstants: {
       levelMultiplier: 1.7, // higher -> deep nodes get revealed faster

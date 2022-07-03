@@ -86,7 +86,7 @@
 
 <script>
 import DragSelectModular from "@/utils/dragSelectModular"
-import { mapGetters, mapMutations, mapState } from "vuex"
+import { mapActions, mapGetters, mapMutations, mapState } from "vuex"
 import TapestryNode from "./TapestryNode"
 import TapestryLink from "./TapestryLink"
 import TapestryMinimapButton from "./TapestryMinimap/TapestryMinimapButton"
@@ -135,7 +135,7 @@ export default {
       "currentDepth",
       "scaleConstants",
     ]),
-    ...mapGetters(["getNode"]),
+    ...mapGetters(["getNode", "getCurrentNodeNav"]),
     computedViewBox() {
       // return this.viewBox.join(" ")
       return `${this.viewBox[0] + this.offset.x} ${this.viewBox[1] +
@@ -192,6 +192,9 @@ export default {
                 }
           )
         }
+        if (nodeId !== this.getCurrentNodeNav) {
+          this.resetNodeNavigation(nodeId)
+        }
         this.updateViewBox()
       },
     },
@@ -247,6 +250,12 @@ export default {
   },
   methods: {
     ...mapMutations(["select", "unselect", "clearSelection"]),
+    ...mapActions([
+      "goToNodeChildren",
+      "goToNodeParent",
+      "goToNodeSibling",
+      "resetNodeNavigation",
+    ]),
     addRootNode() {
       this.$root.$emit("add-node", null)
     },
@@ -429,7 +438,41 @@ export default {
       }
     },
     handleKeydown(evt) {
-      console.log(evt)
+      const { code } = evt
+      const node = this.getNode(this.selectedId)
+      if (code === "Enter") {
+        if (
+          node.accessible ||
+          Helpers.hasPermission(node, "edit", this.settings.showRejected)
+        ) {
+          this.$root.$emit("open-node", node.id)
+        }
+      } else {
+        if (node.id === this.getCurrentNodeNav) {
+          if (code === "ArrowDown") {
+            this.goToNodeChildren().then(this.setSelectedNode)
+          } else if (code === "ArrowUp") {
+            this.goToNodeParent().then(this.setSelectedNode)
+          } else if (code === "ArrowRight") {
+            this.goToNodeSibling(1).then(this.setSelectedNode)
+          } else if (code === "ArrowLeft") {
+            this.goToNodeSibling(-1).then(this.setSelectedNode)
+          }
+        } else {
+          this.resetNodeNavigation(node.id)
+        }
+      }
+    },
+    setSelectedNode(nodeId) {
+      if (nodeId === false) {
+        return
+      }
+      this.$router.push({
+        name: names.APP,
+        params: { nodeId },
+        query: this.$route.query,
+        path: `/nodes/${nodeId}`,
+      })
     },
   },
 }

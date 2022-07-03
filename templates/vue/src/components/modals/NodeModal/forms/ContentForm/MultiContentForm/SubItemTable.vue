@@ -68,7 +68,7 @@ export default {
     ...mapState({
       node: "currentEditingNode",
     }),
-    ...mapGetters(["getNode", "getDirectChildren"]),
+    ...mapGetters(["getNode"]),
     requiresSaving() {
       // Require saving if node is changing from non-multi-content to multi-content
       const node = this.getNode(this.node.id)

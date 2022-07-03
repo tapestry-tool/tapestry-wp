@@ -3,7 +3,7 @@
     <g
       v-show="show"
       ref="node"
-      :aria-label="`${node.title}. You are currently on a level ${node.level} node.`"
+      :aria-label="ariaLabel"
       :data-qa="`node-${node.id}`"
       :data-locked="!node.accessible"
       :transform="`translate(${coordinates.x}, ${coordinates.y})`"
@@ -204,8 +204,31 @@ export default {
       "visibleNodes",
       "maxLevel",
       "currentDepth",
+      "nodeNavigation",
     ]),
     ...mapGetters(["getNode", "getDirectChildren", "isVisible", "getParent"]),
+    ariaLabel() {
+      let label = `${this.node.title}. You are on a level ${this.node.level} node. `
+      if (
+        this.node.id ===
+        this.nodeNavigation.stack[this.nodeNavigation.stack.length - 1]
+      ) {
+        const childrenCount = this.getDirectChildren(this.node.id).length
+        if (childrenCount === 0) {
+          label += `This node has no children. To view this node, press Enter. To go back up, press the Up Arrow Key. To go to its siblings, press the Left or Right Arrow Key. `
+        } else {
+          label += `This node has ${childrenCount} ${
+            childrenCount === 1 ? "child" : "children"
+          }. To view this node, press Enter. To go to its${
+            childrenCount === 1 ? "" : " first"
+          } child, press the Down Arrow Key. To go back up, press the Up Arrow Key. To go to its siblings, press the Left or Right Arrow Key. `
+        }
+      } else {
+        // TODO: provide option to go back to correct navigation route
+        label += "You are not on the node navigation route. "
+      }
+      return label
+    },
     canReview() {
       if (!this.isLoggedIn) {
         return false
@@ -388,6 +411,11 @@ export default {
     },
   },
   watch: {
+    root(root) {
+      if (root) {
+        this.$refs.node.focus()
+      }
+    },
     radius(newRadius) {
       d3.select(this.$refs.circle)
         .transition()
