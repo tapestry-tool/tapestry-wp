@@ -155,7 +155,7 @@ export default {
     },
     filteredPages() {
       return this.pages
-        ? this.pages.filter(page => page.accessible || !page.hideWhenLocked)
+        ? this.pages.filter(page => page.unlocked || !page.hideWhenLocked)
         : false
     },
     pageIndex() {
