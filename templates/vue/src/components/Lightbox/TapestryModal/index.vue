@@ -2,12 +2,13 @@
   <div class="modal-container">
     <div v-if="allowClose" class="overlay" @click="$emit('close')"></div>
     <transition name="modal">
-      <div v-if="load" class="content" :style="contentContainerStyle">
+      <div v-if="load" class="content" :style="contentContainerStyle" tabindex="0">
         <div class="buttons-container">
           <modal-button
             v-if="allowClose"
             data-qa="close-lightbox"
             icon="times"
+            tabindex="0"
             @clicked="$emit('close')"
           />
           <modal-button
@@ -17,6 +18,7 @@
             :icon-color="isFavourite ? 'red' : ''"
             :bg-color="isFavourite ? '#fff' : ''"
             :bg-hover-color="isFavourite ? '#fff' : 'red'"
+            tabindex="0"
             @clicked="toggleFavourite(node.id)"
           />
           <modal-button
@@ -24,6 +26,7 @@
             icon="pencil-alt"
             icon-size="sm"
             title="Edit Node"
+            tabindex="0"
             @clicked="editNode"
           />
         </div>

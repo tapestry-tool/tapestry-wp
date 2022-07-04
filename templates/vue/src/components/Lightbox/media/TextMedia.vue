@@ -1,10 +1,10 @@
 <template>
   <article :class="'article context-' + context">
-    <h1 v-if="showTitle">
+    <h1 v-if="showTitle" tabindex="0">
       {{ node.title }}
       <completed-icon :node="node" class="mx-2" />
     </h1>
-    <div v-html="content"></div>
+    <div tabindex="0" v-html="content"></div>
   </article>
 </template>
 

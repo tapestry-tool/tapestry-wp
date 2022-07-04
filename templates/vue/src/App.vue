@@ -1,11 +1,11 @@
 <template>
   <loading v-if="loading" data-qa="tapestry-loading" style="height: 75vh;"></loading>
   <div v-else id="app">
-    <tapestry-app></tapestry-app>
+    <tapestry-app :aria-hidden="viewingNode ? 'true' : 'false'"></tapestry-app>
     <router-view></router-view>
     <node-modal></node-modal>
     <link-modal></link-modal>
-    <lightbox v-if="viewingNode" :node-id="nodeId"></lightbox>
+    <lightbox v-if="viewingNode" :node-id="nodeId" aria-hidden="false"></lightbox>
     <sidebar v-if="!isEmpty"></sidebar>
     <tapestry-error></tapestry-error>
     <b-modal
