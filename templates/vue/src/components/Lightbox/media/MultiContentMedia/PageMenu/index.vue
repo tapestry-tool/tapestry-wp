@@ -246,7 +246,7 @@ export default {
 }
 
 .page-nav-wrapper {
-  position: absolute;
+  position: relative;
   transition: width 0.2s ease-in-out;
   z-index: 0;
   min-width: 200px;
@@ -260,11 +260,8 @@ export default {
   }
 
   &.fullscreen {
-    position: absolute;
-    left: 0;
-    top: 0;
     height: 100vh;
-    margin: -24px 24px 0 -18px;
+    margin: -24px 24px 0 -24px;
     z-index: 11;
 
     &.closed {

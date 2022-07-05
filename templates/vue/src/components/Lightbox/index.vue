@@ -111,13 +111,6 @@ export default {
         }
       }
 
-      if (this.node.mediaType === "multi-content") {
-        styles.display = "flex"
-        // Reversed because PageMenu is placed after MultiContentMedia for refs to correctly render
-        styles.flexDirection = "row-reverse"
-        return Object.assign(styles, { padding: "24px" })
-      }
-
       if (this.node.mediaType === "text" || this.node.mediaType === "wp-post") {
         return Object.assign(styles, {
           background: "var(--background-color);",
