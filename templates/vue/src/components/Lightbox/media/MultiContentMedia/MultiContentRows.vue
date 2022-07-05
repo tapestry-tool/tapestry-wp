@@ -77,6 +77,7 @@ export default {
     allHidden() {
       return (
         this.level === 0 &&
+        this.rows.length > 0 &&
         this.rows.every(row => !row.node.unlocked && row.node.hideWhenLocked)
       )
     },

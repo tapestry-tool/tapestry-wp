@@ -20,7 +20,11 @@
       </header>
       <template v-if="node.presentationStyle">
         <div v-if="node.presentationStyle === 'unit'">
-          The content of this unit has not been unlocked yet.
+          {{
+            node.childOrdering.length
+              ? "The content of this unit has not been unlocked yet."
+              : "There is no content in this node."
+          }}
         </div>
         <template v-else>
           <div v-if="!node.accessible">
@@ -157,7 +161,7 @@ export default {
     },
     filteredPages() {
       return this.pages
-        ? this.pages.filter(page => page.accessible || !page.hideWhenLocked)
+        ? this.pages.filter(page => page.unlocked || !page.hideWhenLocked)
         : false
     },
     pageIndex() {

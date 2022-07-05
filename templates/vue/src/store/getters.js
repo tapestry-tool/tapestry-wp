@@ -88,8 +88,7 @@ export function isVisible(state, { getNode, hasMultiContentAncestor }) {
     }
     if (!Helpers.hasPermission(node, "edit", showRejected)) {
       return (
-        (node.accessible || !node.hideWhenLocked) &&
-        !hasMultiContentAncestor(node.id)
+        (node.unlocked || !node.hideWhenLocked) && !hasMultiContentAncestor(node.id)
       )
     }
     return true

@@ -157,7 +157,6 @@ class TapestryNode implements ITapestryNode
         }
         if (isset($node->thumbnailFileId) && (is_numeric($node->thumbnailFileId) || is_string($node->thumbnailFileId))) {
             if (is_string($node->thumbnailFileId) && '' == $node->thumbnailFileId) {
-                $this->imageURL = '';
                 $this->thumbnailFileId = '';
             } else {
                 $this->thumbnailFileId = $node->thumbnailFileId;
@@ -173,7 +172,6 @@ class TapestryNode implements ITapestryNode
         }
         if (isset($node->lockedThumbnailFileId) && (is_numeric($node->lockedThumbnailFileId) || is_string($node->lockedThumbnailFileId))) {
             if (is_string($node->lockedThumbnailFileId) && '' == $node->lockedThumbnailFileId) {
-                $this->lockedImageURL = '';
                 $this->lockedThumbnailFileId = '';
             } else {
                 $this->lockedThumbnailFileId = $node->lockedThumbnailFileId;
