@@ -123,19 +123,23 @@ export default {
         const c = canvas.getContext("2d")
 
         c.clearRect(0, 0, this.viewBox[2], this.viewBox[3])
+        c.fillStyle = "#8495a188"
+        c.fillRect(0, 0, this.viewBox[2], this.viewBox[3])
 
         const viewX = this.offset.x / this.scale
         const viewY = this.offset.y / this.scale
         const viewWidth = this.viewBox[2] / this.scale
         const viewHeight = this.viewBox[3] / this.scale
-        c.strokeStyle = "#11a6d8"
-        c.lineWidth = this.viewBox[2] * 0.01
+
+        c.strokeStyle = "#000000"
+        c.lineWidth = this.viewBox[2] * 0.005
         this.viewPosition = {
           x: viewX,
           y: viewY,
           width: viewWidth,
           height: viewHeight,
         }
+        c.clearRect(viewX, viewY, viewWidth, viewHeight)
         c.strokeRect(viewX, viewY, viewWidth, viewHeight)
       }
     },

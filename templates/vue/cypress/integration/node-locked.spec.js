@@ -38,8 +38,7 @@ describe("Locked Nodes", () => {
         cy.getNodeById(child.id).click()
         cy.contains(/this content will be unlocked/i).should("be.visible")
 
-        cy.server()
-        cy.route("POST", "**/progress").as("complete")
+        cy.intercept("POST", "**/progress").as("complete")
 
         cy.openLightbox(root.id).should("exist")
         cy.closeLightbox()

@@ -23,12 +23,13 @@ describe("Node Appearance", () => {
       cy.contains(/hide progress bar/i).click()
       cy.contains(/background image/i).click()
 
-      cy.server()
-      cy.route("POST", "**/async-upload.php").as("upload")
+      cy.intercept("POST", "**/async-upload.php").as("upload")
 
       cy.getByTestId("import-file-input").attachFile("reddit.png")
       cy.wait("@upload")
-        .its("response.body.data.url")
+        .then(({ response }) => {
+          return JSON.parse(response.body).data.url
+        })
         .then(() => {
           cy.get("No image").should("not.exist")
           cy.get(".alert-success").should("exist")

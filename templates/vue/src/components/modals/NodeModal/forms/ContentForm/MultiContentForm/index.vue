@@ -54,7 +54,7 @@
 
 <script>
 import { mapMutations, mapState } from "vuex"
-import SubItemTable from "./SubItemTable.vue"
+import SubItemTable from "../common/SubItemTable.vue"
 
 export default {
   name: "multi-content-form",

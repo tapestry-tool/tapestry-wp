@@ -29,7 +29,7 @@
         :fill="fill"
         :stroke="progressBackgroundColor"
         :style="{
-          filter: `url(#shadow-${node.level})`,
+          filter: `url(#shadow-${root ? 'root' : node.level})`,
         }"
       ></circle>
       <transition name="fade">
@@ -309,16 +309,13 @@ export default {
       if (!this.show) {
         return 0
       }
-      // TODO: use a different indicator for currently selected node
-      /*
-      if (this.root) {
-        return 210
-      }
-      */
       if (this.isGrandChild) {
         return 40
       }
-      return Helpers.getNodeRadius(this.node.level, this.maxLevel, this.scale)
+      return (
+        Helpers.getNodeRadius(this.node.level, this.maxLevel, this.scale) *
+        (this.root ? 1.2 : 1)
+      )
     },
     fill() {
       const showImages = this.settings.hasOwnProperty("renderImages")
