@@ -318,7 +318,7 @@ $REST_API_ENDPOINTS = [
         'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/export_zip',
         'ARGUMENTS' => [
             'methods' => $REST_API_GET_METHOD,
-            'callback' => 'exportTapestryZip',
+            'callback' => 'exportTapestryAsZip',
             'permission_callback' => 'TapestryPermissions::putTapestrySettings',
         ],
     ],
@@ -370,7 +370,7 @@ function exportTapestry($request)
     }
 }
 
-function exportTapestryZip($request)
+function exportTapestryAsZip($request)
 {
     $postId = $request['tapestryPostId'];
 
@@ -399,8 +399,6 @@ function exportTapestryZip($request)
 
 function importTapestryFromZip($request)
 {
-    // TODO: handle error cases
-
     // Extract archive to directory
     // Get tapestry data from file
     // Upload all media and change URLs/IDs in tapestry data
@@ -411,30 +409,23 @@ function importTapestryFromZip($request)
 
     try {
         if (!array_key_exists('file', $file_params)) {
-            throw new TapestryError('Zip file not found');
+            throw new Exception('Zip file not found');
         }
         $zip_path = $file_params['file']['tmp_name'];
 
         $zip = new ZipArchive();
         if ($zip->open($zip_path, ZipArchive::RDONLY) !== true) {
-            throw new TapestryError('Could not open zip file');
+            throw new Exception('Could not open zip file');
         }
 
-        $upload_dir = wp_upload_dir();
-        $temp_path = '/tapestry_export/extracted-zip';   // TODO: generate unique directory name
-        $temp_dir = $upload_dir['path'].$temp_path;
-        $temp_url = $upload_dir['url'].$temp_path;
-        $zip->extractTo($temp_dir);
-        $zip->close();
-
-        try {
-            $contents = file_get_contents($temp_dir.'/tapestry.json');
-        } catch (Exception $e) {
-            throw new TapestryError('Could not find tapestry.json in zip file');
+        $contents = $zip->getFromName('tapestry.json');
+        if ($contents === false) {
+            throw new Exception('Could not read tapestry.json in zip file');
         }
 
         $tapestry_data = json_decode($contents);
         TapestryHelpers::validateTapestryData($tapestry_data);
+        TapestryHelpers::validateTapestryZipStructure($zip);
 
         $changedPermissions = [];
         $wpUrl = get_bloginfo('url');
@@ -442,9 +433,16 @@ function importTapestryFromZip($request)
             $changedPermissions = TapestryHelpers::prepareImport($tapestry_data);
         }
 
-        TapestryHelpers::importExternalMedia($tapestry_data, $temp_dir, $temp_url);
+        $temp_dir = TapestryHelpers::createTempDirectory($parent_dir);
+        if (!$temp_dir) {
+            throw new Exception('Filesystem error');
+        }
+        $zip->extractTo($temp_dir['path']);
+        $zip->close();
 
-        // TODO: delete temporary directory
+        TapestryHelpers::importExternalMedia($tapestry_data, $temp_dir['path'], $temp_dir['url']);
+
+        TapestryHelpers::deleteTempDirectory($temp_dir['path']);
 
         $importedTapestry = importTapestry($postId, $tapestry_data);
 

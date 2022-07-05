@@ -3,9 +3,15 @@
 require_once dirname(__FILE__).'/class.tapestry-node-permissions.php';
 require_once dirname(__FILE__).'/../classes/class.tapestry-h5p.php';
 require_once dirname(__FILE__).'/../classes/class.constants.php';
-require_once dirname(__FILE__).'/../../h5p/public/class-h5p-plugin.php';
-// TODO: handle case where the plugin doesn't exist
-// TODO: make the file path cleaner
+
+define(
+    'H5P_DEFINED',
+    file_exists(dirname(__FILE__) . '/../../h5p/public/class-h5p-plugin.php')
+);
+
+if (H5P_DEFINED) {
+    include dirname(__FILE__) . '/../../h5p/public/class-h5p-plugin.php';
+}
 
 /**
  * Tapestry Helper Functions.
@@ -379,13 +385,29 @@ class TapestryHelpers
     public static function validateTapestryData($tapestry_data)
     {
         if (empty($tapestry_data)) {
-            throw new TapestryError('Invalid tapestry data: Not valid JSON');
+            throw new Exception('Invalid tapestry data: Not valid JSON');
         }
 
         $properties = ['nodes', 'links', 'site-url'];
         foreach ($properties as $property) {
             if (!property_exists($tapestry_data, $property)) {
-                throw new TapestryError('Invalid tapestry data: Missing property ' . $property);
+                throw new Exception('Invalid tapestry data: Missing property ' . $property);
+            }
+        }
+    }
+
+    public static function validateTapestryZipStructure($zip)
+    {
+        $file_count = $zip->count();
+
+        // TODO: validate other elements as well – references?
+        for ($i = 0; $i < $file_count; $i++) {
+            $name = $zip->getNameIndex($i);
+
+            if (basename($name) !== $name) {
+                // Zip structure should be flat
+                // This allows us to delete the temporary directory after extracting the zip later
+                throw new Exception('Invalid zip file');
             }
         }
     }
@@ -393,8 +415,8 @@ class TapestryHelpers
     public static function exportExternalMedia($tapestry_data)
     {
         $result = self::_createExportZip();
-        $zip = $result['zip'];
-        $zip_url = $result['zip_url'];
+        $zip = $result['path'];
+        $zip_url = $result['url'];
 
         $h5p_controller = new TapestryH5P();
         foreach ($tapestry_data->nodes as $node) {
@@ -420,33 +442,35 @@ class TapestryHelpers
 
     private static function _createExportZip()
     {
-        $wp_upload_dir = wp_upload_dir();
-
-        $tapestry_export_dir = $wp_upload_dir['path'].'/tapestry_export/';
-        if (!file_exists($tapestry_export_dir)) {
-            mkdir($tapestry_export_dir);
+        $tapestry_export_dir = self::getZipExportDirectory();
+        if (!file_exists($tapestry_export_dir['path'])) {
+            mkdir($tapestry_export_dir['path']);
         }
 
         $zip = new ZipArchive();
 
-        // TODO: generate the name, maybe from the title
-        $zip_name = 'export.zip';
+        // TODO: need to delete these temp files as well...
+        $temp_path = tempnam($tapestry_export_dir['path'], 'export_');
+        $zip_name = basename($temp_path) . '.zip';
+        $zip_path = $tapestry_export_dir['path'] . '/' . $zip_name;
+        $zip_url = $tapestry_export_dir['url'] . '/' . $zip_name;
 
-        $zip_path = $tapestry_export_dir.$zip_name;
-        $zip_url = $wp_upload_dir['url'].'/tapestry_export/'.$zip_name;
-
-        if ($zip->open($zip_path, ZipArchive::CREATE) !== true) {
-            throw new TapestryError('Could not open zip file ' . $zip_path);
+        if ($zip->open($zip_path, ZipArchive::CREATE | ZipArchive::EXCL) !== true) {
+            throw new Exception('Could not open zip file ' . $zip_path);
         }
 
         return [
-            'zip' => $zip,
-            'zip_url' => $zip_url,
+            'path' => $zip,
+            'url' => $zip_url,
         ];
     }
 
     private static function _exportH5PNode($node, $zip, $h5p_controller)
     {
+        if (empty(H5P_DEFINED)) {
+            return;
+        }
+
         // TODO: check the existence of these properties?
         $h5p_id = $node->typeData->h5pMeta->id;
         $h5p_data = $h5p_controller->getH5P($h5p_id);
@@ -491,31 +515,15 @@ class TapestryHelpers
 
             // File ID no longer applies, clear it
             $file_id = '';
-
-            if ($path_to_media !== false) {
-                $media_name = $attachment_data['file'];
-            } else {
-                // TODO: should we skip or try again?
-                // TODO: use attachment_url_to_postid?
-                // file ID not found
-                return;
-            }
         } else {
             $path_to_media = self::_getLocalPath($media_url);
-            if ($path_to_media) {
-                if (file_exists($path_to_media) && is_file($path_to_media)) {
-                    $media_name = basename($path_to_media);
-                } else {
-                    error_log('Warning: the URL ' . $media_url . ' is a local upload, but no file exists here.');
-                    $media_url = '';
-                    return;
-                }
-            } else {
-                // file does not exist locally; skip
-                return;
-            }
         }
 
+        if (!$path_to_media || !file_exists($path_to_media) || !is_file($path_to_media)) {
+            // File does not exist locally; skip
+            return;
+        }
+        $media_name = basename($path_to_media);
         $zip->addFile($path_to_media, $media_name);
         $media_url = $media_name;
     }
@@ -547,16 +555,22 @@ class TapestryHelpers
 
     private static function _importH5PNode($node, $temp_url)
     {
+        if (empty(H5P_DEFINED)) {
+            error_log('Warning: Could not import H5P node: H5P plugin files not found.');
+            return;
+        }
+
         $filename = $node->typeData->mediaURL;
 
         // TODO: this may be slow because it's fetching an external URL
         // TODO: this is not creating the h5p export file or the h5p details (`filtered` column in database)
         // TODO: the h5p author is not set
-
-        $h5p_id = H5P_Plugin::get_instance()->fetch_h5p($temp_url.'/'.$filename);
-        $node->typeData->mediaURL = admin_url('admin-ajax.php') . '?action=h5p_embed&id=' . $h5p_id;
-
-        // TODO: update h5pMeta as well?
+        try {
+            $h5p_id = H5P_Plugin::get_instance()->fetch_h5p($temp_url.'/'.$filename);
+            $node->typeData->mediaURL = admin_url('admin-ajax.php') . '?action=h5p_embed&id=' . $h5p_id;
+        } catch (Exception $e) {
+            error_log('Warning: Could not import H5P node due to error: ' . $e->getMessage() . "\n" . $e->getTraceAsString());
+        }
     }
 
     private static function _importActivityNode($node, $temp_dir)
@@ -581,7 +595,7 @@ class TapestryHelpers
     private static function _importMedia(&$media_url, $temp_dir, $generate_metadata = false, &$file_id = null)
     {
         if (empty($media_url) || filter_var($media_url, FILTER_VALIDATE_URL)) {
-            // TODO: does this catch all cases?
+            // Is empty or an external URL
             return;
         }
 
@@ -604,8 +618,8 @@ class TapestryHelpers
     private static function _getLocalPath($url)
     {
         $wp_upload_dir = wp_upload_dir();
-        $wp_upload_dir_path = $wp_upload_dir['path'] . '/';
-        $wp_upload_dir_url = $wp_upload_dir['url'] . '/';
+        $wp_upload_dir_path = $wp_upload_dir['basedir'] . '/';
+        $wp_upload_dir_url = $wp_upload_dir['baseurl'] . '/';
 
         if (substr($url, 0, strlen($wp_upload_dir_url)) === $wp_upload_dir_url) {
             // TODO: is there a less error-prone way to do this?
@@ -614,5 +628,73 @@ class TapestryHelpers
             return $path;
         }
         return false;
+    }
+
+    public static function getZipExportDirectory()
+    {
+        $upload_dir = wp_upload_dir();
+        return [
+            'path' => $upload_dir['basedir'] . '/tapestry/export',
+            'url' => $upload_dir['baseurl'] . '/tapestry/export',
+        ];
+    }
+
+    public static function getZipImportDirectory()
+    {
+        $upload_dir = wp_upload_dir();
+        return [
+            'path' => $upload_dir['basedir'] . '/tapestry/import',
+            'url' => $upload_dir['baseurl'] . '/tapestry/import',
+        ];
+    }
+
+    public static function clearExportedZips($tempfile_path, $zip_path)
+    {
+        $export_dir = self::getZipExportDirectory()['path'];
+        if (!empty($tempfile_path) && !empty($export_dir) && substr($tempfile_path, 0, strlen($export_dir)) === $export_dir) {
+            unlink($tempfile_path);
+        }
+
+        if (!empty($zip_path) && !empty($export_dir) && substr($zip_path, 0, strlen($export_dir)) === $export_dir) {
+            unlink($zip_path);
+        }
+    }
+
+    // https://stackoverflow.com/questions/1707801/making-a-temporary-dir-for-unpacking-a-zipfile-into
+    public static function createTempDirectory()
+    {
+        $parent_dir = self::getZipImportDirectory();
+        if (!file_exists($parent_dir['path'])) {
+            mkdir($parent_dir['path']);
+        }
+
+        $max_attempts = 100;
+        $attempts = 0;
+        $success = false;
+
+        while (!$success && $attempts < $max_attempts) {
+            $dirname = uniqid('temp_');
+            $dirpath = $parent_dir['path'] . '/' . $dirname;
+            $success = mkdir($dirpath, 0700, false);
+            $attempts++;
+        }
+
+        return $success ? [
+            'name' => $dirname,
+            'path' => $dirpath,
+            'url' => $parent_dir['url'] . '/' . $dirname,
+        ] : null;
+    }
+
+    // https://stackoverflow.com/questions/4594180/deleting-all-files-from-a-folder-using-php
+    public static function deleteTempDirectory($dirpath)
+    {
+        $import_dir = self::getZipImportDirectory()['path'];
+
+        // TODO: Careful with this...
+        if (!empty($dirpath) && !empty($import_dir) && substr($dirpath, 0, strlen($import_dir)) === $import_dir) {
+            array_map('unlink', glob($dirpath . '/*.*'));
+            rmdir($dirpath);
+        }
     }
 }
