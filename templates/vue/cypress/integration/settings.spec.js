@@ -40,12 +40,13 @@ describe("Settings", () => {
   })
 
   it(`should be able to set a background image`, () => {
-    cy.server()
-    cy.route("POST", "**/async-upload.php").as("upload")
+    cy.intercept("POST", "**/async-upload.php").as("upload")
 
     cy.get("[name=async-upload]").attachFile("reddit.png")
     cy.wait("@upload")
-      .its("response.body.data.url")
+      .then(({ response }) => {
+        return JSON.parse(response.body).data.url
+      })
       .then(url => {
         cy.getByTestId("node-upload-input").should("have.value", url)
         cy.submitSettingsModal()
@@ -56,8 +57,7 @@ describe("Settings", () => {
   it(`should be able to duplicate a tapestry`, () => {
     cy.contains(/advanced/i).click()
 
-    cy.server()
-    cy.route("POST", "**/tapestries").as("duplicate")
+    cy.intercept("POST", "**/tapestries").as("duplicate")
 
     cy.contains(/duplicate tapestry/i).click()
     cy.getByTestId("spinner").should("be.visible")

@@ -464,7 +464,7 @@ export default {
       let parents = []
       let parentId
       let parent = this.parent
-      while (parent != null) {
+      while (parent != null && parent.mediaType == "multi-content") {
         parents.unshift(parent)
         parentId = this.getParent(parent.id)
         parent = parentId ? this.getNode(parentId) : null
@@ -655,6 +655,11 @@ export default {
           lng: "",
         }
       }
+      if (this.$route.query.popup && this.$route.query.popup == 1) {
+        copy.popup = {
+          time: 0,
+        }
+      }
       this.setCurrentEditingNode(copy)
       this.setTapestryErrorReporting(false)
     },
@@ -779,7 +784,7 @@ export default {
           this.$router.push({
             name: names.APP,
             params: { nodeId: this.nodeId },
-            query: { ...this.$route.query, nav: undefined },
+            query: { ...this.$route.query, nav: undefined, popup: undefined },
           })
         }
       }
@@ -824,6 +829,14 @@ export default {
 
         if (this.linkHasThumbnailData) {
           await this.setLinkData()
+        }
+
+        if (
+          this.node.mediaDuration &&
+          this.node.mediaType !== "video" &&
+          this.node.mediaType !== "h5p"
+        ) {
+          this.update("mediaDuration", undefined)
         }
 
         if (this.shouldReloadDuration()) {
@@ -1155,7 +1168,7 @@ export default {
     isValidVideo(typeData) {
       return (
         typeData.mediaURL !== "" &&
-        (typeData.hasOwnProperty("youtubeID") || typeData.mediaURL.endsWith(".mp4"))
+        (typeData.youtubeID !== undefined || typeData.mediaURL.endsWith(".mp4"))
       )
     },
     updateOrderingArray(arr) {
@@ -1178,6 +1191,7 @@ export default {
               "Would you like to use the link preview image as the thumbnail image?"
             )
           ) {
+            this.update("thumbnailFileId", "")
             this.update("imageURL", data.image)
           }
           if (
@@ -1185,6 +1199,7 @@ export default {
               "Would you like to use the link preview image as the locked thumbnail image?"
             )
           ) {
+            this.update("lockedThumbnailFileId", "")
             this.update("lockedImageURL", data.image)
           }
         }
@@ -1230,7 +1245,7 @@ export default {
       if (this.node.mediaType !== "video" && this.node.mediaType !== "h5p") {
         return false
       }
-      if (this.type === "add") {
+      if (this.type === "add" || !this.node.mediaDuration) {
         return true
       }
       const oldNode = this.getNode(this.nodeId)

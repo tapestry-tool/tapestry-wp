@@ -2,7 +2,7 @@
   "name": "tapestry-d3-vue",
   "description": "A Vue.js project",
   "version": "1.0.0",
-  "author": "Tapestry Team, University of British Coloumbia",
+  "author": "Tapestry Team, University of British Columbia",
   "license": "MIT",
   "private": true,
   "scripts": {
