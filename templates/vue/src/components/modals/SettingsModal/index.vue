@@ -124,8 +124,8 @@
                   variant="success"
                   style="margin-top: 1em;"
                 >
-                  Your Tapestry has been exported! Find the .json file in your
-                  downloads.
+                  Your Tapestry has been exported! Find the
+                  {{ exportedFileType }} file in your downloads.
                 </b-alert>
                 <b-alert
                   v-else
@@ -377,6 +377,7 @@ export default {
       exportFailed: false,
       isOptimizing: false,
       hasOptimized: false,
+      exportedFileType: "",
     }
   },
   computed: {
@@ -504,6 +505,7 @@ export default {
 
       this.isExporting = false
       this.hasExported = true
+      this.exportedFileType = ".json"
     },
     async exportTapestryAsZip() {
       // TODO: try to reduce duplication here
@@ -519,6 +521,7 @@ export default {
 
       this.isExporting = false
       this.hasExported = true
+      this.exportedFileType = ".zip"
     },
     showFileDownload(fileUrl, fileName) {
       const a = document.createElement("a")
