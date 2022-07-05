@@ -59,4 +59,56 @@ describe("Import Export", () => {
       nodes.forEach(node => cy.getNodeByTitle(node.title).should("exist"))
     })
   })
+
+  it("should not be able to import a file that is not zip or json", () => {
+    const invalidImportFile = "reddit.png"
+    cy.setup()
+
+    cy.getByTestId("import-file-input").attachFile(invalidImportFile)
+    cy.contains(/Please upload a JSON file or a ZIP file/i).should("be.visible")
+  })
+
+  it("should not be able to import a zip with no tapestry.json", () => {
+    const invalidImportFile = "no-tapestry-json.zip"
+    cy.setup()
+
+    cy.intercept("POST", "**/tapestries/**/import_zip").as("import")
+
+    cy.getByTestId("import-file-input").attachFile(invalidImportFile)
+    cy.wait("@import")
+    cy.contains(/Zip file is invalid/i).should("be.visible")
+  })
+
+  it("should not be able to import a zip where tapestry.json is not valid JSON", () => {
+    const invalidImportFile = "invalid-json-tapestry-json.zip"
+    cy.setup()
+
+    cy.intercept("POST", "**/tapestries/**/import_zip").as("import")
+
+    cy.getByTestId("import-file-input").attachFile(invalidImportFile)
+    cy.wait("@import")
+    cy.contains(/Tapestry data is invalid/i).should("be.visible")
+  })
+
+  it("should not be able to import a zip where tapestry.json is missing required fields", () => {
+    const invalidImportFile = "invalid-tapestry-json.zip"
+    cy.setup()
+
+    cy.intercept("POST", "**/tapestries/**/import_zip").as("import")
+
+    cy.getByTestId("import-file-input").attachFile(invalidImportFile)
+    cy.wait("@import")
+    cy.contains(/Tapestry data is invalid/i).should("be.visible")
+  })
+
+  it("should not be able to import a zip file with subdirectories", () => {
+    const invalidImportFile = "invalid-zip-structure.zip"
+    cy.setup()
+
+    cy.intercept("POST", "**/tapestries/**/import_zip").as("import")
+
+    cy.getByTestId("import-file-input").attachFile(invalidImportFile)
+    cy.wait("@import")
+    cy.contains(/Zip file is invalid/i).should("be.visible")
+  })
 })

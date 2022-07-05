@@ -146,7 +146,7 @@ export default {
           this.$bvModal.show("import-changelog")
         })
         .catch(err => {
-          this.error = err
+          this.error = err.response.data
         })
         .finally(() => {
           this.isImporting = false

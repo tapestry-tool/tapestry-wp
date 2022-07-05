@@ -387,7 +387,7 @@ function exportTapestryAsZip($request)
         }
         $tapestry = new Tapestry($postId);
         $tapestry_data = $tapestry->export();
-        $zip_url = TapestryHelpers::exportExternalMedia($tapestry_data);
+        $zip_url = TapestryHelpers::exportExternalMedia($tapestry_data, $postId);
 
         return (object) [
             'zipUrl' => $zip_url,
@@ -409,18 +409,18 @@ function importTapestryFromZip($request)
 
     try {
         if (!array_key_exists('file', $file_params)) {
-            throw new Exception('Zip file not found');
+            throw new TapestryError('INVALID_ZIP');
         }
         $zip_path = $file_params['file']['tmp_name'];
 
         $zip = new ZipArchive();
         if ($zip->open($zip_path, ZipArchive::RDONLY) !== true) {
-            throw new Exception('Could not open zip file');
+            throw new TapestryError('FAILED_TO_IMPORT');
         }
 
         $contents = $zip->getFromName('tapestry.json');
         if ($contents === false) {
-            throw new Exception('Could not read tapestry.json in zip file');
+            throw new TapestryError('INVALID_ZIP');
         }
 
         $tapestry_data = json_decode($contents);
@@ -435,10 +435,9 @@ function importTapestryFromZip($request)
 
         $temp_dir = TapestryHelpers::createTempDirectory($parent_dir);
         if (!$temp_dir) {
-            throw new Exception('Filesystem error');
+            throw new TapestryError('FAILED_TO_IMPORT');
         }
         $zip->extractTo($temp_dir['path']);
-        $zip->close();
 
         TapestryHelpers::importExternalMedia($tapestry_data, $temp_dir['path'], $temp_dir['url']);
 
@@ -455,6 +454,10 @@ function importTapestryFromZip($request)
         ];
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    } finally {
+        if ($zip) {
+            $zip->close();
+        }
     }
 }
 

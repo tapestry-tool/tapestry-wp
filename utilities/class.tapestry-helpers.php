@@ -3,6 +3,8 @@
 require_once dirname(__FILE__).'/class.tapestry-node-permissions.php';
 require_once dirname(__FILE__).'/../classes/class.tapestry-h5p.php';
 require_once dirname(__FILE__).'/../classes/class.constants.php';
+require_once ABSPATH . 'wp-admin/includes/export.php';
+require_once ABSPATH . 'wp-admin/includes/import.php';
 
 define(
     'H5P_DEFINED',
@@ -385,13 +387,13 @@ class TapestryHelpers
     public static function validateTapestryData($tapestry_data)
     {
         if (empty($tapestry_data)) {
-            throw new Exception('Invalid tapestry data: Not valid JSON');
+            throw new TapestryError('INVALID_TAPESTRY_DATA');
         }
 
         $properties = ['nodes', 'links', 'site-url'];
         foreach ($properties as $property) {
             if (!property_exists($tapestry_data, $property)) {
-                throw new Exception('Invalid tapestry data: Missing property ' . $property);
+                throw new TapestryError('INVALID_TAPESTRY_DATA');
             }
         }
     }
@@ -407,12 +409,12 @@ class TapestryHelpers
             if (basename($name) !== $name) {
                 // Zip structure should be flat
                 // This allows us to delete the temporary directory after extracting the zip later
-                throw new Exception('Invalid zip file');
+                throw new TapestryError('INVALID_ZIP');
             }
         }
     }
 
-    public static function exportExternalMedia($tapestry_data)
+    public static function exportExternalMedia($tapestry_data, $tapestry_post_id)
     {
         $result = self::_createExportZip();
         $zip = $result['path'];
@@ -426,6 +428,8 @@ class TapestryHelpers
                 self::_exportMedia($node->typeData->mediaURL, $zip);
             } elseif ($node->mediaType === 'activity') {
                 self::_exportActivityNode($node, $zip);
+            } elseif ($node->mediaType === 'wp-post') {
+                self::_exportWpPostNode($node, $zip, $tapestry_post_id);
             }
 
             self::_exportMedia($node->imageURL, $zip, $node->thumbnailFileId);
@@ -456,7 +460,7 @@ class TapestryHelpers
         $zip_url = $tapestry_export_dir['url'] . '/' . $zip_name;
 
         if ($zip->open($zip_path, ZipArchive::CREATE | ZipArchive::EXCL) !== true) {
-            throw new Exception('Could not open zip file ' . $zip_path);
+            throw new TapestryError('FAILED_TO_EXPORT');
         }
 
         return [
@@ -528,6 +532,37 @@ class TapestryHelpers
         $media_url = $media_name;
     }
 
+    private static function _exportWpPostNode($node, $zip, $tapestry_post_id)
+    {
+        $post_id = $node->typeData->mediaURL;
+        $temp_category_name = 'tapestry_export_' . $tapestry_post_id;
+
+        if (term_exists($temp_category_name)) {
+            // TODO: Do something if the category already exists (someone else exporting the tapestry as well, for example)
+            $category_id = get_cat_ID($temp_category_name);
+            wp_delete_term($category_id, 'category');
+        }
+
+        $category = wp_insert_term($temp_category_name, 'category');
+        $category_id = $category['term_id'];
+        $category_slug = get_category($category_id)->slug;
+
+        wp_set_post_categories($post_id, $category_id, true);
+
+        $buffer = ob_start();
+        export_wp([
+            'content' => 'post',
+            'category' => $category_slug,
+        ]);
+        $contents = ob_get_clean();
+
+        wp_delete_term($category_id, 'category');
+
+        $filename = $node->id . '-wppost' . $post_id . '.xml';
+        $zip->addFromString($filename, $contents);
+        $node->typeData->mediaURL = $filename;
+    }
+
     public static function importExternalMedia($tapestry_data, $temp_dir, $temp_url)
     {
         foreach ($tapestry_data->nodes as $node) {
@@ -537,6 +572,8 @@ class TapestryHelpers
                 self::_importMedia($node->typeData->mediaURL, $temp_dir);
             } elseif ($node->mediaType === 'activity') {
                 self::_importActivityNode($node, $temp_dir);
+            } elseif ($node->mediaType === 'wp-post') {
+                self::_importWpPostNode($node->typeData->mediaURL, $temp_dir);
             }
 
             self::_importMedia($node->imageURL, $temp_dir, true, $node->thumbnailFileId);
@@ -612,6 +649,10 @@ class TapestryHelpers
         if ($file_id !== null) {
             $file_id = $attachment_id;
         }
+    }
+
+    private static function _importWpPostNode(&$media_url, $temp_dir)
+    {
     }
 
     // Return the path to the local file if url is a local WordPress url, false otherwise
