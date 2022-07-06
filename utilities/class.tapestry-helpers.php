@@ -436,7 +436,7 @@ class TapestryHelpers
             self::_exportMedia($tapestry_data->settings->backgroundUrl, $zip);
         }
 
-        $zip->addFromString('tapestry.json', json_encode($tapestry_data));
+        $zip->addFromString('tapestry.json', json_encode($tapestry_data, JSON_PRETTY_PRINT));
         $zip->close();
 
         return $zip_url;
@@ -606,8 +606,12 @@ class TapestryHelpers
                 self::_importActivityNode($node, $temp_dir, $node_warnings);
             }
 
-            self::_importMedia($node->imageURL, $temp_dir, $node_warnings, true, $node->thumbnailFileId);
-            self::_importMedia($node->lockedImageURL, $temp_dir, $node_warnings, true, $node->lockedThumbnailFileId);
+            if (!empty($node->thumbnailFileId)) {
+                self::_importMedia($node->imageURL, $temp_dir, $node_warnings, true, $node->thumbnailFileId);
+            }
+            if (!empty($node->lockedThumbnailFileId)) {
+                self::_importMedia($node->lockedImageURL, $temp_dir, $node_warnings, true, $node->lockedThumbnailFileId);
+            }
 
             array_push($warnings['nodes'], [
                 'id' => $node->id,

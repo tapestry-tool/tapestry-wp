@@ -20,7 +20,7 @@
           for user groups were on the old site, but do not exist on this site and
           were removed. These also include user-specific permissions, which were all
           removed by default.
-          <ul>
+          <ul data-qa="import-removed-permissions">
             <li v-for="perm in changes.permissions" :key="perm">
               {{ perm }}
             </li>
@@ -38,8 +38,9 @@
             :items="nodeWarnings"
             :fields="['title', 'warnings']"
             thead-class="d-none"
+            data-qa="import-warnings-table"
           >
-            <template slot="bottom-row">
+            <template v-if="settingsWarnings.length" slot="bottom-row">
               <b-td><b>Tapestry Settings:</b></b-td>
               <b-td>
                 <li v-for="warning in settingsWarnings" :key="warning">
@@ -58,6 +59,9 @@
             Nodes with warnings have been imported as-is. Please edit them to check
             their contents.
           </p>
+        </div>
+        <div v-else>
+          No warnings were generated during import.
         </div>
         <div>
           Pressing "Confirm" will reload your page.
