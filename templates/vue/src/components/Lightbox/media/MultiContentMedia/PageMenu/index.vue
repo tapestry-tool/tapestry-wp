@@ -2,15 +2,14 @@
   <div>
     <transition name="slide-fade">
       <aside
-        v-show="node.fullscreen || opened"
+        v-show="menuVisible"
         ref="wrapper"
         :class="[
           'page-nav-wrapper',
           {
             lightbox: !node.fullscreen,
             fullscreen: node.fullscreen,
-            closed: !opened,
-            'is-unit-child': unitsMenuVisible,
+            'unit-child': unitsMenuVisible,
           },
         ]"
       >
@@ -52,7 +51,6 @@
               'mb-auto',
               {
                 fullscreen: node.fullscreen,
-                closed: !opened,
               },
             ]"
           >
@@ -130,6 +128,7 @@ export default {
   data() {
     return {
       opened: false,
+      browserWidth: Helpers.getBrowserWidth(),
     }
   },
   computed: {
@@ -168,14 +167,11 @@ export default {
     isFullScreen() {
       return this.fullScreen || this.node.fullscreen
     },
-    browserWidth() {
-      return Helpers.getBrowserWidth()
+    menuVisible() {
+      return this.opened || (this.node.fullscreen && this.browserWidth > 800)
     },
     unitsMenuVisible() {
-      if (!this.pages || this.parentNode.childOrdering.length <= 1) {
-        return false
-      }
-      return this.opened || (this.browserWidth > 800 && this.node.fullscreen)
+      return this.pages && this.parentNode.childOrdering.length > 1
     },
     pageMenuVisible() {
       return this.node.accessible && this.node.typeData.showNavBar
@@ -187,7 +183,17 @@ export default {
       return wpData.logoutUrl
     },
   },
+  mounted() {
+    this.computeBrowserWidth()
+    window.addEventListener("resize", this.computeBrowserWidth)
+  },
+  beforeDestroy() {
+    window.removeEventListener("resize", this.computeBrowserWidth)
+  },
   methods: {
+    computeBrowserWidth() {
+      this.browserWidth = Helpers.getBrowserWidth()
+    },
     disabledRow(node) {
       const index = this.rows.findIndex(row => row.node.id === node.id)
       return (
@@ -247,7 +253,6 @@ export default {
 
 .page-nav-wrapper {
   position: relative;
-  transition: width 0.2s ease-in-out;
   z-index: 0;
   min-width: 200px;
 
@@ -264,20 +269,12 @@ export default {
     margin: -24px 24px 0 -24px;
     z-index: 11;
 
-    &.closed {
-      @media screen and (max-width: 800px) {
-        min-width: 0;
-        width: 0;
-
-        .page-nav {
-          padding: 0;
-          width: 0;
-        }
-      }
+    .page-nav {
+      padding: 4rem 1.5rem 3rem 1.5rem;
     }
   }
 
-  &.is-unit-child {
+  &.unit-child {
     width: 250px;
     max-width: 25vw;
   }
@@ -286,7 +283,6 @@ export default {
     color: #ffffff;
     background: #5d656c;
     padding: 2.2rem 1.5rem;
-    transition: width 0.2s ease-in-out;
     font-size: 14px;
     text-align: left;
     overflow-y: auto;
@@ -306,18 +302,6 @@ export default {
         margin-top: 9em;
       }
 
-      &.fullscreen {
-        &.closed {
-          @media screen and (max-width: 800px) {
-            display: none;
-          }
-
-          @media screen and (min-width: 801px) {
-            display: block;
-          }
-        }
-      }
-
       .page-menu-items {
         margin-left: 2em;
         margin-right: -0.5em;
@@ -330,16 +314,87 @@ export default {
   }
 }
 
-.slide-fade-enter-active,
+$slide-fade-speed: 0.3s;
+
+.slide-fade-enter-active {
+  white-space: nowrap;
+
+  &:not(.unit-child) {
+    animation: slide-fade $slide-fade-speed ease;
+
+    &.page-nav {
+      animation: slide-fade $slide-fade-speed ease;
+    }
+  }
+  &.unit-child {
+    animation: slide-fade-unit-child $slide-fade-speed ease;
+
+    &.page-nav {
+      animation: slide-fade-unit-child $slide-fade-speed ease;
+    }
+  }
+}
 .slide-fade-leave-active {
-  transition: all 0.3s ease;
+  white-space: nowrap;
+
+  &:not(.unit-child) {
+    animation: slide-fade $slide-fade-speed ease reverse;
+
+    &.page-nav {
+      animation: slide-fade $slide-fade-speed ease reverse;
+    }
+  }
+  &.unit-child {
+    animation: slide-fade-unit-child $slide-fade-speed ease reverse;
+
+    &.page-nav {
+      animation: slide-fade-unit-child $slide-fade-speed ease reverse;
+    }
+  }
 }
 
+/*
+.slide-fade-enter-active,
+.slide-fade-leave-active {
+  transition: all 3s ease;
+}
 .slide-fade-enter,
 .slide-fade-leave-to {
-  min-width: 20px;
-  max-width: 20px;
+  min-width: 5px;
+  max-width: 5px;
   opacity: 0;
+
+  &.page-nav {
+    min-width: 5px;
+    max-width: 5px;
+  }
+}
+*/
+
+@keyframes slide-fade {
+  from {
+    min-width: 5px;
+    width: 5px;
+    opacity: 0;
+  }
+  to {
+    min-width: 200px;
+    width: 200px;
+    opacity: 1;
+  }
+}
+
+@keyframes slide-fade-unit-child {
+  from {
+    min-width: 5px;
+    width: 5px;
+    opacity: 0;
+  }
+  to {
+    width: 250px;
+    max-width: 25vw;
+    opacity: 1;
+  }
 }
 </style>
 
