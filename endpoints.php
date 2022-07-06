@@ -439,7 +439,7 @@ function importTapestryFromZip($request)
         }
         $zip->extractTo($temp_dir['path']);
 
-        TapestryHelpers::importExternalMedia($tapestry_data, $temp_dir['path'], $temp_dir['url']);
+        $importWarnings = TapestryHelpers::importExternalMedia($tapestry_data, $temp_dir['path'], $temp_dir['url']);
 
         TapestryHelpers::deleteTempDirectory($temp_dir['path']);
 
@@ -450,6 +450,7 @@ function importTapestryFromZip($request)
                 'permissions' => $changedPermissions,
                 'noChange' => count($changedPermissions) === 0,
             ],
+            'warnings' => $importWarnings,
             'tapestry' => $importedTapestry,
         ];
     } catch (TapestryError $e) {

@@ -565,39 +565,58 @@ class TapestryHelpers
 
     public static function importExternalMedia($tapestry_data, $temp_dir, $temp_url)
     {
+        $warnings = [
+            'nodes' => [],
+            'settings' => [],
+        ];
+
         foreach ($tapestry_data->nodes as $node) {
+            $node_warnings = [];
+
             if ($node->mediaType === 'h5p') {
-                self::_importH5PNode($node, $temp_url);
+                self::_importH5PNode($node, $temp_dir, $temp_url, $node_warnings);
             } elseif ($node->mediaType === 'video') {
-                self::_importMedia($node->typeData->mediaURL, $temp_dir);
+                self::_importMedia($node->typeData->mediaURL, $temp_dir, $node_warnings);
             } elseif ($node->mediaType === 'activity') {
-                self::_importActivityNode($node, $temp_dir);
+                self::_importActivityNode($node, $temp_dir, $node_warnings);
             } elseif ($node->mediaType === 'wp-post') {
-                self::_importWpPostNode($node->typeData->mediaURL, $temp_dir);
+                self::_importWpPostNode($node->typeData->mediaURL, $temp_dir, $node_warnings);
             }
 
-            self::_importMedia($node->imageURL, $temp_dir, true, $node->thumbnailFileId);
-            self::_importMedia($node->lockedImageURL, $temp_dir, true, $node->lockedThumbnailFileId);
+            self::_importMedia($node->imageURL, $temp_dir, $node_warnings, true, $node->thumbnailFileId);
+            self::_importMedia($node->lockedImageURL, $temp_dir, $node_warnings, true, $node->lockedThumbnailFileId);
 
-            self::_importMedia($tapestry_data->settings->backgroundUrl, $temp_dir);
+            array_push($warnings['nodes'], [
+                'id' => $node->id,
+                'title' => $node->title,
+                'warnings' => $node_warnings,
+            ]);
         }
+
+        self::_importMedia($tapestry_data->settings->backgroundUrl, $temp_dir, $warnings['settings']);
 
         // TODO: this doesn't work, probably because we're not logged in
         // The filtered parameters will be rebuilt upon a request to admin-ajax.php?action=h5p_embed&id=<ID>
         // (e.g. when the H5P node is opened), but it's not guaranteed that the user will do this first
         do_action('wp_ajax_h5p_rebuild_cache');
 
-        return $tapestry_data;
+        return $warnings;
     }
 
-    private static function _importH5PNode($node, $temp_url)
+    private static function _importH5PNode($node, $temp_dir, $temp_url, &$warnings)
     {
         if (empty(H5P_DEFINED)) {
-            error_log('Warning: Could not import H5P node: H5P plugin files not found.');
+            array_push($warnings, 'Could not import H5P node: H5P plugin files not found.');
             return;
         }
 
         $filename = $node->typeData->mediaURL;
+        $temp_filepath = $temp_dir.'/'.$filename;
+        if (!file_exists($temp_filepath) || !is_file($temp_filepath)) {
+            // File does not exist locally; skip
+            array_push($warnings, 'File "' . $filename . '" not found in zip');
+            return;
+        }
 
         // TODO: this may be slow because it's fetching an external URL
         // TODO: this is not creating the h5p export file or the h5p details (`filtered` column in database)
@@ -606,33 +625,40 @@ class TapestryHelpers
             $h5p_id = H5P_Plugin::get_instance()->fetch_h5p($temp_url.'/'.$filename);
             $node->typeData->mediaURL = admin_url('admin-ajax.php') . '?action=h5p_embed&id=' . $h5p_id;
         } catch (Exception $e) {
-            error_log('Warning: Could not import H5P node due to error: ' . $e->getMessage() . "\n" . $e->getTraceAsString());
+            array_push($warnings, 'Could not import H5P node due to error: ' . $e->getMessage());
         }
     }
 
-    private static function _importActivityNode($node, $temp_dir)
+    private static function _importActivityNode($node, $temp_dir, &$warnings)
     {
         foreach ($node->typeData->activity->questions as $question) {
             $multiple_choice = $question->answerTypes->multipleChoice;
             if ($multiple_choice->enabled && $multiple_choice->useImages && isset($multiple_choice->choices)) {
                 foreach ($multiple_choice->choices as $choice) {
-                    self::_importMedia($choice->imageUrl, $temp_dir);
+                    self::_importMedia($choice->imageUrl, $temp_dir, $warnings);
                 }
             }
 
             $drag_drop = $question->answerTypes->dragDrop;
             if ($drag_drop->enabled && $drag_drop->useImages && isset($drag_drop->items)) {
                 foreach ($drag_drop->items as $item) {
-                    self::_importMedia($item->imageUrl, $temp_dir);
+                    self::_importMedia($item->imageUrl, $temp_dir, $warnings);
                 }
             }
         }
     }
 
-    private static function _importMedia(&$media_url, $temp_dir, $generate_metadata = false, &$file_id = null)
+    private static function _importMedia(&$media_url, $temp_dir, &$warnings, $generate_metadata = false, &$file_id = null)
     {
         if (empty($media_url) || filter_var($media_url, FILTER_VALIDATE_URL)) {
             // Is empty or an external URL
+            return;
+        }
+
+        $temp_filepath = $temp_dir.'/'.$media_url;
+        if (!file_exists($temp_filepath) || !is_file($temp_filepath)) {
+            // File does not exist locally; skip
+            array_push($warnings, 'File "' . $media_url . '" not found in zip');
             return;
         }
 
@@ -641,7 +667,7 @@ class TapestryHelpers
         $new_filepath = $upload_dir['path'].'/'.$new_filename;
 
         // Move file to uploads directory
-        rename($temp_dir.'/'.$media_url, $new_filepath);
+        rename($temp_filepath, $new_filepath);
 
         $attachment_id = self::_createAttachment($new_filepath, $generate_metadata);
         $media_url = wp_get_attachment_url($attachment_id);
