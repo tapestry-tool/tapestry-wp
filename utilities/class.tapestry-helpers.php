@@ -604,8 +604,6 @@ class TapestryHelpers
                 self::_importMedia($node->typeData->mediaURL, $temp_dir, $node_warnings);
             } elseif ($node->mediaType === 'activity') {
                 self::_importActivityNode($node, $temp_dir, $node_warnings);
-            } elseif ($node->mediaType === 'wp-post') {
-                self::_importWpPostNode($node->typeData->mediaURL, $temp_dir, $node_warnings);
             }
 
             self::_importMedia($node->imageURL, $temp_dir, $node_warnings, true, $node->thumbnailFileId);
@@ -702,13 +700,13 @@ class TapestryHelpers
         }
     }
 
-    private static function _importWpPostNode(&$media_url, $temp_dir, &$warnings)
+    public static function tryUpdateWpPostId(&$media_url)
     {
         $old_post_id = $media_url;
 
         $query_args = array(
             'meta_key' => 'tapestry_export_old_post_id',
-            'meta_value' => $media_url,
+            'meta_value' => $old_post_id,
         );
         $query = new WP_Query($query_args);
 
@@ -719,8 +717,6 @@ class TapestryHelpers
             $media_url = $new_post_id;
 
             wp_reset_postdata();
-        } else {
-            array_push($warnings, 'Could not find an imported WordPress post with original ID ' . $old_post_id);
         }
     }
 

@@ -666,9 +666,13 @@ function importTapestry($postId, $tapestryData)
                 }
             }
 
-            if ($node->mediaType === "answer") {
+            if ($node->mediaType === 'answer') {
                 $oldActivityNodeId = $oldNode->typeData->activityId;
                 $node->typeData->activityId = $idMap->$oldActivityNodeId;
+            } else if ($node->mediaType === 'wp-post') {
+                // We are requiring the user to import WordPress posts independently
+                // The post may have a different ID after import, so try to get the new post ID
+                TapestryHelpers::tryUpdateWpPostId($node->typeData->mediaURL);
             }
 
             $tapestryNode->set($node);
