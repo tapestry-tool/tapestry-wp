@@ -322,6 +322,14 @@ $REST_API_ENDPOINTS = [
             'permission_callback' => 'TapestryPermissions::putTapestrySettings',
         ],
     ],
+    'GET_TAPESTRY_EXPORT_WP_POSTS' => (object) [
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/export_wp_posts',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => 'exportWpPostsInTapestry',
+            'permission_callback' => 'TapestryPermissions::putTapestrySettings',
+        ],
+    ],
     'IMPORT_ZIP' => (object) [
         'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/import_zip',
         'ARGUMENTS' => [
@@ -391,6 +399,25 @@ function exportTapestryAsZip($request)
 
         return (object) [
             'zipUrl' => $zip_url,
+        ];
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+function exportWpPostsInTapestry($request)
+{
+    $postId = $request['tapestryPostId'];
+
+    try {
+        if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+        $tapestry = new Tapestry($postId);
+        $contents = TapestryHelpers::exportWpPostsInTapestry($tapestry);
+
+        return [
+            'wxrContents' => $contents,
         ];
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());

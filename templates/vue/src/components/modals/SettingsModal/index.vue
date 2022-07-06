@@ -88,20 +88,45 @@
           :active="tab === 'advanced'"
           @click="$emit('change:tab', 'advanced')"
         >
-          <b-form-group
-            label="Export/Duplicate"
-            description="Export your tapestry to a file and then you can import it on another site.
-              Duplicating will create a copy of this tapestry on this site."
-          >
+          <b-form-group label="Export Tapestry">
+            <template #description>
+              Export your tapestry to a file and then you can import it on another
+              site.
+              <br />
+              If your Tapestry includes WordPress post nodes, they must be exported
+              separately. To export, export both the WordPress posts and the
+              Tapestry. To import, first import the WordPress posts by going to Tools
+              -> Import in the WordPress dashboard, then import the Tapestry.
+            </template>
             <b-row class="mb-2">
               <b-col>
+                <b-button
+                  block
+                  variant="light"
+                  :class="{
+                    'export-button': true,
+                    'mb-1': true,
+                    disabled: isExporting,
+                  }"
+                  :disabled="isExportingWpPosts"
+                  @click="exportWpPostsInTapestry"
+                >
+                  <b-spinner v-if="isExportingWpPosts" small></b-spinner>
+                  <div :style="isExportingWpPosts ? 'opacity: 50%;' : ''">
+                    Export All WordPress Posts
+                  </div>
+                </b-button>
+              </b-col>
+              <b-col>
                 <b-dropdown
-                  id="export-button"
                   block
                   split
                   variant="light"
                   menu-class="w-100"
-                  :class="isExporting ? 'disabled' : ''"
+                  :split-class="{
+                    'export-button': true,
+                    disabled: isExporting,
+                  }"
                   :disabled="isExporting"
                   @click="exportTapestry"
                 >
@@ -115,31 +140,35 @@
                     Export as JSON
                   </b-dropdown-item-button>
                   <b-dropdown-item-button @click="exportTapestryAsZip">
-                    Export as ZIP
+                    Export as ZIP (include uploaded media)
                   </b-dropdown-item-button>
                 </b-dropdown>
-                <b-alert
-                  v-if="apiError == null"
-                  :show="hasExported"
-                  variant="success"
-                  style="margin-top: 1em;"
-                >
-                  Your Tapestry has been exported! Find the
-                  {{ exportedFileType }} file in your downloads.
-                </b-alert>
-                <b-alert
-                  v-else
-                  :show="hasExported"
-                  variant="danger"
-                  style="margin-top: 1em;"
-                >
-                  {{ apiError.error }}
-                </b-alert>
-              </b-col>
-              <b-col>
-                <duplicate-tapestry-button />
               </b-col>
             </b-row>
+            <b-alert
+              v-if="apiError == null"
+              :show="hasExported"
+              variant="success"
+              style="margin-top: 1em;"
+            >
+              Your content has been exported! Find the
+              {{ exportedFileType }} file in your downloads.
+            </b-alert>
+            <b-alert
+              v-else
+              :show="hasExported"
+              variant="danger"
+              style="margin-top: 1em;"
+            >
+              {{ apiError.error }}
+            </b-alert>
+          </b-form-group>
+          <b-form-group
+            class="mt-4"
+            label="Duplicate Tapestry"
+            description="Duplicating will create a copy of this tapestry on this site."
+          >
+            <duplicate-tapestry-button />
           </b-form-group>
           <b-form-group
             class="mt-4"
@@ -367,6 +396,7 @@ export default {
       showAcceptedHighlight: true,
       defaultDepth: 3,
       isExporting: false,
+      isExportingWpPosts: false,
       renderImages: true,
       analyticsEnabled: false,
       draftNodesEnabled: true,
@@ -429,7 +459,11 @@ export default {
     })
   },
   methods: {
-    ...mapActions(["getTapestryExport", "getTapestryExportAsZip"]),
+    ...mapActions([
+      "getTapestryExport",
+      "getTapestryExportAsZip",
+      "getWpPostsExport",
+    ]),
     closeModal() {
       this.$emit("close")
     },
@@ -506,6 +540,26 @@ export default {
       this.isExporting = false
       this.hasExported = true
       this.exportedFileType = ".json"
+    },
+    async exportWpPostsInTapestry() {
+      this.isExportingWpPosts = true
+      const exportedPosts = await this.getWpPostsExport()
+      if (!exportedPosts) {
+        this.isExportingWpPosts = false
+        this.hasExported = true
+        return
+      }
+
+      const blob = new Blob([exportedPosts.wxrContents], {
+        type: "application/xml",
+      })
+      const fileUrl = URL.createObjectURL(blob)
+      this.showFileDownload(fileUrl, `${this.settings.title}-WP-Posts.xml`)
+      URL.revokeObjectURL(fileUrl)
+
+      this.isExportingWpPosts = false
+      this.hasExported = true
+      this.exportedFileType = ".xml"
     },
     async exportTapestryAsZip() {
       // TODO: try to reduce duplication here
@@ -589,7 +643,7 @@ export default {
   justify-content: center;
 }
 
-[id^="export-button"] {
+.export-button {
   position: relative;
   > span {
     position: absolute;

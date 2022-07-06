@@ -84,6 +84,12 @@ class TapestryApi {
     return response.data
   }
 
+  async getWpPostsExport() {
+    const url = `/tapestries/${this.postId}/export_wp_posts`
+    const response = await this.client.get(url)
+    return response.data
+  }
+
   async getTapestryExportAsZip() {
     const url = `/tapestries/${this.postId}/export_zip`
     const response = await this.client.get(url)

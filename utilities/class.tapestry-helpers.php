@@ -428,8 +428,6 @@ class TapestryHelpers
                 self::_exportMedia($node->typeData->mediaURL, $zip);
             } elseif ($node->mediaType === 'activity') {
                 self::_exportActivityNode($node, $zip);
-            } elseif ($node->mediaType === 'wp-post') {
-                self::_exportWpPostNode($node, $zip, $tapestry_post_id);
             }
 
             self::_exportMedia($node->imageURL, $zip, $node->thumbnailFileId);
@@ -532,35 +530,62 @@ class TapestryHelpers
         $media_url = $media_name;
     }
 
-    private static function _exportWpPostNode($node, $zip, $tapestry_post_id)
+    public static function exportWpPostsInTapestry($tapestry)
     {
-        $post_id = $node->typeData->mediaURL;
-        $temp_category_name = 'tapestry_export_' . $tapestry_post_id;
+        $post_ids = [];
 
-        if (term_exists($temp_category_name)) {
-            // TODO: Do something if the category already exists (someone else exporting the tapestry as well, for example)
-            $category_id = get_cat_ID($temp_category_name);
-            wp_delete_term($category_id, 'category');
+        foreach ($tapestry->getNodeIds() as $nodeId) {
+            $node = $tapestry->getNode($nodeId)->get();
+            if ($node->mediaType === 'wp-post') {
+                array_push($post_ids, $node->typeData->mediaURL);
+            }
         }
 
-        $category = wp_insert_term($temp_category_name, 'category');
+        return self::_exportWpPosts($post_ids);
+    }
+
+    private static function _exportWpPosts($post_ids)
+    {
+        $category = self::_getUniqueCategory();
+        if (!$category) {
+            throw new TapestryError('FAILED_TO_EXPORT');
+        }
+
         $category_id = $category['term_id'];
+        foreach ($post_ids as $post_id) {
+            if ((int)$post_id > 0) {
+                wp_set_post_categories($post_id, $category_id, true);
+                update_post_meta($post_id, 'tapestry_export_old_post_id', $post_id);
+            }
+        }
+
         $category_slug = get_category($category_id)->slug;
-
-        wp_set_post_categories($post_id, $category_id, true);
-
         $buffer = ob_start();
         export_wp([
             'content' => 'post',
             'category' => $category_slug,
         ]);
-        $contents = ob_get_clean();
+        $export_contents = ob_get_clean();
 
         wp_delete_term($category_id, 'category');
 
-        $filename = $node->id . '-wppost' . $post_id . '.xml';
-        $zip->addFromString($filename, $contents);
-        $node->typeData->mediaURL = $filename;
+        return $export_contents;
+    }
+
+    private static function _getUniqueCategory()
+    {
+        $max_attempts = 100;
+        $attempts = 0;
+        $success = false;
+
+        while (!$success && $attempts < $max_attempts) {
+            $category_name = uniqid('tapestry_export_');
+            $result = wp_insert_term($category_name, 'category');
+            $success = !is_wp_error($result);
+            $attempts++;
+        }
+
+        return $success ? $result : null;
     }
 
     public static function importExternalMedia($tapestry_data, $temp_dir, $temp_url)
@@ -677,8 +702,26 @@ class TapestryHelpers
         }
     }
 
-    private static function _importWpPostNode(&$media_url, $temp_dir)
+    private static function _importWpPostNode(&$media_url, $temp_dir, &$warnings)
     {
+        $old_post_id = $media_url;
+
+        $query_args = array(
+            'meta_key' => 'tapestry_export_old_post_id',
+            'meta_value' => $media_url,
+        );
+        $query = new WP_Query($query_args);
+
+        if ($query->have_posts()) {
+            $query->the_post();
+
+            $new_post_id = get_the_ID();
+            $media_url = $new_post_id;
+
+            wp_reset_postdata();
+        } else {
+            array_push($warnings, 'Could not find an imported WordPress post with original ID ' . $old_post_id);
+        }
     }
 
     // Return the path to the local file if url is a local WordPress url, false otherwise
