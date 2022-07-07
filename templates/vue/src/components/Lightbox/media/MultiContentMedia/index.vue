@@ -8,6 +8,7 @@
     <header>
       <h1
         v-if="showTitle"
+        :id="context === 'lightbox' ? 'lightboxTitle' : ''"
         :class="{
           title: true,
           'nested-media-title': context === 'multi-content',
@@ -32,10 +33,12 @@
       v-if="showCompletion"
       :node-id="node.id"
       :allow-close="false"
+      aria-labelledby="confirmationTitle"
+      aria-describedby="confirmationBody"
       @close="handleCancel"
     >
-      <h1>{{ node.typeData.confirmationTitleText }}</h1>
-      <p>{{ node.typeData.confirmationBodyText }}</p>
+      <h1 id="confirmationTitle">{{ node.typeData.confirmationTitleText }}</h1>
+      <p id="confirmationBody">{{ node.typeData.confirmationBodyText }}</p>
       <div class="button-container">
         <button class="button-completion" @click="handleClose">
           <i class="far fa-arrow-alt-circle-right fa-4x"></i>

@@ -15,6 +15,7 @@
     <multi-content-media
       v-if="node.mediaType === 'multi-content'"
       id="multicontent-container"
+      context="lightbox"
       :node="node"
       :row-id="rowId"
       @close="handleAutoClose"

@@ -1,5 +1,5 @@
 <template>
-  <div class="modal-container">
+  <div class="modal-container" role="dialog">
     <div v-if="allowClose" class="overlay" @click="$emit('close')"></div>
     <transition name="modal">
       <div v-if="load" class="content" :style="contentContainerStyle">

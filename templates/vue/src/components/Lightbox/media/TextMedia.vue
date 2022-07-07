@@ -1,6 +1,10 @@
 <template>
   <article :class="'article context-' + context">
-    <h1 v-if="showTitle" tabindex="0">
+    <h1
+      v-if="showTitle"
+      :id="context === 'lightbox' ? 'lightboxTitle' : ''"
+      tabindex="0"
+    >
       {{ node.title }}
       <completed-icon :node="node" class="mx-2" />
     </h1>
