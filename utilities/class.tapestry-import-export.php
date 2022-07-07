@@ -437,16 +437,14 @@ class TapestryImportExport
         $wp_upload_dir_path = $wp_upload_dir['basedir'] . '/';
         $wp_upload_dir_url = $wp_upload_dir['baseurl'] . '/';
 
-        if (substr($url, 0, strlen($wp_upload_dir_url)) === $wp_upload_dir_url) {
-            // TODO: is there a less error-prone way to do this?
+        if (self::_stringStartsWith($url, $wp_upload_dir_url)) {
             $path = $wp_upload_dir_path . substr($url, strlen($wp_upload_dir_url));
-
             return $path;
         }
         return false;
     }
 
-    public static function _getZipExportDirectory()
+    private static function _getZipExportDirectory()
     {
         $upload_dir = wp_upload_dir();
         return [
@@ -455,7 +453,7 @@ class TapestryImportExport
         ];
     }
 
-    public static function _getZipImportDirectory()
+    private static function _getZipImportDirectory()
     {
         $upload_dir = wp_upload_dir();
         return [
@@ -465,6 +463,7 @@ class TapestryImportExport
     }
 
     // Delete all export files in the export directory older than 1 day
+    // Returns number of files successfully deleted
     public static function clearExportedZips()
     {
         $deleted_count = 0;
@@ -478,8 +477,7 @@ class TapestryImportExport
             foreach ($files as $file) {
                 if (is_file($file)) {
                     if (filemtime($file) + $one_day <= $now) {
-                        unlink($file);
-                        $deleted_count++;
+                        $deleted_count += unlink($file);
                     }
                 } 
             }
@@ -492,12 +490,6 @@ class TapestryImportExport
     public static function createTempDirectory()
     {
         $parent_dir = self::_getZipImportDirectory();
-        if (!file_exists($parent_dir['path'])) {
-            if (!mkdir($parent_dir['path'], 0755, true)) {
-                throw new TapestryError('FAILED_TO_IMPORT');
-            }
-        }
-
         $max_attempts = 100;
         $attempts = 0;
         $success = false;
@@ -505,12 +497,11 @@ class TapestryImportExport
         while (!$success && $attempts < $max_attempts) {
             $dirname = uniqid('temp_');
             $dirpath = $parent_dir['path'] . '/' . $dirname;
-            $success = mkdir($dirpath, 0700, false);
+            $success = mkdir($dirpath, 0755, true);
             $attempts++;
         }
 
         return $success ? [
-            'name' => $dirname,
             'path' => $dirpath,
             'url' => $parent_dir['url'] . '/' . $dirname,
         ] : null;
@@ -521,10 +512,14 @@ class TapestryImportExport
     {
         $import_dir = self::_getZipImportDirectory()['path'];
 
-        // TODO: Careful with this...
-        if (!empty($dirpath) && !empty($import_dir) && substr($dirpath, 0, strlen($import_dir)) === $import_dir) {
+        if (!empty($dirpath) && !empty($import_dir) && self::_stringStartsWith($dirpath, $import_dir)) {
             array_map('unlink', glob($dirpath . '/*.*'));
             rmdir($dirpath);
         }
+    }
+
+    private static function _stringStartsWith($str, $start)
+    {
+        return substr($str, 0, strlen($start)) === $start;
     }
 }
