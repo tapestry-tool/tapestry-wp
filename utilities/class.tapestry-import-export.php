@@ -230,6 +230,8 @@ class TapestryImportExport
 
     private static function _exportWpPosts($post_ids)
     {
+        $site_url = get_bloginfo('url');
+
         $category = self::_createUniqueCategory();
         if (!$category) {
             throw new TapestryError('FAILED_TO_EXPORT');
@@ -239,7 +241,8 @@ class TapestryImportExport
         foreach ($post_ids as $post_id) {
             if ($post_id > 0) {
                 wp_set_post_categories($post_id, $category_id, true);
-                update_post_meta($post_id, 'tapestry_export_old_post_id', $post_id);
+                $site_and_post_id = $site_url . '-' . $post_id;
+                update_post_meta($post_id, 'tapestry_export_old_post_id', $site_and_post_id);
             }
         }
 
@@ -392,11 +395,13 @@ class TapestryImportExport
 
     public static function tryUpdateWpPostId(&$media_url)
     {
+        $site_url = get_bloginfo('url');
         $old_post_id = $media_url;
+        $site_and_post_id = $site_url . '-' . $old_post_id;
 
         $query_args = array(
             'meta_key' => 'tapestry_export_old_post_id',
-            'meta_value' => $old_post_id,
+            'meta_value' => $site_and_post_id,
         );
         $query = new WP_Query($query_args);
 
