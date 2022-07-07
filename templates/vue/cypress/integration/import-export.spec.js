@@ -6,7 +6,7 @@ describe("Import Export", () => {
 
     cy.get(".settings-button").click()
     cy.contains(/advanced/i).click()
-    cy.get("#export-button").click()
+    cy.getByTestId("export-tapestry-button").click()
 
     cy.wait("@export")
       .its("response.body")

@@ -48,7 +48,7 @@ describe("Settings", () => {
 
     cy.intercept("POST", "**/tapestries").as("duplicate")
 
-    cy.contains(/duplicate tapestry/i).click()
+    cy.getByTestId("duplicate-tapestry-button").click()
     cy.getByTestId("spinner").should("be.visible")
     cy.wait("@duplicate")
 

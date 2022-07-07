@@ -123,6 +123,7 @@
                   split
                   variant="light"
                   menu-class="w-100"
+                  data-qa="export-tapestry-button"
                   :split-class="{
                     'export-button': true,
                     disabled: isExporting,
