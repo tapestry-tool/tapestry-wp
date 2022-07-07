@@ -12,6 +12,9 @@ require_once __DIR__.'/classes/class.tapestry-audio.php';
 require_once __DIR__.'/classes/class.tapestry-h5p.php';
 require_once __DIR__.'/classes/class.constants.php';
 require_once __DIR__.'/utilities/class.tapestry-user.php';
+require_once __DIR__.'/utilities/class.tapestry-import-export.php';
+require_once __DIR__.'/utilities/class.tapestry-errors.php';
+require_once __DIR__.'/utilities/class.tapestry-helpers.php';
 
 $REST_API_NAMESPACE = 'tapestry-tool/v1';
 
@@ -395,7 +398,7 @@ function exportTapestryAsZip($request)
         }
         $tapestry = new Tapestry($postId);
         $tapestry_data = $tapestry->export();
-        $zip_url = TapestryHelpers::exportExternalMedia($tapestry_data, $postId);
+        $zip_url = TapestryImportExport::exportExternalMedia($tapestry_data);
 
         return (object) [
             'zipUrl' => $zip_url,
@@ -414,7 +417,7 @@ function exportWpPostsInTapestry($request)
             throw new TapestryError('INVALID_POST_ID');
         }
         $tapestry = new Tapestry($postId);
-        $contents = TapestryHelpers::exportWpPostsInTapestry($tapestry);
+        $contents = TapestryImportExport::exportWpPostsInTapestry($tapestry);
 
         return [
             'wxrContents' => $contents,
@@ -436,7 +439,7 @@ function importTapestryFromZip($request)
 
     try {
         if (!array_key_exists('file', $file_params)) {
-            throw new TapestryError('INVALID_ZIP');
+            throw new TapestryError('INVALID_ZIP', 'Could not find zip file');
         }
         $zip_path = $file_params['file']['tmp_name'];
 
@@ -447,28 +450,28 @@ function importTapestryFromZip($request)
 
         $contents = $zip->getFromName('tapestry.json');
         if ($contents === false) {
-            throw new TapestryError('INVALID_ZIP');
+            throw new TapestryError('INVALID_ZIP', 'Could not find tapestry.json in zip');
         }
 
         $tapestry_data = json_decode($contents);
-        TapestryHelpers::validateTapestryData($tapestry_data);
-        TapestryHelpers::validateTapestryZipStructure($zip);
+        TapestryImportExport::validateTapestryData($tapestry_data);
+        TapestryImportExport::validateTapestryZipStructure($zip);
 
         $changedPermissions = [];
         $wpUrl = get_bloginfo('url');
         if ($tapestry_data->{'site-url'} !== $wpUrl) {
-            $changedPermissions = TapestryHelpers::prepareImport($tapestry_data);
+            $changedPermissions = TapestryImportExport::prepareImport($tapestry_data);
         }
 
-        $temp_dir = TapestryHelpers::createTempDirectory($parent_dir);
+        $temp_dir = TapestryImportExport::createTempDirectory($parent_dir);
         if (!$temp_dir) {
             throw new TapestryError('FAILED_TO_IMPORT');
         }
         $zip->extractTo($temp_dir['path']);
 
-        $importWarnings = TapestryHelpers::importExternalMedia($tapestry_data, $temp_dir['path'], $temp_dir['url']);
+        $importWarnings = TapestryImportExport::importExternalMedia($tapestry_data, $temp_dir['path'], $temp_dir['url']);
 
-        TapestryHelpers::deleteTempDirectory($temp_dir['path']);
+        TapestryImportExport::deleteTempDirectory($temp_dir['path']);
 
         $importedTapestry = importTapestry($postId, $tapestry_data);
 
@@ -486,6 +489,7 @@ function importTapestryFromZip($request)
         if ($zip) {
             $zip->close();
         }
+        // TODO: delete temp directory here, for good measure
     }
 }
 
@@ -601,12 +605,12 @@ function putTapestry($request)
     $postId = $request['tapestryPostId'];
     $tapestryData = json_decode($request->get_body());
     try {
-        TapestryHelpers::validateTapestryData($tapestryData);
+        TapestryImportExport::validateTapestryData($tapestryData);
 
         $changedPermissions = [];
         $wpUrl = get_bloginfo('url');
         if ($tapestryData->{'site-url'} !== $wpUrl) {
-            $changedPermissions = TapestryHelpers::prepareImport($tapestryData);
+            $changedPermissions = TapestryImportExport::prepareImport($tapestryData);
         }
 
         $importedTapestry = importTapestry($postId, $tapestryData);
@@ -672,7 +676,7 @@ function importTapestry($postId, $tapestryData)
             } else if ($node->mediaType === 'wp-post') {
                 // We are requiring the user to import WordPress posts independently
                 // The post may have a different ID after import, so try to get the new post ID
-                TapestryHelpers::tryUpdateWpPostId($node->typeData->mediaURL);
+                TapestryImportExport::tryUpdateWpPostId($node->typeData->mediaURL);
             }
 
             $tapestryNode->set($node);

@@ -30,7 +30,6 @@ class TapestryH5P implements ITapestryH5P
     {
         global $wpdb;
 
-        // TODO: See class-h5p-plugin.php
         $sql = $wpdb->prepare('SELECT content.id as id, content.slug as slug
                                 FROM '.$wpdb->prefix.'h5p_contents content
                                 WHERE content.id = %d;', (int) $id);
