@@ -187,7 +187,7 @@
               :disabled="loading || fileUploading || fieldsInvalid"
               @click="handlePublish"
             >
-              <span>Publish</span>
+              <span>Save and Publish</span>
             </b-button>
             <b-button
               v-else-if="settings.submitNodesEnabled"
