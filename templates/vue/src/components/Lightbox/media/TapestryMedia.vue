@@ -172,7 +172,6 @@ export default {
 
 <style lang="scss" scoped>
 .media-wrapper {
-  outline: none;
   overflow: auto;
   height: 100%;
   widows: 100%;

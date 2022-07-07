@@ -75,7 +75,6 @@ export default {
 .modal-button {
   display: flex;
   flex-direction: column;
-  outline: none;
   margin: 3px;
   background: #666;
   color: white;

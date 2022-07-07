@@ -1332,10 +1332,6 @@ table {
 }
 
 #node-modal-container {
-  * {
-    outline: none;
-  }
-
   .form-control {
     padding: 15px;
     border: none;
