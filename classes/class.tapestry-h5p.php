@@ -26,11 +26,11 @@ class TapestryH5P implements ITapestryH5P
 
     /**
      * Gets the id and slug of an H5P content, by id.
-     * 
+     *
      * @param string|int    H5P id
-     * 
-     * @return object|null  An object containing the id and slug of the H5P content,
-     *                      or null if not found.
+     *
+     * @return object|null an object containing the id and slug of the H5P content,
+     *                     or null if not found
      */
     public function getH5P($id)
     {
