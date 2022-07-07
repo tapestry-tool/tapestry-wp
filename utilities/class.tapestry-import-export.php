@@ -104,7 +104,7 @@ class TapestryImportExport
 
     public static function exportExternalMedia($tapestry_data)
     {
-        list('path' => $zip, 'url' => $zip_url) = self::_createExportZip();
+        list('zip' => $zip, 'url' => $zip_url) = self::_createExportZip();
 
         $h5p_controller = new TapestryH5P();
         foreach ($tapestry_data->nodes as $node) {
@@ -147,7 +147,7 @@ class TapestryImportExport
         }
 
         return [
-            'path' => $zip,
+            'zip' => $zip,
             'url' => $zip_url,
         ];
     }
@@ -209,6 +209,8 @@ class TapestryImportExport
         $zip->addFile($path_to_media, $media_name);
         $media_url = $media_name;
     }
+
+    // --- Export WordPress posts ---
 
     public static function exportWpPostsInTapestry($tapestry)
     {
@@ -298,10 +300,10 @@ class TapestryImportExport
             }
 
             array_push($warnings['nodes'], [
-              'id' => $node->id,
-              'title' => $node->title,
-              'warnings' => $node_warnings,
-          ]);
+                'id' => $node->id,
+                'title' => $node->title,
+                'warnings' => $node_warnings,
+            ]);
         }
 
         self::_importMedia($tapestry_data->settings->backgroundUrl, $temp_dir, $warnings['settings']);
@@ -323,13 +325,11 @@ class TapestryImportExport
         }
 
         $filename = $node->typeData->mediaURL;
-        $temp_filepath = $temp_dir.'/'.$filename;
-        if (!file_exists($temp_filepath) || !is_file($temp_filepath)) {
-            array_push($warnings, 'File "' . $filename . '" not found in zip');
+        $temp_filepath = self::_getPathIfExists($filename, $temp_dir, $warnings);
+        if (!$temp_filepath) {
             return false;
         }
 
-        error_log('H5P file ' . $temp_filepath . ' exists');
         try {
             // Downloads the H5P through a GET request – even though it is already in the filesystem.
             // Unfortunately slow, but seems to be the only public method for adding H5Ps.
@@ -368,9 +368,8 @@ class TapestryImportExport
             return;
         }
 
-        $temp_filepath = $temp_dir.'/'.$media_url;
-        if (!file_exists($temp_filepath) || !is_file($temp_filepath)) {
-            array_push($warnings, 'File "' . $media_url . '" not found in zip');
+        $temp_filepath = self::_getPathIfExists($media_url, $temp_dir, $warnings);
+        if (!$temp_filepath) {
             return;
         }
 
@@ -409,6 +408,19 @@ class TapestryImportExport
         }
     }
 
+    // --- Utilities ---
+
+    private static function _getPathIfExists($filename, $temp_dir, &$warnings)
+    {
+        $temp_filepath = $temp_dir.'/'.$filename;
+        if (!file_exists($temp_filepath) || !is_file($temp_filepath)) {
+            array_push($warnings, 'File "' . $filename . '" not found in zip');
+            return false;
+        }
+
+        return $temp_filepath;
+    }
+
     // Return the path to the local file if url is a local WordPress url, false otherwise
     private static function _getLocalPath($url)
     {
@@ -429,18 +441,18 @@ class TapestryImportExport
     {
         $upload_dir = wp_upload_dir();
         return [
-          'path' => $upload_dir['basedir'] . '/tapestry/export',
-          'url' => $upload_dir['baseurl'] . '/tapestry/export',
-      ];
+            'path' => $upload_dir['basedir'] . '/tapestry/export',
+            'url' => $upload_dir['baseurl'] . '/tapestry/export',
+        ];
     }
 
     public static function _getZipImportDirectory()
     {
         $upload_dir = wp_upload_dir();
         return [
-          'path' => $upload_dir['basedir'] . '/tapestry/import',
-          'url' => $upload_dir['baseurl'] . '/tapestry/import',
-      ];
+            'path' => $upload_dir['basedir'] . '/tapestry/import',
+            'url' => $upload_dir['baseurl'] . '/tapestry/import',
+        ];
     }
 
     public static function clearExportedZips($tempfile_path, $zip_path)
@@ -475,10 +487,10 @@ class TapestryImportExport
         }
 
         return $success ? [
-          'name' => $dirname,
-          'path' => $dirpath,
-          'url' => $parent_dir['url'] . '/' . $dirname,
-      ] : null;
+            'name' => $dirname,
+            'path' => $dirpath,
+            'url' => $parent_dir['url'] . '/' . $dirname,
+        ] : null;
     }
 
     // https://stackoverflow.com/questions/4594180/deleting-all-files-from-a-folder-using-php
