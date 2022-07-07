@@ -179,6 +179,12 @@ class TapestryHelpers
         return self::createAttachment($uploadfile, true);
     }
 
+    /**
+     * Add a media item (image, video) as a WordPress attachment.
+     * 
+     * @param string $filepath          Filepath of the file to add.
+     * @param bool $generate_metadata   If true, also generates metadata and image sub-sizes.
+     */
     public static function createAttachment($filepath, $generate_metadata = false)
     {
         include_once(ABSPATH . 'wp-admin/includes/image.php');

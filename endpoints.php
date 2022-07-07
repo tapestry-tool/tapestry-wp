@@ -302,13 +302,6 @@ $REST_API_ENDPOINTS = [
             'callback' => 'getTapestryContributors',
         ],
     ],
-    'GET_ALL_ROLES' => (object) [
-        'ROUTE' => '/roles',
-        'ARGUMENTS' => [
-            'methods' => $REST_API_GET_METHOD,
-            'callback' => 'get_all_user_roles',
-        ],
-    ],
     'GET_TAPESTRY_EXPORT' => (object) [
         'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/export',
         'ARGUMENTS' => [
@@ -381,23 +374,27 @@ function exportTapestry($request)
     }
 }
 
+/**
+ * Export a Tapestry to a zip file.
+ * Returns URL of the exported zip on the server.
+ *
+ * @param object $request   HTTP request
+ */
 function exportTapestryAsZip($request)
 {
     $postId = $request['tapestryPostId'];
-
-    // Export tapestry to an object
-    // Open archive
-    // Go through tapestry data and add media to the archive
-    // Write tapestry data to archive as JSON file
-    // Close archive
-    // Return URL of archive
 
     try {
         if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
             throw new TapestryError('INVALID_POST_ID');
         }
+
+        // Export Tapestry to an object
         $tapestry = new Tapestry($postId);
         $tapestry_data = $tapestry->export();
+        
+        // Create zip file containing the Tapestry data as a JSON file,
+        // and all media referenced by the Tapestry data
         $zip_url = TapestryImportExport::exportExternalMedia($tapestry_data);
 
         return (object) [
@@ -408,6 +405,11 @@ function exportTapestryAsZip($request)
     }
 }
 
+/**
+ * Exports all WordPress posts used in a Tapestry using WordPress's WXR (XML) format.
+ *
+ * @param object $request   HTTP request
+ */
 function exportWpPostsInTapestry($request)
 {
     $postId = $request['tapestryPostId'];
@@ -427,13 +429,14 @@ function exportWpPostsInTapestry($request)
     }
 }
 
+/**
+ * Imports a Tapestry from an uploaded zip file.
+ * Returns a list of warnings and changes made during import.
+ *
+ * @param object $request   HTTP request (contains the zip file)
+ */
 function importTapestryFromZip($request)
 {
-    // Extract archive to directory
-    // Get tapestry data from file
-    // Upload all media and change URLs/IDs in tapestry data
-    // Import tapestry as normal
-
     $postId = $request['tapestryPostId'];
     $file_params = $request->get_file_params();
 
@@ -448,29 +451,34 @@ function importTapestryFromZip($request)
             throw new TapestryError('FAILED_TO_IMPORT');
         }
 
+        // Validate import file
         $contents = $zip->getFromName('tapestry.json');
         if ($contents === false) {
             throw new TapestryError('INVALID_ZIP', 'Could not find tapestry.json in zip');
         }
-
         $tapestry_data = json_decode($contents);
         TapestryImportExport::validateTapestryData($tapestry_data);
         TapestryImportExport::validateTapestryZipStructure($zip);
 
+        // If import is from a different site, filter permissions
         $changedPermissions = [];
         $wpUrl = get_bloginfo('url');
         if ($tapestry_data->{'site-url'} !== $wpUrl) {
             $changedPermissions = TapestryImportExport::prepareImport($tapestry_data);
         }
 
+        // Extract zip file to a temporary directory
         $temp_dir = TapestryImportExport::createTempDirectory($parent_dir);
         if (!$temp_dir) {
             throw new TapestryError('FAILED_TO_IMPORT');
         }
         $zip->extractTo($temp_dir['path']);
 
+        // Re-create all media referenced by the Tapestry data on this site,
+        // and update references to new URLs
         $importWarnings = TapestryImportExport::importExternalMedia($tapestry_data, $temp_dir['path'], $temp_dir['url']);
 
+        // Import the modified Tapestry data as normal
         $importedTapestry = importTapestry($postId, $tapestry_data);
 
         return [
@@ -484,6 +492,7 @@ function importTapestryFromZip($request)
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     } finally {
+        // Clean up resources
         if ($zip) {
             $zip->close();
         }
@@ -492,16 +501,6 @@ function importTapestryFromZip($request)
         }
     }
 }
-
-function get_all_user_roles($request)
-{
-    global $wp_roles;
-
-    $roles = $wp_roles->roles;
-
-    return $roles;
-}
-
 
 function login($request)
 {
@@ -673,7 +672,7 @@ function importTapestry($postId, $tapestryData)
             if ($node->mediaType === 'answer') {
                 $oldActivityNodeId = $oldNode->typeData->activityId;
                 $node->typeData->activityId = $idMap->$oldActivityNodeId;
-            } else if ($node->mediaType === 'wp-post') {
+            } elseif ($node->mediaType === 'wp-post') {
                 // We are requiring the user to import WordPress posts independently
                 // The post may have a different ID after import, so try to get the new post ID
                 TapestryImportExport::tryUpdateWpPostId($node->typeData->mediaURL);
