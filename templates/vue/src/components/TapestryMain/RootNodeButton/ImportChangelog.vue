@@ -90,10 +90,6 @@ export default {
   computed: {
     nodeWarnings() {
       return this.warnings.nodes
-        ? this.warnings.nodes.filter(
-            nodeWarningData => nodeWarningData.warnings.length > 0
-          )
-        : []
     },
     settingsWarnings() {
       return this.warnings.settings

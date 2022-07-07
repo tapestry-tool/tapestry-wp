@@ -304,11 +304,13 @@ class TapestryImportExport
                 self::_importMedia($node->lockedImageURL, $temp_dir, $node_warnings, true, $node->lockedThumbnailFileId);
             }
 
-            array_push($warnings['nodes'], [
-                'id' => $node->id,
-                'title' => $node->title,
-                'warnings' => $node_warnings,
-            ]);
+            if (!empty($node_warnings)) {
+                array_push($warnings['nodes'], [
+                    'id' => $node->id,
+                    'title' => $node->title,
+                    'warnings' => $node_warnings,
+                ]);    
+            }
         }
 
         self::_importMedia($tapestry_data->settings->backgroundUrl, $temp_dir, $warnings['settings']);
