@@ -1173,14 +1173,6 @@ export default {
             this.update("thumbnailFileId", "")
             this.update("imageURL", data.image)
           }
-          if (
-            confirm(
-              "Would you like to use the link preview image as the locked thumbnail image?"
-            )
-          ) {
-            this.update("lockedThumbnailFileId", "")
-            this.update("lockedImageURL", data.image)
-          }
         }
       }
     },
