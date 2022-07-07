@@ -450,7 +450,7 @@ class TapestryImportExport
     {
         $upload_dir = wp_upload_dir();
         return [
-            'path' => $upload_dir['basedir'] . '/tapestry/import',
+            'path' => sys_get_temp_dir() . '/tapestry/import',
             'url' => $upload_dir['baseurl'] . '/tapestry/import',
         ];
     }
@@ -472,7 +472,9 @@ class TapestryImportExport
     {
         $parent_dir = self::_getZipImportDirectory();
         if (!file_exists($parent_dir['path'])) {
-            mkdir($parent_dir['path']);
+            if (!mkdir($parent_dir['path'])) {
+                throw new TapestryError('TEST_CODE', 'Failed to create import directory');
+            }
         }
 
         $max_attempts = 100;
