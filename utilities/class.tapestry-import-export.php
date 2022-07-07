@@ -11,7 +11,7 @@ define(
 );
 
 if (H5P_DEFINED) {
-    include __DIR__.'/../../h5p/public/class-h5p-plugin.php';
+    include_once __DIR__.'/../../h5p/public/class-h5p-plugin.php';
 }
 
 class TapestryImportExport
@@ -457,16 +457,28 @@ class TapestryImportExport
         ];
     }
 
-    public static function clearExportedZips($tempfile_path, $zip_path)
+    // Delete all export files in the export directory older than 1 day
+    public static function clearExportedZips()
     {
+        $deleted_count = 0;
         $export_dir = self::_getZipExportDirectory()['path'];
-        if (!empty($tempfile_path) && !empty($export_dir) && substr($tempfile_path, 0, strlen($export_dir)) === $export_dir) {
-            unlink($tempfile_path);
+
+        if (!empty($export_dir)) {
+            $files = glob($export_dir . '/export_*');
+            $now = time();
+            $one_day = 60 * 60 * 24;
+
+            foreach ($files as $file) {
+                if (is_file($file)) {
+                    if (filemtime($file) + $one_day <= $now) {
+                        unlink($file);
+                        $deleted_count++;
+                    }
+                } 
+            }
         }
 
-        if (!empty($zip_path) && !empty($export_dir) && substr($zip_path, 0, strlen($export_dir)) === $export_dir) {
-            unlink($zip_path);
-        }
+        return $deleted_count;
     }
 
     // https://stackoverflow.com/questions/1707801/making-a-temporary-dir-for-unpacking-a-zipfile-into

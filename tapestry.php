@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__.'/classes/class.tapestry-analytics.php';
+require_once __DIR__.'/utilities/class.tapestry-import-export.php';
 
 /**
  * Plugin Name: Tapestry
@@ -329,4 +330,23 @@ function tapestry_tool_log_event()
     $analytics->log($_POST);
 
     wp_die();
+}
+
+// Cleanup
+
+add_action('tapestry_clean_export_files', 'clean_export_files');
+function clean_export_files() {
+    TapestryImportExport::clearExportedZips();
+}
+
+register_activation_hook(__FILE__, 'schedule_tapestry_export_file_cleanup');
+function schedule_tapestry_export_file_cleanup() {
+    if ( ! wp_next_scheduled('tapestry_clean_export_files') ) {
+        wp_schedule_event( time(), 'daily', 'tapestry_clean_export_files' );
+    }
+}
+
+register_deactivation_hook(__FILE__, 'unschedule_tapestry_export_file_cleanup');
+function unschedule_tapestry_export_file_cleanup() {
+    wp_clear_scheduled_hook('tapestry_clean_export_files');
 }

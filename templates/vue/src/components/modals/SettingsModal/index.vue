@@ -563,7 +563,6 @@ export default {
       this.exportedFileType = ".xml"
     },
     async exportTapestryAsZip() {
-      // TODO: try to reduce duplication here
       this.isExporting = true
       const exportedTapestry = await this.getTapestryExportAsZip()
       if (!exportedTapestry) {

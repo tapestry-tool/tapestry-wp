@@ -112,8 +112,6 @@ export default {
       }
     },
     importTapestry(file) {
-      // TODO: try to reduce duplication here
-
       const reader = new FileReader()
       reader.onload = async e => {
         this.error = ""
