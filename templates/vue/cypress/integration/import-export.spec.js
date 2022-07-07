@@ -147,9 +147,7 @@ describe("Import Export", () => {
       "Activity (multiple choice)",
       "Activity (drag drop)",
       "Multicontent with background image",
-      "H5P",
       "Answer",
-      "H5P 2",
       "External Link",
     ]
     cy.wrap(expectedTitles).each(title => cy.getNodeByTitle(title).should("exist"))
@@ -173,7 +171,7 @@ describe("Import Export", () => {
       .children()
       .eq(1)
       .find("tr")
-      .should("have.length", 6)
+      .should("have.length", 5)
 
     cy.get("button")
       .contains(/confirm/i)
@@ -188,9 +186,7 @@ describe("Import Export", () => {
       "Activity (multiple choice)",
       "Activity (drag drop)",
       "Multicontent with background image",
-      "H5P",
       "Answer",
-      "H5P 2",
       "External Link",
     ]
     cy.wrap(expectedTitles).each(title => cy.getNodeByTitle(title).should("exist"))
