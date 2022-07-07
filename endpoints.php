@@ -445,7 +445,7 @@ function importTapestryFromZip($request)
 
         $zip = new ZipArchive();
         if ($zip->open($zip_path, ZipArchive::RDONLY) !== true) {
-            throw new TapestryError('FAILED_TO_IMPORT');
+            throw new TapestryError('TEST_CODE', 'Failed to open zip file', 500);
         }
 
         $contents = $zip->getFromName('tapestry.json');
@@ -465,7 +465,7 @@ function importTapestryFromZip($request)
 
         $temp_dir = TapestryImportExport::createTempDirectory($parent_dir);
         if (!$temp_dir) {
-            throw new TapestryError('FAILED_TO_IMPORT');
+            throw new TapestryError('TEST_CODE', 'Failed to create temporary directory', 500);
         }
         $zip->extractTo($temp_dir['path']);
 
