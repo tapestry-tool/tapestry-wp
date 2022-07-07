@@ -19,6 +19,7 @@
             : 'not-allowed',
       }"
       tabindex="0"
+      @focus="handleFocus"
       @click="handleClick"
       @mouseover="handleMouseover"
       @mouseleave="handleMouseleave"
@@ -206,7 +207,13 @@ export default {
       "currentDepth",
       "nodeNavigation",
     ]),
-    ...mapGetters(["getNode", "getDirectChildren", "isVisible", "getParent"]),
+    ...mapGetters([
+      "getNode",
+      "getDirectChildren",
+      "isVisible",
+      "getParent",
+      "getCurrentNodeNav",
+    ]),
     ariaLabel() {
       let label = `${this.node.title}. You are on a level ${this.node.level} node. `
       if (
@@ -491,7 +498,7 @@ export default {
     )
   },
   methods: {
-    ...mapActions(["updateNodeCoordinates"]),
+    ...mapActions(["updateNodeCoordinates", "resetNodeNavigation"]),
     ...mapMutations(["select", "unselect"]),
     updateRootNode() {
       if (!this.root) {
@@ -574,6 +581,12 @@ export default {
           : this.updateRootNode()
       }
       client.recordAnalyticsEvent("user", "click", "node", this.node.id)
+    },
+    handleFocus() {
+      if (!this.root && this.getCurrentNodeNav !== this.node.id) {
+        this.resetNodeNavigation(this.node.id)
+        this.updateRootNode()
+      }
     },
     hasPermission(action) {
       return Helpers.hasPermission(this.node, action, this.settings.showRejected)

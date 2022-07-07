@@ -458,15 +458,21 @@ export default {
         ) {
           this.$root.$emit("open-node", node.id)
         }
+      } else if (code === "Tab") {
+        // ? potentially let the user tab out of the main tapestry view, since the user should be fully capable of navigating through all the nodes by using just arrow keys
       } else {
         if (node.id === this.getCurrentNodeNav) {
           if (code === "ArrowDown") {
+            evt.preventDefault()
             this.goToNodeChildren().then(this.setSelectedNode)
           } else if (code === "ArrowUp") {
+            evt.preventDefault()
             this.goToNodeParent().then(this.setSelectedNode)
           } else if (code === "ArrowRight") {
+            evt.preventDefault()
             this.goToNodeSibling(1).then(this.setSelectedNode)
           } else if (code === "ArrowLeft") {
+            evt.preventDefault()
             this.goToNodeSibling(-1).then(this.setSelectedNode)
           }
         } else {
