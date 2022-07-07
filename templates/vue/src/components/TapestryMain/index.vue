@@ -253,11 +253,11 @@ export default {
     )
     this.zoomPanHelper.register()
 
-    this.$refs.app.addEventListener("keydown", this.handleKeydown)
+    this.$refs.app.addEventListener("keyup", this.handleKeyup)
   },
   beforeDestroy() {
     this.zoomPanHelper && this.zoomPanHelper.unregister()
-    this.$refs.app.removeEventListener("keydown", this.handleKeydown)
+    this.$refs.app.removeEventListener("keyup", this.handleKeyup)
   },
   methods: {
     ...mapMutations(["select", "unselect", "clearSelection"]),
@@ -448,7 +448,7 @@ export default {
         this.activeNode = id
       }
     },
-    handleKeydown(evt) {
+    handleKeyup(evt) {
       const { code } = evt
       const node = this.getNode(this.selectedId)
       if (code === "Enter") {

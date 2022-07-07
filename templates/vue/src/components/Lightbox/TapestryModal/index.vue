@@ -1,8 +1,17 @@
 <template>
-  <div class="modal-container" role="dialog">
+  <div class="modal-container">
     <div v-if="allowClose" class="overlay" @click="$emit('close')"></div>
     <transition name="modal">
-      <div v-if="load" class="content" :style="contentContainerStyle">
+      <div
+        v-if="load"
+        ref="dialogContent"
+        class="content"
+        :style="contentContainerStyle"
+        role="dialog"
+        :aria-labelledby="ariaLabelledby"
+        :aria-describedby="ariaDescribedby"
+        tabindex="0"
+      >
         <div class="buttons-container">
           <modal-button
             v-if="allowClose"
@@ -85,6 +94,18 @@ export default {
       required: false,
       default: true,
     },
+    ariaLabelledby: {
+      type: String,
+      required: false,
+    },
+    ariaDescribedby: {
+      type: String,
+      required: false,
+    },
+    initialFocus: {
+      type: String,
+      required: false,
+    },
   },
   data() {
     return {
@@ -102,6 +123,15 @@ export default {
   },
   mounted() {
     this.load = true
+    this.$nextTick(() => {
+      // if (this.initialFocus) {
+      //   const element = document.getElementById(this.initialFocus)
+      //   element && element.focus()
+      // }
+      if (this.$refs.dialogContent) {
+        this.$refs.dialogContent.focus()
+      }
+    })
   },
   methods: {
     ...mapActions(["toggleFavourite"]),

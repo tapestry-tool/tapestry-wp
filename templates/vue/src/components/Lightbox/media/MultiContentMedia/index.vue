@@ -33,6 +33,7 @@
       v-if="showCompletion"
       :node-id="node.id"
       :allow-close="false"
+      initial-focus="confirmationTitle"
       aria-labelledby="confirmationTitle"
       aria-describedby="confirmationBody"
       @close="handleCancel"
