@@ -27,6 +27,8 @@
           <i class="fas fa-chevron-right fa-xs mx-2" />
         </b-link>
       </span>
+      <i v-if="type === 'add'" class="fas fa-plus fa-xs mr-1" />
+      <i v-else-if="type === 'edit'" class="fas fa-pen fa-xs mr-1" />
       <span data-qa="node-modal-header">
         {{ title }}
       </span>
