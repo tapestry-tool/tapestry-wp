@@ -111,6 +111,18 @@ class Tapestry implements ITapestry
                 $this->settings->draftNodesEnabled = true;
                 $this->settings->submitNodesEnabled = true;
             }
+            if (!isset($this->settings->permalink)) {
+                $this->settings->permalink = get_permalink($this->postId);
+            }
+            if (!isset($this->settings->tapestrySlug)) {
+                $this->settings->tapestrySlug = get_post($this->postId)->post_name;
+            }
+            if (!isset($this->settings->title)) {
+                $this->settings->title = get_the_title($this->postId);
+            }
+            if (!isset($this->settings->status)) {
+                $this->settings->status = get_post_status($this->postId);
+            }
         }
     }
 
