@@ -282,7 +282,8 @@ class TapestryImportExport
             $node_warnings = [];
 
             if ($node->mediaType === 'h5p') {
-                $added_h5p = $added_h5p || self::_importH5PNode($node, $temp_dir, $temp_url, $node_warnings);
+                $success = self::_importH5PNode($node, $temp_dir, $temp_url, $node_warnings);
+                $added_h5p = $success || $added_h5p;
             } elseif ($node->mediaType === 'video') {
                 self::_importMedia($node->typeData->mediaURL, $temp_dir, $node_warnings);
             } elseif ($node->mediaType === 'activity') {
@@ -328,6 +329,7 @@ class TapestryImportExport
             return false;
         }
 
+        error_log('H5P file ' . $temp_filepath . ' exists');
         try {
             // Downloads the H5P through a GET request – even though it is already in the filesystem.
             // Unfortunately slow, but seems to be the only public method for adding H5Ps.

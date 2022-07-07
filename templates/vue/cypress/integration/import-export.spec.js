@@ -122,6 +122,7 @@ describe("Import Export", () => {
     cy.getByTestId("import-file-input").attachFile(fullTapestry)
     cy.wait("@import")
 
+    cy.contains(/Please try with another file/).should("not.exist")
     cy.contains(/import successful/i).should("be.visible")
     cy.contains(/no warnings were generated during import/i).should("be.visible")
 
@@ -163,6 +164,7 @@ describe("Import Export", () => {
 
     cy.getByTestId("import-file-input").attachFile(fullTapestry)
     cy.wait("@import")
+    cy.contains(/Please try with another file/).should("not.exist")
     cy.contains(/import successful/i).should("be.visible")
     cy.getByTestId("import-warnings-table")
       .as("warnings-table")
