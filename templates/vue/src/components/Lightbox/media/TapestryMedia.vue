@@ -11,7 +11,6 @@
           node.mediaFormat === 'youtube',
       },
     ]"
-    tabindex="0"
     @mouseenter="setHovered"
   >
     <text-media

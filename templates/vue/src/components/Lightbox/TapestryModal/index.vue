@@ -2,10 +2,11 @@
   <div class="modal-container">
     <div v-if="allowClose" class="overlay" @click="$emit('close')"></div>
     <transition name="modal">
-      <div v-if="load" class="content" :style="contentContainerStyle" tabindex="0">
+      <div v-if="load" class="content" :style="contentContainerStyle">
         <div class="buttons-container">
           <modal-button
             v-if="allowClose"
+            aria-label="Close lightbox."
             data-qa="close-lightbox"
             icon="times"
             tabindex="0"
@@ -23,6 +24,7 @@
           />
           <modal-button
             v-if="canEditNode"
+            aria-label="Edit this node."
             icon="pencil-alt"
             icon-size="sm"
             title="Edit Node"
