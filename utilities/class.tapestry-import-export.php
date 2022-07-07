@@ -512,7 +512,7 @@ class TapestryImportExport
     {
         $import_dir = self::_getZipImportDirectory()['path'];
 
-        if (!empty($dirpath) && !empty($import_dir) && self::_stringStartsWith($dirpath, $import_dir)) {
+        if (!empty($dirpath) && self::_stringStartsWith($dirpath, $import_dir) && file_exists($dirpath)) {
             array_map('unlink', glob($dirpath . '/*.*'));
             rmdir($dirpath);
         }

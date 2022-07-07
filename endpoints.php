@@ -471,8 +471,6 @@ function importTapestryFromZip($request)
 
         $importWarnings = TapestryImportExport::importExternalMedia($tapestry_data, $temp_dir['path'], $temp_dir['url']);
 
-        TapestryImportExport::deleteTempDirectory($temp_dir['path']);
-
         $importedTapestry = importTapestry($postId, $tapestry_data);
 
         return [
@@ -489,7 +487,9 @@ function importTapestryFromZip($request)
         if ($zip) {
             $zip->close();
         }
-        // TODO: delete temp directory here, for good measure
+        if ($temp_dir) {
+            TapestryImportExport::deleteTempDirectory($temp_dir['path']);
+        }
     }
 }
 
