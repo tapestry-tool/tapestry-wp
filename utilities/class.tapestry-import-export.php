@@ -132,7 +132,9 @@ class TapestryImportExport
     {
         $tapestry_export_dir = self::_getZipExportDirectory();
         if (!file_exists($tapestry_export_dir['path'])) {
-            mkdir($tapestry_export_dir['path'], 0755, true);
+            if (!mkdir($tapestry_export_dir['path'], 0755, true)) {
+                throw new TapestryError('FAILED_TO_EXPORT');
+            }
         }
 
         $zip = new ZipArchive();
@@ -473,7 +475,7 @@ class TapestryImportExport
         $parent_dir = self::_getZipImportDirectory();
         if (!file_exists($parent_dir['path'])) {
             if (!mkdir($parent_dir['path'], 0755, true)) {
-                throw new TapestryError('TEST_CODE', 'Failed to create import directory');
+                throw new TapestryError('FAILED_TO_IMPORT');
             }
         }
 
