@@ -60,12 +60,17 @@
             their contents.
           </p>
         </div>
-        <div v-else>
+        <p v-else>
           No warnings were generated during import.
-        </div>
-        <div>
+        </p>
+        <p>
+          If your Tapestry contains H5P nodes, we recommend rebuilding the H5P cache
+          after importing, by going to H5P Content -> Libraries in the WordPress
+          dashboard.
+        </p>
+        <p>
           Pressing "Confirm" will reload your page.
-        </div>
+        </p>
       </b-card>
     </b-container>
     <div slot="modal-footer">

@@ -90,13 +90,14 @@
         >
           <b-form-group label="Export Tapestry">
             <template #description>
-              Export your tapestry to a file and then you can import it on another
-              site.
-              <br />
-              If your Tapestry includes WordPress post nodes, they must be exported
-              separately. To export, export both the WordPress posts and the
-              Tapestry. To import, first import the WordPress posts by going to Tools
-              -> Import in the WordPress dashboard, then import the Tapestry.
+              <p>
+                Export the contents of your tapestry to a file, which you can then
+                import on another site.
+              </p>
+              WordPress post nodes in your tapestry must be exported separately. To
+              export, export all WordPress posts as well as the tapestry. To import,
+              first import the WordPress posts by going to Tools -> Import in the
+              WordPress dashboard, then import the tapestry.
             </template>
             <b-row class="mb-2">
               <b-col>
