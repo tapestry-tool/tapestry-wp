@@ -104,10 +104,7 @@
           </node-button>
           <template v-if="isLoggedIn">
             <add-child-button
-              v-if="
-                (node.mediaType === 'multi-content' || !hasTooManyLevels) &&
-                  (hasPermission('add') || settings.draftNodesEnabled)
-              "
+              v-if="canAddChild"
               :node="node"
               :fill="buttonBackgroundColor"
               :x="canReview || hasPermission('edit') ? -35 : 0"
@@ -231,10 +228,19 @@ export default {
           } child, press the Down Arrow Key. To go back up, press the Up Arrow Key. To go to its siblings, press the Left or Right Arrow Key. `
         }
       } else {
-        // TODO: provide option to go back to correct navigation route
-        label += "You are not on the node navigation route. "
+        label +=
+          "You are not on the node navigation route. To view this node, press Enter. "
+      }
+      if (this.hasPermission("edit")) {
+        label += "To edit this node, press E. "
       }
       return label
+    },
+    canAddChild() {
+      return (
+        (this.node.mediaType === "multi-content" || !this.hasTooManyLevels) &&
+        (this.hasPermission("add") || this.settings.draftNodesEnabled)
+      )
     },
     canReview() {
       if (!this.isLoggedIn) {

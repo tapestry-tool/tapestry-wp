@@ -468,6 +468,10 @@ export default {
         }
       } else if (code === "Tab") {
         // ? potentially let the user tab out of the main tapestry view, since the user should be fully capable of navigating through all the nodes by using just arrow keys
+      } else if (code === "KeyE") {
+        if (Helpers.hasPermission(node, "edit", this.settings.showRejected)) {
+          this.$root.$emit("edit-node", node.id)
+        }
       } else {
         if (node.id === this.getCurrentNodeNav) {
           if (code === "ArrowDown") {
