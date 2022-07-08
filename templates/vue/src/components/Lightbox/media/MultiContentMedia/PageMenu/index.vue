@@ -44,16 +44,7 @@
             </b-dropdown>
             <h5 class="pl-2 py-1 mb-4">{{ node.title }}</h5>
           </div>
-          <div
-            v-if="pageMenuVisible"
-            :class="[
-              'page-nav-content',
-              'mb-auto',
-              {
-                fullscreen: node.fullscreen,
-              },
-            ]"
-          >
+          <div v-if="pageMenuVisible" class="page-nav-content mb-auto">
             <ul class="page-menu-items fa-ul">
               <page-menu-item
                 v-for="row in rows"
@@ -219,7 +210,9 @@ export default {
     },
     scrollToRef(nodeId) {
       this.$nextTick(() => {
-        const container = document.getElementById(`multicontent-container`)
+        const container = document.querySelector(
+          `#multicontent-container .media-container`
+        )
         const yOffset = -50
         const element = document.getElementById(`row-${nodeId}`)
         const y =
@@ -293,7 +286,7 @@ export default {
       font-size: clamp(14px, 1.3vw, 16px);
     }
 
-    .page-nav-container {
+    .page-nav {
       text-align: left;
     }
 
@@ -352,24 +345,6 @@ $slide-fade-speed: 0.3s;
     }
   }
 }
-
-/*
-.slide-fade-enter-active,
-.slide-fade-leave-active {
-  transition: all 3s ease;
-}
-.slide-fade-enter,
-.slide-fade-leave-to {
-  min-width: 5px;
-  max-width: 5px;
-  opacity: 0;
-
-  &.page-nav {
-    min-width: 5px;
-    max-width: 5px;
-  }
-}
-*/
 
 @keyframes slide-fade {
   from {
