@@ -133,24 +133,22 @@ describe("Import Export", () => {
 
     cy.contains(/the following permissions/i).should("be.visible")
     cy.task("log", "Line 135")
+    cy.getByTestId("import-removed-permissions").should("be.visible")
+    cy.task("log", "Line 137")
     cy.getByTestId("import-removed-permissions")
-      .as("permissions-list")
-      .should("be.visible")
-    cy.task("log", "Line 139")
-    cy.get("@permissions-list")
       .find("li")
       .should("have.length", 3)
-    cy.task("log", "Line 143")
+    cy.task("log", "Line 141")
 
     cy.get("button")
       .contains(/confirm/i)
       .click()
-    cy.task("log", "Line 148")
+    cy.task("log", "Line 146")
     cy.wait("@load")
-    cy.task("log", "Line 150")
+    cy.task("log", "Line 148")
 
     cy.getByTestId("tapestry-loading").should("not.exist")
-    cy.task("log", "Line 153")
+    cy.task("log", "Line 151")
     const expectedTitles = [
       "Root",
       "Local Video",
@@ -162,7 +160,7 @@ describe("Import Export", () => {
       "External Link",
     ]
     cy.wrap(expectedTitles).each(title => cy.getNodeByTitle(title).should("exist"))
-    cy.task("log", "Line 165")
+    cy.task("log", "Line 163")
   })
 
   it("should be able to import a Tapestry with missing files and show warnings", () => {
@@ -173,33 +171,31 @@ describe("Import Export", () => {
     cy.intercept("GET", "**/tapestries/**").as("load")
 
     cy.getByTestId("import-file-input").attachFile(fullTapestry)
-    cy.task("log", "Line 176")
+    cy.task("log", "Line 174")
     cy.wait("@import")
-    cy.task("log", "Line 178")
+    cy.task("log", "Line 176")
     cy.contains(/Please try with another file/).should("not.exist")
-    cy.task("log", "Line 180")
+    cy.task("log", "Line 178")
     cy.contains(/import successful/i).should("be.visible")
+    cy.task("log", "Line 180")
+    cy.getByTestId("import-warnings-table").should("be.visible")
     cy.task("log", "Line 182")
     cy.getByTestId("import-warnings-table")
-      .as("warnings-table")
-      .should("be.visible")
-    cy.task("log", "Line 186")
-    cy.get("@warnings-table")
       .children()
       .eq(1)
       .find("tr")
       .should("have.length", 5)
-    cy.task("log", "Line 192")
+    cy.task("log", "Line 188")
 
     cy.get("button")
       .contains(/confirm/i)
       .click()
-    cy.task("log", "Line 197")
+    cy.task("log", "Line 193")
     cy.wait("@load")
-    cy.task("log", "Line 199")
+    cy.task("log", "Line 195")
 
     cy.getByTestId("tapestry-loading").should("not.exist")
-    cy.task("log", "Line 202")
+    cy.task("log", "Line 198")
     const expectedTitles = [
       "Root",
       "Local Video",
@@ -211,6 +207,6 @@ describe("Import Export", () => {
       "External Link",
     ]
     cy.wrap(expectedTitles).each(title => cy.getNodeByTitle(title).should("exist"))
-    cy.task("log", "Line 214")
+    cy.task("log", "Line 210")
   })
 })
