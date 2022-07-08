@@ -8,6 +8,7 @@
     scrollable
     :header-class="isMultiContentNodeChild ? 'modal-header-small' : ''"
     body-class="p-0"
+    :aria-label="title"
     @hide="handleClose"
   >
     <template #modal-title>

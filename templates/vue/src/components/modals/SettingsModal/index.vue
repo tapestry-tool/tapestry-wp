@@ -7,6 +7,7 @@
     title="Tapestry Settings"
     scrollable
     body-class="p-0"
+    aria-label="Tapestry Settings"
     @hidden="$emit('close')"
   >
     <b-container fluid class="px-0">
