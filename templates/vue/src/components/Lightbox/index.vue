@@ -3,7 +3,7 @@
     v-if="node"
     id="lightbox"
     data-qa="lightbox"
-    aria-labelledby="lightboxTitle"
+    :aria-label="`You're now in a modal, viewing the content of ${node.title}.`"
     initial-focus="lightboxTitle"
     :class="{
       'full-screen': node.fullscreen,

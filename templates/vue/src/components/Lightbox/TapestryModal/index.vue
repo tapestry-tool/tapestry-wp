@@ -4,13 +4,10 @@
     <transition name="modal">
       <div
         v-if="load"
-        ref="dialogContent"
         class="content"
         :style="contentContainerStyle"
         role="dialog"
-        :aria-labelledby="ariaLabelledby"
-        :aria-describedby="ariaDescribedby"
-        tabindex="0"
+        :aria-label="ariaLabel"
       >
         <div class="buttons-container">
           <modal-button
@@ -94,13 +91,10 @@ export default {
       required: false,
       default: true,
     },
-    ariaLabelledby: {
+    ariaLabel: {
       type: String,
       required: false,
-    },
-    ariaDescribedby: {
-      type: String,
-      required: false,
+      default: "You're now in a modal.",
     },
     initialFocus: {
       type: String,
@@ -124,12 +118,9 @@ export default {
   mounted() {
     this.load = true
     this.$nextTick(() => {
-      // if (this.initialFocus) {
-      //   const element = document.getElementById(this.initialFocus)
-      //   element && element.focus()
-      // }
-      if (this.$refs.dialogContent) {
-        this.$refs.dialogContent.focus()
+      if (this.initialFocus) {
+        const element = document.getElementById(this.initialFocus)
+        element && element.focus()
       }
     })
   },

@@ -175,6 +175,9 @@ export default {
     maxScale() {
       return 140 / Helpers.getNodeBaseRadius(this.maxLevel, this.maxLevel)
     },
+    routeName() {
+      return this.$route.name
+    },
   },
   watch: {
     empty(empty) {
@@ -208,6 +211,11 @@ export default {
         }
         this.updateViewBox()
       },
+    },
+    routeName(newName, oldName) {
+      if (newName === names.APP && oldName === names.LIGHTBOX) {
+        this.focusSelectedNode()
+      }
     },
   },
   created() {
@@ -253,11 +261,11 @@ export default {
     )
     this.zoomPanHelper.register()
 
-    this.$refs.app.addEventListener("keyup", this.handleKeyup)
+    this.$refs.app.addEventListener("keydown", this.handleKey)
   },
   beforeDestroy() {
     this.zoomPanHelper && this.zoomPanHelper.unregister()
-    this.$refs.app.removeEventListener("keyup", this.handleKeyup)
+    this.$refs.app.removeEventListener("keydown", this.handleKey)
   },
   methods: {
     ...mapMutations(["select", "unselect", "clearSelection"]),
@@ -448,7 +456,7 @@ export default {
         this.activeNode = id
       }
     },
-    handleKeyup(evt) {
+    handleKey(evt) {
       const { code } = evt
       const node = this.getNode(this.selectedId)
       if (code === "Enter") {
@@ -489,6 +497,14 @@ export default {
         params: { nodeId },
         query: this.$route.query,
         path: `/nodes/${nodeId}`,
+      })
+    },
+    focusSelectedNode() {
+      this.$nextTick(() => {
+        const nodeElement = document.querySelector(
+          `.node[data-id='${this.selectedId}']`
+        )
+        nodeElement && nodeElement.focus()
       })
     },
   },

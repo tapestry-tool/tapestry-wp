@@ -34,12 +34,10 @@
       :node-id="node.id"
       :allow-close="false"
       initial-focus="confirmationTitle"
-      aria-labelledby="confirmationTitle"
-      aria-describedby="confirmationBody"
       @close="handleCancel"
     >
       <h1 id="confirmationTitle">{{ node.typeData.confirmationTitleText }}</h1>
-      <p id="confirmationBody">{{ node.typeData.confirmationBodyText }}</p>
+      <p>{{ node.typeData.confirmationBodyText }}</p>
       <div class="button-container">
         <button class="button-completion" @click="handleClose">
           <i class="far fa-arrow-alt-circle-right fa-4x"></i>
