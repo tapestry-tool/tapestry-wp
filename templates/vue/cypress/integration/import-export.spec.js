@@ -140,15 +140,13 @@ describe("Import Export", () => {
       .should("have.length", 3)
     cy.task("log", "Line 141")
 
-    cy.get("button")
-      .contains(/confirm/i)
-      .click()
-    cy.task("log", "Line 146")
+    cy.contains("button", /confirm/i).click()
+    cy.task("log", "Line 144")
     cy.wait("@load")
-    cy.task("log", "Line 148")
+    cy.task("log", "Line 146")
 
     cy.getByTestId("tapestry-loading").should("not.exist")
-    cy.task("log", "Line 151")
+    cy.task("log", "Line 149")
     const expectedTitles = [
       "Root",
       "Local Video",
@@ -160,7 +158,7 @@ describe("Import Export", () => {
       "External Link",
     ]
     cy.wrap(expectedTitles).each(title => cy.getNodeByTitle(title).should("exist"))
-    cy.task("log", "Line 163")
+    cy.task("log", "Line 161")
   })
 
   it("should be able to import a Tapestry with missing files and show warnings", () => {
@@ -171,31 +169,29 @@ describe("Import Export", () => {
     cy.intercept("GET", "**/tapestries/**").as("load")
 
     cy.getByTestId("import-file-input").attachFile(fullTapestry)
-    cy.task("log", "Line 174")
+    cy.task("log", "Line 172")
     cy.wait("@import")
-    cy.task("log", "Line 176")
+    cy.task("log", "Line 174")
     cy.contains(/Please try with another file/).should("not.exist")
-    cy.task("log", "Line 178")
+    cy.task("log", "Line 176")
     cy.contains(/import successful/i).should("be.visible")
-    cy.task("log", "Line 180")
+    cy.task("log", "Line 178")
     cy.getByTestId("import-warnings-table").should("be.visible")
-    cy.task("log", "Line 182")
+    cy.task("log", "Line 180")
     cy.getByTestId("import-warnings-table")
       .children()
       .eq(1)
       .find("tr")
       .should("have.length", 5)
-    cy.task("log", "Line 188")
+    cy.task("log", "Line 186")
 
-    cy.get("button")
-      .contains(/confirm/i)
-      .click()
-    cy.task("log", "Line 193")
+    cy.contains("button", /confirm/i).click()
+    cy.task("log", "Line 189")
     cy.wait("@load")
-    cy.task("log", "Line 195")
+    cy.task("log", "Line 191")
 
     cy.getByTestId("tapestry-loading").should("not.exist")
-    cy.task("log", "Line 198")
+    cy.task("log", "Line 194")
     const expectedTitles = [
       "Root",
       "Local Video",
@@ -207,6 +203,6 @@ describe("Import Export", () => {
       "External Link",
     ]
     cy.wrap(expectedTitles).each(title => cy.getNodeByTitle(title).should("exist"))
-    cy.task("log", "Line 210")
+    cy.task("log", "Line 206")
   })
 })
