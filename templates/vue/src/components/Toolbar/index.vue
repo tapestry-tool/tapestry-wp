@@ -1,5 +1,5 @@
 <template>
-  <div class="toolbar">
+  <div class="toolbar" data-qa="tapestry-toolbar">
     <tapestry-filter v-if="!showMap" style="z-index: 10" />
     <div :class="[{ 'hide-toolbar': hideToolbar }, 'slider-wrapper']">
       <b-container class="can-edit">

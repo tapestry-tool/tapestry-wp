@@ -53,6 +53,9 @@ describe("Answers", () => {
       cy.wait("@addNode")
     })
 
+    // hide the toolbar so the newly created node will never be blocked
+    cy.getByTestId("tapestry-toolbar").invoke("attr", "style", "display: none;")
+
     cy.getNodeByTitle("Answer Node").then(answer => {
       cy.getNodeById(answer.id).click()
       cy.openLightbox(answer.id).within(() => {
