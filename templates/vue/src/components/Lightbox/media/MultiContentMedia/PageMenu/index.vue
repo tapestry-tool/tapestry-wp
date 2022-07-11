@@ -310,8 +310,6 @@ export default {
 $slide-fade-speed: 0.3s;
 
 .slide-fade-enter-active {
-  white-space: nowrap;
-
   &:not(.unit-child) {
     animation: slide-fade $slide-fade-speed ease;
 
@@ -328,8 +326,6 @@ $slide-fade-speed: 0.3s;
   }
 }
 .slide-fade-leave-active {
-  white-space: nowrap;
-
   &:not(.unit-child) {
     animation: slide-fade $slide-fade-speed ease reverse;
 
@@ -348,26 +344,22 @@ $slide-fade-speed: 0.3s;
 
 @keyframes slide-fade {
   from {
-    min-width: 5px;
-    width: 5px;
+    transform: translateX(-100%);
     opacity: 0;
   }
   to {
-    min-width: 200px;
-    width: 200px;
+    transform: translateX(0);
     opacity: 1;
   }
 }
 
 @keyframes slide-fade-unit-child {
   from {
-    min-width: 5px;
-    width: 5px;
+    transform: translateX(-100%);
     opacity: 0;
   }
   to {
-    width: 250px;
-    max-width: 25vw;
+    transform: translateX(0);
     opacity: 1;
   }
 }
