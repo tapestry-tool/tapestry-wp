@@ -5,7 +5,11 @@
     <router-view></router-view>
     <node-modal></node-modal>
     <link-modal></link-modal>
-    <lightbox v-if="viewingNode" :node-id="nodeId" aria-hidden="false"></lightbox>
+    <lightbox
+      :visible="viewingNode"
+      :node-id="nodeId"
+      aria-hidden="false"
+    ></lightbox>
     <sidebar v-if="!isEmpty"></sidebar>
     <tapestry-error></tapestry-error>
     <b-modal

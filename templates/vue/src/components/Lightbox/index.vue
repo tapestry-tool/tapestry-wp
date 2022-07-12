@@ -1,7 +1,10 @@
 <template>
-  <tapestry-modal
+  <b-modal
     v-if="node"
     id="lightbox"
+    :visible="visible"
+    size="lg"
+    scrollable
     data-qa="lightbox"
     :aria-label="`You're now in a modal, viewing the content of ${node.title}.`"
     initial-focus="lightboxTitle"
@@ -38,7 +41,7 @@
       @complete="complete"
       @change:dimensions="updateDimensions"
     />
-  </tapestry-modal>
+  </b-modal>
 </template>
 
 <script>
@@ -62,6 +65,10 @@ export default {
     PageMenu,
   },
   props: {
+    visible: {
+      type: Boolean,
+      required: true,
+    },
     nodeId: {
       type: [Number, String],
       required: true,
