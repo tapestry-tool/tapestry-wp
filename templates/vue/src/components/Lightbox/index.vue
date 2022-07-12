@@ -22,14 +22,10 @@
       id="multicontent-container"
       context="lightbox"
       :node="node"
+      :menu-dimensions="dimensions"
       :row-id="rowId"
       @close="handleAutoClose"
       @complete="complete"
-    />
-    <page-menu
-      v-if="node.typeData.showNavBar && node.presentationStyle === 'page'"
-      :node="node"
-      :dimensions="dimensions"
     />
     <tapestry-media
       v-if="node.mediaType !== 'multi-content'"
@@ -124,13 +120,6 @@ export default {
         }
       }
 
-      if (this.node.mediaType === "multi-content") {
-        styles.display = "flex"
-        // Reversed because PageMenu is placed after MultiContentMedia for refs to correctly render
-        styles.flexDirection = "row-reverse"
-        return Object.assign(styles, { padding: "24px" })
-      }
-
       if (this.node.mediaType === "text" || this.node.mediaType === "wp-post") {
         return Object.assign(styles, {
           background: "var(--background-color);",
@@ -145,7 +134,8 @@ export default {
         return {}
       }
 
-      const { mediaWidth: width, mediaHeight: height } = this.node.typeData
+      const width = this.node.typeData.mediaWidth ?? 960
+      const height = this.node.typeData.mediaHeight ?? 600
       const browserWidth = Helpers.getBrowserWidth()
       const browserHeight = Helpers.getBrowserHeight()
 
@@ -303,8 +293,15 @@ export default {
         this.node.presentationStyle === "unit" &&
         this.node.childOrdering?.length
       ) {
-        const pageNode = this.getNode(this.node.childOrdering[0])
-        this.$root.$emit("open-node", pageNode.id)
+        const firstVisible = this.node.childOrdering.find(id => {
+          const node = this.getNode(id)
+          return node.unlocked || !node.hideWhenLocked
+        })
+        if (firstVisible) {
+          this.$root.$emit("open-node", firstVisible)
+        } else {
+          this.applyDimensions()
+        }
       } else {
         this.applyDimensions()
       }

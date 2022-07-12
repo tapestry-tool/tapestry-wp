@@ -48,6 +48,7 @@ class TapestryNode implements ITapestryNode
     private $mapCoordinates;
     private $popup;
     private $level;
+    private $hideWhenLocked;
 
     /**
      * Constructor.
@@ -100,6 +101,8 @@ class TapestryNode implements ITapestryNode
             'lng' => '',
         ];
         $this->popup = null;
+        $this->level = 1;
+        $this->hideWhenLocked = false;
 
         if (TapestryHelpers::isValidTapestryNode($this->nodeMetaId)) {
             $node = $this->_loadFromDatabase();
@@ -249,6 +252,9 @@ class TapestryNode implements ITapestryNode
         }
         if (isset($node->level) && is_numeric($node->level)) {
             $this->level = $node->level;
+        }
+        if (isset($node->hideWhenLocked) && is_bool($node->hideWhenLocked)) {
+            $this->hideWhenLocked = $node->hideWhenLocked;
         }
     }
 
@@ -587,6 +593,7 @@ class TapestryNode implements ITapestryNode
             'mapCoordinates' => $this->mapCoordinates,
             'popup' => $this->popup,
             'level' => $this->level,
+            'hideWhenLocked' => $this->hideWhenLocked,
         ];
     }
 

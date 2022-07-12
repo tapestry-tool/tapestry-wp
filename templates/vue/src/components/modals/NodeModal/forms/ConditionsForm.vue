@@ -9,6 +9,11 @@
         logged in.
       </b-form-invalid-feedback>
     </b-form-group>
+    <b-form-group v-if="lock" class="mb-3">
+      <b-form-checkbox v-model="hideWhenLocked">
+        Also hide this node when locked
+      </b-form-checkbox>
+    </b-form-group>
     <div v-if="lock">
       <b-card
         v-for="(condition, idx) in conditions"
@@ -105,6 +110,14 @@ export default {
     ...mapState({
       nodeId: state => state.currentEditingNode.id,
     }),
+    hideWhenLocked: {
+      get() {
+        return this.$store.state.currentEditingNode.hideWhenLocked ?? false
+      },
+      set(value) {
+        this.update("hideWhenLocked", value)
+      },
+    },
     nodeOptions() {
       return Object.values(this.nodes)
         .filter(node => node.id !== this.nodeId)
