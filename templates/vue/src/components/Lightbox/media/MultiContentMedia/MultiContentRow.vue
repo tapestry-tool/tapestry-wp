@@ -1,5 +1,10 @@
 <template>
-  <b-col :class="htmlClass" cols="12" :lg="node.typeData.halfWidth ? 6 : 12">
+  <b-col
+    v-if="node.unlocked || !node.hideWhenLocked"
+    :class="htmlClass"
+    cols="12"
+    :lg="node.typeData.halfWidth ? 6 : 12"
+  >
     <div class="multi-content-row">
       <div v-if="presentationStyle === 'accordion'" class="button-row">
         <button class="trigger-row-btn" :disabled="disabled" @click="toggle">
