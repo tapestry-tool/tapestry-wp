@@ -713,10 +713,7 @@ class TapestryImportExport
         $export_dir = self::_getZipExportDirectory()['path'];
 
         if (!empty($export_dir)) {
-            // TODO: not clearing!
-            // On Windows, temporary files only get the first 3 letters of the prefix
-            // so search for "exp*" instead of "export_"
-            $files = glob($export_dir . '/exp*');
+            $files = glob($export_dir . '/export_*.zip');
             $now = time();
             $one_day = 60 * 60 * 24;
 
