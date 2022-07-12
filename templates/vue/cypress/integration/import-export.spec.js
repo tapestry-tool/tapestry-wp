@@ -141,7 +141,7 @@ describe("Import Export", () => {
       .should("have.length", 3)
     cy.task("log", "Line 141")
 
-    cy.contains("button", /confirm/i).click()
+    cy.contains("button", /confirm/i).click({ force: true })
     cy.task("log", "Line 144")
     cy.wait("@load")
     cy.task("log", "Line 146")
@@ -186,7 +186,7 @@ describe("Import Export", () => {
       .should("have.length", 5)
     cy.task("log", "Line 186")
 
-    cy.contains("button", /confirm/i).click()
+    cy.contains("button", /confirm/i).click({ force: true })
     cy.task("log", "Line 189")
     cy.wait("@load")
     cy.task("log", "Line 191")
