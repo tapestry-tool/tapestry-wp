@@ -443,12 +443,7 @@ function importTapestryFromZip($request)
         TapestryImportExport::validateTapestryData($tapestry_data);
         TapestryImportExport::validateTapestryZipStructure($zip);
 
-        // If import is from a different site, filter permissions
-        $changedPermissions = [];
-        $wpUrl = get_bloginfo('url');
-        if ($tapestry_data->{'site-url'} !== $wpUrl) {
-            $changedPermissions = TapestryImportExport::prepareImport($tapestry_data);
-        }
+        $changes = TapestryImportExport::prepareImport($tapestry_data);
 
         // Extract zip file to a temporary directory
         $temp_dir = TapestryImportExport::createTempDirectory($parent_dir);
@@ -457,21 +452,14 @@ function importTapestryFromZip($request)
         }
         $zip->extractTo($temp_dir['path']);
 
-        // Delete leftover category from importing WordPress posts, if exists
-        TapestryImportExport::deleteWpExportCategory($tapestry_data);
-
         // Re-create all media referenced by the Tapestry data on this site,
         // and update references to new URLs
         $importWarnings = TapestryImportExport::importExternalMedia($tapestry_data, $temp_dir['path'], $temp_dir['url']);
 
-        // Import the modified Tapestry data as normal
         $importedTapestry = importTapestry($postId, $tapestry_data);
 
         return [
-            'changes' => [
-                'permissions' => $changedPermissions,
-                'noChange' => count($changedPermissions) === 0,
-            ],
+            'changes' => $changes,
             'warnings' => $importWarnings,
             'tapestry' => $importedTapestry,
         ];
@@ -592,21 +580,12 @@ function putTapestry($request)
     try {
         TapestryImportExport::validateTapestryData($tapestryData);
 
-        $changedPermissions = [];
-        $wpUrl = get_bloginfo('url');
-        if ($tapestryData->{'site-url'} !== $wpUrl) {
-            $changedPermissions = TapestryImportExport::prepareImport($tapestryData);
-        }
+        $changes = TapestryImportExport::prepareImport($tapestryData);
 
-        // Delete leftover category from importing WordPress posts, if exists
-        TapestryImportExport::deleteWpExportCategory($tapestryData);
         $importedTapestry = importTapestry($postId, $tapestryData);
 
         return [
-            'changes' => [
-                'permissions' => $changedPermissions,
-                'noChange' => count($changedPermissions) === 0,
-            ],
+            'changes' => $changes,
             'tapestry' => $importedTapestry,
         ];
     } catch (TapestryError $e) {
@@ -616,6 +595,7 @@ function putTapestry($request)
 
 function importTapestry($postId, $tapestryData)
 {
+    // TODO: warn if export file has warnings
     $tapestry = new Tapestry($postId);
 
     if (!$tapestry->isEmpty()) {

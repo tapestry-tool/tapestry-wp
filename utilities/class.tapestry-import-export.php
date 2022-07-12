@@ -26,17 +26,37 @@ class TapestryImportExport
      */
     public static function prepareImport($tapestry_data)
     {
+        // Delete leftover category from importing WordPress posts, if it exists
+        self::_deleteWpExportCategory($tapestryData);
+
+        // If import is from a different site, filter permissions
+        $changedPermissions = self::_filterPermissionsIfMovingSites($tapestry_data);
+        $changes = [
+            'permissions' => $changedPermissions,
+            'noChange' => count($changedPermissions) === 0,
+        ];
+
+        return $changes;
+    }
+
+    private static function _filterPermissionsIfMovingSites($tapestry_data)
+    {
         $changes = [];
-        $wp_roles = self::_getAllRoles();
-        foreach ($tapestry_data->nodes as $node) {
-            $node->permissions = self::_filterImportedPerms($node->permissions, $wp_roles, $changes);
-        }
-        if ($tapestry_data->settings) {
-            $tapestry_data->settings->defaultPermissions = self::_filterImportedPerms(
-                $tapestry_data->settings->defaultPermissions,
-                $wp_roles,
-                $changes
-            );
+
+        $wpUrl = get_bloginfo('url');
+        if ($tapestry_data->{'site-url'} !== $wpUrl) {
+            $wp_roles = self::_getAllRoles();
+
+            foreach ($tapestry_data->nodes as $node) {
+                $node->permissions = self::_filterImportedPerms($node->permissions, $wp_roles, $changes);
+            }
+            if ($tapestry_data->settings) {
+                $tapestry_data->settings->defaultPermissions = self::_filterImportedPerms(
+                    $tapestry_data->settings->defaultPermissions,
+                    $wp_roles,
+                    $changes
+                );
+            }
         }
 
         return $changes;
@@ -335,7 +355,7 @@ class TapestryImportExport
     /**
      * Exports all WordPress posts in a Tapestry.
      * Adds the name of the export category to the Tapestry data.
-     * 
+     *
      * @param object $tapestry_data     Data of the Tapestry
      * @return string|null      Contents of the WXR file, or NULL if no WordPress posts in the Tapestry.
      */
@@ -429,7 +449,7 @@ class TapestryImportExport
     /**
      * Deletes the category in the wpExportCategory field of the Tapestry data.
      */
-    public static function deleteWpExportCategory($tapestry_data)
+    private static function _deleteWpExportCategory($tapestry_data)
     {
         $category_name = $tapestry_data->wpExportCategory;
 
