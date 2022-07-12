@@ -215,19 +215,23 @@ class TapestryImportExport
 
         $zip = new ZipArchive();
 
-        // Create a unique temp file, and give the zip file the same name, to ensure uniqueness
-        $temp_path = tempnam($tapestry_export_dir['path'], 'export_');
-        $zip_name = basename($temp_path) . '.zip';
-        $zip_path = $tapestry_export_dir['path'] . '/' . $zip_name;
-        $zip_url = $tapestry_export_dir['url'] . '/' . $zip_name;
+        $max_attempts = 50;
+        $attempts = 0;
+        $success = false;
+        while (!$success && $attempts < $max_attempts) {
+            $zip_name = uniqid('export_') . '.zip';
+            $zip_path = $tapestry_export_dir['path'] . '/' . $zip_name;
+            $success = $zip->open($zip_path, ZipArchive::CREATE | ZipArchive::EXCL);
+            $attempts++;
+        }
 
-        if ($zip->open($zip_path, ZipArchive::CREATE | ZipArchive::EXCL) !== true) {
+        if (!$success) {
             throw new TapestryError('FAILED_TO_EXPORT');
         }
 
         return [
             'zip' => $zip,
-            'url' => $zip_url,
+            'url' => $tapestry_export_dir['url'] . '/' . $zip_name,
         ];
     }
 

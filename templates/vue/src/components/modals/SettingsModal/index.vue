@@ -554,7 +554,18 @@ export default {
       this.isExporting = false
       this.hasExported = true
       this.exportedFileType = ".zip"
-      this.exportWarnings = exportedTapestry.warnings
+
+      if (this.hasWarnings(exportedTapestry)) {
+        this.exportWarnings = exportedTapestry.warnings
+      } else {
+        this.exportWarnings = null
+      }
+    },
+    hasWarnings(exportedTapestry) {
+      return (
+        exportedTapestry.warnings.nodes.length > 0 ||
+        exportedTapestry.warnings.settings.length > 0
+      )
     },
     downloadWpPosts(exportedPosts) {
       const blob = new Blob([exportedPosts], {
