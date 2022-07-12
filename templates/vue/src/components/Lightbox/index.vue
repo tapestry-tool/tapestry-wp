@@ -3,6 +3,8 @@
     v-if="node"
     id="lightbox"
     :visible="visible"
+    hide-header-close
+    hide-footer
     size="lg"
     scrollable
     data-qa="lightbox"
@@ -14,9 +16,40 @@
     }"
     :node="node"
     :content-container-style="lightboxContentStyles"
-    :allow-close="canSkip"
-    @close="handleUserClose"
+    @hide="handleUserClose"
   >
+    <template #modal-header="{ close }">
+      <div class="buttons-container">
+        <modal-button
+          v-if="canSkip"
+          aria-label="Close lightbox."
+          data-qa="close-lightbox"
+          icon="times"
+          tabindex="0"
+          @clicked="close"
+        />
+        <modal-button
+          icon="heart"
+          icon-size="sm"
+          :title="isFavourite ? 'Remove from Favourites' : 'Add to Favourites'"
+          :icon-color="isFavourite ? 'red' : ''"
+          :bg-color="isFavourite ? '#fff' : ''"
+          :bg-hover-color="isFavourite ? '#fff' : 'red'"
+          tabindex="0"
+          @clicked="toggleFavourite(node.id)"
+        />
+        <modal-button
+          v-if="canEditNode"
+          aria-label="Edit this node."
+          icon="pencil-alt"
+          icon-size="sm"
+          title="Edit Node"
+          tabindex="0"
+          @clicked="editNode"
+        />
+      </div>
+    </template>
+
     <multi-content-media
       v-if="node.mediaType === 'multi-content'"
       id="multicontent-container"
@@ -41,16 +74,16 @@
 </template>
 
 <script>
-import { mapActions, mapGetters, mapState } from "vuex"
+import { mapActions, mapGetters, mapMutations, mapState } from "vuex"
 import client from "@/services/TapestryAPI"
 import TapestryModal from "./TapestryModal"
 import MultiContentMedia from "./media/MultiContentMedia"
 import TapestryMedia from "./media/TapestryMedia"
 import PageMenu from "./media/MultiContentMedia/PageMenu"
+import ModalButton from "./TapestryModal/ModalButton"
 import { names } from "@/config/routes"
 import Helpers from "@/utils/Helpers"
 import { sizes } from "@/utils/constants"
-import DragSelectModular from "@/utils/dragSelectModular"
 
 export default {
   name: "lightbox",
@@ -59,6 +92,7 @@ export default {
     TapestryMedia,
     TapestryModal,
     PageMenu,
+    ModalButton,
   },
   props: {
     visible: {
@@ -85,7 +119,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(["h5pSettings", "rootId"]),
+    ...mapState(["h5pSettings", "rootId", "favourites"]),
     ...mapGetters(["getNode", "getParent", "isMultiContent", "isMultiContentRow"]),
     node() {
       const node = this.getNode(this.nodeId)
@@ -95,8 +129,14 @@ export default {
       const parentNodeId = this.getParent(this.node.id)
       return this.getNode(parentNodeId)
     },
+    isFavourite() {
+      return this.favourites.find(id => id == this.node.id)
+    },
     canSkip() {
       return this.node.completed || this.node.skippable !== false
+    },
+    canEditNode() {
+      return Helpers.hasPermission(this.node, "edit")
     },
     lightboxContentStyles() {
       const styles = {
@@ -219,13 +259,9 @@ export default {
     },
   },
   mounted() {
-    document.querySelector("body").classList.add("tapestry-lightbox-open")
-    DragSelectModular.removeDragSelectListener()
     this.handleNodeChanged()
   },
   beforeDestroy() {
-    document.querySelector("body").classList.remove("tapestry-lightbox-open")
-    DragSelectModular.addDragSelectListener()
     this.$router.push({
       ...this.$route,
       params: { ...this.$route.params, rowId: undefined },
@@ -233,7 +269,16 @@ export default {
     })
   },
   methods: {
-    ...mapActions(["completeNode", "updateNodeProgress"]),
+    ...mapActions(["completeNode", "updateNodeProgress", "toggleFavourite"]),
+    ...mapMutations(["setReturnRoute"]),
+    editNode() {
+      this.setReturnRoute(this.$route)
+      this.$router.push({
+        name: names.MODAL,
+        params: { nodeId: this.node.id, type: "edit", tab: "content" },
+        query: { from: "lightbox" },
+      })
+    },
     complete(nodeId) {
       const node = this.getNode(nodeId || this.nodeId)
       if (node.progress !== 1) {
@@ -314,14 +359,6 @@ export default {
 body.tapestry-lightbox-open {
   overflow: hidden;
 }
-</style>
-
-<style lang="scss" scoped>
-.content-text {
-  .media-wrapper {
-    overflow: auto;
-  }
-}
 
 #lightbox {
   &.full-screen {
@@ -333,6 +370,30 @@ body.tapestry-lightbox-open {
       right: 50px;
     }
   }
-  height: 100%;
+
+  .modal-header {
+    padding: 0;
+  }
+
+  .modal-content {
+    overflow: unset;
+  }
+
+  .buttons-container {
+    position: absolute;
+    display: flex;
+    flex-direction: row-reverse;
+    top: -20px;
+    right: -20px;
+    z-index: 1000;
+  }
+}
+</style>
+
+<style lang="scss" scoped>
+.content-text {
+  .media-wrapper {
+    overflow: auto;
+  }
 }
 </style>
