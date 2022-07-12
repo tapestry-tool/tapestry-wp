@@ -376,7 +376,8 @@ function exportTapestry($request)
 
 /**
  * Export a Tapestry to a zip file.
- * Returns URL of the exported zip on the server.
+ * Returns URL of the exported zip on the server, and a list of warnings
+ * generated during export.
  *
  * @param object $request   HTTP request
  */
@@ -395,11 +396,7 @@ function exportTapestryAsZip($request)
         
         // Create zip file containing the Tapestry data as a JSON file,
         // and all media referenced by the Tapestry data
-        $zip_url = TapestryImportExport::exportExternalMedia($tapestry_data);
-
-        return (object) [
-            'zipUrl' => $zip_url,
-        ];
+        return TapestryImportExport::exportExternalMedia($tapestry_data);
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }

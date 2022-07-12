@@ -145,27 +145,44 @@ class TapestryImportExport
     public static function exportExternalMedia($tapestry_data)
     {
         list('zip' => $zip, 'url' => $zip_url) = self::_createExportZip();
+        $export_warnings = [
+            'nodes' => [],
+            'settings' => [],
+        ];
 
         $h5p_controller = new TapestryH5P();
         foreach ($tapestry_data->nodes as $node) {
+            $node_warnings = [];
+
             if ($node->mediaType === 'h5p') {
-                self::_exportH5PNode($node, $zip, $h5p_controller);
+                self::_exportH5PNode($node, $zip, $node_warnings, $h5p_controller);
             } elseif ($node->mediaType === 'video') {
-                self::_exportMedia($node->typeData->mediaURL, $zip);
+                self::_exportMedia($node->typeData->mediaURL, $zip, $node_warnings);
             } elseif ($node->mediaType === 'activity') {
-                self::_exportActivityNode($node, $zip);
+                self::_exportActivityNode($node, $zip, $node_warnings);
             }
 
-            self::_exportMedia($node->imageURL, $zip, $node->thumbnailFileId);
-            self::_exportMedia($node->lockedImageURL, $zip, $node->lockedThumbnailFileId);
+            self::_exportMedia($node->imageURL, $zip, $node_warnings, $node->thumbnailFileId);
+            self::_exportMedia($node->lockedImageURL, $zip, $node_warnings, $node->lockedThumbnailFileId);
 
-            self::_exportMedia($tapestry_data->settings->backgroundUrl, $zip);
+            if (!empty($node_warnings)) {
+                array_push($export_warnings['nodes'], [
+                    'id' => $node->id,
+                    'title' => $node->title,
+                    'warnings' => $node_warnings,
+                ]);
+            }
         }
+
+        self::_exportMedia($tapestry_data->settings->backgroundUrl, $zip, $export_warnings['settings']);
 
         $zip->addFromString('tapestry.json', json_encode($tapestry_data, JSON_PRETTY_PRINT));
         $zip->close();
 
-        return $zip_url;
+        return [
+            'zipUrl' => $zip_url,
+            'warnings' => $export_warnings,
+        ];
     }
 
     /**
@@ -209,10 +226,11 @@ class TapestryImportExport
      * @param object $node      H5P node data
      * @param ZipArchive $zip   Zip file to add the archive to
      */
-    private static function _exportH5PNode($node, $zip, $h5p_controller)
+    private static function _exportH5PNode($node, $zip, &$warnings, $h5p_controller)
     {
         // If H5P plugin files are not available, nothing to do
         if (empty(H5P_DEFINED)) {
+            array_push($warnings, 'Could not export H5P content: H5P plugin files not found.');
             return;
         }
 
@@ -224,7 +242,11 @@ class TapestryImportExport
             $h5p_name = ($h5p_data->slug ? $h5p_data->slug . '-' : '') . $h5p_data->id . '.h5p';
             $h5p_path = H5P_Plugin::get_instance()->get_h5p_path() . '/exports/' . $h5p_name;
 
-            // TODO: what if the file doesn't exist?
+            if (!file_exists($h5p_path) || !is_file($h5p_path)) {
+                array_push($warnings, 'Could not find file "' . $h5p_name . '" in H5P export folder.');
+                return;
+            }
+
             $zip->addFile($h5p_path, $h5p_name);
 
             $node->typeData->mediaURL = $h5p_name;
@@ -238,20 +260,20 @@ class TapestryImportExport
      * @param object $node      Activity node data
      * @param ZipArchive $zip   Zip file to add images to
      */
-    private static function _exportActivityNode($node, $zip)
+    private static function _exportActivityNode($node, $zip, &$warnings)
     {
         foreach ($node->typeData->activity->questions as $question) {
             $multiple_choice = $question->answerTypes->multipleChoice;
             if ($multiple_choice->enabled && $multiple_choice->useImages && isset($multiple_choice->choices)) {
                 foreach ($multiple_choice->choices as $choice) {
-                    self::_exportMedia($choice->imageUrl, $zip);
+                    self::_exportMedia($choice->imageUrl, $zip, $warnings);
                 }
             }
 
             $drag_drop = $question->answerTypes->dragDrop;
             if ($drag_drop->enabled && $drag_drop->useImages && isset($drag_drop->items)) {
                 foreach ($drag_drop->items as $item) {
-                    self::_exportMedia($item->imageUrl, $zip);
+                    self::_exportMedia($item->imageUrl, $zip, $warnings);
                 }
             }
         }
@@ -266,17 +288,23 @@ class TapestryImportExport
      * @param int $file_id          (Optional) WordPress attachment id of the media item.
      *                              If specified, is used instead of the URL to find the local path.
      */
-    private static function _exportMedia(&$media_url, $zip, $file_id = null)
+    private static function _exportMedia(&$media_url, $zip, &$warnings, $file_id = null)
     {
         if (!empty($file_id)) {
             // Retrieve the original file, not the resized version
             $path_to_media = get_attached_file($file_id);
+
+            if (!$path_to_media) {
+                array_push($warnings, 'Could not find WordPress attachment. A thumbnail may be missing.');
+            }
         } else {
             $path_to_media = self::_getLocalPath($media_url);
         }
 
-        if (!$path_to_media || !file_exists($path_to_media) || !is_file($path_to_media)) {
-            // File does not exist locally; skip
+        if (!$path_to_media) {
+            return;
+        } elseif (!file_exists($path_to_media) || !is_file($path_to_media)) {
+            array_push($warnings, 'Could not find file "' . basename($path_to_media) . '" in WordPress uploads.');
             return;
         }
         $media_name = basename($path_to_media);
@@ -303,6 +331,7 @@ class TapestryImportExport
             }
         }
 
+        // TODO: check if post_ids is empty first
         return self::_exportWpPosts($post_ids);
     }
 
@@ -361,11 +390,11 @@ class TapestryImportExport
 
     /**
      * Uploads all media (images, videos, H5Ps) referenced by the imported Tapestry.
-     * 
+     *
      * @param object $tapestry_data     Data of the Tapestry
      * @param string $temp_dir          Path to the directory where zip was extracted.
      * @param string $temp_url          URL of the directory where zip was extracted.
-     * 
+     *
      * @return array $warnings  Warnings generated during import
      *                          [
      *                              'nodes' => [
@@ -426,18 +455,18 @@ class TapestryImportExport
     /**
      * Uploads an H5P file to the site and sets the H5P node's mediaURL to the embed link for the new H5P,
      * if the file exists.
-     * 
+     *
      * @param object $node      H5P node data
      * @param string $temp_dir  Path to the directory where zip was extracted.
      * @param string $temp_url  URL of the directory where zip was extracted.
      * @param array &$warnings  (Modified) Import warnings generated so far
-     * 
+     *
      * @return bool True if successfully imported, otherwise false
      */
     private static function _importH5PNode($node, $temp_dir, $temp_url, &$warnings)
     {
         if (empty(H5P_DEFINED)) {
-            array_push($warnings, 'Could not import H5P node: H5P plugin files not found.');
+            array_push($warnings, 'Could not import H5P content: H5P plugin files not found.');
             return false;
         }
 
@@ -454,7 +483,7 @@ class TapestryImportExport
             $node->typeData->mediaURL = admin_url('admin-ajax.php') . '?action=h5p_embed&id=' . $h5p_id;
             return true;
         } catch (Exception $e) {
-            array_push($warnings, 'Could not import H5P node due to error: ' . $e->getMessage());
+            array_push($warnings, 'Could not import H5P content due to error: ' . $e->getMessage());
         }
         return false;
     }
@@ -462,7 +491,7 @@ class TapestryImportExport
     /**
      * Uploads all images in an Activity node to the site, and sets the image URLs to the new URLs.
      * Currently checks the multiple choice and drag drop question types.
-     * 
+     *
      * @param object $node      Activity node data
      * @param string $temp_dir  Path to the directory where zip was extracted.
      * @param array &$warnings  (Modified) Import warnings generated so far
@@ -489,7 +518,7 @@ class TapestryImportExport
     /**
      * If the media_url references a filename in the zip, uploads the media item (image, video) to the site,
      * and sets the media_url to the URL of the uploaded media.
-     * 
+     *
      * @param string &$media_url        (Modified) Link to the media item
      * @param string $temp_dir          Path to the directory where zip was extracted
      * @param array &$warnings          (Modified) Import warnings generated so far
@@ -525,7 +554,7 @@ class TapestryImportExport
 
     /**
      * Attempts to update the post ID of a WordPress Post node to its ID after being imported.
-     * 
+     *
      * @param int &$media_url   (Modified) Current post ID
      *                          If a matching post is found, will be set to this new post ID.
      */
@@ -556,11 +585,11 @@ class TapestryImportExport
 
     /**
      * Checks that a file exists in the directory where the zip was extracted and returns its path.
-     * 
+     *
      * @param string $filename      Name of the file in the zip
      * @param string $temp_dir      Path to the directory where zip was extracted
      * @param array &$warnings      (Modified) Import warnings generated so far
-     * 
+     *
      * @return string|false The path, or false if it doesn't exist.
      */
     private static function _getPathIfExists($filename, $temp_dir, &$warnings)
@@ -577,7 +606,7 @@ class TapestryImportExport
     /**
      * Gets the local path to a Wordpress upload given its URL.
      * Does not check if the file actually exists, only the form of the URL.
-     * 
+     *
      * @return string|false The path, or false if the URL is not a local WordPress upload
      */
     private static function _getLocalPath($url)
@@ -619,7 +648,7 @@ class TapestryImportExport
 
     /**
      * Deletes all export files in the export directory older than 1 day
-     * 
+     *
      * @return int Number of files successfully deleted
      */
     public static function clearExportedZips()
@@ -628,7 +657,10 @@ class TapestryImportExport
         $export_dir = self::_getZipExportDirectory()['path'];
 
         if (!empty($export_dir)) {
-            $files = glob($export_dir . '/export_*');
+            // TODO: not clearing!
+            // On Windows, temporary files only get the first 3 letters of the prefix
+            // so search for "exp*" instead of "export_"
+            $files = glob($export_dir . '/exp*');
             $now = time();
             $one_day = 60 * 60 * 24;
 
@@ -647,9 +679,9 @@ class TapestryImportExport
     /**
      * Creates a temporary directory with a unique name in the import directory.
      * Also creates the import directory if it doesn't exist.
-     * 
+     *
      * See https://stackoverflow.com/a/30010928
-     * 
+     *
      * @return array    [
      *                      'path' => (string) Path to the directory
      *                      'url' => (string) URL of the directory
@@ -679,7 +711,7 @@ class TapestryImportExport
 
     /**
      * Removes a temporary directory from the import directory.
-     * 
+     *
      * See https://stackoverflow.com/a/13468943
      */
     public static function deleteTempDirectory($dirpath)

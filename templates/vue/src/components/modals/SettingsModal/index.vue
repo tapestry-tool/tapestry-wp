@@ -406,7 +406,6 @@ export default {
       renderMap: false,
       mapBounds: { neLat: 90, neLng: 180, swLat: -90, swLng: -180 },
       hasExported: false,
-      exportFailed: false,
       isOptimizing: false,
       hasOptimized: false,
       exportedFileType: "",
