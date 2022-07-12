@@ -10,6 +10,7 @@ class ZoomPanHelper {
   pinchPoint
   isPanning
   panPoint
+  lastClickTime
 
   constructor(targetDOMId, onZoom, onZoomEnd, onPan, onPanEnd) {
     this.onZoom = onZoom
@@ -25,6 +26,8 @@ class ZoomPanHelper {
 
     this.isPanning = false
     this.panPoint = { x: 0, y: 0 }
+
+    this.lastClickTime = null
   }
 
   register() {
@@ -44,6 +47,8 @@ class ZoomPanHelper {
       elem.addEventListener("touchmove", this.moveHandler.bind(this))
       elem.addEventListener("touchcancel", this.endHandler.bind(this))
       elem.addEventListener("touchend", this.endHandler.bind(this))
+      // catch double click to zoom
+      elem.addEventListener("click", this.clickHandler.bind(this))
     }
   }
 
@@ -61,6 +66,7 @@ class ZoomPanHelper {
       elem.removeEventListener("touchmove", this.moveHandler.bind(this))
       elem.removeEventListener("touchcancel", this.endHandler.bind(this))
       elem.removeEventListener("touchend", this.endHandler.bind(this))
+      elem.removeEventListener("click", this.clickHandler.bind(this))
     }
   }
 
@@ -163,6 +169,19 @@ class ZoomPanHelper {
       this.pinchPoint = { x: 0, y: 0 }
     }
     this.lastDistance = null
+  }
+
+  clickHandler(e) {
+    const time = Date.now()
+    if (this.lastClickTime && time - this.lastClickTime <= 1000) {
+      // the second click of double click
+      const scaleDelta = 1
+      this.onZoom(scaleDelta, e.offsetX, e.offsetY)
+      this.onZoomEnd()
+      this.lastClickTime = null // to prevent triple clicks...
+    } else {
+      this.lastClickTime = time
+    }
   }
 }
 export default ZoomPanHelper
