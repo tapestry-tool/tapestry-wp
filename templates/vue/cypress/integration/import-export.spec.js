@@ -11,7 +11,8 @@ describe("Import Export", () => {
     cy.wait("@export")
       .its("response.body")
       .then(data => {
-        expect("nodes" in data).to.be.true
+        expect("json" in data).to.be.true
+        expect("nodes" in data.json).to.be.true
       })
 
     cy.contains(/exported/i).should("be.visible")

@@ -12,6 +12,10 @@
     <b-container fluid class="px-0">
       <b-card>
         <h2>Import Successful!</h2>
+        <b-alert :show="exportWarnings" variant="warning">
+          The file you provided was exported with warnings. Even if there are no
+          import warnings, we recommend checking that all your content is present.
+        </b-alert>
         <div v-if="changes.noChange">No changes were made in import.</div>
         <div v-else>
           <p>All authors have been set to the current user.</p>
@@ -58,6 +62,10 @@ export default {
     },
     warnings: {
       type: Object,
+      required: true,
+    },
+    exportWarnings: {
+      type: Boolean,
       required: true,
     },
   },

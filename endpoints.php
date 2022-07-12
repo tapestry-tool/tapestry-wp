@@ -461,6 +461,7 @@ function importTapestryFromZip($request)
         return [
             'changes' => $changes,
             'warnings' => $importWarnings,
+            'exportWarnings' => !empty($tapestry_data->warnings),
             'tapestry' => $importedTapestry,
         ];
     } catch (TapestryError $e) {
@@ -595,7 +596,6 @@ function putTapestry($request)
 
 function importTapestry($postId, $tapestryData)
 {
-    // TODO: warn if export file has warnings
     $tapestry = new Tapestry($postId);
 
     if (!$tapestry->isEmpty()) {

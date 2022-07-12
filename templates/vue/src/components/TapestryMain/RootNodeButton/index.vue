@@ -1,6 +1,10 @@
 <template>
   <div id="root-node-button">
-    <import-changelog :changes="changes" :warnings="warnings" />
+    <import-changelog
+      :changes="changes"
+      :warnings="warnings"
+      :exportWarnings="exportWarnings"
+    />
     <div data-qa="root-node-button" @click="addRootNode">
       <i class="fas fa-plus-circle fa-5x"></i>
       <div>Add Root Node</div>
@@ -56,6 +60,7 @@ export default {
         permissions: new Set(),
       },
       warnings: {},
+      exportWarnings: false,
     }
   },
   methods: {
@@ -143,6 +148,7 @@ export default {
           this.changes.permissions = new Set(response.changes.permissions)
           this.changes.noChange = response.changes.noChange
           this.warnings = response.warnings
+          this.exportWarnings = response.exportWarnings
           this.$bvModal.show("import-changelog")
         })
         .catch(err => {

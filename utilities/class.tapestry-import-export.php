@@ -207,6 +207,8 @@ class TapestryImportExport
 
         self::_exportMedia($tapestry_data->settings->backgroundUrl, $zip, $export_warnings['settings']);
 
+        $tapestry_data->warnings = !empty($export_warnings['nodes']) || !empty($export_warnings['settings']);
+
         $zip->addFromString('tapestry.json', json_encode($tapestry_data, JSON_PRETTY_PRINT));
         $zip->close();
 
