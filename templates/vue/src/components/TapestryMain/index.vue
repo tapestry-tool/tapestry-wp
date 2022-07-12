@@ -37,6 +37,10 @@
         <filter id="shadow-root" y="-10%" height="200%" x="-10%" width="200%">
           <!-- <feDropShadow :dx="3 * maxLevel * scale" :dy="3 * maxLevel * scale" stdDeviation="5" flood-color="#81A684" flood-opacity="0.6" /> -->
           <feGaussianBlur in="SourceAlpha" stdDeviation="5" />
+          <feColorMatrix
+            type="matrix"
+            values="0 0 0 0 0.8 0 0 0 0 0.4 0 0 0 0 0.1 0 0 0 1 0"
+          />
           <feOffset :dx="4 * maxLevel * scale" :dy="4 * maxLevel * scale" />
           <feComponentTransfer>
             <feFuncA type="linear" slope="0.4" />
