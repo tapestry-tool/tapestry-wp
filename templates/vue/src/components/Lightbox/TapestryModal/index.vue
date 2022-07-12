@@ -142,7 +142,7 @@ export default {
     height: 100%;
 
     .content-cutoff {
-      position: absolute;
+      position: relative;
       height: 100%;
       overflow: hidden;
     }
