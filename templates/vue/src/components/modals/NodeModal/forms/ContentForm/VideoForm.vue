@@ -87,8 +87,11 @@ export default {
     },
   },
   watch: {
-    youtubeId(id) {
-      this.updateFormatType(id)
+    youtubeId: {
+      handler(id) {
+        this.updateFormatType(id)
+      },
+      immediate: true,
     },
   },
   created() {
