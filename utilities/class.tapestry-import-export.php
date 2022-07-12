@@ -139,7 +139,18 @@ class TapestryImportExport
      * Creates a zip file containing the JSON representation and
      * all media (images, videos, H5Ps) referenced by a Tapestry.
      *
-     * @return string URL of the zip file on the server.
+     * @return array    [
+     *                      'zipUrl' => (string) URL of the zip file on the server
+     *                      'warnings' => (array) Warnings generated during export
+     *                                  [
+     *                                      'nodes' => [
+     *                                          'id' => (int) Node ID
+     *                                          'title' => (title) Node title
+     *                                          'warnings' => (array) List of warning messages
+     *                                      ],
+     *                                      'settings' => (array) List of warning messages
+     *                                  ]
+     *                  ]
      * @throws TapestryError if the zip could not be created or opened
      */
     public static function exportExternalMedia($tapestry_data)
@@ -225,6 +236,7 @@ class TapestryImportExport
      *
      * @param object $node      H5P node data
      * @param ZipArchive $zip   Zip file to add the archive to
+     * @param array &$warnings  (Modified) Export warnings generated so far
      */
     private static function _exportH5PNode($node, $zip, &$warnings, $h5p_controller)
     {
@@ -259,6 +271,7 @@ class TapestryImportExport
      *
      * @param object $node      Activity node data
      * @param ZipArchive $zip   Zip file to add images to
+     * @param array &$warnings  (Modified) Export warnings generated so far
      */
     private static function _exportActivityNode($node, $zip, &$warnings)
     {
@@ -285,6 +298,7 @@ class TapestryImportExport
      *
      * @param string &$media_url    (Modified in place) URL of the media item
      * @param ZipArchive $zip       Zip file to add item to
+     * @param array &$warnings  (Modified) Export warnings generated so far
      * @param int $file_id          (Optional) WordPress attachment id of the media item.
      *                              If specified, is used instead of the URL to find the local path.
      */
@@ -312,29 +326,45 @@ class TapestryImportExport
         $media_url = $media_name;
     }
 
-    // --- Export WordPress posts ---
+    // --- Import/Export WordPress posts ---
 
     /**
      * Exports all WordPress posts in a Tapestry.
-     *
-     * @param Tapestry $tapestry
-     * @return string Contents of the WXR file.
+     * Adds the name of the export category to the Tapestry data.
+     * 
+     * @param object $tapestry_data     Data of the Tapestry
+     * @return string|null      Contents of the WXR file, or NULL if no WordPress posts in the Tapestry.
      */
-    public static function exportWpPostsInTapestry($tapestry)
+    public static function exportWpPostsInTapestry($tapestry_data)
     {
         $post_ids = [];
-
-        foreach ($tapestry->getNodeIds() as $nodeId) {
-            $node = $tapestry->getNode($nodeId)->get();
+        foreach ($tapestry_data->nodes as $node) {
             if ($node->mediaType === 'wp-post') {
                 array_push($post_ids, (int) $node->typeData->mediaURL);
             }
         }
 
-        // TODO: check if post_ids is empty first
-        return self::_exportWpPosts($post_ids);
+        if (!empty($post_ids)) {
+            list('contents' => $wxr_contents, 'category' => $category) = self::_exportWpPosts($post_ids);
+
+            // Save the temporary export category so we can delete it on the destination site
+            $tapestry_data->wpExportCategory = $category;
+
+            return $wxr_contents;
+        }
+        return null;
     }
 
+    /**
+     * Exports a list of WordPress posts using WordPress's WXR (XML) format.
+     *
+     * @param array $post_ids   Post IDs of the posts to export.
+     * @return array    [
+     *                      'contents' => (string) Contents of the export file
+     *                      'category' => (string) Name of the temporary category created to facilitate exporting.
+     *                                    Can be used to delete the category later.
+     *                  ]
+     */
     private static function _exportWpPosts($post_ids)
     {
         $site_url = get_bloginfo('url');
@@ -364,10 +394,13 @@ class TapestryImportExport
         ]);
         $export_contents = ob_get_clean();
 
-        // Delete category when done
+        // Delete category from this site when done
         wp_delete_term($category_id, 'category');
 
-        return $export_contents;
+        return [
+            'contents' => $export_contents,
+            'category' => $category['name'],
+        ];
     }
 
     private static function _createUniqueCategory()
@@ -383,7 +416,26 @@ class TapestryImportExport
             $attempts++;
         }
 
-        return $success ? $result : null;
+        return $success ? [
+            'name' => $category_name,
+            'term_id' => $result['term_id']
+        ] : null;
+    }
+
+    /**
+     * Deletes the category in the wpExportCategory field of the Tapestry data.
+     */
+    public static function deleteWpExportCategory($tapestry_data)
+    {
+        $category_name = $tapestry_data->wpExportCategory;
+
+        if (isset($category_name) && self::_stringStartsWith($category_name, 'tapestry_export_')) {
+            $category = get_term_by('name', $category_name, 'category');
+
+            if ($category) {
+                wp_delete_term($category->term_id, 'category');
+            }
+        }
     }
 
     // --- Import ---

@@ -26,43 +26,7 @@
             </li>
           </ul>
         </div>
-        <div v-if="hasWarnings">
-          <p>
-            The following
-            <b>warnings</b>
-            were generated during import:
-          </p>
-          <b-table
-            small
-            borderless
-            :items="nodeWarnings"
-            :fields="['title', 'warnings']"
-            thead-class="d-none"
-            data-qa="import-warnings-table"
-          >
-            <template v-if="settingsWarnings.length" slot="bottom-row">
-              <b-td><b>Tapestry Settings:</b></b-td>
-              <b-td>
-                <li v-for="warning in settingsWarnings" :key="warning">
-                  {{ warning }}
-                </li>
-              </b-td>
-            </template>
-            <template #cell(title)="{value}">{{ value }}:</template>
-            <template #cell(warnings)="{value}">
-              <li v-for="warning in value" :key="warning">
-                {{ warning }}
-              </li>
-            </template>
-          </b-table>
-          <p>
-            Nodes with warnings have been imported as-is. Please edit them to check
-            their contents.
-          </p>
-        </div>
-        <p v-else>
-          No warnings were generated during import.
-        </p>
+        <import-warnings :warnings="warnings" action="import"></import-warnings>
         <p>
           If your Tapestry contains H5P nodes, we recommend rebuilding the H5P cache
           after importing, by going to H5P Content -> Libraries in the WordPress
@@ -80,8 +44,13 @@
 </template>
 
 <script>
+import ImportExportWarnings from "@/components/common/ImportExportWarnings"
+
 export default {
   name: "import-changelog",
+  components: {
+    "import-warnings": ImportExportWarnings,
+  },
   props: {
     changes: {
       type: Object,
@@ -90,20 +59,6 @@ export default {
     warnings: {
       type: Object,
       required: true,
-    },
-  },
-  computed: {
-    nodeWarnings() {
-      return this.warnings.nodes
-    },
-    settingsWarnings() {
-      return this.warnings.settings
-    },
-    hasWarnings() {
-      return (
-        Object.keys(this.warnings).length > 0 &&
-        (this.nodeWarnings.length > 0 || this.settingsWarnings.length > 0)
-      )
     },
   },
   methods: {

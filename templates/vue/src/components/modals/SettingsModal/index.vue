@@ -99,62 +99,51 @@
               first import the WordPress posts by going to Tools -> Import in the
               WordPress dashboard, then import the tapestry.
             </template>
-            <b-row class="mb-2">
-              <b-col>
-                <b-button
-                  block
-                  variant="light"
-                  :class="{
-                    'export-button': true,
-                    'mb-1': true,
-                    disabled: isExporting,
-                  }"
-                  :disabled="isExportingWpPosts"
-                  @click="exportWpPostsInTapestry"
-                >
-                  <b-spinner v-if="isExportingWpPosts" small></b-spinner>
-                  <div :style="isExportingWpPosts ? 'opacity: 50%;' : ''">
-                    Export All WordPress Posts
-                  </div>
-                </b-button>
-              </b-col>
-              <b-col>
-                <b-dropdown
-                  block
-                  split
-                  variant="light"
-                  menu-class="w-100"
-                  data-qa="export-tapestry-button"
-                  :split-class="{
-                    'export-button': true,
-                    disabled: isExporting,
-                  }"
-                  :disabled="isExporting"
-                  @click="exportTapestry"
-                >
-                  <template #button-content>
-                    <b-spinner v-if="isExporting" small></b-spinner>
-                    <div :style="isExporting ? 'opacity: 50%;' : ''">
-                      Export Tapestry
-                    </div>
-                  </template>
-                  <b-dropdown-item-button @click="exportTapestry">
-                    Export as JSON
-                  </b-dropdown-item-button>
-                  <b-dropdown-item-button @click="exportTapestryAsZip">
-                    Export as ZIP (include uploaded media)
-                  </b-dropdown-item-button>
-                </b-dropdown>
-              </b-col>
-            </b-row>
+            <b-dropdown
+              block
+              split
+              variant="light"
+              menu-class="w-100"
+              data-qa="export-tapestry-button"
+              :split-class="{
+                'export-button': true,
+                disabled: isExporting,
+              }"
+              :disabled="isExporting"
+              @click="exportTapestry"
+            >
+              <template #button-content>
+                <b-spinner v-if="isExporting" small></b-spinner>
+                <div :style="isExporting ? 'opacity: 50%;' : ''">
+                  Export Tapestry
+                </div>
+              </template>
+              <b-dropdown-item-button @click="exportTapestry">
+                Export as JSON
+              </b-dropdown-item-button>
+              <b-dropdown-item-button @click="exportTapestryAsZip">
+                Export as ZIP (include uploaded media)
+              </b-dropdown-item-button>
+            </b-dropdown>
             <b-alert
               v-if="apiError == null"
               :show="hasExported"
-              variant="success"
+              :variant="exportWarnings ? 'warning' : 'success'"
               style="margin-top: 1em;"
             >
-              Your content has been exported! Find the
-              {{ exportedFileType }} file in your downloads.
+              <div v-if="!exportWarnings">
+                Your content has been exported! Find the
+                {{ exportedFileType }} file in your downloads.
+              </div>
+              <export-warnings
+                v-else
+                :warnings="exportWarnings"
+                action="export"
+              ></export-warnings>
+              <div v-if="hasExportedWpPosts">
+                The WordPress posts in this Tapestry have also been exported. Find
+                the .xml file in your downloads.
+              </div>
             </b-alert>
             <b-alert
               v-else
@@ -350,6 +339,7 @@ import { mapGetters, mapState, mapActions } from "vuex"
 import FileUpload from "../common/FileUpload"
 import DuplicateTapestryButton from "./DuplicateTapestryButton"
 import PermissionsTable from "../common/PermissionsTable"
+import ImportExportWarnings from "@/components/common/ImportExportWarnings"
 import DragSelectModular from "@/utils/dragSelectModular"
 import { data as wpData } from "@/services/wp"
 import client from "@/services/TapestryAPI"
@@ -370,6 +360,7 @@ export default {
     FileUpload,
     DuplicateTapestryButton,
     PermissionsTable,
+    "export-warnings": ImportExportWarnings,
   },
   props: {
     show: {
@@ -398,7 +389,8 @@ export default {
       showAcceptedHighlight: true,
       defaultDepth: 3,
       isExporting: false,
-      isExportingWpPosts: false,
+      exportedFileType: "",
+      exportWarnings: null,
       renderImages: true,
       analyticsEnabled: false,
       draftNodesEnabled: true,
@@ -406,9 +398,9 @@ export default {
       renderMap: false,
       mapBounds: { neLat: 90, neLng: 180, swLat: -90, swLng: -180 },
       hasExported: false,
+      hasExportedWpPosts: false,
       isOptimizing: false,
       hasOptimized: false,
-      exportedFileType: "",
     }
   },
   computed: {
@@ -460,11 +452,7 @@ export default {
     })
   },
   methods: {
-    ...mapActions([
-      "getTapestryExport",
-      "getTapestryExportAsZip",
-      "getWpPostsExport",
-    ]),
+    ...mapActions(["getTapestryExport", "getTapestryExportAsZip"]),
     closeModal() {
       this.$emit("close")
     },
@@ -531,36 +519,21 @@ export default {
         this.hasExported = true
         return
       }
-      const blob = new Blob([JSON.stringify(exportedTapestry, null, 2)], {
+      const blob = new Blob([JSON.stringify(exportedTapestry.json, null, 2)], {
         type: "application/json",
       })
       const fileUrl = URL.createObjectURL(blob)
       this.showFileDownload(fileUrl, `${this.settings.title}.json`)
       URL.revokeObjectURL(fileUrl)
 
+      if (exportedTapestry.wpPosts) {
+        this.downloadWpPosts(exportedTapestry.wpPosts)
+        this.hasExportedWpPosts = true
+      }
+
       this.isExporting = false
       this.hasExported = true
       this.exportedFileType = ".json"
-    },
-    async exportWpPostsInTapestry() {
-      this.isExportingWpPosts = true
-      const exportedPosts = await this.getWpPostsExport()
-      if (!exportedPosts) {
-        this.isExportingWpPosts = false
-        this.hasExported = true
-        return
-      }
-
-      const blob = new Blob([exportedPosts.wxrContents], {
-        type: "application/xml",
-      })
-      const fileUrl = URL.createObjectURL(blob)
-      this.showFileDownload(fileUrl, `${this.settings.title}-WP-Posts.xml`)
-      URL.revokeObjectURL(fileUrl)
-
-      this.isExportingWpPosts = false
-      this.hasExported = true
-      this.exportedFileType = ".xml"
     },
     async exportTapestryAsZip() {
       this.isExporting = true
@@ -573,9 +546,23 @@ export default {
       const fileUrl = exportedTapestry.zipUrl
       this.showFileDownload(fileUrl, `${this.settings.title}.zip`)
 
+      if (exportedTapestry.wpPosts) {
+        this.downloadWpPosts(exportedTapestry.wpPosts)
+        this.hasExportedWpPosts = true
+      }
+
       this.isExporting = false
       this.hasExported = true
       this.exportedFileType = ".zip"
+      this.exportWarnings = exportedTapestry.warnings
+    },
+    downloadWpPosts(exportedPosts) {
+      const blob = new Blob([exportedPosts], {
+        type: "application/xml",
+      })
+      const fileUrl = URL.createObjectURL(blob)
+      this.showFileDownload(fileUrl, `${this.settings.title}-WP-Posts.xml`)
+      URL.revokeObjectURL(fileUrl)
     },
     showFileDownload(fileUrl, fileName) {
       const a = document.createElement("a")
