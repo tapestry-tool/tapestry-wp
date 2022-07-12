@@ -172,6 +172,9 @@ class ZoomPanHelper {
   }
 
   clickHandler(e) {
+    if (!e.target.id || e.target.id !== this.targetDOMId) {
+      return
+    }
     const time = Date.now()
     if (this.lastClickTime && time - this.lastClickTime <= 1000) {
       // the second click of double click
