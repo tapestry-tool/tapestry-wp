@@ -18,6 +18,7 @@
     }"
     :node="node"
     @show="handleShow"
+    @shown="handleShown"
     @close="handleUserClose"
     @hide="handleHide"
   >
@@ -67,7 +68,7 @@
       <tapestry-media
         v-if="node.mediaType !== 'multi-content'"
         :node-id="nodeId"
-        :dimensions="dimensions"
+        :dimensions="lightboxDimensions"
         context="lightbox"
         @load="handleLoad"
         @close="handleAutoClose"
@@ -275,10 +276,11 @@ export default {
     contentStyles: {
       immediate: true,
       handler(contentStyles) {
-        document.querySelector("#lightbox .modal-dialog").style.width =
-          contentStyles.width
-        document.querySelector("#lightbox .modal-dialog").style.height =
-          contentStyles.height
+        const dialogElement = document.querySelector("#lightbox .modal-dialog")
+        if (dialogElement) {
+          dialogElement.style.width = contentStyles.width
+          dialogElement.style.height = contentStyles.height
+        }
       },
     },
   },
@@ -315,6 +317,9 @@ export default {
     handleShow() {
       this.dimensions = {}
     },
+    handleShown() {
+      // this.applyDimensions()
+    },
     handleHide() {
       this.close()
     },
@@ -348,6 +353,7 @@ export default {
     },
     updateDimensions(dimensions) {
       if (dimensions.height <= this.lightboxDimensions.height) {
+        // console.log("updateDimensions", dimensions.width, dimensions.height)
         this.dimensions = {
           ...this.dimensions,
           ...dimensions,
@@ -360,6 +366,7 @@ export default {
       // }
     },
     applyDimensions() {
+      // console.log("applyDimensions", this.lightboxDimensions.width, this.lightboxDimensions.height)
       // this.dimensions = {
       //   ...this.dimensions,
       //   left: (Helpers.getBrowserWidth() - this.lightboxDimensions.width) / 2,
