@@ -87,16 +87,14 @@ export default {
     },
   },
   watch: {
-    youtubeId: {
-      handler(id) {
-        this.updateFormatType(id)
-      },
-      immediate: true,
+    youtubeId(id) {
+      this.updateMediaFormat(id)
     },
   },
   created() {
-    if (typeof this.kalturaId === "undefined") {
+    if (this.kalturaId === undefined) {
       this.update("typeData.kalturaId", "")
+      this.updateMediaFormat(this.youtubeId)
     } else if (this.kalturaId !== "") {
       this.useKaltura = true
     }
@@ -116,10 +114,10 @@ export default {
         this.update("mediaFormat", "kaltura")
       } else {
         this.update("typeData.kalturaId", "")
-        this.updateFormatType(this.youtubeId)
+        this.updateMediaFormat(this.youtubeId)
       }
     },
-    updateFormatType(id) {
+    updateMediaFormat(id) {
       if (id !== null) {
         this.update("mediaFormat", "youtube")
         this.update("typeData.youtubeID", id)
