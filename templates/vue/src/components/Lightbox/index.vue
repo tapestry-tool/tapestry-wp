@@ -11,7 +11,7 @@
     data-qa="lightbox"
     :aria-label="`You're now in a modal, viewing the content of ${node.title}.`"
     initial-focus="lightboxTitle"
-    :class="{
+    :modal-class="{
       'full-screen': node.fullscreen,
       'content-text': node.mediaType === 'text' || node.mediaType === 'wp-post',
     }"
@@ -383,16 +383,6 @@ body.tapestry-lightbox-open {
 }
 
 #lightbox {
-  &.full-screen {
-    background: var(--bg-color-primary);
-
-    .close-btn {
-      position: fixed;
-      top: 50px;
-      right: 50px;
-    }
-  }
-
   .modal-header {
     padding: 0;
   }
@@ -430,6 +420,35 @@ body.tapestry-lightbox-open {
   .full-height-media {
     height: 100%;
     min-height: 70vh;
+  }
+
+  &.full-screen {
+    background: var(--bg-color-primary);
+
+    .modal-dialog {
+      position: relative;
+      top: auto;
+      left: auto;
+      width: 100%;
+      height: 100%;
+      max-width: unset;
+      max-height: unset;
+      margin: 0;
+    }
+
+    .modal-content {
+      max-width: unset;
+      max-height: unset;
+    }
+
+    .buttons-container {
+      top: 20px;
+      right: 30px;
+    }
+
+    .content {
+      border-radius: 0;
+    }
   }
 }
 </style>
