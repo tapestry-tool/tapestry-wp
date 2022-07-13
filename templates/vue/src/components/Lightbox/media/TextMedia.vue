@@ -1,5 +1,13 @@
 <template>
-  <article :class="'article context-' + context">
+  <article
+    :class="[
+      'article',
+      'context-' + context,
+      {
+        'full-height-media': context === 'lightbox',
+      },
+    ]"
+  >
     <h1
       v-if="showTitle"
       :id="context === 'lightbox' ? 'lightboxTitle' : ''"
@@ -65,7 +73,6 @@ export default {
 <style lang="scss" scoped>
 .article {
   text-align: left;
-  min-height: 100%;
 
   &.context-lightbox {
     padding: 1em;

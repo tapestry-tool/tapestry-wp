@@ -16,7 +16,9 @@
       'content-text': node.mediaType === 'text' || node.mediaType === 'wp-post',
     }"
     :node="node"
-    @hide="handleUserClose"
+    @show="handleShow"
+    @close="handleUserClose"
+    @hide="handleHide"
   >
     <template #modal-header="{ close }">
       <div class="buttons-container">
@@ -297,6 +299,12 @@ export default {
         this.completeNode(node.id)
       }
     },
+    handleShow() {
+      this.dimensions = {}
+    },
+    handleHide() {
+      this.close()
+    },
     handleUserClose() {
       client.recordAnalyticsEvent("user", "close", "lightbox", this.nodeId)
       this.close()
@@ -414,6 +422,13 @@ body.tapestry-lightbox-open {
   }
 
   .content {
+    position: relative;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .full-height-media {
+    height: 100%;
     min-height: 70vh;
   }
 }

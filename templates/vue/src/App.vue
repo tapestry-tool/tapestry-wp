@@ -177,7 +177,8 @@ html {
     }
   }
 
-  #app {
+  #app,
+  #lightbox {
     color: var(--text-color-primary);
     font-family: "Avenir", Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;

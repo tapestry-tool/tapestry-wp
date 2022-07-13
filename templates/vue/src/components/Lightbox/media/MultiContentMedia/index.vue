@@ -2,7 +2,12 @@
   <div class="multicontent-media-container">
     <div
       ref="container"
-      class="media-container"
+      :class="[
+        'media-container',
+        {
+          'full-height-media': context === 'lightbox',
+        },
+      ]"
       :style="navBarStyle"
       data-qa="multi-content"
     >

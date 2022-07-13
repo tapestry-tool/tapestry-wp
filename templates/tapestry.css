@@ -34,11 +34,6 @@ body.single-tapestry .btn-outline:hover {
     box-sizing: border-box;
 }
 
-/* the following rule is for overriding the line above h1 and h2 in the Wordpress theme */
-h1:not(.site-title):before, h2:before {
-    content: unset !important;
-}
-
 li p {
     margin-bottom: 0;
 }

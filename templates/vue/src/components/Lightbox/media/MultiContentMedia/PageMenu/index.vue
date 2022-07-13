@@ -253,6 +253,7 @@ export default {
     position: absolute;
     left: 0;
     top: 0;
+    bottom: 0;
     z-index: 11;
     border-radius: 15px 0 0 15px;
   }
@@ -279,6 +280,7 @@ export default {
     font-size: 14px;
     text-align: left;
     overflow-y: auto;
+    height: 100%;
     display: flex;
     flex-direction: column;
 
