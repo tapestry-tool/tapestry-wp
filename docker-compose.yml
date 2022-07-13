@@ -3,6 +3,7 @@ version: "3.7"
 services:
   wp:
     image: wordpress:latest
+    shm_size: '2gb'
     ports:
       - ${IP}:8000:80
     volumes:
