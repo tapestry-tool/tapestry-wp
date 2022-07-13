@@ -142,8 +142,8 @@ export default {
        * Adjust the lightbox height to fit the video
        */
       this.$emit("load", {
-        width: this.dimensions.width,
-        height: this.dimensions.height,
+        width: this.videoDimensions.width,
+        height: this.videoDimensions.height,
         type: "html5-video",
         currentTime,
       })

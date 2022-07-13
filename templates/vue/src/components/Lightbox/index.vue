@@ -5,6 +5,7 @@
     :visible="visible"
     hide-header-close
     hide-footer
+    hide-backdrop
     size="lg"
     scrollable
     data-qa="lightbox"
@@ -15,7 +16,6 @@
       'content-text': node.mediaType === 'text' || node.mediaType === 'wp-post',
     }"
     :node="node"
-    :content-container-style="lightboxContentStyles"
     @hide="handleUserClose"
   >
     <template #modal-header="{ close }">
@@ -50,26 +50,28 @@
       </div>
     </template>
 
-    <multi-content-media
-      v-if="node.mediaType === 'multi-content'"
-      id="multicontent-container"
-      context="lightbox"
-      :node="node"
-      :menu-dimensions="dimensions"
-      :row-id="rowId"
-      @close="handleAutoClose"
-      @complete="complete"
-    />
-    <tapestry-media
-      v-if="node.mediaType !== 'multi-content'"
-      :node-id="nodeId"
-      :dimensions="dimensions"
-      context="lightbox"
-      @load="handleLoad"
-      @close="handleAutoClose"
-      @complete="complete"
-      @change:dimensions="updateDimensions"
-    />
+    <div class="content" :style="contentStyles">
+      <multi-content-media
+        v-if="node.mediaType === 'multi-content'"
+        id="multicontent-container"
+        context="lightbox"
+        :node="node"
+        :menu-dimensions="dimensions"
+        :row-id="rowId"
+        @close="handleAutoClose"
+        @complete="complete"
+      />
+      <tapestry-media
+        v-if="node.mediaType !== 'multi-content'"
+        :node-id="nodeId"
+        :dimensions="dimensions"
+        context="lightbox"
+        @load="handleLoad"
+        @close="handleAutoClose"
+        @complete="complete"
+        @change:dimensions="updateDimensions"
+      />
+    </div>
   </b-modal>
 </template>
 
@@ -112,8 +114,8 @@ export default {
   data() {
     return {
       dimensions: {
-        top: 100,
-        left: 50,
+        // top: 100,
+        // left: 50,
       },
       showCompletionScreen: false,
     }
@@ -137,6 +139,13 @@ export default {
     },
     canEditNode() {
       return Helpers.hasPermission(this.node, "edit")
+    },
+    contentStyles() {
+      const { width, height } = this.dimensions
+      return {
+        width: width ? width + "px" : null,
+        height: height ? height + "px" : null,
+      }
     },
     lightboxContentStyles() {
       const styles = {
@@ -323,14 +332,19 @@ export default {
           ...dimensions,
         }
       }
+
+      // this.dimensions = {
+      //   ...this.dimensions,
+      //   ...dimensions,
+      // }
     },
     applyDimensions() {
-      this.dimensions = {
-        ...this.dimensions,
-        left: (Helpers.getBrowserWidth() - this.lightboxDimensions.width) / 2,
-        width: this.lightboxDimensions.width,
-        height: this.lightboxDimensions.height,
-      }
+      // this.dimensions = {
+      //   ...this.dimensions,
+      //   left: (Helpers.getBrowserWidth() - this.lightboxDimensions.width) / 2,
+      //   width: this.lightboxDimensions.width,
+      //   height: this.lightboxDimensions.height,
+      // }
     },
     handleNodeChanged() {
       if (
@@ -375,8 +389,19 @@ body.tapestry-lightbox-open {
     padding: 0;
   }
 
+  .modal-body {
+    position: unset;
+    padding: 0;
+  }
+
   .modal-content {
     overflow: unset;
+    background: var(--bg-color-secondary);
+    color: var(--text-color-primary);
+    background-position: 0 0;
+    background-size: cover;
+    box-shadow: 0 0 70px -40px #000;
+    border-radius: 15px;
   }
 
   .buttons-container {
@@ -386,6 +411,10 @@ body.tapestry-lightbox-open {
     top: -20px;
     right: -20px;
     z-index: 1000;
+  }
+
+  .content {
+    min-height: 70vh;
   }
 }
 </style>
