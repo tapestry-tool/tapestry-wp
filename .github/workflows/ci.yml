@@ -60,7 +60,7 @@ jobs:
           wait-on: "http://localhost:8080/dist/build.js"
           working-directory: templates/vue
           record: true
-          browser: chrome
+          browser: edge
           headless: true
           parallel: true
           group: 'Tapestry GitHub Action'
