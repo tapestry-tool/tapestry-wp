@@ -370,6 +370,11 @@ class TapestryImportExport
             }
         }
 
+        // Keep only post IDs pointing to valid posts
+        $post_ids = array_filter($post_ids, function ($id) {
+            return $id > 0 && get_post_status($id);
+        });
+
         if (!empty($post_ids)) {
             list('contents' => $wxr_contents, 'category' => $category) = self::_exportWpPosts($post_ids);
 
@@ -403,13 +408,11 @@ class TapestryImportExport
 
         $category_id = $category['term_id'];
         foreach ($post_ids as $post_id) {
-            if ($post_id > 0) {
-                wp_set_post_categories($post_id, $category_id, true);
+            wp_set_post_categories($post_id, $category_id, true);
 
-                // Save the old post IDs and site identity to make posts discoverable after being imported
-                $site_and_post_id = $site_url . '-' . $post_id;
-                update_post_meta($post_id, 'tapestry_export_old_post_id', $site_and_post_id);
-            }
+            // Save the old post IDs and site identity to make posts discoverable after being imported
+            $site_and_post_id = $site_url . '-' . $post_id;
+            update_post_meta($post_id, 'tapestry_export_old_post_id', $site_and_post_id);
         }
 
         $category_slug = get_category($category_id)->slug;
