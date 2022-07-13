@@ -13,6 +13,7 @@
     initial-focus="lightboxTitle"
     :modal-class="{
       'full-screen': node.fullscreen,
+      'custom-dimensions': hasCustomDimensions,
       'content-text': node.mediaType === 'text' || node.mediaType === 'wp-post',
     }"
     :node="node"
@@ -142,6 +143,9 @@ export default {
     canEditNode() {
       return Helpers.hasPermission(this.node, "edit")
     },
+    hasCustomDimensions() {
+      return this.dimensions.width || this.dimensions.height
+    },
     contentStyles() {
       const { width, height } = this.dimensions
       return {
@@ -266,6 +270,15 @@ export default {
             })
           }
         }
+      },
+    },
+    contentStyles: {
+      immediate: true,
+      handler(contentStyles) {
+        document.querySelector("#lightbox .modal-dialog").style.width =
+          contentStyles.width
+        document.querySelector("#lightbox .modal-dialog").style.height =
+          contentStyles.height
       },
     },
   },
@@ -448,6 +461,18 @@ body.tapestry-lightbox-open {
 
     .content {
       border-radius: 0;
+    }
+  }
+
+  &.custom-dimensions {
+    .modal-dialog {
+      max-width: unset;
+      max-height: unset;
+    }
+
+    .modal-content {
+      max-width: unset;
+      max-height: unset;
     }
   }
 }

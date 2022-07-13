@@ -69,7 +69,6 @@ export default {
   },
   data() {
     return {
-      videoDimensions: null,
       player: null,
       playerStatus: YouTubeStates.unstarted,
     }
