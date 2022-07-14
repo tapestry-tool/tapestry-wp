@@ -218,7 +218,8 @@ export default {
     },
     routeName(newName, oldName) {
       if (newName === names.APP && oldName === names.LIGHTBOX) {
-        this.focusSelectedNode()
+        // TODO: this is not needed anymore due to new lightbox using Bootstrap modal which automatically returns focus to last selected node; remove after testing on a screen reader
+        // this.focusSelectedNode()
       }
     },
   },

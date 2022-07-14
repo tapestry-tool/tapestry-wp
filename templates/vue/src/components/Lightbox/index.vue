@@ -5,6 +5,7 @@
     hide-header
     hide-footer
     hide-backdrop
+    :return-focus="`.node[data-id='${returnFocusTo}']`"
     size="lg"
     scrollable
     :aria-label="`You're now in a modal, viewing the content of ${node.title}.`"
@@ -18,7 +19,7 @@
     @show="handleShow"
     @shown="handleShown"
     @close="handleUserClose"
-    @hide="handleHide"
+    @hidden="handleHidden"
   >
     <template #default="{ close }">
       <div class="buttons-container">
@@ -127,6 +128,12 @@ export default {
     parentNode() {
       const parentNodeId = this.getParent(this.node.id)
       return this.getNode(parentNodeId)
+    },
+    returnFocusTo() {
+      return this.parentNode?.mediaType === "multi-content" &&
+        this.parentNode?.presentationStyle === "unit"
+        ? this.parentNode.id
+        : this.nodeId
     },
     isFavourite() {
       return this.favourites.find(id => id == this.node.id)
@@ -274,28 +281,20 @@ export default {
     handleShown() {
       this.applyContentStyles()
     },
-    handleHide() {
+    handleHidden() {
       this.close()
     },
     handleUserClose() {
       client.recordAnalyticsEvent("user", "close", "lightbox", this.nodeId)
-      // no need to call this.close() since handleHide will also be triggered
     },
     handleAutoClose() {
       client.recordAnalyticsEvent("app", "close", "lightbox", this.nodeId)
       this.close()
     },
     close() {
-      let selectedNode = this.nodeId
-      if (
-        this.parentNode?.mediaType === "multi-content" &&
-        this.parentNode?.presentationStyle === "unit"
-      ) {
-        selectedNode = this.parentNode.id
-      }
       this.$router.push({
         name: names.APP,
-        params: { nodeId: selectedNode },
+        params: { nodeId: this.returnFocusTo },
         query: this.$route.query,
       })
     },
@@ -306,26 +305,14 @@ export default {
       }
     },
     updateDimensions(dimensions) {
-      console.log("updateDimensions", dimensions.width, dimensions.height)
       if (dimensions.height <= this.lightboxDimensions.height) {
-        console.log("perform updateDimensions")
         this.dimensions = {
           ...this.dimensions,
           ...dimensions,
         }
       }
-
-      // this.dimensions = {
-      //   ...this.dimensions,
-      //   ...dimensions,
-      // }
     },
     applyDimensions() {
-      console.log(
-        "applyDimensions",
-        this.lightboxDimensions.width,
-        this.lightboxDimensions.height
-      )
       // use default Bootstrap modal width until applyContentStyles has succeeded
       this.isUsingCustomDimensions = false
       this.dimensions = {
