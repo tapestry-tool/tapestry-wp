@@ -60,7 +60,7 @@ describe("Answers", () => {
         cy.contains("Tapestry").should("be.visible")
       })
     })
-    cy.getByTestId("close-lightbox").click()
+    cy.closeLightbox()
     cy.lightbox().should("not.exist")
   })
 })

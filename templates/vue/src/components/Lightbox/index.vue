@@ -1,6 +1,5 @@
 <template>
   <b-modal
-    v-if="node"
     id="lightbox"
     :visible="visible"
     hide-header-close
@@ -8,7 +7,6 @@
     hide-backdrop
     size="lg"
     scrollable
-    data-qa="lightbox"
     :aria-label="`You're now in a modal, viewing the content of ${node.title}.`"
     initial-focus="lightboxTitle"
     :modal-class="{
@@ -54,7 +52,7 @@
       </div>
     </template>
 
-    <div class="content" :style="contentStyles">
+    <div data-qa="lightbox-content" class="content" :style="contentStyles">
       <multi-content-media
         v-if="node.mediaType === 'multi-content'"
         id="multicontent-container"

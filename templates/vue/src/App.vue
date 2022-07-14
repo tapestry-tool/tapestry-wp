@@ -6,6 +6,7 @@
     <node-modal></node-modal>
     <link-modal></link-modal>
     <lightbox
+      v-if="node"
       :visible="viewingNode"
       :node-id="nodeId"
       aria-hidden="false"
@@ -60,12 +61,15 @@ export default {
   },
   computed: {
     ...mapState(["nodes"]),
-    ...mapGetters(["getTheme"]),
+    ...mapGetters(["getNode", "getTheme"]),
     isEmpty() {
       return Object.keys(this.nodes).length === 0
     },
     nodeId() {
       return this.$route.params.nodeId
+    },
+    node() {
+      return this.getNode(this.nodeId)
     },
     viewingNode() {
       return (

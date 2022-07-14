@@ -114,7 +114,7 @@ Cypress.Commands.add("getNodeById", id => cy.getByTestId(`node-${id}`))
 
 // -- Lightbox --
 
-Cypress.Commands.add("lightbox", () => cy.getByTestId("lightbox"))
+Cypress.Commands.add("lightbox", () => cy.getByTestId("lightbox-content"))
 
 Cypress.Commands.add("openLightbox", { prevSubject: "optional" }, (node, id) => {
   // force click to avoid overlapping node problems with auto-placing new nodes
