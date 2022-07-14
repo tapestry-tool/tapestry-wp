@@ -1,6 +1,13 @@
 <template>
   <div>
-    <transition name="slide-fade">
+    <transition
+      name="slide-fade"
+      :css="animate"
+      @after-enter="animate = false"
+      @enter-cancelled="animate = false"
+      @after-leave="animate = false"
+      @leave-cancelled="animate = false"
+    >
       <aside
         v-show="menuVisible"
         ref="wrapper"
@@ -74,7 +81,7 @@
         },
       ]"
       data-qa="page-nav-toggle"
-      @click="opened = !opened"
+      @click="toggleMenu"
     >
       <i
         v-if="!opened"
@@ -120,6 +127,7 @@ export default {
     return {
       opened: false,
       browserWidth: Helpers.getBrowserWidth(),
+      animate: false,
     }
   },
   computed: {
@@ -208,6 +216,11 @@ export default {
     changePage(pageNodeId) {
       this.$emit("change-page", pageNodeId)
     },
+    toggleMenu() {
+      // Only animate the enter/leave if triggered by the toggle button
+      this.animate = true
+      this.opened = !this.opened
+    },
     scrollToRef(nodeId) {
       this.$nextTick(() => {
         const container = document.querySelector(
@@ -258,12 +271,17 @@ export default {
   }
 
   &.fullscreen {
+    position: absolute;
     height: 100vh;
     margin: -24px 24px 0 -24px;
     z-index: 11;
 
     .page-nav {
       padding: 4rem 1.5rem 3rem 1.5rem;
+    }
+
+    @media screen and (min-width: 801px) {
+      position: relative;
     }
   }
 
@@ -310,50 +328,21 @@ export default {
 $slide-fade-speed: 0.3s;
 
 .slide-fade-enter-active {
-  &:not(.unit-child) {
+  animation: slide-fade $slide-fade-speed ease;
+
+  &.page-nav {
     animation: slide-fade $slide-fade-speed ease;
-
-    &.page-nav {
-      animation: slide-fade $slide-fade-speed ease;
-    }
-  }
-  &.unit-child {
-    animation: slide-fade-unit-child $slide-fade-speed ease;
-
-    &.page-nav {
-      animation: slide-fade-unit-child $slide-fade-speed ease;
-    }
   }
 }
 .slide-fade-leave-active {
-  &:not(.unit-child) {
+  animation: slide-fade $slide-fade-speed ease reverse;
+
+  &.page-nav {
     animation: slide-fade $slide-fade-speed ease reverse;
-
-    &.page-nav {
-      animation: slide-fade $slide-fade-speed ease reverse;
-    }
-  }
-  &.unit-child {
-    animation: slide-fade-unit-child $slide-fade-speed ease reverse;
-
-    &.page-nav {
-      animation: slide-fade-unit-child $slide-fade-speed ease reverse;
-    }
   }
 }
 
 @keyframes slide-fade {
-  from {
-    transform: translateX(-100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-@keyframes slide-fade-unit-child {
   from {
     transform: translateX(-100%);
     opacity: 0;
@@ -406,6 +395,20 @@ $slide-fade-speed: 0.3s;
       a {
         white-space: normal !important;
       }
+    }
+
+    .dropdown-item.active,
+    .dropdown-item:active {
+      color: #ffffff;
+      background-color: var(--highlight-color);
+    }
+
+    .disabled-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: gray;
+      cursor: not-allowed;
     }
   }
 }
