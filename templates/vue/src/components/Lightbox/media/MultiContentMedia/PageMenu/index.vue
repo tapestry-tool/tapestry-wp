@@ -13,12 +13,7 @@
           },
         ]"
       >
-        <div
-          ref="container"
-          data-qa="page-nav-container"
-          class="page-nav"
-          :style="{ height: node.fullscreen ? '100vh' : dimensions.height + 'px' }"
-        >
+        <div ref="container" data-qa="page-nav-container" class="page-nav">
           <div v-if="unitsMenuVisible">
             <b-dropdown
               class="unit-switch-dropdown"
@@ -101,11 +96,6 @@ export default {
     node: {
       type: Object,
       required: true,
-    },
-    dimensions: {
-      type: Object,
-      required: false,
-      default: null,
     },
     pages: {
       type: [Array, Boolean],

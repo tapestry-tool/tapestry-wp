@@ -56,7 +56,6 @@
           id="multicontent-container"
           context="lightbox"
           :node="node"
-          :menu-dimensions="dimensions"
           :row-id="rowId"
           @close="handleAutoClose"
           @complete="complete"
@@ -280,7 +279,7 @@ export default {
     },
     handleUserClose() {
       client.recordAnalyticsEvent("user", "close", "lightbox", this.nodeId)
-      this.close()
+      // no need to call this.close() since handleHide will also be triggered
     },
     handleAutoClose() {
       client.recordAnalyticsEvent("app", "close", "lightbox", this.nodeId)
@@ -371,6 +370,7 @@ body.tapestry-lightbox-open {
     background-size: cover;
     box-shadow: 0 0 70px -40px #000;
     border-radius: 15px;
+    border: unset;
   }
 
   .buttons-container {
@@ -410,6 +410,7 @@ body.tapestry-lightbox-open {
     .modal-content {
       max-width: unset;
       max-height: unset;
+      border-radius: 0;
     }
 
     .buttons-container {
@@ -431,7 +432,6 @@ body.tapestry-lightbox-open {
     .modal-content {
       max-width: unset;
       max-height: unset;
-      border: unset;
     }
   }
 }

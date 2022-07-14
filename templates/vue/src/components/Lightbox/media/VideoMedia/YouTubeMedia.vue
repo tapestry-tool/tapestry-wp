@@ -3,8 +3,8 @@
     <youtube
       class="embed-responsive-item"
       :video-id="node.typeData.youtubeID"
-      :player-width="dimensions.width - widthReduction"
-      :player-height="dimensions.height - heightReduction"
+      :player-width="dimensions.width"
+      :player-height="dimensions.height"
       :player-vars="{
         autoplay: autoplay ? 1 : 0,
         playsinline: 1,
@@ -71,8 +71,6 @@ export default {
     return {
       player: null,
       playerStatus: YouTubeStates.unstarted,
-      widthReduction: 15,
-      heightReduction: 40,
     }
   },
   computed: {

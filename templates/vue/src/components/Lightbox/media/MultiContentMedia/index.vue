@@ -86,7 +86,6 @@
     <page-menu
       v-if="showPageMenu"
       :node="node"
-      :dimensions="menuDimensions"
       :pages="filteredPages"
       :active-page-index="pageIndex"
       @change-page="changePage"
@@ -137,11 +136,6 @@ export default {
       type: Boolean,
       required: false,
       default: false,
-    },
-    menuDimensions: {
-      type: Object,
-      required: false,
-      default: null,
     },
   },
   data() {
