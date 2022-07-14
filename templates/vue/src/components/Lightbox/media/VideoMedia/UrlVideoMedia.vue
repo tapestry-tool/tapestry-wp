@@ -141,20 +141,19 @@ export default {
       /**
        * Adjust the lightbox height to fit the video
        */
-      // const aspectRatio = this.videoDimensions.width / this.videoDimensions.height
-      // let fitDimensions = {
-      //   width: this.dimensions.width,
-      //   height: this.dimensions.height,
-      // }
-      // if (this.dimensions.height * aspectRatio > this.dimensions.width) {
-      //   fitDimensions.height = this.dimensions.width / aspectRatio
-      // }
-      // else {
-      //   fitDimensions.width = this.dimensions.height * aspectRatio
-      // }
-      this.$emit("load", {
+      const aspectRatio = this.videoDimensions.width / this.videoDimensions.height
+      let fitDimensions = {
         width: this.dimensions.width,
         height: this.dimensions.height,
+      }
+      if (this.dimensions.height * aspectRatio > this.dimensions.width) {
+        fitDimensions.height = this.dimensions.width / aspectRatio
+      } else {
+        fitDimensions.width = this.dimensions.height * aspectRatio
+      }
+      this.$emit("load", {
+        width: fitDimensions.width,
+        height: fitDimensions.height,
         type: "html5-video",
         currentTime,
       })

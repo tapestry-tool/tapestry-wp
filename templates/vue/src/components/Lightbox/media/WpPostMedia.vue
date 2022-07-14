@@ -78,7 +78,7 @@ export default {
   text-align: left;
 
   &.context-lightbox {
-    padding: 25px;
+    padding: 2em;
 
     .wp-media-title {
       padding-left: 25px;

@@ -75,7 +75,7 @@ export default {
   text-align: left;
 
   &.context-lightbox {
-    padding: 1em;
+    padding: 2em;
   }
 
   h1 {

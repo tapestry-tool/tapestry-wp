@@ -3,8 +3,8 @@
     <youtube
       class="embed-responsive-item"
       :video-id="node.typeData.youtubeID"
-      :player-width="dimensions.width - 15"
-      :player-height="dimensions.height - 40"
+      :player-width="dimensions.width - widthReduction"
+      :player-height="dimensions.height - heightReduction"
       :player-vars="{
         autoplay: autoplay ? 1 : 0,
         playsinline: 1,
@@ -71,6 +71,8 @@ export default {
     return {
       player: null,
       playerStatus: YouTubeStates.unstarted,
+      widthReduction: 15,
+      heightReduction: 40,
     }
   },
   computed: {
@@ -154,7 +156,11 @@ export default {
       this.applySettings()
 
       const currentTime = this.progress * this.totalDuration
-      this.$emit("load", { currentTime })
+      this.$emit("load", {
+        // width: this.dimensions.width + this.widthReduction,
+        // height: this.dimensions.height + this.heightReduction,
+        currentTime,
+      })
 
       if (this.autoplay) {
         setTimeout(() => this.handlePlay(), 2000)
@@ -252,7 +258,6 @@ export default {
 
 <style lang="scss" scoped>
 .embed-responsive {
-  max-height: calc(100vh - 120px);
   height: 100%;
 }
 </style>

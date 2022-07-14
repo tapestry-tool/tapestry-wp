@@ -38,6 +38,15 @@ export default class Helpers {
   }
 
   /**
+   * Convert the number in css rem units to number in px
+   * @param {Number} rem
+   * @return {Number}
+   */
+  static remToPx(rem) {
+    return rem * parseFloat(getComputedStyle(document.documentElement).fontSize)
+  }
+
+  /**
    * Finds the node index with node ID
    *
    * @param  {Number} id          nodeMetaId

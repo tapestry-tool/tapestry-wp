@@ -11,7 +11,7 @@
     initial-focus="lightboxTitle"
     :modal-class="{
       'full-screen': node.fullscreen,
-      'custom-dimensions': hasCustomDimensions,
+      'custom-dimensions': isUsingCustomDimensions,
       'content-text': node.mediaType === 'text' || node.mediaType === 'wp-post',
     }"
     :node="node"
@@ -66,7 +66,7 @@
       <tapestry-media
         v-if="node.mediaType !== 'multi-content'"
         :node-id="nodeId"
-        :dimensions="lightboxDimensions"
+        :dimensions="dimensions"
         context="lightbox"
         @load="handleLoad"
         @close="handleAutoClose"
@@ -87,7 +87,6 @@ import PageMenu from "./media/MultiContentMedia/PageMenu"
 import ModalButton from "./TapestryModal/ModalButton"
 import { names } from "@/config/routes"
 import Helpers from "@/utils/Helpers"
-import { sizes } from "@/utils/constants"
 
 export default {
   name: "lightbox",
@@ -115,10 +114,8 @@ export default {
   },
   data() {
     return {
-      dimensions: {
-        // top: 100,
-        // left: 50,
-      },
+      dimensions: {},
+      isUsingCustomDimensions: false,
       showCompletionScreen: false,
     }
   },
@@ -142,99 +139,50 @@ export default {
     canEditNode() {
       return Helpers.hasPermission(this.node, "edit")
     },
-    hasCustomDimensions() {
-      return this.dimensions.width || this.dimensions.height
+    shouldUseCustomDimensions() {
+      return !(
+        this.node.fullscreen ||
+        this.node.mediaType === "text" ||
+        this.node.mediaType === "wp-post" ||
+        this.node.mediaType === "multi-content"
+      )
     },
     contentStyles() {
-      const { width, height } = this.dimensions
+      const { width, height } = this.shouldUseCustomDimensions ? this.dimensions : {}
       return {
         width: width ? width + "px" : null,
         height: height ? height + "px" : null,
       }
-    },
-    lightboxContentStyles() {
-      const styles = {
-        top: this.dimensions.top + "px",
-        left: this.dimensions.left + "px",
-        width: this.dimensions.width + "px",
-        height: this.dimensions.height + "px",
-      }
-
-      if (this.node.fullscreen) {
-        styles.top = "auto"
-        styles.left = "auto"
-        styles.width = "100vw"
-        styles.height = "100vh"
-        styles.position = "relative"
-
-        const adminBar = document.getElementById("wpadminbar")
-        if (adminBar) {
-          styles.top = `${adminBar.clientHeight}px`
-          styles.height = `calc(100vh - ${styles.top})`
-        }
-      }
-
-      if (this.node.mediaType === "text" || this.node.mediaType === "wp-post") {
-        return Object.assign(styles, {
-          background: "var(--background-color);",
-          padding: "1em",
-        })
-      }
-
-      return styles
     },
     lightboxDimensions() {
       if (!this.node) {
         return {}
       }
 
-      const width = this.node.typeData.mediaWidth ?? 960
-      const height = this.node.typeData.mediaHeight ?? 600
       const browserWidth = Helpers.getBrowserWidth()
       const browserHeight = Helpers.getBrowserHeight()
 
-      if (this.node.fullscreen) {
-        return {
-          width: browserWidth,
-          height: browserHeight,
-        }
+      const width = this.node.typeData.mediaWidth ?? 960
+      const height = this.node.typeData.mediaHeight ?? 600
+      const aspectRatio = width / height
+
+      // fit content within max. possible dimensions of modal while maintaining the aspect ratio of media
+      // marginSpace = 3rem for the b-modal default vert. margin, plus 32px for the admin bar
+      const marginSpace = Helpers.remToPx(3) + 32
+      let adjustedHeight = height
+      let adjustedWidth = width
+      if (adjustedHeight > browserHeight - marginSpace) {
+        adjustedHeight = browserHeight - marginSpace
+        adjustedWidth = adjustedHeight * aspectRatio
+      }
+      if (adjustedWidth > browserWidth - marginSpace) {
+        adjustedWidth = browserWidth - marginSpace
+        adjustedHeight = adjustedWidth / aspectRatio
       }
 
-      let resizeRatio = 1
-      let videoWidth = width
-      let videoHeight = height
-
-      if (width > Helpers.getBrowserWidth()) {
-        resizeRatio *= browserWidth / width
-        videoWidth *= resizeRatio
-        videoHeight *= resizeRatio
-      }
-
-      if (videoHeight > browserHeight * resizeRatio) {
-        resizeRatio *= browserHeight / videoHeight
-        videoWidth *= resizeRatio
-        videoHeight *= resizeRatio
-      }
-
-      const nodeSpace = sizes.NODE_RADIUS * 2 * 1.3
-      const adjustedVideoHeight = Math.min(videoHeight, browserHeight - nodeSpace)
-      const adjustedVideoWidth = Math.min(videoWidth, browserWidth - nodeSpace)
-
-      const heightAdjustmentRatio = adjustedVideoHeight / videoHeight
-      const widthAdjustmentRatio = adjustedVideoWidth / videoWidth
-      let adjustmentRatio = widthAdjustmentRatio
-      let adjustedOn = "width"
-
-      if (Helpers.getAspectRatio() < 1) {
-        adjustedOn = "height"
-        adjustmentRatio = heightAdjustmentRatio
-      }
-
-      adjustmentRatio *= 0.95
       return {
-        adjustedOn,
-        width: videoWidth * adjustmentRatio,
-        height: videoHeight * adjustmentRatio,
+        width: adjustedWidth,
+        height: adjustedHeight,
       }
     },
   },
@@ -271,12 +219,8 @@ export default {
     },
     contentStyles: {
       immediate: true,
-      handler(contentStyles) {
-        const dialogElement = document.querySelector("#lightbox .modal-dialog")
-        if (dialogElement) {
-          dialogElement.style.width = contentStyles.width
-          dialogElement.style.height = contentStyles.height
-        }
+      handler() {
+        this.applyContentStyles()
       },
     },
   },
@@ -308,8 +252,6 @@ export default {
       }
     },
     handleShow() {
-      this.dimensions = {}
-
       // if opening a multi-content unit node, instead go to its first visible child
       if (
         this.node.mediaType === "multi-content" &&
@@ -328,9 +270,11 @@ export default {
           })
         }
       }
+
+      this.applyDimensions()
     },
     handleShown() {
-      // this.applyDimensions()
+      this.applyContentStyles()
     },
     handleHide() {
       this.close()
@@ -364,8 +308,9 @@ export default {
       }
     },
     updateDimensions(dimensions) {
+      console.log("updateDimensions", dimensions.width, dimensions.height)
       if (dimensions.height <= this.lightboxDimensions.height) {
-        // console.log("updateDimensions", dimensions.width, dimensions.height)
+        console.log("perform updateDimensions")
         this.dimensions = {
           ...this.dimensions,
           ...dimensions,
@@ -378,13 +323,27 @@ export default {
       // }
     },
     applyDimensions() {
-      // console.log("applyDimensions", this.lightboxDimensions.width, this.lightboxDimensions.height)
-      // this.dimensions = {
-      //   ...this.dimensions,
-      //   left: (Helpers.getBrowserWidth() - this.lightboxDimensions.width) / 2,
-      //   width: this.lightboxDimensions.width,
-      //   height: this.lightboxDimensions.height,
-      // }
+      console.log(
+        "applyDimensions",
+        this.lightboxDimensions.width,
+        this.lightboxDimensions.height
+      )
+      // use default Bootstrap modal width until applyContentStyles has succeeded
+      this.isUsingCustomDimensions = false
+      this.dimensions = {
+        width: this.lightboxDimensions.width,
+        height: this.lightboxDimensions.height,
+      }
+    },
+    applyContentStyles() {
+      const dialogElement = document.querySelector("#lightbox .modal-dialog")
+      if (dialogElement) {
+        dialogElement.style.width = this.contentStyles.width
+        dialogElement.style.height = this.contentStyles.height
+        this.isUsingCustomDimensions = this.shouldUseCustomDimensions
+      } else {
+        this.isUsingCustomDimensions = false
+      }
     },
   },
 }
