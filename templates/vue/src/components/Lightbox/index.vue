@@ -249,8 +249,6 @@ export default {
             params: { nodeId: this.rootId },
             query: this.$route.query,
           })
-        } else {
-          this.handleNodeChanged()
         }
       },
     },
@@ -282,9 +280,6 @@ export default {
       },
     },
   },
-  mounted() {
-    this.handleNodeChanged()
-  },
   beforeDestroy() {
     this.$router.push({
       ...this.$route,
@@ -314,6 +309,25 @@ export default {
     },
     handleShow() {
       this.dimensions = {}
+
+      // if opening a multi-content unit node, instead go to its first visible child
+      if (
+        this.node.mediaType === "multi-content" &&
+        this.node.presentationStyle === "unit" &&
+        this.node.childOrdering?.length
+      ) {
+        const firstVisible = this.node.childOrdering.find(id => {
+          const node = this.getNode(id)
+          return node.unlocked || !node.hideWhenLocked
+        })
+        if (firstVisible) {
+          this.$router.replace({
+            name: names.LIGHTBOX,
+            params: { nodeId: firstVisible },
+            query: this.$route.query,
+          })
+        }
+      }
     },
     handleShown() {
       // this.applyDimensions()
@@ -371,25 +385,6 @@ export default {
       //   width: this.lightboxDimensions.width,
       //   height: this.lightboxDimensions.height,
       // }
-    },
-    handleNodeChanged() {
-      if (
-        this.node.mediaType === "multi-content" &&
-        this.node.presentationStyle === "unit" &&
-        this.node.childOrdering?.length
-      ) {
-        const firstVisible = this.node.childOrdering.find(id => {
-          const node = this.getNode(id)
-          return node.unlocked || !node.hideWhenLocked
-        })
-        if (firstVisible) {
-          this.$root.$emit("open-node", firstVisible)
-        } else {
-          this.applyDimensions()
-        }
-      } else {
-        this.applyDimensions()
-      }
     },
   },
 }
