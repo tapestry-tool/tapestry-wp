@@ -2,7 +2,7 @@
   <b-modal
     id="lightbox"
     :visible="visible"
-    hide-header-close
+    hide-header
     hide-footer
     hide-backdrop
     size="lg"
@@ -20,7 +20,7 @@
     @close="handleUserClose"
     @hide="handleHide"
   >
-    <template #modal-header="{ close }">
+    <template #default="{ close }">
       <div class="buttons-container">
         <modal-button
           v-if="canSkip"
@@ -50,30 +50,29 @@
           @clicked="editNode"
         />
       </div>
+      <div data-qa="lightbox-content" class="content" :style="contentStyles">
+        <multi-content-media
+          v-if="node.mediaType === 'multi-content'"
+          id="multicontent-container"
+          context="lightbox"
+          :node="node"
+          :menu-dimensions="dimensions"
+          :row-id="rowId"
+          @close="handleAutoClose"
+          @complete="complete"
+        />
+        <tapestry-media
+          v-if="node.mediaType !== 'multi-content'"
+          :node-id="nodeId"
+          :dimensions="dimensions"
+          context="lightbox"
+          @load="handleLoad"
+          @close="handleAutoClose"
+          @complete="complete"
+          @change:dimensions="updateDimensions"
+        />
+      </div>
     </template>
-
-    <div data-qa="lightbox-content" class="content" :style="contentStyles">
-      <multi-content-media
-        v-if="node.mediaType === 'multi-content'"
-        id="multicontent-container"
-        context="lightbox"
-        :node="node"
-        :menu-dimensions="dimensions"
-        :row-id="rowId"
-        @close="handleAutoClose"
-        @complete="complete"
-      />
-      <tapestry-media
-        v-if="node.mediaType !== 'multi-content'"
-        :node-id="nodeId"
-        :dimensions="dimensions"
-        context="lightbox"
-        @load="handleLoad"
-        @close="handleAutoClose"
-        @complete="complete"
-        @change:dimensions="updateDimensions"
-      />
-    </div>
   </b-modal>
 </template>
 
@@ -432,6 +431,7 @@ body.tapestry-lightbox-open {
     .modal-content {
       max-width: unset;
       max-height: unset;
+      border: unset;
     }
   }
 }
