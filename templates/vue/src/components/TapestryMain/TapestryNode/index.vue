@@ -22,6 +22,8 @@
       tabindex="0"
       @focus="handleFocus"
       @click="handleClick"
+      @mousedown="isMouseDown = true"
+      @mouseup="isMouseDown = false"
       @mouseover="handleMouseover"
       @mouseleave="handleMouseleave"
     >
@@ -194,6 +196,7 @@ export default {
     return {
       transitioning: false,
       isHovered: false,
+      isMouseDown: false,
     }
   },
   computed: {
@@ -422,11 +425,6 @@ export default {
     },
   },
   watch: {
-    root(root) {
-      if (root) {
-        this.$refs.node.focus()
-      }
-    },
     radius(newRadius) {
       d3.select(this.$refs.circle)
         .transition()
@@ -592,7 +590,9 @@ export default {
     handleFocus() {
       if (!this.root && this.getCurrentNodeNav !== this.node.id) {
         this.resetNodeNavigation(this.node.id)
-        this.updateRootNode()
+        if (!this.isMouseDown) {
+          this.updateRootNode()
+        }
       }
     },
     hasPermission(action) {
