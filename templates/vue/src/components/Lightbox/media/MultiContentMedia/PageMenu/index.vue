@@ -396,6 +396,20 @@ $slide-fade-speed: 0.3s;
         white-space: normal !important;
       }
     }
+
+    .dropdown-item.active,
+    .dropdown-item:active {
+      color: #ffffff;
+      background-color: var(--highlight-color);
+    }
+
+    .disabled-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: gray;
+      cursor: not-allowed;
+    }
   }
 }
 </style>
