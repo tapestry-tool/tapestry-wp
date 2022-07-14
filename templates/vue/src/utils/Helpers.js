@@ -29,12 +29,16 @@ export default class Helpers {
   }
 
   /**
-   * Get browser height
+   * Get browser height, taking the admin bar into account if the bar is visible
    *
    * @return {Number}
    */
   static getBrowserHeight() {
-    return Math.max(document.documentElement.clientHeight, window.innerHeight || 0)
+    const adminBar = document.getElementById("wpadminbar")
+    return (
+      Math.max(document.documentElement.clientHeight, window.innerHeight || 0) -
+      (adminBar && adminBar.clientHeight ? adminBar.clientHeight : 0)
+    )
   }
 
   /**

@@ -167,13 +167,20 @@ export default {
       const browserWidth = Helpers.getBrowserWidth()
       const browserHeight = Helpers.getBrowserHeight()
 
+      if (this.node.fullscreen) {
+        return {
+          width: browserWidth,
+          height: browserHeight,
+        }
+      }
+
       const width = this.node.typeData.mediaWidth ?? 960
       const height = this.node.typeData.mediaHeight ?? 600
       const aspectRatio = width / height
 
       // fit content within max. possible dimensions of modal while maintaining the aspect ratio of media
-      // marginSpace = 3rem for the b-modal default vert. margin, plus 32px for the admin bar
-      const marginSpace = Helpers.remToPx(3) + 32
+      // marginSpace = 3rem for the b-modal default vert. margin
+      const marginSpace = Helpers.remToPx(3)
       let adjustedHeight = height
       let adjustedWidth = width
       if (adjustedHeight > browserHeight - marginSpace) {
