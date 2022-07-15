@@ -21,6 +21,7 @@
       }"
       tabindex="0"
       @focus="handleFocus"
+      @blur="handleBlur"
       @click="handleClick"
       @mousedown="isMouseDown = true"
       @mouseup="isMouseDown = false"
@@ -196,6 +197,7 @@ export default {
     return {
       transitioning: false,
       isHovered: false,
+      isFocused: false,
       isMouseDown: false,
     }
   },
@@ -559,9 +561,11 @@ export default {
     handleMouseover() {
       this.isHovered = true
 
-      // Move node to end of svg document so it appears on top
-      const node = this.$refs.node
-      node.parentNode.appendChild(node)
+      // Move node to end of svg document so it appears on top, but do not do this when the node is in focus since it will blur the node
+      if (!this.isFocused) {
+        const node = this.$refs.node
+        node.parentNode.appendChild(node)
+      }
 
       bus.$emit("mouseover", this.node.id)
       this.$emit("mouseover")
@@ -588,12 +592,16 @@ export default {
       client.recordAnalyticsEvent("user", "click", "node", this.node.id)
     },
     handleFocus() {
-      if (!this.root && this.getCurrentNodeNav !== this.node.id) {
-        this.resetNodeNavigation(this.node.id)
-        if (!this.isMouseDown) {
-          this.updateRootNode()
-        }
+      this.isFocused = true
+      if (!this.root && !this.isMouseDown) {
+        this.updateRootNode()
       }
+      if (this.getCurrentNodeNav !== this.node.id) {
+        this.resetNodeNavigation(this.node.id)
+      }
+    },
+    handleBlur() {
+      this.isFocused = false
     },
     hasPermission(action) {
       return Helpers.hasPermission(this.node, action, this.settings.showRejected)
