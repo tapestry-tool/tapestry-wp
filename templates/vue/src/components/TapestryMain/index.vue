@@ -82,7 +82,7 @@ export default {
       return Number(this.$route.params.nodeId)
     },
     dragSelectEnabled() {
-      return !this.settings.renderMap && !Helpers.isTouchEnabledDevice()
+      return !Helpers.isTouchEnabledDevice()
     },
     editableNodes() {
       return this.nodes.length
