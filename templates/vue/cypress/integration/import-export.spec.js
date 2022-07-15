@@ -112,4 +112,76 @@ describe("Import Export", () => {
     cy.wait("@import")
     cy.contains(/Zip file is invalid/i).should("be.visible")
   })
+
+  it("should be able to import a Tapestry from a zip file", () => {
+    const fullTapestry = "full-export.zip"
+    cy.setup()
+
+    cy.intercept("POST", "**/tapestries/**/import_zip").as("import")
+    cy.intercept("GET", "**/tapestries/**").as("load")
+
+    cy.getByTestId("import-file-input").attachFile(fullTapestry)
+    cy.wait("@import")
+
+    cy.contains(/Please try with another file/).should("not.exist")
+    cy.contains(/import successful/i).should("be.visible")
+    cy.contains(/no warnings were generated during import/i).should("be.visible")
+
+    cy.contains(/the following permissions/i).should("be.visible")
+    cy.getByTestId("import-removed-permissions").should("be.visible")
+    cy.getByTestId("import-removed-permissions")
+      .find("li")
+      .should("have.length", 3)
+
+    cy.contains("button", /confirm/i).click()
+    cy.wait("@load")
+
+    cy.getByTestId("tapestry-loading").should("not.exist")
+    const expectedTitles = [
+      "Root",
+      "Local Video",
+      "YouTube Video",
+      "Activity (multiple choice)",
+      "Activity (drag drop)",
+      "Multicontent with background image",
+      "Answer",
+      "External Link",
+    ]
+    cy.wrap(expectedTitles).each(title => cy.getNodeByTitle(title).should("exist"))
+  })
+
+  it("should be able to import a Tapestry with missing files and show warnings", () => {
+    const tapestryWithWarnings = "missing-files.zip"
+    cy.setup()
+
+    cy.intercept("POST", "**/tapestries/**/import_zip").as("import")
+    cy.intercept("GET", "**/tapestries/**").as("load")
+
+    cy.getByTestId("import-file-input").attachFile(tapestryWithWarnings)
+    cy.wait("@import")
+    cy.contains(/Please try with another file/).should("not.exist")
+    cy.contains(/import successful/i).should("be.visible")
+    cy.getByTestId("import-warnings-table").should("be.visible")
+    cy.getByTestId("import-warnings-table")
+      .children()
+      .eq(1)
+      .find("tr")
+      .should("have.length", 5)
+
+    cy.contains("button", /confirm/i).click()
+    cy.wait("@load")
+
+    cy.getByTestId("tapestry-loading").should("not.exist")
+    const expectedTitles = [
+      "Root",
+      "Local Video",
+      "YouTube Video",
+      "Activity (multiple choice)",
+      "Activity (drag drop)",
+      "Multicontent with background image",
+      "Answer",
+      "External Link",
+    ]
+    cy.wrap(expectedTitles).each(title => cy.getNodeByTitle(title).should("exist"))
+  })
 })
