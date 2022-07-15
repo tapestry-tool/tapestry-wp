@@ -459,7 +459,6 @@ function importTapestryFromZip($request)
         $importedTapestry = importTapestry($postId, $tapestry_data);
 
         return [
-            'size' => filesize($zip_path),
             'changes' => $changes,
             'warnings' => $importWarnings,
             'exportWarnings' => !empty($tapestry_data->warnings),
