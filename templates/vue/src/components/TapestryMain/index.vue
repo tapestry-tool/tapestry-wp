@@ -507,6 +507,7 @@ export default {
         query: this.$route.query,
         path: `/nodes/${nodeId}`,
       })
+      this.focusSelectedNode()
     },
     focusSelectedNode() {
       this.$nextTick(() => {

@@ -8,15 +8,11 @@
       },
     ]"
   >
-    <h1
-      v-if="showTitle"
-      :id="context === 'lightbox' ? 'lightboxTitle' : ''"
-      tabindex="0"
-    >
+    <h1 v-if="showTitle" :id="context === 'lightbox' ? 'lightboxTitle' : ''">
       {{ node.title }}
       <completed-icon :node="node" class="mx-2" />
     </h1>
-    <div tabindex="0" v-html="content"></div>
+    <div v-html="content"></div>
   </article>
 </template>
 
