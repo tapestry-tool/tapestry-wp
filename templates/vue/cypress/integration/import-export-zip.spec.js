@@ -27,12 +27,12 @@ describe("Import Export Zip Files", () => {
       .should("have.length", 3)
     cy.task("log", "Line 28")
 
-    cy.window().then(win => {
-      win.onbeforeunload = null
-    })
+    cy.screenshot()
 
     cy.contains("button", /confirm/i).click()
+    cy.screenshot()
     cy.task("log", "Line 31")
+
     cy.wait("@load")
     cy.task("log", "Line 33")
 
@@ -76,12 +76,12 @@ describe("Import Export Zip Files", () => {
       .should("have.length", 5)
     cy.task("log", "Line 73")
 
-    cy.window().then(win => {
-      win.onbeforeunload = null
-    })
+    cy.screenshot()
 
     cy.contains("button", /confirm/i).click()
+    cy.screenshot()
     cy.task("log", "Line 76")
+
     cy.wait("@load")
     cy.task("log", "Line 78")
 
