@@ -149,7 +149,8 @@ export default {
         this.node.fullscreen ||
         this.node.mediaType === "text" ||
         this.node.mediaType === "wp-post" ||
-        this.node.mediaType === "multi-content"
+        this.node.mediaType === "multi-content" ||
+        this.node.mediaType === "url-embed"
       )
     },
     contentStyles() {
