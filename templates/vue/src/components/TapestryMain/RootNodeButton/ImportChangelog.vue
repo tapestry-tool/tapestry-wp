@@ -39,6 +39,9 @@
         <p>
           Pressing "Confirm" will reload your page.
         </p>
+        <p>
+          {{ size }}
+        </p>
       </b-card>
     </b-container>
     <div slot="modal-footer">
@@ -66,6 +69,10 @@ export default {
     },
     exportWarnings: {
       type: Boolean,
+      required: true,
+    },
+    size: {
+      type: Number,
       required: true,
     },
   },

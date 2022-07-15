@@ -4,6 +4,7 @@
       :changes="changes"
       :warnings="warnings"
       :exportWarnings="exportWarnings"
+      :size="size"
     />
     <div data-qa="root-node-button" @click="addRootNode">
       <i class="fas fa-plus-circle fa-5x"></i>
@@ -61,6 +62,7 @@ export default {
       },
       warnings: {},
       exportWarnings: false,
+      size: 0,
     }
   },
   methods: {
@@ -149,6 +151,7 @@ export default {
           this.changes.noChange = response.changes.noChange
           this.warnings = response.warnings
           this.exportWarnings = response.exportWarnings
+          this.size = response.size
           this.$bvModal.show("import-changelog")
         })
         .catch(err => {
