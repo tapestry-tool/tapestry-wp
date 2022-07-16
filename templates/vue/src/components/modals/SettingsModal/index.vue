@@ -105,6 +105,9 @@
               variant="light"
               menu-class="w-100"
               data-qa="export-tapestry-button"
+              :toggle-attrs="{
+                'data-qa': 'export-type-toggle',
+              }"
               :split-class="{
                 'export-button': true,
                 disabled: isExporting,

@@ -242,7 +242,7 @@ class TapestryImportExport
         $success = false;
         while (!$success && $attempts < $max_attempts) {
             $zip_name = uniqid('export_') . '.zip';
-            $zip_path = $tapestry_export_dir['path'] . '/' . $zip_name;
+            $zip_path = $tapestry_export_dir['path'] . DIRECTORY_SEPARATOR . $zip_name;
             $success = $zip->open($zip_path, ZipArchive::CREATE | ZipArchive::EXCL);
             $attempts++;
         }
@@ -278,8 +278,7 @@ class TapestryImportExport
         if ($h5p_data !== null) {
             // Find the H5P export file and add it to the zip
             $h5p_name = ($h5p_data->slug ? $h5p_data->slug . '-' : '') . $h5p_data->id . '.h5p';
-            $h5p_path = H5P_Plugin::get_instance()->get_h5p_path() . '/exports/' . $h5p_name;
-
+            $h5p_path = H5P_Plugin::get_instance()->get_h5p_path() . DIRECTORY_SEPARATOR . 'exports' . DIRECTORY_SEPARATOR . $h5p_name;
             if (!file_exists($h5p_path) || !is_file($h5p_path)) {
                 array_push($warnings, 'Could not find file "' . $h5p_name . '" in H5P export folder.');
                 return;
@@ -620,7 +619,7 @@ class TapestryImportExport
 
         $upload_dir = wp_upload_dir();
         $new_filename = wp_unique_filename($upload_dir['path'], $media_url);
-        $new_filepath = $upload_dir['path'].'/'.$new_filename;
+        $new_filepath = $upload_dir['path'] . DIRECTORY_SEPARATOR . $new_filename;
 
         // Move file to uploads directory
         rename($temp_filepath, $new_filepath);
@@ -675,7 +674,7 @@ class TapestryImportExport
      */
     private static function _getPathIfExists($filename, $temp_dir, &$warnings)
     {
-        $temp_filepath = $temp_dir.'/'.$filename;
+        $temp_filepath = $temp_dir . DIRECTORY_SEPARATOR . $filename;
         if (!file_exists($temp_filepath) || !is_file($temp_filepath)) {
             array_push($warnings, 'File "' . $filename . '" not found in zip');
             return false;
@@ -693,7 +692,7 @@ class TapestryImportExport
     private static function _getLocalPath($url)
     {
         $wp_upload_dir = wp_upload_dir();
-        $wp_upload_dir_path = $wp_upload_dir['basedir'] . '/';
+        $wp_upload_dir_path = $wp_upload_dir['basedir'] . DIRECTORY_SEPARATOR;
         $wp_upload_dir_url = $wp_upload_dir['baseurl'] . '/';
 
         if (self::_stringStartsWith($url, $wp_upload_dir_url)) {
@@ -710,7 +709,7 @@ class TapestryImportExport
     {
         $upload_dir = wp_upload_dir();
         return [
-            'path' => $upload_dir['basedir'] . '/tapestry/export',
+            'path' => $upload_dir['basedir'] . DIRECTORY_SEPARATOR . 'tapestry' . DIRECTORY_SEPARATOR . 'export',
             'url' => $upload_dir['baseurl'] . '/tapestry/export',
         ];
     }
@@ -722,7 +721,7 @@ class TapestryImportExport
     {
         $upload_dir = wp_upload_dir();
         return [
-            'path' => $upload_dir['basedir'] . '/tapestry/import',
+            'path' => $upload_dir['basedir'] . DIRECTORY_SEPARATOR . 'tapestry' . DIRECTORY_SEPARATOR . 'import',
             'url' => $upload_dir['baseurl'] . '/tapestry/import',
         ];
     }
@@ -738,7 +737,7 @@ class TapestryImportExport
         $export_dir = self::_getZipExportDirectory()['path'];
 
         if (!empty($export_dir)) {
-            $files = glob($export_dir . '/export_*.zip');
+            $files = glob($export_dir . DIRECTORY_SEPARATOR . 'export_*.zip');
             $now = time();
             $one_day = 60 * 60 * 24;
 
@@ -775,7 +774,7 @@ class TapestryImportExport
 
         while (!$success && $attempts < $max_attempts) {
             $dirname = uniqid('temp_');
-            $dirpath = $parent_dir['path'] . '/' . $dirname;
+            $dirpath = $parent_dir['path'] . DIRECTORY_SEPARATOR . $dirname;
             $success = mkdir($dirpath, 0755, true);
             $attempts++;
         }
@@ -797,7 +796,7 @@ class TapestryImportExport
         $import_dir = self::_getZipImportDirectory()['path'];
 
         if (!empty($dirpath) && self::_stringStartsWith($dirpath, $import_dir) && file_exists($dirpath)) {
-            array_map('unlink', glob($dirpath . '/*.*'));
+            array_map('unlink', glob($dirpath . DIRECTORY_SEPARATOR . '*.*'));
             rmdir($dirpath);
         }
     }

@@ -8,7 +8,7 @@
       :fields="['title', 'warnings']"
       thead-class="d-none"
       class="warnings-table"
-      data-qa="import-warnings-table"
+      :data-qa="`${action}-warnings-table`"
     >
       <template v-if="settingsWarnings.length" slot="bottom-row">
         <b-td><b>Tapestry Settings:</b></b-td>
@@ -37,6 +37,7 @@
 export default {
   name: "import-export-warnings",
   props: {
+    // action is either "import" or "export"
     action: {
       type: String,
       required: true,
