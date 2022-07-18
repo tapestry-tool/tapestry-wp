@@ -7,7 +7,7 @@
       v-else
       :class="(node.presentationStyle === 'page' ? 'mr' : 'ml') + '-0'"
       :aria-label="
-        `You're on the main section of a ${
+        `Main section of a ${
           level !== 0 ? 'nested' : ''
         } multi-content. This multi-content has ${rows.length} rows.`
       "

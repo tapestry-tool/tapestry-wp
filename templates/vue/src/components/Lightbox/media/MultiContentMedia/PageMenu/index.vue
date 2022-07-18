@@ -19,6 +19,7 @@
             'unit-child': unitsMenuVisible,
           },
         ]"
+        tabindex="0"
         aria-label="Page menu"
       >
         <div ref="container" data-qa="page-nav-container" class="page-nav">
@@ -212,6 +213,11 @@ export default {
       // Only animate the enter/leave if triggered by the toggle button
       this.animate = true
       this.opened = !this.opened
+      if (this.opened) {
+        this.$nextTick(() => {
+          this.$refs.wrapper && this.$refs.wrapper.focus()
+        })
+      }
     },
     scrollToRef(nodeId) {
       this.$nextTick(() => {
