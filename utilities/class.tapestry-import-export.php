@@ -607,8 +607,9 @@ class TapestryImportExport
      */
     private static function _importMedia(&$media_url, $temp_dir, &$warnings, $generate_metadata = false, &$file_id = null)
     {
-        if (empty($media_url) || filter_var($media_url, FILTER_VALIDATE_URL)) {
+        if (empty($media_url) || self::_stringStartsWith($media_url, '//') || filter_var($media_url, FILTER_VALIDATE_URL)) {
             // Is empty or an external URL
+            // Also detect URLs with the scheme removed
             return;
         }
 
