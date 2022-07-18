@@ -48,15 +48,20 @@
             @complete="complete"
           />
           <div v-if="isUnitChild && pageIndex !== -1" class="unit-navigation">
-            <button :disabled="pageIndex === 0" @click="prevPage">
+            <button
+              :disabled="pageIndex === 0"
+              aria-label="Go to previous page in unit."
+              @click="prevPage"
+            >
               <i class="fas fa-chevron-left" />
-              <div>Previous</div>
+              <div aria-hidden="true">Previous</div>
             </button>
             <button
               :disabled="pageIndex === filteredPages.length - 1"
+              aria-label="Go to next page in unit."
               @click="nextPage"
             >
-              <div>Next</div>
+              <div aria-hidden="true">Next</div>
               <i class="fas fa-chevron-right" />
             </button>
           </div>

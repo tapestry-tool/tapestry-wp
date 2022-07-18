@@ -19,6 +19,7 @@
             'unit-child': unitsMenuVisible,
           },
         ]"
+        aria-label="Page menu"
       >
         <div ref="container" data-qa="page-nav-container" class="page-nav">
           <div v-if="unitsMenuVisible">
@@ -75,6 +76,7 @@
           fullscreen: node.fullscreen,
         },
       ]"
+      :aria-label="opened ? 'Close page menu' : 'Open page menu'"
       data-qa="page-nav-toggle"
       @click="toggleMenu"
     >
