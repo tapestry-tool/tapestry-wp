@@ -53,7 +53,6 @@
                 data-qa="node-level-input"
                 type="number"
                 number
-                autofocus
                 @update="update('level', $event)"
               />
             </b-form-group>

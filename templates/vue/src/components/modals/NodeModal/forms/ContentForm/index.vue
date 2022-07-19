@@ -7,7 +7,6 @@
         data-qa="node-title"
         data-testid="node-title"
         placeholder="Enter title"
-        autofocus
         required
         @update="update('title', $event)"
       />
@@ -30,7 +29,6 @@
           :value="node.typeData.menuTitle"
           data-qa="node-nav-title"
           placeholder="Enter custom menu title"
-          autofocus
           @update="update('typeData.menuTitle', $event)"
         />
       </b-form-group>

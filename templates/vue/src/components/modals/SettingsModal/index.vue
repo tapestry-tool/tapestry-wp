@@ -26,7 +26,6 @@
               id="background-url"
               v-model="backgroundUrl"
               placeholder="Enter background URL"
-              autofocus
               @isUploading="isUploading"
             />
           </b-form-group>
