@@ -15,13 +15,13 @@
           x="-10%"
           width="200%"
         >
-          <feGaussianBlur in="SourceAlpha" stdDeviation="5" />
+          <feGaussianBlur in="SourceAlpha" :stdDeviation="Math.max(10 - i, 4)" />
           <feOffset
-            :dx="3 * (maxLevel - i) * scale"
-            :dy="3 * (maxLevel - i) * scale"
+            :dx="4 * (maxLevel - i) * scale"
+            :dy="4 * (maxLevel - i) * scale"
           />
           <feComponentTransfer>
-            <feFuncA type="linear" :slope="Math.max(0.4 - i * 0.05, 0.1)" />
+            <feFuncA type="linear" :slope="Math.max(0.5 - i * 0.05, 0.2)" />
           </feComponentTransfer>
           <feMerge>
             <feMergeNode />
@@ -130,7 +130,7 @@ export default {
       zoomPanHelper: null,
       isPanning: false,
 
-      showMinimap: false,
+      showMinimap: true,
     }
   },
   computed: {

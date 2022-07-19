@@ -177,8 +177,13 @@ export default {
           c.beginPath()
           c.arc(x, y, radius, 0, Math.PI * 2)
           c.fillStyle = node.backgroundColor
+          c.shadowColor = `rgba(0, 0, 0, ${Math.max(0.5 - node.level * 0.05, 0.2)})`
+          c.shadowBlur = Math.max(10 - node.level, 4)
+          c.shadowOffsetX = 4 * (this.maxLevel - node.level)
+          c.shadowOffsetY = 4 * (this.maxLevel - node.level)
           c.fill()
         }
+        c.shadowColor = "rgba(0, 0, 0, 0)"
 
         this.drawView()
       } else {
