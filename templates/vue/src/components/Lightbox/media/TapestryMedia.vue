@@ -6,9 +6,10 @@
       { 'media-wrapper-embed': node.mediaFormat === 'embed' },
       {
         'media-wrapper-no-scroll':
-          node.mediaFormat === 'mp4' ||
-          node.mediaFormat === 'h5p' ||
-          node.mediaFormat === 'youtube',
+          (node.mediaFormat === 'mp4' ||
+            node.mediaFormat === 'h5p' ||
+            node.mediaFormat === 'youtube') &&
+          !(node.fullscreen && !node.fitWindow),
       },
     ]"
     @mouseenter="setHovered"
