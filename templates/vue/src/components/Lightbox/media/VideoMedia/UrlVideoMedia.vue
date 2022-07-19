@@ -22,6 +22,7 @@
 import client from "@/services/TapestryAPI"
 import { SEEK_THRESHOLD } from "./video.config"
 import PlayScreen from "./PlayScreen"
+import { mapState } from "vuex"
 
 export default {
   name: "url-video-media",
@@ -56,12 +57,14 @@ export default {
     }
   },
   computed: {
+    ...mapState(["browserDimensions"]),
     videoStyles() {
       if (!this.videoDimensions) {
         return { width: "100%" }
       }
       const { height, width } = this.videoDimensions
-      if (width / height <= 1) {
+      const aspectRatio = width / height
+      if (aspectRatio <= 1) {
         return { height: "100%", width: "auto" }
       }
 
@@ -70,13 +73,9 @@ export default {
        * aspect ratio.
        */
       if (this.node.fullscreen && this.node.fitWindow) {
-        if (width > window.innerWidth) {
-          const resizeRatio = window.innerWidth / width
-          const newHeight = height * resizeRatio
-          if (newHeight >= window.innerHeight) {
-            return { height: "100%", width: "auto" }
-          }
-        } else if (height > window.innerHeight) {
+        const windowAspectRatio =
+          this.browserDimensions.width / this.browserDimensions.height
+        if (aspectRatio < windowAspectRatio) {
           return { height: "100%", width: "auto" }
         }
       }

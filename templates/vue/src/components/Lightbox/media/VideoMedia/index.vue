@@ -150,6 +150,8 @@ export default {
     heightCss() {
       if (this.context !== "lightbox") {
         return "auto"
+      } else if (this.node.fullscreen) {
+        return "100%"
       } else {
         return this.dimensions.height + "px"
       }
