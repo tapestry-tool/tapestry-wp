@@ -126,6 +126,10 @@ export default {
       isMounted: false,
       navBarStyle: {},
       pages: false,
+      dimensions: {
+        width: 0,
+        height: 0,
+      },
     }
   },
   computed: {
@@ -159,17 +163,6 @@ export default {
           : this.getDirectChildren(id).map(this.getNode)
         return { node, children }
       })
-    },
-    dimensions() {
-      if (!this.isMounted) {
-        return {
-          width: 0,
-          height: 0,
-        }
-      }
-      const box = this.$refs.container
-      const rect = box.getBoundingClientRect()
-      return { width: rect.width, height: rect.height }
     },
     lockRows() {
       return this.node.typeData.lockRows
@@ -210,10 +203,11 @@ export default {
     },
   },
   mounted() {
-    this.isMounted = true
     this.activeIndex = this.node.presentationStyle === "page" ? -1 : 0
 
     this.updatePages()
+
+    this.updateDimensions()
 
     // if all children are completed, mark this as completed too
     // this is just in case it hasn't done this properly before
@@ -224,6 +218,15 @@ export default {
   methods: {
     ...mapMutations(["updateNode"]),
     ...mapActions(["completeNode", "toggleFavourite"]),
+    updateDimensions() {
+      // this setTimeout is a way to run code after everything has been rendered by Vue, not just the component itself (to avoid resulting in a boundingClientRect of 0 by 0)
+      setTimeout(() => {
+        const box = this.$refs.container
+        const rect = box.getBoundingClientRect()
+        this.dimensions.width = rect.width
+        this.dimensions.height = rect.height
+      }, 0)
+    },
     updatePages() {
       this.pages = this.isUnitChild
         ? this.parentNode.childOrdering.map(this.getNode)
