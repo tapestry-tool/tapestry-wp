@@ -32,11 +32,6 @@
         </div>
         <import-warnings :warnings="warnings" action="import"></import-warnings>
         <p>
-          If your Tapestry contains H5P nodes, we recommend rebuilding the H5P cache
-          after importing, by going to H5P Content -> Libraries in the WordPress
-          dashboard.
-        </p>
-        <p>
           Pressing "Confirm" will reload your page.
         </p>
       </b-card>

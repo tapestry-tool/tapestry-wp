@@ -43,6 +43,7 @@
 <script>
 import { names } from "@/config/routes"
 import client from "@/services/TapestryAPI"
+import WordpressApi from "@/services/WordpressApi"
 import ImportChangelog from "./ImportChangelog"
 
 export default {
@@ -149,10 +150,24 @@ export default {
           this.changes.noChange = response.changes.noChange
           this.warnings = response.warnings
           this.exportWarnings = response.exportWarnings
-          this.$bvModal.show("import-changelog")
+
+          return response.rebuildH5PCache
         })
         .catch(err => {
           this.error = err.response.data
+        })
+        .then(shouldRebuild => {
+          if (shouldRebuild) {
+            // The h5pMeta.details field is not generated for imported H5Ps
+            // If any H5Ps were added during import, we need to rebuild the H5P cache
+            return WordpressApi.rebuildAllH5PCache()
+          }
+        })
+        .then(() => {
+          this.$bvModal.show("import-changelog")
+        })
+        .catch(err => {
+          this.error = err
         })
         .finally(() => {
           this.isImporting = false

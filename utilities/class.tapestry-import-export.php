@@ -475,15 +475,19 @@ class TapestryImportExport
      * @param string $temp_dir          Path to the directory where zip was extracted.
      * @param string $temp_url          URL of the directory where zip was extracted.
      *
-     * @return array $warnings  Warnings generated during import
-     *                          [
-     *                              'nodes' => [
-     *                                  'id' => (int) Node ID
-     *                                  'title' => (title) Node title
-     *                                  'warnings' => (array) List of warning messages
-     *                              ],
-     *                              'settings' => (array) List of warning messages
-     *                          ]
+     * @return array [
+     *                  'warnings' => (array) Warnings generated during import
+     *                      [
+     *                          'nodes' => [
+     *                              'id' => (int) Node ID
+     *                              'title' => (title) Node title
+     *                              'warnings' => (array) List of warning messages
+     *                          ],
+     *                          'settings' => (array) List of warning messages
+     *                      ]
+     *                  'rebuildH5PCache' => (boolean) Whether the H5P cache needs to be rebuilt.
+     *                                       True if any H5P contents were added.
+     *               ]
      */
     public static function importExternalMedia($tapestry_data, $temp_dir, $temp_url)
     {
@@ -523,13 +527,10 @@ class TapestryImportExport
 
         self::_importMedia($tapestry_data->settings->backgroundUrl, $temp_dir, $warnings['settings']);
 
-        if ($added_h5p) {
-            // Rebuild H5P caches so that the h5pMeta->details field is available for just added H5Ps
-            // Note: this actually rebuilds as many as possible in 5 seconds; not guaranteed to rebuild everything
-            wp_remote_post(admin_url('admin-ajax.php?action=h5p_rebuild_cache'));
-        }
-
-        return $warnings;
+        return [
+            'warnings' => $warnings,
+            'rebuildH5PCache' => $added_h5p,
+        ];
     }
 
     /**

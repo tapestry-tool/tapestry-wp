@@ -454,13 +454,14 @@ function importTapestryFromZip($request)
 
         // Re-create all media referenced by the Tapestry data on this site,
         // and update references to new URLs
-        $importWarnings = TapestryImportExport::importExternalMedia($tapestry_data, $temp_dir['path'], $temp_dir['url']);
+        $importResult = TapestryImportExport::importExternalMedia($tapestry_data, $temp_dir['path'], $temp_dir['url']);
 
         $importedTapestry = importTapestry($postId, $tapestry_data);
 
         return [
             'changes' => $changes,
-            'warnings' => $importWarnings,
+            'warnings' => $importResult['warnings'],
+            'rebuildH5PCache' => $importResult['rebuildH5PCache'],
             'exportWarnings' => !empty($tapestry_data->warnings),
             'tapestry' => $importedTapestry,
         ];
