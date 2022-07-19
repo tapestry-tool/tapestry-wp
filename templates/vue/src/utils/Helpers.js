@@ -465,7 +465,7 @@ export default class Helpers {
         value: level,
         maxValue: maxLevel,
         from: 1,
-        to: Math.max(1 - maxLevel * 0.15, 0.3),
+        to: Math.max(1 - maxLevel * 0.2, 0.2),
       })
     )
   }
