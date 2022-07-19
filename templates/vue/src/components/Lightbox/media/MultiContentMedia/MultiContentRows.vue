@@ -66,7 +66,6 @@ export default {
   },
   data() {
     return {
-      showCompletion: false,
       numRowsLoaded: 0,
     }
   },

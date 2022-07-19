@@ -67,26 +67,6 @@
           </div>
         </template>
       </template>
-      <tapestry-modal
-        v-if="showCompletion"
-        :node-id="node.id"
-        :allow-close="false"
-        initial-focus="confirmationTitle"
-        @close="handleCancel"
-      >
-        <h1 id="confirmationTitle">{{ node.typeData.confirmationTitleText }}</h1>
-        <p>{{ node.typeData.confirmationBodyText }}</p>
-        <div class="button-container">
-          <button class="button-completion" @click="handleClose">
-            <i class="far fa-arrow-alt-circle-right fa-4x"></i>
-            <p>{{ node.typeData.continueButtonText }}</p>
-          </button>
-          <button class="button-completion" @click="handleCancel">
-            <i class="far fa-times-circle fa-4x"></i>
-            <p>{{ node.typeData.cancelLinkText }}</p>
-          </button>
-        </div>
-      </tapestry-modal>
     </div>
     <page-menu
       v-if="showPageMenu"
@@ -100,11 +80,9 @@
 
 <script>
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex"
-import client from "@/services/TapestryAPI"
 import CompletedIcon from "@/components/common/CompletedIcon"
 import LockedContent from "./common/LockedContent"
 import PageMenu from "./PageMenu"
-import TapestryModal from "../../TapestryModal"
 import MultiContentRows from "./MultiContentRows"
 import { names } from "@/config/routes"
 
@@ -114,7 +92,6 @@ export default {
     CompletedIcon,
     LockedContent,
     PageMenu,
-    TapestryModal,
     MultiContentRows,
   },
   props: {
@@ -146,7 +123,6 @@ export default {
   data() {
     return {
       activeIndex: -1,
-      showCompletion: false,
       isMounted: false,
       navBarStyle: {},
       pages: false,
@@ -248,26 +224,6 @@ export default {
   methods: {
     ...mapMutations(["updateNode"]),
     ...mapActions(["completeNode", "toggleFavourite"]),
-    handleClose(evt) {
-      client.recordAnalyticsEvent("user", "close", "multi-content", this.node.id, {
-        x: evt.clientX,
-        y: evt.clientY,
-      })
-      this.$emit("close")
-    },
-    handleCancel(evt) {
-      client.recordAnalyticsEvent(
-        "user",
-        "close",
-        "multi-content-completion-screen",
-        this.node.id,
-        {
-          x: evt.clientX,
-          y: evt.clientY,
-        }
-      )
-      this.showCompletion = false
-    },
     updatePages() {
       this.pages = this.isUnitChild
         ? this.parentNode.childOrdering.map(this.getNode)

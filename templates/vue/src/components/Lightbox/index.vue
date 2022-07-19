@@ -79,11 +79,10 @@
 <script>
 import { mapActions, mapGetters, mapMutations, mapState } from "vuex"
 import client from "@/services/TapestryAPI"
-import TapestryModal from "./TapestryModal"
 import MultiContentMedia from "./media/MultiContentMedia"
 import TapestryMedia from "./media/TapestryMedia"
 import PageMenu from "./media/MultiContentMedia/PageMenu"
-import ModalButton from "./TapestryModal/ModalButton"
+import ModalButton from "./ModalButton"
 import { names } from "@/config/routes"
 import Helpers from "@/utils/Helpers"
 
@@ -92,7 +91,6 @@ export default {
   components: {
     MultiContentMedia,
     TapestryMedia,
-    TapestryModal,
     PageMenu,
     ModalButton,
   },
@@ -115,7 +113,6 @@ export default {
     return {
       dimensions: {},
       isUsingCustomDimensions: false,
-      showCompletionScreen: false,
     }
   },
   computed: {
