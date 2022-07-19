@@ -439,8 +439,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-#tapestry.panning {
+#tapestry {
   cursor: move;
+
+  &.panning {
+    cursor: grabbing;
+  }
 }
 
 #app-container {
