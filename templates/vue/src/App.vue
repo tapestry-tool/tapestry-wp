@@ -97,6 +97,8 @@ export default {
     }
 
     window.addEventListener("click", this.recordAnalytics)
+    window.addEventListener("resize", this.updateBrowserDimensions)
+    this.updateBrowserDimensions()
 
     const data = [
       client.getTapestry(),
@@ -144,9 +146,10 @@ export default {
   },
   beforeDestroy() {
     window.removeEventListener("click", this.recordAnalytics)
+    window.removeEventListener("resize", this.updateBrowserDimensions)
   },
   methods: {
-    ...mapMutations(["init", "changeTheme"]),
+    ...mapMutations(["init", "changeTheme", "updateBrowserDimensions"]),
     refresh() {
       this.$router.go()
     },

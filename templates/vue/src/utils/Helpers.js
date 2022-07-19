@@ -20,6 +20,7 @@ export default class Helpers {
   }
 
   /**
+   * [DO NOT USE DIRECTLY! Use the browserDimensions Vuex state instead]
    * Get browser width
    *
    * @return {Number}
@@ -29,6 +30,7 @@ export default class Helpers {
   }
 
   /**
+   * [DO NOT USE DIRECTLY! Use the browserDimensions Vuex state instead]
    * Get browser height, taking the admin bar into account if the bar is visible
    *
    * @return {Number}
@@ -64,15 +66,6 @@ export default class Helpers {
     }
 
     return tapestry.nodes.findIndex(helper)
-  }
-
-  static getAspectRatio() {
-    const browserHeight = this.getBrowserHeight()
-    const browserWidth = this.getBrowserWidth()
-    if (browserHeight < 10) {
-      return 0
-    }
-    return browserWidth / browserHeight
   }
 
   static normalizeUrl(url) {

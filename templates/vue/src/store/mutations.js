@@ -1,6 +1,7 @@
 import Vue from "vue"
 import * as getters from "./getters"
 import { parse } from "@/utils/dataset"
+import Helpers from "@/utils/Helpers"
 
 export function init(state, dataset) {
   const datasetWithProgress = parse(dataset, dataset["userProgress"])
@@ -184,6 +185,11 @@ export function changeTheme(state, newTheme) {
 
 export function setReturnRoute(state, route) {
   state.returnRoute = route
+}
+
+export function updateBrowserDimensions(state) {
+  state.browserDimensions.width = Helpers.getBrowserWidth()
+  state.browserDimensions.height = Helpers.getBrowserHeight()
 }
 
 export function setCurrentEditingNode(state, node) {

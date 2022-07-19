@@ -27,6 +27,10 @@ export const store = {
     theme: "",
     userAnswers: {},
     returnRoute: null,
+    browserDimensions: {
+      width: 0,
+      height: 0,
+    },
     currentEditingNode: null,
     nodeNavigation: {
       stack: [],

@@ -92,10 +92,9 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex"
+import { mapGetters, mapState } from "vuex"
 import PageMenuItem from "./PageMenuItem"
 import { isLoggedIn, data as wpData } from "@/services/wp"
-import Helpers from "@/utils/Helpers"
 
 export default {
   name: "page-menu",
@@ -119,11 +118,11 @@ export default {
   data() {
     return {
       opened: false,
-      browserWidth: Helpers.getBrowserWidth(),
       animate: false,
     }
   },
   computed: {
+    ...mapState(["browserDimensions"]),
     ...mapGetters(["getDirectChildren", "getNode", "isMultiContent", "getParent"]),
     nodeId() {
       return parseInt(this.$route.params.nodeId, 10)
@@ -160,7 +159,9 @@ export default {
       return this.fullScreen || this.node.fullscreen
     },
     menuVisible() {
-      return this.opened || (this.node.fullscreen && this.browserWidth > 800)
+      return (
+        this.opened || (this.node.fullscreen && this.browserDimensions.width > 800)
+      )
     },
     unitsMenuVisible() {
       return this.pages && this.parentNode.childOrdering.length > 1
@@ -175,17 +176,7 @@ export default {
       return wpData.logoutUrl
     },
   },
-  mounted() {
-    this.computeBrowserWidth()
-    window.addEventListener("resize", this.computeBrowserWidth)
-  },
-  beforeDestroy() {
-    window.removeEventListener("resize", this.computeBrowserWidth)
-  },
   methods: {
-    computeBrowserWidth() {
-      this.browserWidth = Helpers.getBrowserWidth()
-    },
     disabledRow(node) {
       const index = this.rows.findIndex(row => row.node.id === node.id)
       return (

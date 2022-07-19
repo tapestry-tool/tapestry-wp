@@ -119,7 +119,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(["h5pSettings", "rootId", "favourites"]),
+    ...mapState(["h5pSettings", "rootId", "favourites", "browserDimensions"]),
     ...mapGetters(["getNode", "getParent", "isMultiContent", "isMultiContentRow"]),
     node() {
       const node = this.getNode(this.nodeId)
@@ -165,8 +165,8 @@ export default {
         return {}
       }
 
-      const browserWidth = Helpers.getBrowserWidth()
-      const browserHeight = Helpers.getBrowserHeight()
+      const browserWidth = this.browserDimensions.width
+      const browserHeight = this.browserDimensions.height
 
       if (this.node.fullscreen) {
         return {

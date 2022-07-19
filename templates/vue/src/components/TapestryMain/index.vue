@@ -146,6 +146,7 @@ export default {
       "selection",
       "settings",
       "rootId",
+      "browserDimensions",
       "maxLevel",
       "currentDepth",
       "scaleConstants",
@@ -391,7 +392,7 @@ export default {
           tapestryDimensions.width = x
           tapestryDimensions.height = y
         }
-        const windowWidth = Helpers.getBrowserWidth()
+        const windowWidth = this.browserDimensions.width
         // Center the nodes if there is not enough of them to fill the width of the screen
         if (
           tapestryDimensions.width - tapestryDimensions.startX - MAX_RADIUS * 1.25 <
@@ -405,8 +406,8 @@ export default {
         tapestryDimensions.width = tapestryDimensions.width + MAX_RADIUS * 1.25
         tapestryDimensions.height = tapestryDimensions.height + MAX_RADIUS * 1.25
 
-        const MIN_WIDTH = Helpers.getBrowserWidth() * MIN_TAPESTRY_WIDTH_FACTOR
-        const MIN_HEIGHT = Helpers.getBrowserHeight() * MIN_TAPESTRY_WIDTH_FACTOR
+        const MIN_WIDTH = this.browserDimensions.width * MIN_TAPESTRY_WIDTH_FACTOR
+        const MIN_HEIGHT = this.browserDimensions.height * MIN_TAPESTRY_WIDTH_FACTOR
 
         this.unscaledViewBox = [
           tapestryDimensions.startX,
