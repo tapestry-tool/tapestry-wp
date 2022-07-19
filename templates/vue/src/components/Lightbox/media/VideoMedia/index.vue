@@ -148,7 +148,7 @@ export default {
       }
     },
     heightCss() {
-      if (this.context !== "lightbox" && this.videoComponent !== "youtube-media") {
+      if (this.context !== "lightbox") {
         return "auto"
       } else {
         return this.dimensions.height + "px"
