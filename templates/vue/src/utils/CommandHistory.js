@@ -20,7 +20,7 @@ export default class CommandHistory {
     this.history.push(command)
     this.position++
 
-    await command.do()
+    await command.execute()
   }
 
   async undo() {
@@ -37,7 +37,7 @@ export default class CommandHistory {
       return false
     }
     const command = this.history[++this.position]
-    await command.do()
+    await command.execute()
     return `Redo ${command.name}`
   }
 }

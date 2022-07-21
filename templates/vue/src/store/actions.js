@@ -5,6 +5,7 @@ import ErrorHelper from "../utils/errorHelper"
 
 const LOCAL_PROGRESS_ID = "tapestry-progress"
 
+// undo / redo
 export async function command({ state }, command) {
   await state.commandHistory.doCommand(command)
 }
@@ -17,6 +18,7 @@ export async function redo({ state }) {
   return state.commandHistory.redo()
 }
 
+// settings
 export async function updateSettings({ commit, dispatch }, newSettings) {
   try {
     await client.updateSettings(JSON.stringify(newSettings))
@@ -304,17 +306,14 @@ export async function reviewNode({ commit, dispatch }, { id, comments }) {
 }
 
 // links
-export async function addLink({ dispatch }, newLink) {
+export async function addLink({ dispatch }, payload) {
   await dispatch("command", {
     name: "add link",
-    do: async () => {
-      await dispatch("doAddLink", newLink)
+    execute: async () => {
+      await dispatch("doAddLink", payload)
     },
     undo: async () => {
-      await dispatch("deleteLink", {
-        source: newLink.source,
-        target: newLink.target,
-      })
+      await dispatch("doDeleteLink", payload)
     },
   })
 }
@@ -336,7 +335,19 @@ export async function doAddLink({ commit, dispatch, getters }, newLink) {
   }
 }
 
-export async function reverseLink({ commit, dispatch, getters }, link) {
+export async function reverseLink({ dispatch }, payload) {
+  await dispatch("command", {
+    name: "reverse link",
+    execute: async () => {
+      await dispatch("doReverseLink", payload)
+    },
+    undo: async () => {
+      await dispatch("doReverseLink", payload)
+    },
+  })
+}
+
+export async function doReverseLink({ commit, dispatch, getters }, link) {
   try {
     const parent = getters.getNode(link.source)
     await commit("updateNode", {
@@ -361,7 +372,23 @@ export async function reverseLink({ commit, dispatch, getters }, link) {
   }
 }
 
-export async function deleteLink(
+export async function deleteLink({ dispatch }, payload) {
+  if (payload.useClient) {
+    await dispatch("command", {
+      name: "delete link",
+      execute: async () => {
+        await dispatch("doDeleteLink", payload)
+      },
+      undo: async () => {
+        await dispatch("doAddLink", payload)
+      },
+    })
+  } else {
+    await dispatch("doDeleteLink", payload)
+  }
+}
+
+export async function doDeleteLink(
   { commit, dispatch },
   { source, target, useClient = true }
 ) {
@@ -374,7 +401,19 @@ export async function deleteLink(
 }
 
 // favourites
-export function toggleFavourite({ dispatch, getters }, id) {
+export async function toggleFavourite({ dispatch }, payload) {
+  await dispatch("command", {
+    name: "toggle favourite",
+    execute: async () => {
+      await dispatch("doToggleFavourite", payload)
+    },
+    undo: async () => {
+      await dispatch("doToggleFavourite", payload)
+    },
+  })
+}
+
+export function doToggleFavourite({ dispatch, getters }, id) {
   const favourites = getters.favourites
   const newFavourites = getters.isFavourite(id)
     ? favourites.filter(fid => fid != id)
