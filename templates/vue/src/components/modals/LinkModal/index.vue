@@ -81,6 +81,13 @@ export default {
       )
     },
   },
+  watch: {
+    show(show) {
+      if (show) {
+        this.reverse = false
+      }
+    },
+  },
   methods: {
     ...mapActions(["deleteLink", "reverseLink"]),
     ...mapGetters(["isMultiContent"]),

@@ -342,7 +342,10 @@ export async function reverseLink({ dispatch }, payload) {
       await dispatch("doReverseLink", payload)
     },
     undo: async () => {
-      await dispatch("doReverseLink", payload)
+      await dispatch("doReverseLink", {
+        source: payload.target,
+        target: payload.source,
+      })
     },
   })
 }
