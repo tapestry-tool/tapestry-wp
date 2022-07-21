@@ -56,7 +56,7 @@ export default {
   },
   computed: {
     ...mapState(["nodes"]),
-    ...mapGetters(["getTheme"]),
+    ...mapGetters(["getTheme", "getInitialNodeId"]),
     isEmpty() {
       return Object.keys(this.nodes).length === 0
     },
@@ -120,7 +120,7 @@ export default {
       this.init(tapestryData)
       this.loading = false
       if (!this.$route.params.nodeId && tapestryData.nodes.length > 0) {
-        let path = `/nodes/${tapestryData.rootId}`
+        let path = `/nodes/${this.getInitialNodeId}`
         if (selectedNode) {
           path = `/nodes/${selectedNode.nodeId}`
           if (selectedNode.rowId) {

@@ -39,7 +39,7 @@
 
 <script>
 import DragSelectModular from "@/utils/dragSelectModular"
-import { mapMutations, mapState } from "vuex"
+import { mapGetters, mapMutations, mapState } from "vuex"
 import TapestryNode from "./TapestryNode"
 import TapestryLink from "./TapestryLink"
 import RootNodeButton from "./RootNodeButton"
@@ -68,7 +68,8 @@ export default {
     }
   },
   computed: {
-    ...mapState(["nodes", "links", "selection", "settings", "rootId"]),
+    ...mapState(["nodes", "links", "selection", "settings"]),
+    ...mapGetters(["getInitialNodeId"]),
     background() {
       return this.settings.backgroundUrl
     },
@@ -106,7 +107,7 @@ export default {
               ? { path: "/", query: this.$route.query }
               : {
                   name: names.APP,
-                  params: { nodeId: this.rootId },
+                  params: { nodeId: this.getInitialNodeId },
                   query: this.$route.query,
                 }
           )

@@ -84,7 +84,7 @@ import mapMarkerInaccessible from "@/assets/map-marker-inaccessible.png"
 import mapMarkerDraft from "@/assets/map-marker-draft.png"
 import { latLng, latLngBounds, icon } from "leaflet"
 import { LMap, LTileLayer, LMarker, LPopup } from "vue2-leaflet"
-import { mapState } from "vuex"
+import { mapGetters, mapState } from "vuex"
 import { names } from "@/config/routes"
 import Helpers from "@/utils/Helpers"
 import * as wp from "@/services/wp"
@@ -104,7 +104,8 @@ export default {
     },
   },
   computed: {
-    ...mapState(["settings", "nodes", "rootId"]),
+    ...mapState(["settings", "nodes"]),
+    ...mapGetters(["getInitialNodeId"]),
     url() {
       return "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
     },
@@ -235,7 +236,7 @@ export default {
       this.$router.push({
         name: names.MODAL,
         params: {
-          nodeId: this.isEmpty ? 0 : this.rootId,
+          nodeId: this.isEmpty ? 0 : this.getInitialNodeId,
           type: "add",
           tab: "content",
         },

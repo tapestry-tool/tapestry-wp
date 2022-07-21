@@ -31,7 +31,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(["nodes", "links", "selection", "settings", "rootId"]),
+    ...mapState(["nodes", "links", "selection", "settings"]),
     isSidebarOpen() {
       return Boolean(this.$route.query.sidebar)
     },

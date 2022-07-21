@@ -344,11 +344,11 @@ class Tapestry implements ITapestry
     /**
      * Returns true if the tapestry is empty.
      *
-     * @return bool true if there is no root node, false otherwise
+     * @return bool true if there are no nodes, false otherwise
      */
     public function isEmpty()
     {
-        return empty($this->rootId);
+        return empty($this->nodes);
     }
 
     public function getNodesDataForRender()

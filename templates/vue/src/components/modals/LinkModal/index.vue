@@ -31,7 +31,6 @@
           variant="danger"
           style="margin-right:auto"
           data-qa="delete-link-btn"
-          :disabled="!canDelete"
           @click="remove"
         >
           Delete Link
@@ -43,9 +42,6 @@
           Save
         </b-button>
       </b-overlay>
-      <b-form-invalid-feedback :state="canDelete">
-        Link can only be deleted if both connected nodes have another link.
-      </b-form-invalid-feedback>
     </template>
   </b-modal>
 </template>
@@ -63,7 +59,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(["nodes", "rootId"]),
+    ...mapState(["nodes"]),
     ...mapGetters(["getNeighbours"]),
     show() {
       return this.$route.name === names.LINKMODAL
@@ -73,12 +69,6 @@ export default {
     },
     target() {
       return this.nodes[this.$route.params.target]
-    },
-    canDelete() {
-      return (
-        this.isConnectedToRoot(this.source.id, this.target.id) &&
-        this.isConnectedToRoot(this.target.id, this.source.id)
-      )
     },
   },
   methods: {
@@ -110,29 +100,6 @@ export default {
         }
       }
       this.close()
-    },
-    isConnectedToRoot(source, target) {
-      let queue = []
-      let visited = new Set()
-      queue.push(source)
-      visited.add(source)
-      while (queue.length > 0) {
-        const node = queue.shift()
-        if (node == this.rootId) {
-          return true
-        }
-        const neighbours = this.getNeighbours(node)
-        for (const neighbour of neighbours) {
-          if (
-            !visited.has(neighbour) &&
-            !(node === source && neighbour === target)
-          ) {
-            visited.add(neighbour)
-            queue.push(neighbour)
-          }
-        }
-      }
-      return false
     },
   },
 }

@@ -1,5 +1,13 @@
 import Helpers from "@/utils/Helpers"
 
+export function getInitialNodeId(state) {
+  if (state.rootId) {
+    return state.rootId
+  }
+  const nodeIds = state.nodes.keys()
+  return nodeIds.length === 0 ? null : nodeIds[0]
+}
+
 export function getDirectChildren(state) {
   return id => {
     const links = state.links

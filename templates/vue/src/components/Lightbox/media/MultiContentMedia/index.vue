@@ -107,7 +107,7 @@ export default {
       "isFavourite",
       "isMultiContent",
     ]),
-    ...mapState(["favourites", "rootId"]),
+    ...mapState(["favourites"]),
     rows() {
       return this.node.childOrdering.map(id => {
         const node = this.getNode(id)

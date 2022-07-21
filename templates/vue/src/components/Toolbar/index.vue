@@ -59,7 +59,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(["nodes", "links", "selection", "settings", "rootId"]),
+    ...mapState(["nodes", "links", "selection", "settings"]),
     canEdit() {
       return wp.canEditTapestry()
     },

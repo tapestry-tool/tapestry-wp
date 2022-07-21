@@ -35,7 +35,7 @@ export default {
     },
   },
   computed: {
-    ...mapState(["visibleNodes", "rootId"]),
+    ...mapState(["visibleNodes"]),
     ...mapGetters(["getNeighbours", "isVisible"]),
     show() {
       return this.isVisible(this.source.id) && this.isVisible(this.target.id)
