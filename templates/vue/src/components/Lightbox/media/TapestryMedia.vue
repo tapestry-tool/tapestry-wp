@@ -9,7 +9,7 @@
           (node.mediaFormat === 'mp4' ||
             node.mediaFormat === 'h5p' ||
             node.mediaFormat === 'youtube') &&
-          !(node.fullscreen && !node.fitWindow),
+          !(context == 'lightbox' && node.fullscreen && !node.fitWindow),
       },
     ]"
     @mouseenter="setHovered"
