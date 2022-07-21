@@ -1,8 +1,5 @@
 <?php
 
-require_once __DIR__.'/classes/class.tapestry-analytics.php';
-require_once __DIR__.'/utilities/class.tapestry-import-export.php';
-
 /**
  * Plugin Name: Tapestry
  * Plugin URI: https://www.tapestry-tool.com
@@ -11,20 +8,19 @@ require_once __DIR__.'/utilities/class.tapestry-import-export.php';
  * Author: Tapestry Team, University of British Columbia.
  */
 
-// Used to force-refresh assets
+// Used to force-refresh assets and run updates
 $TAPESTRY_VERSION_NUMBER = '2.55.0-beta';
-
-// Set this to false if you want to use the Vue build instead of npm dev
-$TAPESTRY_USE_DEV_MODE = true;
 
 error_reporting(E_ERROR | E_PARSE);
 
 /**
- * Register endpoints.
+ * Register endpoints and perform other includes
  */
+require_once dirname(__FILE__).'/classes/class.tapestry-analytics.php';
 require_once dirname(__FILE__).'/endpoints.php';
 require_once dirname(__FILE__).'/settings.php';
 require_once dirname(__FILE__).'/plugin-updates.php';
+require_once dirname(__FILE__).'/utilities/class.tapestry-import-export.php';
 
 /**
  * Register Tapestry type on initialization.
@@ -133,9 +129,8 @@ function tapestry_enqueue_vue_app()
     global $post;
     if ('tapestry' == get_post_type($post) && !post_password_required($post)) {
         global $TAPESTRY_VERSION_NUMBER;
-        global $TAPESTRY_USE_DEV_MODE;
 
-        $use_dev = $TAPESTRY_USE_DEV_MODE || isset($_GET['debug']);
+        $use_dev = (defined('TAPESTRY_USE_DEV_MODE') && !empty(TAPESTRY_USE_DEV_MODE)) || isset($_GET['debug']);
 
         // register the Vue build script.
         $vueUrl = $use_dev ? 'http://localhost:8080/dist' : plugin_dir_url(__FILE__).'templates/vue/dist';
