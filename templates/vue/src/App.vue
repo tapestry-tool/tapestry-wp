@@ -78,6 +78,9 @@ export default {
         this.$bvModal.show("loggedOutModal")
       }
     },
+    getTheme() {
+      this.applyTheme()
+    },
   },
   mounted() {
     if (isLoggedIn()) {
@@ -101,25 +104,7 @@ export default {
     ]
     Promise.all(data).then(([tapestryData, selectedNode, theme]) => {
       this.changeTheme(theme.data)
-      if (this.getTheme == "system") {
-        const isDarkMode =
-          window.matchMedia &&
-          window.matchMedia("(prefers-color-scheme: dark)").matches
-        document.documentElement.setAttribute(
-          "data-theme",
-          isDarkMode ? "dark" : "light"
-        )
-        window
-          .matchMedia("(prefers-color-scheme: dark)")
-          .addEventListener("change", e => {
-            document.documentElement.setAttribute(
-              "data-theme",
-              e.matches ? "dark" : "light"
-            )
-          })
-      } else {
-        document.documentElement.setAttribute("data-theme", this.getTheme)
-      }
+      this.applyTheme()
 
       this.init(tapestryData)
       this.loading = false
@@ -158,6 +143,27 @@ export default {
         x: x,
         y: y,
       })
+    },
+    applyTheme() {
+      if (this.getTheme == "system") {
+        const isDarkMode =
+          window.matchMedia &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches
+        document.documentElement.setAttribute(
+          "data-theme",
+          isDarkMode ? "dark" : "light"
+        )
+        window
+          .matchMedia("(prefers-color-scheme: dark)")
+          .addEventListener("change", e => {
+            document.documentElement.setAttribute(
+              "data-theme",
+              e.matches ? "dark" : "light"
+            )
+          })
+      } else {
+        document.documentElement.setAttribute("data-theme", this.getTheme)
+      }
     },
     handleKeydown(evt) {
       if (this.viewingApp) {
