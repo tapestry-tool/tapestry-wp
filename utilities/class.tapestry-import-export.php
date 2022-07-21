@@ -358,9 +358,10 @@ class TapestryImportExport
      * Adds the name of the export category to the Tapestry data.
      *
      * @param object $tapestry_data     Data of the Tapestry
+     * @param string $export_id         ID that identifies this export run
      * @return string|null      Contents of the WXR file, or NULL if no WordPress posts in the Tapestry.
      */
-    public static function exportWpPostsInTapestry($tapestry_data)
+    public static function exportWpPostsInTapestry($tapestry_data, $export_id)
     {
         $post_ids = [];
         foreach ($tapestry_data->nodes as $node) {
@@ -375,7 +376,7 @@ class TapestryImportExport
         });
 
         if (!empty($post_ids)) {
-            list('contents' => $wxr_contents, 'category' => $category) = self::_exportWpPosts($post_ids);
+            list('contents' => $wxr_contents, 'category' => $category) = self::_exportWpPosts($post_ids, $export_id);
 
             // Save the temporary export category so we can delete it on the destination site
             $tapestry_data->wpExportCategory = $category;
@@ -388,19 +389,20 @@ class TapestryImportExport
     /**
      * Exports a list of WordPress posts using WordPress's WXR (XML) format.
      *
-     * @param array $post_ids   Post IDs of the posts to export.
+     * @param array $post_ids       Post IDs of the posts to export.
+     * @param string $export_id     ID that identifies this export run.
      * @return array    [
      *                      'contents' => (string) Contents of the export file
      *                      'category' => (string) Name of the temporary category created to facilitate exporting.
      *                                    Can be used to delete the category later.
      *                  ]
      */
-    private static function _exportWpPosts($post_ids)
+    private static function _exportWpPosts($post_ids, $export_id)
     {
         $site_url = get_bloginfo('url');
 
         // WordPress cannot export posts by id, so make a unique category to gather all posts to export
-        $category = self::_createUniqueCategory();
+        $category = self::_createExportCategory($export_id);
         if (!$category) {
             throw new TapestryError('FAILED_TO_EXPORT');
         }
@@ -431,18 +433,12 @@ class TapestryImportExport
         ];
     }
 
-    private static function _createUniqueCategory()
+    private static function _createExportCategory($export_id)
     {
-        $max_attempts = 100;
-        $attempts = 0;
-        $success = false;
+        $category_name = 'tapestry_export_' . $export_id;
+        $result = wp_insert_term($category_name, 'category');
 
-        while (!$success && $attempts < $max_attempts) {
-            $category_name = uniqid('tapestry_export_');
-            $result = wp_insert_term($category_name, 'category');
-            $success = !is_wp_error($result);
-            $attempts++;
-        }
+        $success = !is_wp_error($result);
 
         return $success ? [
             'name' => $category_name,
@@ -464,6 +460,10 @@ class TapestryImportExport
                 wp_delete_term($category->term_id, 'category');
             }
         }
+    }
+
+    public static function getExportId() {
+        return uniqid();
     }
 
     // --- Import ---

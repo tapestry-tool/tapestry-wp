@@ -522,15 +522,16 @@ export default {
         this.hasExported = true
         return
       }
+      const exportId = exportedTapestry.exportId
       const blob = new Blob([JSON.stringify(exportedTapestry.json, null, 2)], {
         type: "application/json",
       })
       const fileUrl = URL.createObjectURL(blob)
-      this.showFileDownload(fileUrl, `${this.settings.title}.json`)
+      this.showFileDownload(fileUrl, `${this.settings.title}_${exportId}.json`)
       URL.revokeObjectURL(fileUrl)
 
       if (exportedTapestry.wpPosts) {
-        this.downloadWpPosts(exportedTapestry.wpPosts)
+        this.downloadWpPosts(exportedTapestry.wpPosts, exportId)
         this.hasExportedWpPosts = true
       }
 
@@ -546,11 +547,12 @@ export default {
         this.hasExported = true
         return
       }
+      const exportId = exportedTapestry.exportId
       const fileUrl = exportedTapestry.zipUrl
-      this.showFileDownload(fileUrl, `${this.settings.title}.zip`)
+      this.showFileDownload(fileUrl, `${this.settings.title}_${exportId}.zip`)
 
       if (exportedTapestry.wpPosts) {
-        this.downloadWpPosts(exportedTapestry.wpPosts)
+        this.downloadWpPosts(exportedTapestry.wpPosts, exportId)
         this.hasExportedWpPosts = true
       }
 
@@ -570,12 +572,15 @@ export default {
         exportedTapestry.warnings.settings.length > 0
       )
     },
-    downloadWpPosts(exportedPosts) {
+    downloadWpPosts(exportedPosts, exportId) {
       const blob = new Blob([exportedPosts], {
         type: "application/xml",
       })
       const fileUrl = URL.createObjectURL(blob)
-      this.showFileDownload(fileUrl, `${this.settings.title}-WP-Posts.xml`)
+      this.showFileDownload(
+        fileUrl,
+        `${this.settings.title}-WP-Posts_${exportId}.xml`
+      )
       URL.revokeObjectURL(fileUrl)
     },
     showFileDownload(fileUrl, fileName) {

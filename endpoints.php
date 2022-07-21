@@ -359,13 +359,16 @@ function exportTapestry($request)
         if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
             throw new TapestryError('INVALID_POST_ID');
         }
+        // Create an ID to identify this export run
+        $export_id = TapestryImportExport::getExportId();
+
         $tapestry = new Tapestry($postId);
         $tapestry_data = $tapestry->export();
 
         // If the Tapestry contains WordPress posts, separately export them too
-        $wp_posts = TapestryImportExport::exportWpPostsInTapestry($tapestry_data);
+        $wp_posts = TapestryImportExport::exportWpPostsInTapestry($tapestry_data, $export_id);
         
-        $result = ['json' => $tapestry_data];
+        $result = ['json' => $tapestry_data, 'exportId' => $export_id];
         if ($wp_posts) {
             $result['wpPosts'] = $wp_posts;
         }
@@ -392,16 +395,20 @@ function exportTapestryAsZip($request)
             throw new TapestryError('INVALID_POST_ID');
         }
 
+        // Create an ID to identify this export run
+        $export_id = TapestryImportExport::getExportId();
+
         // Export Tapestry to an object
         $tapestry = new Tapestry($postId);
         $tapestry_data = $tapestry->export();
 
         // If the Tapestry contains WordPress posts, separately export them too
-        $wp_posts = TapestryImportExport::exportWpPostsInTapestry($tapestry_data);
+        $wp_posts = TapestryImportExport::exportWpPostsInTapestry($tapestry_data, $export_id);
 
         // Create zip file containing the Tapestry data as a JSON file,
         // and all media referenced by the Tapestry data
         $result = TapestryImportExport::exportExternalMedia($tapestry_data);
+        $result['exportId'] = $export_id;
 
         if ($wp_posts) {
             $result['wpPosts'] = $wp_posts;
