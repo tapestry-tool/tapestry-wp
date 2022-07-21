@@ -495,25 +495,25 @@ class TapestryImportExport
             'nodes' => [],
             'settings' => [],
         ];
-        $added_h5p = false;
 
+        $imported_h5ps = [];
+        $imported_media = [];
         foreach ($tapestry_data->nodes as $node) {
             $node_warnings = [];
 
             if ($node->mediaType === 'h5p') {
-                $success = self::_importH5PNode($node, $temp_dir, $temp_url, $node_warnings);
-                $added_h5p = $success || $added_h5p;
+                self::_importH5PNode($node, $temp_dir, $temp_url, $node_warnings, $imported_h5ps);
             } elseif ($node->mediaType === 'video') {
-                self::_importMedia($node->typeData->mediaURL, $temp_dir, $node_warnings);
+                self::_importMedia($node->typeData->mediaURL, $temp_dir, $node_warnings, $imported_media);
             } elseif ($node->mediaType === 'activity') {
-                self::_importActivityNode($node, $temp_dir, $node_warnings);
+                self::_importActivityNode($node, $temp_dir, $node_warnings, $imported_media);
             }
 
             if (!empty($node->thumbnailFileId)) {
-                self::_importMedia($node->imageURL, $temp_dir, $node_warnings, true, $node->thumbnailFileId);
+                self::_importMedia($node->imageURL, $temp_dir, $node_warnings, $imported_media, true, $node->thumbnailFileId);
             }
             if (!empty($node->lockedThumbnailFileId)) {
-                self::_importMedia($node->lockedImageURL, $temp_dir, $node_warnings, true, $node->lockedThumbnailFileId);
+                self::_importMedia($node->lockedImageURL, $temp_dir, $node_warnings, $imported_media, true, $node->lockedThumbnailFileId);
             }
 
             if (!empty($node_warnings)) {
@@ -525,11 +525,11 @@ class TapestryImportExport
             }
         }
 
-        self::_importMedia($tapestry_data->settings->backgroundUrl, $temp_dir, $warnings['settings']);
+        self::_importMedia($tapestry_data->settings->backgroundUrl, $temp_dir, $warnings['settings'], $imported_media);
 
         return [
             'warnings' => $warnings,
-            'rebuildH5PCache' => $added_h5p,
+            'rebuildH5PCache' => count($imported_h5ps) > 0,
         ];
     }
 
@@ -537,60 +537,70 @@ class TapestryImportExport
      * Uploads an H5P file to the site and sets the H5P node's mediaURL to the embed link for the new H5P,
      * if the file exists.
      *
-     * @param object $node      H5P node data
-     * @param string $temp_dir  Path to the directory where zip was extracted.
-     * @param string $temp_url  URL of the directory where zip was extracted.
-     * @param array &$warnings  (Modified) Import warnings generated so far
+     * @param object $node              H5P node data
+     * @param string $temp_dir          Path to the directory where zip was extracted.
+     * @param string $temp_url          URL of the directory where zip was extracted.
+     * @param array &$warnings          (Modified) Import warnings generated so far
+     * @param array &$imported_h5ps     (Modified) Maps file names of H5Ps to their H5P ids.
+     *                                  If the same file name is encountered, it will not be added twice.
      *
      * @return bool True if successfully imported, otherwise false
      */
-    private static function _importH5PNode($node, $temp_dir, $temp_url, &$warnings)
+    private static function _importH5PNode($node, $temp_dir, $temp_url, &$warnings, &$imported_h5ps)
     {
         if (empty(H5P_DEFINED)) {
             array_push($warnings, 'Could not import H5P content: H5P plugin files not found.');
-            return false;
+            return;
         }
 
         $filename = $node->typeData->mediaURL;
-        $temp_filepath = self::_getPathIfExists($filename, $temp_dir, $warnings);
-        if (!$temp_filepath) {
-            return false;
+        if (array_key_exists($filename, $imported_h5ps)) {
+            // H5P file was already imported; no need to create again
+            $h5p_id = $imported_h5ps[$filename];
+        } else {
+            $temp_filepath = self::_getPathIfExists($filename, $temp_dir, $warnings);
+            if (!$temp_filepath) {
+                return;
+            }
+
+            try {
+                // Downloads the H5P through a GET request – even though it is already in the filesystem.
+                // Unfortunately slow, but seems to be the only public method for adding H5Ps.
+                $h5p_id = H5P_Plugin::get_instance()->fetch_h5p($temp_url.'/'.$filename);
+                $imported_h5ps[$filename] = $h5p_id;
+            } catch (Exception $e) {
+                array_push($warnings, 'Could not import H5P content due to error: ' . $e->getMessage());
+                return;
+            }
         }
 
-        try {
-            // Downloads the H5P through a GET request – even though it is already in the filesystem.
-            // Unfortunately slow, but seems to be the only public method for adding H5Ps.
-            $h5p_id = H5P_Plugin::get_instance()->fetch_h5p($temp_url.'/'.$filename);
-            $node->typeData->mediaURL = admin_url('admin-ajax.php') . '?action=h5p_embed&id=' . $h5p_id;
-            return true;
-        } catch (Exception $e) {
-            array_push($warnings, 'Could not import H5P content due to error: ' . $e->getMessage());
-        }
-        return false;
+        $node->typeData->mediaURL = admin_url('admin-ajax.php') . '?action=h5p_embed&id=' . $h5p_id;
     }
 
     /**
      * Uploads all images in an Activity node to the site, and sets the image URLs to the new URLs.
      * Currently checks the multiple choice and drag drop question types.
      *
-     * @param object $node      Activity node data
-     * @param string $temp_dir  Path to the directory where zip was extracted.
-     * @param array &$warnings  (Modified) Import warnings generated so far
+     * @param object $node              Activity node data
+     * @param string $temp_dir          Path to the directory where zip was extracted.
+     * @param array &$warnings          (Modified) Import warnings generated so far
+     * @param array &$imported_files    (Modified) Maps filenames of imported media to their attachment ids.
+     *                                  If the same file name is encountered, it will not be added twice.
      */
-    private static function _importActivityNode($node, $temp_dir, &$warnings)
+    private static function _importActivityNode($node, $temp_dir, &$warnings, &$imported_files)
     {
         foreach ($node->typeData->activity->questions as $question) {
             $multiple_choice = $question->answerTypes->multipleChoice;
             if ($multiple_choice->enabled && $multiple_choice->useImages && isset($multiple_choice->choices)) {
                 foreach ($multiple_choice->choices as $choice) {
-                    self::_importMedia($choice->imageUrl, $temp_dir, $warnings);
+                    self::_importMedia($choice->imageUrl, $temp_dir, $warnings, $imported_files);
                 }
             }
 
             $drag_drop = $question->answerTypes->dragDrop;
             if ($drag_drop->enabled && $drag_drop->useImages && isset($drag_drop->items)) {
                 foreach ($drag_drop->items as $item) {
-                    self::_importMedia($item->imageUrl, $temp_dir, $warnings);
+                    self::_importMedia($item->imageUrl, $temp_dir, $warnings, $imported_files);
                 }
             }
         }
@@ -603,10 +613,12 @@ class TapestryImportExport
      * @param string &$media_url        (Modified) Link to the media item
      * @param string $temp_dir          Path to the directory where zip was extracted
      * @param array &$warnings          (Modified) Import warnings generated so far
+     * @param array &$imported_files    (Modified) Maps filenames of imported media to their attachment ids.
+     *                                  If the same file name is encountered, it will not be added twice.
      * @param bool $generate_metadata   True if sub-sizes should be created for the image
      * @param int|string &$file_id      (Optional, modified) If provided, is set to the ID of the new attachment.
      */
-    private static function _importMedia(&$media_url, $temp_dir, &$warnings, $generate_metadata = false, &$file_id = null)
+    private static function _importMedia(&$media_url, $temp_dir, &$warnings, &$imported_files, $generate_metadata = false, &$file_id = null)
     {
         if (empty($media_url) || self::_stringStartsWith($media_url, '//') || filter_var($media_url, FILTER_VALIDATE_URL)) {
             // Is empty or an external URL
@@ -614,19 +626,26 @@ class TapestryImportExport
             return;
         }
 
-        $temp_filepath = self::_getPathIfExists($media_url, $temp_dir, $warnings);
-        if (!$temp_filepath) {
-            return;
+        if (array_key_exists($media_url, $imported_files)) {
+            // Media file was already imported; no need to create again
+            $attachment_id = $imported_files[$media_url];
+        } else {
+            $temp_filepath = self::_getPathIfExists($media_url, $temp_dir, $warnings);
+            if (!$temp_filepath) {
+                return;
+            }
+
+            $upload_dir = wp_upload_dir();
+            $new_filename = wp_unique_filename($upload_dir['path'], $media_url);
+            $new_filepath = $upload_dir['path'] . DIRECTORY_SEPARATOR . $new_filename;
+
+            // Move file to uploads directory
+            rename($temp_filepath, $new_filepath);
+
+            $attachment_id = TapestryHelpers::createAttachment($new_filepath, $generate_metadata);
+            $imported_files[$media_url] = $attachment_id;
         }
 
-        $upload_dir = wp_upload_dir();
-        $new_filename = wp_unique_filename($upload_dir['path'], $media_url);
-        $new_filepath = $upload_dir['path'] . DIRECTORY_SEPARATOR . $new_filename;
-
-        // Move file to uploads directory
-        rename($temp_filepath, $new_filepath);
-
-        $attachment_id = TapestryHelpers::createAttachment($new_filepath, $generate_metadata);
         $media_url = wp_get_attachment_url($attachment_id);
 
         if ($file_id !== null) {
