@@ -375,19 +375,22 @@ export async function doReverseLink({ commit, dispatch, getters }, link) {
   }
 }
 
-export async function deleteLink({ dispatch }, payload) {
-  if (payload.useClient) {
+export async function deleteLink(
+  { dispatch },
+  { source, target, useClient = true }
+) {
+  if (useClient) {
     await dispatch("command", {
       name: "delete link",
       execute: async () => {
-        await dispatch("doDeleteLink", payload)
+        await dispatch("doDeleteLink", { source, target, useClient })
       },
       undo: async () => {
-        await dispatch("doAddLink", payload)
+        await dispatch("doAddLink", { source, target })
       },
     })
   } else {
-    await dispatch("doDeleteLink", payload)
+    await dispatch("doDeleteLink", { source, target, useClient })
   }
 }
 
