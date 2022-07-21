@@ -162,7 +162,19 @@ export default {
     handleKeydown(evt) {
       if (this.viewingApp) {
         if (evt.code === "KeyZ" && (evt.metaKey || evt.ctrlKey)) {
-          evt.shiftKey ? this.redo() : this.undo()
+          const action = evt.shiftKey ? this.redo : this.undo
+          action().then(message => {
+            if (message) {
+              this.$bvToast.toast(message, {
+                noCloseButton: true,
+                autoHideDelay: 3000,
+                variant: "secondary",
+                solid: true,
+                toaster: "b-toaster-bottom-center",
+                bodyClass: "tapestry-toast-body",
+              })
+            }
+          })
         }
       }
     },
@@ -219,6 +231,11 @@ html {
         }
       }
     }
+  }
+
+  .tapestry-toast-body {
+    text-align: center;
+    font-weight: bold;
   }
 }
 </style>

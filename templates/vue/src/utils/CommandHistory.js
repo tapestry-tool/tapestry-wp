@@ -25,15 +25,19 @@ export default class CommandHistory {
 
   async undo() {
     if (this.position === -1) {
-      return
+      return false
     }
-    await this.history[this.position--].undo()
+    const command = this.history[this.position--]
+    await command.undo()
+    return `Undo ${command.name}`
   }
 
   async redo() {
     if (this.position === this.history.length - 1) {
-      return
+      return false
     }
-    await this.history[++this.position].do()
+    const command = this.history[++this.position]
+    await command.do()
+    return `Redo ${command.name}`
   }
 }
