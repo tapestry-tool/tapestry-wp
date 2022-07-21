@@ -5,6 +5,18 @@ import ErrorHelper from "../utils/errorHelper"
 
 const LOCAL_PROGRESS_ID = "tapestry-progress"
 
+export async function command({ state }, command) {
+  await state.commandHistory.doCommand(command)
+}
+
+export async function undo({ state }) {
+  await state.commandHistory.undo()
+}
+
+export async function redo({ state }) {
+  await state.commandHistory.redo()
+}
+
 export async function updateSettings({ commit, dispatch }, newSettings) {
   try {
     await client.updateSettings(JSON.stringify(newSettings))
@@ -292,7 +304,21 @@ export async function reviewNode({ commit, dispatch }, { id, comments }) {
 }
 
 // links
-export async function addLink({ commit, dispatch, getters }, newLink) {
+export async function addLink({ dispatch }, newLink) {
+  await dispatch("command", {
+    do: async () => {
+      await dispatch("doAddLink", newLink)
+    },
+    undo: async () => {
+      await dispatch("deleteLink", {
+        source: newLink.source,
+        target: newLink.target,
+      })
+    },
+  })
+}
+
+export async function doAddLink({ commit, dispatch, getters }, newLink) {
   try {
     await client.addLink(JSON.stringify(newLink))
     commit("addLink", newLink)

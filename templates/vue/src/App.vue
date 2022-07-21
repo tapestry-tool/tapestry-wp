@@ -24,7 +24,7 @@
 </template>
 
 <script>
-import { mapState, mapMutations, mapGetters } from "vuex"
+import { mapState, mapMutations, mapGetters, mapActions } from "vuex"
 import { names } from "@/config/routes"
 import Lightbox from "@/components/Lightbox"
 import LinkModal from "@/components/modals/LinkModal"
@@ -68,6 +68,9 @@ export default {
         this.$route.name === names.LIGHTBOX || this.$route.query.from === "lightbox"
       )
     },
+    viewingApp() {
+      return this.$route.name === names.APP
+    },
   },
   watch: {
     loggedIn(isStillLoggedIn) {
@@ -89,6 +92,7 @@ export default {
     }
 
     window.addEventListener("click", this.recordAnalytics)
+    window.addEventListener("keydown", this.handleKeydown)
 
     const data = [
       client.getTapestry(),
@@ -136,8 +140,10 @@ export default {
   },
   beforeDestroy() {
     window.removeEventListener("click", this.recordAnalytics)
+    window.removeEventListener("keydown", this.handleKeydown)
   },
   methods: {
+    ...mapActions(["undo", "redo"]),
     ...mapMutations(["init", "changeTheme"]),
     refresh() {
       this.$router.go()
@@ -152,6 +158,13 @@ export default {
         x: x,
         y: y,
       })
+    },
+    handleKeydown(evt) {
+      if (this.viewingApp) {
+        if (evt.code === "KeyZ" && (evt.metaKey || evt.ctrlKey)) {
+          evt.shiftKey ? this.redo() : this.undo()
+        }
+      }
     },
   },
 }
