@@ -39,6 +39,8 @@ export const store = {
       },
       zoomSensitivity: 0.8, // higher -> zooms in/out faster
       panSensitivity: 1, // higher -> pans faster (keep it at 1 for natural pan)
+      maxNodeSizeToScreen: 0.15, // max. allowed value of: (radius of the deepest node) / min(viewWidth, viewHeight)
+      minTapestrySizeToScreen: 0.6, // min. allowed value of: tapestryWidth / viewWidth
     },
   },
   getters,

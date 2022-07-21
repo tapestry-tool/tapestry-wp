@@ -38,6 +38,18 @@
       <b-form-input v-model="scaleConstants.largeNodeGrowthSupressor" number />
     </b-form-group>
     <b-form-group
+      label="Max. Node Size to Screen Ratio"
+      description="Maximum allowed value of: (radius of the deepest node) / min(viewWidth, viewHeight)"
+    >
+      <b-form-input v-model="scaleConstants.maxNodeSizeToScreen" number />
+    </b-form-group>
+    <b-form-group
+      label="Min. Tapestry Size to Screen Ratio"
+      description="Minimum allowed value of: tapestryWidth / viewWidth"
+    >
+      <b-form-input v-model="scaleConstants.minTapestrySizeToScreen" number />
+    </b-form-group>
+    <b-form-group
       label="Line Width Ratio"
       description="Higher means links are thicker relative to the node size"
     >

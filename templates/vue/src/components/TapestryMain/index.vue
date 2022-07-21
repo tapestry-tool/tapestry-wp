@@ -171,7 +171,12 @@ export default {
         : this.nodes
     },
     maxScale() {
-      return 140 / Helpers.getNodeBaseRadius(this.maxLevel, this.maxLevel)
+      return Math.max(
+        (this.scaleConstants.maxNodeSizeToScreen *
+          Math.min(this.viewBox[2], this.viewBox[3])) /
+          Helpers.getNodeBaseRadius(this.maxLevel, this.maxLevel),
+        140 / Helpers.getNodeBaseRadius(this.maxLevel, this.maxLevel)
+      )
     },
   },
   watch: {
@@ -257,7 +262,10 @@ export default {
       this.$root.$emit("add-node", null)
     },
     clampScale(scale) {
-      return Math.max(Math.min(scale, this.maxScale), 1)
+      return Math.max(
+        Math.min(scale, this.maxScale),
+        this.scaleConstants.minTapestrySizeToScreen
+      )
     },
     fetchAppDimensions() {
       const { width, height } = this.$refs.app.getBoundingClientRect()
