@@ -18,8 +18,33 @@ export async function redo({ state }) {
   return state.commandHistory.redo()
 }
 
+export async function buildCommand(
+  { dispatch },
+  { name, executeAction, undoAction, executePayload, undoPayload }
+) {
+  // NOTE: undoAction and undoPayload are optional; they default ot the execute counterpart
+  await dispatch("command", {
+    name,
+    execute: async () => {
+      dispatch(executeAction, executePayload)
+    },
+    undo: async () => {
+      dispatch(undoAction ?? executeAction, undoPayload ?? executePayload)
+    },
+  })
+}
+
 // settings
-export async function updateSettings({ commit, dispatch }, newSettings) {
+export async function updateSettings({ state, dispatch }, newSettings) {
+  await dispatch("buildCommand", {
+    name: "update settings",
+    executeAction: "doUpdateSettings",
+    executePayload: newSettings,
+    undoPayload: state.settings,
+  })
+}
+
+export async function doUpdateSettings({ commit, dispatch }, newSettings) {
   try {
     await client.updateSettings(JSON.stringify(newSettings))
     commit("updateSettings", newSettings)
@@ -38,8 +63,16 @@ export async function updateH5pSettings({ commit, dispatch }, newSettings) {
 }
 
 // userSettings
+export async function updateUserSettings({ state, dispatch }, userSettings) {
+  await dispatch("buildCommand", {
+    name: "update user settings",
+    executeAction: "doUpdateUserSettings",
+    executePayload: userSettings,
+    undoPayload: { theme: state.theme },
+  })
+}
 
-export async function updateUserSettings({ commit, dispatch }, userSettings) {
+export async function doUpdateUserSettings({ commit, dispatch }, userSettings) {
   try {
     await client.updateUserSettings(JSON.stringify(userSettings))
     commit("changeTheme", userSettings.theme)
@@ -307,14 +340,11 @@ export async function reviewNode({ commit, dispatch }, { id, comments }) {
 
 // links
 export async function addLink({ dispatch }, payload) {
-  await dispatch("command", {
+  await dispatch("buildCommand", {
     name: "add link",
-    execute: async () => {
-      await dispatch("doAddLink", payload)
-    },
-    undo: async () => {
-      await dispatch("doDeleteLink", payload)
-    },
+    executeAction: "doAddLink",
+    undoAction: "doDeleteLink",
+    executePayload: payload,
   })
 }
 
@@ -336,16 +366,13 @@ export async function doAddLink({ commit, dispatch, getters }, newLink) {
 }
 
 export async function reverseLink({ dispatch }, payload) {
-  await dispatch("command", {
+  await dispatch("buildCommand", {
     name: "reverse link",
-    execute: async () => {
-      await dispatch("doReverseLink", payload)
-    },
-    undo: async () => {
-      await dispatch("doReverseLink", {
-        source: payload.target,
-        target: payload.source,
-      })
+    executeAction: "doReverseLink",
+    executePayload: payload,
+    undoPayload: {
+      source: payload.target,
+      target: payload.source,
     },
   })
 }
@@ -380,14 +407,12 @@ export async function deleteLink(
   { source, target, useClient = true }
 ) {
   if (useClient) {
-    await dispatch("command", {
+    await dispatch("buildCommand", {
       name: "delete link",
-      execute: async () => {
-        await dispatch("doDeleteLink", { source, target, useClient })
-      },
-      undo: async () => {
-        await dispatch("doAddLink", { source, target })
-      },
+      executeAction: "doDeleteLink",
+      executePayload: { source, target, useClient },
+      undoAction: "doAddLink",
+      undoPayload: { source, target },
     })
   } else {
     await dispatch("doDeleteLink", { source, target, useClient })
@@ -408,14 +433,10 @@ export async function doDeleteLink(
 
 // favourites
 export async function toggleFavourite({ dispatch }, payload) {
-  await dispatch("command", {
+  await dispatch("buildCommand", {
     name: "toggle favourite",
-    execute: async () => {
-      await dispatch("doToggleFavourite", payload)
-    },
-    undo: async () => {
-      await dispatch("doToggleFavourite", payload)
-    },
+    executeAction: "doToggleFavourite",
+    executePayload: payload,
   })
 }
 

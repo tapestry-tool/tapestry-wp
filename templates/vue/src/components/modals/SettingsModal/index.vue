@@ -7,6 +7,7 @@
     title="Tapestry Settings"
     scrollable
     body-class="p-0"
+    @show="getSettings"
     @hidden="$emit('close')"
   >
     <b-container fluid class="px-0">
@@ -455,7 +456,8 @@ export default {
       this.mapBounds = mapBounds
     },
     async updateSettings() {
-      const settings = Object.assign(this.settings, {
+      await this.$store.dispatch("updateSettings", {
+        ...this.settings,
         backgroundUrl: this.backgroundUrl,
         autoLayout: this.autoLayout,
         defaultPermissions: this.defaultPermissions,
@@ -471,7 +473,6 @@ export default {
         submitNodesEnabled: this.submitNodesEnabled,
         mapBounds: this.mapBounds,
       })
-      await this.$store.dispatch("updateSettings", settings)
       this.closeModal()
     },
     isUploading(status) {
