@@ -1,7 +1,7 @@
 <template>
   <div>
     <b-button
-      :disabled="isDisabled"
+      :disabled="disabled"
       size="sm"
       variant="danger"
       @click="handleRemoveNode"
@@ -12,8 +12,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters, mapMutations, mapState } from "vuex"
-import { nodeStatus } from "@/utils/constants"
+import { mapActions } from "vuex"
 
 export default {
   props: {
@@ -32,48 +31,8 @@ export default {
       default: false,
     },
   },
-  computed: {
-    ...mapGetters(["getNode", "getNeighbours", "getNeighbouringLinks"]),
-    ...mapState(["nodes", "rootId"]),
-    neighbourLink() {
-      return this.getNeighbouringLinks(this.nodeId)[0]
-    },
-    neighbour() {
-      return this.getNode(this.getNeighbours(this.nodeId)[0])
-    },
-    isRoot() {
-      return this.nodeId === this.rootId
-    },
-    isDisabled() {
-      return Boolean(this.disabled || this.disabledMessage.length)
-    },
-    disabledMessage() {
-      if (this.isRoot && Object.keys(this.nodes).length > 1) {
-        return "Root node can only be deleted if there are no other nodes in the tapestry."
-      }
-      const nonDraftNeighbours = this.getNeighbouringLinks(this.nodeId).filter(
-        link => {
-          const node = this.getNode(
-            this.nodeId == link.source ? link.target : link.source
-          )
-          return node.status !== nodeStatus.DRAFT
-        }
-      )
-      if (nonDraftNeighbours.length > 1) {
-        return "Only nodes with a single connection can be deleted."
-      }
-      return ""
-    },
-  },
-  mounted() {
-    this.$emit("message", this.disabledMessage)
-  },
-  updated() {
-    this.$emit("message", this.disabledMessage)
-  },
   methods: {
-    ...mapActions(["deleteNode", "deleteLink", "getNodeHasDraftChildren"]),
-    ...mapMutations(["updateNode"]),
+    ...mapActions(["deleteNode", "getNodeHasDraftChildren"]),
     async handleRemoveNode() {
       this.$emit("setLoading", true)
       const nodeHasDraftChildren = await this.getNodeHasDraftChildren(this.nodeId)
@@ -100,24 +59,9 @@ export default {
       this.$emit("setLoading", false)
     },
     removeNode() {
-      this.$emit("complete")
-      if (!this.isRoot) {
-        const neighbour = this.neighbour
-        this.deleteLink({
-          source: this.neighbourLink.source,
-          target: this.neighbourLink.target,
-          useClient: false,
-        })
-        this.updateNode({
-          id: neighbour.id,
-          newNode: {
-            childOrdering: neighbour.childOrdering.filter(id => id !== this.nodeId),
-          },
-        })
-      } else {
-        this.$router.push({ path: "/", query: this.$route.query })
-      }
-      this.deleteNode(this.nodeId)
+      this.deleteNode(this.nodeId).then(() => {
+        this.$emit("complete")
+      })
     },
   },
 }

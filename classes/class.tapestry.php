@@ -199,11 +199,6 @@ class Tapestry implements ITapestry
     {
         // Remove the rootId field
         if ($nodeId == $this->rootId) {
-            foreach ($this->nodes as $node) {
-                if ($node !== $this->rootId && !TapestryHelpers::nodeIsDraft($node, $this->postId)) {
-                    throw new TapestryError('CANNOT_DELETE_ROOT');
-                }
-            }
             $this->rootId = 0;
         }
 

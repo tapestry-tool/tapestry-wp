@@ -166,7 +166,6 @@
               :isMultiContentNodeChild="isMultiContentNodeChild"
               @submit="loading = true"
               @setLoading="setLoading"
-              @message="setDisabledMessage"
               @complete="handleDeleteComplete"
             ></delete-node-button>
             <span style="flex-grow:1;"></span>
@@ -215,8 +214,6 @@
           </div>
           <b-form-invalid-feedback :state="canMakeDraft">
             {{ warningText }}
-            <br v-if="warningText" />
-            {{ deleteWarningText }}
           </b-form-invalid-feedback>
           <b-form-invalid-feedback
             :state="!hasUnsavedChanges"
@@ -320,7 +317,6 @@ export default {
       fileUploading: false,
       loadDuration: false,
       warningText: "",
-      deleteWarningText: "",
       keepOpen: false,
     }
   },
@@ -331,6 +327,7 @@ export default {
       "getParent",
       "getNode",
       "getNeighbours",
+      "getInitialNodeId",
     ]),
     ...mapState([
       "nodes",
@@ -352,9 +349,7 @@ export default {
     },
     title() {
       if (this.type === "add") {
-        return this.parent
-          ? `Add new sub-topic to ${this.parent.title}`
-          : "Add root node"
+        return this.parent ? `Add new sub-topic to ${this.parent.title}` : "Add node"
       } else if (this.type === "edit") {
         return `Edit node: ${this.node.title}`
       }
@@ -584,7 +579,6 @@ export default {
   },
   methods: {
     ...mapMutations([
-      "updateRootNode",
       "setReturnRoute",
       "setCurrentEditingNode",
       "setCurrentEditingNodeProperty",
@@ -702,9 +696,6 @@ export default {
       }
       return node.mediaType === "multi-content"
     },
-    setDisabledMessage(msg) {
-      this.deleteWarningText = msg
-    },
     changeTab(tab) {
       // Prevent multiple clicks
       if (tab !== this.tab) {
@@ -716,9 +707,13 @@ export default {
       }
     },
     handleDeleteComplete() {
-      this.setCurrentEditingNode(this.parent)
       this.loading = false
-      this.keepOpen = true
+      if (this.parent) {
+        this.setCurrentEditingNode(this.parent)
+        this.keepOpen = true
+      } else {
+        this.keepOpen = false
+      }
       this.close("delete")
     },
     handleClose(event) {
@@ -759,11 +754,11 @@ export default {
             params: { nodeId: this.node.id, type: "edit", tab: "content" },
             query: this.$route.query,
           })
-        } else if (this.rootId && !this.nodeId) {
-          // We just added a root node
+        } else if (!this.nodeId) {
+          // We just added the first node in the tapestry
           this.$router.push({
             name: names.APP,
-            params: { nodeId: this.rootId },
+            params: { nodeId: this.getInitialNodeId },
             query: this.$route.query,
           })
         } else if (
@@ -894,8 +889,6 @@ export default {
               },
             })
           }
-        } else {
-          this.updateRootNode(id)
         }
       } else {
         await this.updateNode({

@@ -233,9 +233,29 @@ async function unlockNodes({ commit, getters, dispatch }) {
   }
 }
 
-export async function deleteNode({ commit, dispatch }, id) {
+export async function deleteNode({ getters, commit, dispatch }, id) {
   try {
     await client.deleteNode(id)
+
+    // delete all links connected to the node, and remove node from childOrdering of neighbours
+    const neighbouringLinks = getters.getNeighbouringLinks(id)
+    for (const link of neighbouringLinks) {
+      const neighbour = getters.getNode(
+        link.source === id ? link.target : link.source
+      )
+      await dispatch("deleteLink", {
+        source: link.source,
+        target: link.target,
+        useClient: false,
+      })
+      commit("updateNode", {
+        id: neighbour.id,
+        newNode: {
+          childOrdering: neighbour.childOrdering.filter(childId => childId !== id),
+        },
+      })
+    }
+
     commit("deleteNode", id)
   } catch (error) {
     dispatch("addApiError", error)

@@ -191,6 +191,9 @@ export default {
         document.body.style.backgroundImage = background ? `url(${background})` : ""
       },
     },
+    nodes() {
+      this.updateViewBox()
+    },
     selectedId: {
       immediate: true,
       handler(nodeId) {
