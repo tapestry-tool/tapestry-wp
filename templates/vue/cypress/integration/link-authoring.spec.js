@@ -103,6 +103,7 @@ describe("Link Authoring", () => {
               /are you sure you want to delete this link?/i
             )
           })
+        cy.getByTestId("links-modal").should("not.exist")
         cy.openLightbox(root.id)
         cy.lightbox().within(() => {
           cy.contains(child1.title).should("not.exist")

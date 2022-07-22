@@ -68,6 +68,7 @@ function parseToStore(dataset) {
   if (defaultDepth === undefined) {
     store.settings.defaultDepth = DEFAULT_DEPTH
   }
+  store.currentDepth = store.settings.defaultDepth
 
   dataset.nodes.forEach(n => initializeOrdering(dataset, n))
 

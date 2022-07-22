@@ -604,7 +604,7 @@ describe("Activity", () => {
     cy.getSelectedNode().then(node => {
       cy.getByTestId("user-settings-button").click()
       cy.contains(/light mode/i).click()
-      cy.contains(/save/i).click()
+      cy.getByTestId("user-settings-submit-button").click()
 
       cy.openModal("edit", node.id)
       cy.changeMediaType("activity")

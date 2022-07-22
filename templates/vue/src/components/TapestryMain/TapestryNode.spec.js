@@ -14,8 +14,12 @@ describe("Tapestry node", () => {
       return render(TapestryNode, {
         fixture: oneNodeTapestry,
         props: {
-          node: node,
+          node: {
+            ...node,
+            level: 1,
+          },
           root: true,
+          scale: 1,
         },
         settings: settings,
       })

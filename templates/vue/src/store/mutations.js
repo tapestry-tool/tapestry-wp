@@ -7,10 +7,19 @@ export function init(state, dataset) {
   Object.entries(datasetWithProgress).forEach(([key, value]) => {
     if (key === "nodes") {
       state.nodes = {}
+      let maxLevel = 1
       Object.values(value).forEach(node => {
-        // Has to call this so `state.nodes` is reactive
-        Vue.set(state.nodes, node.id, node)
+        const level = node.level ?? 1
+        // Has to call Vue.set so `state.nodes` is reactive
+        Vue.set(state.nodes, node.id, {
+          ...node,
+          level: level,
+        })
+        if (level > maxLevel) {
+          maxLevel = level
+        }
       })
+      state.maxLevel = maxLevel
     } else {
       state[key] = value
     }
@@ -204,4 +213,16 @@ export function setCurrentEditingNodeProperty(state, { property, value }) {
       }
     }
   }
+}
+
+export function setMaxLevel(state, maxLevel) {
+  state.maxLevel = maxLevel
+}
+
+export function setCurrentDepth(state, depth) {
+  state.currentDepth = depth
+}
+
+export function setScaleConstants(state, scaleConstants) {
+  state.scaleConstants = scaleConstants
 }

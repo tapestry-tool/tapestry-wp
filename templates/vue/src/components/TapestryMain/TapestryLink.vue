@@ -1,19 +1,22 @@
 <template>
   <transition name="fade">
-    <line
+    <polygon
       v-show="show"
       :data-qa="`link-${source.id}-${target.id}`"
       :class="{
+        'half-opaque':
+          (!source.accessible && source.hideWhenLocked) ||
+          (!target.accessible && target.hideWhenLocked),
         opaque:
           !visibleNodes.includes(source.id) || !visibleNodes.includes(target.id),
         disabled: !isLoggedIn,
       }"
-      :x1="source.coordinates.x"
-      :x2="target.coordinates.x"
-      :y1="source.coordinates.y"
-      :y2="target.coordinates.y"
+      :style="{
+        filter: `url(#shadow-${source.level})`,
+      }"
+      :points="polygonPoints"
       @click="openLinkModal"
-    ></line>
+    ></polygon>
   </transition>
 </template>
 
@@ -21,6 +24,7 @@
 import { mapGetters, mapState } from "vuex"
 import { names } from "@/config/routes"
 import * as wp from "@/services/wp"
+import Helpers from "@/utils/Helpers"
 
 export default {
   name: "tapestry-link",
@@ -33,15 +37,40 @@ export default {
       type: Object,
       required: true,
     },
+    scale: {
+      type: Number,
+      required: true,
+    },
   },
   computed: {
-    ...mapState(["visibleNodes"]),
+    ...mapState(["visibleNodes", "maxLevel", "currentDepth"]),
     ...mapGetters(["getNeighbours", "isVisible"]),
     show() {
-      return this.isVisible(this.source.id) && this.isVisible(this.target.id)
+      return (
+        this.isVisible(this.source.id) &&
+        Helpers.getNodeVisibility(
+          this.source.level,
+          this.scale,
+          this.currentDepth
+        ) >= 0 &&
+        this.isVisible(this.target.id) &&
+        Helpers.getNodeVisibility(
+          this.target.level,
+          this.scale,
+          this.currentDepth
+        ) >= 0
+      )
     },
     isLoggedIn() {
       return wp.isLoggedIn()
+    },
+    polygonPoints() {
+      return Helpers.getLinePolygonPoints(
+        this.source,
+        this.target,
+        this.maxLevel,
+        this.scale
+      )
     },
   },
   methods: {
@@ -60,25 +89,38 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-line {
-  stroke: #999;
-  stroke-width: 6;
+polygon {
+  fill: #999;
 
   &:hover {
     cursor: pointer;
-    stroke: #3498db;
-    stroke-width: 11;
+    fill: #3498db;
+  }
+
+  &.opaque {
+    opacity: 0.2;
+  }
+
+  &.disabled {
+    &:hover {
+      cursor: not-allowed;
+      fill: #999;
+    }
   }
 }
 
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.5s;
+  transition: opacity 0.2s;
 }
 
 .fade-enter,
 .fade-leave-to {
   opacity: 0;
+}
+
+.half-opaque {
+  opacity: 0.6;
 }
 
 .opaque {

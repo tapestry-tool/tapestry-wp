@@ -44,3 +44,18 @@ export const userActions = {
 }
 
 export const DEFAULT_DEPTH = 3
+
+// * DEV: this is not used; use store.state.scaleConstants temporarily
+export const scaleConstants = {
+  levelMultiplier: 1.7, // higher -> deep nodes get revealed faster
+  largeNodeGrowthSupressor: 2, // [>=1] higher -> larger nodes grow slower
+  lineWidthRatio: 0.05, // higher -> links are thicker
+  widthDifferenceEnhancer: {
+    grow: 1.8, // [>=1] higher -> links are thicker at parent end
+    shrink: 0.4, // [<=1] lower -> links are thinner at child end
+  },
+  zoomSensitivity: 0.8, // higher -> zooms in/out faster
+  panSensitivity: 1, // higher -> pans faster (keep it at 1 for natural pan)
+  maxNodeSizeToScreen: 0.15, // max. allowed value of: (radius of the deepest node) / min(viewWidth, viewHeight)
+  minTapestrySizeToScreen: 0.6, // min. allowed value of: tapestryWidth / viewWidth
+}

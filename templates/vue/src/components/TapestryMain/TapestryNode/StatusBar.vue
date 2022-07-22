@@ -87,13 +87,13 @@ export default {
     radius(radius, oldRadius) {
       d3.select(this.$refs.track)
         .transition()
-        .duration(750)
+        .duration(300)
         .ease(d3.easePolyOut)
         .attr("r", Math.max(radius + this.spacing + this.width / 2, 0))
 
       d3.select(this.$refs.path)
         .transition()
-        .duration(750)
+        .duration(300)
         .ease(d3.easePolyOut)
         .attrTween("d", () => {
           const interpolate = d3.interpolate(oldRadius, radius)

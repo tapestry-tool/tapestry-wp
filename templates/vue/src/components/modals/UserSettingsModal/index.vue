@@ -18,6 +18,13 @@
         >
           <theme-form ref="themeForm"></theme-form>
         </b-tab>
+        <b-tab
+          title="Developer"
+          :active="tab === 'developer'"
+          @click="$emit('change:tab', 'developer')"
+        >
+          <developer-form ref="developerForm"></developer-form>
+        </b-tab>
       </b-tabs>
     </b-container>
     <template slot="modal-footer">
@@ -40,12 +47,14 @@
 <script>
 import DragSelectModular from "@/utils/dragSelectModular"
 import ThemeForm from "./ThemeForm"
+import DeveloperForm from "./DeveloperForm"
 import { mapActions } from "vuex"
 
 export default {
   name: "user-settings-modal",
   components: {
     ThemeForm,
+    DeveloperForm,
   },
   props: {
     show: {
@@ -78,6 +87,7 @@ export default {
     },
     saveSettings() {
       const theme = this.$refs.themeForm.getTheme()
+      this.$refs.developerForm.applyChanges()
       this.$refs.themeForm.applyTheme()
       this.updateUserSettings({ theme })
       this.$root.$emit("bv::hide::modal", "user-settings-modal")

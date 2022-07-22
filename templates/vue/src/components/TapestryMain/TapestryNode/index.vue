@@ -4,16 +4,17 @@
       v-show="show"
       ref="node"
       :data-qa="`node-${node.id}`"
-      :data-locked="!node.accessible"
-      :transform="`translate(${node.coordinates.x}, ${node.coordinates.y})`"
+      :data-locked="!node.unlocked"
+      :transform="`translate(${coordinates.x}, ${coordinates.y})`"
       :class="{
+        'half-opaque': !node.unlocked && node.hideWhenLocked,
         opaque: !visibleNodes.includes(node.id),
         'has-thumbnail': node.thumbnailURL,
         'has-title': !node.hideTitle,
       }"
       :style="{
         cursor:
-          node.accessible || hasPermission('edit') || hasPermission('move')
+          node.unlocked || hasPermission('edit') || hasPermission('move')
             ? 'pointer'
             : 'not-allowed',
       }"
@@ -26,73 +27,75 @@
         :data-qa="`node-circle-${node.id}`"
         :fill="fill"
         :stroke="progressBackgroundColor"
+        :style="{
+          filter: `url(#shadow-${root ? 'root' : node.level})`,
+        }"
       ></circle>
       <transition name="fade">
         <circle
-          v-show="(!node.hideTitle && !isHovered) || !node.accessible || selected"
+          v-show="(!node.hideTitle && !isHovered) || !node.unlocked || selected"
           :r="radius"
           :fill="overlayFill"
           class="node-overlay"
-          :class="selected ? 'selected' : !node.accessible ? 'locked' : 'normal'"
+          :class="selected ? 'selected' : !node.unlocked ? 'locked' : 'normal'"
         ></circle>
       </transition>
       <progress-bar
-        v-if="
-          node.nodeType !== 'grandchild' &&
-            node.nodeType !== '' &&
-            !node.hideProgress
-        "
-        :x="node.coordinates.x"
-        :y="node.coordinates.y"
+        v-if="!isGrandChild && node.nodeType !== '' && !node.hideProgress"
+        :x="coordinates.x"
+        :y="coordinates.y"
         :radius="radius"
         :background-color="progressBackgroundColor"
         :data-qa="`node-progress-${node.id}`"
         :progress="progress"
-        :locked="!node.accessible"
+        :locked="!node.unlocked"
       ></progress-bar>
       <status-bar
-        v-if="
-          node.nodeType !== 'grandchild' &&
-            node.nodeType !== '' &&
-            !node.hideProgress
-        "
-        :x="node.coordinates.x"
-        :y="node.coordinates.y"
+        v-if="!isGrandChild && node.nodeType !== '' && !node.hideProgress"
+        :x="coordinates.x"
+        :y="coordinates.y"
         :radius="radius"
-        :locked="!node.accessible"
+        :locked="!node.unlocked"
         :status="node.status"
         :reviewStatus="node.reviewStatus"
         :enableHighlight="highlightNode"
         :data-qa="`node-status-${node.id}`"
       ></status-bar>
-      <g v-show="node.nodeType !== 'grandchild' && node.nodeType !== ''">
+      <g v-show="!isGrandChild && node.nodeType !== ''">
         <transition name="fade">
           <foreignObject
             v-if="!node.hideTitle"
-            v-show="!isHovered || !thumbnailURL || selected || !node.accessible"
+            v-show="!isHovered || !thumbnailURL || selected || !node.unlocked"
             :data-qa="`node-title-${node.id}`"
             class="metaWrapper"
-            :width="(140 * 2 * 5) / 6"
-            :height="(140 * 2 * 5) / 6"
-            :x="-(140 * 5) / 6"
-            :y="-(140 * 5) / 6"
+            :width="(radius * 2 * 5) / 6"
+            :height="(radius * 2 * 5) / 6"
+            :x="-(radius * 5) / 6"
+            :y="-(radius * 5) / 6"
           >
-            <div class="meta" :style="{ color: node.textColor }">
+            <div
+              class="meta"
+              :style="{
+                color: node.textColor,
+                fontSize: Math.min(radius * 0.25, 30) + 'px',
+              }"
+            >
               <p class="title">{{ node.title }}</p>
+              <p style="font-size: 60%;">Level {{ node.level }}</p>
               <p v-if="node.mediaDuration" class="timecode">
                 {{ formatDuration() }}
               </p>
             </div>
           </foreignObject>
         </transition>
-        <g v-show="!transitioning">
+        <g v-show="radius >= 80">
           <node-button
             v-if="!node.hideMedia"
             :x="0"
             :y="-radius"
             :fill="buttonBackgroundColor"
             :data-qa="`open-node-${node.id}`"
-            :disabled="!node.accessible && !hasPermission('edit')"
+            :disabled="!node.unlocked && !hasPermission('edit')"
             @click="handleRequestOpen"
           >
             <tapestry-icon :icon="icon" svg></tapestry-icon>
@@ -182,6 +185,10 @@ export default {
       type: Boolean,
       required: true,
     },
+    scale: {
+      type: Number,
+      required: true,
+    },
   },
   data() {
     return {
@@ -190,7 +197,13 @@ export default {
     }
   },
   computed: {
-    ...mapState(["selection", "settings", "visibleNodes"]),
+    ...mapState([
+      "selection",
+      "settings",
+      "visibleNodes",
+      "maxLevel",
+      "currentDepth",
+    ]),
     ...mapGetters(["getNode", "getDirectChildren", "isVisible", "getParent"]),
     canReview() {
       if (!this.isLoggedIn) {
@@ -221,7 +234,7 @@ export default {
       return false
     },
     icon() {
-      if (!this.node.accessible) {
+      if (!this.node.unlocked) {
         return "lock"
       }
       switch (this.node.mediaType) {
@@ -245,41 +258,68 @@ export default {
       }
     },
     show() {
-      return this.isVisible(this.node.id)
+      return this.isVisible(this.node.id) && this.visibility >= 0
+    },
+    visibility() {
+      return Helpers.getNodeVisibility(
+        this.node.level,
+        this.scale,
+        this.currentDepth
+      )
+    },
+    coordinates() {
+      return {
+        x: this.node.coordinates.x * this.scale,
+        y: this.node.coordinates.y * this.scale,
+      }
+    },
+    currentLevel() {
+      return Helpers.getCurrentLevel(this.scale)
+    },
+    isGrandChild() {
+      // return this.node.nodeType === "grandchild"
+      // make it grandchild when not visible too, to prevent buttons showing up while transitioning to hidden
+      return this.visibility <= 0
     },
     radius() {
       if (!this.show) {
         return 0
       }
-      if (this.root) {
-        return 210
-      }
-      if (this.node.nodeType === "grandchild") {
+      if (this.isGrandChild) {
         return 40
       }
-      return 140
+      return (
+        Helpers.getNodeRadius(this.node.level, this.maxLevel, this.scale) *
+        (this.root ? 1.2 : 1)
+      )
     },
     fill() {
       const showImages = this.settings.hasOwnProperty("renderImages")
         ? this.settings.renderImages
         : true
 
-      if (this.node.nodeType !== "grandchild") {
+      const backgroundColor = Helpers.darkenColor(
+        this.node.backgroundColor,
+        this.node.level,
+        this.maxLevel
+      )
+
+      if (!this.isGrandChild) {
         if (showImages && this.thumbnailURL) {
           return `url(#node-image-${this.node.id})`
         } else {
-          return this.node.backgroundColor
+          return backgroundColor
         }
       } else if (this.selected) {
         return "var(--highlight-color)"
       } else {
-        return TinyColor(this.node.backgroundColor)
+        return backgroundColor
       }
     },
     overlayFill() {
       if (this.selected) {
         return "var(--highlight-color)8a"
-      } else if (!this.node.accessible) {
+      } else if (!this.node.unlocked) {
         return "#8a8a8cb3"
       }
       return this.thumbnailURL ? "#33333366" : "transparent"
@@ -318,7 +358,7 @@ export default {
         .toString()
     },
     thumbnailURL() {
-      return !this.node.accessible && this.node.lockedImageURL
+      return !this.node.unlocked && this.node.lockedImageURL
         ? this.node.lockedImageURL
         : this.node.imageURL
     },
@@ -347,7 +387,7 @@ export default {
     radius(newRadius) {
       d3.select(this.$refs.circle)
         .transition()
-        .duration(800)
+        .duration(350)
         .ease(d3.easePolyOut)
         .on("start", () => {
           this.transitioning = true
@@ -366,9 +406,9 @@ export default {
       d3
         .drag()
         .on("start", () => {
-          this.coordinates = {}
+          this.dragCoordinates = {}
           if (this.selection.length) {
-            this.coordinates = this.selection.reduce((coordinates, nodeId) => {
+            this.dragCoordinates = this.selection.reduce((coordinates, nodeId) => {
               const node = this.getNode(nodeId)
               coordinates[nodeId] = {
                 x: node.coordinates.x,
@@ -377,24 +417,26 @@ export default {
               return coordinates
             }, {})
           } else {
-            this.coordinates[this.node.id] = {
+            this.dragCoordinates[this.node.id] = {
               x: this.node.coordinates.x,
               y: this.node.coordinates.y,
             }
           }
         })
         .on("drag", () => {
-          for (const id of Object.keys(this.coordinates)) {
+          for (const id of Object.keys(this.dragCoordinates)) {
             const node = this.getNode(id)
-            node.coordinates.x += d3.event.dx
-            node.coordinates.y += d3.event.dy
+            node.coordinates.x += d3.event.dx / this.scale
+            node.coordinates.y += d3.event.dy / this.scale
           }
         })
         .on("end", () => {
-          for (const [id, originalCoordinates] of Object.entries(this.coordinates)) {
+          for (const [id, originalCoordinates] of Object.entries(
+            this.dragCoordinates
+          )) {
             const node = this.getNode(id)
-            node.coordinates.x += d3.event.dx
-            node.coordinates.y += d3.event.dy
+            node.coordinates.x += d3.event.dx / this.scale
+            node.coordinates.y += d3.event.dy / this.scale
             let coordinates = {
               x: node.coordinates.x,
               y: node.coordinates.y,
@@ -468,7 +510,7 @@ export default {
       return hours + ":" + minutes + ":" + sec
     },
     handleRequestOpen() {
-      if (this.node.accessible || this.hasPermission("edit")) {
+      if (this.node.unlocked || this.hasPermission("edit")) {
         this.openNode(this.node.id)
       }
       client.recordAnalyticsEvent("user", "click", "open-node-button", this.node.id)
@@ -493,7 +535,11 @@ export default {
         (evt.ctrlKey || evt.metaKey || evt.shiftKey)
       ) {
         this.selected ? this.unselect(this.node.id) : this.select(this.node.id)
-      } else if (this.node.accessible || this.hasPermission("edit")) {
+      } else if (this.node.unlocked || this.hasPermission("edit")) {
+        this.$emit("click", {
+          event: evt,
+          level: this.node.level,
+        })
         this.root && this.node.hideMedia
           ? this.openNode(this.node.id)
           : this.updateRootNode()
@@ -508,13 +554,17 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.half-opaque {
+  opacity: 0.6;
+}
+
 .opaque {
   opacity: 0.2;
 }
 
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.5s;
+  transition: opacity 0.2s;
 }
 
 .fade-enter,
