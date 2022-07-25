@@ -233,7 +233,7 @@ async function unlockNodes({ commit, getters, dispatch }) {
   }
 }
 
-export async function deleteNode({ getters, commit, dispatch }, id) {
+export async function deleteNode({ state, getters, commit, dispatch }, id) {
   try {
     await client.deleteNode(id)
 
@@ -257,6 +257,9 @@ export async function deleteNode({ getters, commit, dispatch }, id) {
     }
 
     commit("deleteNode", id)
+    if (id === state.rootId) {
+      commit("updateRootNode", null)
+    }
   } catch (error) {
     dispatch("addApiError", error)
   }

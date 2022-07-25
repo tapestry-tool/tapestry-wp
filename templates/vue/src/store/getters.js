@@ -4,8 +4,8 @@ export function getInitialNodeId(state) {
   if (state.rootId) {
     return state.rootId
   }
-  const nodeIds = state.nodes.keys()
-  return nodeIds.length === 0 ? null : nodeIds[0]
+  const nodeIds = Object.keys(state.nodes)
+  return nodeIds.length === 0 ? null : parseInt(nodeIds[0])
 }
 
 export function getDirectChildren(state) {
