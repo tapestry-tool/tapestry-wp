@@ -4,16 +4,17 @@
       v-show="show"
       ref="node"
       :data-qa="`node-${node.id}`"
-      :data-locked="!node.accessible"
+      :data-locked="!node.unlocked"
       :transform="`translate(${node.coordinates.x}, ${node.coordinates.y})`"
       :class="{
+        'half-opaque': !node.unlocked && node.hideWhenLocked,
         opaque: !visibleNodes.includes(node.id),
         'has-thumbnail': node.thumbnailURL,
         'has-title': !node.hideTitle,
       }"
       :style="{
         cursor:
-          node.accessible || hasPermission('edit') || hasPermission('move')
+          node.unlocked || hasPermission('edit') || hasPermission('move')
             ? 'pointer'
             : 'not-allowed',
       }"
@@ -29,11 +30,11 @@
       ></circle>
       <transition name="fade">
         <circle
-          v-show="(!node.hideTitle && !isHovered) || !node.accessible || selected"
+          v-show="(!node.hideTitle && !isHovered) || !node.unlocked || selected"
           :r="radius"
           :fill="overlayFill"
           class="node-overlay"
-          :class="selected ? 'selected' : !node.accessible ? 'locked' : 'normal'"
+          :class="selected ? 'selected' : !node.unlocked ? 'locked' : 'normal'"
         ></circle>
       </transition>
       <progress-bar
@@ -48,7 +49,7 @@
         :background-color="progressBackgroundColor"
         :data-qa="`node-progress-${node.id}`"
         :progress="progress"
-        :locked="!node.accessible"
+        :locked="!node.unlocked"
       ></progress-bar>
       <status-bar
         v-if="
@@ -59,7 +60,7 @@
         :x="node.coordinates.x"
         :y="node.coordinates.y"
         :radius="radius"
-        :locked="!node.accessible"
+        :locked="!node.unlocked"
         :status="node.status"
         :reviewStatus="node.reviewStatus"
         :enableHighlight="highlightNode"
@@ -69,7 +70,7 @@
         <transition name="fade">
           <foreignObject
             v-if="!node.hideTitle"
-            v-show="!isHovered || !thumbnailURL || selected || !node.accessible"
+            v-show="!isHovered || !thumbnailURL || selected || !node.unlocked"
             :data-qa="`node-title-${node.id}`"
             class="metaWrapper"
             :width="(140 * 2 * 5) / 6"
@@ -92,7 +93,7 @@
             :y="-radius"
             :fill="buttonBackgroundColor"
             :data-qa="`open-node-${node.id}`"
-            :disabled="!node.accessible && !hasPermission('edit')"
+            :disabled="!node.unlocked && !hasPermission('edit')"
             @click="handleRequestOpen"
           >
             <tapestry-icon :icon="icon" svg></tapestry-icon>
@@ -221,7 +222,7 @@ export default {
       return false
     },
     icon() {
-      if (!this.node.accessible) {
+      if (!this.node.unlocked) {
         return "lock"
       }
       switch (this.node.mediaType) {
@@ -279,7 +280,7 @@ export default {
     overlayFill() {
       if (this.selected) {
         return "var(--highlight-color)8a"
-      } else if (!this.node.accessible) {
+      } else if (!this.node.unlocked) {
         return "#8a8a8cb3"
       }
       return this.thumbnailURL ? "#33333366" : "transparent"
@@ -318,7 +319,7 @@ export default {
         .toString()
     },
     thumbnailURL() {
-      return !this.node.accessible && this.node.lockedImageURL
+      return !this.node.unlocked && this.node.lockedImageURL
         ? this.node.lockedImageURL
         : this.node.imageURL
     },
@@ -468,7 +469,7 @@ export default {
       return hours + ":" + minutes + ":" + sec
     },
     handleRequestOpen() {
-      if (this.node.accessible || this.hasPermission("edit")) {
+      if (this.node.unlocked || this.hasPermission("edit")) {
         this.openNode(this.node.id)
       }
       client.recordAnalyticsEvent("user", "click", "open-node-button", this.node.id)
@@ -493,7 +494,7 @@ export default {
         (evt.ctrlKey || evt.metaKey || evt.shiftKey)
       ) {
         this.selected ? this.unselect(this.node.id) : this.select(this.node.id)
-      } else if (this.node.accessible || this.hasPermission("edit")) {
+      } else if (this.node.unlocked || this.hasPermission("edit")) {
         this.root && this.node.hideMedia
           ? this.openNode(this.node.id)
           : this.updateRootNode()
@@ -508,6 +509,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.half-opaque {
+  opacity: 0.6;
+}
+
 .opaque {
   opacity: 0.2;
 }
