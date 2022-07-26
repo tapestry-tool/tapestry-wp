@@ -9,23 +9,21 @@
     require_once dirname(__FILE__).'/../utilities/class.tapestry-helpers.php';
 
     use Kaltura\Client\ApiException;
-    use Kaltura\Client\ClientException;
     use Kaltura\Client\Client;
     use Kaltura\Client\Configuration;
-    use Kaltura\Client\Enum\MediaType;
     use Kaltura\Client\Enum\Language;
+    use Kaltura\Client\Enum\MediaType;
     use Kaltura\Client\Enum\SessionType;
+    use Kaltura\Client\Plugin\Caption\CaptionPlugin;
+    use Kaltura\Client\Plugin\Caption\Enum\CaptionAssetStatus;
+    use Kaltura\Client\Plugin\Caption\Enum\CaptionType;
+    use Kaltura\Client\Plugin\Caption\Type\CaptionAsset;
+    use Kaltura\Client\Plugin\Caption\Type\CaptionAssetFilter;
     use Kaltura\Client\Type\Category;
     use Kaltura\Client\Type\CategoryFilter;
     use Kaltura\Client\Type\MediaEntry;
     use Kaltura\Client\Type\UploadedFileTokenResource;
     use Kaltura\Client\Type\UploadToken;
-    use Kaltura\Client\Type\UrlResource;
-    use Kaltura\Client\Plugin\Caption\Enum\CaptionType;
-    use Kaltura\Client\Plugin\Caption\Enum\CaptionAssetStatus;
-    use Kaltura\Client\Plugin\Caption\Type\CaptionAsset;
-    use Kaltura\Client\Plugin\Caption\Type\CaptionAssetFilter;
-    use Kaltura\Client\Plugin\Caption\CaptionPlugin;
 
     class KalturaApi
     {
@@ -154,6 +152,7 @@
         public function getAvailableLanguages()
         {
             $languageClass = new ReflectionClass(Language::class);
+
             return array_values($languageClass->getConstants());
         }
 
@@ -161,6 +160,7 @@
         {
             $kclient = $this->getKClient();
             $captionAssets = $this->_getCaptions($kclient, $videoEntryId);
+
             return $this->_filterCaptionAssets($kclient, $captionAssets, true);
         }
 
@@ -168,6 +168,7 @@
         {
             $captionPlugin = CaptionPlugin::get($kclient);
             $response = $captionPlugin->captionAsset->serve($captionAssetId);
+
             return $response;
         }
 
@@ -196,7 +197,7 @@
                 'id' => $captionAsset->id,
                 'label' => $captionAsset->label,
                 'language' => $captionAsset->language,
-                'fileUrl' => $this->_getCaptionUrl($kclient, $captionAsset->id) . '?.vtt',
+                'fileUrl' => $this->_getCaptionUrl($kclient, $captionAsset->id).'?.vtt',
             ];
         }
 
@@ -223,8 +224,8 @@
                 $updatedCaptions = $this->setCaptions($videoEntryId, $captions);
                 $result = array_values($updatedCaptions);
 
-                error_log("Updated captions: " . print_r($updatedCaptions, true));
-    
+                error_log('Updated captions: '.print_r($updatedCaptions, true));
+
                 if (!empty($defaultCaptionId) && is_string($defaultCaptionId) && isset($updatedCaptions[$defaultCaptionId])) {
                     $newDefaultCaptionId = $updatedCaptions[$defaultCaptionId]->id;
                     $this->setCaptionAsDefault($newDefaultCaptionId);
@@ -246,6 +247,7 @@
             $captionPlugin = CaptionPlugin::get($kclient);
 
             $response = $captionPlugin->captionAsset->setAsDefault($captionAssetId);
+
             return $response;
         }
 
@@ -270,7 +272,7 @@
             $captionsToAdd = array_diff_key($newCaptionsMap, $oldCaptionsMap);
             $captionsToUpdate = array_intersect_key($newCaptionsMap, $oldCaptionsMap);
 
-            $requestTracker = array();
+            $requestTracker = [];
 
             $kclient->startMultiRequest();
 
@@ -297,7 +299,7 @@
             }
 
             $allResults = $kclient->doMultiRequest();
-            error_log("All results: " . print_r($allResults, true));
+            error_log('All results: '.print_r($allResults, true));
             $this->_deleteUploadedCaptionFiles($allResults, $requestTracker);
             $returnedCaptions = array_map(function ($request) use ($allResults) {
                 return $allResults[$request['index']];
@@ -316,8 +318,9 @@
 
                     $this->_deleteLocalUpload($request['caption']->fileUrl);
                 } else {
-                    if ($request)
-                    $finalCaptions[$id] = $oldCaptionsMap[$id];
+                    if ($request) {
+                        $finalCaptions[$id] = $oldCaptionsMap[$id];
+                    }
                 }
             }
         }
@@ -343,7 +346,7 @@
         private function _addCaption($kclient, $videoEntryId, $caption)
         {
             $file = TapestryHelpers::getPathToMedia($caption->fileUrl);
-            if (!$file || pathinfo($file->name, PATHINFO_EXTENSION) !== 'vtt') {
+            if (!$file || 'vtt' !== pathinfo($file->name, PATHINFO_EXTENSION)) {
                 return;
             }
 
@@ -368,7 +371,7 @@
         }
 
         private function _updateCaption($kclient, $oldCaption, $caption)
-        {            
+        {
             $captionPlugin = CaptionPlugin::get($kclient);
 
             $captionAsset = new CaptionAsset();
@@ -380,7 +383,7 @@
             $updatedCaptionAsset = $captionPlugin->captionAsset->update($captionAsset->id, $captionAsset);
 
             $file = TapestryHelpers::getPathToMedia($caption->fileUrl);
-            if (!$file || pathinfo($file->name, PATHINFO_EXTENSION) !== 'vtt') {
+            if (!$file || 'vtt' !== pathinfo($file->name, PATHINFO_EXTENSION)) {
                 return $updatedCaptionAsset;
             }
 
@@ -399,7 +402,7 @@
         {
             $captionPlugin = CaptionPlugin::get($kclient);
             $response = $captionPlugin->captionAsset->delete($captionAssetId);
-    
+
             return $response;
         }
     }
