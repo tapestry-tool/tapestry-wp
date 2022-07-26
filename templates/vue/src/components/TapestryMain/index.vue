@@ -1,7 +1,7 @@
 <template>
   <main id="tapestry" ref="app" :style="background" :class="{ panning: isPanning }">
     <div v-if="isEmptyTapestry">
-      <root-node-button v-if="canEdit" @click="addRootNode"></root-node-button>
+      <root-node-button v-if="canEdit"></root-node-button>
       <div v-else class="empty-message">The requested Tapestry is empty.</div>
     </div>
     <svg v-else id="vue-svg" :viewBox="computedViewBox">
@@ -257,9 +257,6 @@ export default {
   },
   methods: {
     ...mapMutations(["select", "unselect", "clearSelection"]),
-    addRootNode() {
-      this.$root.$emit("add-node", null)
-    },
     clampScale(scale) {
       return Math.max(
         Math.min(scale, this.maxScale),
