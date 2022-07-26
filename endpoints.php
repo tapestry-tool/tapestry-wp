@@ -1790,7 +1790,7 @@ function create_upload_log($videos)
         }
 
         $node = new TapestryNode($video->tapestryID, $video->nodeID);
-        if (TapestryHelpers::videoCanBeUploaded($node)) {
+        if (TapestryHelpers::videoCanBeUploaded($node) && TapestryHelpers::checkVideoFileSize($node)) {
             $video_info = (object) [
                 'tapestryID' => $video->tapestryID,
                 'nodeID' => $video->nodeID,

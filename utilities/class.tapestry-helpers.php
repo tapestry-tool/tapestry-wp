@@ -310,7 +310,7 @@ class TapestryHelpers
 
     /**
      * Update the Kaltura upload status of a video node.
-     * 
+     *
      * @param TapestryNode      $node           Video node to update
      * @param string            $newStatus      Upload status
      * @param MediaEntry|null   $kalturaData    (optional) Response from Kaltura API
@@ -329,7 +329,7 @@ class TapestryHelpers
 
     /**
      * Delete a local video after it has been uploaded to Kaltura.
-     * 
+     *
      * @param TapestryNode  $node               Video node to update
      * @param MediaEntry    $kalturaData        Response from Kaltura API
      * @param boolean       $useKalturaPlayer   If true, also switch the video to use Kaltura player
@@ -352,7 +352,7 @@ class TapestryHelpers
 
     /**
      * Assumes the node's mediaURL is a local upload, and gets its file path
-     * 
+     *
      * @param TapestryNode  $node
      */
     public static function getPathToMedia($node)
@@ -408,6 +408,62 @@ class TapestryHelpers
         return $nodeMeta->mediaType == "video" && substr($nodeTypeData->mediaURL, 0, strlen($upload_dir_url)) === $upload_dir_url;
     }
 
+    /**
+     * Checks if the user has defined a maximum video upload size for Kaltura that is smaller than the WordPress max upload size,
+     * and if so, whether a video is too large to be uploaded.
+     * 
+     * @param TapestryNode  $node
+     * @return boolean  True if the user has defined no maximum video upload size, or it is not smaller than the WordPress max upload size.
+     *                  Otherwise, returns true if the video is within the user-defined limit.
+     */
+    public static function checkVideoFileSize($node)
+    {
+        if (!defined('TAPESTRY_KALTURA_UPLOAD_MAX_FILE_SIZE')) {
+            return true;
+        }
+
+        $user_defined_max_upload_size = wp_convert_hr_to_bytes(TAPESTRY_VIDEO_UPLOAD_MAX_FILE_SIZE);
+
+        if ($user_defined_max_upload_size >= wp_max_upload_size()) {
+            return true;
+        }
+
+        $file = self::getPathToMedia($node);
+        $filesize = self::_realFileSize($file->file_path);
+
+        return $filesize <= $user_defined_max_upload_size;
+    }
+
+    // Get the actual file size for large files.
+    // https://www.php.net/manual/en/function.filesize.php#113457
+    private static function _realFileSize($path)
+    {
+        $fp = fopen($path, 'r');
+
+        $pos = 0;
+        $size = 1073741824;
+        fseek($fp, 0, SEEK_SET);
+        while ($size > 1) {
+            fseek($fp, $size, SEEK_CUR);
+
+            if (fgetc($fp) === false) {
+                fseek($fp, -$size, SEEK_CUR);
+                $size = (int)($size / 2);
+            } else {
+                fseek($fp, -1, SEEK_CUR);
+                $pos += $size;
+            }
+        }
+
+        while (fgetc($fp) !== false) {
+            $pos++;
+        }
+
+        fclose($fp);
+
+        return $pos;
+    }
+
     private static function _getVideosToUploadInTapestry($tapestryPostId)
     {
         $videos_to_upload = array();
@@ -420,6 +476,7 @@ class TapestryHelpers
                     'tapestryID' => (int) $tapestryPostId,
                     'nodeID' => $nodeID,
                     'nodeTitle' => $node->getTitle(),
+                    'withinSizeLimit' => self::checkVideoFileSize($node),
                 ];
                 array_push($videos_to_upload, $video);
             }

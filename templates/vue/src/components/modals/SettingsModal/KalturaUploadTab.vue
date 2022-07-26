@@ -12,6 +12,7 @@
         v-model="allVideos"
         class="my-3"
         selectable
+        no-select-on-click
         show-empty
         empty-text="There are no videos to upload in this Tapestry."
         selected-variant=""
@@ -20,17 +21,31 @@
         :items="getVideosToUpload"
         @row-selected="handleVideoSelected"
       >
-        <template #head(selected)="{selectAllRows, clearSelected}">
+        <template #head(selected)="{clearSelected}">
           <b-form-checkbox
             :checked="allVideosSelected"
-            @change="$event ? selectAllRows() : clearSelected()"
+            @change="$event ? selectAllVideos() : clearSelected()"
           ></b-form-checkbox>
         </template>
-        <template #cell(selected)="{rowSelected, selectRow, unselectRow}">
+        <template #cell(selected)="{rowSelected, selectRow, unselectRow, item}">
           <b-form-checkbox
             :checked="rowSelected"
+            :disabled="!item.withinSizeLimit"
+            class="d-inline"
             @change="$event ? selectRow() : unselectRow()"
           ></b-form-checkbox>
+          <i
+            v-if="!item.withinSizeLimit"
+            :id="`video-select-info-${item.nodeID}`"
+            class="far fa-question-circle"
+          ></i>
+          <b-tooltip
+            v-if="!item.withinSizeLimit"
+            :target="`video-select-info-${item.nodeID}`"
+            triggers="hover"
+          >
+            This video is too big to be uploaded to Kaltura.
+          </b-tooltip>
         </template>
       </b-table>
       <b-form-group>
@@ -147,9 +162,12 @@ export default {
   computed: {
     allVideosSelected() {
       return (
-        this.allVideos.length === this.selectedVideos.length &&
-        this.allVideos.length > 0
+        this.allUploadableVideos.length === this.selectedVideos.length &&
+        this.allUploadableVideos.length > 0
       )
+    },
+    allUploadableVideos() {
+      return this.allVideos.filter(video => video.withinSizeLimit)
     },
     canStartUpload() {
       return this.selectedVideos.length > 0
@@ -173,6 +191,13 @@ export default {
     this.cancelUploadStatusRefresh()
   },
   methods: {
+    selectAllVideos() {
+      for (let i = 0; i < this.allVideos.length; i++) {
+        if (this.allVideos[i].withinSizeLimit) {
+          this.$refs.videoTable.selectRow(i)
+        }
+      }
+    },
     handleVideoSelected(rows) {
       this.selectedVideos = rows
     },
