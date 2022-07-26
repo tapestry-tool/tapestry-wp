@@ -332,10 +332,11 @@ export default {
     ...mapState({
       node: "currentEditingNode",
     }),
+    parentId() {
+      return this.type === "add" ? this.nodeId : this.getParent(this.nodeId)
+    },
     parent() {
-      const parent = this.getNode(
-        this.type === "add" ? this.nodeId : this.getParent(this.nodeId)
-      )
+      const parent = this.getNode(this.parentId)
       return parent ? parent : null
     },
     title() {
