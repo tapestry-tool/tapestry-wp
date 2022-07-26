@@ -555,7 +555,7 @@ export default {
       }
     })
     this.$root.$on("add-node", () => {
-      this.keepOpen = this.node.id
+      this.keepOpen = true
       this.handlePublish()
     })
     this.$root.$on("remove-thumbnail", thumbnailType => {
@@ -731,7 +731,11 @@ export default {
         } else if (this.keepOpen) {
           this.$router.push({
             name: names.MODAL,
-            params: { nodeId: this.keepOpen, type: "edit", tab: "content" },
+            params: {
+              nodeId: this.keepOpen === true ? this.node.id : this.keepOpen,
+              type: "edit",
+              tab: "content",
+            },
             query: this.$route.query,
           })
           this.loading = false
