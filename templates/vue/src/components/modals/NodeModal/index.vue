@@ -822,6 +822,7 @@ export default {
       } else {
         this.removeNode()
       }
+      this.loading = false
     },
     removeNode() {
       const nodeId = this.nodeId
