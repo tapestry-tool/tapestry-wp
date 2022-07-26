@@ -331,19 +331,25 @@ class TapestryHelpers
      * Delete a local video after it has been uploaded to Kaltura.
      *
      * @param TapestryNode  $node               Video node to update
+     * @param KalturaApi    $kalturaApi         Kaltura controller to use
      * @param MediaEntry    $kalturaData        Response from Kaltura API
      * @param boolean       $useKalturaPlayer   If true, also switch the video to use Kaltura player
      * @param string        $videoPath          Path to the video file.
      */
-    public static function saveAndDeleteLocalVideo($node, $kalturaData, $useKalturaPlayer, $videoPath)
+    public static function saveAndDeleteLocalVideo($node, $kalturaApi, $kalturaData, $useKalturaPlayer, $videoPath)
     {
         $typeData = $node->getTypeData();
         $typeData->mediaURL = $kalturaData->dataUrl.'?.mp4';
 
+        $typeData->kalturaId = $kalturaData->id;
         if ($useKalturaPlayer) {
-            $typeData->kalturaId = $kalturaData->id;
             $node->set((object) ['mediaFormat' => 'kaltura']);
         }
+
+        $captionData = $kalturaApi->setCaptionsAndDefaultCaption($kalturaData->id, $typeData->captions, $typeData->defaultCaptionId);
+
+        $typeData->captions = $captionData->captions;
+        $typeData->defaultCaptionId = $captionData->defaultCaptionId;
 
         $node->save();
 
@@ -351,16 +357,21 @@ class TapestryHelpers
     }
 
     /**
-     * Assumes the node's mediaURL is a local upload, and gets its file path
-     *
-     * @param TapestryNode  $node
+     * Get the file path of a local WordPress upload by its URL.
+     * 
+     * @param string $url
+     * @return object|null     Returns null if the URL is not a local upload.
      */
-    public static function getPathToMedia($node)
+    public static function getPathToMedia($url)
     {
-        $upload_folder = wp_upload_dir()['path'];
+        if (!self::isLocalUpload($url)) {
+            return null;
+        }
 
-        $file_name = pathinfo($node->getTypeData()->mediaURL)['basename'];
-        $file_obj = new StdClass();
+        $upload_folder = wp_upload_dir()['basedir'];
+
+        $file_name = pathinfo($url)['basename'];
+        $file_obj = new stdClass();
         $file_obj->file_path = $upload_folder.'/'.$file_name;
         $file_obj->name = $file_name;
 
@@ -403,9 +414,17 @@ class TapestryHelpers
     {
         $nodeMeta = $node->getMeta();
         $nodeTypeData = $node->getTypeData();
-        $upload_dir_url = wp_upload_dir()['url'];
+        return $nodeMeta->mediaType == "video" && self::isLocalUpload($node->getTypeData()->mediaURL);
+    }
 
-        return $nodeMeta->mediaType == "video" && substr($nodeTypeData->mediaURL, 0, strlen($upload_dir_url)) === $upload_dir_url;
+    /**
+     * Checks if a URL represents a local upload (a file in the WordPress upload directory).
+     * Only checks the URL form, not that the file actually exists.
+     */
+    public static function isLocalUpload($url)
+    {
+        $upload_dir_url = wp_upload_dir()['baseurl'];
+        return substr($url, 0, strlen($upload_dir_url)) === $upload_dir_url;
     }
 
     /**

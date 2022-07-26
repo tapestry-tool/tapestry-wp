@@ -394,6 +394,27 @@ $REST_API_ENDPOINTS = [
             'callback' => 'getKalturaVideoUrl',
         ],
     ],
+    'GET_KALTURA_AVAILABLE_LANGUAGES' => (object) [
+        'ROUTE' => '/kaltura/languages',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => 'getKalturaAvailableLanguages',
+        ],
+    ],
+    'GET_KALTURA_VIDEO_CAPTIONS' => (object) [
+        'ROUTE' => '/kaltura/video/captions',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => 'getKalturaVideoCaptions',
+        ],
+    ],
+    'PUT_KALTURA_VIDEO_CAPTIONS' => (object) [
+        'ROUTE' => '/kaltura/video/captions',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_PUT_METHOD,
+            'callback' => 'updateKalturaVideoCaptions',
+        ],
+    ],
 ];
 
 /*
@@ -1743,7 +1764,7 @@ function perform_batched_upload_to_kaltura($videos, $use_kaltura_player)
 
                 if ($response->status === EntryStatus::READY) {
                     $node = save_video_upload_status($video, $videos_to_upload, UploadStatus::COMPLETE);
-                    TapestryHelpers::saveAndDeleteLocalVideo($node, $response, $use_kaltura_player, $video->file->file_path);
+                    TapestryHelpers::saveAndDeleteLocalVideo($node, $kalturaApi, $response, $use_kaltura_player, $video->file->file_path);
                     $num_successfully_uploaded++;
                 } elseif ($response->status === EntryStatus::ERROR_CONVERTING) {
                     $video->additionalInfo = 'An error occurred: Could not convert the video.';
@@ -1796,7 +1817,7 @@ function create_upload_log($videos)
                 'nodeID' => $video->nodeID,
                 'nodeTitle' => $node->getTitle(),
                 'uploadStatus' => UploadStatus::NOT_STARTED,
-                'file' => TapestryHelpers::getPathToMedia($node),
+                'file' => TapestryHelpers::getPathToMedia($node->getTypeData()->mediaURL),
                 'kalturaID' => '',
                 'additionalInfo' => '',
             ];
@@ -1938,36 +1959,41 @@ function updateConvertingVideos($request)
                 && array_key_exists('uploadStatus', $kalturaData)
                 && $kalturaData['uploadStatus'] === UploadStatus::CONVERTING) {
                 $kalturaID = $kalturaData['id'];
-                $response = $kaltura_api->getVideo($kalturaID);
 
-                $video = (object) [
-                    'tapestryID' => $post->ID,
-                    'nodeID' => $nodeID,
-                    'nodeTitle' => $node->getTitle(),
-                    'kalturaID' => $kalturaID,
-                    'previousStatus' => UploadStatus::CONVERTING,
-                    'currentStatus' => UploadStatus::CONVERTING,
-                    'additionalInfo' => '',
-                ];
+                try {
+                    $response = $kaltura_api->getVideo($kalturaID);
 
-                if ($response->status === EntryStatus::READY) {
-                    TapestryHelpers::saveVideoUploadStatusInNode($node, UploadStatus::COMPLETE, $response);
+                    $video = (object) [
+                        'tapestryID' => $post->ID,
+                        'nodeID' => $nodeID,
+                        'nodeTitle' => $node->getTitle(),
+                        'kalturaID' => $kalturaID,
+                        'previousStatus' => UploadStatus::CONVERTING,
+                        'currentStatus' => UploadStatus::CONVERTING,
+                        'additionalInfo' => '',
+                    ];
 
-                    $file_path = TapestryHelpers::getPathToMedia($node)->file_path;
-                    TapestryHelpers::saveAndDeleteLocalVideo($node, $response, $use_kaltura_player, $file_path);
+                    if ($response->status === EntryStatus::READY) {
+                        TapestryHelpers::saveVideoUploadStatusInNode($node, UploadStatus::COMPLETE, $response);
 
-                    $video->currentStatus = UploadStatus::COMPLETE;
-                } else {
-                    TapestryHelpers::saveVideoUploadStatusInNode($node, UploadStatus::ERROR, $response);
-                    $video->currentStatus = UploadStatus::ERROR;
-                    if ($response->status === EntryStatus::ERROR_CONVERTING) {
-                        $video->additionalInfo = 'An error occurred: Could not convert the video.';
-                    } else {
-                        $video->additionalInfo = 'An error occurred: Expected the video to be converting, but it was not.';
+                        $file_path = TapestryHelpers::getPathToMedia($node->getTypeData()->mediaURL)->file_path;
+                        TapestryHelpers::saveAndDeleteLocalVideo($node, $kaltura_api, $response, $use_kaltura_player, $file_path);
+
+                        $video->currentStatus = UploadStatus::COMPLETE;
+                    } elseif ($response->status !== EntryStatus::PRECONVERT) {
+                        TapestryHelpers::saveVideoUploadStatusInNode($node, UploadStatus::ERROR, $response);
+                        $video->currentStatus = UploadStatus::ERROR;
+                        if ($response->status === EntryStatus::ERROR_CONVERTING) {
+                            $video->additionalInfo = 'An error occurred: Could not convert the video.';
+                        } else {
+                            $video->additionalInfo = 'An error occurred: Expected the video to be converting, but it was not.';
+                        }
                     }
-                }
 
-                array_push($videos, $video);
+                    array_push($videos, $video);
+                } catch (TapestryError $e) {
+                    continue;
+                }
             }
         }
     }
@@ -2079,5 +2105,40 @@ function getKalturaVideoUrl($request)
             return array("mediaURL" => $result->dataUrl);
         }
         return false;
+    }
+}
+
+function getKalturaAvailableLanguages($request)
+{
+    if (LOAD_KALTURA) {
+        $kaltura_api = new KalturaApi();
+        return $kaltura_api->getAvailableLanguages();
+    }
+}
+
+function getKalturaVideoCaptions($request)
+{
+    if (LOAD_KALTURA) {
+        $video_entry_id = $request['entry_id'];
+
+        $kaltura_api = new KalturaApi();
+        return $kaltura_api->getCaptionsAndDefaultCaption($video_entry_id);
+    }
+}
+
+function updateKalturaVideoCaptions($request)
+{
+    if (LOAD_KALTURA) {
+        $video_entry_id = $request['entry_id'];
+        $body = json_decode($request->get_body());
+        $captions = $body->captions;
+        $default_caption_id = $body->defaultCaptionId;
+
+        try {
+            $kaltura_api = new KalturaApi();
+            return $kaltura_api->setCaptionsAndDefaultCaption($video_entry_id, $captions, $default_caption_id);
+        } catch (TapestryError $e) {
+            return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+        }
     }
 }

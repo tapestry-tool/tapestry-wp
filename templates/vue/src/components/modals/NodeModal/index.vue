@@ -818,7 +818,10 @@ export default {
         }
 
         if (this.node.mediaFormat === "kaltura") {
-          await this.updateKalturaVideoMediaURL()
+          await Promise.all([
+            this.updateKalturaVideoMediaURL(),
+            this.updateKalturaVideoCaptions(), // TODO: could do this somewhere else
+          ])
         }
 
         if (
@@ -1025,6 +1028,15 @@ export default {
       if (!this.node.mediaType) {
         errMsgs.push("Please select a Content Type")
       } else if (this.node.mediaType === "video") {
+        if (this.node.typeData.captions) {
+          if (
+            this.node.typeData.captions.some(
+              caption => !caption.fileUrl?.endsWith(".vtt")
+            )
+          ) {
+            errMsgs.push("Please upload a WebVTT file for each caption")
+          }
+        }
         if (this.node.mediaFormat === "kaltura") {
           const validKalturaVideo = await client.checkKalturaVideo(
             this.node.typeData.kalturaId
@@ -1295,6 +1307,19 @@ export default {
         this.update("typeData.mediaURL", mediaURL)
       } else if (this.node.typeData.mediaURL !== oldMediaURL) {
         this.update("typeData.mediaURL", oldMediaURL)
+      }
+    },
+    async updateKalturaVideoCaptions() {
+      // Sync changes made to Kaltura captions
+      if (this.node.typeData.captions) {
+        const result = await client.updateKalturaVideoCaptions(
+          this.node.typeData.kalturaId,
+          this.node.typeData.captions,
+          this.node.typeData.defaultCaptionId
+        )
+
+        this.update("typeData.captions", result.captions) // TODO: is this the right thing to do?
+        this.update("typeData.defaultCaptionId", result.defaultCaptionId)
       }
     },
   },

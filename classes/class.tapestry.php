@@ -175,7 +175,7 @@ class Tapestry implements ITapestry
         }
 
         $tapestryNode->set($node);
-        $node = $tapestryNode->save($node);
+        $node = $tapestryNode->save();
 
         array_push($this->nodes, $node->id);
 
