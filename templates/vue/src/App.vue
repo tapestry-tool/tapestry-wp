@@ -6,7 +6,7 @@
     <node-modal></node-modal>
     <link-modal></link-modal>
     <lightbox v-if="viewingNode" :node-id="nodeId"></lightbox>
-    <sidebar v-if="!isEmpty"></sidebar>
+    <sidebar v-if="!isEmptyTapestry"></sidebar>
     <tapestry-error></tapestry-error>
     <b-modal
       id="loggedOutModal"
@@ -24,7 +24,7 @@
 </template>
 
 <script>
-import { mapState, mapMutations, mapGetters } from "vuex"
+import { mapMutations, mapGetters } from "vuex"
 import { names } from "@/config/routes"
 import Lightbox from "@/components/Lightbox"
 import LinkModal from "@/components/modals/LinkModal"
@@ -55,11 +55,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(["nodes"]),
-    ...mapGetters(["getTheme", "getInitialNodeId"]),
-    isEmpty() {
-      return Object.keys(this.nodes).length === 0
-    },
+    ...mapGetters(["isEmptyTapestry", "getTheme", "getInitialNodeId"]),
     nodeId() {
       return this.$route.params.nodeId
     },

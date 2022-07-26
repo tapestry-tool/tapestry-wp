@@ -1,6 +1,6 @@
 <template>
   <main id="tapestry" ref="app" :style="background" :class="{ panning: isPanning }">
-    <div v-if="empty">
+    <div v-if="isEmptyTapestry">
       <root-node-button v-if="canEdit" @click="addRootNode"></root-node-button>
       <div v-else class="empty-message">The requested Tapestry is empty.</div>
     </div>
@@ -143,7 +143,7 @@ export default {
       "currentDepth",
       "scaleConstants",
     ]),
-    ...mapGetters(["getNode", "getInitialNodeId"]),
+    ...mapGetters(["isEmptyTapestry", "getNode", "getInitialNodeId"]),
     computedViewBox() {
       // return this.viewBox.join(" ")
       return `${this.viewBox[0] + this.offset.x} ${this.viewBox[1] +
@@ -154,9 +154,6 @@ export default {
     },
     canEdit() {
       return wp.canEditTapestry()
-    },
-    empty() {
-      return Object.keys(this.nodes).length === 0
     },
     selectedId() {
       return Number(this.$route.params.nodeId)
@@ -179,7 +176,7 @@ export default {
     },
   },
   watch: {
-    empty(empty) {
+    isEmptyTapestry(empty) {
       if (!empty) {
         this.zoomPanHelper.unregister()
         this.zoomPanHelper.register()
@@ -199,7 +196,7 @@ export default {
       handler(nodeId) {
         if (this.$route.name === names.APP && !this.nodes.hasOwnProperty(nodeId)) {
           this.$router.replace(
-            Object.keys(this.nodes).length === 0
+            this.isEmptyTapestry
               ? { path: "/", query: this.$route.query }
               : {
                   name: names.APP,

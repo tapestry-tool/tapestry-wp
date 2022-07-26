@@ -105,7 +105,7 @@ export default {
   },
   computed: {
     ...mapState(["settings", "nodes"]),
-    ...mapGetters(["getInitialNodeId"]),
+    ...mapGetters(["isEmptyTapestry", "getInitialNodeId"]),
     url() {
       return "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
     },
@@ -144,9 +144,6 @@ export default {
           this.getCoord(this.settings.mapBounds.neLng, 180),
         ],
       ])
-    },
-    isEmpty() {
-      return Object.keys(this.nodes).length === 0
     },
     markerlocations() {
       const markers = []
@@ -236,7 +233,7 @@ export default {
       this.$router.push({
         name: names.MODAL,
         params: {
-          nodeId: this.isEmpty ? 0 : this.getInitialNodeId,
+          nodeId: this.isEmptyTapestry ? 0 : this.getInitialNodeId,
           type: "add",
           tab: "content",
         },

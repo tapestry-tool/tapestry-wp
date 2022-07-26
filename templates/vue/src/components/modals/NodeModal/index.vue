@@ -178,7 +178,7 @@
               Cancel
             </b-button>
             <b-button
-              v-if="rootId !== 0 && canMakeDraft"
+              v-if="canMakeDraft"
               id="draft-button"
               size="sm"
               variant="secondary"
@@ -326,16 +326,9 @@ export default {
       "getNode",
       "getNeighbours",
       "getInitialNodeId",
+      "isEmptyTapestry",
     ]),
-    ...mapState([
-      "nodes",
-      "rootId",
-      "settings",
-      "visibleNodes",
-      "apiError",
-      "returnRoute",
-      "maxLevel",
-    ]),
+    ...mapState(["settings", "visibleNodes", "apiError", "returnRoute", "maxLevel"]),
     ...mapState({
       node: "currentEditingNode",
     }),
@@ -616,11 +609,11 @@ export default {
     },
     validateNodeRoute(nodeId) {
       if (this.type === "add") {
-        if (Object.keys(this.nodes).length === 0 || this.isAuthenticated) {
+        if (this.isEmptyTapestry || this.isAuthenticated) {
           return true
         }
       }
-      if (!this.nodes.hasOwnProperty(nodeId)) {
+      if (!this.getNode(nodeId)) {
         return false
       }
       const isAllowed = Helpers.hasPermission(this.getNode(nodeId), this.type)
@@ -731,7 +724,7 @@ export default {
     },
     close(event = null) {
       if (this.show) {
-        if (Object.keys(this.nodes).length === 0) {
+        if (this.isEmptyTapestry) {
           this.$router.push({ path: "/", query: this.$route.query })
         } else if (this.returnRoute) {
           this.$router.push(this.returnRoute)

@@ -1,5 +1,9 @@
 import Helpers from "@/utils/Helpers"
 
+export function isEmptyTapestry(state) {
+  return Object.keys(state.nodes).length === 0
+}
+
 export function getInitialNodeId(state) {
   if (state.rootId) {
     return state.rootId
