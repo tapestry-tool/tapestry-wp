@@ -159,15 +159,15 @@
       <b-overlay :show="loading || fileUploading" variant="white" class="w-100">
         <template>
           <div class="buttons-container d-flex w-100">
-            <delete-node-button
+            <b-button
               v-if="type === 'edit'"
-              :node-id="Number(nodeId)"
               :disabled="loading || fileUploading"
-              :isMultiContentNodeChild="isMultiContentNodeChild"
-              @submit="loading = true"
-              @setLoading="setLoading"
-              @complete="handleDeleteComplete"
-            ></delete-node-button>
+              size="sm"
+              variant="danger"
+              @click="handleRemoveNode"
+            >
+              Delete Node
+            </b-button>
             <span style="flex-grow:1;"></span>
             <b-button
               size="sm"
@@ -274,7 +274,6 @@ import ContentForm from "./forms/ContentForm"
 import CopyrightForm from "./forms/CopyrightForm"
 import ReferencesForm from "./forms/ReferencesForm"
 import PermissionsTable from "../common/PermissionsTable"
-import DeleteNodeButton from "./DeleteNodeButton"
 import { names } from "@/config/routes"
 import Helpers from "@/utils/Helpers"
 import * as Comment from "@/utils/comments"
@@ -305,7 +304,6 @@ export default {
     SlickItem,
     SlickList,
     PermissionsTable,
-    DeleteNodeButton,
   },
   data() {
     return {
@@ -341,10 +339,11 @@ export default {
     ...mapState({
       node: "currentEditingNode",
     }),
+    parentId() {
+      return this.type === "add" ? this.nodeId : this.getParent(this.nodeId)
+    },
     parent() {
-      const parent = this.getNode(
-        this.type === "add" ? this.nodeId : this.getParent(this.nodeId)
-      )
+      const parent = this.getNode(this.parentId)
       return parent ? parent : null
     },
     title() {
@@ -589,13 +588,12 @@ export default {
       "addLink",
       "updateNode",
       "updateLockedStatus",
+      "deleteNode",
+      "getNodeHasDraftChildren",
       "setTapestryErrorReporting",
     ]),
     update(property, value) {
       this.setCurrentEditingNodeProperty({ property, value })
-    },
-    setLoading(status) {
-      this.loading = status
     },
     isValid() {
       const isNodeValid = this.validateNodeRoute(this.nodeId)
@@ -706,16 +704,6 @@ export default {
         })
       }
     },
-    handleDeleteComplete() {
-      this.loading = false
-      if (this.parent) {
-        this.setCurrentEditingNode(this.parent)
-        this.keepOpen = true
-      } else {
-        this.keepOpen = false
-      }
-      this.close("delete")
-    },
     handleClose(event) {
       if (
         this.hasUnsavedChanges &&
@@ -810,6 +798,42 @@ export default {
           params: { nodeId, type: "edit", tab: "content" },
         })
       }
+    },
+    async handleRemoveNode() {
+      this.loading = true
+      const nodeHasDraftChildren = await this.getNodeHasDraftChildren(this.nodeId)
+      if (nodeHasDraftChildren.hasDraft) {
+        this.$bvModal
+          .msgBoxConfirm(
+            "There are draft nodes attached to this node. Deleting this node will also remove the draft nodes. Are you sure you want to continue?",
+            {
+              modalClass: "node-modal-confirmation",
+              title: "Are you sure you want to continue?",
+              okTitle: "Yes, Delete!",
+              okVariant: "danger",
+            }
+          )
+          .then(close => {
+            if (close) {
+              this.removeNode()
+            }
+          })
+          .catch(err => console.log(err))
+      } else {
+        this.removeNode()
+      }
+    },
+    removeNode() {
+      const nodeId = this.nodeId
+      if (this.parent) {
+        this.setCurrentEditingNode(this.parent)
+        this.keepOpen = true
+      } else {
+        this.keepOpen = false
+      }
+      this.loading = false
+      this.close("delete")
+      this.deleteNode(nodeId)
     },
     async handleSubmit() {
       this.errors = this.validateNode()

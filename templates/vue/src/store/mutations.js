@@ -66,6 +66,12 @@ export function updateNode(state, payload) {
     copy[key] = value
   })
   state.nodes[payload.id] = copy
+
+  if (state.currentEditingNode && state.currentEditingNode.id === payload.id) {
+    Object.entries(payload.newNode).forEach(([key, value]) => {
+      state.currentEditingNode[key] = value
+    })
+  }
 }
 
 export function updateNodeProgress(state, payload) {
