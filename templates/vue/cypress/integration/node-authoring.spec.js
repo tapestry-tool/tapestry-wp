@@ -82,30 +82,6 @@ describe("Node Authoring", () => {
       })
   })
 
-  it("should not be able to delete a non-leaf node", () => {
-    cy.setup("@twoNodes")
-
-    cy.store()
-      .its("state.nodes")
-      .then(nodes => {
-        const [root, child] = Object.values(nodes)
-
-        cy.addNode(root.id, {
-          title: "child 2",
-          typeData: {
-            textContent: "abcd",
-          },
-        })
-
-        cy.getNodeByTitle("child 2").then(({ id }) => {
-          cy.addLink(id, child.id)
-
-          cy.openModal("edit", id)
-          cy.contains(/delete node/i).should("be.disabled")
-        })
-      })
-  })
-
   it("should render warning and be able to delete node if node has draft child from another user", () => {
     cy.setup("@twoNodesDiffUser")
 
