@@ -22,7 +22,7 @@ VueRouter.prototype.push = function push(location) {
 router.beforeEach((to, from, next) => {
   const nodes = Object.keys(store.state.nodes)
   if (to.matched.length === 0 && nodes.length > 0) {
-    next({ name: names.APP, params: { nodeId: store.state.rootId } })
+    next({ name: names.APP, params: { nodeId: store.getters.getInitialNodeId } })
   } else {
     next()
   }

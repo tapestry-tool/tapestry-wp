@@ -71,6 +71,15 @@ export default {
         this.$bvModal.show("loggedOutModal")
       }
     },
+    getInitialNodeId(initialNodeId, oldInitialNodeId) {
+      if (!oldInitialNodeId && !this.nodeId) {
+        // to recover from a rare case of having 0 as nodeId (during the addition of the first node in the Tapestry)
+        this.$router.replace({
+          ...this.$route,
+          params: { nodeId: initialNodeId },
+        })
+      }
+    },
   },
   mounted() {
     if (isLoggedIn()) {
