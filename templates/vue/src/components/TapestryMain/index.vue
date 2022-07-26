@@ -11,46 +11,6 @@
       aria-label="Main Tapestry View"
       :viewBox="computedViewBox"
     >
-      <defs>
-        <filter
-          v-for="i in maxLevel"
-          :id="'shadow-' + i"
-          :key="i"
-          y="-10%"
-          height="200%"
-          x="-10%"
-          width="200%"
-        >
-          <feGaussianBlur in="SourceAlpha" stdDeviation="5" />
-          <feOffset
-            :dx="3 * (maxLevel - i) * scale"
-            :dy="3 * (maxLevel - i) * scale"
-          />
-          <feComponentTransfer>
-            <feFuncA type="linear" :slope="Math.max(0.4 - i * 0.05, 0.1)" />
-          </feComponentTransfer>
-          <feMerge>
-            <feMergeNode />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-        <filter id="shadow-root" y="-10%" height="200%" x="-10%" width="200%">
-          <!-- <feDropShadow :dx="3 * maxLevel * scale" :dy="3 * maxLevel * scale" stdDeviation="5" flood-color="#81A684" flood-opacity="0.6" /> -->
-          <feGaussianBlur in="SourceAlpha" stdDeviation="5" />
-          <feColorMatrix
-            type="matrix"
-            values="0 0 0 0 0.8 0 0 0 0 0.4 0 0 0 0 0.1 0 0 0 1 0"
-          />
-          <feOffset :dx="4 * maxLevel * scale" :dy="4 * maxLevel * scale" />
-          <feComponentTransfer>
-            <feFuncA type="linear" slope="0.4" />
-          </feComponentTransfer>
-          <feMerge>
-            <feMergeNode />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-      </defs>
       <g class="links">
         <tapestry-link
           v-for="link in links"
@@ -136,7 +96,7 @@ export default {
       zoomPanHelper: null,
       isPanning: false,
 
-      showMinimap: false,
+      showMinimap: true,
     }
   },
   computed: {
@@ -178,7 +138,12 @@ export default {
         : this.nodes
     },
     maxScale() {
-      return 140 / Helpers.getNodeBaseRadius(this.maxLevel, this.maxLevel)
+      return Math.max(
+        (this.scaleConstants.maxNodeSizeToScreen *
+          Math.min(this.viewBox[2], this.viewBox[3])) /
+          Helpers.getNodeBaseRadius(this.maxLevel, this.maxLevel),
+        140 / Helpers.getNodeBaseRadius(this.maxLevel, this.maxLevel)
+      )
     },
     routeName() {
       return this.$route.name
@@ -285,7 +250,10 @@ export default {
       this.$root.$emit("add-node", null)
     },
     clampScale(scale) {
-      return Math.max(Math.min(scale, this.maxScale), 1)
+      return Math.max(
+        Math.min(scale, this.maxScale),
+        this.scaleConstants.minTapestrySizeToScreen
+      )
     },
     fetchAppDimensions() {
       const { width, height } = this.$refs.app.getBoundingClientRect()
@@ -523,8 +491,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-#tapestry.panning {
+#tapestry {
   cursor: move;
+
+  &.panning {
+    cursor: grabbing;
+  }
 }
 
 #app-container {

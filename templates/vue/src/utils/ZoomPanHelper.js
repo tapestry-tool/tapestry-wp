@@ -176,7 +176,7 @@ class ZoomPanHelper {
       return
     }
     const time = Date.now()
-    if (this.lastClickTime && time - this.lastClickTime <= 1000) {
+    if (this.lastClickTime && time - this.lastClickTime <= 300) {
       // the second click of double click
       const scaleDelta = 1
       this.onZoom(scaleDelta, e.offsetX, e.offsetY)

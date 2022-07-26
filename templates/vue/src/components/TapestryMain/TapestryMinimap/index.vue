@@ -119,8 +119,10 @@ export default {
   methods: {
     drawView() {
       if (this.$refs.viewbox) {
-        const canvas = this.$refs.viewbox
-        const c = canvas.getContext("2d")
+        const c = this.getCanvasContext(this.$refs.viewbox)
+        if (!c) {
+          return
+        }
 
         c.clearRect(0, 0, this.viewBox[2], this.viewBox[3])
         c.fillStyle = "#8495a188"
@@ -145,8 +147,10 @@ export default {
     },
     drawMinimap() {
       if (this.$refs.minimap) {
-        const canvas = this.$refs.minimap
-        const c = canvas.getContext("2d")
+        const c = this.getCanvasContext(this.$refs.minimap)
+        if (!c) {
+          return
+        }
 
         // 1. draw background
         c.fillStyle = "white"
@@ -177,14 +181,28 @@ export default {
           c.beginPath()
           c.arc(x, y, radius, 0, Math.PI * 2)
           c.fillStyle = node.backgroundColor
+          c.shadowColor = `rgba(0, 0, 0, ${Math.max(0.5 - node.level * 0.05, 0.2)})`
+          c.shadowBlur = Math.max(10 - node.level, 4)
+          c.shadowOffsetX = 4 * (this.maxLevel - node.level)
+          c.shadowOffsetY = 4 * (this.maxLevel - node.level)
           c.fill()
         }
+        c.shadowColor = "rgba(0, 0, 0, 0)"
 
         this.drawView()
       } else {
         setTimeout(() => {
           this.drawMinimap()
         }, 100)
+      }
+    },
+    getCanvasContext(canvasElement) {
+      // ignore errors if canvas context is not supported (e.g. in the unit testing environment)
+      try {
+        const context = canvasElement.getContext("2d")
+        return context
+      } catch {
+        return null
       }
     },
     transformCoordinates(coordinates) {
