@@ -11,6 +11,15 @@
         @change="$emit('setDefault', $event)"
       ></b-form-radio>
     </b-input-group-prepend>
+    <b-input-group-prepend v-if="isPending && errorMessage" is-text>
+      <i
+        :id="`caption-error-message-${caption.id}`"
+        class="far fa-question-circle"
+      ></i>
+      <b-tooltip :target="`caption-error-message-${caption.id}`" triggers="hover">
+        {{ errorMessage }}
+      </b-tooltip>
+    </b-input-group-prepend>
     <b-form-input v-model="caption.label" placeholder="Label" />
     <b-form-select v-model="caption.language" :options="languages"></b-form-select>
     <file-upload
@@ -19,7 +28,7 @@
       compact-mode
       :is-image="false"
       :file-upload-id="
-        `file-upload-input-${isPending ? 'pending' : ''}-${caption.id}`
+        `caption-file-upload-${isPending ? 'pending' : ''}-${caption.id}`
       "
     />
     <b-input-group-append>

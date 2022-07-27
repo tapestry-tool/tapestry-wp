@@ -107,6 +107,7 @@
                 is-removable
                 is-pending
                 :languages="useKaltura ? kalturaLanguages : languages"
+                :error-message="caption.errorMessage"
                 @input="pendingCaptions[index] = $event"
                 @move="moveFromPending(index, caption)"
                 @remove="removePendingCaption(index)"
