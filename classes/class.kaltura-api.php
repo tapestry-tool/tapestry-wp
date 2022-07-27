@@ -285,6 +285,7 @@
             }
 
             $allResults = $kclient->doMultiRequest();
+
             return $this->_processResponses($kclient, $allResults, $captionsToAdd, $captionsToUpdate);
         }
 
@@ -336,7 +337,7 @@
 
                 if ($contentError) {
                     array_push($pending, $this->_filterCaptionAsset($kclient, $caption, $caption->fileUrl));
-                } else if ($metadataError) {
+                } elseif ($metadataError) {
                     array_push($pending, $this->_filterCaptionAsset($kclient, $caption));
                     $this->_deleteLocalUpload($caption->file);
                 } else {

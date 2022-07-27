@@ -1318,8 +1318,13 @@ export default {
           this.node.typeData.defaultCaptionId
         )
 
+        const pendingCaptions = this.node.typeData.pendingCaptions ?? []
+
         this.update("typeData.captions", result.captions) // TODO: is this the right thing to do?
-        this.update("typeData.pendingCaptions", result.pendingCaptions)
+        this.update(
+          "typeData.pendingCaptions",
+          pendingCaptions.concat(result.pendingCaptions)
+        ) // Persist old pending captions
         this.update("typeData.defaultCaptionId", result.defaultCaptionId)
       }
     },
