@@ -1,14 +1,14 @@
 <template>
   <b-input-group class="caption-container mt-2">
-    <b-input-group-prepend :is-text="!addButton">
-      <b-button v-if="addButton" variant="primary" @click="$emit('add')">
+    <b-input-group-prepend :is-text="!isPending">
+      <b-button v-if="isPending" variant="primary" @click="$emit('move')">
         +
       </b-button>
       <b-form-radio
         v-else
         name="default-caption"
-        :checked="isDefault"
-        @change="$emit('setDefault', caption.id)"
+        :value="caption.id"
+        @change="$emit('setDefault', $event)"
       ></b-form-radio>
     </b-input-group-prepend>
     <b-form-input v-model="caption.label" placeholder="Label" />
@@ -18,7 +18,9 @@
       file-types=".vtt"
       compact-mode
       :is-image="false"
-      :file-upload-id="`file-upload-input-${caption.id}`"
+      :file-upload-id="
+        `file-upload-input-${isPending ? 'pending' : ''}-${caption.id}`
+      "
     />
     <b-input-group-append>
       <b-button
@@ -49,11 +51,6 @@ export default {
       required: false,
       default: true,
     },
-    isDefault: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
     languages: {
       type: Array,
       required: true,
@@ -63,20 +60,20 @@ export default {
       required: false,
       default: "",
     },
-    addButton: {
+    isPending: {
       type: Boolean,
       required: false,
       default: false,
     },
   },
-  data() {
-    return {
-      caption: this.value,
-    }
-  },
-  watch: {
-    caption(val) {
-      this.$emit("input", val)
+  computed: {
+    caption: {
+      get() {
+        return this.value
+      },
+      set(val) {
+        this.$emit("input", val)
+      },
     },
   },
 }

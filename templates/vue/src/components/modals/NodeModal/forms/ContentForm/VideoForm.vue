@@ -86,7 +86,6 @@
                 :key="caption.id"
                 :value="caption"
                 :is-removable="captions.length >= 2"
-                :is-default="caption.id === defaultCaptionId"
                 :languages="useKaltura ? kalturaLanguages : languages"
                 @input="captions.splice(index, 1, $event)"
                 @setDefault="defaultCaptionId = $event"
@@ -106,10 +105,10 @@
                 :key="caption.id"
                 :value="caption"
                 is-removable
-                add-button
+                is-pending
                 :languages="useKaltura ? kalturaLanguages : languages"
                 @input="pendingCaptions[index] = $event"
-                @add="moveFromPending(index, caption)"
+                @move="moveFromPending(index, caption)"
                 @remove="removePendingCaption(index)"
               ></caption-row>
             </b-alert>
@@ -297,11 +296,13 @@ export default {
       const existingCaptionIndex = this.captions.findIndex(
         cap => cap.id === caption.id
       )
+      const copy = [...this.captions]
       if (existingCaptionIndex >= 0) {
-        // TODO: To investigate - Vue state isn't updating
-        this.$set(this.captions, existingCaptionIndex, caption)
+        copy[existingCaptionIndex] = caption
+        this.captions = copy
       } else {
-        this.captions = [...this.captions, caption]
+        copy.push(caption)
+        this.captions = copy
       }
 
       this.removePendingCaption(index)
