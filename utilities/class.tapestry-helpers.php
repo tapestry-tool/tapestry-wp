@@ -346,14 +346,24 @@ class TapestryHelpers
             $node->set((object) ['mediaFormat' => 'kaltura']);
         }
 
+        $node->save();
+
+        wp_delete_file($videoPath);
+
+    }
+
+    public static function uploadVideoCaptions($node, $kalturaApi, $kalturaData)
+    {
+        $typeData = $node->getTypeData();
         $captionData = $kalturaApi->setCaptionsAndDefaultCaption($kalturaData->id, $typeData->captions, $typeData->defaultCaptionId);
 
         $typeData->captions = $captionData->captions;
+        $typeData->pendingCaptions = $captionData->pendingCaptions;
         $typeData->defaultCaptionId = $captionData->defaultCaptionId;
 
         $node->save();
 
-        wp_delete_file($videoPath);
+        return count($captionData->pendingCaptions);
     }
 
     /**

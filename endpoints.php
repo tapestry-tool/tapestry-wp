@@ -1766,6 +1766,12 @@ function perform_batched_upload_to_kaltura($videos, $use_kaltura_player)
                     $node = save_video_upload_status($video, $videos_to_upload, UploadStatus::COMPLETE);
                     TapestryHelpers::saveAndDeleteLocalVideo($node, $kalturaApi, $response, $use_kaltura_player, $video->file->file_path);
                     $num_successfully_uploaded++;
+
+                    $failed_captions = TapestryHelpers::uploadVideoCaptions($node, $kalturaApi, $response);
+                    if ($failed_captions > 0) {
+                        $video->additionalInfo = $failed_captions . ' captions could not be uploaded. Please edit the node to check them.';
+                        save_video_upload_status($video, $videos_to_upload, UploadStatus::COMPLETE, null, false);
+                    }
                 } elseif ($response->status === EntryStatus::ERROR_CONVERTING) {
                     $video->additionalInfo = 'An error occurred: Could not convert the video.';
                     save_video_upload_status($video, $videos_to_upload, UploadStatus::ERROR);
@@ -1831,14 +1837,16 @@ function create_upload_log($videos)
     return $upload_log;
 }
 
-function save_video_upload_status($video, $videos_to_upload, $new_status, $kaltura_data = null)
+function save_video_upload_status($video, $videos_to_upload, $new_status, $kaltura_data = null, $save_node = true)
 {
     $video->uploadStatus = $new_status;
     update_upload_log($videos_to_upload);
 
-    $node = new TapestryNode($video->tapestryID, $video->nodeID);
-    TapestryHelpers::saveVideoUploadStatusInNode($node, $new_status, $kaltura_data);
-    return $node;
+    if ($save_node) {
+        $node = new TapestryNode($video->tapestryID, $video->nodeID);
+        TapestryHelpers::saveVideoUploadStatusInNode($node, $new_status, $kaltura_data);
+        return $node;
+    }
 }
 
 function update_upload_log($videos)
@@ -1894,11 +1902,11 @@ function getKalturaUploadStatus($request)
     }
 
     $in_progress = get_option(KalturaUpload::IN_PROGRESS_OPTION) === KalturaUpload::YES_VALUE;
-    $error = get_option(KalturaUpload::UPLOAD_ERROR_OPTION, null);
+    $error = get_option(KalturaUpload::UPLOAD_ERROR_OPTION, '');
     return (object) [
         'videos' => $videos,
         'inProgress' => $in_progress,
-        'error' => $error,
+        'error' => !empty($error),
     ];
 }
 
@@ -1978,8 +1986,12 @@ function updateConvertingVideos($request)
 
                         $file_path = TapestryHelpers::getPathToMedia($node->getTypeData()->mediaURL)->file_path;
                         TapestryHelpers::saveAndDeleteLocalVideo($node, $kaltura_api, $response, $use_kaltura_player, $file_path);
-
                         $video->currentStatus = UploadStatus::COMPLETE;
+
+                        $failed_captions = TapestryHelpers::uploadVideoCaptions($node, $kaltura_api, $response);
+                        if ($failed_captions > 0) {
+                            $video->additionalInfo = $failed_captions . ' captions could not be uploaded. Please edit the node to check them.';
+                        }
                     } elseif ($response->status !== EntryStatus::PRECONVERT) {
                         TapestryHelpers::saveVideoUploadStatusInNode($node, UploadStatus::ERROR, $response);
                         $video->currentStatus = UploadStatus::ERROR;

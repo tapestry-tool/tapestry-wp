@@ -304,6 +304,7 @@ export default {
       } else {
         copy.push(caption)
         this.captions = copy
+        this.useCaptions = true
       }
 
       this.removePendingCaption(index)
