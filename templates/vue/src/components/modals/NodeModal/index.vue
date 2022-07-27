@@ -1319,6 +1319,7 @@ export default {
         )
 
         this.update("typeData.captions", result.captions) // TODO: is this the right thing to do?
+        this.update("typeData.pendingCaptions", result.pendingCaptions)
         this.update("typeData.defaultCaptionId", result.defaultCaptionId)
       }
     },

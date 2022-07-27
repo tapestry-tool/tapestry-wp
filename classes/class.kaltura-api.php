@@ -161,15 +161,7 @@
             $kclient = $this->getKClient();
             $captionAssets = $this->_getCaptions($kclient, $videoEntryId);
 
-            return $this->_filterCaptionAssets($kclient, $captionAssets, true);
-        }
-
-        private function _getCaptionUrl($kclient, $captionAssetId)
-        {
-            $captionPlugin = CaptionPlugin::get($kclient);
-            $response = $captionPlugin->captionAsset->serve($captionAssetId);
-
-            return $response;
+            return $this->_filterCaptionAssets($kclient, $captionAssets);
         }
 
         private function _filterCaptionAssets($kclient, $captionAssets)
@@ -191,14 +183,22 @@
             ];
         }
 
-        private function _filterCaptionAsset($kclient, $captionAsset)
+        private function _filterCaptionAsset($kclient, $captionAsset, $overrideFileUrl = null)
         {
             return (object) [
                 'id' => $captionAsset->id,
                 'label' => $captionAsset->label,
                 'language' => $captionAsset->language,
-                'fileUrl' => $this->_getCaptionUrl($kclient, $captionAsset->id).'?.vtt',
+                'fileUrl' => $overrideFileUrl ?? $this->_getCaptionUrl($kclient, $captionAsset->id).'?.vtt',
             ];
+        }
+
+        private function _getCaptionUrl($kclient, $captionAssetId)
+        {
+            $captionPlugin = CaptionPlugin::get($kclient);
+            $response = $captionPlugin->captionAsset->serve($captionAssetId);
+
+            return $response;
         }
 
         private function _getCaptions($kclient, $videoEntryId)
@@ -207,7 +207,7 @@
 
             $filter = new CaptionAssetFilter();
             $filter->entryIdEqual = $videoEntryId;
-            // $filter->statusEqual = CaptionAssetStatus::READY;        // TODO: is this filter useful?
+            $filter->statusEqual = CaptionAssetStatus::READY;        // TODO: is this filter useful?
 
             $captionAssets = $captionPlugin->captionAsset->listAction($filter);
 
@@ -221,10 +221,10 @@
             }
 
             try {
-                $updatedCaptions = $this->setCaptions($videoEntryId, $captions);
-                $result = array_values($updatedCaptions);
+                $result = $this->setCaptions($videoEntryId, $captions);
 
-                error_log('Updated captions: '.print_r($updatedCaptions, true));
+                $updatedCaptions = $result->captions;
+                $captions = array_values($updatedCaptions);
 
                 if (!empty($defaultCaptionId) && is_string($defaultCaptionId) && isset($updatedCaptions[$defaultCaptionId])) {
                     $newDefaultCaptionId = $updatedCaptions[$defaultCaptionId]->id;
@@ -232,11 +232,11 @@
                 }
 
                 return (object) [
-                    'captions' => $result,
+                    'captions' => $captions,
+                    'pendingCaptions' => $result->pendingCaptions,
                     'defaultCaptionId' => $newDefaultCaptionId,
                 ];
             } catch (Exception $e) {
-                // TODO:
                 throw new TapestryError($e->getCode(), $e->getMessage(), 500);
             }
         }
@@ -255,150 +255,169 @@
         {
             $kclient = $this->getKClient(SessionType::ADMIN);
 
-            $oldCaptions = $this->_getCaptions($kclient, $videoEntryId);
+            $oldCaptions = $this->getCaptionsAndDefaultCaption($videoEntryId)->captions;
 
-            $oldCaptionsMap = [];
-            foreach ($oldCaptions as $caption) {
-                $oldCaptionsMap[$caption->id] = $caption;
-            }
-            $newCaptionsMap = [];
-            foreach ($captions as $caption) {
-                $newCaptionsMap[$caption->id] = $caption;
-            }
-
-            $requestTracker = [];
+            $oldCaptionsMap = $this->_formRequests($oldCaptions);
+            $newCaptionsMap = $this->_formRequests($captions);
 
             $captionsToDelete = array_diff_key($oldCaptionsMap, $newCaptionsMap);
             $captionsToAdd = array_diff_key($newCaptionsMap, $oldCaptionsMap);
             $captionsToUpdate = array_intersect_key($newCaptionsMap, $oldCaptionsMap);
 
-            $requestTracker = [];
-
             $kclient->startMultiRequest();
 
             foreach ($captionsToDelete as $caption) {
-                $this->_deleteCaption($kclient, $caption->id);
+                $this->_deleteCaptionAsset($kclient, $caption->id);
             }
             foreach ($captionsToAdd as $caption) {
-                $id = $caption->id;
-                $this->_addCaption($kclient, $videoEntryId, $caption);
-                $requestTracker[$id] = [
-                    'index' => $kclient->getMultiRequestQueueSize() - 1,
-                    'type' => 'add',
-                    'caption' => $caption,
-                ];
+                $captionAssetId = $this->_createCaptionAsset($kclient, $caption, $videoEntryId);
+                $tokenId = $this->_uploadFile($kclient, $caption->file, ['vtt']);
+                $this->_setCaptionAssetContent($kclient, $caption, $captionAssetId, $tokenId);
             }
             foreach ($captionsToUpdate as $caption) {
-                $id = $caption->id;
-                $this->_updateCaption($kclient, $oldCaptionsMap[$id], $caption);
-                $requestTracker[$id] = [
-                    'index' => $kclient->getMultiRequestQueueSize() - 1,
-                    'type' => 'update',
-                    'caption' => $caption,
-                ];
+                $this->_updateCaptionAsset($kclient, $caption);
+                if (isset($caption->file)) {
+                    $tokenId = $this->_uploadFile($kclient, $caption->file, ['vtt']);
+                }
+                if (isset($tokenId)) {
+                    $this->_setCaptionAssetContent($kclient, $caption, $caption->id, $tokenId);
+                }
             }
 
             $allResults = $kclient->doMultiRequest();
-            error_log('All results: '.print_r($allResults, true));
-            $this->_deleteUploadedCaptionFiles($allResults, $requestTracker);
-            $returnedCaptions = array_map(function ($request) use ($allResults) {
-                return $allResults[$request['index']];
-            }, $requestTracker);
-
-            return $this->_filterCaptionAssets($kclient, $returnedCaptions)->captions;
+            return $this->_processResponses($kclient, $allResults, $captionsToAdd, $captionsToUpdate);
         }
 
-        private function _getCaptionsToStore($kclient, $multirequestResults, $requestTracker, $oldCaptionsMap)
+        private function _formRequests($captions)
         {
-            $finalCaptions = [];
-            foreach ($requestTracker as $id => $request) {
-                $result = $multirequestResults[$request['index']];
-                if (!is_a($result, ApiException::class)) {
-                    $finalCaptions[$id] = $this->_filterCaptionAsset($kclient, $request['caption']);
+            $requests = [];
 
-                    $this->_deleteLocalUpload($request['caption']->fileUrl);
+            foreach ($captions as $caption) {
+                $language = $caption->language ?? 'English';
+
+                $requests[$caption->id] = (object) [
+                    'id' => $caption->id,
+                    'file' => TapestryHelpers::getPathToMedia($caption->fileUrl),
+                    'fileUrl' => $caption->fileUrl,
+                    'label' => $caption->label ?? $language,
+                    'language' => $language,
+                ];
+            }
+
+            return $requests;
+        }
+
+        private function _processResponses($kclient, $responses, $captionsToAdd, $captionsToUpdate)
+        {
+            $results = [];
+            $pending = [];
+
+            foreach ($captionsToAdd as $caption) {
+                $metadataResponse = $responses[$caption->metadataRequestIndex];
+                $contentResponse = $responses[$caption->contentRequestIndex];
+
+                $metadataError = is_a($metadataResponse, ApiException::class);
+                $contentError = is_a($contentResponse, ApiException::class);
+
+                if ($contentError) {
+                    array_push($pending, $this->_filterCaptionAsset($kclient, $caption, $caption->fileUrl));
                 } else {
-                    if ($request) {
-                        $finalCaptions[$id] = $oldCaptionsMap[$id];
-                    }
+                    $results[$caption->id] = $this->_filterCaptionAsset($kclient, $metadataResponse);
+                    $this->_deleteLocalUpload($caption->file);
                 }
             }
-        }
 
-        private function _deleteUploadedCaptionFiles($multirequestResults, $requestTracker)
-        {
-            foreach ($requestTracker as $request) {
-                $result = $multirequestResults[$request['index']];
-                if (!is_a($result, ApiException::class)) {
-                    $this->_deleteLocalUpload($request['caption']->fileUrl);
+            foreach ($captionsToUpdate as $caption) {
+                $metadataResponse = $responses[$caption->metadataRequestIndex];
+                $contentResponse = isset($caption->contentRequestIndex) ? $responses[$caption->contentRequestIndex] : null;
+
+                $metadataError = is_a($metadataResponse, ApiException::class);
+                $contentError = is_a($contentResponse, ApiException::class);
+
+                if ($contentError) {
+                    array_push($pending, $this->_filterCaptionAsset($kclient, $caption, $caption->fileUrl));
+                } else if ($metadataError) {
+                    array_push($pending, $this->_filterCaptionAsset($kclient, $caption));
+                    $this->_deleteLocalUpload($caption->file);
+                } else {
+                    $results[$caption->id] = $this->_filterCaptionAsset($kclient, $metadataResponse);
+                    $this->_deleteLocalUpload($caption->file);
                 }
             }
+
+            return (object) [
+                'pendingCaptions' => $pending,
+                'captions' => $results,
+            ];
         }
 
-        private function _deleteLocalUpload($fileUrl)
+        private function _deleteLocalUpload($file)
         {
-            $file = TapestryHelpers::getPathToMedia($fileUrl);
             if ($file) {
                 wp_delete_file($file->file_path);
             }
         }
 
-        private function _addCaption($kclient, $videoEntryId, $caption)
+        private function _uploadFile($kclient, $file, $allowedExtensions)
         {
-            $file = TapestryHelpers::getPathToMedia($caption->fileUrl);
-            if (!$file || 'vtt' !== pathinfo($file->name, PATHINFO_EXTENSION)) {
-                return;
+            if (empty($file) || !in_array(pathinfo($file->name, PATHINFO_EXTENSION), $allowedExtensions)) {
+                return null;
             }
 
             $uploadToken = new UploadToken();
             $token = $kclient->uploadToken->add($uploadToken);
             $upload = $kclient->uploadToken->upload($token->id, $file->file_path);
 
-            $captionPlugin = CaptionPlugin::get($kclient);
-
-            $captionAsset = new CaptionAsset();
-            $captionAsset->label = $caption->label ?? 'CC';
-            $captionAsset->language = $caption->language ?? Language::EN;
-            $captionAsset->format = CaptionType::WEBVTT;
-
-            $addedCaptionAsset = $captionPlugin->captionAsset->add($videoEntryId, $captionAsset);
-
-            $resource = new UploadedFileTokenResource();
-            $resource->token = $token->id;
-            $result = $captionPlugin->captionAsset->setContent($addedCaptionAsset->id, $resource);
-
-            return $result;
+            return $token->id;
         }
 
-        private function _updateCaption($kclient, $oldCaption, $caption)
+        private function _createCaptionAsset($kclient, $caption, $videoEntryId)
         {
             $captionPlugin = CaptionPlugin::get($kclient);
 
             $captionAsset = new CaptionAsset();
-            $captionAsset->id = $oldCaption->id;
-            $captionAsset->label = $caption->label ?? 'CC';
-            $captionAsset->language = $caption->language ?? Language::EN;
+            $captionAsset->label = $caption->label;
+            $captionAsset->language = $caption->language;
             $captionAsset->format = CaptionType::WEBVTT;
 
-            $updatedCaptionAsset = $captionPlugin->captionAsset->update($captionAsset->id, $captionAsset);
+            $response = $captionPlugin->captionAsset->add($videoEntryId, $captionAsset);
 
-            $file = TapestryHelpers::getPathToMedia($caption->fileUrl);
-            if (!$file || 'vtt' !== pathinfo($file->name, PATHINFO_EXTENSION)) {
-                return $updatedCaptionAsset;
-            }
+            $caption->metadataRequestIndex = $kclient->getMultiRequestQueueSize() - 1;
 
-            $uploadToken = new UploadToken();
-            $token = $kclient->uploadToken->add($uploadToken);
-            $upload = $kclient->uploadToken->upload($token->id, $file->file_path);
-
-            $resource = new UploadedFileTokenResource();
-            $resource->token = $token->id;
-            $result = $captionPlugin->captionAsset->setContent($updatedCaptionAsset->id, $resource);
-
-            return $result;
+            return $response->id;
         }
 
-        private function _deleteCaption($kclient, $captionAssetId)
+        private function _setCaptionAssetContent($kclient, $caption, $captionAssetId, $tokenId)
+        {
+            $captionPlugin = CaptionPlugin::get($kclient);
+
+            $resource = new UploadedFileTokenResource();
+            $resource->token = $tokenId;
+            $response = $captionPlugin->captionAsset->setContent($captionAssetId, $resource);
+
+            $caption->contentRequestIndex = $kclient->getMultiRequestQueueSize() - 1;
+
+            return $response->id;
+        }
+
+        private function _updateCaptionAsset($kclient, $caption)
+        {
+            $captionPlugin = CaptionPlugin::get($kclient);
+
+            $captionAsset = new CaptionAsset();
+            $captionAsset->id = $caption->id;
+            $captionAsset->label = $caption->label;
+            $captionAsset->language = $caption->language;
+            $captionAsset->format = CaptionType::WEBVTT;
+
+            $response = $captionPlugin->captionAsset->update($captionAsset->id, $captionAsset);
+
+            $caption->metadataRequestIndex = $kclient->getMultiRequestQueueSize() - 1;
+
+            return $response->id;
+        }
+
+        private function _deleteCaptionAsset($kclient, $captionAssetId)
         {
             $captionPlugin = CaptionPlugin::get($kclient);
             $response = $captionPlugin->captionAsset->delete($captionAssetId);

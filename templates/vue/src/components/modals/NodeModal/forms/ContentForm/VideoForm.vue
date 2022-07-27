@@ -81,40 +81,17 @@
               {{ useCaptions ? "On" : "Off" }}
             </b-form-checkbox>
             <template v-if="useCaptions">
-              <b-input-group
-                v-for="caption in captions"
+              <caption-row
+                v-for="(caption, index) in captions"
                 :key="caption.id"
-                class="caption-container mt-2"
-              >
-                <b-input-group-prepend is-text>
-                  <b-form-radio
-                    v-model="defaultCaptionId"
-                    name="default-caption"
-                    :value="caption.id"
-                  ></b-form-radio>
-                </b-input-group-prepend>
-                <b-form-input v-model="caption.label" placeholder="Label" />
-                <b-form-select
-                  v-model="caption.language"
-                  :options="useKaltura ? kalturaLanguages : languages"
-                ></b-form-select>
-                <file-upload
-                  v-model="caption.fileUrl"
-                  file-types=".vtt"
-                  compact-mode
-                  :is-image="false"
-                  :file-upload-id="`file-upload-input-${caption.id}`"
-                />
-                <b-input-group-append>
-                  <b-button
-                    :variant="captions.length < 2 ? 'secondary' : 'danger'"
-                    :disabled="captions.length < 2"
-                    @click="removeCaption(caption.id)"
-                  >
-                    X
-                  </b-button>
-                </b-input-group-append>
-              </b-input-group>
+                :value="caption"
+                :is-removable="captions.length >= 2"
+                :is-default="caption.id === defaultCaptionId"
+                :languages="useKaltura ? kalturaLanguages : languages"
+                @input="captions.splice(index, 1, $event)"
+                @setDefault="defaultCaptionId = $event"
+                @remove="removeCaption(index, caption)"
+              ></caption-row>
               <p class="default-caption-instructions text-muted">
                 Select the default caption to display for this video.
               </p>
@@ -123,6 +100,19 @@
                 Add caption
               </b-button>
             </template>
+            <b-alert v-if="pendingCaptions.length > 0" show variant="danger">
+              <caption-row
+                v-for="(caption, index) in pendingCaptions"
+                :key="caption.id"
+                :value="caption"
+                is-removable
+                add-button
+                :languages="useKaltura ? kalturaLanguages : languages"
+                @input="pendingCaptions[index] = $event"
+                @add="moveFromPending(index, caption)"
+                @remove="removePendingCaption(index)"
+              ></caption-row>
+            </b-alert>
           </b-form-group>
         </b-overlay>
       </b-col>
@@ -136,6 +126,7 @@ import FileUpload from "@/components/modals/common/FileUpload"
 import client from "@/services/TapestryAPI"
 import Helpers from "@/utils/Helpers"
 import { mapMutations } from "vuex"
+import CaptionRow from "./CaptionRow"
 
 const defaultCaption = {
   fileUrl: "",
@@ -146,14 +137,17 @@ const defaultCaption = {
 export default {
   components: {
     FileUpload,
+    CaptionRow,
   },
   data() {
     return {
       kalturaId: this.$store.state.currentEditingNode.typeData.kalturaId,
       useKaltura: false,
+      captions: this.$store.state.currentEditingNode.typeData.captions ?? [],
       useCaptions:
         this.$store.state.currentEditingNode.typeData.captions?.length > 0,
-      captions: this.$store.state.currentEditingNode.typeData.captions ?? [],
+      pendingCaptions:
+        this.$store.state.currentEditingNode.typeData.pendingCaptions ?? [],
       editingKalturaId: false,
       isLoadingKalturaCaptions: false,
       kalturaLanguages: [],
@@ -193,6 +187,12 @@ export default {
     captions: {
       handler(value) {
         this.update("typeData.captions", value)
+      },
+      deep: true,
+    },
+    pendingCaptions: {
+      handler(value) {
+        this.update("typeData.pendingCaptions", value)
       },
       deep: true,
     },
@@ -287,21 +287,33 @@ export default {
         },
       ]
     },
-    removeCaption(captionId) {
-      this.captions = this.captions.filter(caption => caption.id != captionId)
-      if (captionId === this.defaultCaptionId) {
+    removeCaption(index, caption) {
+      this.captions = this.captions.filter((c, i) => i != index)
+      if (caption.id === this.defaultCaptionId) {
         this.defaultCaptionId = null
       }
+    },
+    moveFromPending(index, caption) {
+      const existingCaptionIndex = this.captions.findIndex(
+        cap => cap.id === caption.id
+      )
+      if (existingCaptionIndex >= 0) {
+        // TODO: To investigate - Vue state isn't updating
+        this.$set(this.captions, existingCaptionIndex, caption)
+      } else {
+        this.captions = [...this.captions, caption]
+      }
+
+      this.removePendingCaption(index)
+    },
+    removePendingCaption(index) {
+      this.pendingCaptions = this.pendingCaptions.filter((c, i) => i != index)
     },
   },
 }
 </script>
 
 <style lang="scss" scoped>
-.caption-container {
-  background-color: white;
-}
-
 .default-caption-instructions {
   margin-left: 17px;
   margin-bottom: 0;
