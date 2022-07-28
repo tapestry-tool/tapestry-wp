@@ -4,12 +4,11 @@
       <b-button v-if="isPending" variant="primary" @click="$emit('move')">
         +
       </b-button>
-      <b-form-radio
+      <b-form-checkbox
         v-else
-        name="default-caption"
-        :value="caption.id"
-        @change="$emit('setDefault', $event)"
-      ></b-form-radio>
+        :checked="isSelected"
+        @change="$emit('setDefault', $event ? caption.id : null)"
+      ></b-form-checkbox>
     </b-input-group-prepend>
     <b-input-group-prepend v-if="isPending && errorMessage" is-text>
       <i
@@ -54,6 +53,11 @@ export default {
     value: {
       type: Object,
       required: true,
+    },
+    isSelected: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
     isRemovable: {
       type: Boolean,

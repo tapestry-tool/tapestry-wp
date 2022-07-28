@@ -331,7 +331,7 @@
                 if ($metadataError) {
                     array_push($pending, $this->_filterCaptionAsset($kclient, $caption, $caption->fileUrl, $metadataErrorMessage));
                 } elseif ($contentError) {
-                    array_push($pending, $this->_filterCaptionAsset($kclient, $caption, $caption->fileUrl, $contentErrorMessage));
+                    array_push($pending, $this->_filterCaptionAsset($kclient, $metadataResponse, $caption->fileUrl, $contentErrorMessage));
                 } else {
                     $results[$caption->id] = $this->_filterCaptionAsset($kclient, $metadataResponse);
                     $this->_deleteLocalUpload($caption->file);

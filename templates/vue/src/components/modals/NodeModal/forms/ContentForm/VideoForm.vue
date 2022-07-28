@@ -86,6 +86,7 @@
                 :key="caption.id"
                 :value="caption"
                 :is-removable="captions.length >= 2"
+                :is-selected="caption.id === defaultCaptionId"
                 :languages="useKaltura ? kalturaLanguages : languages"
                 @input="captions.splice(index, 1, $event)"
                 @setDefault="defaultCaptionId = $event"
