@@ -215,7 +215,7 @@ class Tapestry implements ITapestry
         // Delete associated links with this node
         foreach ($this->links as $index => $link) {
             if ($link->source == $nodeId || $link->target == $nodeId) {
-                $this->removeLink([
+                $this->removeLink((object) [
                     'source' => $link->source,
                     'target' => $link->target,
                     ]);
