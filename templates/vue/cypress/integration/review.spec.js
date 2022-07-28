@@ -54,26 +54,6 @@ describe("Review Nodes", () => {
     cy.contains(node.title).should("exist")
   })
 
-  it("should not be able to accept a child node of a submitted node", () => {
-    cy.setup("@review")
-    const node = {
-      title: "Review Child",
-      status: "draft",
-      reviewStatus: "submitted",
-    }
-    cy.getNodeByTitle(node.title).then(node => {
-      cy.getByTestId(`review-node-${node.id}`).click()
-      cy.getByTestId("sidebar-content")
-        .should("be.visible")
-        .within(() => {
-          cy.findByLabelText("edit node").should("not.exist")
-          cy.contains(/accept/i).should("be.disabled")
-          cy.contains(/can only be added/).should("exist")
-        })
-      cy.getByTestId(`review-node-${node.id}`).should("exist")
-    })
-  })
-
   it("should be able to reject a node with a comment", () => {
     cy.setup("@oneNode", roles.SUBSCRIBER)
     const node = {

@@ -802,7 +802,7 @@ export default {
       if (nodeHasDraftChildren.hasDraft) {
         this.$bvModal
           .msgBoxConfirm(
-            "There are draft nodes attached to this node. Deleting this node will also remove the draft nodes. Are you sure you want to continue?",
+            "There are draft nodes attached to this node. Deleting this node will break the links to the draft nodes. Are you sure you want to continue?",
             {
               modalClass: "node-modal-confirmation",
               title: "Are you sure you want to continue?",
