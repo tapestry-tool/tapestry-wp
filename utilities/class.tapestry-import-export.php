@@ -79,9 +79,9 @@ class TapestryImportExport
         });
 
         // create new permissions object with filtered roles
-        $filteredPerms = [];
+        $filteredPerms = (object) [];
         foreach ($filteredRoles as $role) {
-            $filteredPerms[$role] = $permissions->{$role};
+            $filteredPerms->{$role} = $permissions->{$role};
         }
 
         // if permissions modified, add the role to changes
