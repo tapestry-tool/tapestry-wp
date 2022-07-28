@@ -5,46 +5,6 @@
       <div v-else class="empty-message">The requested Tapestry is empty.</div>
     </div>
     <svg v-else id="vue-svg" :viewBox="computedViewBox">
-      <defs>
-        <filter
-          v-for="i in maxLevel"
-          :id="'shadow-' + i"
-          :key="i"
-          y="-10%"
-          height="200%"
-          x="-10%"
-          width="200%"
-        >
-          <feGaussianBlur in="SourceAlpha" :stdDeviation="Math.max(10 - i, 4)" />
-          <feOffset
-            :dx="4 * (maxLevel - i) * scale"
-            :dy="4 * (maxLevel - i) * scale"
-          />
-          <feComponentTransfer>
-            <feFuncA type="linear" :slope="Math.max(0.5 - i * 0.05, 0.2)" />
-          </feComponentTransfer>
-          <feMerge>
-            <feMergeNode />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-        <filter id="shadow-root" y="-10%" height="200%" x="-10%" width="200%">
-          <!-- <feDropShadow :dx="3 * maxLevel * scale" :dy="3 * maxLevel * scale" stdDeviation="5" flood-color="#81A684" flood-opacity="0.6" /> -->
-          <feGaussianBlur in="SourceAlpha" stdDeviation="5" />
-          <feColorMatrix
-            type="matrix"
-            values="0 0 0 0 0.8 0 0 0 0 0.4 0 0 0 0 0.1 0 0 0 1 0"
-          />
-          <feOffset :dx="4 * maxLevel * scale" :dy="4 * maxLevel * scale" />
-          <feComponentTransfer>
-            <feFuncA type="linear" slope="0.4" />
-          </feComponentTransfer>
-          <feMerge>
-            <feMergeNode />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-      </defs>
       <g class="links">
         <tapestry-link
           v-for="link in links"

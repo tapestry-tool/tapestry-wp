@@ -12,7 +12,12 @@
         disabled: !isLoggedIn,
       }"
       :style="{
-        filter: `url(#shadow-${source.level})`,
+        filter: `drop-shadow(${4 * (maxLevel - source.level) * scale}px ${4 *
+          (maxLevel - source.level) *
+          scale}px ${Math.max(10 - source.level, 4)}px rgba(0, 0, 0, ${Math.max(
+          0.5 - source.level * 0.05,
+          0.2
+        )}))`,
       }"
       :points="polygonPoints"
       @click="openLinkModal"
