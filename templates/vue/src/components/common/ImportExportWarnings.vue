@@ -37,10 +37,10 @@
 export default {
   name: "import-export-warnings",
   props: {
-    // action is either "import" or "export"
     action: {
       type: String,
       required: true,
+      validator: val => val === "import" || val === "export",
     },
     warnings: {
       type: Object,

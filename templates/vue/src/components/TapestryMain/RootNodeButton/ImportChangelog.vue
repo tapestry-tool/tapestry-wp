@@ -32,7 +32,7 @@
         </div>
         <import-warnings :warnings="warnings" action="import"></import-warnings>
         <p>
-          Pressing "Confirm" will reload your page.
+          Pressing "Confirm" will reload the page.
         </p>
       </b-card>
     </b-container>
