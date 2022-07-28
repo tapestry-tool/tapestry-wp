@@ -177,11 +177,11 @@ class Tapestry implements ITapestry
         $tapestryNode->set($node);
         $node = $tapestryNode->save($node);
 
-        array_push($this->nodes, $node->id);
-
-        if (empty($this->rootId)) {
+        if ($this->isEmpty()) {
             $this->rootId = $node->id;
         }
+
+        array_push($this->nodes, $node->id);
 
         $this->_saveToDatabase();
 
