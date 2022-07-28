@@ -458,7 +458,6 @@ class Tapestry implements ITapestry
         // foreach ($this->groups as $group) {
         //     $groups[] = (new TapestryGroup($this->postId, $$group))->get();
         // }
-        $parsedUrl = parse_url($this->settings->permalink);
         unset($this->settings->permalink);
         unset($this->settings->tapestrySlug);
         unset($this->settings->title);
@@ -469,7 +468,7 @@ class Tapestry implements ITapestry
             // 'groups' => $groups,
             'links' => $this->links,
             'settings' => $this->settings,
-            'site-url' => $parsedUrl['scheme'].'://'.$parsedUrl['host'],
+            'site-url' => get_bloginfo('url'),
         ];
     }
 

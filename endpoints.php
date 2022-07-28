@@ -352,6 +352,13 @@ foreach ($REST_API_ENDPOINTS as $ENDPOINT) {
     );
 }
 
+/**
+ * Export a Tapestry to JSON.
+ * Returns:
+ *  - A string ID identifying this export run
+ *  - The JSON data of the Tapestry
+ *  - The XML data of WordPress posts in the Tapestry, if any exist
+ */
 function exportTapestry($request)
 {
     $postId = $request['tapestryPostId'];
@@ -381,8 +388,11 @@ function exportTapestry($request)
 
 /**
  * Export a Tapestry to a zip file.
- * Returns URL of the exported zip on the server, and a list of warnings
- * generated during export.
+ * Returns:
+ *  - A string ID identifying this export run
+ *  - The URL of the zip file on the server
+ *  - A list of warnings generated during the zip export
+ *  - The XML data of WordPress posts in the Tapestry, if any exist
  *
  * @param object $request   HTTP request
  */
@@ -421,7 +431,6 @@ function exportTapestryAsZip($request)
 
 /**
  * Imports a Tapestry from an uploaded zip file.
- * Returns a list of warnings and changes made during import.
  *
  * @param object $request   HTTP request (contains the zip file)
  */
@@ -468,9 +477,9 @@ function importTapestryFromZip($request)
         return [
             'changes' => $changes,
             'warnings' => $importResult['warnings'],
-            'rebuildH5PCache' => $importResult['rebuildH5PCache'],
-            'exportWarnings' => !empty($tapestry_data->warnings),
-            'tapestry' => $importedTapestry,
+            'rebuildH5PCache' => $importResult['rebuildH5PCache'],  // Whether the H5P cache needs rebuilding
+            'exportWarnings' => !empty($tapestry_data->warnings),   // Whether the provided file was exported with warnings
+            'tapestry' => $importedTapestry,                        // Data of imported Tapestry
         ];
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
@@ -651,7 +660,7 @@ function importTapestry($postId, $tapestryData)
             } elseif ($node->mediaType === 'wp-post') {
                 // We are requiring the user to import WordPress posts independently
                 // The post may have a different ID after import, so try to get the new post ID
-                TapestryImportExport::tryUpdateWpPostId($node->typeData->mediaURL);
+                TapestryImportExport::tryUpdateWpPostId($tapestryData->{'site-url'}, $node->typeData->mediaURL);
             }
 
             $tapestryNode->set($node);

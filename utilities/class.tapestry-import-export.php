@@ -27,7 +27,7 @@ class TapestryImportExport
     public static function prepareImport($tapestry_data)
     {
         // Delete leftover category from importing WordPress posts, if it exists
-        self::_deleteWpExportCategory($tapestryData);
+        self::_deleteWpExportCategory($tapestry_data);
 
         // If import is from a different site, filter permissions
         $changedPermissions = self::_filterPermissionsIfMovingSites($tapestry_data);
@@ -376,7 +376,7 @@ class TapestryImportExport
         });
 
         if (!empty($post_ids)) {
-            list('contents' => $wxr_contents, 'category' => $category) = self::_exportWpPosts($post_ids, $export_id);
+            list('contents' => $wxr_contents, 'category' => $category) = self::_exportWpPosts($tapestry_data->{'site-url'}, $post_ids, $export_id);
 
             // Save the temporary export category so we can delete it on the destination site
             $tapestry_data->wpExportCategory = $category;
@@ -389,6 +389,7 @@ class TapestryImportExport
     /**
      * Exports a list of WordPress posts using WordPress's WXR (XML) format.
      *
+     * @param string $site_url      Site URL of this WordPress site.
      * @param array $post_ids       Post IDs of the posts to export.
      * @param string $export_id     ID that identifies this export run.
      * @return array    [
@@ -397,10 +398,8 @@ class TapestryImportExport
      *                                    Can be used to delete the category later.
      *                  ]
      */
-    private static function _exportWpPosts($post_ids, $export_id)
+    private static function _exportWpPosts($site_url, $post_ids, $export_id)
     {
-        $site_url = get_bloginfo('url');
-
         // WordPress cannot export posts by id, so make a unique category to gather all posts to export
         $category = self::_createExportCategory($export_id);
         if (!$category) {
@@ -656,14 +655,14 @@ class TapestryImportExport
     /**
      * Attempts to update the post ID of a WordPress Post node to its ID after being imported.
      *
-     * @param int &$media_url   (Modified) Current post ID
-     *                          If a matching post is found, will be set to this new post ID.
+     * @param string $old_site_url      Site URL of the site from which the Tapestry was exported.
+     * @param int &$media_url           (Modified) Current post ID
+     *                                  If a matching post is found, will be set to this new post ID.
      */
-    public static function tryUpdateWpPostId(&$media_url)
+    public static function tryUpdateWpPostId($old_site_url, &$media_url)
     {
-        $site_url = get_bloginfo('url');
         $old_post_id = $media_url;
-        $site_and_post_id = $site_url . '-' . $old_post_id;
+        $site_and_post_id = $old_site_url . '-' . $old_post_id;
 
         // Look for a post whose old ID matches the current post ID
         $query_args = array(
