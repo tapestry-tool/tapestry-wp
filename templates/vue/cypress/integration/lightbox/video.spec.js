@@ -109,31 +109,53 @@ describe("Video", () => {
 
   it("should be able to add a video node via Kaltura", () => {
     const kalturaId = "0_55iod32r"
+    const mediaURL =
+      "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
+
+    // Mock the request to the Kaltura API
+    // TODO: decide whether or not to mock Kaltura when testing
+    cy.intercept("GET", "**/kaltura/video/status?**", {
+      statusCode: 200,
+      body: true,
+    })
+    cy.intercept("GET", "**/kaltura/video/meta?**", {
+      statusCode: 200,
+      body: {
+        image: "",
+        duration: 223,
+      },
+    })
+    cy.intercept("GET", "**/kaltura/video/mediaURL?**", {
+      statusCode: 200,
+      body: {
+        mediaURL: mediaURL,
+      },
+    })
 
     cy.getSelectedNode().then(node => {
       cy.openModal("edit", node.id)
       cy.changeMediaType("video")
 
-      cy.getByTestId("node-video-kaltura-id").should("not.be.visible")
       cy.get(".b-overlay").should("not.exist")
-
-      cy.getByTestId("use-kaltura-checkbox").click({ force: true })
+      cy.getByTestId("use-kaltura-toggle").click({ force: true })
       cy.get(".b-overlay").should("exist") // Checking that video URL field is greyed out by Bootstrap overlay
-
+      cy.getByTestId("node-video-kaltura-id").should("be.disabled")
+      cy.getByTestId("edit-kaltura-id-button").click()
       cy.getByTestId("node-video-kaltura-id").type(kalturaId)
+      cy.getByTestId("edit-kaltura-id-button").click()
 
       cy.submitModal()
 
       cy.openModal("edit", node.id)
-      cy.getByTestId("use-kaltura-checkbox").should("be.checked")
+      cy.getByTestId("use-kaltura-toggle").should("be.checked")
       cy.getByTestId("node-video-kaltura-id")
         .invoke("val")
         .should("eq", kalturaId)
 
-      // Checking that mediaURL of Kaltura video matches. We just check that the URL includes the Kaltura ID
+      // Checking that mediaURL of Kaltura video matches whatever Kaltura returns
       cy.getByTestId("node-video-url")
         .invoke("val")
-        .should("include", kalturaId)
+        .should("equal", mediaURL)
       cy.get(".close").click()
 
       cy.openLightbox(node.id).within(() => {

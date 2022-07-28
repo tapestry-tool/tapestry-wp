@@ -22,7 +22,7 @@
         <b-form-checkbox
           v-model="useKaltura"
           switch
-          data-qa="use-kaltura-checkbox"
+          data-qa="use-kaltura-toggle"
           :value="true"
           :unchecked-value="false"
           style="display:inline-block;"
@@ -40,8 +40,7 @@
         <b-input-group>
           <b-form-input
             v-model="kalturaId"
-            :disabled="isLoadingKalturaCaptions"
-            :readonly="!editingKalturaId"
+            :disabled="isLoadingKalturaCaptions || !editingKalturaId"
             class="rounded-left"
             data-qa="node-video-kaltura-id"
             name="text-input"
@@ -60,6 +59,7 @@
           <b-input-group-append>
             <b-button
               variant="primary"
+              data-qa="edit-kaltura-id-button"
               :disabled="isLoadingKalturaCaptions"
               @click="handleKalturaIdEdit"
             >
@@ -100,22 +100,22 @@
                 Add caption
               </b-button>
             </template>
-            <b-alert v-if="pendingCaptions.length > 0" show variant="danger">
-              <caption-row
-                v-for="(caption, index) in pendingCaptions"
-                :key="caption.id"
-                :value="caption"
-                is-removable
-                is-pending
-                :languages="useKaltura ? kalturaLanguages : languages"
-                :error-message="caption.errorMessage"
-                @input="pendingCaptions[index] = $event"
-                @move="moveFromPending(index, caption)"
-                @remove="removePendingCaption(index)"
-              ></caption-row>
-            </b-alert>
           </b-form-group>
         </b-overlay>
+        <b-alert v-if="pendingCaptions.length > 0" show variant="danger">
+          <caption-row
+            v-for="(caption, index) in pendingCaptions"
+            :key="caption.id"
+            :value="caption"
+            is-removable
+            is-pending
+            :languages="useKaltura ? kalturaLanguages : languages"
+            :error-message="caption.errorMessage"
+            @input="pendingCaptions[index] = $event"
+            @move="moveFromPending(index, caption)"
+            @remove="removePendingCaption(index)"
+          ></caption-row>
+        </b-alert>
       </b-col>
     </b-row>
   </div>
