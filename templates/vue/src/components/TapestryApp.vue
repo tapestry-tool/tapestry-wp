@@ -1,12 +1,12 @@
 <template>
   <div id="app-container" :class="{ 'sidebar-open': isSidebarOpen }">
-    <toolbar />
     <tapestry-map
       v-if="settings.renderMap"
       :is-sidebar-open="isSidebarOpen"
       data-qa="tapestry-map"
     />
     <tapestry-main v-else-if="viewingTapestry" ref="graph" />
+    <toolbar />
   </div>
 </template>
 

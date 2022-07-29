@@ -1,5 +1,12 @@
 <template>
-  <main id="tapestry" ref="app" :style="background" :class="{ panning: isPanning }">
+  <main
+    id="tapestry"
+    ref="app"
+    :class="{ panning: isPanning }"
+    :style="{
+      height: appHeight,
+    }"
+  >
     <div v-if="empty">
       <root-node-button v-if="canEdit" @click="addRootNode"></root-node-button>
       <div v-else class="empty-message">The requested Tapestry is empty.</div>
@@ -88,6 +95,8 @@ export default {
       dragSelectReady: false,
       activeNode: null,
 
+      appHeight: "100vh",
+
       unscaledViewBox: [2200, 2700, 1600, 1100],
       viewBox: [2200, 2700, 1600, 1100],
       scale: 1,
@@ -148,6 +157,9 @@ export default {
     routeName() {
       return this.$route.name
     },
+    browserHeight() {
+      return this.browserDimensions.height
+    },
   },
   watch: {
     empty(empty) {
@@ -181,6 +193,9 @@ export default {
         }
         this.updateViewBox()
       },
+    },
+    browserHeight() {
+      this.updateAppHeight()
     },
     routeName(newName, oldName) {
       if (newName === names.APP && oldName === names.LIGHTBOX) {
@@ -233,6 +248,10 @@ export default {
     this.zoomPanHelper.register()
 
     this.$refs.app.addEventListener("keydown", this.handleKey)
+
+    this.$nextTick(() => {
+      this.updateAppHeight()
+    })
   },
   beforeDestroy() {
     this.zoomPanHelper && this.zoomPanHelper.unregister()
@@ -254,6 +273,18 @@ export default {
         Math.min(scale, this.maxScale),
         this.scaleConstants.minTapestrySizeToScreen
       )
+    },
+    updateAppHeight() {
+      if (this.$refs.app) {
+        const bodyHeight = document.body.getBoundingClientRect().height
+        const appHeight = this.$refs.app.getBoundingClientRect().height
+        // TODO: removing the min. 50vh restriction below will result in the Tapestry getting extremely small when header and footer take up too much space
+        this.appHeight = `max(50vh, ${this.browserDimensions.height -
+          bodyHeight +
+          appHeight}px)`
+      } else {
+        this.appHeight = "100vh"
+      }
     },
     fetchAppDimensions() {
       const { width, height } = this.$refs.app.getBoundingClientRect()

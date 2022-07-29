@@ -89,6 +89,11 @@ export default {
 
 <style lang="scss">
 .toolbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
   display: flex;
   justify-content: space-between;
   padding: 0 5vw;
