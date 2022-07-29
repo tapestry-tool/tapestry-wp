@@ -277,7 +277,7 @@ import PermissionsTable from "../common/PermissionsTable"
 import { names } from "@/config/routes"
 import Helpers from "@/utils/Helpers"
 import * as Comment from "@/utils/comments"
-import { sizes, nodeStatus } from "@/utils/constants"
+import { sizes, nodeStatus, userActions } from "@/utils/constants"
 import { getLinkMetadata } from "@/services/LinkPreviewApi"
 import DragSelectModular from "@/utils/dragSelectModular"
 import * as wp from "@/services/wp"
@@ -826,7 +826,7 @@ export default {
       const parentId = this.parentId
       this.deleteNode(this.nodeId).then(() => {
         const parent = this.getNode(parentId)
-        if (parent) {
+        if (parent && Helpers.hasPermission(parent, userActions.EDIT)) {
           this.setCurrentEditingNode(parent)
           this.keepOpen = parentId
         } else {
