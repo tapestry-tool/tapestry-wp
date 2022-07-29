@@ -15,6 +15,11 @@ module.exports = (on, config) => {
   require("@cypress/code-coverage/task")(on, config)
   on("file:preprocessor", require("@cypress/code-coverage/use-browserify-istanbul"))
   on("task", {
+    /*
+      Register the ability to print to the console during Cypress tests, to help debug
+      To log a debug message, use:
+        cy.task("log", "Print this to the console")
+    */
     log(message) {
       console.log(message)
       return null
