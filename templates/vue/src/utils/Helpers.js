@@ -208,7 +208,7 @@ export default class Helpers {
   }
 
   static hasPermission(node, action, showRejected) {
-    // Check 0: node is null case - this should only apply to creating the root node.
+    // Check 0: node is null case - this should only apply to creating a standalone node
     if (node === null) {
       return wp.canEditTapestry()
     }
@@ -227,12 +227,10 @@ export default class Helpers {
      *  - Allow "read" to reviewers only if the node is submitted for review
      */
     if (node.status === nodeStatus.DRAFT) {
-      if (node.author && wp.isCurrentUser(node.author.id) && action == "move") {
-        if (node.reviewStatus !== nodeStatus.ACCEPT) {
+      if (node.author && wp.isCurrentUser(node.author.id)) {
+        if (action === "move" && node.reviewStatus !== nodeStatus.ACCEPT) {
           return true
         }
-      }
-      if (node.author && wp.isCurrentUser(node.author.id)) {
         return action === userActions.READ || node.reviewStatus !== nodeStatus.SUBMIT
       }
       if (wp.canEditTapestry()) {

@@ -373,12 +373,16 @@ export default {
           (!this.parent || this.parent.status !== "draft")
         )
       } else if (this.node.status === "draft" && this.type === "edit") {
-        return this.getNeighbours(this.nodeId).some(neighbourId => {
-          let neighbour = this.getNode(neighbourId)
-          return (
-            neighbour.status !== "draft" && Helpers.hasPermission(neighbour, "add")
-          )
-        })
+        const neighbours = this.getNeighbours(this.nodeId)
+        return (
+          (neighbours.length === 0 && Helpers.hasPermission(null, "add")) ||
+          neighbours.some(neighbourId => {
+            let neighbour = this.getNode(neighbourId)
+            return (
+              neighbour.status !== "draft" && Helpers.hasPermission(neighbour, "add")
+            )
+          })
+        )
       } else {
         return Helpers.hasPermission(this.node, this.type)
       }
