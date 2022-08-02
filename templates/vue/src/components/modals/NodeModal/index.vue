@@ -743,8 +743,8 @@ export default {
             query: this.$route.query,
           })
           this.loading = false
-        } else if (!this.nodeId) {
-          // We just added the first node in the tapestry
+        } else if (!this.nodeId || event === "delete") {
+          // Should close modal but cannot determine a node to return to
           this.$router.push({
             name: names.APP,
             params: { nodeId: this.getInitialNodeId },
