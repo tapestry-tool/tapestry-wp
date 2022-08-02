@@ -194,8 +194,11 @@ export default {
         this.updateViewBox()
       },
     },
-    browserHeight() {
-      this.updateAppHeight()
+    browserDimensions: {
+      deep: true,
+      handler() {
+        this.updateAppHeight()
+      },
     },
     routeName(newName, oldName) {
       if (newName === names.APP && oldName === names.LIGHTBOX) {
@@ -285,6 +288,9 @@ export default {
       } else {
         this.appHeight = "100vh"
       }
+      this.$nextTick(() => {
+        this.updateViewBox()
+      })
     },
     fetchAppDimensions() {
       const { width, height } = this.$refs.app.getBoundingClientRect()
@@ -380,30 +386,39 @@ export default {
         const { x0, y0, x, y } = this.getNodeDimensions()
 
         const tapestryDimensions = {
-          startX: 0,
-          startY: 0,
-          width,
-          height,
+          startX: x0 - MAX_RADIUS * 1.25,
+          startY: y0 - MAX_RADIUS * 1.25,
+          width: x + MAX_RADIUS * 1.25,
+          height: y + MAX_RADIUS * 1.25,
         }
-        if (x > width || y > height) {
-          tapestryDimensions.startX = x0 - MAX_RADIUS * 1.25
-          tapestryDimensions.startY = y0 - MAX_RADIUS * 1.25
-          tapestryDimensions.width = x
-          tapestryDimensions.height = y
+        const tapestryWidth = tapestryDimensions.width - tapestryDimensions.startX
+        const tapestryHeight = tapestryDimensions.height - tapestryDimensions.startY
+
+        const appAspectRatio = width / height
+        const tapestryAspectRatio = tapestryWidth / tapestryHeight
+        if (appAspectRatio > tapestryAspectRatio) {
+          const targetWidth = tapestryHeight * appAspectRatio
+          const widthDiff = targetWidth - tapestryWidth
+          tapestryDimensions.width += widthDiff / 2
+          tapestryDimensions.startX -= widthDiff / 2
+        } else {
+          const targetHeight = tapestryWidth / appAspectRatio
+          const heightDiff = targetHeight - tapestryHeight
+          tapestryDimensions.height += heightDiff / 2
+          tapestryDimensions.startY -= heightDiff / 2
         }
-        const windowWidth = this.browserDimensions.width
+
+        // const windowWidth = this.browserDimensions.width
         // Center the nodes if there is not enough of them to fill the width of the screen
-        if (
-          tapestryDimensions.width - tapestryDimensions.startX - MAX_RADIUS * 1.25 <
-          windowWidth
-        ) {
-          tapestryDimensions.startX -=
-            (windowWidth - tapestryDimensions.width + tapestryDimensions.startX) /
-              2 +
-            MAX_RADIUS
-        }
-        tapestryDimensions.width = tapestryDimensions.width + MAX_RADIUS * 1.25
-        tapestryDimensions.height = tapestryDimensions.height + MAX_RADIUS * 1.25
+        // if (
+        //   tapestryDimensions.width - tapestryDimensions.startX - MAX_RADIUS * 1.25 <
+        //   windowWidth
+        // ) {
+        //   tapestryDimensions.startX -=
+        //     (windowWidth - tapestryDimensions.width + tapestryDimensions.startX) /
+        //       2 +
+        //     MAX_RADIUS
+        // }
 
         const MIN_WIDTH = this.browserDimensions.width * MIN_TAPESTRY_WIDTH_FACTOR
         const MIN_HEIGHT = this.browserDimensions.height * MIN_TAPESTRY_WIDTH_FACTOR
