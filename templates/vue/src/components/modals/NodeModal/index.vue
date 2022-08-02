@@ -835,7 +835,7 @@ export default {
         if (this.node.mediaFormat === "kaltura") {
           await Promise.all([
             this.updateKalturaVideoMediaURL(),
-            this.updateKalturaVideoCaptions(), // TODO: could do this somewhere else
+            this.updateKalturaVideoCaptions(),
           ])
         }
 
@@ -1325,7 +1325,7 @@ export default {
       }
     },
     async updateKalturaVideoCaptions() {
-      // Sync changes made to Kaltura captions
+      // "Push" changes made to Kaltura captions to Kaltura, then save results in node
       if (this.node.typeData.captions) {
         const result = await client.updateKalturaVideoCaptions(
           this.node.typeData.kalturaId,
@@ -1333,12 +1333,12 @@ export default {
           this.node.typeData.defaultCaptionId
         )
 
-        const pendingCaptions = this.node.typeData.pendingCaptions ?? []
+        const currentPendingCaptions = this.node.typeData.pendingCaptions ?? []
 
-        this.update("typeData.captions", result.captions) // TODO: is this the right thing to do?
+        this.update("typeData.captions", result.captions)
         this.update(
           "typeData.pendingCaptions",
-          pendingCaptions.concat(result.pendingCaptions)
+          currentPendingCaptions.concat(result.pendingCaptions)
         ) // Persist old pending captions
         this.update("typeData.defaultCaptionId", result.defaultCaptionId)
       }

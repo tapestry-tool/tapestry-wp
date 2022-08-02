@@ -139,15 +139,15 @@ export default {
     CaptionRow,
   },
   data() {
+    const captions = this.$store.state.currentEditingNode.typeData.captions ?? []
     return {
-      kalturaId: this.$store.state.currentEditingNode.typeData.kalturaId,
       useKaltura: false,
-      captions: this.$store.state.currentEditingNode.typeData.captions ?? [],
-      useCaptions:
-        this.$store.state.currentEditingNode.typeData.captions?.length > 0,
+      kalturaId: this.$store.state.currentEditingNode.typeData.kalturaId,
+      editingKalturaId: false,
+      captions: captions,
+      useCaptions: captions.length > 0,
       pendingCaptions:
         this.$store.state.currentEditingNode.typeData.pendingCaptions ?? [],
-      editingKalturaId: false,
       isLoadingKalturaCaptions: false,
       languages: [],
     }
@@ -233,13 +233,6 @@ export default {
         this.updateMediaFormat(this.youtubeId)
       }
     },
-    handleToggleCaptions() {
-      if (this.captions.length === 0) {
-        this.addCaption()
-      } else {
-        this.clearCaptions()
-      }
-    },
     handleKalturaIdEdit() {
       if (this.editingKalturaId) {
         this.setKalturaVideo(this.kalturaId)
@@ -262,6 +255,13 @@ export default {
       } else {
         this.update("mediaFormat", "mp4")
         this.update("typeData.youtubeID", undefined)
+      }
+    },
+    handleToggleCaptions() {
+      if (this.captions.length === 0) {
+        this.addCaption()
+      } else {
+        this.clearCaptions()
       }
     },
     async getKalturaCaptions(kalturaId) {
@@ -301,13 +301,13 @@ export default {
       const existingCaptionIndex = this.captions.findIndex(
         cap => cap.id === caption.id
       )
-      const copy = [...this.captions]
+
       if (existingCaptionIndex >= 0) {
+        const copy = [...this.captions]
         copy[existingCaptionIndex] = caption
         this.captions = copy
       } else {
-        copy.push(caption)
-        this.captions = copy
+        this.captions = [...this.captions, caption]
         this.useCaptions = true
       }
 
