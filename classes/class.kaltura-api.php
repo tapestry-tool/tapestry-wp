@@ -190,13 +190,13 @@
             ];
         }
 
-        private function _filterCaptionAsset($kclient, $captionAsset, $overrideFileUrl = null, $errorMessage = null)
+        private function _filterCaptionAsset($kclient, $captionAsset, $overrideCaptionUrl = null, $errorMessage = null)
         {
             $caption = (object) [
                 'id' => $captionAsset->id,
                 'label' => $captionAsset->label,
                 'language' => $captionAsset->language,
-                'fileUrl' => $overrideFileUrl ?? $this->_getCaptionUrl($kclient, $captionAsset->id).'?.vtt',
+                'captionUrl' => $overrideCaptionUrl ?? $this->_getCaptionUrl($kclient, $captionAsset->id).'?.vtt',
             ];
             if (!empty($errorMessage)) {
                 $caption->errorMessage = $errorMessage;
@@ -310,8 +310,8 @@
 
                 $requests[$caption->id] = (object) [
                     'id' => $caption->id,
-                    'file' => TapestryHelpers::getPathToMedia($caption->fileUrl),
-                    'fileUrl' => $caption->fileUrl,
+                    'file' => TapestryHelpers::getPathToMedia($caption->captionUrl),
+                    'captionUrl' => $caption->captionUrl,
                     'label' => $caption->label ?? ($caption->language ?? $language),
                     'language' => $language,
                 ];
@@ -326,7 +326,7 @@
             $pending = [];
 
             $metadataErrorMessage = 'Please check the language and label.';
-            $contentErrorMessage = 'Please check the .vtt file you uploaded.';
+            $contentErrorMessage = 'Please check the .vtt file you provided.';
 
             foreach ($captionsToAdd as $caption) {
                 $metadataResponse = $responses[$caption->metadataRequestIndex];
@@ -336,9 +336,9 @@
                 $contentError = is_a($contentResponse, ApiException::class);
 
                 if ($metadataError) {
-                    array_push($pending, $this->_filterCaptionAsset($kclient, $caption, $caption->fileUrl, $metadataErrorMessage));
+                    array_push($pending, $this->_filterCaptionAsset($kclient, $caption, $caption->captionUrl, $metadataErrorMessage));
                 } elseif ($contentError) {
-                    array_push($pending, $this->_filterCaptionAsset($kclient, $metadataResponse, $caption->fileUrl, $contentErrorMessage));
+                    array_push($pending, $this->_filterCaptionAsset($kclient, $metadataResponse, $caption->captionUrl, $contentErrorMessage));
                 } else {
                     $results[$caption->id] = $this->_filterCaptionAsset($kclient, $metadataResponse);
                     $this->_deleteLocalUpload($caption->file);
@@ -353,7 +353,7 @@
                 $contentError = is_a($contentResponse, ApiException::class);
 
                 if ($contentError) {
-                    array_push($pending, $this->_filterCaptionAsset($kclient, $caption, $caption->fileUrl, $contentErrorMessage));
+                    array_push($pending, $this->_filterCaptionAsset($kclient, $caption, $caption->captionUrl, $contentErrorMessage));
                 } elseif ($metadataError) {
                     array_push($pending, $this->_filterCaptionAsset($kclient, $caption, $metadataErrorMessage));
                     $this->_deleteLocalUpload($caption->file);

@@ -85,16 +85,14 @@
                 v-for="(caption, index) in captions"
                 :key="caption.id"
                 :value="caption"
+                :index="index"
                 :is-removable="captions.length >= 2"
-                :is-selected="caption.id === defaultCaptionId"
+                :is-default="caption.id === defaultCaptionId"
                 :languages="languages"
                 @input="captions.splice(index, 1, $event)"
                 @setDefault="defaultCaptionId = $event"
                 @remove="removeCaption(index, caption)"
               ></caption-row>
-              <p class="default-caption-instructions text-muted">
-                Select the default caption to display for this video.
-              </p>
               <b-button class="mt-3" @click="addCaption">
                 <i class="fas fa-plus icon"></i>
                 Add caption
@@ -102,7 +100,7 @@
             </template>
           </b-form-group>
         </b-overlay>
-        <b-alert v-if="pendingCaptions.length > 0" show variant="danger">
+        <b-form-group v-if="pendingCaptions.length > 0" label="Pending captions">
           <caption-row
             v-for="(caption, index) in pendingCaptions"
             :key="caption.id"
@@ -115,7 +113,7 @@
             @move="moveFromPending(index, caption)"
             @remove="removePendingCaption(index)"
           ></caption-row>
-        </b-alert>
+        </b-form-group>
       </b-col>
     </b-row>
   </div>
@@ -130,8 +128,9 @@ import { mapMutations } from "vuex"
 import CaptionRow from "./CaptionRow"
 
 const defaultCaption = {
-  fileUrl: "",
+  captionUrl: "",
   language: "English",
+  label: undefined,
 }
 
 export default {
@@ -320,15 +319,3 @@ export default {
   },
 }
 </script>
-
-<style lang="scss" scoped>
-.default-caption-instructions {
-  margin-left: 17px;
-  margin-bottom: 0;
-
-  &::before {
-    font-weight: bold;
-    content: "↑ ";
-  }
-}
-</style>

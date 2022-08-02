@@ -441,7 +441,22 @@ export default {
     },
     hasUnsavedChanges() {
       const oldNode = this.getNode(this.nodeId)
-      return this.type === "add" || !Helpers.nodeEqual(oldNode, this.node)
+      return (
+        this.type === "add" ||
+        !Helpers.nodeEqual(oldNode, this.node, {
+          captionUrl: (oldUrl, newUrl) => {
+            if (oldUrl !== newUrl) {
+              const oldUrlParams = new URLSearchParams(oldUrl)
+              const newUrlParams = new URLSearchParams(newUrl)
+              return (
+                oldUrlParams.get("captionAssetId") ===
+                newUrlParams.get("captionAssetId")
+              )
+            }
+            return true
+          },
+        })
+      )
     },
     isMultiContentNodeChild() {
       return this.parent && this.parent.mediaType == "multi-content"
@@ -1031,7 +1046,7 @@ export default {
         if (this.node.typeData.captions) {
           if (
             this.node.typeData.captions.some(
-              caption => !caption.fileUrl?.endsWith(".vtt")
+              caption => !caption.captionUrl?.endsWith(".vtt")
             )
           ) {
             errMsgs.push("Please upload a WebVTT file for each caption")

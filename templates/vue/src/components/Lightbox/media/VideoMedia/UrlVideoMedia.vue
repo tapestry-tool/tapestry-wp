@@ -22,7 +22,7 @@
         :default="caption.id === defaultCaptionId"
         kind="captions"
         :label="caption.label || caption.language"
-        :src="caption.fileUrl"
+        :src="caption.captionUrl"
         :srclang="getLanguageCode(caption.language)"
       />
     </video>

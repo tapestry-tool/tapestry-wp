@@ -1,45 +1,95 @@
 <template>
-  <b-input-group class="caption-container mt-2">
-    <b-input-group-prepend :is-text="!isPending">
-      <b-button v-if="isPending" variant="primary" @click="$emit('move')">
-        +
-      </b-button>
-      <b-form-checkbox
-        v-else
-        :checked="isSelected"
-        @change="$emit('setDefault', $event ? caption.id : null)"
-      ></b-form-checkbox>
-    </b-input-group-prepend>
-    <b-input-group-prepend v-if="isPending && errorMessage" is-text>
-      <i
-        :id="`caption-error-message-${caption.id}`"
-        class="far fa-question-circle"
-      ></i>
-      <b-tooltip :target="`caption-error-message-${caption.id}`" triggers="hover">
-        {{ errorMessage }}
-      </b-tooltip>
-    </b-input-group-prepend>
-    <b-form-input v-model="caption.label" placeholder="Label" />
-    <b-form-select v-model="caption.language" :options="languages"></b-form-select>
-    <file-upload
-      v-model="caption.fileUrl"
-      file-types=".vtt"
-      compact-mode
-      :is-image="false"
-      :file-upload-id="
-        `caption-file-upload-${isPending ? 'pending' : ''}-${caption.id}`
-      "
-    />
-    <b-input-group-append>
-      <b-button
-        :variant="isRemovable ? 'danger' : 'secondary'"
-        :disabled="!isRemovable"
-        @click="$emit('remove')"
-      >
-        <i class="fas fa-times"></i>
-      </b-button>
-    </b-input-group-append>
-  </b-input-group>
+  <b-card
+    :bg-variant="isPending ? 'danger' : 'secondary'"
+    text-variant="light"
+    class="mt-2"
+  >
+    <b-row align-v="center" class="mb-2 mx-0">
+      <div>
+        <b>{{ title }}</b>
+      </div>
+      <div v-if="isDefault" class="ml-2">
+        (default)
+      </div>
+      <div v-if="isPending && errorMessage" class="mx-1">
+        <i
+          :id="`caption-error-message-${caption.id}`"
+          class="far fa-question-circle"
+        ></i>
+        <b-tooltip :target="`caption-error-message-${caption.id}`" triggers="hover">
+          This caption could not be uploaded. {{ errorMessage }}
+        </b-tooltip>
+      </div>
+      <div class="ml-auto d-flex align-items-center">
+        <b-button
+          class="mr-1"
+          size="sm"
+          :variant="isRemovable ? 'danger' : 'light'"
+          :disabled="!isRemovable"
+          @click="$emit('remove')"
+        >
+          Delete
+        </b-button>
+        <b-button
+          v-if="isPending"
+          size="sm"
+          variant="primary"
+          @click="$emit('move')"
+        >
+          Add back
+        </b-button>
+        <b-button
+          v-else
+          size="sm"
+          variant="primary"
+          :disabled="isDefault"
+          @click="$emit('setDefault', caption.id)"
+        >
+          Set as default
+        </b-button>
+      </div>
+    </b-row>
+    <b-card bg-variant="light" text-variant="dark">
+      <b-row>
+        <b-col cols="6">
+          <b-form-group label="Source">
+            <file-upload
+              v-model="caption.captionUrl"
+              file-types=".vtt"
+              compact-mode
+              :is-image="false"
+              :file-upload-id="
+                `caption-file-upload-${isPending ? 'pending' : ''}-${caption.id}`
+              "
+            />
+          </b-form-group>
+        </b-col>
+        <b-col cols="6">
+          <b-form-group label="Language">
+            <b-form-select
+              v-model="caption.language"
+              :options="languages"
+            ></b-form-select>
+          </b-form-group>
+        </b-col>
+        <b-col>
+          <b-form-checkbox
+            switch
+            :checked="customizeLabel"
+            @change="handleCustomizeLabel($event)"
+          >
+            Customize label
+          </b-form-checkbox>
+          <b-form-input
+            v-if="customizeLabel"
+            v-model="caption.label"
+            class="mt-2"
+            :placeholder="caption.language"
+          />
+        </b-col>
+      </b-row>
+    </b-card>
+  </b-card>
 </template>
 
 <script>
@@ -50,11 +100,15 @@ export default {
     FileUpload,
   },
   props: {
+    index: {
+      type: Number,
+      required: true,
+    },
     value: {
       type: Object,
       required: true,
     },
-    isSelected: {
+    isDefault: {
       type: Boolean,
       required: false,
       default: false,
@@ -88,26 +142,26 @@ export default {
         this.$emit("input", val)
       },
     },
+    customizeLabel: {
+      get() {
+        return this.caption.label !== undefined
+      },
+      set(val) {
+        if (val) {
+          this.caption.label = ""
+        } else {
+          this.caption.label = undefined
+        }
+      },
+    },
+    title() {
+      return this.isPending ? "Pending Caption" : `Caption ${this.index + 1}`
+    },
+  },
+  methods: {
+    handleCustomizeLabel(customize) {
+      this.customizeLabel = customize
+    },
   },
 }
 </script>
-
-<style lang="scss" scoped>
-.caption-container {
-  background-color: white;
-}
-
-.caption-x-button {
-  position: absolute;
-  right: -5px;
-  top: 5px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 10px;
-  height: 10px;
-
-  border-radius: 50%;
-  z-index: 10;
-}
-</style>
