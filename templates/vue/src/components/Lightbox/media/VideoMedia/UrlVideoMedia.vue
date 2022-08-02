@@ -21,7 +21,7 @@
         :key="caption.id"
         :default="caption.id === defaultCaptionId"
         kind="captions"
-        :label="caption.label"
+        :label="caption.label || caption.language"
         :src="caption.fileUrl"
         :srclang="getLanguageCode(caption.language)"
       />
@@ -117,7 +117,7 @@ export default {
   methods: {
     ...mapMutations(["updateNode"]),
     getLanguageCode(language) {
-      return ISO6391.validate(language) ? language : ISO6391.getCode(language)
+      return ISO6391.getCode(language)
     },
     playVideo() {
       const video = this.$refs.video

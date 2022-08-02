@@ -27,6 +27,15 @@
 
     class KalturaApi
     {
+        private $languages;
+
+        public function __construct()
+        {
+            // Get available languages via reflection and cache results
+            $languageClass = new ReflectionClass(Language::class);
+            $this->languages = array_values($languageClass->getConstants());
+        }
+
         /**
          * Creates Kaltura Client and starts Kaltura Session.
          *
@@ -151,9 +160,7 @@
 
         public function getAvailableLanguages()
         {
-            $languageClass = new ReflectionClass(Language::class);
-
-            return array_values($languageClass->getConstants());
+            return array_values($this->languages);
         }
 
         public function getCaptionsAndDefaultCaption($videoEntryId)
@@ -299,13 +306,13 @@
             $requests = [];
 
             foreach ($captions as $caption) {
-                $language = $caption->language ?? 'English';
+                $language = in_array($caption->language, $this->getAvailableLanguages()) ? $caption->language : Language::UN;
 
                 $requests[$caption->id] = (object) [
                     'id' => $caption->id,
                     'file' => TapestryHelpers::getPathToMedia($caption->fileUrl),
                     'fileUrl' => $caption->fileUrl,
-                    'label' => $caption->label ?? $language,
+                    'label' => $caption->label ?? ($caption->language ?? $language),
                     'language' => $language,
                 ];
             }

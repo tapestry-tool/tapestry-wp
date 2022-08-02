@@ -87,7 +87,7 @@
                 :value="caption"
                 :is-removable="captions.length >= 2"
                 :is-selected="caption.id === defaultCaptionId"
-                :languages="useKaltura ? kalturaLanguages : languages"
+                :languages="languages"
                 @input="captions.splice(index, 1, $event)"
                 @setDefault="defaultCaptionId = $event"
                 @remove="removeCaption(index, caption)"
@@ -109,7 +109,7 @@
             :value="caption"
             is-removable
             is-pending
-            :languages="useKaltura ? kalturaLanguages : languages"
+            :languages="languages"
             :error-message="caption.errorMessage"
             @input="pendingCaptions[index] = $event"
             @move="moveFromPending(index, caption)"
@@ -131,7 +131,6 @@ import CaptionRow from "./CaptionRow"
 
 const defaultCaption = {
   fileUrl: "",
-  label: "CC",
   language: "English",
 }
 
@@ -151,7 +150,6 @@ export default {
         this.$store.state.currentEditingNode.typeData.pendingCaptions ?? [],
       editingKalturaId: false,
       isLoadingKalturaCaptions: false,
-      kalturaLanguages: [],
       languages: [],
     }
   },
@@ -199,11 +197,7 @@ export default {
     },
   },
   async created() {
-    const bcpLanguageNames = ISO6391.getAllNames()
-    bcpLanguageNames.sort()
-    this.languages = bcpLanguageNames
-
-    this.kalturaLanguages = await client.getKalturaAvailableLanguages()
+    this.languages = await this.getAllLanguages()
 
     if (this.mediaFormat === "kaltura") {
       this.useKaltura = true
@@ -214,6 +208,16 @@ export default {
     ...mapMutations(["setCurrentEditingNodeProperty", "addApiError"]),
     update(property, value) {
       this.setCurrentEditingNodeProperty({ property, value })
+    },
+    async getAllLanguages() {
+      const iso6391LanguageNames = ISO6391.getAllNames()
+      const kalturaLanguageNames = await client.getKalturaAvailableLanguages()
+      const allLanguageNames = Array.from(
+        new Set(iso6391LanguageNames.concat(kalturaLanguageNames))
+      )
+      allLanguageNames.sort()
+
+      return allLanguageNames
     },
     handleUploadChange(state) {
       this.$root.$emit("node-modal::uploading", state)
