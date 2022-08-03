@@ -44,7 +44,6 @@ Cypress.Commands.add("deleteTapestry", (title = TEST_TAPESTRY_NAME) => {
 Cypress.Commands.add("visitTapestry", () => {
   cy.visit(`/tapestry/${TEST_TAPESTRY_NAME}`)
   cy.getByTestId("tapestry-loading").should("not.exist")
-  cy.getByTestId("close-minimap").click()
 })
 
 // -- Nodes --
@@ -144,9 +143,9 @@ Cypress.Commands.add("addLink", (source, target) => {
 Cypress.Commands.add("openModal", (type, id) => {
   switch (type) {
     case "add":
-      return cy.getByTestId(`add-node-${id}`).click()
+      return cy.getByTestId(`add-node-${id}`).click({ force: true })
     case "edit":
-      return cy.getByTestId(`edit-node-${id}`).click()
+      return cy.getByTestId(`edit-node-${id}`).click({ force: true })
     case "settings":
       return cy.getByTestId("settings-button").click()
     default:
