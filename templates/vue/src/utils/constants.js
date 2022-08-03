@@ -59,3 +59,10 @@ export const scaleConstants = {
   maxNodeSizeToScreen: 0.15, // max. allowed value of: (radius of the deepest node) / min(viewWidth, viewHeight)
   minTapestrySizeToScreen: 0.6, // min. allowed value of: tapestryWidth / viewWidth
 }
+
+export const tools = {
+  ADD_NODE: "add_node",
+  ADD_LINK: "add_link",
+  SELECT: "select",
+  PAN: "pan",
+}

@@ -236,3 +236,7 @@ export function setCurrentDepth(state, depth) {
 export function setScaleConstants(state, scaleConstants) {
   state.scaleConstants = scaleConstants
 }
+
+export function setCurrentTool(state, tool) {
+  state.currentTool = tool
+}

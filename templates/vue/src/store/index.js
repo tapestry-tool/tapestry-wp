@@ -51,6 +51,7 @@ export const store = {
       maxNodeSizeToScreen: 0.15, // max. allowed value of: (radius of the deepest node) / min(viewWidth, viewHeight)
       minTapestrySizeToScreen: 0.6, // min. allowed value of: tapestryWidth / viewWidth
     },
+    currentTool: null,
   },
   getters,
   mutations,
