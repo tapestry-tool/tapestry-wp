@@ -3,6 +3,7 @@
     :bg-variant="isPending ? 'danger' : 'secondary'"
     text-variant="light"
     class="mt-2"
+    data-qa="caption-row"
   >
     <b-row align-v="center" class="mb-2 mx-0">
       <div>
@@ -43,6 +44,7 @@
           size="sm"
           variant="primary"
           :disabled="isDefault"
+          :data-qa="`caption-set-default-button-${index}`"
           @click="$emit('setDefault', caption.id)"
         >
           Set as default
@@ -68,6 +70,7 @@
           <b-form-group label="Language">
             <b-form-select
               v-model="caption.language"
+              :data-qa="`caption-language-${index}`"
               :options="languages"
             ></b-form-select>
           </b-form-group>
@@ -76,6 +79,7 @@
           <b-form-checkbox
             switch
             :checked="customizeLabel"
+            :data-qa="`caption-label-toggle-${index}`"
             @change="handleCustomizeLabel($event)"
           >
             Customize label
@@ -85,6 +89,7 @@
             v-model="caption.label"
             class="mt-2"
             :placeholder="caption.language"
+            :data-qa="`caption-label-${index}`"
           />
         </b-col>
       </b-row>

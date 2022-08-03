@@ -75,6 +75,7 @@
           <b-form-group label="Captions">
             <b-form-checkbox
               v-model="useCaptions"
+              data-qa="node-captions-toggle"
               switch
               @change="handleToggleCaptions"
             >
@@ -93,7 +94,11 @@
                 @setDefault="defaultCaptionId = $event"
                 @remove="removeCaption(index, caption)"
               ></caption-row>
-              <b-button class="mt-3" @click="addCaption">
+              <b-button
+                class="mt-3"
+                data-qa="add-caption-button"
+                @click="addCaption"
+              >
                 <i class="fas fa-plus icon"></i>
                 Add caption
               </b-button>

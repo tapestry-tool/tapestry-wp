@@ -165,4 +165,80 @@ describe("Video", () => {
       })
     })
   })
+
+  it("should be able to add a caption to a video", () => {
+    const url =
+      "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
+    const label0 = "Custom Label"
+
+    cy.intercept("POST", "**/async-upload.php").as("upload")
+
+    cy.getSelectedNode().then(node => {
+      cy.openModal("edit", node.id)
+      cy.changeMediaType("video")
+      cy.getByTestId(`node-video-url`).type(url)
+
+      cy.getByTestId("node-captions-toggle").click({ force: true })
+      cy.getByTestId("caption-row").should("have.length", 1)
+
+      cy.getByTestId("import-file-input")
+        .last()
+        .attachFile("captions.vtt")
+      cy.wait("@upload")
+
+      // Test a Kaltura-only language
+      cy.getByTestId("caption-language-0").select("Nisgaa")
+
+      // Test customized label
+      cy.getByTestId("caption-label-0").should("not.exist")
+      cy.getByTestId("caption-label-toggle-0").click({ force: true })
+      cy.getByTestId("caption-label-0").type(label0)
+
+      // Add another caption
+      cy.getByTestId("add-caption-button").click()
+      cy.getByTestId("caption-row").should("have.length", 2)
+
+      cy.getByTestId("import-file-input")
+        .last()
+        .attachFile("captions.vtt")
+      cy.wait("@upload")
+
+      // Test an ISO 639-1 only language
+      cy.getByTestId("caption-language-1").select("Divehi")
+
+      // Continue without customizing label
+      // Set default caption
+      cy.getByTestId("caption-set-default-button-1").click()
+      cy.getByTestId("caption-row")
+        .last()
+        .contains("(default)")
+        .should("exist")
+
+      cy.submitModal()
+
+      cy.openLightbox(node.id).within(() => {
+        cy.get("video").within(() => {
+          cy.get("track").should("have.length", 2)
+          cy.get("track")
+            .first()
+            .as("caption-0")
+          cy.get("track")
+            .last()
+            .as("caption-1")
+
+          cy.get("@caption-0").should("have.attr", "kind", "captions")
+          cy.get("@caption-0").should("have.attr", "label", label0)
+          cy.get("@caption-0").should("have.attr", "srclang", "")
+
+          cy.get("@caption-1").should("have.attr", "kind", "captions")
+          cy.get("@caption-1").should("have.attr", "label", "Divehi")
+          cy.get("@caption-1").should("have.attr", "srclang", "dv")
+          cy.get("@caption-1")
+            .invoke("attr", "default")
+            .should("be.ok")
+        })
+      })
+      cy.closeLightbox()
+    })
+  })
 })
