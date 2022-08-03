@@ -445,6 +445,8 @@ export default {
         this.type === "add" ||
         !Helpers.nodeEqual(oldNode, this.node, {
           captionUrl: (oldUrl, newUrl) => {
+            // Caption URLs fetched from Kaltura include a string that identifies the current Kaltura session, which changes every time -
+            // so we use a custom comparison that only compares the caption asset ID
             if (oldUrl !== newUrl) {
               const oldUrlParams = new URLSearchParams(oldUrl)
               const newUrlParams = new URLSearchParams(newUrl)
