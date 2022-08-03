@@ -44,6 +44,7 @@ Cypress.Commands.add("deleteTapestry", (title = TEST_TAPESTRY_NAME) => {
 Cypress.Commands.add("visitTapestry", () => {
   cy.visit(`/tapestry/${TEST_TAPESTRY_NAME}`)
   cy.getByTestId("tapestry-loading").should("not.exist")
+  cy.getByTestId("close-minimap").click()
 })
 
 // -- Nodes --
