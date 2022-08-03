@@ -143,9 +143,10 @@ Cypress.Commands.add("addLink", (source, target) => {
 Cypress.Commands.add("openModal", (type, id) => {
   switch (type) {
     case "add":
-      return cy.getByTestId(`add-node-${id}`).click({ force: true })
+      return cy.getByTestId(`add-node-${id}`).click()
     case "edit":
-      return cy.getByTestId(`edit-node-${id}`).click({ force: true })
+      cy.getByTestId(`edit-node-${id}`).click({ force: true })
+      return cy.getByTestId("node-modal").should("be.visible")
     case "settings":
       return cy.getByTestId("settings-button").click()
     default:

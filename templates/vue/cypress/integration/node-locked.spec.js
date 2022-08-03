@@ -35,7 +35,7 @@ describe("Locked Nodes", () => {
         cy.login("subscriber").visitTapestry()
         cy.getByTestId(`open-node-${child.id}`).should("have.attr", "aria-disabled")
 
-        cy.getNodeById(child.id).click()
+        cy.getNodeById(child.id).click({ force: true })
         cy.contains(/this content will be unlocked/i).should("be.visible")
 
         cy.intercept("POST", "**/progress").as("complete")
