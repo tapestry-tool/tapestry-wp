@@ -1,36 +1,33 @@
 <template>
   <div class="toolbar" aria-label="Tapestry Toolbar">
-    <tapestry-filter v-if="false && !showMap" style="z-index: 10" />
-    <div>
-      <b-container class="can-edit">
-        <b-row align-v="center">
-          <template v-if="isLoggedIn">
-            <b-col class="p-0">
-              <user-settings-button
-                data-qa="user-settings-button"
-              ></user-settings-button>
+    <b-container class="can-edit">
+      <b-row align-v="center">
+        <template v-if="isLoggedIn">
+          <b-col class="p-0">
+            <user-settings-button
+              data-qa="user-settings-button"
+            ></user-settings-button>
+          </b-col>
+          <template v-if="canEdit || (!showMap && hasDepth)">
+            <b-col v-if="canEdit" class="p-0">
+              <help-button />
             </b-col>
-            <template v-if="canEdit || (!showMap && hasDepth)">
-              <b-col v-if="canEdit" class="p-0">
-                <help-button />
-              </b-col>
-              <b-col v-if="canEdit && settings.submitNodesEnabled" class="p-0">
-                <review-notifications />
-              </b-col>
-              <b-col v-if="canEdit" class="p-0">
-                <settings-modal-button :max-depth="maxDepth"></settings-modal-button>
-              </b-col>
-            </template>
+            <b-col v-if="canEdit && settings.submitNodesEnabled" class="p-0">
+              <review-notifications />
+            </b-col>
+            <b-col v-if="canEdit" class="p-0">
+              <settings-modal-button :max-depth="maxDepth"></settings-modal-button>
+            </b-col>
           </template>
-          <tapestry-depth-slider
-            v-if="false"
-            v-show="!showMap && hasDepth"
-            @change="updateViewBox"
-            @change:max-depth="maxDepth = $event"
-          ></tapestry-depth-slider>
-        </b-row>
-      </b-container>
-    </div>
+        </template>
+        <tapestry-depth-slider
+          v-if="false"
+          v-show="!showMap && hasDepth"
+          @change="updateViewBox"
+          @change:max-depth="maxDepth = $event"
+        ></tapestry-depth-slider>
+      </b-row>
+    </b-container>
   </div>
 </template>
 
@@ -39,7 +36,6 @@ import { mapMutations, mapState } from "vuex"
 import TapestryDepthSlider from "./TapestryDepthSlider"
 import SettingsModalButton from "./SettingsModalButton"
 import UserSettingsButton from "./UserSettingsButton"
-import TapestryFilter from "./TapestryFilter"
 import ReviewNotifications from "./ReviewNotifications"
 import HelpButton from "./HelpButton"
 import * as wp from "@/services/wp"
@@ -47,7 +43,6 @@ import * as wp from "@/services/wp"
 export default {
   components: {
     TapestryDepthSlider,
-    TapestryFilter,
     SettingsModalButton,
     ReviewNotifications,
     UserSettingsButton,

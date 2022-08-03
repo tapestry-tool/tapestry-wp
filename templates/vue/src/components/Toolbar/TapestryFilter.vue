@@ -361,10 +361,7 @@ export default {
 <style lang="scss" scoped>
 .filter {
   display: flex;
-  height: 3.5rem;
-  background: var(--bg-color-secondary);
-  box-shadow: 0 0 7px 0 var(--bg-color-primary);
-  padding: 0.5rem;
+  height: 36px;
   border-radius: 8px;
 
   button {
