@@ -6,6 +6,7 @@
       data-qa="tapestry-map"
     />
     <tapestry-main v-else-if="viewingTapestry" ref="graph" />
+    <tapestry-title />
     <toolbar />
   </div>
 </template>
@@ -17,12 +18,14 @@ import Toolbar from "./Toolbar"
 import TapestryMain from "./TapestryMain"
 import { mapMutations, mapState } from "vuex"
 import TapestryMap from "./TapestryMap"
+import TapestryTitle from "./TapestryTitle"
 
 export default {
   components: {
     TapestryMap,
     Toolbar,
     TapestryMain,
+    TapestryTitle,
   },
   data() {
     return {}
