@@ -219,7 +219,6 @@
 
             $filter = new CaptionAssetFilter();
             $filter->entryIdEqual = $videoEntryId;
-            // $filter->statusEqual = CaptionAssetStatus::READY;        // TODO: is this filter useful?
 
             $captionAssets = $captionPlugin->captionAsset->listAction($filter);
 
