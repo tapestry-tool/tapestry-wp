@@ -15,7 +15,6 @@
     use Kaltura\Client\Enum\MediaType;
     use Kaltura\Client\Enum\SessionType;
     use Kaltura\Client\Plugin\Caption\CaptionPlugin;
-    use Kaltura\Client\Plugin\Caption\Enum\CaptionAssetStatus;
     use Kaltura\Client\Plugin\Caption\Enum\CaptionType;
     use Kaltura\Client\Plugin\Caption\Type\CaptionAsset;
     use Kaltura\Client\Plugin\Caption\Type\CaptionAssetFilter;
