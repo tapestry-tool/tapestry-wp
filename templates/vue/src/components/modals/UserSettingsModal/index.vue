@@ -46,7 +46,6 @@
 </template>
 
 <script>
-import DragSelectModular from "@/utils/dragSelectModular"
 import ThemeForm from "./ThemeForm"
 import DeveloperForm from "./DeveloperForm"
 import { mapActions } from "vuex"
@@ -69,14 +68,8 @@ export default {
     },
   },
   mounted() {
-    this.$root.$on("bv::modal::show", (_, modalId) => {
-      if (modalId === "user-settings-modal") {
-        DragSelectModular.removeDragSelectListener()
-      }
-    })
     this.$root.$on("bv::modal::hide", (_, modalId) => {
       if (modalId === "user-settings-modal") {
-        DragSelectModular.addDragSelectListener()
         this.$emit("close")
       }
     })

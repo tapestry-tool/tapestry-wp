@@ -283,7 +283,6 @@ import Helpers from "@/utils/Helpers"
 import * as Comment from "@/utils/comments"
 import { sizes, nodeStatus } from "@/utils/constants"
 import { getLinkMetadata } from "@/services/LinkPreviewApi"
-import DragSelectModular from "@/utils/dragSelectModular"
 import * as wp from "@/services/wp"
 
 const shouldFetch = (url, selectedNode) => {
@@ -523,12 +522,9 @@ export default {
       handler(show) {
         if (show) {
           if (this.isValid()) {
-            DragSelectModular.removeDragSelectListener()
             this.loading = false
             this.initialize()
           }
-        } else {
-          DragSelectModular.addDragSelectListener()
         }
       },
     },

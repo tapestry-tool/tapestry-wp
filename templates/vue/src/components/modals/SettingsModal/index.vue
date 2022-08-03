@@ -309,7 +309,6 @@ import { mapGetters, mapState, mapActions } from "vuex"
 import FileUpload from "../common/FileUpload"
 import DuplicateTapestryButton from "./DuplicateTapestryButton"
 import PermissionsTable from "../common/PermissionsTable"
-import DragSelectModular from "@/utils/dragSelectModular"
 import { data as wpData } from "@/services/wp"
 import client from "@/services/TapestryAPI"
 
@@ -401,14 +400,8 @@ export default {
   },
   mounted() {
     this.getSettings()
-    this.$root.$on("bv::modal::show", (_, modalId) => {
-      if (modalId === "settings-modal") {
-        DragSelectModular.removeDragSelectListener()
-      }
-    })
     this.$root.$on("bv::modal::hide", (_, modalId) => {
       if (modalId === "settings-modal") {
-        DragSelectModular.addDragSelectListener()
         this.$emit("close")
       }
     })
