@@ -16,24 +16,17 @@
               <review-notifications />
             </b-col>
             <b-col v-if="canEdit" class="p-0">
-              <settings-modal-button :max-depth="maxDepth"></settings-modal-button>
+              <settings-modal-button></settings-modal-button>
             </b-col>
           </template>
         </template>
-        <tapestry-depth-slider
-          v-if="false"
-          v-show="!showMap && hasDepth"
-          @change="updateViewBox"
-          @change:max-depth="maxDepth = $event"
-        ></tapestry-depth-slider>
       </b-row>
     </b-container>
   </div>
 </template>
 
 <script>
-import { mapMutations, mapState } from "vuex"
-import TapestryDepthSlider from "./TapestryDepthSlider"
+import { mapState } from "vuex"
 import SettingsModalButton from "./SettingsModalButton"
 import UserSettingsButton from "./UserSettingsButton"
 import ReviewNotifications from "./ReviewNotifications"
@@ -42,24 +35,18 @@ import * as wp from "@/services/wp"
 
 export default {
   components: {
-    TapestryDepthSlider,
     SettingsModalButton,
     ReviewNotifications,
     UserSettingsButton,
     HelpButton,
   },
-  data() {
-    return {
-      maxDepth: 0,
-    }
-  },
   computed: {
-    ...mapState(["nodes", "links", "selection", "settings", "rootId"]),
+    ...mapState(["settings"]),
     canEdit() {
       return wp.canEditTapestry()
     },
     hasDepth() {
-      return this.maxDepth > 1 && this.settings.defaultDepth > 0
+      return this.maxLevel > 1 && this.settings.defaultDepth > 0
     },
     showMap() {
       return this.settings.renderMap
@@ -69,14 +56,8 @@ export default {
     },
   },
   methods: {
-    ...mapMutations(["select", "unselect", "clearSelection"]),
-    updateViewBox() {
-      this.$parent.updateViewBox()
-    },
-    getNodeDimensions() {
-      this.$parent.getNodeDimensions()
-    },
     hideToolbar() {
+      // TODO: if this is still needed, add the necessary CSS for hiding the toolbar
       return !(this.canEdit || (!this.showMap && this.hasDepth))
     },
   },

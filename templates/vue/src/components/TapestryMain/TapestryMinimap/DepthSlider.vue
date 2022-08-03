@@ -54,46 +54,8 @@ export default {
     selectedNodeId() {
       return Number(this.$route.params.nodeId)
     },
-    levels() {
-      return []
-      // TODO: remove dependency on levels (using manual levels now), and safely delete code below.
-      /*
-      if (!Object.keys(this.nodes).length) {
-        return []
-      }
-
-      const levels = {}
-      const queue = []
-      const visited = new Set()
-
-      queue.push(this.selectedNodeId)
-      visited.add(this.selectedNodeId)
-      levels[this.selectedNodeId] = 0
-
-      while (queue.length > 0) {
-        const currentNodeId = queue.shift()
-        const neighbours = this.getNeighbours(currentNodeId)
-        neighbours
-          .filter(childId => !visited.has(childId))
-          .forEach(childId => {
-            levels[childId] = levels[currentNodeId] + 1
-            queue.push(childId)
-            visited.add(childId)
-          })
-      }
-
-      const levelsArray = []
-      Object.entries(levels).forEach(([nodeId, level]) => {
-        const nodesAtLevel = levelsArray[level] || []
-        nodesAtLevel.push(nodeId)
-        levelsArray[level] = nodesAtLevel
-      })
-      return levelsArray
-      */
-    },
     maxDepth() {
       return this.maxLevel
-      // return this.levels.length
     },
     zoomInBg() {
       return "url(" + Helpers.getImagePath(ZoomIn) + ")"
@@ -115,12 +77,6 @@ export default {
       immediate: true,
       handler: function() {
         this.updateNodeTypes()
-      },
-    },
-    maxDepth: {
-      immediate: true,
-      handler: function(maxDepth) {
-        this.$emit("change:max-depth", maxDepth)
       },
     },
   },

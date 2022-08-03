@@ -9,7 +9,6 @@
     <settings-modal
       :show="settingsModalOpen"
       :tab="tab"
-      :max-depth="maxDepth"
       @close="close"
       @change:tab="changeTab"
     ></settings-modal>
@@ -26,12 +25,6 @@ export default {
   components: {
     SettingsModal,
     TapestryIcon,
-  },
-  props: {
-    maxDepth: {
-      type: Number,
-      required: true,
-    },
   },
   computed: {
     settingsModalOpen: {

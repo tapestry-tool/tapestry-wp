@@ -72,7 +72,7 @@
               class="depth-slider"
               type="range"
               min="0"
-              :max="maxDepth || 3"
+              :max="maxLevel"
             ></b-form-input>
             <p class="my-2 p-0 text-muted small">
               <strong>Note:</strong>
@@ -340,10 +340,6 @@ export default {
       required: false,
       default: "",
     },
-    maxDepth: {
-      type: Number,
-      required: true,
-    },
   },
   data() {
     return {
@@ -371,7 +367,7 @@ export default {
   },
   computed: {
     ...mapGetters(["tapestryJson"]),
-    ...mapState(["settings", "rootId", "nodes", "apiError"]),
+    ...mapState(["settings", "rootId", "nodes", "apiError", "maxLevel"]),
     latRangeValid() {
       return (
         this.getCoord(this.mapBounds.neLat, 90) >

@@ -25,14 +25,24 @@
         <i class="fas fa-times"></i>
       </button>
     </div>
+    <depth-indicator
+      :style="{
+        right: width + 'px',
+      }"
+    ></depth-indicator>
   </div>
 </template>
 
 <script>
 import Helpers from "@/utils/Helpers"
 import { mapState } from "vuex"
+import DepthIndicator from "./DepthIndicator"
+
 export default {
   name: "tapestry-minimap",
+  components: {
+    DepthIndicator,
+  },
   props: {
     viewBox: {
       type: Array,
