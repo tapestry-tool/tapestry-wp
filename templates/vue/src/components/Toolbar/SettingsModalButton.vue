@@ -88,21 +88,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.settings-button,
-.settings-button:focus {
-  padding: 0.5rem;
-  background: none;
-  color: #999;
-  font-size: 1.2em;
-  transition: all 0.2s ease;
-}
-
-.settings-button:hover {
-  background: none;
-  color: var(--highlight-color);
-  transform: scale(1.1);
-}
-
 .settings-button:only-child {
   margin-right: 12px;
 }

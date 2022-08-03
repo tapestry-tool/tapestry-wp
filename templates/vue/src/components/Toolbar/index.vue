@@ -1,7 +1,7 @@
 <template>
   <div class="toolbar" aria-label="Tapestry Toolbar">
-    <tapestry-filter v-if="!showMap" style="z-index: 10" />
-    <div :class="[{ 'hide-toolbar': hideToolbar }, 'slider-wrapper']">
+    <tapestry-filter v-if="false && !showMap" style="z-index: 10" />
+    <div>
       <b-container class="can-edit">
         <b-row align-v="center">
           <template v-if="isLoggedIn">
@@ -23,6 +23,7 @@
             </template>
           </template>
           <tapestry-depth-slider
+            v-if="false"
             v-show="!showMap && hasDepth"
             @change="updateViewBox"
             @change:max-depth="maxDepth = $event"
@@ -91,13 +92,24 @@ export default {
 .toolbar {
   position: absolute;
   top: 0;
-  left: 0;
   right: 0;
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  padding: 0 5vw;
+  padding-right: 5vw;
   transition: all 0.2s ease-out;
+
+  button {
+    color: var(--text-color-tertiary);
+    padding: 0.5rem;
+    background: none;
+    font-size: 1.2em;
+    transition: all 0.2s ease;
+
+    &.active,
+    &:hover {
+      background: none;
+      color: var(--highlight-color);
+      transform: scale(1.1);
+    }
+  }
 
   .slider-wrapper {
     background: var(--bg-color-secondary);

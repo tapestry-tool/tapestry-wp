@@ -150,21 +150,6 @@ ul {
   }
 }
 
-button {
-  padding: 0.5rem;
-  background: none;
-  color: #999;
-  font-size: 1.2em;
-  transition: all 0.2s ease;
-
-  &.active,
-  &:hover {
-    background: none;
-    color: var(--highlight-color);
-    transform: scale(1.1);
-  }
-}
-
 .count {
   position: absolute;
   top: 2px;
