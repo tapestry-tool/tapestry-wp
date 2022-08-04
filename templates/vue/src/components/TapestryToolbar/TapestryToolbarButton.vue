@@ -63,7 +63,7 @@ export default {
 <style lang="scss" scoped>
 .tapestry-toolbar-button {
   color: var(--text-color-tertiary);
-  padding: 0 18px;
+  padding: 0 15px;
   background: none;
   font-size: 1.2em;
   transition: all 0.2s ease;
