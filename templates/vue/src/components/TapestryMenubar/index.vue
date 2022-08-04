@@ -69,6 +69,7 @@ export default {
   position: absolute;
   top: 0;
   right: 0;
+  padding-top: 1vh;
   padding-right: 5vw;
   transition: all 0.2s ease-out;
 
