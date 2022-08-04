@@ -7,14 +7,14 @@
     />
     <tapestry-main v-else-if="viewingTapestry" ref="graph" />
     <tapestry-title />
-    <toolbar />
+    <tapestry-menubar />
   </div>
 </template>
 
 <script>
 import client from "../services/TapestryAPI"
 import { names } from "@/config/routes"
-import Toolbar from "./Toolbar"
+import TapestryMenubar from "./TapestryMenubar"
 import TapestryMain from "./TapestryMain"
 import { mapMutations, mapState } from "vuex"
 import TapestryMap from "./TapestryMap"
@@ -23,7 +23,7 @@ import TapestryTitle from "./TapestryTitle"
 export default {
   components: {
     TapestryMap,
-    Toolbar,
+    TapestryMenubar,
     TapestryMain,
     TapestryTitle,
   },
@@ -105,17 +105,9 @@ export default {
       width: calc(100% - min(400px, max(300px, 25vw)) - 2.5em);
       padding-right: 0;
 
-      .toolbar {
+      .menubar {
         padding-right: 1.5vw;
       }
-    }
-  }
-  #tapestry {
-    .empty-message {
-      margin: 30vh auto;
-    }
-    svg {
-      position: relative;
     }
   }
 }
