@@ -31,7 +31,7 @@ export default {
   position: absolute;
   top: 0;
   left: 0;
-  padding: 8px 0 0 5vw;
+  padding: calc(1vh + 8px) 0 0 5vw;
   height: 36px;
   line-height: 36px;
   display: flex;
