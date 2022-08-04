@@ -37,10 +37,13 @@ export default {
         return this.$store.state.currentDepth
       },
       set(depth) {
+        depth = parseInt(depth)
+        if (!Number.isInteger(depth)) {
+          return
+        }
         if (depth > this.maxDepth) {
           depth = this.maxDepth
         }
-        depth = parseInt(depth)
         if (depth !== this.currentDepth) {
           this.setCurrentDepth(depth)
           this.$router.push({
@@ -125,8 +128,8 @@ export default {
   },
   created() {
     const { depth } = this.$route.query
-    if (depth && Number.isInteger(depth)) {
-      this.currentDepth = parseInt(depth)
+    if (depth) {
+      this.currentDepth = depth
     }
   },
   methods: {
