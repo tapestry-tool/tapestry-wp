@@ -277,7 +277,7 @@ describe("Node Authoring", () => {
 
   describe("As subscriber:", () => {
     beforeEach(() => {
-      cy.setup("@subscriberNode", roles.SUBSCRIBER)
+      cy.setup("@subscriberNode", { role: roles.SUBSCRIBER })
     })
 
     it("should be able to add a child node using the node modal and edit as subscriber", () => {

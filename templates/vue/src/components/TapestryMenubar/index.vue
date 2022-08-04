@@ -1,5 +1,5 @@
 <template>
-  <div class="menu-bar" aria-label="Tapestry Menu Bar">
+  <div class="tapestry-menubar" aria-label="Tapestry Menubar">
     <b-container class="can-edit">
       <b-row align-v="center">
         <template v-if="isLoggedIn">
@@ -56,8 +56,8 @@ export default {
     },
   },
   methods: {
-    hideToolbar() {
-      // TODO: if this is still needed, add the necessary CSS for hiding the toolbar
+    hideMenubar() {
+      // TODO: if this is still needed, add the necessary CSS for hiding the menubar
       return !(this.canEdit || (!this.showMap && this.hasDepth))
     },
   },
@@ -65,7 +65,7 @@ export default {
 </script>
 
 <style lang="scss">
-.menu-bar {
+.tapestry-menubar {
   position: absolute;
   top: 0;
   right: 0;

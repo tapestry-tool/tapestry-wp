@@ -569,6 +569,8 @@ export default {
 
 <style lang="scss" scoped>
 #tapestry {
+  position: relative;
+
   &.can-pan {
     cursor: move;
   }
@@ -576,46 +578,13 @@ export default {
   &.panning {
     cursor: grabbing;
   }
-}
 
-#app-container {
-  position: relative;
-  transform: scale(1);
-  transform-origin: top left;
-  transition: all 0.2s ease-out;
-  width: 100%;
-  z-index: 0;
-
-  @media screen and (min-width: 500px) {
-    width: calc(100% - 2.5em);
-
-    &.sidebar-open {
-      width: calc(100% - min(400px, max(300px, 25vw)) - 2.5em);
-      padding-right: 0;
-
-      .toolbar {
-        padding-right: 1.5vw;
-      }
-    }
+  .empty-message {
+    margin: 30vh auto;
   }
-  #tapestry {
+
+  svg {
     position: relative;
-
-    .empty-message {
-      margin: 30vh auto;
-    }
-    svg {
-      position: relative;
-    }
   }
-}
-</style>
-
-<style lang="scss">
-#app {
-  background-size: cover;
-}
-#app-container .btn-link {
-  background: transparent;
 }
 </style>

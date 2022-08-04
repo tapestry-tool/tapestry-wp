@@ -4,19 +4,23 @@ import roles from "./roles"
 import { deepMerge } from "./utils"
 import { API_URL, TEST_TAPESTRY_NAME } from "./constants"
 
-Cypress.Commands.add("setup", { prevSubject: false }, (fixture, role = "admin") => {
-  if (fixture) {
-    cy.get(fixture).then(tapestry => {
-      cy.addTapestry(tapestry)
-    })
-  } else {
-    cy.addTapestry()
+Cypress.Commands.add(
+  "setup",
+  { prevSubject: false },
+  (fixture, { role = "admin", skipClosingMinimap = false } = {}) => {
+    if (fixture) {
+      cy.get(fixture).then(tapestry => {
+        cy.addTapestry(tapestry)
+      })
+    } else {
+      cy.addTapestry()
+    }
+    if (role !== "public") {
+      cy.login(role)
+    }
+    cy.visitTapestry({ skipClosingMinimap })
   }
-  if (role !== "public") {
-    cy.login(role)
-  }
-  cy.visitTapestry()
-})
+)
 
 Cypress.Commands.add("login", role => {
   const { username, password } = roles[role]
@@ -41,9 +45,12 @@ Cypress.Commands.add("deleteTapestry", (title = TEST_TAPESTRY_NAME) => {
   })
 })
 
-Cypress.Commands.add("visitTapestry", () => {
+Cypress.Commands.add("visitTapestry", ({ skipClosingMinimap = false } = {}) => {
   cy.visit(`/tapestry/${TEST_TAPESTRY_NAME}`)
   cy.getByTestId("tapestry-loading").should("not.exist")
+  if (!skipClosingMinimap) {
+    cy.getByTestId("close-minimap").click()
+  }
 })
 
 // -- Nodes --
@@ -122,10 +129,12 @@ Cypress.Commands.add("openLightbox", { prevSubject: "optional" }, (node, id) => 
   return cy.lightbox()
 })
 
-Cypress.Commands.add("closeLightbox", () => {
+Cypress.Commands.add("closeLightbox", ({ skipWaitingForFocus = false } = {}) => {
   cy.getByTestId("close-lightbox").click()
   // ensure focus returns to a node before doing anything else
-  cy.focused().should("have.class", "node")
+  if (!skipWaitingForFocus) {
+    cy.focused().should("have.class", "node")
+  }
 })
 
 // -- Links --
@@ -149,8 +158,7 @@ Cypress.Commands.add("openModal", (type, id) => {
     case "add":
       return cy.getByTestId(`add-node-${id}`).click()
     case "edit":
-      cy.getByTestId(`edit-node-${id}`).click({ force: true })
-      return cy.getByTestId("node-modal").should("be.visible")
+      return cy.getByTestId(`edit-node-${id}`).click()
     case "settings":
       return cy.getByTestId("settings-button").click()
     default:

@@ -7,7 +7,7 @@
 
 <script>
 import { mapState } from "vuex"
-import TapestryFilter from "./Toolbar/TapestryFilter"
+import TapestryFilter from "./TapestryMenubar/TapestryFilter"
 
 export default {
   components: {
