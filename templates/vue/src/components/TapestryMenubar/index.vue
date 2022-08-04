@@ -1,5 +1,5 @@
 <template>
-  <div class="menubar" aria-label="Tapestry Menubar">
+  <div class="tapestry-menubar" aria-label="Tapestry Menubar">
     <b-container class="can-edit">
       <b-row align-v="center">
         <template v-if="isLoggedIn">
@@ -65,7 +65,7 @@ export default {
 </script>
 
 <style lang="scss">
-.menubar {
+.tapestry-menubar {
   position: absolute;
   top: 0;
   right: 0;

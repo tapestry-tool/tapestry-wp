@@ -105,7 +105,7 @@ export default {
       width: calc(100% - min(400px, max(300px, 25vw)) - 2.5em);
       padding-right: 0;
 
-      .menubar {
+      .tapestry-menubar {
         padding-right: 1.5vw;
       }
     }
