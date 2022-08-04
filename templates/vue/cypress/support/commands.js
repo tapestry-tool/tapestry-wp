@@ -7,7 +7,7 @@ import { API_URL, TEST_TAPESTRY_NAME } from "./constants"
 Cypress.Commands.add(
   "setup",
   { prevSubject: false },
-  (fixture, { role = "admin", skipClosingMinimap = false }) => {
+  (fixture, { role = "admin", skipClosingMinimap = false } = {}) => {
     if (fixture) {
       cy.get(fixture).then(tapestry => {
         cy.addTapestry(tapestry)
@@ -45,7 +45,7 @@ Cypress.Commands.add("deleteTapestry", (title = TEST_TAPESTRY_NAME) => {
   })
 })
 
-Cypress.Commands.add("visitTapestry", ({ skipClosingMinimap = false }) => {
+Cypress.Commands.add("visitTapestry", ({ skipClosingMinimap = false } = {}) => {
   cy.visit(`/tapestry/${TEST_TAPESTRY_NAME}`)
   cy.getByTestId("tapestry-loading").should("not.exist")
   if (!skipClosingMinimap) {
@@ -129,7 +129,7 @@ Cypress.Commands.add("openLightbox", { prevSubject: "optional" }, (node, id) => 
   return cy.lightbox()
 })
 
-Cypress.Commands.add("closeLightbox", ({ skipWaitingForFocus = false }) => {
+Cypress.Commands.add("closeLightbox", ({ skipWaitingForFocus = false } = {}) => {
   cy.getByTestId("close-lightbox").click()
   // ensure focus returns to a node before doing anything else
   if (!skipWaitingForFocus) {
