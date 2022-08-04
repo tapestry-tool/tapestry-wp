@@ -15,7 +15,7 @@
         :style="{ '--zoomInBg': zoomInBg, '--zoomOutBg': zoomOutBg }"
       />
     </div>
-    <p v-if="currentDepth < maxDepth" class="warning-text alert p-2 small">
+    <p v-if="false && currentDepth < maxDepth" class="warning-text alert p-2 small">
       Some nodes might be hidden because you're not at maximum depth.
     </p>
   </div>
@@ -171,6 +171,11 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
+  position: relative;
+  right: 30px;
+  bottom: -5px;
+  transform-origin: bottom right;
+  transform: rotate(90deg);
 
   div {
     img {
@@ -195,12 +200,13 @@ export default {
 .slider {
   -webkit-appearance: none;
   background: var(--bg-color-primary);
+  width: 100px;
   height: 10px;
   opacity: 0.8;
   transition: opacity 0.2s;
   position: relative;
   align-items: center;
-  margin: 0 38px;
+  margin: 0 30px;
 
   &:before,
   &:after {
