@@ -22,7 +22,7 @@ export async function buildCommand(
   { dispatch },
   { name, executeAction, undoAction, executePayload, undoPayload }
 ) {
-  // NOTE: undoAction and undoPayload are optional; they default ot the execute counterpart
+  // NOTE: undoAction and undoPayload are optional; they default to the execute counterpart
   await dispatch("command", {
     name,
     execute: async () => {
