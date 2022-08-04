@@ -79,7 +79,7 @@ describe("Search bar", () => {
   })
 
   it("should only show authors of public contributions", () => {
-    cy.setup("@oneNode", roles.SUBSCRIBER)
+    cy.setup("@oneNode", { role: roles.SUBSCRIBER })
 
     const node = {
       title: "For Review",

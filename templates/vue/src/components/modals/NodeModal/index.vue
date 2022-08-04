@@ -2,7 +2,6 @@
   <b-modal
     v-if="node"
     id="node-modal"
-    data-qa="node-modal"
     :visible="show"
     size="lg"
     class="text-muted"
@@ -33,7 +32,7 @@
         {{ title }}
       </span>
     </template>
-    <b-container fluid class="px-0">
+    <b-container fluid class="px-0" data-qa="node-modal">
       <b-overlay :show="loading" variant="white">
         <div v-if="hasSubmissionError" class="error-wrapper">
           <h5>Operation failed due to the following error(s):</h5>
