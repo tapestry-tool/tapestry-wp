@@ -44,8 +44,6 @@
 <script>
 import TapestryToolbarButton from "./TapestryToolbarButton"
 import { tools } from "@/utils/constants"
-import { mapMutations, mapState } from "vuex"
-import DragSelectModular from "@/utils/dragSelectModular"
 
 export default {
   components: {
@@ -55,29 +53,6 @@ export default {
     return {
       tools: tools,
     }
-  },
-  computed: {
-    ...mapState(["currentTool"]),
-  },
-  watch: {
-    currentTool(newTool) {
-      if (newTool === tools.SELECT) {
-        DragSelectModular.addDragSelectListener()
-      } else {
-        DragSelectModular.removeDragSelectListener()
-      }
-    },
-  },
-  mounted() {
-    this.$root.$on("bv::modal::show", () => {
-      this.setCurrentTool(null)
-    })
-    this.$root.$on("bv::modal::hide", () => {
-      this.setCurrentTool(null)
-    })
-  },
-  methods: {
-    ...mapMutations(["setCurrentTool"]),
   },
 }
 </script>

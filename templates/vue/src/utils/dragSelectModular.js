@@ -8,7 +8,6 @@ export default class DragSelectModular {
   dragSelect
 
   static initializeDragSelect(area, app, nodes) {
-    this.addDragSelectListener()
     this.app = app
     this.nodes = nodes
     this.dragSelect = new DragSelect({
@@ -22,7 +21,25 @@ export default class DragSelectModular {
       },
       onElementSelect: el => app.select(el.dataset.id),
       onElementUnselect: el => app.unselect(el.dataset.id),
+      selectorClass: "drag-select-selector",
     })
+
+    this.disableDragSelect()
+  }
+
+  static enableDragSelect() {
+    if (this.dragSelect) {
+      this.dragSelect.start()
+      this.addDragSelectListener()
+    }
+  }
+
+  static disableDragSelect() {
+    if (this.dragSelect) {
+      this.removeDragSelectListener()
+      this.dragSelect.stop(false)
+      this.dragSelect.clearSelection()
+    }
   }
 
   static dragSelectListener(evt) {

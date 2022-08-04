@@ -2,7 +2,7 @@
   <main
     id="tapestry"
     ref="app"
-    :class="{ panning: isPanning }"
+    :class="{ 'can-pan': canPan, panning: isPanning }"
     :style="{
       height: appHeight,
     }"
@@ -79,6 +79,7 @@ import Helpers from "@/utils/Helpers"
 import ZoomPanHelper from "@/utils/ZoomPanHelper"
 import { names } from "@/config/routes"
 import * as wp from "@/services/wp"
+import { tools } from "@/utils/constants"
 // import { scaleConstants } from "@/utils/constants"
 
 export default {
@@ -119,6 +120,7 @@ export default {
       "maxLevel",
       "currentDepth",
       "scaleConstants",
+      "currentTool",
     ]),
     ...mapGetters(["getNode", "getCurrentNodeNav"]),
     computedViewBox() {
@@ -131,6 +133,9 @@ export default {
     },
     canEdit() {
       return wp.canEditTapestry()
+    },
+    canPan() {
+      return this.currentTool === null || this.currentTool === tools.PAN
     },
     empty() {
       return Object.keys(this.nodes).length === 0
@@ -206,6 +211,15 @@ export default {
         // this.focusSelectedNode()
       }
     },
+    currentTool: {
+      handler(newTool) {
+        if (this.dragSelectEnabled && newTool === tools.SELECT) {
+          DragSelectModular.enableDragSelect(this.$refs.app, this, this.nodes)
+        } else {
+          DragSelectModular.disableDragSelect()
+        }
+      },
+    },
   },
   created() {
     const { scale, x, y } = this.$route.query
@@ -221,8 +235,7 @@ export default {
   },
   mounted() {
     if (this.dragSelectEnabled) {
-      // ! disabled drag select in favor of panning
-      // DragSelectModular.initializeDragSelect(this.$refs.app, this, this.nodes)
+      DragSelectModular.initializeDragSelect(this.$refs.app, this, this.nodes)
     }
     this.updateViewBox()
     this.dragSelectReady = true
@@ -243,9 +256,7 @@ export default {
         )
       },
       () => {
-        this.isPanning = false
-        this.updateOffset()
-        this.fetchAppDimensions()
+        this.handlePanEnd()
       }
     )
     this.zoomPanHelper.register()
@@ -255,13 +266,20 @@ export default {
     this.$nextTick(() => {
       this.updateAppHeight()
     })
+
+    this.$root.$on("bv::modal::show", () => {
+      this.setCurrentTool(null)
+    })
+    this.$root.$on("bv::modal::hide", () => {
+      this.setCurrentTool(null)
+    })
   },
   beforeDestroy() {
     this.zoomPanHelper && this.zoomPanHelper.unregister()
     this.$refs.app.removeEventListener("keydown", this.handleKey)
   },
   methods: {
-    ...mapMutations(["select", "unselect", "clearSelection"]),
+    ...mapMutations(["select", "unselect", "clearSelection", "setCurrentTool"]),
     ...mapActions([
       "goToNodeChildren",
       "goToNodeParent",
@@ -329,6 +347,9 @@ export default {
       this.scale = newScale
     },
     handlePan(dx, dy) {
+      if (!this.canPan) {
+        return
+      }
       if (!this.appDimensions) {
         this.fetchAppDimensions()
       }
@@ -340,6 +361,14 @@ export default {
       dy = (dy / height) * this.viewBox[3]
       this.offset.x -= dx
       this.offset.y -= dy
+    },
+    handlePanEnd() {
+      if (!this.canPan) {
+        return
+      }
+      this.isPanning = false
+      this.updateOffset()
+      this.fetchAppDimensions()
     },
     handleMinimapPanBy({ dx, dy }) {
       this.zoomPanHelper.onPan(dx, dy)
@@ -538,7 +567,9 @@ export default {
 
 <style lang="scss" scoped>
 #tapestry {
-  cursor: move;
+  &.can-pan {
+    cursor: move;
+  }
 
   &.panning {
     cursor: grabbing;
@@ -584,5 +615,9 @@ export default {
 }
 #app-container .btn-link {
   background: transparent;
+}
+
+.drag-select-selector {
+  z-index: -1;
 }
 </style>
