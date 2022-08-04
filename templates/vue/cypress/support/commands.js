@@ -122,10 +122,12 @@ Cypress.Commands.add("openLightbox", { prevSubject: "optional" }, (node, id) => 
   return cy.lightbox()
 })
 
-Cypress.Commands.add("closeLightbox", () => {
+Cypress.Commands.add("closeLightbox", ({ skipWaitingForFocus = false }) => {
   cy.getByTestId("close-lightbox").click()
   // ensure focus returns to a node before doing anything else
-  cy.focused().should("have.class", "node")
+  if (!skipWaitingForFocus) {
+    cy.focused().should("have.class", "node")
+  }
 })
 
 // -- Links --

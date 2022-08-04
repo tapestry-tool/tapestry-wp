@@ -79,7 +79,7 @@ describe("Map Tapestry", () => {
       .get(".btn > h6")
       .click({ force: true })
     cy.lightbox().should("be.visible")
-    cy.closeLightbox()
+    cy.closeLightbox({ skipWaitingForFocus: true })
   })
 
   it("should be able to click on nodes list to go to a marker and open popups", () => {
@@ -109,7 +109,7 @@ describe("Map Tapestry", () => {
               .get(".btn > h6")
               .click({ force: true })
             cy.lightbox().should("be.visible")
-            cy.closeLightbox()
+            cy.closeLightbox({ skipWaitingForFocus: true })
           }
         })
       })
