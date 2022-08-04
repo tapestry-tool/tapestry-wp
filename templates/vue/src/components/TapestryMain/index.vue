@@ -11,45 +11,46 @@
       <root-node-button v-if="canEdit" @click="addRootNode"></root-node-button>
       <div v-else class="empty-message">The requested Tapestry is empty.</div>
     </div>
-    <svg
-      v-else
-      id="vue-svg"
-      role="application"
-      aria-label="Main Tapestry View"
-      :viewBox="computedViewBox"
-    >
-      <g class="links">
-        <tapestry-link
-          v-for="link in links"
-          :key="`${link.source}-${link.target}`"
-          :source="nodes[link.source]"
-          :target="nodes[link.target]"
-          :scale="scale"
-        ></tapestry-link>
-      </g>
-      <g v-if="dragSelectEnabled && dragSelectReady" class="nodes">
-        <tapestry-node
-          v-for="(node, id) in nodes"
-          :key="id"
-          :node="node"
-          :scale="scale"
-          class="node"
-          :class="{ selectable: true }"
-          :data-id="id"
-          :root="id == selectedId"
-          @dragend="updateViewBox"
-          @mouseover="handleMouseover(id)"
-          @mouseleave="activeNode = null"
-          @mounted="dragSelectEnabled ? updateSelectableNodes(node) : null"
-          @click="handleNodeClick"
-        ></tapestry-node>
-      </g>
-      <locked-tooltip
-        v-if="activeNode"
-        :node="nodes[activeNode]"
+    <div v-else ref="dragArea">
+      <svg
+        id="vue-svg"
+        role="application"
+        aria-label="Main Tapestry View"
         :viewBox="computedViewBox"
-      ></locked-tooltip>
-    </svg>
+      >
+        <g class="links">
+          <tapestry-link
+            v-for="link in links"
+            :key="`${link.source}-${link.target}`"
+            :source="nodes[link.source]"
+            :target="nodes[link.target]"
+            :scale="scale"
+          ></tapestry-link>
+        </g>
+        <g v-if="dragSelectEnabled && dragSelectReady" class="nodes">
+          <tapestry-node
+            v-for="(node, id) in nodes"
+            :key="id"
+            :node="node"
+            :scale="scale"
+            class="node"
+            :class="{ selectable: true }"
+            :data-id="id"
+            :root="id == selectedId"
+            @dragend="updateViewBox"
+            @mouseover="handleMouseover(id)"
+            @mouseleave="activeNode = null"
+            @mounted="dragSelectEnabled ? updateSelectableNodes(node) : null"
+            @click="handleNodeClick"
+          ></tapestry-node>
+        </g>
+        <locked-tooltip
+          v-if="activeNode"
+          :node="nodes[activeNode]"
+          :viewBox="computedViewBox"
+        ></locked-tooltip>
+      </svg>
+    </div>
     <tapestry-minimap
       v-if="showMinimap"
       :view-box="unscaledViewBox"
@@ -214,7 +215,7 @@ export default {
     currentTool: {
       handler(newTool) {
         if (this.dragSelectEnabled && newTool === tools.SELECT) {
-          DragSelectModular.enableDragSelect(this.$refs.app, this, this.nodes)
+          DragSelectModular.enableDragSelect()
         } else {
           DragSelectModular.disableDragSelect()
         }
@@ -235,7 +236,7 @@ export default {
   },
   mounted() {
     if (this.dragSelectEnabled) {
-      DragSelectModular.initializeDragSelect(this.$refs.app, this, this.nodes)
+      DragSelectModular.initializeDragSelect(this.$refs.dragArea, this, this.nodes)
     }
     this.updateViewBox()
     this.dragSelectReady = true
@@ -249,14 +250,15 @@ export default {
         this.updateScale()
         this.fetchAppDimensions()
       },
-      (dx, dy) => {
+      (dx, dy, fromMinimap = false) => {
         this.handlePan(
           dx * this.scaleConstants.panSensitivity,
-          dy * this.scaleConstants.panSensitivity
+          dy * this.scaleConstants.panSensitivity,
+          fromMinimap
         )
       },
-      () => {
-        this.handlePanEnd()
+      (fromMinimap = false) => {
+        this.handlePanEnd(fromMinimap)
       }
     )
     this.zoomPanHelper.register()
@@ -346,8 +348,8 @@ export default {
 
       this.scale = newScale
     },
-    handlePan(dx, dy) {
-      if (!this.canPan) {
+    handlePan(dx, dy, fromMinimap) {
+      if (!this.canPan && !fromMinimap) {
         return
       }
       if (!this.appDimensions) {
@@ -362,8 +364,8 @@ export default {
       this.offset.x -= dx
       this.offset.y -= dy
     },
-    handlePanEnd() {
-      if (!this.canPan) {
+    handlePanEnd(fromMinimap) {
+      if (!this.canPan && !fromMinimap) {
         return
       }
       this.isPanning = false
@@ -371,8 +373,8 @@ export default {
       this.fetchAppDimensions()
     },
     handleMinimapPanBy({ dx, dy }) {
-      this.zoomPanHelper.onPan(dx, dy)
-      this.zoomPanHelper.onPanEnd()
+      this.zoomPanHelper.onPan(dx, dy, true)
+      this.zoomPanHelper.onPanEnd(true)
     },
     handleMinimapPanTo({ x, y }) {
       // x, y is in viewbox coordinates (before scaling)
@@ -615,9 +617,5 @@ export default {
 }
 #app-container .btn-link {
   background: transparent;
-}
-
-.drag-select-selector {
-  z-index: -1;
 }
 </style>

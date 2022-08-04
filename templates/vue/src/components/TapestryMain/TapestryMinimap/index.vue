@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div :class="{ 'can-pan': mouseMoved }">
     <canvas
       ref="minimap"
       :width="viewBox[2]"
@@ -265,6 +265,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.can-pan {
+  cursor: move;
+}
 .tapestry-minimap {
   position: absolute;
   bottom: 0;

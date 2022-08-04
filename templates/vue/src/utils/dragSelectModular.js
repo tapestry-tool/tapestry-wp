@@ -21,7 +21,6 @@ export default class DragSelectModular {
       },
       onElementSelect: el => app.select(el.dataset.id),
       onElementUnselect: el => app.unselect(el.dataset.id),
-      selectorClass: "drag-select-selector",
     })
 
     this.disableDragSelect()
