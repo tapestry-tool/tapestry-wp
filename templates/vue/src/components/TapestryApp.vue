@@ -7,7 +7,7 @@
     />
     <tapestry-main v-else-if="viewingTapestry" ref="graph" />
     <tapestry-title />
-    <tapestry-toolbar />
+    <tapestry-toolbar v-if="!settings.renderMap" />
     <tapestry-menubar />
   </div>
 </template>
