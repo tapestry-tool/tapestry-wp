@@ -7,7 +7,6 @@
     />
     <tapestry-main v-else-if="viewingTapestry" ref="graph" />
     <tapestry-title />
-    <tapestry-toolbar v-if="!settings.renderMap" />
     <tapestry-menubar />
   </div>
 </template>
@@ -20,7 +19,6 @@ import TapestryMain from "./TapestryMain"
 import { mapMutations, mapState } from "vuex"
 import TapestryMap from "./TapestryMap"
 import TapestryTitle from "./TapestryTitle"
-import TapestryToolbar from "./TapestryToolbar/index.vue"
 
 export default {
   components: {
@@ -28,7 +26,6 @@ export default {
     TapestryMenubar,
     TapestryMain,
     TapestryTitle,
-    TapestryToolbar,
   },
   data() {
     return {}
