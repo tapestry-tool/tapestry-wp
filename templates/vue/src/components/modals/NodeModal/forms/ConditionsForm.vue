@@ -1,18 +1,18 @@
 <template>
   <div>
     <b-form-group class="mb-3">
-      <b-form-checkbox v-model="lock">
-        Prevent access until specified conditions are met
-      </b-form-checkbox>
+      <div class="lock-node-container">
+        <b-form-checkbox v-model="lock">
+          Prevent access until specified conditions are met
+        </b-form-checkbox>
+        <b-form-checkbox v-show="lock" v-model="hideWhenLocked" switch>
+          {{ hideWhenLocked ? "Hide" : "Grey out" }}
+        </b-form-checkbox>
+      </div>
       <b-form-invalid-feedback :force-show="lock">
         Please note: Currently, locked nodes cannot be unlocked by users who are not
         logged in.
       </b-form-invalid-feedback>
-    </b-form-group>
-    <b-form-group v-if="lock" class="mb-3">
-      <b-form-checkbox v-model="hideWhenLocked">
-        Also hide this node when locked
-      </b-form-checkbox>
     </b-form-group>
     <div v-if="lock">
       <b-card
@@ -184,6 +184,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.lock-node-container {
+  display: flex;
+  justify-content: space-between;
+}
+
 .condition-container {
   position: relative;
 
