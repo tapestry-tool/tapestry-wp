@@ -6,6 +6,7 @@
       variant="danger"
       @click="handleRemoveNode"
     >
+      <i class="fas fa-trash-alt mr-1"></i>
       Delete Node
     </b-button>
   </div>
