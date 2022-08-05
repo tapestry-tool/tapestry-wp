@@ -7,7 +7,7 @@
       :tool="tools.ADD_NODE"
       tooltip="Add Node"
     />
-    <div class="separator"></div>
+    <div class="tapestry-toolbar-separator"></div>
     <tapestry-toolbar-button
       :id="`delete-node-button-${node.id}`"
       horizontal
@@ -45,6 +45,4 @@ export default {
     },
   },
 }
-
-// TODO: make sure separators still work
 </script>

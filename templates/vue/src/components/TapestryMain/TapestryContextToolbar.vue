@@ -66,12 +66,6 @@ export default {
     flex-direction: row;
     justify-content: center;
     align-items: stretch;
-
-    .separator {
-      width: 2px;
-      background-color: #fafafa;
-      margin: 0 4px;
-    }
   }
 
   // override BootstrapVue popover styles
@@ -81,5 +75,13 @@ export default {
   ::v-deep .popover-body {
     padding: 0;
   }
+}
+</style>
+
+<style lang="scss">
+.tapestry-toolbar-separator {
+  width: 2px;
+  background-color: #fafafa;
+  margin: 0 4px;
 }
 </style>

@@ -47,5 +47,4 @@ export default {
     },
   },
 }
-// TODO: make sure separators still work
 </script>
