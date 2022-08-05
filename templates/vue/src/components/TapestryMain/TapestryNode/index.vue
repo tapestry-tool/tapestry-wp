@@ -7,7 +7,6 @@
       :data-locked="!node.unlocked"
       :transform="`translate(${coordinates.x}, ${coordinates.y})`"
       :class="{
-        'half-opaque': !node.unlocked && node.hideWhenLocked,
         opaque: !visibleNodes.includes(node.id),
         'has-thumbnail': node.thumbnailURL,
         'has-title': !node.hideTitle,
@@ -325,7 +324,7 @@ export default {
       if (this.selected) {
         return "var(--highlight-color)8a"
       } else if (!this.node.unlocked) {
-        return "#8a8a8cb3"
+        return this.node.hideWhenLocked ? "#656567" : "#8a8a8cb3"
       }
       return this.thumbnailURL ? "#33333366" : "transparent"
     },
@@ -559,10 +558,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.half-opaque {
-  opacity: 0.6;
-}
-
 .opaque {
   opacity: 0.2;
 }

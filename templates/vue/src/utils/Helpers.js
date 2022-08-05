@@ -38,6 +38,15 @@ export default class Helpers {
   }
 
   /**
+   * Check if user is on a touch enabled device
+   *
+   * @returns {Boolean}
+   */
+  static isTouchEnabledDevice() {
+    return "ontouchstart" in window || navigator.maxTouchPoints > 0
+  }
+
+  /**
    * Finds the node index with node ID
    *
    * @param  {Number} id          nodeMetaId
