@@ -27,6 +27,8 @@
           <i class="fas fa-chevron-right fa-xs mx-2" />
         </b-link>
       </span>
+      <i v-if="type === 'add'" class="fas fa-plus fa-xs mr-1" />
+      <i v-else-if="type === 'edit'" class="fas fa-pen fa-xs mr-1" />
       <span data-qa="node-modal-header">
         {{ title }}
       </span>
@@ -196,7 +198,7 @@
               :disabled="loading || fileUploading || fieldsInvalid"
               @click="handlePublish"
             >
-              <span>Publish</span>
+              <span>Save and Publish</span>
             </b-button>
             <b-button
               v-else-if="settings.submitNodesEnabled"
@@ -341,7 +343,7 @@ export default {
     },
     title() {
       if (this.type === "add") {
-        return this.parent ? `Add new sub-topic to ${this.parent.title}` : "Add node"
+        return this.parent ? `Add node to ${this.parent.title}` : "Add node"
       } else if (this.type === "edit") {
         return `Edit node: ${this.node.title}`
       }
@@ -1214,14 +1216,6 @@ export default {
           ) {
             this.update("thumbnailFileId", "")
             this.update("imageURL", data.image)
-          }
-          if (
-            confirm(
-              "Would you like to use the link preview image as the locked thumbnail image?"
-            )
-          ) {
-            this.update("lockedThumbnailFileId", "")
-            this.update("lockedImageURL", data.image)
           }
         }
       }
