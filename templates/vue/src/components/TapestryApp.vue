@@ -5,8 +5,10 @@
       :is-sidebar-open="isSidebarOpen"
       data-qa="tapestry-map"
     />
-    <tapestry-main v-else-if="viewingTapestry" ref="graph" />
-    <tapestry-title />
+    <template v-else>
+      <tapestry-main v-if="viewingTapestry" ref="graph" />
+      <tapestry-title />
+    </template>
     <tapestry-menubar />
   </div>
 </template>

@@ -47,6 +47,7 @@
         :options="mapOptions"
         :bounds="getBounds"
         :max-bounds="worldBounds"
+        style="z-index: 0;"
         @update:center="updateCenter"
         @update:zoom="updateZoom"
       >
