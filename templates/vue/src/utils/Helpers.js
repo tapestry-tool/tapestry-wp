@@ -240,7 +240,11 @@ export default class Helpers {
         if (action === "move" && node.reviewStatus !== nodeStatus.ACCEPT) {
           return true
         }
-        return action === userActions.READ || node.reviewStatus !== nodeStatus.SUBMIT
+        return (
+          wp.canEditTapestry() ||
+          action === userActions.READ ||
+          (node.reviewStatus !== nodeStatus.SUBMIT && action !== userActions.ADD)
+        )
       }
       if (wp.canEditTapestry()) {
         if (action === userActions.READ) {

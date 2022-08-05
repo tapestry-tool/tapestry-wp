@@ -370,15 +370,11 @@ export default {
     },
     canPublish() {
       if (this.type === "add") {
-        return (
-          Helpers.hasPermission(this.parent, this.type) &&
-          (!this.parent || this.parent.status !== "draft")
-        )
+        return Helpers.hasPermission(this.parent, this.type)
       } else if (this.node.status === "draft" && this.type === "edit") {
-        const neighbours = this.getNeighbours(this.nodeId)
         return (
-          (neighbours.length === 0 && Helpers.hasPermission(null, "add")) ||
-          neighbours.some(neighbourId => {
+          Helpers.hasPermission(null, "add") ||
+          this.getNeighbours(this.nodeId).some(neighbourId => {
             let neighbour = this.getNode(neighbourId)
             return (
               neighbour.status !== "draft" && Helpers.hasPermission(neighbour, "add")
