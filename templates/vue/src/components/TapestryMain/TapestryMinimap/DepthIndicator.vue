@@ -82,7 +82,7 @@ export default {
         value: level,
         maxValue: this.maxLevel,
         from: 0,
-        to: 90,
+        to: 100,
       })
     },
     isCurrentLevel(level) {
