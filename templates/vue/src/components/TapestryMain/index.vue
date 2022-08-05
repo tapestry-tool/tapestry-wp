@@ -261,6 +261,7 @@ export default {
       "vue-svg",
       (delta, x, y) => {
         this.handleZoom(delta * this.scaleConstants.zoomSensitivity, x, y)
+        this.$root.$emit("context-toolbar::dismiss")
       },
       () => {
         this.updateScale()
