@@ -53,6 +53,12 @@
     </div>
     <tapestry-toolbar />
     <tapestry-node-toolbar v-for="(node, id) in nodes" :key="id" :node="node" />
+    <tapestry-link-toolbar
+      v-for="link in links"
+      :key="`${link.source}-${link.target}`"
+      :source="nodes[link.source]"
+      :target="nodes[link.target]"
+    />
     <tapestry-minimap
       v-if="showMinimap"
       :view-box="unscaledViewBox"
@@ -76,6 +82,7 @@ import TapestryNode from "./TapestryNode"
 import TapestryLink from "./TapestryLink"
 import TapestryToolbar from "./TapestryToolbar"
 import TapestryNodeToolbar from "./TapestryNodeToolbar"
+import TapestryLinkToolbar from "./TapestryLinkToolbar"
 import TapestryMinimapButton from "./TapestryMinimap/TapestryMinimapButton"
 import TapestryMinimap from "./TapestryMinimap"
 import RootNodeButton from "./RootNodeButton"
@@ -93,6 +100,7 @@ export default {
     TapestryLink,
     TapestryToolbar,
     TapestryNodeToolbar,
+    TapestryLinkToolbar,
     TapestryMinimapButton,
     TapestryMinimap,
     RootNodeButton,
@@ -221,7 +229,11 @@ export default {
     currentTool: {
       handler(newTool) {
         if (this.dragSelectEnabled && newTool === tools.SELECT) {
-          DragSelectModular.enableDragSelect()
+          DragSelectModular.initializeDragSelect(
+            this.$refs.dragArea,
+            this,
+            this.nodes
+          )
         } else {
           DragSelectModular.disableDragSelect()
         }
@@ -241,9 +253,6 @@ export default {
     }
   },
   mounted() {
-    if (this.dragSelectEnabled) {
-      DragSelectModular.initializeDragSelect(this.$refs.dragArea, this, this.nodes)
-    }
     this.updateViewBox()
     this.dragSelectReady = true
 

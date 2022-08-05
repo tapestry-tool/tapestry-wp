@@ -1,18 +1,16 @@
 <template>
-  <tapestry-context-toolbar :target="nodeElementId">
+  <tapestry-context-toolbar :target="linkElementId">
     <tapestry-toolbar-button
-      :id="`add-node-tool-${node.id}`"
+      :id="`reverse-link-button-${source.id}-${target.id}`"
       horizontal
       icon="cog"
-      :tool="tools.ADD_NODE"
-      tooltip="Add Node"
+      tooltip="Reverse Link"
     />
-    <div class="separator"></div>
     <tapestry-toolbar-button
-      :id="`delete-node-button-${node.id}`"
+      :id="`delete-link-button-${source.id}-${target.id}`"
       horizontal
       icon="cog"
-      tooltip="Delete Node"
+      tooltip="Delete Link"
     />
   </tapestry-context-toolbar>
 </template>
@@ -29,7 +27,11 @@ export default {
     TapestryToolbarButton,
   },
   props: {
-    node: {
+    source: {
+      type: Object,
+      required: true,
+    },
+    target: {
       type: Object,
       required: true,
     },
@@ -40,11 +42,10 @@ export default {
     }
   },
   computed: {
-    nodeElementId() {
-      return Helpers.getNodeElementId(this.node.id)
+    linkElementId() {
+      return Helpers.getLinkElementId(this.source.id, this.target.id)
     },
   },
 }
-
 // TODO: make sure separators still work
 </script>

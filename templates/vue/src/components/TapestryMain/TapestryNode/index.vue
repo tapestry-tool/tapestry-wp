@@ -2,7 +2,7 @@
   <transition name="fade">
     <g
       v-show="show"
-      :id="`tapestry-node-${node.id}`"
+      :id="elementId"
       ref="node"
       :aria-label="ariaLabel"
       :data-qa="`node-${node.id}`"
@@ -265,6 +265,9 @@ export default {
         return this.node.reviewStatus === nodeStatus.SUBMIT
       }
       return false
+    },
+    elementId() {
+      return Helpers.getNodeElementId(this.node.id)
     },
     isLoggedIn() {
       return wp.isLoggedIn()
@@ -579,7 +582,7 @@ export default {
     },
     handleMousedown() {
       this.isMouseDown = true
-      this.$root.$emit("node-mousedown", this.node.id)
+      this.$root.$emit("node-mousedown")
     },
     handleClick(evt) {
       if (
@@ -597,8 +600,7 @@ export default {
           : this.updateRootNode()
       }
       client.recordAnalyticsEvent("user", "click", "node", this.node.id)
-
-      this.$root.$emit("node-click", this.node.id)
+      this.$root.$emit("context-menu::click", this.elementId)
     },
     handleFocus() {
       this.isFocused = true

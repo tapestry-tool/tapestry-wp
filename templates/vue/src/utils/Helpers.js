@@ -551,4 +551,12 @@ export default class Helpers {
     return `${x1 + dx1},${y1 + dy1} ${x1 - dx1},${y1 - dy1} ${x2 - dx2},${y2 -
       dy2} ${x2 + dx2},${y2 + dy2}`
   }
+
+  static getNodeElementId(nodeId) {
+    return `tapestry-node-${nodeId}`
+  }
+
+  static getLinkElementId(sourceId, targetId) {
+    return `tapestry-link-${sourceId}-${targetId}`
+  }
 }

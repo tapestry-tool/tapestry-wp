@@ -2,6 +2,7 @@
   <transition name="fade">
     <polygon
       v-show="show"
+      :id="elementId"
       aria-hidden="true"
       :data-qa="`link-${source.id}-${target.id}`"
       :class="{
@@ -21,7 +22,7 @@
         )}))`,
       }"
       :points="polygonPoints"
-      @click="openLinkModal"
+      @click="handleClick"
     ></polygon>
   </transition>
 </template>
@@ -78,8 +79,14 @@ export default {
         this.scale
       )
     },
+    elementId() {
+      return Helpers.getLinkElementId(this.source.id, this.target.id)
+    },
   },
   methods: {
+    handleClick() {
+      this.$root.$emit("context-menu::click", this.elementId)
+    },
     openLinkModal() {
       this.$router.push({
         name: names.LINKMODAL,

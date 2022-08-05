@@ -5,7 +5,7 @@ import * as wp from "@/services/wp"
 export default class DragSelectModular {
   app
   nodes
-  dragSelect
+  dragSelect = null
 
   static initializeDragSelect(area, app, nodes) {
     this.app = app
@@ -22,22 +22,15 @@ export default class DragSelectModular {
       onElementSelect: el => app.select(el.dataset.id),
       onElementUnselect: el => app.unselect(el.dataset.id),
     })
-
-    this.disableDragSelect()
-  }
-
-  static enableDragSelect() {
-    if (this.dragSelect) {
-      this.dragSelect.start()
-      this.addDragSelectListener()
-    }
+    this.addDragSelectListener()
   }
 
   static disableDragSelect() {
-    if (this.dragSelect) {
-      this.removeDragSelectListener()
-      this.dragSelect.stop(false)
-      this.dragSelect.clearSelection()
+    if (DragSelectModular.dragSelect) {
+      DragSelectModular.removeDragSelectListener()
+      DragSelectModular.dragSelect.clearSelection()
+      DragSelectModular.dragSelect.stop()
+      DragSelectModular.dragSelect = null
     }
   }
 

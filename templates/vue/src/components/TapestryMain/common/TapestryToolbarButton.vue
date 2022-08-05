@@ -9,7 +9,6 @@
           selected: isSelected,
         },
       ]"
-      @click="toggleTool"
     >
       <tapestry-icon :icon="icon"></tapestry-icon>
     </button>
@@ -65,6 +64,12 @@ export default {
   },
   methods: {
     ...mapMutations(["setCurrentTool"]),
+    handleClick() {
+      this.$emit("click")
+      if (this.tool) {
+        this.toggleTool()
+      }
+    },
     toggleTool() {
       if (this.tool === this.currentTool) {
         this.setCurrentTool(null)
