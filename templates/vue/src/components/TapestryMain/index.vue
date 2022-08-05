@@ -4,52 +4,54 @@
       <root-node-button v-if="canEdit"></root-node-button>
       <div v-else class="empty-message">The requested Tapestry is empty.</div>
     </div>
-    <svg v-else id="vue-svg" :viewBox="computedViewBox">
-      <g class="links">
-        <tapestry-link
-          v-for="link in links"
-          :key="`${link.source}-${link.target}`"
-          :source="nodes[link.source]"
-          :target="nodes[link.target]"
-          :scale="scale"
-        ></tapestry-link>
-      </g>
-      <g v-if="!dragSelectEnabled || dragSelectReady" class="nodes">
-        <tapestry-node
-          v-for="(node, id) in nodes"
-          :key="id"
-          :node="node"
-          :scale="scale"
-          class="node"
-          :class="{ selectable: true }"
-          :data-id="id"
-          :root="id == selectedId"
-          @dragend="updateViewBox"
-          @mouseover="handleMouseover(id)"
-          @mouseleave="activeNode = null"
-          @mounted="dragSelectEnabled ? updateSelectableNodes(node) : null"
-          @click="handleNodeClick"
-        ></tapestry-node>
-      </g>
-      <locked-tooltip
-        v-if="activeNode"
-        :node="nodes[activeNode]"
-        :viewBox="computedViewBox"
-      ></locked-tooltip>
-    </svg>
-    <tapestry-minimap
-      v-if="showMinimap"
-      :view-box="unscaledViewBox"
-      :scale="scale"
-      :offset="offset"
-      @pan-by="handleMinimapPanBy"
-      @pan-to="handleMinimapPanTo"
-      @close="showMinimap = false"
-    ></tapestry-minimap>
-    <tapestry-minimap-button
-      v-else
-      @click="showMinimap = true"
-    ></tapestry-minimap-button>
+    <template v-else>
+      <svg id="vue-svg" :viewBox="computedViewBox">
+        <g class="links">
+          <tapestry-link
+            v-for="link in links"
+            :key="`${link.source}-${link.target}`"
+            :source="nodes[link.source]"
+            :target="nodes[link.target]"
+            :scale="scale"
+          ></tapestry-link>
+        </g>
+        <g v-if="!dragSelectEnabled || dragSelectReady" class="nodes">
+          <tapestry-node
+            v-for="(node, id) in nodes"
+            :key="id"
+            :node="node"
+            :scale="scale"
+            class="node"
+            :class="{ selectable: true }"
+            :data-id="id"
+            :root="id == selectedId"
+            @dragend="updateViewBox"
+            @mouseover="handleMouseover(id)"
+            @mouseleave="activeNode = null"
+            @mounted="dragSelectEnabled ? updateSelectableNodes(node) : null"
+            @click="handleNodeClick"
+          ></tapestry-node>
+        </g>
+        <locked-tooltip
+          v-if="activeNode"
+          :node="nodes[activeNode]"
+          :viewBox="computedViewBox"
+        ></locked-tooltip>
+      </svg>
+      <tapestry-minimap
+        v-if="showMinimap"
+        :view-box="unscaledViewBox"
+        :scale="scale"
+        :offset="offset"
+        @pan-by="handleMinimapPanBy"
+        @pan-to="handleMinimapPanTo"
+        @close="showMinimap = false"
+      ></tapestry-minimap>
+      <tapestry-minimap-button
+        v-else
+        @click="showMinimap = true"
+      ></tapestry-minimap-button>
+    </template>
   </main>
 </template>
 
