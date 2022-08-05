@@ -2,6 +2,7 @@
   <transition name="fade">
     <g
       v-show="show"
+      :id="`tapestry-node-${node.id}`"
       ref="node"
       :aria-label="ariaLabel"
       :data-qa="`node-${node.id}`"
@@ -23,7 +24,7 @@
       @focus="handleFocus"
       @blur="handleBlur"
       @click="handleClick"
-      @mousedown="isMouseDown = true"
+      @mousedown="handleMousedown"
       @mouseup="isMouseDown = false"
       @mouseover="handleMouseover"
       @mouseleave="handleMouseleave"
@@ -579,6 +580,10 @@ export default {
       this.isHovered = false
       this.$emit("mouseleave")
     },
+    handleMousedown() {
+      this.isMouseDown = true
+      this.$root.$emit("node-mousedown", this.node.id)
+    },
     handleClick(evt) {
       if (
         this.hasPermission("edit") &&
@@ -595,6 +600,8 @@ export default {
           : this.updateRootNode()
       }
       client.recordAnalyticsEvent("user", "click", "node", this.node.id)
+
+      this.$root.$emit("node-click", this.node.id)
     },
     handleFocus() {
       this.isFocused = true

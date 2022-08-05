@@ -52,6 +52,7 @@
       </svg>
     </div>
     <tapestry-toolbar />
+    <tapestry-node-toolbar v-for="(node, id) in nodes" :key="id" :node="node" />
     <tapestry-minimap
       v-if="showMinimap"
       :view-box="unscaledViewBox"
@@ -74,6 +75,7 @@ import { mapActions, mapGetters, mapMutations, mapState } from "vuex"
 import TapestryNode from "./TapestryNode"
 import TapestryLink from "./TapestryLink"
 import TapestryToolbar from "./TapestryToolbar"
+import TapestryNodeToolbar from "./TapestryNodeToolbar"
 import TapestryMinimapButton from "./TapestryMinimap/TapestryMinimapButton"
 import TapestryMinimap from "./TapestryMinimap"
 import RootNodeButton from "./RootNodeButton"
@@ -90,6 +92,7 @@ export default {
     TapestryNode,
     TapestryLink,
     TapestryToolbar,
+    TapestryNodeToolbar,
     TapestryMinimapButton,
     TapestryMinimap,
     RootNodeButton,

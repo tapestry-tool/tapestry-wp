@@ -2,12 +2,23 @@
   <div>
     <button
       :id="id"
-      :class="{ 'tapestry-toolbar-button': true, selected: isSelected }"
+      :class="[
+        'tapestry-toolbar-button',
+        'm-2',
+        {
+          selected: isSelected,
+        },
+      ]"
       @click="toggleTool"
     >
       <tapestry-icon :icon="icon"></tapestry-icon>
     </button>
-    <b-tooltip :target="id" triggers="hover" placement="right">
+    <b-tooltip
+      :custom-class="horizontal ? 'offset-bottom' : 'offset-left'"
+      :target="id"
+      triggers="hover"
+      :placement="horizontal ? 'top' : 'right'"
+    >
       {{ tooltip }}
     </b-tooltip>
   </div>
@@ -40,6 +51,11 @@ export default {
       type: String,
       required: true,
     },
+    horizontal: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   computed: {
     ...mapState(["currentTool"]),
@@ -63,7 +79,7 @@ export default {
 <style lang="scss" scoped>
 .tapestry-toolbar-button {
   color: var(--text-color-tertiary);
-  padding: 0 15px;
+  padding: 0;
   background: none;
   font-size: 1.2em;
   transition: all 0.2s ease;
@@ -71,5 +87,13 @@ export default {
   &.selected {
     color: var(--highlight-color);
   }
+}
+
+.offset-left {
+  left: 24px !important;
+}
+
+.offset-bottom {
+  top: -12px !important;
 }
 </style>

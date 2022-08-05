@@ -1,6 +1,6 @@
 <template>
   <div class="toolbar-wrapper" aria-label="Tapestry Toolbar">
-    <div class="toolbar toolbar-top">
+    <div class="toolbar">
       <tapestry-toolbar-button
         id="tapestry-add-node-tool"
         icon="cog"
@@ -30,8 +30,7 @@
         icon="cog"
         tooltip="Settings"
       />
-    </div>
-    <div class="toolbar toolbar-bottom">
+      <div class="separator"></div>
       <tapestry-toolbar-button id="tapestry-undo-button" icon="cog" tooltip="Undo" />
       <tapestry-toolbar-button id="tapestry-redo-button" icon="cog" tooltip="Redo" />
     </div>
@@ -39,7 +38,7 @@
 </template>
 
 <script>
-import TapestryToolbarButton from "./TapestryToolbarButton"
+import TapestryToolbarButton from "../common/TapestryToolbarButton"
 import { tools } from "@/utils/constants"
 
 export default {
@@ -67,19 +66,18 @@ export default {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: center;
+    align-items: stretch;
+    padding: 12px 0;
+    width: 60px;
+
     background-color: var(--bg-color-secondary);
     border: 2px solid #fafafa;
-    row-gap: 8px;
+    border-radius: 9px;
 
-    &.toolbar-top {
-      padding: 18px 0;
-      border-radius: 8.58974px 8.58974px 0px 0px;
-    }
-
-    &.toolbar-bottom {
-      padding: 18px 0;
-      border-radius: 0px 0px 8.58974px 8.58974px;
+    .separator {
+      height: 2px;
+      background-color: #fafafa;
+      margin: 5px 0;
     }
   }
 }
