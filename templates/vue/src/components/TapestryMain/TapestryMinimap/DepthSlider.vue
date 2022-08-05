@@ -174,9 +174,9 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  position: relative;
-  right: 30px;
-  bottom: -5px;
+  position: absolute;
+  right: 36px;
+  bottom: 0;
   transform-origin: bottom right;
   transform: rotate(90deg);
 

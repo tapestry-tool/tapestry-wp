@@ -1,10 +1,46 @@
 <template>
-  <div class="depth-indicator-container">
+  <div v-if="maxLevel > 1" class="depth-indicator-container">
+    <svg class="layer-indicator">
+      <defs>
+        <rect
+          id="indicator-layer"
+          x="0"
+          y="0"
+          width="40"
+          height="30"
+          transform="rotate(-30) translate(-5 35) skewX(30)"
+          fill-opacity="0.9"
+        />
+      </defs>
+      <use
+        v-for="level in layerOrder"
+        :key="level"
+        href="#indicator-layer"
+        x="0"
+        :y="mapValue(level)"
+        :fill="isVisibleLevel(level) ? '#6F8699' : '#C2C2C2'"
+        :stroke="isCurrentLevel(level) ? '#49CFFF' : ''"
+        :stroke-width="isCurrentLevel(level) ? 2 : 0"
+      />
+      <!--
+      <use href="#indicator-layer" x="0" y="40" fill="#C2C2C2" />
+      <use href="#indicator-layer" x="0" y="20" fill="#6F8699" />
+      <use
+        href="#indicator-layer"
+        x="0"
+        y="0"
+        fill="#6F8699"
+        stroke="#49CFFF"
+        stroke-width="2"
+      />
+      -->
+    </svg>
     <depth-slider v-show="!showMap && hasDepth"></depth-slider>
   </div>
 </template>
 
 <script>
+import Helpers from "@/utils/Helpers"
 import { mapState } from "vuex"
 import DepthSlider from "./DepthSlider"
 
@@ -13,18 +49,49 @@ export default {
   components: {
     DepthSlider,
   },
+  props: {
+    scale: {
+      type: Number,
+      required: true,
+    },
+  },
   computed: {
-    ...mapState(["settings", "maxLevel"]),
+    ...mapState(["settings", "maxLevel", "currentDepth"]),
     hasDepth() {
       return this.maxLevel > 1 && this.settings.defaultDepth > 0
     },
     showMap() {
       return this.settings.renderMap
     },
+    currentLevel() {
+      return Math.min(Helpers.getCurrentLevel(this.scale), this.maxLevel)
+    },
+    layerOrder() {
+      const layers = []
+      for (let i = this.maxLevel; i >= 1; i--) {
+        layers.push(i)
+      }
+      return layers
+    },
   },
   mounted() {},
   beforeDestroy() {},
-  methods: {},
+  methods: {
+    mapValue(level) {
+      return Helpers.mapValue({
+        value: level,
+        maxValue: this.maxLevel,
+        from: 0,
+        to: 100,
+      })
+    },
+    isCurrentLevel(level) {
+      return this.currentLevel == level
+    },
+    isVisibleLevel(level) {
+      return level < this.currentLevel + this.currentDepth
+    },
+  },
 }
 </script>
 
@@ -33,6 +100,15 @@ export default {
   position: absolute;
   bottom: 0;
   right: 0;
-  padding: 0 0.5rem 0.5rem 0;
+  width: 140px;
+  height: 160px;
+}
+
+.layer-indicator {
+  position: absolute;
+  right: 40px;
+  bottom: 0;
+  width: 100px;
+  height: 160px;
 }
 </style>
