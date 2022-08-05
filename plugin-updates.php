@@ -50,6 +50,33 @@ function tapestry_accordion_row_update()
     }
 }
 
+function tapestry_remove_invalid_links_update()
+{
+    return;
+    $query_args = array(
+        'post_type' => 'tapestry',
+    );
+    $query = new WP_Query($query_args);
+    while ($query->have_posts()) {
+        $query->the_post();
+        $post_id = get_the_ID();
+        $tapestry = get_post_meta($post_id, 'tapestry', true);
+        $nodes = $tapestry->nodes;
+        $links = $tapestry->links;
+        if (empty($nodes) || empty($links)) {
+            continue;
+        }
+        error_log($post_id . ", " . $tapestry->settings->title);
+        $filteredLinks = array_filter($links, function($link) use ($nodes) {
+            return in_array($link->source, $nodes) && in_array($link->target, $nodes);
+        });
+        if (count($filteredLinks) !== count($links)) {
+            $tapestry->links = array_values($filteredLinks);
+            // update_post_meta($post_id, 'tapestry', $tapestry);
+        }
+    }
+}
+
 function tapestry_plugin_update()
 {
     global $TAPESTRY_VERSION_NUMBER;
@@ -61,6 +88,10 @@ function tapestry_plugin_update()
         tapestry_accordion_update();
         tapestry_accordion_row_update();
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        update_option('tapestry_plugin_version', $TAPESTRY_VERSION_NUMBER);
+    }
+    if (version_compare($installed_version, '3.0.0-beta', '<')) {
+        tapestry_remove_invalid_links_update();
         update_option('tapestry_plugin_version', $TAPESTRY_VERSION_NUMBER);
     }
 }
