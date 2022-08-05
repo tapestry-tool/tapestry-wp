@@ -29,6 +29,7 @@
       :style="{
         right: width + 'px',
       }"
+      :scale="scale"
     ></depth-indicator>
   </div>
 </template>

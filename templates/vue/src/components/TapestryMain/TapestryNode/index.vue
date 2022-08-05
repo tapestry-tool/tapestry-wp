@@ -321,9 +321,6 @@ export default {
         y: this.node.coordinates.y * this.scale,
       }
     },
-    currentLevel() {
-      return Helpers.getCurrentLevel(this.scale)
-    },
     isGrandChild() {
       // return this.node.nodeType === "grandchild"
       // make it grandchild when not visible too, to prevent buttons showing up while transitioning to hidden
