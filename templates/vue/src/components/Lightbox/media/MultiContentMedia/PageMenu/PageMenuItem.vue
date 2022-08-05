@@ -1,6 +1,9 @@
 <template>
   <li
-    v-if="(node.typeData.menuTitle || node.title).trim().length"
+    v-if="
+      (node.unlocked || !node.hideWhenLocked) &&
+        (node.typeData.menuTitle || node.title).trim().length
+    "
     :class="{ disabled: disabled }"
   >
     <div

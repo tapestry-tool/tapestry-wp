@@ -47,6 +47,7 @@ class TapestryNode implements ITapestryNode
     private $references;
     private $mapCoordinates;
     private $popup;
+    private $hideWhenLocked;
 
     /**
      * Constructor.
@@ -99,6 +100,7 @@ class TapestryNode implements ITapestryNode
             'lng' => '',
         ];
         $this->popup = null;
+        $this->hideWhenLocked = false;
 
         if (TapestryHelpers::isValidTapestryNode($this->nodeMetaId)) {
             $node = $this->_loadFromDatabase();
@@ -245,6 +247,9 @@ class TapestryNode implements ITapestryNode
         }
         if (property_exists($node, 'popup')) {
             $this->popup = $node->popup;
+        }
+        if (isset($node->hideWhenLocked) && is_bool($node->hideWhenLocked)) {
+            $this->hideWhenLocked = $node->hideWhenLocked;
         }
     }
 
@@ -582,6 +587,7 @@ class TapestryNode implements ITapestryNode
             'references' => $this->references,
             'mapCoordinates' => $this->mapCoordinates,
             'popup' => $this->popup,
+            'hideWhenLocked' => $this->hideWhenLocked,
         ];
     }
 
@@ -637,14 +643,15 @@ class TapestryNode implements ITapestryNode
             $id = 1;
         }
         $user = get_user_by('id', $id);
-        if ($user) {
-            return (object) [
-                'id' => $id,
-                'name' => $user->display_name,
-                'email' => $user->user_email,
-                'original_author_name' => '',
-                'original_author_email' => '',
-            ];
+        if (!$user) {
+            $user = get_user_by('id', 1);
         }
+        return (object) [
+            'id' => $id,
+            'name' => $user->display_name,
+            'email' => $user->user_email,
+            'original_author_name' => '',
+            'original_author_email' => '',
+        ];
     }
 }
