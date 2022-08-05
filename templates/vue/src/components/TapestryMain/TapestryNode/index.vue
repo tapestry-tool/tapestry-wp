@@ -582,7 +582,9 @@ export default {
     },
     handleMousedown() {
       this.isMouseDown = true
-      this.$root.$emit("node-mousedown")
+
+      // Dismiss toolbar when drag starts
+      this.$root.$emit("context-toolbar::dismiss")
     },
     handleClick(evt) {
       if (
@@ -600,7 +602,7 @@ export default {
           : this.updateRootNode()
       }
       client.recordAnalyticsEvent("user", "click", "node", this.node.id)
-      this.$root.$emit("context-menu::click", this.elementId)
+      this.$root.$emit("context-toolbar::click", this.elementId)
     },
     handleFocus() {
       this.isFocused = true

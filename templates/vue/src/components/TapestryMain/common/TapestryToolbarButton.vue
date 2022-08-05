@@ -9,6 +9,7 @@
           selected: isSelected,
         },
       ]"
+      @click="handleClick"
     >
       <tapestry-icon :icon="icon"></tapestry-icon>
     </button>

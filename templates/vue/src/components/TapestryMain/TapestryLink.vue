@@ -85,7 +85,7 @@ export default {
   },
   methods: {
     handleClick() {
-      this.$root.$emit("context-menu::click", this.elementId)
+      this.$root.$emit("context-toolbar::click", this.elementId)
     },
     openLinkModal() {
       this.$router.push({

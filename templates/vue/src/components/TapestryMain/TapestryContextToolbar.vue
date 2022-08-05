@@ -38,12 +38,10 @@ export default {
     this.$root.$on("bv::modal::show", () => {
       this.show = false
     })
-    this.$root.$on("node-mousedown", () => {
-      // Handle node drag
+    this.$root.$on("context-toolbar::dismiss", () => {
       this.show = false
     })
-    // TODO: dismiss menu if the user clicks outside the menu
-    this.$root.$on("context-menu::click", elementId => {
+    this.$root.$on("context-toolbar::click", elementId => {
       if (elementId === this.target && !this.show) {
         this.show = true
       } else {

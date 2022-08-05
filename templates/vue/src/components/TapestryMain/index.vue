@@ -6,6 +6,7 @@
     :style="{
       height: appHeight,
     }"
+    @mousedown="handleMousedownOnApp"
   >
     <div v-if="empty">
       <root-node-button v-if="canEdit" @click="addRootNode"></root-node-button>
@@ -577,6 +578,9 @@ export default {
         )
         nodeElement && nodeElement.focus()
       })
+    },
+    handleMousedownOnApp() {
+      this.$root.$emit("context-toolbar::dismiss")
     },
   },
 }
