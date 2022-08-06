@@ -72,15 +72,15 @@ export default {
     }
   },
   computed: {
-    ...mapState(["nodes", "links", "maxLevel"]),
+    ...mapState(["nodes", "links", "maxLevel", "browserDimensions"]),
     aspectRatio() {
       return this.viewBox[2] / this.viewBox[3]
     },
     width() {
-      return this.height * this.aspectRatio
+      return this.browserDimensions.width * 0.2
     },
     height() {
-      return 150
+      return this.width / this.aspectRatio
     },
     displayScale() {
       return this.height / this.viewBox[3]
