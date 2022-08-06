@@ -79,10 +79,6 @@ describe("Locked Nodes", () => {
           "aria-disabled"
         )
 
-        cy.getByTestId(`node-${child.id}`)
-          .invoke("css", "opacity")
-          .should("not.equal", "1")
-
         cy.login("subscriber").visitTapestry()
         cy.getByTestId(`node-${child.id}`).should("not.be.visible")
 
