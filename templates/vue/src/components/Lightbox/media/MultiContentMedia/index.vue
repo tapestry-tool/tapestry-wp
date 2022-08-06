@@ -29,7 +29,7 @@
           {{
             node.childOrdering.length
               ? "The content of this unit has not been unlocked yet."
-              : "There is no content in this node."
+              : "There's currently no content here."
           }}
         </div>
         <template v-else>
