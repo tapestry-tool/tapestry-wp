@@ -66,7 +66,7 @@ describe("Locked Nodes", () => {
         cy.openModal("edit", child.id)
         cy.contains(/access/i).click()
         cy.contains(/prevent access/i).click()
-        cy.contains(/hide this node when locked/i).click()
+        cy.contains(/grey out/i).click()
 
         cy.getByTestId("add-condition").click()
         cy.getByTestId("condition-type").select(condition.type)
@@ -78,10 +78,6 @@ describe("Locked Nodes", () => {
           "not.have.attr",
           "aria-disabled"
         )
-
-        cy.getByTestId(`node-${child.id}`)
-          .invoke("css", "opacity")
-          .should("not.equal", "1")
 
         cy.login("subscriber").visitTapestry()
         cy.getByTestId(`node-${child.id}`).should("not.be.visible")
