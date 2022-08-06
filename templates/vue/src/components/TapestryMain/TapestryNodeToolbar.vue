@@ -3,17 +3,19 @@
     <tapestry-toolbar-button
       :id="`add-node-tool-${node.id}`"
       horizontal
-      icon="cog"
       :tool="tools.ADD_NODE"
       tooltip="Add Node"
-    />
+    >
+      <i class="fas fa-plus-circle fa-lg"></i>
+    </tapestry-toolbar-button>
     <div class="tapestry-toolbar-separator"></div>
     <tapestry-toolbar-button
       :id="`delete-node-button-${node.id}`"
       horizontal
-      icon="cog"
       tooltip="Delete Node"
-    />
+    >
+      <i class="fas fa-trash-alt fa-lg"></i>
+    </tapestry-toolbar-button>
   </tapestry-context-toolbar>
 </template>
 

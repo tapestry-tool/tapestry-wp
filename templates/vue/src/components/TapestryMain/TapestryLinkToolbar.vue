@@ -3,15 +3,17 @@
     <tapestry-toolbar-button
       :id="`reverse-link-button-${source.id}-${target.id}`"
       horizontal
-      icon="cog"
       tooltip="Reverse Link"
-    />
+    >
+      <i class="fas fa-exchange-alt fa-lg"></i>
+    </tapestry-toolbar-button>
     <tapestry-toolbar-button
       :id="`delete-link-button-${source.id}-${target.id}`"
       horizontal
-      icon="cog"
       tooltip="Delete Link"
-    />
+    >
+      <i class="fas fa-trash-alt fa-lg"></i>
+    </tapestry-toolbar-button>
   </tapestry-context-toolbar>
 </template>
 

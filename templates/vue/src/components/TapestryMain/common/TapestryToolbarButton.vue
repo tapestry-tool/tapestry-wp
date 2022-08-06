@@ -11,7 +11,7 @@
       ]"
       @click="handleClick"
     >
-      <tapestry-icon :icon="icon"></tapestry-icon>
+      <slot></slot>
     </button>
     <b-tooltip
       :custom-class="horizontal ? 'offset-bottom' : 'offset-left'"
@@ -25,14 +25,10 @@
 </template>
 
 <script>
-import TapestryIcon from "@/components/common/TapestryIcon"
 import { tools } from "@/utils/constants"
 import { mapMutations, mapState } from "vuex"
 
 export default {
-  components: {
-    TapestryIcon,
-  },
   props: {
     id: {
       type: String,
@@ -40,7 +36,8 @@ export default {
     },
     icon: {
       type: String,
-      required: true,
+      required: false,
+      default: "",
     },
     tool: {
       required: false,
