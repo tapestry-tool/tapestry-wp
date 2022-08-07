@@ -1,5 +1,5 @@
 <template>
-  <div data-qa="open-minimap" class="minimap-button">
+  <div data-qa="open-minimap" class="minimap-button" title="Open minimap">
     <button @click="$emit('click')">
       <i class="fas fa-map"></i>
     </button>
