@@ -277,7 +277,9 @@ export default {
       this.offset.y -= dy
     },
     handleMinimapPanBy({ dx, dy }) {
-      this.zoomPanHelper.onPan(dx, dy)
+      // dx, dy passed here is in viewBox dimensions, not screen pixels; we apply the changes to the offset directly, bypassing the calculations in handlePan
+      this.offset.x -= dx * this.scaleConstants.panSensitivity
+      this.offset.y -= dy * this.scaleConstants.panSensitivity
       this.zoomPanHelper.onPanEnd()
     },
     handleMinimapPanTo({ x, y }) {
