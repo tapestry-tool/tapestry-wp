@@ -156,7 +156,7 @@ export default {
       for (let node of data.nodes) {
         node.permissions = this.filterImportedPerms(node.permissions, wp_roles)
       }
-      if (data.settings) {
+      if (data.settings && data.settings.defaultPermissions) {
         data.settings.defaultPermissions = this.filterImportedPerms(
           data.settings.defaultPermissions,
           wp_roles

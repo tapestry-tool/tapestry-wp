@@ -155,7 +155,6 @@ class TapestryNode implements ITapestryNode
         }
         if (isset($node->thumbnailFileId) && (is_numeric($node->thumbnailFileId) || is_string($node->thumbnailFileId))) {
             if (is_string($node->thumbnailFileId) && '' == $node->thumbnailFileId) {
-                $this->imageURL = '';
                 $this->thumbnailFileId = '';
             } else {
                 $this->thumbnailFileId = $node->thumbnailFileId;
@@ -171,7 +170,6 @@ class TapestryNode implements ITapestryNode
         }
         if (isset($node->lockedThumbnailFileId) && (is_numeric($node->lockedThumbnailFileId) || is_string($node->lockedThumbnailFileId))) {
             if (is_string($node->lockedThumbnailFileId) && '' == $node->lockedThumbnailFileId) {
-                $this->lockedImageURL = '';
                 $this->lockedThumbnailFileId = '';
             } else {
                 $this->lockedThumbnailFileId = $node->lockedThumbnailFileId;
@@ -639,14 +637,15 @@ class TapestryNode implements ITapestryNode
             $id = 1;
         }
         $user = get_user_by('id', $id);
-        if ($user) {
-            return (object) [
-                'id' => $id,
-                'name' => $user->display_name,
-                'email' => $user->user_email,
-                'original_author_name' => '',
-                'original_author_email' => '',
-            ];
+        if (!$user) {
+            $user = get_user_by('id', 1);
         }
+        return (object) [
+            'id' => $id,
+            'name' => $user->display_name,
+            'email' => $user->user_email,
+            'original_author_name' => '',
+            'original_author_email' => '',
+        ];
     }
 }

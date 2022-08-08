@@ -2,8 +2,7 @@ describe("Import Export", () => {
   it("should be able to export a Tapestry", () => {
     cy.fixture("one-node.json").as("oneNode")
     cy.setup("@oneNode")
-    cy.server()
-    cy.route("GET", "**/tapestries/**/export").as("export")
+    cy.intercept("GET", "**/tapestries/**/export").as("export")
 
     cy.get(".settings-button").click()
     cy.contains(/advanced/i).click()
@@ -21,9 +20,8 @@ describe("Import Export", () => {
   it("should be able to import a Tapestry using file input", () => {
     const tapestry = "full-featured-exported-tapestry.json"
     cy.setup()
-    cy.server()
-    cy.route("PUT", "**/tapestries/**").as("import")
-    cy.route("GET", "**/tapestries/**").as("load")
+    cy.intercept("PUT", "**/tapestries/**").as("import")
+    cy.intercept("GET", "**/tapestries/**").as("load")
 
     cy.getByTestId("import-file-input").attachFile(tapestry)
     cy.wait("@import")
@@ -44,9 +42,8 @@ describe("Import Export", () => {
     const tapestry = "one-node.json"
     cy.setup()
 
-    cy.server()
-    cy.route("PUT", "**/tapestries/**").as("import")
-    cy.route("GET", "**/tapestries/**").as("load")
+    cy.intercept("PUT", "**/tapestries/**").as("import")
+    cy.intercept("GET", "**/tapestries/**").as("load")
 
     cy.getByTestId("import-file-input").attachFile(tapestry)
     cy.wait("@import")
