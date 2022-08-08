@@ -108,29 +108,7 @@ describe("Video", () => {
   })
 
   it("should be able to add a video node via Kaltura", () => {
-    const kalturaId = "0_55iod32r"
-    const mediaURL =
-      "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
-
-    // Mock the request to the Kaltura API
-    // TODO: decide whether or not to mock Kaltura when testing
-    cy.intercept("GET", "**/kaltura/video/status?**", {
-      statusCode: 200,
-      body: true,
-    })
-    cy.intercept("GET", "**/kaltura/video/meta?**", {
-      statusCode: 200,
-      body: {
-        image: "",
-        duration: 223,
-      },
-    })
-    cy.intercept("GET", "**/kaltura/video/mediaURL?**", {
-      statusCode: 200,
-      body: {
-        mediaURL: mediaURL,
-      },
-    })
+    const kalturaId = "0_lchbo276"
 
     cy.getSelectedNode().then(node => {
       cy.openModal("edit", node.id)
@@ -152,10 +130,10 @@ describe("Video", () => {
         .invoke("val")
         .should("eq", kalturaId)
 
-      // Checking that mediaURL of Kaltura video matches whatever Kaltura returns
+      // Checking that mediaURL of Kaltura video matches. We just check that the URL includes the Kaltura ID
       cy.getByTestId("node-video-url")
         .invoke("val")
-        .should("equal", mediaURL)
+        .should("include", kalturaId)
       cy.get(".close").click()
 
       cy.openLightbox(node.id).within(() => {
