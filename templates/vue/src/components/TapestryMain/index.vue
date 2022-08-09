@@ -446,6 +446,9 @@ export default {
         if (Helpers.hasPermission(node, "edit", this.settings.showRejected)) {
           this.$root.$emit("edit-node", node.id)
         }
+      } else if (code === "KeyQ" || code === "Escape") {
+        // focus the next element after the main
+        document.querySelector(".minimap-button button")?.focus()
       } else {
         if (node.id === this.getCurrentNodeNav) {
           if (code === "ArrowDown") {

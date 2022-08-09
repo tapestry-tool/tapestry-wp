@@ -244,6 +244,7 @@ export default {
       if (this.hasPermission("edit")) {
         label += "To edit this node, press E. "
       }
+      label += "To exit the Main Tapestry view, press Q or Escape. "
       return label
     },
     canAddChild() {
