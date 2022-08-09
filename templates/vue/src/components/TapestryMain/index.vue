@@ -108,7 +108,12 @@ export default {
       "currentDepth",
       "scaleConstants",
     ]),
-    ...mapGetters(["isEmptyTapestry", "getNode", "getInitialNodeId", "getCurrentNodeNav"]),
+    ...mapGetters([
+      "isEmptyTapestry",
+      "getNode",
+      "getInitialNodeId",
+      "getCurrentNodeNav",
+    ]),
     computedViewBox() {
       // return this.viewBox.join(" ")
       return `${this.viewBox[0] + this.offset.x} ${this.viewBox[1] +
