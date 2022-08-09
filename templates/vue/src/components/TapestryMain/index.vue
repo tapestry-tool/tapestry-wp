@@ -45,6 +45,7 @@
     </svg>
     <tapestry-minimap
       v-if="showMinimap"
+      ref="minimap"
       :view-box="unscaledViewBox"
       :scale="scale"
       :offset="offset"
@@ -210,7 +211,7 @@ export default {
     this.dragSelectReady = true
 
     this.zoomPanHelper = new ZoomPanHelper(
-      "vue-svg",
+      "tapestry",
       (delta, x, y) => {
         this.handleZoom(delta * this.scaleConstants.zoomSensitivity, x, y)
       },
@@ -228,7 +229,8 @@ export default {
         this.isPanning = false
         this.updateOffset()
         this.fetchAppDimensions()
-      }
+      },
+      [this.$refs.minimap.$el]
     )
     this.zoomPanHelper.register()
 
@@ -305,7 +307,9 @@ export default {
       this.offset.y -= dy
     },
     handleMinimapPanBy({ dx, dy }) {
-      this.zoomPanHelper.onPan(dx, dy)
+      // dx, dy passed here is in viewBox dimensions, not screen pixels; we apply the changes to the offset directly, bypassing the calculations in handlePan
+      this.offset.x -= dx * this.scaleConstants.panSensitivity
+      this.offset.y -= dy * this.scaleConstants.panSensitivity
       this.zoomPanHelper.onPanEnd()
     },
     handleMinimapPanTo({ x, y }) {
