@@ -8,6 +8,7 @@
     scrollable
     :header-class="isMultiContentNodeChild ? 'modal-header-small' : ''"
     body-class="p-0"
+    :aria-label="title"
     @hide="handleClose"
   >
     <template #modal-title>
@@ -35,7 +36,12 @@
     </template>
     <b-container fluid class="px-0" data-qa="node-modal">
       <b-overlay :show="loading" variant="white">
-        <div v-if="hasSubmissionError" class="error-wrapper">
+        <div
+          v-if="hasSubmissionError"
+          class="error-wrapper"
+          role="alert"
+          aria-live="assertive"
+        >
           <h5>Operation failed due to the following error(s):</h5>
           <ul>
             <li v-for="error in errors" :key="error">{{ error }}</li>
@@ -54,7 +60,6 @@
                 data-qa="node-level-input"
                 type="number"
                 number
-                autofocus
                 @update="update('level', $event)"
               />
             </b-form-group>
@@ -1321,10 +1326,6 @@ table {
     position: absolute;
     top: 15px;
     right: 12px;
-
-    &:focus {
-      outline: none;
-    }
   }
 }
 
@@ -1335,10 +1336,6 @@ table {
 .modal-title {
   font-size: 1.5rem;
   font-weight: 600;
-}
-
-.nav-link:focus {
-  outline: none;
 }
 </style>
 
@@ -1351,10 +1348,6 @@ table {
 }
 
 #node-modal-container {
-  * {
-    outline: none;
-  }
-
   .form-control {
     padding: 15px;
     border: none;

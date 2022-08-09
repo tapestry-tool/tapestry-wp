@@ -7,12 +7,18 @@
   >
     <div class="multi-content-row">
       <div v-if="presentationStyle === 'accordion'" class="button-row">
-        <button class="trigger-row-btn" :disabled="disabled" @click="toggle">
+        <button
+          class="trigger-row-btn"
+          :disabled="disabled"
+          :aria-label="`${isVisible ? 'Close' : 'Open'} multi-content row`"
+          @click="toggle"
+        >
           <i
             v-if="!disabled"
             :class="isVisible ? 'fas fa-minus' : 'fas fa-plus'"
+            aria-hidden="true"
           ></i>
-          <i v-else class="fas fa-lock fa-sm title-row-icon"></i>
+          <i v-else class="fas fa-lock fa-sm title-row-icon" aria-hidden="true"></i>
           {{ node.title }}
           <locked-content
             v-if="disabled"
@@ -20,34 +26,53 @@
             :condition-node="conditionNode"
           ></locked-content>
         </button>
-        <a v-if="canEditNode" @click="editNode">
+        <a
+          v-if="canEditNode"
+          aria-label="Edit this node"
+          role="button"
+          tabindex="0"
+          @click="editNode"
+        >
           <i class="fas fa-pencil-alt fa-sm pr-2"></i>
         </a>
         <a
           v-if="!disabled"
           class="favourite-btn"
           :class="{ 'is-favourite': isFavourite(node.id) }"
+          :aria-label="
+            `${isFavourite(node.id) ? 'Remove from' : 'Add to'} favourites`
+          "
+          role="button"
+          tabindex="0"
           @click="toggleFavourite(node.id)"
         >
           <i class="fas fa-heart fa-sm"></i>
         </a>
       </div>
       <div v-else class="title-row-icon">
-        <i v-if="disabled" class="fas fa-lock fa-sm"></i>
+        <i v-if="disabled" class="fas fa-lock fa-sm" aria-hidden="true"></i>
         <span v-else>
-          <a>
-            <i
-              v-if="canEditNode"
-              class="fas fa-pencil-alt fa-sm pr-2"
-              @click="editNode"
-            ></i>
+          <a
+            v-if="canEditNode"
+            aria-label="Edit this node"
+            role="button"
+            tabindex="0"
+            @click="editNode"
+          >
+            <i class="fas fa-pencil-alt fa-sm pr-2"></i>
           </a>
           <a
             v-if="node.typeData.showTitle !== false"
             class="favourite-btn"
             :class="{ 'is-favourite': isFavourite(node.id) }"
+            :aria-label="
+              `${isFavourite(node.id) ? 'Remove from' : 'Add to'} favourites`
+            "
+            role="button"
+            tabindex="0"
+            @click="toggleFavourite(node.id)"
           >
-            <i class="fas fa-heart fa-sm" @click="toggleFavourite(node.id)"></i>
+            <i class="fas fa-heart fa-sm"></i>
           </a>
         </span>
       </div>
@@ -64,6 +89,7 @@
         v-if="!disabled && isVisible"
         :data-qa="`row-content-${node.id}`"
         class="row-content"
+        :aria-label="`Content of multi-content row titled ${node.title}`"
       >
         <div v-if="node.mediaType !== 'multi-content'">
           <tapestry-media

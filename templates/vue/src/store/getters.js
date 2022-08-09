@@ -216,3 +216,9 @@ export function getNeighbouringLinks(state) {
 export function getTheme(state) {
   return state.theme ? state.theme : "light"
 }
+
+export function getCurrentNodeNav(state) {
+  return state.nodeNavigation.stack.length === 0
+    ? -1
+    : state.nodeNavigation.stack[state.nodeNavigation.stack.length - 1]
+}

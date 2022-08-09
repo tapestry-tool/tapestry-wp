@@ -27,7 +27,16 @@ export const store = {
     theme: "",
     userAnswers: {},
     returnRoute: null,
+    browserDimensions: {
+      width: 0,
+      height: 0,
+    },
     currentEditingNode: null,
+    nodeNavigation: {
+      stack: [],
+      siblings: [],
+      siblingPosition: -1,
+    },
     // * DEV: temporarily allow editing constants.js/scaleConstants
     scaleConstants: {
       levelMultiplier: 1.7, // higher -> deep nodes get revealed faster

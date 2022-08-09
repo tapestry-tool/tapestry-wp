@@ -29,6 +29,9 @@ describe("Sidebar", () => {
       .should("be.visible")
       .closeLightbox()
 
+    // ensure focus returns to a node before doing anything else
+    cy.focused().should("have.class", "node")
+
     cy.sidebar().within(() => cy.contains(/edit/i).click())
     cy.getByTestId("node-modal").should("be.visible")
     cy.contains(/cancel/i).click()

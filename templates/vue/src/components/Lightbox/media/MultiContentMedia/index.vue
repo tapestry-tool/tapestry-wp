@@ -2,13 +2,19 @@
   <div class="multicontent-media-container">
     <div
       ref="container"
-      class="media-container"
+      :class="[
+        'media-container',
+        {
+          'full-height-media': context === 'lightbox',
+        },
+      ]"
       :style="navBarStyle"
       data-qa="multi-content"
     >
       <header>
         <h1
           v-if="showTitle"
+          :id="context === 'lightbox' ? 'lightboxTitle' : ''"
           :class="{
             title: true,
             'nested-media-title': context === 'multi-content',
@@ -42,44 +48,29 @@
             @complete="complete"
           />
           <div v-if="isUnitChild && pageIndex !== -1" class="unit-navigation">
-            <button :disabled="pageIndex === 0" @click="prevPage">
+            <button
+              :disabled="pageIndex === 0"
+              aria-label="Go to previous page in unit."
+              @click="prevPage"
+            >
               <i class="fas fa-chevron-left" />
-              <div>Previous</div>
+              <div aria-hidden="true">Previous</div>
             </button>
             <button
               :disabled="pageIndex === filteredPages.length - 1"
+              aria-label="Go to next page in unit."
               @click="nextPage"
             >
-              <div>Next</div>
+              <div aria-hidden="true">Next</div>
               <i class="fas fa-chevron-right" />
             </button>
           </div>
         </template>
       </template>
-      <tapestry-modal
-        v-if="showCompletion"
-        :node-id="node.id"
-        :allow-close="false"
-        @close="handleCancel"
-      >
-        <h1>{{ node.typeData.confirmationTitleText }}</h1>
-        <p>{{ node.typeData.confirmationBodyText }}</p>
-        <div class="button-container">
-          <button class="button-completion" @click="handleClose">
-            <i class="far fa-arrow-alt-circle-right fa-4x"></i>
-            <p>{{ node.typeData.continueButtonText }}</p>
-          </button>
-          <button class="button-completion" @click="handleCancel">
-            <i class="far fa-times-circle fa-4x"></i>
-            <p>{{ node.typeData.cancelLinkText }}</p>
-          </button>
-        </div>
-      </tapestry-modal>
     </div>
     <page-menu
       v-if="showPageMenu"
       :node="node"
-      :dimensions="menuDimensions"
       :pages="filteredPages"
       :active-page-index="pageIndex"
       @change-page="changePage"
@@ -89,11 +80,9 @@
 
 <script>
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex"
-import client from "@/services/TapestryAPI"
 import CompletedIcon from "@/components/common/CompletedIcon"
 import LockedContent from "./common/LockedContent"
 import PageMenu from "./PageMenu"
-import TapestryModal from "../../TapestryModal"
 import MultiContentRows from "./MultiContentRows"
 import { names } from "@/config/routes"
 
@@ -103,7 +92,6 @@ export default {
     CompletedIcon,
     LockedContent,
     PageMenu,
-    TapestryModal,
     MultiContentRows,
   },
   props: {
@@ -131,19 +119,17 @@ export default {
       required: false,
       default: false,
     },
-    menuDimensions: {
-      type: Object,
-      required: false,
-      default: null,
-    },
   },
   data() {
     return {
       activeIndex: -1,
-      showCompletion: false,
       isMounted: false,
       navBarStyle: {},
       pages: false,
+      dimensions: {
+        width: 0,
+        height: 0,
+      },
     }
   },
   computed: {
@@ -177,17 +163,6 @@ export default {
           : this.getDirectChildren(id).map(this.getNode)
         return { node, children }
       })
-    },
-    dimensions() {
-      if (!this.isMounted) {
-        return {
-          width: 0,
-          height: 0,
-        }
-      }
-      const box = this.$refs.container
-      const rect = box.getBoundingClientRect()
-      return { width: rect.width, height: rect.height }
     },
     lockRows() {
       return this.node.typeData.lockRows
@@ -228,10 +203,11 @@ export default {
     },
   },
   mounted() {
-    this.isMounted = true
     this.activeIndex = this.node.presentationStyle === "page" ? -1 : 0
 
     this.updatePages()
+
+    this.updateDimensions()
 
     // if all children are completed, mark this as completed too
     // this is just in case it hasn't done this properly before
@@ -242,25 +218,14 @@ export default {
   methods: {
     ...mapMutations(["updateNode"]),
     ...mapActions(["completeNode", "toggleFavourite"]),
-    handleClose(evt) {
-      client.recordAnalyticsEvent("user", "close", "multi-content", this.node.id, {
-        x: evt.clientX,
-        y: evt.clientY,
-      })
-      this.$emit("close")
-    },
-    handleCancel(evt) {
-      client.recordAnalyticsEvent(
-        "user",
-        "close",
-        "multi-content-completion-screen",
-        this.node.id,
-        {
-          x: evt.clientX,
-          y: evt.clientY,
-        }
-      )
-      this.showCompletion = false
+    updateDimensions() {
+      // this setTimeout is a way to run code after everything has been rendered by Vue, not just the component itself (to avoid resulting in a boundingClientRect of 0 by 0)
+      setTimeout(() => {
+        const box = this.$refs.container
+        const rect = box.getBoundingClientRect()
+        this.dimensions.width = rect.width
+        this.dimensions.height = rect.height
+      }, 0)
     },
     updatePages() {
       this.pages = this.isUnitChild

@@ -7,6 +7,7 @@
     title="Tapestry Settings"
     scrollable
     body-class="p-0"
+    aria-label="Tapestry Settings"
     @hidden="$emit('close')"
   >
     <b-container fluid class="px-0">
@@ -25,7 +26,6 @@
               id="background-url"
               v-model="backgroundUrl"
               placeholder="Enter background URL"
-              autofocus
               @isUploading="isUploading"
             />
           </b-form-group>
@@ -176,48 +176,52 @@
           <b-form-group v-if="renderMap">
             <b-row>
               <b-col sm="4" offset-sm="4">
-                <b-form-input
-                  v-model="mapBounds.neLat"
-                  placeholder="90"
-                  :state="
-                    latRangeValid && isValidLat(mapBounds.neLat) ? null : false
-                  "
-                />
-                <b-form-text>Northern Latitudinal Bound</b-form-text>
+                <b-form-group description="Northern Latitudinal Bound">
+                  <b-form-input
+                    v-model="mapBounds.neLat"
+                    placeholder="90"
+                    :state="
+                      latRangeValid && isValidLat(mapBounds.neLat) ? null : false
+                    "
+                  />
+                </b-form-group>
               </b-col>
             </b-row>
             <b-row>
               <b-col sm="4">
-                <b-form-input
-                  v-model="mapBounds.swLng"
-                  placeholder="-180"
-                  :state="
-                    lngRangeValid && isValidLng(mapBounds.swLng) ? null : false
-                  "
-                />
-                <b-form-text>Western Longitudinal Bound</b-form-text>
+                <b-form-group description="Western Longitudinal Bound">
+                  <b-form-input
+                    v-model="mapBounds.swLng"
+                    placeholder="-180"
+                    :state="
+                      lngRangeValid && isValidLng(mapBounds.swLng) ? null : false
+                    "
+                  />
+                </b-form-group>
               </b-col>
               <b-col sm="4" offset-sm="4">
-                <b-form-input
-                  v-model="mapBounds.neLng"
-                  placeholder="180"
-                  :state="
-                    lngRangeValid && isValidLng(mapBounds.neLng) ? null : false
-                  "
-                />
-                <b-form-text>Eastern Longitudinal Bound</b-form-text>
+                <b-form-group description="Eastern Longitudinal Bound">
+                  <b-form-input
+                    v-model="mapBounds.neLng"
+                    placeholder="180"
+                    :state="
+                      lngRangeValid && isValidLng(mapBounds.neLng) ? null : false
+                    "
+                  />
+                </b-form-group>
               </b-col>
             </b-row>
             <b-row>
               <b-col sm="4" offset-sm="4">
-                <b-form-input
-                  v-model="mapBounds.swLat"
-                  placeholder="-90"
-                  :state="
-                    latRangeValid && isValidLat(mapBounds.swLat) ? null : false
-                  "
-                />
-                <b-form-text>Southern Latitudinal Bound</b-form-text>
+                <b-form-group description="Southern Latitudinal Bound">
+                  <b-form-input
+                    v-model="mapBounds.swLat"
+                    placeholder="-90"
+                    :state="
+                      latRangeValid && isValidLat(mapBounds.swLat) ? null : false
+                    "
+                  />
+                </b-form-group>
               </b-col>
             </b-row>
           </b-form-group>

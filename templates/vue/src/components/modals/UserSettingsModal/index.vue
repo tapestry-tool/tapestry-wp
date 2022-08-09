@@ -7,6 +7,7 @@
     title="User Settings"
     scrollable
     body-class="p-0"
+    aria-label="User Settings"
     @hidden="$emit('close')"
   >
     <b-container fluid class="px-0">

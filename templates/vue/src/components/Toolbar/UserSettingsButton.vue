@@ -1,5 +1,5 @@
 <template>
-  <button class="user-settings-button" @click="open">
+  <button aria-label="Open User Settings" class="user-settings-button" @click="open">
     <span class="fas fa-user fa-s"></span>
     <user-settings-modal
       :show="themeFormOpen"
@@ -80,7 +80,6 @@ export default {
   color: #999;
   font-size: 1.2em;
   transition: all 0.2s ease;
-  outline: none;
 }
 .user-settings-button:hover {
   background: none;

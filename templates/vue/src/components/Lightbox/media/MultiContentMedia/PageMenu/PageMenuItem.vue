@@ -8,6 +8,7 @@
   >
     <div
       class="page-menu-item-wrapper"
+      tabindex="0"
       @mouseover="hovered = true"
       @mouseleave="hovered = false"
       @click="handleTitleClick"

@@ -3,6 +3,7 @@
     <g
       v-show="show"
       ref="node"
+      :aria-label="ariaLabel"
       :data-qa="`node-${node.id}`"
       :data-locked="!node.unlocked"
       :transform="`translate(${coordinates.x}, ${coordinates.y})`"
@@ -17,7 +18,12 @@
             ? 'pointer'
             : 'not-allowed',
       }"
+      tabindex="0"
+      @focus="handleFocus"
+      @blur="handleBlur"
       @click="handleClick"
+      @mousedown="isMouseDown = true"
+      @mouseup="isMouseDown = false"
       @mouseover="handleMouseover"
       @mouseleave="handleMouseleave"
     >
@@ -106,10 +112,7 @@
           </node-button>
           <template v-if="isLoggedIn">
             <add-child-button
-              v-if="
-                (node.mediaType === 'multi-content' || !hasTooManyLevels) &&
-                  (hasPermission('add') || settings.draftNodesEnabled)
-              "
+              v-if="canAddChild"
               :node="node"
               :fill="buttonBackgroundColor"
               :x="canReview || hasPermission('edit') ? -35 : 0"
@@ -198,6 +201,8 @@ export default {
     return {
       transitioning: false,
       isHovered: false,
+      isFocused: false,
+      isMouseDown: false,
     }
   },
   computed: {
@@ -207,8 +212,47 @@ export default {
       "visibleNodes",
       "maxLevel",
       "currentDepth",
+      "nodeNavigation",
     ]),
-    ...mapGetters(["getNode", "getDirectChildren", "isVisible", "getParent"]),
+    ...mapGetters([
+      "getNode",
+      "getDirectChildren",
+      "isVisible",
+      "getParent",
+      "getCurrentNodeNav",
+    ]),
+    ariaLabel() {
+      let label = `${this.node.title}. You are on a level ${this.node.level} node. `
+      if (
+        this.node.id ===
+        this.nodeNavigation.stack[this.nodeNavigation.stack.length - 1]
+      ) {
+        const childrenCount = this.getDirectChildren(this.node.id).length
+        if (childrenCount === 0) {
+          label += `This node has no children. To view this node, press Enter. To go back up, press the Up Arrow Key. To go to its siblings, press the Left or Right Arrow Key. `
+        } else {
+          label += `This node has ${childrenCount} ${
+            childrenCount === 1 ? "child" : "children"
+          }. To view this node, press Enter. To go to its${
+            childrenCount === 1 ? "" : " first"
+          } child, press the Down Arrow Key. To go back up, press the Up Arrow Key. To go to its siblings, press the Left or Right Arrow Key. `
+        }
+      } else {
+        label +=
+          "You are not on the node navigation route. To view this node, press Enter. "
+      }
+      if (this.hasPermission("edit")) {
+        label += "To edit this node, press E. "
+      }
+      label += "To exit the Main Tapestry view, press Q or Escape. "
+      return label
+    },
+    canAddChild() {
+      return (
+        (this.node.mediaType === "multi-content" || !this.hasTooManyLevels) &&
+        (this.hasPermission("add") || this.settings.draftNodesEnabled)
+      )
+    },
     canReview() {
       if (!this.isLoggedIn) {
         return false
@@ -466,7 +510,7 @@ export default {
     )
   },
   methods: {
-    ...mapActions(["updateNodeCoordinates"]),
+    ...mapActions(["updateNodeCoordinates", "resetNodeNavigation"]),
     ...mapMutations(["select", "unselect"]),
     updateRootNode() {
       if (!this.root) {
@@ -522,9 +566,11 @@ export default {
     handleMouseover() {
       this.isHovered = true
 
-      // Move node to end of svg document so it appears on top
-      const node = this.$refs.node
-      node.parentNode.appendChild(node)
+      // Move node to end of svg document so it appears on top, but do not do this when the node is in focus since it will blur the node
+      if (!this.isFocused) {
+        const node = this.$refs.node
+        node.parentNode.appendChild(node)
+      }
 
       bus.$emit("mouseover", this.node.id)
       this.$emit("mouseover")
@@ -549,6 +595,18 @@ export default {
           : this.updateRootNode()
       }
       client.recordAnalyticsEvent("user", "click", "node", this.node.id)
+    },
+    handleFocus() {
+      this.isFocused = true
+      if (!this.root && !this.isMouseDown) {
+        this.updateRootNode()
+      }
+      if (this.getCurrentNodeNav !== this.node.id) {
+        this.resetNodeNavigation(this.node.id)
+      }
+    },
+    handleBlur() {
+      this.isFocused = false
     },
     hasPermission(action) {
       return Helpers.hasPermission(this.node, action, this.settings.showRejected)

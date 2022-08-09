@@ -38,6 +38,7 @@
           v-if="itemRemovalAllowed"
           squared
           variant="danger"
+          aria-label="Remove item"
           @click="$emit('remove-item')"
         >
           <i class="fas fa-trash-alt"></i>

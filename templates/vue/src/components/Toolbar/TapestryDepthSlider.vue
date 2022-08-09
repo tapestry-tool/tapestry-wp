@@ -7,6 +7,7 @@
     <div>
       <input
         v-model="currentDepth"
+        aria-label="Change the depth of the Tapestry view"
         class="slider"
         type="range"
         min="1"
@@ -240,7 +241,6 @@ export default {
 
 .slider {
   -webkit-appearance: none;
-  outline: none;
   background: var(--bg-color-primary);
   height: 10px;
   opacity: 0.8;
@@ -306,7 +306,6 @@ export default {
 
   &:focus {
     border-color: transparent !important;
-    outline: none !important;
   }
 }
 

@@ -5,7 +5,12 @@
       <div v-else class="empty-message">The requested Tapestry is empty.</div>
     </div>
     <template v-else>
-      <svg id="vue-svg" :viewBox="computedViewBox">
+      <svg
+        id="vue-svg"
+        role="application"
+        aria-label="Main Tapestry View"
+        :viewBox="computedViewBox"
+      >
         <g class="links">
           <tapestry-link
             v-for="link in links"
@@ -40,6 +45,7 @@
       </svg>
       <tapestry-minimap
         v-if="showMinimap"
+        ref="minimap"
         :view-box="unscaledViewBox"
         :scale="scale"
         :offset="offset"
@@ -47,17 +53,13 @@
         @pan-to="handleMinimapPanTo"
         @close="showMinimap = false"
       ></tapestry-minimap>
-      <tapestry-minimap-button
-        v-else
-        @click="showMinimap = true"
-      ></tapestry-minimap-button>
     </template>
   </main>
 </template>
 
 <script>
 import DragSelectModular from "@/utils/dragSelectModular"
-import { mapGetters, mapMutations, mapState } from "vuex"
+import { mapActions, mapGetters, mapMutations, mapState } from "vuex"
 import TapestryNode from "./TapestryNode"
 import TapestryLink from "./TapestryLink"
 import TapestryMinimapButton from "./TapestryMinimap/TapestryMinimapButton"
@@ -101,11 +103,12 @@ export default {
       "links",
       "selection",
       "settings",
+      "browserDimensions",
       "maxLevel",
       "currentDepth",
       "scaleConstants",
     ]),
-    ...mapGetters(["isEmptyTapestry", "getNode", "getInitialNodeId"]),
+    ...mapGetters(["isEmptyTapestry", "getNode", "getInitialNodeId", "getCurrentNodeNav"]),
     computedViewBox() {
       // return this.viewBox.join(" ")
       return `${this.viewBox[0] + this.offset.x} ${this.viewBox[1] +
@@ -135,6 +138,9 @@ export default {
           Helpers.getNodeBaseRadius(this.maxLevel, this.maxLevel),
         140 / Helpers.getNodeBaseRadius(this.maxLevel, this.maxLevel)
       )
+    },
+    routeName() {
+      return this.$route.name
     },
   },
   watch: {
@@ -167,8 +173,17 @@ export default {
                 }
           )
         }
+        if (nodeId !== this.getCurrentNodeNav) {
+          this.resetNodeNavigation(nodeId)
+        }
         this.updateViewBox()
       },
+    },
+    routeName(newName, oldName) {
+      if (newName === names.APP && oldName === names.LIGHTBOX) {
+        // TODO: this is not needed anymore due to new lightbox using Bootstrap modal which automatically returns focus to last selected node; remove after testing on a screen reader
+        // this.focusSelectedNode()
+      }
     },
   },
   created() {
@@ -192,7 +207,7 @@ export default {
     this.dragSelectReady = true
 
     this.zoomPanHelper = new ZoomPanHelper(
-      "vue-svg",
+      "tapestry",
       (delta, x, y) => {
         this.handleZoom(delta * this.scaleConstants.zoomSensitivity, x, y)
       },
@@ -210,15 +225,25 @@ export default {
         this.isPanning = false
         this.updateOffset()
         this.fetchAppDimensions()
-      }
+      },
+      [this.$refs.minimap.$el]
     )
     this.zoomPanHelper.register()
+
+    this.$refs.app.addEventListener("keydown", this.handleKey)
   },
   beforeDestroy() {
     this.zoomPanHelper && this.zoomPanHelper.unregister()
+    this.$refs.app.removeEventListener("keydown", this.handleKey)
   },
   methods: {
     ...mapMutations(["select", "unselect", "clearSelection"]),
+    ...mapActions([
+      "goToNodeChildren",
+      "goToNodeParent",
+      "goToNodeSibling",
+      "resetNodeNavigation",
+    ]),
     clampScale(scale) {
       return Math.max(
         Math.min(scale, this.maxScale),
@@ -275,7 +300,9 @@ export default {
       this.offset.y -= dy
     },
     handleMinimapPanBy({ dx, dy }) {
-      this.zoomPanHelper.onPan(dx, dy)
+      // dx, dy passed here is in viewBox dimensions, not screen pixels; we apply the changes to the offset directly, bypassing the calculations in handlePan
+      this.offset.x -= dx * this.scaleConstants.panSensitivity
+      this.offset.y -= dy * this.scaleConstants.panSensitivity
       this.zoomPanHelper.onPanEnd()
     },
     handleMinimapPanTo({ x, y }) {
@@ -330,7 +357,7 @@ export default {
           tapestryDimensions.width = x
           tapestryDimensions.height = y
         }
-        const windowWidth = Helpers.getBrowserWidth()
+        const windowWidth = this.browserDimensions.width
         // Center the nodes if there is not enough of them to fill the width of the screen
         if (
           tapestryDimensions.width - tapestryDimensions.startX - MAX_RADIUS * 1.25 <
@@ -344,8 +371,8 @@ export default {
         tapestryDimensions.width = tapestryDimensions.width + MAX_RADIUS * 1.25
         tapestryDimensions.height = tapestryDimensions.height + MAX_RADIUS * 1.25
 
-        const MIN_WIDTH = Helpers.getBrowserWidth() * MIN_TAPESTRY_WIDTH_FACTOR
-        const MIN_HEIGHT = Helpers.getBrowserHeight() * MIN_TAPESTRY_WIDTH_FACTOR
+        const MIN_WIDTH = this.browserDimensions.width * MIN_TAPESTRY_WIDTH_FACTOR
+        const MIN_HEIGHT = this.browserDimensions.height * MIN_TAPESTRY_WIDTH_FACTOR
 
         this.unscaledViewBox = [
           tapestryDimensions.startX,
@@ -399,6 +426,65 @@ export default {
       ) {
         this.activeNode = id
       }
+    },
+    handleKey(evt) {
+      const { code } = evt
+      const node = this.getNode(this.selectedId)
+      if (code === "Enter") {
+        if (
+          node.accessible ||
+          Helpers.hasPermission(node, "edit", this.settings.showRejected)
+        ) {
+          this.$root.$emit("open-node", node.id)
+        }
+      } else if (code === "Tab") {
+        // ? potentially let the user tab out of the main tapestry view, since the user should be fully capable of navigating through all the nodes by using just arrow keys
+      } else if (code === "KeyE") {
+        if (Helpers.hasPermission(node, "edit", this.settings.showRejected)) {
+          this.$root.$emit("edit-node", node.id)
+        }
+      } else if (code === "KeyQ" || code === "Escape") {
+        // focus the next element after the main
+        document.querySelector(".minimap-button button")?.focus()
+      } else {
+        if (node.id === this.getCurrentNodeNav) {
+          if (code === "ArrowDown") {
+            evt.preventDefault()
+            this.goToNodeChildren().then(this.setSelectedNode)
+          } else if (code === "ArrowUp") {
+            evt.preventDefault()
+            this.goToNodeParent().then(this.setSelectedNode)
+          } else if (code === "ArrowRight") {
+            evt.preventDefault()
+            this.goToNodeSibling(1).then(this.setSelectedNode)
+          } else if (code === "ArrowLeft") {
+            evt.preventDefault()
+            this.goToNodeSibling(-1).then(this.setSelectedNode)
+          }
+        } else {
+          this.resetNodeNavigation(node.id)
+        }
+      }
+    },
+    setSelectedNode(nodeId) {
+      if (nodeId === false) {
+        return
+      }
+      this.$router.push({
+        name: names.APP,
+        params: { nodeId },
+        query: this.$route.query,
+        path: `/nodes/${nodeId}`,
+      })
+      this.focusSelectedNode()
+    },
+    focusSelectedNode() {
+      this.$nextTick(() => {
+        const nodeElement = document.querySelector(
+          `.node[data-id='${this.selectedId}']`
+        )
+        nodeElement && nodeElement.focus()
+      })
     },
   },
 }

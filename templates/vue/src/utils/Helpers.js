@@ -20,6 +20,7 @@ export default class Helpers {
   }
 
   /**
+   * [DO NOT USE DIRECTLY! Use the browserDimensions Vuex state instead]
    * Get browser width
    *
    * @return {Number}
@@ -29,12 +30,26 @@ export default class Helpers {
   }
 
   /**
-   * Get browser height
+   * [DO NOT USE DIRECTLY! Use the browserDimensions Vuex state instead]
+   * Get browser height, taking the admin bar into account if the bar is visible
    *
    * @return {Number}
    */
   static getBrowserHeight() {
-    return Math.max(document.documentElement.clientHeight, window.innerHeight || 0)
+    const adminBar = document.getElementById("wpadminbar")
+    return (
+      Math.max(document.documentElement.clientHeight, window.innerHeight || 0) -
+      (adminBar && adminBar.clientHeight ? adminBar.clientHeight : 0)
+    )
+  }
+
+  /**
+   * Convert the number in css rem units to number in px
+   * @param {Number} rem
+   * @return {Number}
+   */
+  static remToPx(rem) {
+    return rem * parseFloat(getComputedStyle(document.documentElement).fontSize)
   }
 
   /**
@@ -60,15 +75,6 @@ export default class Helpers {
     }
 
     return tapestry.nodes.findIndex(helper)
-  }
-
-  static getAspectRatio() {
-    const browserHeight = this.getBrowserHeight()
-    const browserWidth = this.getBrowserWidth()
-    if (browserHeight < 10) {
-      return 0
-    }
-    return browserWidth / browserHeight
   }
 
   static normalizeUrl(url) {

@@ -19,13 +19,10 @@
             'unit-child': unitsMenuVisible,
           },
         ]"
+        tabindex="0"
+        aria-label="Page menu"
       >
-        <div
-          ref="container"
-          data-qa="page-nav-container"
-          class="page-nav"
-          :style="{ height: node.fullscreen ? '100vh' : dimensions.height + 'px' }"
-        >
+        <div ref="container" data-qa="page-nav-container" class="page-nav">
           <div v-if="unitsMenuVisible">
             <b-dropdown
               class="unit-switch-dropdown"
@@ -80,6 +77,7 @@
           fullscreen: node.fullscreen,
         },
       ]"
+      :aria-label="opened ? 'Close page menu' : 'Open page menu'"
       data-qa="page-nav-toggle"
       @click="toggleMenu"
     >
@@ -94,10 +92,9 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex"
+import { mapGetters, mapState } from "vuex"
 import PageMenuItem from "./PageMenuItem"
 import { isLoggedIn, data as wpData } from "@/services/wp"
-import Helpers from "@/utils/Helpers"
 
 export default {
   name: "page-menu",
@@ -108,11 +105,6 @@ export default {
     node: {
       type: Object,
       required: true,
-    },
-    dimensions: {
-      type: Object,
-      required: false,
-      default: null,
     },
     pages: {
       type: [Array, Boolean],
@@ -126,11 +118,11 @@ export default {
   data() {
     return {
       opened: false,
-      browserWidth: Helpers.getBrowserWidth(),
       animate: false,
     }
   },
   computed: {
+    ...mapState(["browserDimensions"]),
     ...mapGetters(["getDirectChildren", "getNode", "isMultiContent", "getParent"]),
     nodeId() {
       return parseInt(this.$route.params.nodeId, 10)
@@ -167,7 +159,9 @@ export default {
       return this.fullScreen || this.node.fullscreen
     },
     menuVisible() {
-      return this.opened || (this.node.fullscreen && this.browserWidth > 800)
+      return (
+        this.opened || (this.node.fullscreen && this.browserDimensions.width > 800)
+      )
     },
     unitsMenuVisible() {
       return this.pages && this.parentNode.childOrdering.length > 1
@@ -182,17 +176,7 @@ export default {
       return wpData.logoutUrl
     },
   },
-  mounted() {
-    this.computeBrowserWidth()
-    window.addEventListener("resize", this.computeBrowserWidth)
-  },
-  beforeDestroy() {
-    window.removeEventListener("resize", this.computeBrowserWidth)
-  },
   methods: {
-    computeBrowserWidth() {
-      this.browserWidth = Helpers.getBrowserWidth()
-    },
     disabledRow(node) {
       const index = this.rows.findIndex(row => row.node.id === node.id)
       return (
@@ -220,6 +204,11 @@ export default {
       // Only animate the enter/leave if triggered by the toggle button
       this.animate = true
       this.opened = !this.opened
+      if (this.opened) {
+        this.$nextTick(() => {
+          this.$refs.wrapper && this.$refs.wrapper.focus()
+        })
+      }
     },
     scrollToRef(nodeId) {
       this.$nextTick(() => {
@@ -266,6 +255,7 @@ export default {
     position: absolute;
     left: 0;
     top: 0;
+    bottom: 0;
     z-index: 11;
     border-radius: 15px 0 0 15px;
   }
@@ -297,6 +287,7 @@ export default {
     font-size: 14px;
     text-align: left;
     overflow-y: auto;
+    height: 100%;
     display: flex;
     flex-direction: column;
 

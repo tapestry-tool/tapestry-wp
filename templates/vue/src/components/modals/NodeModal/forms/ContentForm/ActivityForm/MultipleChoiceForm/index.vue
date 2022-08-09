@@ -140,8 +140,7 @@ export default {
         ...Helpers.deepCopy(defaultChoice),
         id: choiceId,
       })
-      // TODO: Fix this as this line doesn't seem to work
-      this.$nextTick(() => this.$refs["choice-row-" + choiceId][0].$el.focus())
+      this.$nextTick(() => this.$refs["choice-row-" + choiceId][0].focus())
     },
     removeChoice: function(index, item) {
       this.multipleChoice.choices.splice(index, 1)

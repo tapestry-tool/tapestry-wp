@@ -364,7 +364,6 @@ h2:before {
     &:focus {
       background-color: rgba($color-black, 0.2);
       background: rgba($color-black, 0.2);
-      outline: unset;
     }
   }
 

@@ -30,6 +30,7 @@
     </completion-screen>
     <question
       v-else-if="state === 'activity'"
+      class="activity-question"
       :question="activeQuestion"
       :node="questionNode"
       @submit="handleComplete('activity')"
@@ -113,10 +114,6 @@ export default {
   },
   props: {
     node: {
-      type: Object,
-      required: true,
-    },
-    dimensions: {
       type: Object,
       required: true,
     },
@@ -245,11 +242,6 @@ export default {
         break
     }
 
-    this.$emit("change:dimensions", {
-      width: this.dimensions.width,
-      height:
-        this.$refs.activity.clientHeight - (this.context === "lightbox" ? 0 : 100),
-    })
     this.$emit("load")
   },
   created() {
@@ -360,6 +352,10 @@ export default {
     margin-bottom: 1em;
     width: 100%;
   }
+}
+
+.activity-question {
+  min-height: 200px;
 }
 
 .question-footer {

@@ -20,7 +20,6 @@
       />
       <multi-content-media
         v-if="node.mediaType === 'multi-content'"
-        :dimensions="dimensions"
         :context="context"
         :node="node"
         @complete="handleComplete"
