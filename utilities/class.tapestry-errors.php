@@ -110,6 +110,10 @@ class TapestryError extends Error
             'MESSAGE' => 'The Tapestry is not empty',
             'STATUS' => ['status' => 400],
         ],
+        'FAILED_TO_SAVE_CAPTIONS' => [
+            'MESSAGE' => 'Failed to save captions to Kaltura.',
+            'STATUS' => ['status' => 500],
+        ],
     ];
 
     /**

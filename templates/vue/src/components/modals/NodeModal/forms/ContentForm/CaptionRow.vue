@@ -16,8 +16,9 @@
         <i
           :id="`caption-error-message-${caption.id}`"
           class="far fa-question-circle"
+          tabindex="0"
         ></i>
-        <b-tooltip :target="`caption-error-message-${caption.id}`" triggers="hover">
+        <b-tooltip :target="`caption-error-message-${caption.id}`">
           This caption could not be uploaded. {{ errorMessage }}
         </b-tooltip>
       </div>

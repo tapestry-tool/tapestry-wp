@@ -167,14 +167,8 @@
             $kclient = $this->getKClient();
             $captionAssets = $this->_getCaptions($kclient, $videoEntryId);
 
-            return $this->_filterCaptionAssets($kclient, $captionAssets);
-        }
-
-        private function _filterCaptionAssets($kclient, $captionAssets)
-        {
             $captions = [];
             $defaultCaptionId = null;
-
             foreach ($captionAssets as $key => $captionAsset) {
                 $captions[$key] = $this->_filterCaptionAsset($kclient, $captionAsset);
 
@@ -189,6 +183,28 @@
             ];
         }
 
+        private function _getCaptions($kclient, $videoEntryId)
+        {
+            $captionPlugin = CaptionPlugin::get($kclient);
+
+            $filter = new CaptionAssetFilter();
+            $filter->entryIdEqual = $videoEntryId;
+
+            $captionAssets = $captionPlugin->captionAsset->listAction($filter);
+
+            return $captionAssets->objects;
+        }
+
+        private function _getCaptionUrl($kclient, $captionAssetId)
+        {
+            $captionPlugin = CaptionPlugin::get($kclient);
+
+            return $captionPlugin->captionAsset->serve($captionAssetId);
+        }
+
+        /**
+         * Filter caption asset fields to return to the user.
+         */
         private function _filterCaptionAsset($kclient, $captionAsset, $overrideCaptionUrl = null, $errorMessage = null)
         {
             $caption = (object) [
@@ -204,26 +220,6 @@
             return $caption;
         }
 
-        private function _getCaptionUrl($kclient, $captionAssetId)
-        {
-            $captionPlugin = CaptionPlugin::get($kclient);
-            $response = $captionPlugin->captionAsset->serve($captionAssetId);
-
-            return $response;
-        }
-
-        private function _getCaptions($kclient, $videoEntryId)
-        {
-            $captionPlugin = CaptionPlugin::get($kclient);
-
-            $filter = new CaptionAssetFilter();
-            $filter->entryIdEqual = $videoEntryId;
-
-            $captionAssets = $captionPlugin->captionAsset->listAction($filter);
-
-            return $captionAssets->objects;
-        }
-
         public function setCaptionsAndDefaultCaption($videoEntryId, $captions, $defaultCaptionId)
         {
             if (!isset($captions) || !is_array($captions)) {
@@ -231,60 +227,56 @@
             }
 
             try {
-                $result = $this->setCaptions($videoEntryId, $captions);
+                $kclient = $this->getKClient(SessionType::ADMIN);
 
+                $result = $this->setCaptions($kclient, $videoEntryId, $captions);
                 $updatedCaptions = $result->captions;
-                $captions = array_values($updatedCaptions);
 
                 if (!empty($defaultCaptionId) && is_string($defaultCaptionId) && isset($updatedCaptions[$defaultCaptionId])) {
+                    // Map default caption ID to its (possibly) new ID after being uploaded
                     $newDefaultCaptionId = $updatedCaptions[$defaultCaptionId]->id;
-                    $this->setCaptionAsDefault($newDefaultCaptionId);
+                    $this->setCaptionAsDefault($kclient, $newDefaultCaptionId);
                 }
 
                 return (object) [
-                    'captions' => $captions,
+                    'captions' => array_values($updatedCaptions),
                     'pendingCaptions' => $result->pendingCaptions,
                     'defaultCaptionId' => $newDefaultCaptionId,
                 ];
             } catch (Exception $e) {
-                throw new TapestryError($e->getCode(), $e->getMessage(), 500);
+                throw new TapestryError('FAILED_TO_SAVE_CAPTIONS');
             }
         }
 
-        public function setCaptionAsDefault($captionAssetId)
+        public function setCaptionAsDefault($kclient, $captionAssetId)
         {
-            $kclient = $this->getKClient(SessionType::ADMIN);
             $captionPlugin = CaptionPlugin::get($kclient);
-
-            $response = $captionPlugin->captionAsset->setAsDefault($captionAssetId);
-
-            return $response;
+            $captionPlugin->captionAsset->setAsDefault($captionAssetId);
         }
 
-        public function setCaptions($videoEntryId, $captions)
+        public function setCaptions($kclient, $videoEntryId, $captions)
         {
-            $kclient = $this->getKClient(SessionType::ADMIN);
-
+            // Get existing captions
             $oldCaptions = $this->getCaptionsAndDefaultCaption($videoEntryId)->captions;
 
+            // Prepare the changes to make
             $oldCaptionsMap = $this->_formRequests($oldCaptions);
             $newCaptionsMap = $this->_formRequests($captions);
 
-            $captionsToDelete = array_diff_key($oldCaptionsMap, $newCaptionsMap);
-            $captionsToAdd = array_diff_key($newCaptionsMap, $oldCaptionsMap);
-            $captionsToUpdate = array_intersect_key($newCaptionsMap, $oldCaptionsMap);
+            $toDelete = array_diff_key($oldCaptionsMap, $newCaptionsMap);
+            $toAdd = array_diff_key($newCaptionsMap, $oldCaptionsMap);
+            $toUpdate = array_intersect_key($newCaptionsMap, $oldCaptionsMap);
 
             $kclient->startMultiRequest();
-
-            foreach ($captionsToDelete as $caption) {
+            foreach ($toDelete as $caption) {
                 $this->_deleteCaptionAsset($kclient, $caption->id);
             }
-            foreach ($captionsToAdd as $caption) {
+            foreach ($toAdd as $caption) {
                 $captionAssetId = $this->_createCaptionAsset($kclient, $caption, $videoEntryId);
                 $tokenId = $this->_uploadFile($kclient, $caption->file, ['vtt']);
                 $this->_setCaptionAssetContent($kclient, $caption, $captionAssetId, $tokenId);
             }
-            foreach ($captionsToUpdate as $caption) {
+            foreach ($toUpdate as $caption) {
                 $this->_updateCaptionAsset($kclient, $caption);
                 if (isset($caption->file)) {
                     $tokenId = $this->_uploadFile($kclient, $caption->file, ['vtt']);
@@ -296,7 +288,7 @@
 
             $allResults = $kclient->doMultiRequest();
 
-            return $this->_processResponses($kclient, $allResults, $captionsToAdd, $captionsToUpdate);
+            return $this->_processResponses($kclient, $allResults, $toAdd, $toUpdate);
         }
 
         private function _formRequests($captions)
@@ -318,15 +310,16 @@
             return $requests;
         }
 
-        private function _processResponses($kclient, $responses, $captionsToAdd, $captionsToUpdate)
+        private function _processResponses($kclient, $responses, $toAdd, $toUpdate)
         {
             $results = [];
             $pending = [];
 
+            // Caption metadata and content are set in separate requests, so address errors separately.
             $metadataErrorMessage = 'Please check the language and label.';
             $contentErrorMessage = 'Please check the .vtt file you provided.';
 
-            foreach ($captionsToAdd as $caption) {
+            foreach ($toAdd as $caption) {
                 $metadataResponse = $responses[$caption->metadataRequestIndex];
                 $contentResponse = $responses[$caption->contentRequestIndex];
 
@@ -343,9 +336,9 @@
                 }
             }
 
-            foreach ($captionsToUpdate as $caption) {
+            foreach ($toUpdate as $caption) {
                 $metadataResponse = $responses[$caption->metadataRequestIndex];
-                $contentResponse = isset($caption->contentRequestIndex) ? $responses[$caption->contentRequestIndex] : null;
+                $contentResponse = $responses[$caption->contentRequestIndex];
 
                 $metadataError = is_a($metadataResponse, ApiException::class);
                 $contentError = is_a($contentResponse, ApiException::class);
@@ -374,6 +367,14 @@
             }
         }
 
+        /**
+         * Uploads a local file and returns the Kaltura upload token ID.
+         *
+         * @param object $file              object containing file name and path information
+         * @param array  $allowedExtensions list of valid file extensions to upload
+         *
+         * @return string|null the upload token ID or null if given file is invalid
+         */
         private function _uploadFile($kclient, $file, $allowedExtensions)
         {
             if (empty($file) || !in_array(pathinfo($file->name, PATHINFO_EXTENSION), $allowedExtensions)) {
@@ -387,6 +388,12 @@
             return $token->id;
         }
 
+        /**
+         * Adds a new caption asset to a Kaltura video and returns its ID.
+         *
+         * @param object $caption      caption to add
+         * @param string $videoEntryId kaltura ID of the video
+         */
         private function _createCaptionAsset($kclient, $caption, $videoEntryId)
         {
             $captionPlugin = CaptionPlugin::get($kclient);
@@ -398,11 +405,19 @@
 
             $response = $captionPlugin->captionAsset->add($videoEntryId, $captionAsset);
 
+            // Save the index of this request to check its response later
             $caption->metadataRequestIndex = $kclient->getMultiRequestQueueSize() - 1;
 
             return $response->id;
         }
 
+        /**
+         * Sets the file contents of a Kaltura caption asset from an uploaded file token.
+         *
+         * @param object $caption        Caption object
+         * @param string $captionAssetId Kaltura ID of the caption to update
+         * @param string $tokenId        ID of the Kaltura uploaded file token
+         */
         private function _setCaptionAssetContent($kclient, $caption, $captionAssetId, $tokenId)
         {
             $captionPlugin = CaptionPlugin::get($kclient);
@@ -411,11 +426,17 @@
             $resource->token = $tokenId;
             $response = $captionPlugin->captionAsset->setContent($captionAssetId, $resource);
 
+            // Save the index of this request to check its response later
             $caption->contentRequestIndex = $kclient->getMultiRequestQueueSize() - 1;
 
             return $response->id;
         }
 
+        /**
+         * Updates the metadata (language, label, etc) of a Kaltura caption asset.
+         *
+         * @param object $caption New metadata for the caption
+         */
         private function _updateCaptionAsset($kclient, $caption)
         {
             $captionPlugin = CaptionPlugin::get($kclient);
@@ -428,6 +449,7 @@
 
             $response = $captionPlugin->captionAsset->update($captionAsset->id, $captionAsset);
 
+            // Save the index of this request to check its response later
             $caption->metadataRequestIndex = $kclient->getMultiRequestQueueSize() - 1;
 
             return $response->id;
@@ -436,8 +458,6 @@
         private function _deleteCaptionAsset($kclient, $captionAssetId)
         {
             $captionPlugin = CaptionPlugin::get($kclient);
-            $response = $captionPlugin->captionAsset->delete($captionAssetId);
-
-            return $response;
+            $captionPlugin->captionAsset->delete($captionAssetId);
         }
     }
