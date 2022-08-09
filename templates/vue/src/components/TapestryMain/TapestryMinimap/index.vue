@@ -1,5 +1,5 @@
 <template>
-  <div :class="{ 'can-pan': mouseMoved }">
+  <div :class="{ 'can-pan': mouseMoved && !isDragSelecting }">
     <canvas
       ref="minimap"
       :width="viewBox[2]"
@@ -55,6 +55,10 @@ export default {
     },
     offset: {
       type: Object,
+      required: true,
+    },
+    isDragSelecting: {
+      type: Boolean,
       required: true,
     },
   },

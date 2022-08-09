@@ -28,7 +28,7 @@
             :scale="scale"
           ></tapestry-link>
         </g>
-        <g v-if="dragSelectEnabled && dragSelectReady" class="nodes">
+        <g v-if="dragSelectEnabled" class="nodes">
           <tapestry-node
             v-for="(node, id) in nodes"
             :key="id"
@@ -65,6 +65,7 @@
       :view-box="unscaledViewBox"
       :scale="scale"
       :offset="offset"
+      :isDragSelecting="isDragSelecting"
       @pan-by="handleMinimapPanBy"
       @pan-to="handleMinimapPanTo"
       @close="showMinimap = false"
@@ -109,7 +110,7 @@ export default {
   },
   data() {
     return {
-      dragSelectReady: false,
+      isDragSelecting: false,
       activeNode: null,
 
       appHeight: "100vh",
@@ -254,8 +255,18 @@ export default {
     }
   },
   mounted() {
+    if (this.dragSelectEnabled) {
+      DragSelectModular.initialize(
+        () => {
+          this.isDragSelecting = true
+        },
+        () => {
+          this.isDragSelecting = false
+        }
+      )
+    }
+
     this.updateViewBox()
-    this.dragSelectReady = true
 
     this.zoomPanHelper = new ZoomPanHelper(
       "vue-svg",

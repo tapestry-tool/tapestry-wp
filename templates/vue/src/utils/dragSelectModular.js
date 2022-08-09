@@ -6,6 +6,13 @@ export default class DragSelectModular {
   app
   nodes
   dragSelect = null
+  onDragStart
+  onDragEnd
+
+  static initialize(onDragStart, onDragEnd) {
+    this.onDragStart = onDragStart
+    this.onDragEnd = onDragEnd
+  }
 
   static initializeDragSelect(area, app, nodes) {
     this.app = app
@@ -14,11 +21,20 @@ export default class DragSelectModular {
       selectables: document.querySelectorAll(".node.selectable"),
       area: area,
     })
-    this.dragSelect.subscribe("dragstart", ({ event }) => {
+    this.dragSelect.subscribe("dragstart", callbackObj => {
+      const { event } = callbackObj
       if (event.ctrlKey || event.metaKey || event.shiftKey) {
         return
       }
       app.clearSelection()
+      if (this.onDragStart) {
+        this.onDragStart(callbackObj)
+      }
+    })
+    this.dragSelect.subscribe("callback", ({ callbackObj }) => {
+      if (this.onDragEnd) {
+        this.onDragEnd(callbackObj)
+      }
     })
     this.dragSelect.subscribe("elementselect", ({ item }) =>
       app.select(item.dataset.id)
