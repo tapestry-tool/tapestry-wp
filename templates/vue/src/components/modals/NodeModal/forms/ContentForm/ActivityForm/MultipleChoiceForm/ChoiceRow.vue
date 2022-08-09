@@ -18,6 +18,7 @@
           />
         </b-input-group-prepend>
         <b-form-input
+          ref="input"
           v-model="item.value"
           placeholder="Enter choice text"
           class="form-input"
@@ -85,6 +86,9 @@ export default {
   methods: {
     handleUploadChange(state) {
       this.$root.$emit("node-modal::uploading", state)
+    },
+    focus() {
+      this.$refs.input?.focus()
     },
   },
 }

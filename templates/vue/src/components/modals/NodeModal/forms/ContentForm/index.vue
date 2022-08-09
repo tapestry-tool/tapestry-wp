@@ -218,6 +218,13 @@ export default {
     mediaTypes() {
       this.selectUnitChild()
     },
+    addMenuTitle(addMenuTitle) {
+      if (addMenuTitle) {
+        this.$nextTick(() => {
+          document.getElementById("node-nav-title")?.focus()
+        })
+      }
+    },
   },
   created() {
     this.selectUnitChild()
