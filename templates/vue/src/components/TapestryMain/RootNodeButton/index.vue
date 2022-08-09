@@ -1,8 +1,8 @@
 <template>
   <div id="root-node-button">
     <import-changelog :changes="changes" />
-    <div data-qa="root-node-button" @click="addRootNode">
-      <i class="fas fa-plus-circle fa-5x"></i>
+    <div data-qa="root-node-button" role="button" @click="addRootNode">
+      <i class="fas fa-plus-circle fa-5x" aria-hidden="true"></i>
       <div>Add Root Node</div>
     </div>
     <p>Or</p>
@@ -13,7 +13,7 @@
         Import a Tapestry
       </div>
     </b-button>
-    <div v-if="error" style="margin-top: 16px;">
+    <div v-if="error" style="margin-top: 16px;" role="alert" aria-live="polite">
       {{ error.message }}
       <br />
       Please try with another file.
