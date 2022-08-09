@@ -13,15 +13,20 @@ export default class DragSelectModular {
     this.dragSelect = new DragSelect({
       selectables: document.querySelectorAll(".node.selectable"),
       area: area,
-      onDragStart: evt => {
-        if (evt.ctrlKey || evt.metaKey || evt.shiftKey) {
-          return
-        }
-        app.clearSelection()
-      },
-      onElementSelect: el => app.select(el.dataset.id),
-      onElementUnselect: el => app.unselect(el.dataset.id),
     })
+    this.dragSelect.subscribe("dragstart", ({ event }) => {
+      if (event.ctrlKey || event.metaKey || event.shiftKey) {
+        return
+      }
+      app.clearSelection()
+    })
+    this.dragSelect.subscribe("elementselect", ({ item }) =>
+      app.select(item.dataset.id)
+    )
+    this.dragSelect.subscribe("elementunselect", ({ item }) =>
+      app.unselect(item.dataset.id)
+    )
+
     this.addDragSelectListener()
   }
 
