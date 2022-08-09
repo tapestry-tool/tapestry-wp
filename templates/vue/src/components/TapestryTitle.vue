@@ -1,6 +1,6 @@
 <template>
   <div class="tapestry-title">
-    <div class="title">{{ title }}</div>
+    <h1 class="title">{{ title }}</h1>
     <tapestry-filter v-if="!showMap" style="z-index: 10" />
   </div>
 </template>
@@ -38,6 +38,7 @@ export default {
 
   .title {
     font-size: 1.5rem;
+    font-weight: normal;
   }
 }
 </style>
