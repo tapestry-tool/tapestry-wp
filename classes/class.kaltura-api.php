@@ -286,6 +286,7 @@
                 }
             }
 
+            // Send all changes in one request
             $allResults = $kclient->doMultiRequest();
 
             return $this->_processResponses($kclient, $allResults, $toAdd, $toUpdate);
@@ -310,26 +311,31 @@
             return $requests;
         }
 
+        /**
+         * Process the array of all API responses from a multi-request.
+         * Deletes local caption files if successfully uploaded.
+         * Returns an array of successfully added captions - containing the updated fields,
+         * and an array of unsuccessfully added (pending) captions - containing the original user-provided fields.
+         */
         private function _processResponses($kclient, $responses, $toAdd, $toUpdate)
         {
             $results = [];
             $pending = [];
 
-            // Caption metadata and content are set in separate requests, so address errors separately.
+            // Caption metadata (language, label) and content (VTT file) are set in separate requests, so address errors separately.
             $metadataErrorMessage = 'Please check the language and label.';
             $contentErrorMessage = 'Please check the .vtt file you provided.';
 
             foreach ($toAdd as $caption) {
                 $metadataResponse = $responses[$caption->metadataRequestIndex];
                 $contentResponse = $responses[$caption->contentRequestIndex];
-
                 $metadataError = is_a($metadataResponse, ApiException::class);
                 $contentError = is_a($contentResponse, ApiException::class);
 
                 if ($metadataError) {
                     array_push($pending, $this->_filterCaptionAsset($kclient, $caption, $caption->captionUrl, $metadataErrorMessage));
                 } elseif ($contentError) {
-                    array_push($pending, $this->_filterCaptionAsset($kclient, $metadataResponse, $caption->captionUrl, $contentErrorMessage));
+                    array_push($pending, $this->_filterCaptionAsset($kclient, $caption, $caption->captionUrl, $contentErrorMessage));
                 } else {
                     $results[$caption->id] = $this->_filterCaptionAsset($kclient, $metadataResponse);
                     $this->_deleteLocalUpload($caption->file);
@@ -339,14 +345,14 @@
             foreach ($toUpdate as $caption) {
                 $metadataResponse = $responses[$caption->metadataRequestIndex];
                 $contentResponse = $responses[$caption->contentRequestIndex];
-
                 $metadataError = is_a($metadataResponse, ApiException::class);
                 $contentError = is_a($contentResponse, ApiException::class);
 
                 if ($contentError) {
+                    // Failed to upload - keep URL of local caption file and do not delete it
                     array_push($pending, $this->_filterCaptionAsset($kclient, $caption, $caption->captionUrl, $contentErrorMessage));
                 } elseif ($metadataError) {
-                    array_push($pending, $this->_filterCaptionAsset($kclient, $caption, $metadataErrorMessage));
+                    array_push($pending, $this->_filterCaptionAsset($kclient, $caption, null, $metadataErrorMessage));
                     $this->_deleteLocalUpload($caption->file);
                 } else {
                     $results[$caption->id] = $this->_filterCaptionAsset($kclient, $metadataResponse);
