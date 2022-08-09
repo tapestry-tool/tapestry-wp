@@ -39,6 +39,7 @@
     </svg>
     <tapestry-minimap
       v-if="showMinimap"
+      ref="minimap"
       :view-box="unscaledViewBox"
       :scale="scale"
       :offset="offset"
@@ -191,7 +192,7 @@ export default {
     this.dragSelectReady = true
 
     this.zoomPanHelper = new ZoomPanHelper(
-      "vue-svg",
+      "tapestry",
       (delta, x, y) => {
         this.handleZoom(delta * this.scaleConstants.zoomSensitivity, x, y)
       },
@@ -209,7 +210,8 @@ export default {
         this.isPanning = false
         this.updateOffset()
         this.fetchAppDimensions()
-      }
+      },
+      [this.$refs.minimap.$el]
     )
     this.zoomPanHelper.register()
   },
