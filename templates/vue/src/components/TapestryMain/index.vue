@@ -608,3 +608,10 @@ export default {
   }
 }
 </style>
+
+<style lang="scss">
+// Override dragselect's default styles so that the minimap covers the select rectangle
+.ds-selector-area {
+  z-index: -1 !important;
+}
+</style>
