@@ -6,21 +6,21 @@
     data-qa="caption-row"
   >
     <b-row align-v="center" class="mb-2 mx-0">
-      <div>
+      <div :id="`${captionContainerId}-toggle`" v-b-toggle="captionContainerId">
         <b>{{ title }}</b>
         <span v-if="isDefault" class="ml-2">
           (default)
         </span>
-      </div>
-      <div v-if="isPending && errorMessage" class="mx-1">
-        <i
-          :id="`caption-error-message-${caption.id}`"
-          class="far fa-question-circle"
-          tabindex="0"
-        ></i>
-        <b-tooltip :target="`caption-error-message-${caption.id}`">
-          This caption could not be uploaded. {{ errorMessage }}
-        </b-tooltip>
+        <span v-if="isPending && errorMessage" class="ml-2">
+          <i
+            :id="`caption-error-message-${caption.id}`"
+            class="far fa-question-circle"
+            tabindex="0"
+          ></i>
+          <b-tooltip :target="`caption-error-message-${caption.id}`">
+            This caption could not be uploaded. {{ errorMessage }}
+          </b-tooltip>
+        </span>
       </div>
       <div class="ml-auto d-flex align-items-center">
         <b-button
@@ -52,51 +52,53 @@
         </b-button>
       </div>
     </b-row>
-    <b-card bg-variant="light" text-variant="dark">
-      <b-row>
-        <b-col cols="6">
-          <b-form-group label="Source">
-            <file-upload
-              v-model="caption.captionUrl"
-              file-types=".vtt"
-              compact-mode
-              placeholder="Enter URL or upload a VTT file"
-              :is-image="false"
-              :file-upload-id="
-                `caption-file-upload-${isPending ? 'pending' : ''}-${caption.id}`
-              "
+    <b-collapse :id="captionContainerId" visible>
+      <b-card bg-variant="light" text-variant="dark">
+        <b-row>
+          <b-col cols="6">
+            <b-form-group label="Source">
+              <file-upload
+                v-model="caption.captionUrl"
+                file-types=".vtt"
+                compact-mode
+                placeholder="Enter URL or upload a VTT file"
+                :is-image="false"
+                :file-upload-id="
+                  `caption-file-upload-${isPending ? 'pending' : ''}-${caption.id}`
+                "
+              />
+            </b-form-group>
+          </b-col>
+          <b-col cols="6">
+            <b-form-group label="Language">
+              <b-form-select
+                v-model="caption.language"
+                :data-qa="`caption-language-${index}`"
+                :options="languages"
+              ></b-form-select>
+            </b-form-group>
+          </b-col>
+          <b-col>
+            <b-form-checkbox
+              switch
+              :checked="customizeLabel"
+              :data-qa="`caption-label-toggle-${index}`"
+              @change="handleCustomizeLabel($event)"
+            >
+              Customize label
+            </b-form-checkbox>
+            <b-form-input
+              v-if="customizeLabel"
+              v-model="caption.label"
+              class="mt-2"
+              aria-label="Caption label"
+              :placeholder="caption.language"
+              :data-qa="`caption-label-${index}`"
             />
-          </b-form-group>
-        </b-col>
-        <b-col cols="6">
-          <b-form-group label="Language">
-            <b-form-select
-              v-model="caption.language"
-              :data-qa="`caption-language-${index}`"
-              :options="languages"
-            ></b-form-select>
-          </b-form-group>
-        </b-col>
-        <b-col>
-          <b-form-checkbox
-            switch
-            :checked="customizeLabel"
-            :data-qa="`caption-label-toggle-${index}`"
-            @change="handleCustomizeLabel($event)"
-          >
-            Customize label
-          </b-form-checkbox>
-          <b-form-input
-            v-if="customizeLabel"
-            v-model="caption.label"
-            class="mt-2"
-            aria-label="Caption label"
-            :placeholder="caption.language"
-            :data-qa="`caption-label-${index}`"
-          />
-        </b-col>
-      </b-row>
-    </b-card>
+          </b-col>
+        </b-row>
+      </b-card>
+    </b-collapse>
   </b-card>
 </template>
 
@@ -149,6 +151,9 @@ export default {
       set(val) {
         this.$emit("input", val)
       },
+    },
+    captionContainerId() {
+      return `caption${this.isPending ? "-pending" : ""}-${this.index}-container`
     },
     customizeLabel: {
       get() {

@@ -301,6 +301,11 @@ export default {
           id: Helpers.createUUID(),
         },
       ]
+      this.$nextTick(() => {
+        document
+          .getElementById(`caption-${this.captions.length - 1}-container-toggle`)
+          .focus()
+      })
     },
     removeCaption(index, caption) {
       this.captions = this.captions.filter((c, i) => i != index)
