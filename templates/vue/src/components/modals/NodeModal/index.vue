@@ -36,7 +36,12 @@
     </template>
     <b-container fluid class="px-0" data-qa="node-modal">
       <b-overlay :show="loading" variant="white">
-        <div v-if="hasSubmissionError" class="error-wrapper">
+        <div
+          v-if="hasSubmissionError"
+          class="error-wrapper"
+          role="alert"
+          aria-live="assertive"
+        >
           <h5>Operation failed due to the following error(s):</h5>
           <ul>
             <li v-for="error in errors" :key="error">{{ error }}</li>
