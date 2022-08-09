@@ -4,7 +4,11 @@
     <div class="input-container">
       <b-input-group :class="{ 'use-image': useImage }">
         <b-input-group-prepend is-text>
-          <b-form-checkbox :value="item.id" :disabled="isDisabled" />
+          <b-form-checkbox
+            :value="item.id"
+            :disabled="isDisabled"
+            aria-label="Make this choice selected by default"
+          />
           <file-upload
             v-if="useImage"
             v-model="item.imageUrl"
@@ -30,9 +34,10 @@
           <b-button
             :disabled="!isRemovable"
             :variant="isRemovable ? 'danger' : 'secondary'"
+            aria-label="Remove choice"
             @click="$emit('remove')"
           >
-            X
+            <i class="fas fa-times"></i>
           </b-button>
         </b-input-group-append>
       </b-input-group>
