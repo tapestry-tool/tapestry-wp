@@ -50,8 +50,13 @@
             required
           />
           <b-input-group-append is-text>
-            <i id="kaltura-info" class="far fa-question-circle"></i>
-            <b-tooltip target="kaltura-info" triggers="hover">
+            <i
+              id="kaltura-info"
+              class="far fa-question-circle"
+              tabindex="0"
+              aria-label="Kaltura ID hint"
+            ></i>
+            <b-tooltip role="tooltip" target="kaltura-info">
               Video ID can be found in the Kaltura managment console under
               Content->Entries.
             </b-tooltip>
@@ -60,6 +65,7 @@
             <b-button
               variant="primary"
               data-qa="edit-kaltura-id-button"
+              :aria-label="editingKalturaId ? 'Submit' : 'Edit Kaltura ID'"
               :disabled="isLoadingKalturaCaptions"
               @click="handleKalturaIdEdit"
             >

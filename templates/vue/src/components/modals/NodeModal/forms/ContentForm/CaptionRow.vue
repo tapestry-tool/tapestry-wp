@@ -8,9 +8,9 @@
     <b-row align-v="center" class="mb-2 mx-0">
       <div>
         <b>{{ title }}</b>
-      </div>
-      <div v-if="isDefault" class="ml-2">
-        (default)
+        <span v-if="isDefault" class="ml-2">
+          (default)
+        </span>
       </div>
       <div v-if="isPending && errorMessage" class="mx-1">
         <i
@@ -59,6 +59,7 @@
               v-model="caption.captionUrl"
               file-types=".vtt"
               compact-mode
+              placeholder="Enter URL or upload a VTT file"
               :is-image="false"
               :file-upload-id="
                 `caption-file-upload-${isPending ? 'pending' : ''}-${caption.id}`
@@ -88,6 +89,7 @@
             v-if="customizeLabel"
             v-model="caption.label"
             class="mt-2"
+            aria-label="Caption label"
             :placeholder="caption.language"
             :data-qa="`caption-label-${index}`"
           />
