@@ -16,7 +16,13 @@
             {{ reverse ? "&#8592;" : "&#8594;" }}
           </b-row>
           <b-row class="justify-content-center">
-            <b-button size="sm" @click="reverse = !reverse">Reverse</b-button>
+            <b-button
+              size="sm"
+              aria-label="Reverse link direction"
+              @click="reverse = !reverse"
+            >
+              Reverse
+            </b-button>
           </b-row>
         </b-col>
         <b-col class="node">
