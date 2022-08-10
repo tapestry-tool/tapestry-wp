@@ -9,3 +9,5 @@ cypress.json
 
 data/
 bin/config.sh
+
+vendor/

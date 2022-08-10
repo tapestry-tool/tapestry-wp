@@ -70,4 +70,77 @@ describe("Video", () => {
       })
     })
   })
+
+  it("should automatically update video url when the current url becomes unavailable", () => {
+    const url =
+      "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4"
+    const nonexistentUrl = "https://streaming.video.ubc.ca/non-existent.mp4"
+
+    cy.getSelectedNode().then(selectedNode => {
+      cy.openModal("edit", selectedNode.id)
+      cy.changeMediaType("video")
+      cy.getByTestId(`node-video-url`).type(url)
+      cy.submitModal()
+    })
+
+    cy.getSelectedNode().then(selectedNode => {
+      // Simulate the file at the current url becoming unavailable
+      cy.store().then(store => {
+        store.commit("updateNode", {
+          id: selectedNode.id,
+          newNode: {
+            typeData: { ...selectedNode.typeData, mediaURL: nonexistentUrl },
+          },
+        })
+      })
+
+      // Assert that the url was changed
+      cy.openModal("edit", selectedNode.id)
+      cy.getByTestId(`node-video-url`)
+        .invoke("val")
+        .should("eq", nonexistentUrl)
+      cy.get(".close").click()
+
+      cy.openLightbox(selectedNode.id).within(() => {
+        cy.get("video").should("have.attr", "src", url)
+      })
+    })
+  })
+
+  it("should be able to add a video node via Kaltura", () => {
+    const kalturaId = "0_55iod32r"
+
+    cy.getSelectedNode().then(node => {
+      cy.openModal("edit", node.id)
+      cy.changeMediaType("video")
+
+      cy.getByTestId("node-video-kaltura-id").should("not.be.visible")
+      cy.get(".b-overlay").should("not.exist")
+
+      cy.getByTestId("use-kaltura-checkbox").click({ force: true })
+      cy.get(".b-overlay").should("exist") // Checking that video URL field is greyed out by Bootstrap overlay
+
+      cy.getByTestId("node-video-kaltura-id").type(kalturaId)
+
+      cy.submitModal()
+
+      cy.openModal("edit", node.id)
+      cy.getByTestId("use-kaltura-checkbox").should("be.checked")
+      cy.getByTestId("node-video-kaltura-id")
+        .invoke("val")
+        .should("eq", kalturaId)
+
+      // Checking that mediaURL of Kaltura video matches. We just check that the URL includes the Kaltura ID
+      cy.getByTestId("node-video-url")
+        .invoke("val")
+        .should("include", kalturaId)
+      cy.get(".close").click()
+
+      cy.openLightbox(node.id).within(() => {
+        cy.get(`#kaltura-container-${node.id} > iframe`, { timeout: 10000 }).should(
+          "be.visible"
+        )
+      })
+    })
+  })
 })

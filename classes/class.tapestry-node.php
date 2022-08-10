@@ -370,6 +370,20 @@ class TapestryNode implements ITapestryNode
         return $node;
     }
 
+    public function getTypeData()
+    {
+        $node = $this->get();
+
+        return $node->typeData;
+    }
+
+    public function getTitle()
+    {
+        $node = $this->get();
+
+        return $node->title;
+    }
+
     public function isAvailableToUser($userId = 0)
     {
         $nodeMeta = $this->getMeta();
@@ -637,15 +651,14 @@ class TapestryNode implements ITapestryNode
             $id = 1;
         }
         $user = get_user_by('id', $id);
-        if (!$user) {
-            $user = get_user_by('id', 1);
+        if ($user) {
+            return (object) [
+                'id' => $id,
+                'name' => $user->display_name,
+                'email' => $user->user_email,
+                'original_author_name' => '',
+                'original_author_email' => '',
+            ];
         }
-        return (object) [
-            'id' => $id,
-            'name' => $user->display_name,
-            'email' => $user->user_email,
-            'original_author_name' => '',
-            'original_author_email' => '',
-        ];
     }
 }

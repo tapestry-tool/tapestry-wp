@@ -1,5 +1,4 @@
 import axios from "axios"
-import Helpers from "../utils/Helpers"
 import { data } from "./wp"
 
 const { apiUrl, nonce, postId, adminAjaxUrl } = data
@@ -72,7 +71,7 @@ class TapestryApi {
 
   async getNode(id) {
     const data = await this.getTapestry()
-    return data.nodes[Helpers.findNodeIndex(id, data)]
+    return data.nodes[id]
   }
 
   async getNodeProgress(id) {
@@ -308,6 +307,50 @@ class TapestryApi {
     const url = `/tapestries/${this.postId}/nodes/${nodeId}/question/hasAnswers?question_id=${questionId}&answer_type=${answerType}`
     const response = await this.client.get(url)
     return response
+  }
+
+  async checkKalturaVideo(entryId) {
+    const url = `/kaltura/video/status?entry_id=${entryId}`
+    const response = await this.client.get(url)
+    return response.data
+  }
+
+  async getKalturaVideoMeta(entryId) {
+    const url = `/kaltura/video/meta?entry_id=${entryId}`
+    const response = await this.client.get(url)
+    return response.data
+  }
+
+  async getKalturaVideoUrl(entryId) {
+    const url = `/kaltura/video/mediaURL?entry_id=${entryId}`
+    const response = await this.client.get(url)
+    return response.data
+  }
+
+  async getVideosToUpload() {
+    const url = `/kaltura/videos/to_upload?tapestryPostId=${this.postId}`
+    const response = await this.client.get(url)
+    return response.data
+  }
+
+  async startKalturaUpload(videos, useKalturaPlayer) {
+    const url = `/kaltura/upload_videos`
+    const response = await this.client.post(url, {
+      videos: videos,
+      useKalturaPlayer: useKalturaPlayer,
+    })
+    return response
+  }
+
+  async getKalturaUploadStatus() {
+    const url = `/kaltura/upload_status?tapestryPostId=${this.postId}`
+    const response = await this.client.get(url)
+    return response.data
+  }
+
+  async requestStopKalturaUpload() {
+    const url = `/kaltura/stop_upload`
+    await this.client.post(url)
   }
 }
 
