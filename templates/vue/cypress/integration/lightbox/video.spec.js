@@ -111,7 +111,6 @@ describe("Video", () => {
     const kalturaId = "0_lchbo276"
 
     cy.intercept("**/kaltura/video/captions?**").as("getKalturaVideoData")
-
     cy.getSelectedNode().then(node => {
       cy.openModal("edit", node.id)
       cy.changeMediaType("video")
