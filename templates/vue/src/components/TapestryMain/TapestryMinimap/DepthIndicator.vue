@@ -1,6 +1,14 @@
 <template>
   <div v-if="maxLevel > 1" class="depth-indicator-container">
     <svg class="layer-indicator">
+      <title id="depth-indicator-title">
+        Indicator for your current level
+      </title>
+      <desc>
+        A stack of translucent layers with the current level highlighted. You are
+        currently on level
+        {{ currentLevel }}. You can see {{ currentDepth }} levels deep.
+      </desc>
       <defs>
         <rect
           id="indicator-layer"

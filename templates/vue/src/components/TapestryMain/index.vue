@@ -13,7 +13,7 @@
     </div>
     <svg
       v-else
-      id="vue-svg"
+      ref="vue-svg"
       role="application"
       aria-label="Main Tapestry View"
       :viewBox="computedViewBox"
@@ -252,7 +252,7 @@ export default {
     )
     this.zoomPanHelper.register()
 
-    this.$refs.app.addEventListener("keydown", this.handleKey)
+    this.$refs["vue-svg"].addEventListener("keydown", this.handleKey)
 
     this.$nextTick(() => {
       this.updateAppHeight()
@@ -260,7 +260,7 @@ export default {
   },
   beforeDestroy() {
     this.zoomPanHelper && this.zoomPanHelper.unregister()
-    this.$refs.app.removeEventListener("keydown", this.handleKey)
+    this.$refs["vue-svg"].removeEventListener("keydown", this.handleKey)
   },
   methods: {
     ...mapMutations(["select", "unselect", "clearSelection"]),
