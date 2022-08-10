@@ -22,9 +22,11 @@
       <b-form-group
         v-if="license.type === licenseTypes.CUSTOM"
         label="License link"
+        label-for="license-link"
         class="mt-3"
       >
         <b-form-input
+          id="license-link"
           :value="license.link"
           placeholder="Paste a link to your license starting with http:// or https://"
           @input="update('license.link', $event)"

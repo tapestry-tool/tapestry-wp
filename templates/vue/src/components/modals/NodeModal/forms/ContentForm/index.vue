@@ -1,6 +1,7 @@
 <template>
   <div id="modal-content-details">
-    <b-form-group label="Title">
+    <b-form-group>
+      <label for="node-title" class="d-block">Title</label>
       <b-form-input
         id="node-title"
         :value="node.title"
@@ -23,6 +24,7 @@
       <b-form-group
         v-if="addMenuTitle || node.typeData.menuTitle"
         label="Custom Menu Title"
+        label-for="node-nav-title"
       >
         <b-form-input
           id="node-nav-title"
@@ -55,7 +57,7 @@
     <b-form-group v-show="isPopupCandidate" label="Popup">
       <popup-form :is-candidate="isPopupCandidate" />
     </b-form-group>
-    <b-form-group label="Content Type">
+    <b-form-group label="Content Type" label-for="node-media-type">
       <b-form-select
         id="node-media-type"
         data-qa="node-media-type"

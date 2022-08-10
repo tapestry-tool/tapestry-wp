@@ -34,9 +34,10 @@
         </template>
       </combobox>
     </b-form-group>
-    <b-form-group label="Show this text first">
+    <b-form-group label="Show this text first" label-for="follow-up-text">
       <b-form-input
         v-if="typeData.questionId"
+        id="follow-up-text"
         :value="typeData.precedingText"
         data-qa="follow-up-text"
         :placeholder="originalQuestionText"

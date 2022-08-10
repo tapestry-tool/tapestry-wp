@@ -66,8 +66,9 @@
               {{ showAcceptedHighlight ? "Enabled" : "Disabled" }}
             </b-form-checkbox>
           </b-form-group>
-          <b-form-group label="Default Depth" class="mb-0">
+          <b-form-group label="Default Depth" label-for="default-depth" class="mb-0">
             <b-form-input
+              id="default-depth"
               v-model="defaultDepth"
               class="depth-slider"
               type="range"
