@@ -167,6 +167,7 @@ export default {
       if (!empty) {
         this.zoomPanHelper.unregister()
         this.zoomPanHelper.register()
+        this.registerKeyHandler()
       }
     },
     background: {
@@ -251,8 +252,7 @@ export default {
       [this.$refs.minimap.$el]
     )
     this.zoomPanHelper.register()
-
-    this.$refs["vue-svg"].addEventListener("keydown", this.handleKey)
+    this.$refs.app.addEventListener("keydown", this.handleKey)
 
     this.$nextTick(() => {
       this.updateAppHeight()
@@ -260,7 +260,7 @@ export default {
   },
   beforeDestroy() {
     this.zoomPanHelper && this.zoomPanHelper.unregister()
-    this.$refs["vue-svg"].removeEventListener("keydown", this.handleKey)
+    this.$refs.app.removeEventListener("keydown", this.handleKey)
   },
   methods: {
     ...mapMutations(["select", "unselect", "clearSelection"]),
@@ -481,6 +481,11 @@ export default {
       }
     },
     handleKey(evt) {
+      // Ignore key events if focus is outside Tapestry view
+      if (!this.$refs["vue-svg"].contains(document.activeElement)) {
+        return
+      }
+
       const { code } = evt
       const node = this.getNode(this.selectedId)
       if (code === "Enter") {
