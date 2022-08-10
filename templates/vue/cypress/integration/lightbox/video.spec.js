@@ -108,7 +108,7 @@ describe("Video", () => {
   })
 
   it("should be able to add a video node via Kaltura", () => {
-    const kalturaId = "0_55iod32r"
+    const kalturaId = "0_lchbo276"
 
     cy.getSelectedNode().then(node => {
       cy.openModal("edit", node.id)
