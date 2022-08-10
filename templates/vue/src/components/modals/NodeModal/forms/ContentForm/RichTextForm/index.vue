@@ -160,6 +160,11 @@ export default {
       type: Number,
       default: null,
     },
+    autofocus: {
+      type: [String, Number, Boolean],
+      required: false,
+      default: false,
+    },
   },
   data() {
     return {
@@ -229,6 +234,7 @@ export default {
         this.editorChange = true
         this.$emit("input", getHTML())
       },
+      autoFocus: this.autofocus,
     })
 
     this.editor.setContent(this.value)

@@ -45,6 +45,7 @@
         data-qa="node-description"
         placeholder="Enter description"
         :maxLength="maxDescriptionLength"
+        autofocus="end"
         @input="update('description', $event)"
       />
     </b-form-group>

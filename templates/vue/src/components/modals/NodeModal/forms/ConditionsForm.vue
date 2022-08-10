@@ -26,6 +26,7 @@
         </button>
         <b-form-group label="Unlock this node">
           <b-form-select
+            :id="`condition-type-${idx}`"
             v-model="condition.type"
             data-qa="condition-type"
             :options="conditionOptions"
@@ -172,9 +173,13 @@ export default {
     update(property, value) {
       this.setCurrentEditingNodeProperty({ property, value })
     },
-    addCondition(e) {
+    addCondition() {
       this.conditions.push({ ...baseCondition })
-      e.target.blur()
+      this.$nextTick(() => {
+        document
+          .getElementById(`condition-type-${this.conditions.length - 1}`)
+          ?.focus()
+      })
     },
     removeCondition(idx) {
       this.conditions.splice(idx, 1)
