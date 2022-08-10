@@ -11,9 +11,9 @@ class ZoomPanHelper {
   isPanning
   panPoint
   lastClickTime
-  excludedElements
+  getExcludedElements
 
-  constructor(targetDOMId, onZoom, onZoomEnd, onPan, onPanEnd, excludedElements) {
+  constructor(targetDOMId, onZoom, onZoomEnd, onPan, onPanEnd, getExcludedElements) {
     this.onZoom = onZoom
     this.onZoomEnd = Helpers.debounce(onZoomEnd)
     this.onPan = onPan
@@ -29,7 +29,7 @@ class ZoomPanHelper {
     this.panPoint = { x: 0, y: 0 }
 
     this.lastClickTime = null
-    this.excludedElements = excludedElements ?? []
+    this.getExcludedElements = getExcludedElements
   }
 
   register() {
@@ -190,7 +190,7 @@ class ZoomPanHelper {
   }
 
   _isValidLocation(e) {
-    return this.excludedElements.every(el => !el.contains(e.target))
+    return this.getExcludedElements().every(el => !el.contains(e.target))
   }
 }
 export default ZoomPanHelper

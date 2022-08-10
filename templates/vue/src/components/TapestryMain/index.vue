@@ -231,7 +231,7 @@ export default {
         this.updateOffset()
         this.fetchAppDimensions()
       },
-      [this.$refs.minimap.$el]
+      () => (this.$refs.minimap ? [this.$refs.minimap.$el] : [])
     )
     this.zoomPanHelper.register()
 
