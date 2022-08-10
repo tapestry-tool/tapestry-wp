@@ -108,7 +108,6 @@
               <b-form-input
                 :id="`question-text-${index}`"
                 v-model="question.text"
-                :data-testid="`question-title-${index}`"
                 :data-qa="`question-text-${index}`"
               />
             </b-form-group>
@@ -264,7 +263,6 @@
             </b-form-group>
             <rich-text-form
               v-model="question.confirmation.message"
-              :data-testid="`question-confirmation-message-${index}`"
               placeholder="Your response has been recorded."
             />
           </b-card>

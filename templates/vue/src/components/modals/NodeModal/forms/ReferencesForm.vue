@@ -4,7 +4,6 @@
       <rich-text-form
         id="node-references"
         v-model="references"
-        data-testid="node-references"
         placeholder="Enter your references here"
       ></rich-text-form>
     </b-form-group>

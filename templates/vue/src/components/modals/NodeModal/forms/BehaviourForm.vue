@@ -1,11 +1,7 @@
 <template>
   <div id="modal-behaviour">
     <b-form-group>
-      <b-form-checkbox
-        v-if="mediaType !== 'multi-content'"
-        v-model="skippable"
-        data-testid="node-behaviour-skippable"
-      >
+      <b-form-checkbox v-if="mediaType !== 'multi-content'" v-model="skippable">
         Allow skipping video if user has not watched at least once
       </b-form-checkbox>
     </b-form-group>
