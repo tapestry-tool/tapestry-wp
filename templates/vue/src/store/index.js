@@ -36,6 +36,7 @@ export const store = {
       stack: [],
       siblings: [],
       siblingPosition: -1,
+      linkMode: false,
     },
     // * DEV: temporarily allow editing constants.js/scaleConstants
     scaleConstants: {

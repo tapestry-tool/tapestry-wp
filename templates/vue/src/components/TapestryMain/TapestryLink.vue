@@ -2,7 +2,11 @@
   <transition name="fade">
     <polygon
       v-show="show"
-      aria-hidden="true"
+      :id="`link-${source.id}-${target.id}`"
+      :aria-label="
+        `Link from ${source.title} to ${target.title}. To edit this link, press Enter. To go to the source node ${source.title}, press the Up Arrow Key. To go to the target node ${target.title}, press the Down Arrow Key. To go to a sibling link, press the Left or Right Arrow Key. To exit the Main Tapestry view, press the Q Key or the Escape Key.`
+      "
+      :tabindex="isLoggedIn ? 0 : -1"
       :data-qa="`link-${source.id}-${target.id}`"
       :class="{
         'half-opaque':

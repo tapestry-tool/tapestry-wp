@@ -112,7 +112,15 @@ export default {
       "currentDepth",
       "scaleConstants",
     ]),
-    ...mapGetters(["getNode", "getCurrentNodeNav"]),
+    ...mapGetters(["getNode", "getNodeNavId", "getNodeNavParent"]),
+    nodeNavLinkMode: {
+      get() {
+        return this.$store.state.nodeNavigation.linkMode
+      },
+      set(linkMode) {
+        this.$store.commit("setNodeNavigation", { linkMode })
+      },
+    },
     computedViewBox() {
       // return this.viewBox.join(" ")
       return `${this.viewBox[0] + this.offset.x} ${this.viewBox[1] +
@@ -177,17 +185,11 @@ export default {
                 }
           )
         }
-        if (nodeId !== this.getCurrentNodeNav) {
+        if (nodeId !== this.getNodeNavId) {
           this.resetNodeNavigation(nodeId)
         }
         this.updateViewBox()
       },
-    },
-    routeName(newName, oldName) {
-      if (newName === names.APP && oldName === names.LIGHTBOX) {
-        // TODO: this is not needed anymore due to new lightbox using Bootstrap modal which automatically returns focus to last selected node; remove after testing on a screen reader
-        // this.focusSelectedNode()
-      }
     },
   },
   created() {
@@ -438,7 +440,16 @@ export default {
       const { code } = evt
       const node = this.getNode(this.selectedId)
       if (code === "Enter") {
-        if (
+        if (this.nodeNavLinkMode) {
+          this.$router.push({
+            name: names.LINKMODAL,
+            params: {
+              source: this.getNodeNavParent,
+              target: this.selectedId,
+            },
+            query: this.$route.query,
+          })
+        } else if (
           node.accessible ||
           Helpers.hasPermission(node, "edit", this.settings.showRejected)
         ) {
@@ -447,14 +458,35 @@ export default {
       } else if (code === "Tab") {
         // ? potentially let the user tab out of the main tapestry view, since the user should be fully capable of navigating through all the nodes by using just arrow keys
       } else if (code === "KeyE") {
-        if (Helpers.hasPermission(node, "edit", this.settings.showRejected)) {
+        if (this.nodeNavLinkMode) {
+          this.openSelectedLinkModal()
+        } else if (Helpers.hasPermission(node, "edit", this.settings.showRejected)) {
           this.$root.$emit("edit-node", node.id)
         }
       } else if (code === "KeyQ" || code === "Escape") {
         // focus the next element after the main
         document.querySelector(".minimap-button button")?.focus()
       } else {
-        if (node.id === this.getCurrentNodeNav) {
+        if (node.id === this.getNodeNavId) {
+          if (this.nodeNavLinkMode) {
+            if (code === "ArrowDown") {
+              evt.preventDefault()
+              this.nodeNavLinkMode = false
+              this.focusSelectedNode()
+              return
+            } else if (code === "ArrowUp") {
+              this.nodeNavLinkMode = false
+            }
+          } else if (evt.shiftKey && wp.isLoggedIn()) {
+            if (code === "ArrowDown") {
+              this.nodeNavLinkMode = true
+            } else if (code === "ArrowUp" && this.getNodeNavParent !== -1) {
+              evt.preventDefault()
+              this.nodeNavLinkMode = true
+              this.focusSelectedNode()
+              return
+            }
+          }
           if (code === "ArrowDown") {
             evt.preventDefault()
             this.goToNodeChildren().then(this.setSelectedNode)
@@ -486,11 +518,26 @@ export default {
       this.focusSelectedNode()
     },
     focusSelectedNode() {
-      this.$nextTick(() => {
-        const nodeElement = document.querySelector(
-          `.node[data-id='${this.selectedId}']`
-        )
-        nodeElement && nodeElement.focus()
+      if (this.nodeNavLinkMode) {
+        this.$nextTick(() => {
+          document
+            .getElementById(`link-${this.getNodeNavParent}-${this.selectedId}`)
+            ?.focus()
+        })
+      } else {
+        this.$nextTick(() => {
+          document.querySelector(`.node[data-id='${this.selectedId}']`)?.focus()
+        })
+      }
+    },
+    openSelectedLinkModal() {
+      this.$router.push({
+        name: names.LINKMODAL,
+        params: {
+          source: this.getNodeNavParent,
+          target: this.selectedId,
+        },
+        query: this.$route.query,
       })
     },
   },
