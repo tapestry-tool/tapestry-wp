@@ -10,10 +10,11 @@
       <div class="connection" style="flex: 1">
         <div class="connection-name">
           <input
-            v-model="connection.name"
+            :value="connection.name"
             name="connection name"
             type="text"
             placeholder="connection"
+            @input="$emit('change', { ...connection, name: $event.target.value })"
             @blur="isInputTouched = true"
           />
           <p :style="{ '--color': countColor }">{{ characterCount }}</p>
@@ -191,6 +192,9 @@ export default {
     })
   },
   methods: {
+    handleChange(prop, value) {
+      this.$emit("change", { ...this.connection, [prop]: value })
+    },
     getEmojiImgFromUnicode(unicode) {
       let div = document.createElement("div")
       div.textContent = unicode
@@ -198,15 +202,17 @@ export default {
     },
     toggleCommunity(communityId) {
       if (this.connection.communities.includes(communityId)) {
-        this.connection.communities = this.connection.communities.filter(
+        const communities = this.connection.communities.filter(
           id => id !== communityId
         )
+        this.handleChange("communities", communities)
       } else {
-        this.connection.communities.push(communityId)
+        const communities = [...this.connection.communities, communityId]
+        this.handleChange("communities", communities)
       }
     },
     handleEmojiSelect(event) {
-      this.connection.avatar = event.data
+      this.handleChange("avatar", event.data)
       this.showPicker = false
     },
     submitConnection() {
