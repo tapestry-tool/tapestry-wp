@@ -18,6 +18,7 @@
           :source="nodes[link.source]"
           :target="nodes[link.target]"
           :scale="scale"
+          tabindex="-1"
         ></tapestry-link>
       </g>
       <g v-if="!dragSelectEnabled || dragSelectReady" class="nodes">
@@ -30,6 +31,7 @@
           :class="{ selectable: true }"
           :data-id="id"
           :root="id == selectedId"
+          tabindex="-1"
           @dragend="updateViewBox"
           @mouseover="handleMouseover(id)"
           @mouseleave="activeNode = null"
@@ -121,6 +123,23 @@ export default {
         this.$store.commit("setNodeNavigation", { linkMode })
       },
     },
+    focused() {
+      if (this.getNodeNavId === -1) {
+        return null
+      }
+      if (this.nodeNavLinkMode) {
+        return {
+          type: "link",
+          source: this.getNodeNavParent,
+          target: this.getNodeNavId,
+        }
+      } else {
+        return {
+          type: "node",
+          id: this.getNodeNavId,
+        }
+      }
+    },
     computedViewBox() {
       // return this.viewBox.join(" ")
       return `${this.viewBox[0] + this.offset.x} ${this.viewBox[1] +
@@ -191,6 +210,17 @@ export default {
         this.updateViewBox()
       },
     },
+    focused: {
+      deep: true,
+      handler(newFocused, oldFocused) {
+        if (oldFocused) {
+          this.getFocusableElement(oldFocused)?.setAttribute("tabindex", "-1")
+        }
+        const el = this.getFocusableElement(newFocused)
+        el?.setAttribute("tabindex", "0")
+        el?.focus()
+      },
+    },
   },
   created() {
     const { scale, x, y } = this.$route.query
@@ -252,6 +282,9 @@ export default {
     ]),
     addRootNode() {
       this.$root.$emit("add-node", null)
+    },
+    isLoggedIn() {
+      return wp.isLoggedIn()
     },
     clampScale(scale) {
       return Math.max(
@@ -344,7 +377,7 @@ export default {
       DragSelectModular.updateSelectableNodes()
     },
     nodeIsEditable(node) {
-      return wp.isLoggedIn() && Helpers.hasPermission(node, "edit")
+      return this.isLoggedIn && Helpers.hasPermission(node, "edit")
     },
     updateViewBox() {
       const MAX_RADIUS = 240
@@ -472,18 +505,16 @@ export default {
             if (code === "ArrowDown") {
               evt.preventDefault()
               this.nodeNavLinkMode = false
-              this.focusSelectedNode()
               return
             } else if (code === "ArrowUp") {
               this.nodeNavLinkMode = false
             }
-          } else if (evt.shiftKey && wp.isLoggedIn()) {
+          } else if (evt.shiftKey && this.isLoggedIn) {
             if (code === "ArrowDown") {
               this.nodeNavLinkMode = true
             } else if (code === "ArrowUp" && this.getNodeNavParent !== -1) {
               evt.preventDefault()
               this.nodeNavLinkMode = true
-              this.focusSelectedNode()
               return
             }
           }
@@ -515,20 +546,13 @@ export default {
         query: this.$route.query,
         path: `/nodes/${nodeId}`,
       })
-      this.focusSelectedNode()
     },
-    focusSelectedNode() {
-      if (this.nodeNavLinkMode) {
-        this.$nextTick(() => {
-          document
-            .getElementById(`link-${this.getNodeNavParent}-${this.selectedId}`)
-            ?.focus()
-        })
-      } else {
-        this.$nextTick(() => {
-          document.querySelector(`.node[data-id='${this.selectedId}']`)?.focus()
-        })
-      }
+    getFocusableElement(focused) {
+      return document.querySelector(
+        focused.type === "node"
+          ? `.node[data-id='${focused.id}']`
+          : `#link-${focused.source}-${focused.target}`
+      )
     },
     openSelectedLinkModal() {
       this.$router.push({

@@ -18,7 +18,6 @@
             ? 'pointer'
             : 'not-allowed',
       }"
-      tabindex="0"
       @focus="handleFocus"
       @blur="handleBlur"
       @click="handleClick"
@@ -450,6 +449,9 @@ export default {
     this.$emit("mounted")
     this.$refs.circle.setAttribute("r", this.radius)
     const nodeRef = this.$refs.node
+    if (this.root) {
+      nodeRef.setAttribute("tabindex", "0")
+    }
     d3.select(nodeRef).call(
       d3
         .drag()
