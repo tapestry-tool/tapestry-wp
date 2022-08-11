@@ -1,7 +1,8 @@
 <template>
   <div v-if="license">
-    <b-form-group label="Copyright/Licensing">
+    <b-form-group label="Copyright/Licensing" label-for="licence-combobox">
       <combobox
+        id="licence-combobox"
         :value="license.type"
         item-text="name"
         item-value="type"

@@ -1,7 +1,12 @@
 <template>
   <div>
-    <b-form-group data-qa="activity-combobox" label="Activity">
+    <b-form-group
+      data-qa="activity-combobox"
+      label="Activity"
+      label-for="activity-combobox"
+    >
       <combobox
+        id="activity-combobox"
         :value="typeData.activityId"
         :options="activityNodes"
         data-qa="choose-activity-node"
@@ -17,8 +22,13 @@
         </template>
       </combobox>
     </b-form-group>
-    <b-form-group data-qa="question-select" label="Question">
+    <b-form-group
+      data-qa="question-select"
+      label="Question"
+      label-for="question-combobox"
+    >
       <combobox
+        id="question-combobox"
         :value="typeData.questionId"
         :options="availableQuestions"
         data-qa="choose-question"

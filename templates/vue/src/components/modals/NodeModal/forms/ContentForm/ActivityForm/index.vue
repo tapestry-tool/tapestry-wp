@@ -61,8 +61,10 @@
             <b-form-group
               v-if="question.followUp.enabled"
               label="Then show user answer to the following activity:"
+              label-for="followup-combobox"
             >
               <combobox
+                id="followup-combobox"
                 v-model="question.followUp.questionId"
                 class="mb-0"
                 :options="getPreviousQuestions(question)"
