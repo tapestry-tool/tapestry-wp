@@ -1,14 +1,10 @@
 <template>
   <div class="question">
-    <button
-      v-if="formOpened && enabledAnswerTypes.length > 1"
-      class="button-nav m-auto"
-      @click="back"
-    >
+    <button v-if="showBackBtn" class="button-nav m-auto" @click="back">
       <i class="fas fa-arrow-left"></i>
     </button>
     <loading v-if="submitting" label="Submitting..." />
-    <div v-else>
+    <div v-else class="question-wrapper" :class="{ 'with-back-btn': showBackBtn }">
       <div v-if="question.followUp.enabled" class="follow-up">
         <div
           v-if="previousQuestionAnswers.length"
@@ -57,7 +53,7 @@
             :id="question.id"
             :node="node"
             :question="question"
-            :answer="answer"
+            :answer="answer || ''"
             @skipQuestion="$emit('skipQuestion')"
             @submit="handleSubmit"
           ></component>
@@ -142,7 +138,7 @@ export default {
               this.question.followUp.questionId
             ]
           ) {
-            // eslint-disable-next-line vue/no-side-effects-in-computed-properties
+            // eslint-disable-next-line vue/no-side-effects-in-computed-properties, vue/no-mutating-props
             this.question.followUp.nodeId = tempNodeId
             // eslint-disable-next-line vue/no-side-effects-in-computed-properties
             this.prevQuestionId = this.question.followUp.questionId
@@ -170,6 +166,9 @@ export default {
         default:
           return null
       }
+    },
+    showBackBtn() {
+      return this.formOpened && this.enabledAnswerTypes.length > 1
     },
   },
   watch: {
@@ -279,7 +278,7 @@ export default {
   justify-content: center;
   height: 100%;
   width: 100%;
-  max-width: 600px;
+  max-width: 800px;
   margin: auto;
 
   .button-nav {
@@ -339,6 +338,10 @@ export default {
     + .recorder {
       margin-top: 4em;
     }
+  }
+
+  &-wrapper.with-back-btn {
+    margin: 0 100px;
   }
 
   &-body {

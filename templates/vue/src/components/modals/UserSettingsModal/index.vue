@@ -50,6 +50,7 @@ import DragSelectModular from "@/utils/dragSelectModular"
 import ThemeForm from "./ThemeForm"
 import AvatarForm from "./AvatarForm"
 import { mapState } from "vuex"
+import { mapActions } from "vuex"
 
 export default {
   name: "user-settings-modal",
@@ -85,13 +86,18 @@ export default {
     })
   },
   methods: {
+    ...mapActions(["updateUserSettings"]),
     closeModal() {
       this.$emit("close")
+      this.$root.$emit("bv::hide::modal", "user-settings-modal")
     },
     saveSettings() {
-      this.$refs.themeForm.saveTheme()
+      const theme = this.$refs.themeForm.getTheme()
+      this.$refs.themeForm.applyTheme()
+      this.updateUserSettings({ theme })
       this.$refs.avatarForm.saveAvatar()
       this.$emit("close")
+      this.$root.$emit("bv::hide::modal", "user-settings-modal")
     },
   },
 }

@@ -4,46 +4,62 @@
       <b-form-select
         id="node-presentation-style"
         data-qa="node-presentation-style"
-        :value="node.presentationStyle ? node.presentationStyle : 'accordion'"
+        :value="presentationStyle ? presentationStyle : 'accordion'"
         :options="presentationStyles"
         @change="handlePresentationChange"
       ></b-form-select>
     </b-form-group>
-    <sub-item-table :actionType="actionType" :node="node"></sub-item-table>
+    <sub-item-table :actionType="actionType"></sub-item-table>
     <b-form-group>
-      <b-form-checkbox v-model="node.typeData.lockRows" data-qa="lock-checkbox">
+      <b-form-checkbox
+        :checked="typeData.lockRows"
+        data-qa="lock-checkbox"
+        @input="update('typeData.lockRows', $event)"
+      >
         Lock rows until previous row is completed
       </b-form-checkbox>
     </b-form-group>
     <b-form-group label="Finish button text">
-      <b-form-input v-model="node.typeData.finishButtonText"></b-form-input>
+      <b-form-input
+        :value="typeData.finishButtonText"
+        @update="update('typeData.finishButtonText', $event)"
+      ></b-form-input>
     </b-form-group>
     <b-form-group label="Confirmation title text">
-      <b-form-input v-model="node.typeData.confirmationTitleText"></b-form-input>
+      <b-form-input
+        :value="typeData.confirmationTitleText"
+        @update="update('typeData.confirmationTitleText', $event)"
+      ></b-form-input>
     </b-form-group>
     <b-form-group label="Confirmation body text">
-      <b-form-input v-model="node.typeData.confirmationBodyText"></b-form-input>
+      <b-form-input
+        :value="typeData.confirmationBodyText"
+        @update="update('typeData.confirmationBodyText', $event)"
+      ></b-form-input>
     </b-form-group>
     <b-form-group label="Continue button text">
-      <b-form-input v-model="node.typeData.continueButtonText"></b-form-input>
+      <b-form-input
+        :value="typeData.continueButtonText"
+        @update="update('typeData.continueButtonText', $event)"
+      ></b-form-input>
     </b-form-group>
     <b-form-group label="Cancel link text">
-      <b-form-input v-model="node.typeData.cancelLinkText"></b-form-input>
+      <b-form-input
+        :value="typeData.cancelLinkText"
+        @update="update('typeData.cancelLinkText', $event)"
+      ></b-form-input>
     </b-form-group>
   </div>
 </template>
 
 <script>
-import SubItemTable from "./SubItemTable.vue"
+import { mapMutations, mapState } from "vuex"
+import SubItemTable from "../common/SubItemTable.vue"
 
 export default {
   name: "multi-content-form",
   components: { SubItemTable },
   props: {
-    node: {
-      type: Object,
-      required: true,
-    },
     actionType: {
       type: String,
       required: true,
@@ -55,6 +71,10 @@ export default {
     },
   },
   computed: {
+    ...mapState({
+      typeData: state => state.currentEditingNode.typeData,
+      presentationStyle: state => state.currentEditingNode.presentationStyle,
+    }),
     presentationStyles() {
       if (this.isUnitChild) {
         return [{ value: "page", text: "Page" }]
@@ -68,7 +88,7 @@ export default {
   },
   mounted() {
     // set node defaults
-    this.node.typeData = {
+    this.update("typeData", {
       lockRows: false,
       finishButtonText: "Finish",
       confirmationTitleText: "Section Complete!",
@@ -76,12 +96,16 @@ export default {
       continueButtonText: "Continue",
       cancelLinkText: "Cancel",
       showNavBar: true,
-      ...this.node.typeData,
-    }
+      ...this.typeData,
+    })
   },
   methods: {
+    ...mapMutations(["setCurrentEditingNodeProperty"]),
+    update(property, value) {
+      this.setCurrentEditingNodeProperty({ property, value })
+    },
     handlePresentationChange(evt) {
-      this.node.presentationStyle = evt
+      this.update("presentationStyle", evt)
     },
   },
 }

@@ -27,6 +27,7 @@ export const store = {
     cos: {},
     userAnswers: {},
     returnRoute: null,
+    currentEditingNode: null,
   },
   getters,
   mutations,

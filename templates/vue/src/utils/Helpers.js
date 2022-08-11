@@ -35,22 +35,6 @@ export default class Helpers {
     return Math.max(document.documentElement.clientHeight, window.innerHeight || 0)
   }
 
-  /**
-   * Finds the node index with node ID
-   *
-   * @param  {Number} id          nodeMetaId
-   * @param  {Object} tapestry    tapestry
-   *
-   * @return {Number}
-   */
-  static findNodeIndex(id, tapestry) {
-    function helper(obj) {
-      return obj.id == id
-    }
-
-    return tapestry.nodes.findIndex(helper)
-  }
-
   static getAspectRatio() {
     const browserHeight = this.getBrowserHeight()
     const browserWidth = this.getBrowserWidth()
@@ -230,7 +214,7 @@ export default class Helpers {
           return true
         }
       }
-      if (wp.isCurrentUser(node.author.id)) {
+      if (node.author && wp.isCurrentUser(node.author.id)) {
         return action === userActions.READ || node.reviewStatus !== nodeStatus.SUBMIT
       }
       if (wp.canEditTapestry()) {
@@ -291,6 +275,13 @@ export default class Helpers {
     }
 
     return false
+  }
+
+  static hasKalturaUploadPermission() {
+    const { roles } = wp.getCurrentUser()
+    const allowedRole = "administrator"
+
+    return roles.includes(allowedRole)
   }
 
   /**
@@ -370,7 +361,6 @@ export default class Helpers {
         mediaURL: "",
         mediaWidth: 960, //TODO: This needs to be flexible with H5P
         mediaHeight: 600,
-        subAccordionText: "More content:",
       },
       hideTitle: false,
       hideProgress: false,
@@ -384,7 +374,6 @@ export default class Helpers {
         y: 3000,
       },
       childOrdering: [],
-      license: "",
       references: "",
       unlocked: true,
       accessible: true,
@@ -393,6 +382,25 @@ export default class Helpers {
       popup: null,
     }
     return Helpers.deepMerge(baseNode, overrides)
+  }
+
+  /**
+   * Return the X, Y position of an element within another given element
+   * @param {DOM Element} element
+   * @param {DOM Element} container
+   * @returns {Object} {x, y}
+   */
+  static getPositionOfElementInElement(element, container) {
+    var xPosition = 0
+    var yPosition = 0
+
+    while (element && !element.isSameNode(container)) {
+      xPosition += element.offsetLeft - element.scrollLeft + element.clientLeft
+      yPosition += element.offsetTop - element.scrollTop + element.clientTop
+      element = element.offsetParent
+    }
+
+    return { x: xPosition, y: yPosition }
   }
 
   static nodeAndUserAreDyad(node) {

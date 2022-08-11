@@ -1,5 +1,6 @@
 <template>
   <tapestry-modal
+    v-if="node"
     id="lightbox"
     data-qa="lightbox"
     :class="[
@@ -26,17 +27,16 @@
     >
       <multi-content-media
         v-if="node.mediaType === 'multi-content'"
+        id="multicontent-container"
         :node="node"
         :row-id="rowId"
         :class="{ 'has-navbar': settings.tydeModeEnabled }"
-        :sub-row-id="subRowId"
         @close="handleAutoClose"
         @complete="complete"
       />
       <page-menu
         v-if="node.typeData.showNavBar && node.presentationStyle === 'page'"
         :node="node"
-        :rowRefs="rowRefs"
         :dimensions="dimensions"
         :full-screen="settings.tydeModeEnabled"
       />
@@ -83,15 +83,10 @@ export default {
   },
   props: {
     nodeId: {
-      type: Number,
+      type: [Number, String],
       required: true,
     },
     rowId: {
-      type: Number,
-      required: false,
-      default: 0,
-    },
-    subRowId: {
       type: Number,
       required: false,
       default: 0,
@@ -104,7 +99,6 @@ export default {
         left: 50,
       },
       showCompletionScreen: false,
-      rowRefs: [],
     }
   },
   computed: {
@@ -255,20 +249,6 @@ export default {
         }
       },
     },
-    subRowId: {
-      immediate: true,
-      handler(subRowId) {
-        if (subRowId) {
-          if (!this.isMultiContentRow(subRowId, this.rowId)) {
-            this.$router.replace({
-              name: names.ACCORDION,
-              params: { nodeId: this.nodeId, rowId: this.rowId },
-              query: this.$route.query,
-            })
-          }
-        }
-      },
-    },
   },
   mounted() {
     document.querySelector("body").classList.add("tapestry-lightbox-open")
@@ -280,18 +260,19 @@ export default {
     DragSelectModular.addDragSelectListener()
     this.$router.push({
       ...this.$route,
-      query: { ...this.$route.query, row: undefined },
+      params: { ...this.$route.params, rowId: undefined },
+      query: this.$route.query,
     })
   },
   methods: {
     ...mapActions(["completeNode", "updateNodeProgress"]),
     complete(nodeId) {
       const node = this.getNode(nodeId || this.nodeId)
-      if (!node.completed) {
-        this.completeNode(node.id)
-      }
       if (node.progress !== 1) {
         this.updateNodeProgress({ id: node.id, progress: 1 })
+      }
+      if (!node.completed) {
+        this.completeNode(node.id)
       }
     },
     handleUserClose() {
@@ -348,26 +329,6 @@ export default {
         this.$root.$emit("open-node", pageNode.id)
       } else {
         this.applyDimensions()
-        if (this.node.mediaType === "multi-content") {
-          this.$root.$on("observe-rows", newRefs => {
-            if (Array.isArray(newRefs)) {
-              newRefs.forEach(newRef => {
-                if (newRef) {
-                  // We need to remove the old ref because it references
-                  // an element that has potentially been destroyed
-                  const existingRefIndex = this.rowRefs.findIndex(
-                    ref => ref && ref.id === newRef.id
-                  )
-                  if (existingRefIndex !== -1) {
-                    this.rowRefs.splice(existingRefIndex, 1)
-                  }
-                  // Add the new ref, pointing to the current ref
-                  this.rowRefs.push(newRef)
-                }
-              })
-            }
-          })
-        }
       }
     },
   },

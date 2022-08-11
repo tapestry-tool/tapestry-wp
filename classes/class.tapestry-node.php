@@ -157,7 +157,6 @@ class TapestryNode implements ITapestryNode
         }
         if (isset($node->thumbnailFileId) && (is_numeric($node->thumbnailFileId) || is_string($node->thumbnailFileId))) {
             if (is_string($node->thumbnailFileId) && '' == $node->thumbnailFileId) {
-                $this->imageURL = '';
                 $this->thumbnailFileId = '';
             } else {
                 $this->thumbnailFileId = $node->thumbnailFileId;
@@ -173,7 +172,6 @@ class TapestryNode implements ITapestryNode
         }
         if (isset($node->lockedThumbnailFileId) && (is_numeric($node->lockedThumbnailFileId) || is_string($node->lockedThumbnailFileId))) {
             if (is_string($node->lockedThumbnailFileId) && '' == $node->lockedThumbnailFileId) {
-                $this->lockedImageURL = '';
                 $this->lockedThumbnailFileId = '';
             } else {
                 $this->lockedThumbnailFileId = $node->lockedThumbnailFileId;
@@ -304,6 +302,11 @@ class TapestryNode implements ITapestryNode
         }
     }
 
+    public function getId()
+    {
+        return $this->nodeMetaId;
+    }
+
     public function getLockedState()
     {
         $conditions = $this->conditions;
@@ -370,6 +373,20 @@ class TapestryNode implements ITapestryNode
         ];
 
         return $node;
+    }
+
+    public function getTypeData()
+    {
+        $node = $this->get();
+
+        return $node->typeData;
+    }
+
+    public function getTitle()
+    {
+        $node = $this->get();
+
+        return $node->title;
     }
 
     public function isAvailableToUser($userId = 0)

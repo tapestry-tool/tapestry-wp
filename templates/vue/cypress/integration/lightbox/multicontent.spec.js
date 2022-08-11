@@ -23,10 +23,9 @@ describe("Multi-content", () => {
           .should("exist")
       }
 
-      cy.server()
-      cy.route("POST", `**/nodes`).as("addNode")
-      cy.route("PUT", `**/nodes/**`).as("editNode")
-      cy.route("DELETE", `**/nodes/**`).as("deleteNode")
+      cy.intercept("POST", `**/nodes`).as("addNode")
+      cy.intercept("PUT", `**/nodes/**`).as("editNode")
+      cy.intercept("DELETE", `**/nodes/**`).as("deleteNode")
 
       // Add multi-content node
       cy.getByTestId(`root-node-button`).click()
@@ -174,8 +173,8 @@ describe("Multi-content", () => {
         }
 
         cy.openLightbox(node.id).within(() => {
-          cy.getByTestId("accordion-rows")
-            .find("div.accordion-row")
+          cy.getByTestId("multi-content-rows")
+            .find("div.multi-content-row")
             .each(($el, index) => {
               const row = rows[index]
               cy.wrap($el)
@@ -203,6 +202,8 @@ describe("Multi-content", () => {
           cy.contains(/lock rows/i).click()
           cy.submitModal()
 
+          cy.logout().visitTapestry()
+
           cy.openLightbox(accordion.id).within(() => {
             cy.contains(row1.title).should("not.be.disabled")
             cy.contains(row2.title).should("be.disabled")
@@ -228,8 +229,8 @@ describe("Multi-content", () => {
         })
 
         cy.openLightbox(node.id).within(() => {
-          cy.getByTestId("accordion-rows")
-            .find("div.accordion-row")
+          cy.getByTestId("multi-content-rows")
+            .find("div.multi-content-row")
             .each(($el, index) => {
               const row = newOrdering[index]
               cy.store()

@@ -3,8 +3,8 @@ import * as getters from "./getters"
 import Helpers from "@/utils/Helpers"
 import { parse } from "@/utils/dataset"
 
-export function init(state, { dataset, progress = {} }) {
-  const datasetWithProgress = parse(dataset, progress)
+export function init(state, dataset) {
+  const datasetWithProgress = parse(dataset, dataset["userProgress"])
   Object.entries(datasetWithProgress).forEach(([key, value]) => {
     if (key === "nodes") {
       state.nodes = {}
@@ -178,6 +178,35 @@ export function changeTheme(state, newTheme) {
 
 export function setReturnRoute(state, route) {
   state.returnRoute = route
+}
+
+export function setCurrentEditingNode(state, node) {
+  state.currentEditingNode = node
+}
+
+export function setCurrentEditingNodeProperty(state, { property, value }) {
+  if (state.currentEditingNode) {
+    const deep = property.includes(".")
+    if (deep) {
+      let anchor = state.currentEditingNode
+      const path = property.split(".")
+      const lastKey = path.pop()
+      for (const key of path) {
+        anchor = anchor[key]
+      }
+      if (!anchor.hasOwnProperty(lastKey)) {
+        Vue.set(anchor, lastKey, value) // for triggering view re-renders
+      } else {
+        anchor[lastKey] = value
+      }
+    } else {
+      if (!state.currentEditingNode.hasOwnProperty(property)) {
+        Vue.set(state.currentEditingNode, property, value) // for triggering view re-renders
+      } else {
+        state.currentEditingNode[property] = value
+      }
+    }
+  }
 }
 
 // TYDE

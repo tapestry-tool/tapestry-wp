@@ -24,7 +24,6 @@
         "mediaURL": "",
         "mediaWidth": 960,
         "mediaHeight": 600,
-        "subAccordionText": "More content:",
         "textContent": "<p>Root</p>"
       },
       "coordinates": {
@@ -98,7 +97,6 @@
         "mediaURL": "",
         "mediaWidth": 960,
         "mediaHeight": 600,
-        "subAccordionText": "More content:",
         "textContent": "<p>Accordion</p>"
       },
       "coordinates": {
@@ -178,7 +176,6 @@
         "mediaURL": "",
         "mediaWidth": 960,
         "mediaHeight": 600,
-        "subAccordionText": "More content:",
         "textContent": "<p>Sub Accordion</p>"
       },
       "coordinates": {
@@ -246,7 +243,6 @@
         "mediaURL": "",
         "mediaWidth": 960,
         "mediaHeight": 600,
-        "subAccordionText": "More content:",
         "textContent": "<p>Sub Accordion Child</p>"
       },
       "coordinates": {
@@ -314,7 +310,6 @@
         "mediaURL": "",
         "mediaWidth": 960,
         "mediaHeight": 600,
-        "subAccordionText": "More content:",
         "textContent": "<p>Accordion Child</p>"
       },
       "coordinates": {
@@ -382,7 +377,6 @@
         "mediaURL": "https://www.google.com/",
         "mediaWidth": 960,
         "mediaHeight": 600,
-        "subAccordionText": "More content:",
         "textContent": "<p>External Link</p>"
       },
       "coordinates": {
@@ -450,7 +444,6 @@
         "mediaURL": "http://localhost/wp-admin/admin-ajax.php?action=h5p_embed&id=1",
         "mediaWidth": 960,
         "mediaHeight": 600,
-        "subAccordionText": "More content:",
         "textContent": ""
       },
       "coordinates": {
@@ -518,7 +511,6 @@
         "mediaURL": "http://localhost/wp-admin/admin-ajax.php?action=h5p_embed&id=2",
         "mediaWidth": 960,
         "mediaHeight": 600,
-        "subAccordionText": "More content:",
         "textContent": ""
       },
       "coordinates": {
@@ -587,7 +579,6 @@
         "mediaURL": "https://www.youtube.com/watch?v=9k11q1tuA38&ab_channel=DanAndShay",
         "mediaWidth": 960,
         "mediaHeight": 600,
-        "subAccordionText": "More content:",
         "textContent": "",
         "youtubeID": "9k11q1tuA38"
       },
@@ -656,7 +647,6 @@
         "mediaURL": "https://www.youtube.com/watch?v=9k11q1tuA38&ab_channel=DanAndShay",
         "mediaWidth": 960,
         "mediaHeight": 600,
-        "subAccordionText": "More content:",
         "textContent": "",
         "youtubeID": "9k11q1tuA38"
       },
@@ -725,7 +715,6 @@
         "mediaURL": "",
         "mediaWidth": 960,
         "mediaHeight": 600,
-        "subAccordionText": "More content:",
         "textContent": "<p>Child</p>"
       },
       "coordinates": {

@@ -117,11 +117,21 @@ export async function updateLockedStatus({ commit, getters, dispatch }) {
   }
 }
 
-export async function updateNodeProgress({ commit, getters, dispatch }, payload) {
+export async function updateNodeProgress(
+  { commit, state, dispatch, getters },
+  payload
+) {
+  // Tapestry editors and admins don't need this feature. We disable this to
+  // improve performance for editors and admins by reducing requests.
+  if (wp.canEditTapestry()) {
+    return
+  }
   try {
     const { id, progress } = payload
-
     const node = getters.getNode(id)
+    if (node.completed || node.progress === progress) {
+      return
+    }
 
     if (!Helpers.nodeAndUserAreDyad(node)) {
       if (!wp.isLoggedIn()) {
@@ -129,7 +139,10 @@ export async function updateNodeProgress({ commit, getters, dispatch }, payload)
         const nodeProgress = progressObj[id] || {}
         nodeProgress.progress = progress
         localStorage.setItem(LOCAL_PROGRESS_ID, JSON.stringify(progressObj))
-      } else {
+      } else if (
+        !state.userProgress[id] ||
+        state.userProgress[id].progress !== progress
+      ) {
         await client.updateUserProgress(id, progress)
       }
       commit("updateNodeProgress", { id, progress })
@@ -156,8 +169,17 @@ export async function updateNodeCoordinates(
 }
 
 export async function completeNode(context, nodeId) {
+  // Tapestry editors and admins don't need this feature. We disable this to
+  // improve performance for editors and admins by reducing requests.
+  if (wp.canEditTapestry()) {
+    return
+  }
   const { commit, dispatch, getters } = context
   const node = getters.getNode(nodeId)
+  if (node.completed) {
+    return
+  }
+
   if (!Helpers.nodeAndUserAreDyad(node)) {
     try {
       if (!wp.isLoggedIn()) {

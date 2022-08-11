@@ -50,7 +50,7 @@ export default {
       immediate: true,
       handler(requestedTab) {
         if (this.settingsModalOpen) {
-          const acceptedTabs = ["appearance", "advanced", "access"]
+          const acceptedTabs = ["appearance", "advanced", "access", "kaltura"]
           if (!acceptedTabs.includes(requestedTab)) {
             this.$router.replace({
               name: names.SETTINGS,

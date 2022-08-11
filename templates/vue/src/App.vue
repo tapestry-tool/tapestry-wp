@@ -2,9 +2,10 @@
   <loading v-if="loading" data-qa="tapestry-loading" style="height: 75vh;"></loading>
   <div v-else id="app">
     <tapestry-app></tapestry-app>
-    <router-view name="lightbox"></router-view>
-    <router-view name="linkmodal"></router-view>
+    <router-view></router-view>
     <node-modal></node-modal>
+    <link-modal></link-modal>
+    <lightbox v-if="viewingNode" :node-id="nodeId"></lightbox>
     <sidebar v-if="!isEmpty"></sidebar>
     <tapestry-error></tapestry-error>
     <b-modal
@@ -24,6 +25,9 @@
 
 <script>
 import { mapState, mapMutations, mapGetters } from "vuex"
+import { names } from "@/config/routes"
+import Lightbox from "@/components/Lightbox"
+import LinkModal from "@/components/modals/LinkModal"
 import NodeModal from "@/components/modals/NodeModal"
 import TapestryApp from "@/components/TapestryApp"
 import Sidebar from "@/components/Sidebar"
@@ -37,7 +41,9 @@ export default {
   name: "app",
   components: {
     Loading,
+    Lightbox,
     NodeModal,
+    LinkModal,
     TapestryApp,
     Sidebar,
     TapestryError,
@@ -53,6 +59,14 @@ export default {
     ...mapGetters(["getTheme"]),
     isEmpty() {
       return Object.keys(this.nodes).length === 0
+    },
+    nodeId() {
+      return this.$route.params.nodeId
+    },
+    viewingNode() {
+      return (
+        this.$route.name === names.LIGHTBOX || this.$route.query.from === "lightbox"
+      )
     },
   },
   watch: {
@@ -77,14 +91,13 @@ export default {
 
     const data = [
       client.getTapestry(),
-      client.getUserProgress(),
       client.getLastSelectedNode(),
       client.getTheme(),
       client.getAvatar(),
       client.cos.getActivity(),
     ]
     Promise.all(data).then(
-      ([dataset, progress, selectedNode, theme, savedAvatar, savedCos]) => {
+      ([tapestryData, selectedNode, theme, savedAvatar, savedCos]) => {
         this.changeTheme(theme.data)
         if (this.getTheme == "system") {
           const isDarkMode =
@@ -106,19 +119,16 @@ export default {
           document.documentElement.setAttribute("data-theme", this.getTheme)
         }
 
-        this.init({ dataset, progress })
+        this.init(tapestryData)
         this.addAvatar(savedAvatar)
         this.addCos(savedCos)
         this.loading = false
-        if (!this.$route.params.nodeId && dataset.nodes.length > 0) {
-          let path = `/nodes/${dataset.rootId}`
+        if (!this.$route.params.nodeId && tapestryData.nodes.length > 0) {
+          let path = `/nodes/${tapestryData.rootId}`
           if (selectedNode) {
             path = `/nodes/${selectedNode.nodeId}`
             if (selectedNode.rowId) {
               path = `${path}/view/${selectedNode.rowId}`
-              if (selectedNode.subRowId) {
-                path = `${path}/rows/${selectedNode.subRowId}`
-              }
             }
           }
           this.$router.replace({

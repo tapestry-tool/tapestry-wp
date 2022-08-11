@@ -6,7 +6,11 @@
       :is-sidebar-open="isSidebarOpen"
       data-qa="tapestry-map"
     />
-    <tapestry-main v-else-if="!tydeModeEnabled" ref="graph" :viewBox="viewBox" />
+    <tapestry-main
+      v-else-if="!tydeModeEnabled && viewingTapestry"
+      ref="graph"
+      :viewBox="viewBox"
+    />
   </div>
 </template>
 
@@ -28,7 +32,6 @@ export default {
   },
   data() {
     return {
-      loading: true,
       viewBox: "2200 2700 1600 1100",
     }
   },
@@ -36,6 +39,13 @@ export default {
     ...mapState(["nodes", "links", "selection", "settings", "rootId", "avatar"]),
     isSidebarOpen() {
       return Boolean(this.$route.query.sidebar)
+    },
+    viewingTapestry() {
+      return (
+        !this.$route.name ||
+        this.$route.name !== names.LIGHTBOX ||
+        !this.nodes[this.$route.params.nodeId].fullscreen
+      )
     },
     analyticsEnabled() {
       return this.settings.analyticsEnabled

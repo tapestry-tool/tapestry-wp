@@ -16,12 +16,12 @@ describe("Node Operations", () => {
       cy.get("button")
         .contains(/close/i)
         .click()
-      cy.getByTestId("node-modal").should("not.be.visible")
+      cy.getByTestId("node-modal").should("not.exist")
 
       cy.openModal("edit", id)
       cy.getByTestId("node-modal").should("be.visible")
       cy.contains(/cancel/i).click()
-      cy.getByTestId("node-modal").should("not.be.visible")
+      cy.getByTestId("node-modal").should("not.exist")
 
       cy.openLightbox(id).should("be.visible")
     })
@@ -52,7 +52,7 @@ describe("Node Operations", () => {
         .contains("Cancel")
         .click()
       cy.getByTestId("node-modal").should("be.visible")
-      cy.get(".node-modal-confirmation").should("not.be.visible")
+      cy.get(".node-modal-confirmation").should("not.exist")
 
       cy.get(".close").click()
       cy.getByTestId("node-modal").should("exist")
@@ -62,7 +62,7 @@ describe("Node Operations", () => {
         .contains("Close")
         .click()
       cy.getByTestId("node-modal").should("not.be.visible")
-      cy.get(".node-modal-confirmation").should("not.be.visible")
+      cy.get(".node-modal-confirmation").should("not.exist")
     })
   })
 
@@ -72,7 +72,7 @@ describe("Node Operations", () => {
       cy.getByTestId("node-modal").should("be.visible")
 
       cy.get(".close").click()
-      cy.getByTestId("node-modal").should("not.be.visible")
+      cy.getByTestId("node-modal").should("not.exist")
     })
 
     cy.getSelectedNode().then(node => {
@@ -80,7 +80,7 @@ describe("Node Operations", () => {
       cy.getByTestId("node-modal").should("be.visible")
 
       clickOutsideModal()
-      cy.getByTestId("node-modal").should("not.be.visible")
+      cy.getByTestId("node-modal").should("not.exist")
     })
   })
 })

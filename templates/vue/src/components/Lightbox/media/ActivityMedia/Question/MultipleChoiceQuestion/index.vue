@@ -62,7 +62,9 @@ export default {
   },
   data() {
     return {
-      userSelection: this.allowSelectMultiple ? [] : null,
+      userSelection: this.question.answerTypes.multipleChoice.allowSelectMultiple
+        ? []
+        : null,
       submitPressed: false,
     }
   },
@@ -119,5 +121,6 @@ export default {
 .container {
   display: flex;
   flex-direction: column;
+  text-align: left;
 }
 </style>

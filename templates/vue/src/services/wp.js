@@ -28,4 +28,6 @@ export const isLoggedIn = () => Boolean(wpData.currentUser.ID)
 
 export const canEditTapestry = () => wpData.wpCanEditTapestry === "1"
 
+export const getKalturaStatus = () => wpData.kaltura.kalturaStatus
+
 export const dyadLinkedUser = () => wpData.dyadLinkedWpUser

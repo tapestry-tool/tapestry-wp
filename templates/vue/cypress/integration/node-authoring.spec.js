@@ -125,12 +125,11 @@ describe("Node Authoring", () => {
           .within(() => {
             cy.contains(/cancel/i).click()
           })
-        cy.contains(modalTitle).should("not.be.visible")
+        cy.contains(modalTitle).should("not.exist")
         cy.contains(/delete node/i).should("be.visible")
 
         // Expect delete to delete node
-        cy.server()
-        cy.route("DELETE", `**/nodes/**`).as("deleteNode")
+        cy.intercept("DELETE", `**/nodes/**`).as("deleteNode")
 
         cy.contains(/delete/i).click()
         cy.contains(modalTitle).should("be.visible")
@@ -306,7 +305,7 @@ describe("Node Authoring", () => {
             cy.getByTestId(`edit-node-${childId}`).click({ force: true })
             cy.getByTestId("node-modal").should("be.visible")
             cy.submitModal()
-            cy.getByTestId("node-modal").should("not.be.visible")
+            cy.getByTestId("node-modal").should("not.exist")
           })
       })
     })

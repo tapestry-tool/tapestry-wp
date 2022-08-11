@@ -3,9 +3,8 @@ describe("Answers", () => {
     cy.fixture("one-node.json").as("oneNode")
     cy.setup("@oneNode")
 
-    cy.server()
-    cy.route("POST", `**/nodes`).as("addNode")
-    cy.route("PUT", `**/nodes/**`).as("editNode")
+    cy.intercept("POST", `**/nodes`).as("addNode")
+    cy.intercept("PUT", `**/nodes/**`).as("editNode")
 
     cy.getSelectedNode().then(node => {
       cy.openModal("edit", node.id)
@@ -19,14 +18,18 @@ describe("Answers", () => {
       cy.getByTestId("question-answer-text-0").click({ force: true })
       cy.getByTestId("question-answer-text-single-0").click({ force: true })
       cy.getByTestId("question-answer-text-single-placeholder-0").type(placeholder)
-      cy.submitModal()
+      cy.getByTestId("submit-node-modal").click()
+      cy.wait("@editNode")
       cy.openLightbox(node.id)
-      cy.route("POST", "/users/activity/**").as("submit")
+      cy.intercept("POST", "**/users/activity?**").as("submit")
       cy.lightbox().within(() => {
         cy.get(`[placeholder="${placeholder}"]`).should("be.visible")
         cy.get(`[placeholder="${placeholder}"]`).type(answer)
         cy.contains(/submit/i).click()
-        cy.contains("Thanks!").should("be.visible")
+        cy.wait("@submit")
+        cy.contains("You can press the button below to continue.").should(
+          "be.visible"
+        )
         cy.contains(/done/i).click()
       })
       cy.lightbox().should("not.exist")

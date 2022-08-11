@@ -9,7 +9,7 @@ class TapestryError extends Error
     protected $message;
     protected $status;
 
-    const ERRORS = [
+    public const ERRORS = [
         'INVALID_USER_ID' => [
             'MESSAGE' => 'UserID is invalid or user is not logged in.',
             'STATUS' => ['status' => 404],
