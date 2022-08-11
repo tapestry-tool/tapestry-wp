@@ -22,6 +22,9 @@ define(
 
 error_reporting(E_ERROR | E_PARSE);
 
+global $TYDE_YOUTH_ROLES;
+global $TYDE_DYAD_ROLES;
+
 // TYDE settings
 $TYDE_YOUTH_ROLES = [
     'youth' => 'Youth',
@@ -380,6 +383,7 @@ register_activation_hook(__FILE__, 'add_tyde_roles');
 function add_tyde_roles()
 {
     global $TYDE_DYAD_ROLES;
+    error_log("Dyad roles: " . print_r($TYDE_DYAD_ROLES, true));
     foreach ($TYDE_DYAD_ROLES as $key => $label) {
         add_role(
             $key,
@@ -391,6 +395,7 @@ function add_tyde_roles()
         );
     }
     global $TYDE_YOUTH_ROLES;
+    error_log("Youth roles: " . print_r($TYDE_YOUTH_ROLES, true));
     foreach ($TYDE_YOUTH_ROLES as $key => $label) {
         add_role(
             $key,
@@ -401,6 +406,8 @@ function add_tyde_roles()
             ]
         );
     }
+
+    // error_log("Roles: " . print_r(wp_roles(), true));
 }
 
 /**
