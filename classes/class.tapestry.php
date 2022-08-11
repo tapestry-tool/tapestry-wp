@@ -354,6 +354,7 @@ class Tapestry implements ITapestry
     public function getNodesDataForRender()
     {
         $nodesData = [];
+        $dyadNodes = [];
 
         foreach ($this->nodeObjects as $i => $nodeObject) {
             $nodeId = $nodeObject->getId();
@@ -364,8 +365,7 @@ class Tapestry implements ITapestry
             $nodesData[$nodeId]->permitted = false;
             $nodesData[$nodeId]->unlocked = !$nodeObject->isLocked();
             $nodesData[$nodeId]->conditions = $nodeObject->getLockedState();
-            // TODO: $data->isDyad = $nodeData->isDyad;
-            // TODO: $data->isDyad = $node->isDyad();
+            $nodesData[$nodeId]->isDyad = $nodeObject->isDyad();
         }
 
         if (count($nodesData)) {
@@ -373,6 +373,7 @@ class Tapestry implements ITapestry
             // Since we are doing a non-bidirectional traversal, we have to loop through all the
             // nodes (unless they have already been visited)
             // Efficiency: N^2
+            // During this traversal, also recursively set isDyad
             $traversedNodeIds = [];
             foreach ($nodesData as $node) {
                 if ($node->unlocked && !in_array($node->id, $traversedNodeIds)) {
@@ -380,8 +381,26 @@ class Tapestry implements ITapestry
                         $nodesData,
                         $node,
                         false,
-                        function ($n) {
+                        function ($n) use (&$dyadNodes) {
                             $n->accessible = $n->unlocked;
+
+                            // If this node is in the list of dyadNodes, mark it as dyad
+                            if (in_array($n->id, $dyadNodes)) {
+                                $n->isDyad = true;
+                                if (($key = array_search($n->id, $dyadNodes)) !== false) {
+                                    unset($dyadNodes[$key]);
+                                }
+                            }
+
+                            // If this node is dyad, save its children to be marked as dyad too
+                            if ($n->isDyad) {
+                                $childNodes = $this->_getNeighbours($n, 'source');
+                                foreach ($childNodes as $childNode) {
+                                    if (!in_array($childNode, $dyadNodes)) {
+                                        array_push($dyadNodes, $childNode);
+                                    }
+                                }
+                            }
                         },
                         function ($n) {
                             return $n->unlocked;
@@ -404,6 +423,7 @@ class Tapestry implements ITapestry
                     $data->accessible = $nodeAccessibleData->accessible;
                     $data->conditions = $nodeAccessibleData->conditions;
                     $data->unlocked = $nodeAccessibleData->unlocked;
+                    $data->isDyad = $nodeAccessibleData->isDyad;
 
                     return $data;
                 },
@@ -491,27 +511,6 @@ class Tapestry implements ITapestry
         }
 
         $func($node, $nodes);
-
-        /*
-        TODO:
-        // If this node is in the list of dyadNodes, mark it as dyad
-        if (in_array($node->id, $dyadNodes)) {
-            $node->isDyad = true;
-            if (($key = array_search($node->id, $dyadNodes)) !== false) {
-                unset($dyadNodes[$key]);
-            }
-        }
-
-        // If this node is dyad, save its children to be marked as dyad too
-        if ($node->isDyad) {
-            $childNodes = $this->_getNeighbours($node, 'source');
-            foreach ($childNodes as $childNode) {
-                if (!in_array($childNode, $dyadNodes)) {
-                    array_push($dyadNodes, $childNode);
-                }
-            }
-        }
-        */
 
         if ($condition($node)) {
             $neighbourIds = $this->_getNeighbours($node, $bidirectional ? 'both' : 'source');
