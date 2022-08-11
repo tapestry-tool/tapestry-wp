@@ -19,6 +19,12 @@
           }"
           :style="item.style"
           :tabindex="focusedMenuItem === idx ? 0 : -1"
+          :aria-label="
+            (item.label ? item.label : item.command) +
+              (isActive[item.command] && isActive[item.command](item.args)
+                ? ', active'
+                : '')
+          "
           @click="handleMenuClick(idx, item, commands[item.command])"
         >
           <template v-if="item.text">
@@ -100,27 +106,34 @@ export default {
       menubarItems: [
         { command: "bold" },
         { command: "italic" },
-        { command: "strike" },
+        { command: "strike", label: "strikethrough" },
         { command: "underline" },
         { command: "code" },
-        { command: "link", clickHandler: this.setUrl },
+        { command: "link", label: "add link", clickHandler: this.setUrl },
         {
           command: "heading",
+          label: "heading level 1",
           style: { marginLeft: "1em" },
           args: { level: 2 },
           text: "H1",
         },
-        { command: "heading", args: { level: 3 }, text: "H2" },
         {
           command: "heading",
+          label: "heading level 2",
+          args: { level: 3 },
+          text: "H2",
+        },
+        {
+          command: "heading",
+          label: "heading level 3",
           style: { marginRight: "1em" },
           args: { level: 4 },
           text: "H3",
         },
-        { command: "bullet_list", icon: "ul" },
-        { command: "ordered_list", icon: "ol" },
+        { command: "bullet_list", label: "bulleted list", icon: "ul" },
+        { command: "ordered_list", label: "ordered list", icon: "ol" },
         { command: "blockquote", icon: "quote" },
-        { command: "horizontal_rule", text: "—" },
+        { command: "horizontal_rule", label: "insert horizontal rule", text: "—" },
         { command: "undo", style: { marginLeft: "auto" } },
         { command: "redo" },
       ],
