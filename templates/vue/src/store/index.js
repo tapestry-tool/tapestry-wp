@@ -24,7 +24,11 @@ export const store = {
     displayErrors: false,
     avatar: {},
     theme: "",
-    cos: {},
+    cos: {
+      circles: [],
+      communities: {},
+      connections: {},
+    },
     userAnswers: {},
     returnRoute: null,
     currentEditingNode: null,
