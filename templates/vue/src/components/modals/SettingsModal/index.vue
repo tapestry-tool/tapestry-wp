@@ -283,6 +283,14 @@
             </b-form-checkbox>
           </b-form-group>
         </b-tab>
+        <b-tab
+          v-if="showKalturaTab"
+          title="Kaltura"
+          :active="tab === 'kaltura'"
+          @click="$emit('change:tab', 'kaltura')"
+        >
+          <kaltura-upload-tab></kaltura-upload-tab>
+        </b-tab>
       </b-tabs>
     </b-container>
     <template slot="modal-footer">
@@ -310,7 +318,9 @@ import FileUpload from "../common/FileUpload"
 import DuplicateTapestryButton from "./DuplicateTapestryButton"
 import PermissionsTable from "../common/PermissionsTable"
 import DragSelectModular from "@/utils/dragSelectModular"
-import { data as wpData } from "@/services/wp"
+import Helpers from "@/utils/Helpers"
+import KalturaUploadTab from "./KalturaUploadTab"
+import { data as wpData, getKalturaStatus } from "@/services/wp"
 import client from "@/services/TapestryAPI"
 
 const defaultPermissions = Object.fromEntries(
@@ -329,6 +339,7 @@ export default {
     FileUpload,
     DuplicateTapestryButton,
     PermissionsTable,
+    KalturaUploadTab,
   },
   props: {
     show: {
@@ -396,6 +407,9 @@ export default {
         )
       }
       return true
+    },
+    showKalturaTab() {
+      return Helpers.hasKalturaUploadPermission() && getKalturaStatus()
     },
   },
   created() {

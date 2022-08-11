@@ -11,15 +11,28 @@
 // Used to force-refresh assets and run updates
 $TAPESTRY_VERSION_NUMBER = '2.55.0-beta';
 
+define(
+    'LOAD_KALTURA',
+    (defined('KALTURA_ADMIN_SECRET') && !empty(KALTURA_ADMIN_SECRET)) &&
+    (defined('KALTURA_PARTNER_ID') && !empty(KALTURA_PARTNER_ID)) &&
+    (defined('KALTURA_SERVICE_URL') && !empty(KALTURA_SERVICE_URL)) &&
+    (defined('KALTURA_UNIQUE_CONFIG') && !empty(KALTURA_UNIQUE_CONFIG)) &&
+    file_exists(plugin_dir_path(__FILE__) . 'vendor/autoload.php')
+);
+
 error_reporting(E_ERROR | E_PARSE);
 
 /**
  * Register endpoints and perform other includes
  */
 require_once dirname(__FILE__).'/classes/class.tapestry-analytics.php';
+require_once dirname(__FILE__).'/classes/class.kaltura-api.php';
+require_once dirname(__FILE__).'/classes/class.constants.php';
 require_once dirname(__FILE__).'/endpoints.php';
 require_once dirname(__FILE__).'/settings.php';
 require_once dirname(__FILE__).'/plugin-updates.php';
+
+use Kaltura\Client\Enum\EntryStatus;
 
 /**
  * Register Tapestry type on initialization.
@@ -146,6 +159,13 @@ function tapestry_enqueue_vue_app()
         global $post;
         global $wp_roles;
 
+        $kaltura_partner_id = null;
+        $kaltura_unique_configuration = null;
+        if (LOAD_KALTURA) {
+            $kaltura_partner_id = KALTURA_PARTNER_ID;
+            $kaltura_unique_configuration = KALTURA_UNIQUE_CONFIG;
+        }
+
         $currentUser = wp_get_current_user();
         $currentUser->data = (object) [
             'ID' => $currentUser->data->ID,
@@ -178,6 +198,11 @@ function tapestry_enqueue_vue_app()
                 'wpCanEditTapestry' => current_user_can('edit_post', get_the_ID()),
                 'currentUser' => $currentUser,
                 'uploadDirArray' => wp_upload_dir(),
+                'kaltura' => array(
+                    'kalturaStatus' => LOAD_KALTURA,
+                    "partnerId" => $kaltura_partner_id,
+                    "uniqueConfiguration" => $kaltura_unique_configuration,
+                ),
             ]
         );
 

@@ -13,7 +13,7 @@
           :target="nodes[link.target]"
         ></tapestry-link>
       </g>
-      <g v-if="!dragSelectEnabled || dragSelectReady" class="nodes">
+      <g v-if="dragSelectEnabled && dragSelectReady" class="nodes">
         <tapestry-node
           v-for="(node, id) in nodes"
           :key="id"
@@ -82,7 +82,7 @@ export default {
       return Number(this.$route.params.nodeId)
     },
     dragSelectEnabled() {
-      return !Helpers.isTouchEnabledDevice()
+      return !this.settings.renderMap
     },
     editableNodes() {
       return this.nodes.length

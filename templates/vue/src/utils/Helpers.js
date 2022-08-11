@@ -35,31 +35,6 @@ export default class Helpers {
     return Math.max(document.documentElement.clientHeight, window.innerHeight || 0)
   }
 
-  /**
-   * Check if user is on a touch enabled device
-   *
-   * @returns {Boolean}
-   */
-  static isTouchEnabledDevice() {
-    return "ontouchstart" in window || navigator.maxTouchPoints > 0
-  }
-
-  /**
-   * Finds the node index with node ID
-   *
-   * @param  {Number} id          nodeMetaId
-   * @param  {Object} tapestry    tapestry
-   *
-   * @return {Number}
-   */
-  static findNodeIndex(id, tapestry) {
-    function helper(obj) {
-      return obj.id == id
-    }
-
-    return tapestry.nodes.findIndex(helper)
-  }
-
   static getAspectRatio() {
     const browserHeight = this.getBrowserHeight()
     const browserWidth = this.getBrowserWidth()
@@ -300,6 +275,13 @@ export default class Helpers {
     }
 
     return false
+  }
+
+  static hasKalturaUploadPermission() {
+    const { roles } = wp.getCurrentUser()
+    const allowedRole = "administrator"
+
+    return roles.includes(allowedRole)
   }
 
   /**

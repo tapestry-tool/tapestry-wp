@@ -643,7 +643,7 @@ class Tapestry implements ITapestry
 
     private function _filterTapestry($tapestry, $filterUserId)
     {
-        $tapestry->nodes = $this->_filterNodesMetaIdsByAccess($filterUserId);
+        $tapestry->nodes = $this->_filterNodesMetaIdsByAccess();
         $tapestry->links = $this->_filterLinksByNodeMetaIds($tapestry->links, $tapestry->nodes);
 
         return $tapestry;
@@ -684,7 +684,7 @@ class Tapestry implements ITapestry
         return $nodes;
     }
 
-    private function _filterNodesMetaIdsByAccess($filterUserId)
+    private function _filterNodesMetaIdsByAccess()
     {
         $currentUser = new TapestryUser();
         $currentUserId = $currentUser->getID();
@@ -728,24 +728,18 @@ class Tapestry implements ITapestry
                 $nodesPermitted[$nodeId]->permitted = false;
             }
 
-            $traversedNodeIds = [];
-            foreach ($nodesPermitted as $node) {
-                if (!in_array($node->id, $traversedNodeIds)) {
-                    $this->_traverseNodesAndApplyFunction(
-                        $nodesPermitted,
-                        $nodesPermitted[$node->id],
-                        false,
-                        function ($n) use ($superuserOverridePermissions, $currentUserId, $filterUserId) {
-                            $n->permitted = $this->_userIsAllowed($n->id, $superuserOverridePermissions, $currentUserId) ||
-                            (-1 !== $filterUserId && $this->_userIsAllowed($n->id, $superuserOverridePermissions, $filterUserId));
-                        },
-                        function ($n) {
-                            return true;
-                        }
-                    );
-                    $traversedNodeIds = array_merge($traversedNodeIds, $this->visitedNodeIds);
+            $this->_traverseNodesAndApplyFunction(
+                $nodesPermitted,
+                $nodesPermitted[$this->rootId],
+                false,
+                function ($n) use ($superuserOverridePermissions, $currentUserId, $filterUserId) {
+                    $n->permitted = $this->_userIsAllowed($n->id, $superuserOverridePermissions, $currentUserId) ||
+                    (-1 !== $filterUserId && $this->_userIsAllowed($n->id, $superuserOverridePermissions, $filterUserId));
+                },
+                function ($n) {
+                    return true;
                 }
-            }
+            );
 
             $nodes = array_filter($nodes, function ($nodeId) use ($nodesPermitted) {
                 return $nodesPermitted[$nodeId]->permitted;

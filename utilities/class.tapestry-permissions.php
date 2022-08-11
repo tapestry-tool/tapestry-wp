@@ -52,4 +52,19 @@ class TapestryPermissions
 
         return current_user_can('publish_posts');
     }
+
+    /**
+     * Permissions to upload videos to Kaltura.
+     *
+     * @return object $permission permission
+     */
+    public static function kalturaUpload()
+    {
+        if (defined('TAPESTRY_USE_DEV_MODE') && !empty(TAPESTRY_USE_DEV_MODE)) {
+            return true;
+        }
+
+        $user = wp_get_current_user();
+        return in_array("administrator", (array) $user->roles);
+    }
 }
