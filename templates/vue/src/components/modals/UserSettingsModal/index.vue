@@ -95,7 +95,7 @@ export default {
       const theme = this.$refs.themeForm.getTheme()
       this.$refs.themeForm.applyTheme()
       this.updateUserSettings({ theme })
-      this.$refs.avatarForm.saveAvatar()
+      this.$refs.avatarForm?.saveAvatar()
       this.$emit("close")
       this.$root.$emit("bv::hide::modal", "user-settings-modal")
     },
