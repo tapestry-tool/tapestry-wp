@@ -28,7 +28,7 @@
             :scale="scale"
           ></tapestry-link>
         </g>
-        <g v-if="dragSelectEnabled" class="nodes">
+        <g class="nodes">
           <tapestry-node
             v-for="(node, id) in nodes"
             :key="id"
@@ -162,7 +162,7 @@ export default {
       return Number(this.$route.params.nodeId)
     },
     dragSelectEnabled() {
-      return !Helpers.isTouchEnabledDevice()
+      return !this.settings.renderMap
     },
     editableNodes() {
       return this.nodes.length
@@ -280,15 +280,14 @@ export default {
         this.updateScale()
         this.fetchAppDimensions()
       },
-      (dx, dy, fromMinimap = false) => {
+      (dx, dy) => {
         this.handlePan(
           dx * this.scaleConstants.panSensitivity,
-          dy * this.scaleConstants.panSensitivity,
-          fromMinimap
+          dy * this.scaleConstants.panSensitivity
         )
       },
-      (fromMinimap = false) => {
-        this.handlePanEnd(fromMinimap)
+      () => {
+        this.handlePanEnd()
       },
       [this.$refs.minimap.$el]
     )
@@ -378,8 +377,8 @@ export default {
 
       this.scale = newScale
     },
-    handlePan(dx, dy, fromMinimap) {
-      if (!this.canPan && !fromMinimap) {
+    handlePan(dx, dy) {
+      if (!this.canPan) {
         return
       }
       if (!this.appDimensions) {
@@ -394,10 +393,7 @@ export default {
       this.offset.x -= dx
       this.offset.y -= dy
     },
-    handlePanEnd(fromMinimap) {
-      if (!this.canPan && !fromMinimap) {
-        return
-      }
+    handlePanEnd() {
       this.isPanning = false
       this.updateOffset()
       this.fetchAppDimensions()
@@ -406,8 +402,6 @@ export default {
       // dx, dy passed here is in viewBox dimensions, not screen pixels; we apply the changes to the offset directly, bypassing the calculations in handlePan
       this.offset.x -= dx * this.scaleConstants.panSensitivity
       this.offset.y -= dy * this.scaleConstants.panSensitivity
-      // TODO: this.zoomPanHelper.onPan(dx, dy, true)
-      //       this.zoomPanHelper.onPanEnd(true)
       this.zoomPanHelper.onPanEnd()
     },
     handleMinimapPanTo({ x, y }) {
