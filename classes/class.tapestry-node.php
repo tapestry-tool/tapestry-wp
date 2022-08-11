@@ -649,14 +649,16 @@ class TapestryNode implements ITapestryNode
             $id = 1;
         }
         $user = get_user_by('id', $id);
-        if ($user) {
-            return (object) [
-                'id' => $id,
-                'name' => $user->display_name,
-                'email' => $user->user_email,
-                'original_author_name' => '',
-                'original_author_email' => '',
-            ];
+        if (!$user) {
+            $user = get_user_by('id', 1);
         }
+
+        return (object) [
+            'id' => $id,
+            'name' => $user->display_name,
+            'email' => $user->user_email,
+            'original_author_name' => '',
+            'original_author_email' => '',
+        ];
     }
 }

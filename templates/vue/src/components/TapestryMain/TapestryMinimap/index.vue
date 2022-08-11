@@ -20,7 +20,7 @@
         height: height + 'px',
       }"
     ></canvas>
-    <div data-qa="close-minimap" class="minimap-button">
+    <div data-qa="close-minimap" class="minimap-button" title="Close minimap">
       <button @click="$emit('close')">
         <i class="fas fa-times"></i>
       </button>
@@ -76,15 +76,15 @@ export default {
     }
   },
   computed: {
-    ...mapState(["nodes", "links", "maxLevel"]),
+    ...mapState(["nodes", "links", "maxLevel", "browserDimensions"]),
     aspectRatio() {
       return this.viewBox[2] / this.viewBox[3]
     },
     width() {
-      return this.height * this.aspectRatio
+      return this.browserDimensions.width * 0.2
     },
     height() {
-      return 150
+      return this.width / this.aspectRatio
     },
     displayScale() {
       return this.height / this.viewBox[3]
@@ -288,6 +288,12 @@ export default {
   background: var(--bg-color-secondary);
   box-shadow: 0 0 7px 0 var(--bg-color-primary);
   border-radius: 8px;
+  transition: opacity 300ms;
+  opacity: 0.7;
+
+  &:hover {
+    opacity: 1;
+  }
 
   button {
     color: var(--text-color-tertiary);
@@ -300,7 +306,8 @@ export default {
     align-items: center;
     justify-content: center;
 
-    &:hover {
+    &:hover,
+    &:active {
       color: var(--highlight-color);
     }
   }

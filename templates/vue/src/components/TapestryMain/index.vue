@@ -14,7 +14,7 @@
     </div>
     <div v-else ref="dragArea">
       <svg
-        id="vue-svg"
+        ref="vue-svg"
         role="application"
         aria-label="Main Tapestry View"
         :viewBox="computedViewBox"
@@ -62,6 +62,7 @@
     />
     <tapestry-minimap
       v-if="showMinimap"
+      ref="minimap"
       :view-box="unscaledViewBox"
       :scale="scale"
       :offset="offset"
@@ -161,7 +162,7 @@ export default {
       return Number(this.$route.params.nodeId)
     },
     dragSelectEnabled() {
-      return !this.settings.renderMap
+      return !Helpers.isTouchEnabledDevice()
     },
     editableNodes() {
       return this.nodes.length
@@ -188,6 +189,7 @@ export default {
       if (!empty) {
         this.zoomPanHelper.unregister()
         this.zoomPanHelper.register()
+        this.registerKeyHandler()
       }
     },
     background: {
@@ -269,7 +271,7 @@ export default {
     this.updateViewBox()
 
     this.zoomPanHelper = new ZoomPanHelper(
-      "vue-svg",
+      "tapestry",
       (delta, x, y) => {
         this.handleZoom(delta * this.scaleConstants.zoomSensitivity, x, y)
         this.$root.$emit("context-toolbar::dismiss")
@@ -287,10 +289,10 @@ export default {
       },
       (fromMinimap = false) => {
         this.handlePanEnd(fromMinimap)
-      }
+      },
+      [this.$refs.minimap.$el]
     )
     this.zoomPanHelper.register()
-
     this.$refs.app.addEventListener("keydown", this.handleKey)
 
     this.$nextTick(() => {
@@ -401,8 +403,12 @@ export default {
       this.fetchAppDimensions()
     },
     handleMinimapPanBy({ dx, dy }) {
-      this.zoomPanHelper.onPan(dx, dy, true)
-      this.zoomPanHelper.onPanEnd(true)
+      // dx, dy passed here is in viewBox dimensions, not screen pixels; we apply the changes to the offset directly, bypassing the calculations in handlePan
+      this.offset.x -= dx * this.scaleConstants.panSensitivity
+      this.offset.y -= dy * this.scaleConstants.panSensitivity
+      // TODO: this.zoomPanHelper.onPan(dx, dy, true)
+      //       this.zoomPanHelper.onPanEnd(true)
+      this.zoomPanHelper.onPanEnd()
     },
     handleMinimapPanTo({ x, y }) {
       // x, y is in viewbox coordinates (before scaling)
@@ -536,6 +542,11 @@ export default {
       }
     },
     handleKey(evt) {
+      // Ignore key events if focus is outside Tapestry view
+      if (!this.$refs["vue-svg"].contains(document.activeElement)) {
+        return
+      }
+
       const { code } = evt
       const node = this.getNode(this.selectedId)
       if (code === "Enter") {
