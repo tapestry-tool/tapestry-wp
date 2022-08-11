@@ -50,7 +50,7 @@ const swatches = [
   { color: "#222F3D", label: "Dark Grey" },
   { color: "#F2C511", label: "Yellow" },
   { color: "#F39C19", label: "Orange" },
-  { color: "#E84B3C", label: "Carmine Pink" },
+  { color: "#E84B3C", label: "Red" },
   { color: "#C0382B", label: "Dark Red" },
   { color: "#DDE6E8", label: "Silver" },
   { color: "#BDC3C8", label: "Platinum" },
