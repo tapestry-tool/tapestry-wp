@@ -64,7 +64,8 @@ export default {
   },
   props: {
     connections: {
-      require: true,
+      type: Object,
+      required: true,
     },
   },
   computed: {

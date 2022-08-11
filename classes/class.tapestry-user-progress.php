@@ -255,7 +255,7 @@ class TapestryUserProgress implements ITapestryUserProgress
             $nodeId = $node->id;
 
             $userId = $this->_userId;
-            
+
             // Use linked user's progress if the user is a dyad and this node is a dyad node
             if ($node->isDyad && $this->_dyadLinkedUserId) {
                 $userId = $this->_dyadLinkedUserId;
