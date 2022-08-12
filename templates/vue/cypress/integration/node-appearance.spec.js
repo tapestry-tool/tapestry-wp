@@ -4,6 +4,22 @@ describe("Node Appearance", () => {
     cy.setup("@oneNode")
   })
 
+  it("should be able to focus on the Color Picker component", () => {
+    cy.getSelectedNode().then(node => {
+      cy.openModal("edit", node.id)
+      cy.contains(/appearance/i).click()
+
+      cy.contains(/Background Color/i)
+        .getByTestId(`node-backgroundcolor-${node.id}`)
+        .find(".vue-swatches__trigger")
+        .focus()
+      cy.contains(/Text Color/i)
+        .getByTestId(`node-textcolor-${node.id}`)
+        .find(".vue-swatches__trigger")
+        .focus()
+    })
+  })
+
   it("should be able to edit a node's appearance using the node modal", () => {
     // Check initial settings for render images
     cy.store()
