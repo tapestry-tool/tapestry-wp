@@ -18,7 +18,6 @@
             ? 'pointer'
             : 'not-allowed',
       }"
-      tabindex="0"
       @focus="handleFocus"
       @blur="handleBlur"
       @click="handleClick"
@@ -219,7 +218,7 @@ export default {
       "getDirectChildren",
       "isVisible",
       "getParent",
-      "getCurrentNodeNav",
+      "getNodeNavId",
     ]),
     ariaLabel() {
       let label = `${this.node.title}. You are on a level ${this.node.level} node. `
@@ -244,7 +243,7 @@ export default {
       if (this.hasPermission("edit")) {
         label += "To edit this node, press E. "
       }
-      label += "To exit the Main Tapestry view, press Q or Escape. "
+      label += "To exit the Main Tapestry view, press the Q Key or the Escape Key."
       return label
     },
     canAddChild() {
@@ -450,6 +449,9 @@ export default {
     this.$emit("mounted")
     this.$refs.circle.setAttribute("r", this.radius)
     const nodeRef = this.$refs.node
+    if (this.root) {
+      nodeRef.setAttribute("tabindex", "0")
+    }
     d3.select(nodeRef).call(
       d3
         .drag()
@@ -601,7 +603,7 @@ export default {
       if (!this.root && !this.isMouseDown) {
         this.updateRootNode()
       }
-      if (this.getCurrentNodeNav !== this.node.id) {
+      if (this.getNodeNavId !== this.node.id) {
         this.resetNodeNavigation(this.node.id)
       }
     },

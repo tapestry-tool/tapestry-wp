@@ -433,6 +433,7 @@ export function resetNodeNavigation({ commit }, nodeId) {
     stack: [nodeId],
     siblings: [],
     siblingPosition: -1,
+    linkMode: false,
   })
 }
 

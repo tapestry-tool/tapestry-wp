@@ -66,8 +66,9 @@
               {{ showAcceptedHighlight ? "Enabled" : "Disabled" }}
             </b-form-checkbox>
           </b-form-group>
-          <b-form-group label="Default Depth" class="mb-0">
+          <b-form-group label="Default Depth" label-for="default-depth" class="mb-0">
             <b-form-input
+              id="default-depth"
               v-model="defaultDepth"
               class="depth-slider"
               type="range"
@@ -176,8 +177,14 @@
           <b-form-group v-if="renderMap">
             <b-row>
               <b-col sm="4" offset-sm="4">
-                <b-form-group description="Northern Latitudinal Bound">
+                <b-form-group
+                  label="Northern Latitudinal Bound"
+                  label-sr-only
+                  label-for="northern-latitudinal-bound"
+                  description="Northern Latitudinal Bound"
+                >
                   <b-form-input
+                    id="northern-latitudinal-bound"
                     v-model="mapBounds.neLat"
                     placeholder="90"
                     :state="
@@ -189,8 +196,14 @@
             </b-row>
             <b-row>
               <b-col sm="4">
-                <b-form-group description="Western Longitudinal Bound">
+                <b-form-group
+                  label="Western Longitudinal Bound"
+                  label-sr-only
+                  label-for="western-longitudinal-bound"
+                  description="Western Longitudinal Bound"
+                >
                   <b-form-input
+                    id="western-longitudinal-bound"
                     v-model="mapBounds.swLng"
                     placeholder="-180"
                     :state="
@@ -200,8 +213,14 @@
                 </b-form-group>
               </b-col>
               <b-col sm="4" offset-sm="4">
-                <b-form-group description="Eastern Longitudinal Bound">
+                <b-form-group
+                  label="Eastern Longitudinal Bound"
+                  label-sr-only
+                  label-for="eastern-longitudinal-bound"
+                  description="Eastern Longitudinal Bound"
+                >
                   <b-form-input
+                    id="eastern-longitudinal-bound"
                     v-model="mapBounds.neLng"
                     placeholder="180"
                     :state="
@@ -213,8 +232,14 @@
             </b-row>
             <b-row>
               <b-col sm="4" offset-sm="4">
-                <b-form-group description="Southern Latitudinal Bound">
+                <b-form-group
+                  label="Southern Latitudinal Bound"
+                  label-sr-only
+                  label-for="southern-latitudinal-bound"
+                  description="Southern Latitudinal Bound"
+                >
                   <b-form-input
+                    id="southern-latitudinal-bound"
                     v-model="mapBounds.swLat"
                     placeholder="-90"
                     :state="

@@ -15,19 +15,19 @@
           <b-row style="font-size: 5rem;" class="justify-content-center">
             {{ reverse ? "&#8592;" : "&#8594;" }}
           </b-row>
-          <b-row class="justify-content-center">
-            <b-button
-              size="sm"
-              aria-label="Reverse link direction"
-              @click="reverse = !reverse"
-            >
-              Reverse
-            </b-button>
-          </b-row>
         </b-col>
         <b-col class="node">
           {{ target.title }}
         </b-col>
+      </b-row>
+      <b-row class="justify-content-center">
+        <b-button
+          size="sm"
+          aria-label="Reverse link direction"
+          @click="reverse = !reverse"
+        >
+          Reverse
+        </b-button>
       </b-row>
     </b-container>
     <template slot="modal-footer">

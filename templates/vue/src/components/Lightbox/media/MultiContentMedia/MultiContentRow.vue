@@ -298,10 +298,12 @@ button[disabled] {
     opacity: 0.25;
   }
   a:hover,
+  a:focus,
   a:active {
     i {
       opacity: 1;
     }
+    outline: none;
   }
 
   .trigger-row-btn {

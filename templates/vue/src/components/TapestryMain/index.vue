@@ -18,6 +18,7 @@
             :source="nodes[link.source]"
             :target="nodes[link.target]"
             :scale="scale"
+            tabindex="-1"
           ></tapestry-link>
         </g>
         <g v-if="!dragSelectEnabled || dragSelectReady" class="nodes">
@@ -30,6 +31,7 @@
             :class="{ selectable: true }"
             :data-id="id"
             :root="id == selectedId"
+            tabindex="-1"
             @dragend="updateViewBox"
             @mouseover="handleMouseover(id)"
             @mouseleave="activeNode = null"
@@ -112,8 +114,34 @@ export default {
       "isEmptyTapestry",
       "getNode",
       "getInitialNodeId",
-      "getCurrentNodeNav",
+      "getNodeNavId",
+      "getNodeNavParent",
     ]),
+    nodeNavLinkMode: {
+      get() {
+        return this.$store.state.nodeNavigation.linkMode
+      },
+      set(linkMode) {
+        this.$store.commit("setNodeNavigation", { linkMode })
+      },
+    },
+    focused() {
+      if (this.getNodeNavId === -1) {
+        return null
+      }
+      if (this.nodeNavLinkMode) {
+        return {
+          type: "link",
+          source: this.getNodeNavParent,
+          target: this.getNodeNavId,
+        }
+      } else {
+        return {
+          type: "node",
+          id: this.getNodeNavId,
+        }
+      }
+    },
     computedViewBox() {
       // return this.viewBox.join(" ")
       return `${this.viewBox[0] + this.offset.x} ${this.viewBox[1] +
@@ -178,17 +206,22 @@ export default {
                 }
           )
         }
-        if (nodeId !== this.getCurrentNodeNav) {
+        if (nodeId !== this.getNodeNavId) {
           this.resetNodeNavigation(nodeId)
         }
         this.updateViewBox()
       },
     },
-    routeName(newName, oldName) {
-      if (newName === names.APP && oldName === names.LIGHTBOX) {
-        // TODO: this is not needed anymore due to new lightbox using Bootstrap modal which automatically returns focus to last selected node; remove after testing on a screen reader
-        // this.focusSelectedNode()
-      }
+    focused: {
+      deep: true,
+      handler(newFocused, oldFocused) {
+        if (oldFocused) {
+          this.getFocusableElement(oldFocused)?.setAttribute("tabindex", "-1")
+        }
+        const el = this.getFocusableElement(newFocused)
+        el?.setAttribute("tabindex", "0")
+        el?.focus()
+      },
     },
   },
   created() {
@@ -249,6 +282,9 @@ export default {
       "goToNodeSibling",
       "resetNodeNavigation",
     ]),
+    isLoggedIn() {
+      return wp.isLoggedIn()
+    },
     clampScale(scale) {
       return Math.max(
         Math.min(scale, this.maxScale),
@@ -340,7 +376,7 @@ export default {
       DragSelectModular.updateSelectableNodes()
     },
     nodeIsEditable(node) {
-      return wp.isLoggedIn() && Helpers.hasPermission(node, "edit")
+      return this.isLoggedIn && Helpers.hasPermission(node, "edit")
     },
     updateViewBox() {
       const MAX_RADIUS = 240
@@ -436,7 +472,16 @@ export default {
       const { code } = evt
       const node = this.getNode(this.selectedId)
       if (code === "Enter") {
-        if (
+        if (this.nodeNavLinkMode) {
+          this.$router.push({
+            name: names.LINKMODAL,
+            params: {
+              source: this.getNodeNavParent,
+              target: this.selectedId,
+            },
+            query: this.$route.query,
+          })
+        } else if (
           node.accessible ||
           Helpers.hasPermission(node, "edit", this.settings.showRejected)
         ) {
@@ -445,14 +490,33 @@ export default {
       } else if (code === "Tab") {
         // ? potentially let the user tab out of the main tapestry view, since the user should be fully capable of navigating through all the nodes by using just arrow keys
       } else if (code === "KeyE") {
-        if (Helpers.hasPermission(node, "edit", this.settings.showRejected)) {
+        if (this.nodeNavLinkMode) {
+          this.openSelectedLinkModal()
+        } else if (Helpers.hasPermission(node, "edit", this.settings.showRejected)) {
           this.$root.$emit("edit-node", node.id)
         }
       } else if (code === "KeyQ" || code === "Escape") {
         // focus the next element after the main
         document.querySelector(".minimap-button button")?.focus()
       } else {
-        if (node.id === this.getCurrentNodeNav) {
+        if (node.id === this.getNodeNavId) {
+          if (this.nodeNavLinkMode) {
+            if (code === "ArrowDown") {
+              evt.preventDefault()
+              this.nodeNavLinkMode = false
+              return
+            } else if (code === "ArrowUp") {
+              this.nodeNavLinkMode = false
+            }
+          } else if (evt.shiftKey && this.isLoggedIn) {
+            if (code === "ArrowDown") {
+              this.nodeNavLinkMode = true
+            } else if (code === "ArrowUp" && this.getNodeNavParent !== -1) {
+              evt.preventDefault()
+              this.nodeNavLinkMode = true
+              return
+            }
+          }
           if (code === "ArrowDown") {
             evt.preventDefault()
             this.goToNodeChildren().then(this.setSelectedNode)
@@ -481,14 +545,22 @@ export default {
         query: this.$route.query,
         path: `/nodes/${nodeId}`,
       })
-      this.focusSelectedNode()
     },
-    focusSelectedNode() {
-      this.$nextTick(() => {
-        const nodeElement = document.querySelector(
-          `.node[data-id='${this.selectedId}']`
-        )
-        nodeElement && nodeElement.focus()
+    getFocusableElement(focused) {
+      return document.querySelector(
+        focused.type === "node"
+          ? `.node[data-id='${focused.id}']`
+          : `#link-${focused.source}-${focused.target}`
+      )
+    },
+    openSelectedLinkModal() {
+      this.$router.push({
+        name: names.LINKMODAL,
+        params: {
+          source: this.getNodeNavParent,
+          target: this.selectedId,
+        },
+        query: this.$route.query,
       })
     },
   },

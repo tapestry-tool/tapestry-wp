@@ -50,8 +50,10 @@
             <b-form-group
               v-if="question.followUp.enabled"
               label="Show this text first:"
+              :label-for="`question-followup-text-${index}`"
             >
               <b-form-input
+                :id="`question-followup-text-${index}`"
                 v-model="question.followUp.text"
                 placeholder="Previously, you said:"
               ></b-form-input>
@@ -59,8 +61,10 @@
             <b-form-group
               v-if="question.followUp.enabled"
               label="Then show user answer to the following activity:"
+              label-for="followup-combobox"
             >
               <combobox
+                id="followup-combobox"
                 v-model="question.followUp.questionId"
                 class="mb-0"
                 :options="getPreviousQuestions(question)"
@@ -99,11 +103,13 @@
                 </span>
               </b-form-checkbox>
             </b-form-group>
-            <b-form-group label="Question text">
+            <b-form-group
+              label="Question text"
+              :label-for="`question-text-${index}`"
+            >
               <b-form-input
                 :id="`question-text-${index}`"
                 v-model="question.text"
-                :data-testid="`question-title-${index}`"
                 :data-qa="`question-text-${index}`"
               />
             </b-form-group>
@@ -247,16 +253,18 @@
             bg-variant="light"
             text-variant="dark"
           >
-            <b-form-group label="Title">
+            <b-form-group
+              label="Title"
+              :label-for="`question-confirmation-title-${index}`"
+            >
               <b-form-input
+                :id="`question-confirmation-title-${index}`"
                 v-model="question.confirmation.title"
-                :data-testid="`question-confirmation-title-${index}`"
                 placeholder="Thanks!"
               />
             </b-form-group>
             <rich-text-form
               v-model="question.confirmation.message"
-              :data-testid="`question-confirmation-message-${index}`"
               placeholder="Your response has been recorded."
             />
           </b-card>
