@@ -804,7 +804,7 @@ export default {
         })
       }
     },
-    async handleSubmit() {
+    async handleSubmit(isForReview = false) {
       this.errors = this.validateNode()
       if (!this.hasSubmissionError) {
         this.loading = true
@@ -812,6 +812,16 @@ export default {
 
         if (this.linkHasThumbnailData) {
           await this.setLinkData()
+        }
+
+        if (isForReview) {
+          this.update("reviewComments", [
+            ...this.node.reviewComments,
+            Comment.createComment(Comment.types.STATUS_CHANGE, {
+              from: null,
+              to: nodeStatus.SUBMIT,
+            }),
+          ])
         }
 
         if (
@@ -843,16 +853,7 @@ export default {
       }
       this.update("reviewStatus", nodeStatus.SUBMIT)
       this.update("status", nodeStatus.DRAFT)
-
-      this.update("reviewComments", [
-        ...this.node.reviewComments,
-        Comment.createComment(Comment.types.STATUS_CHANGE, {
-          from: null,
-          to: nodeStatus.SUBMIT,
-        }),
-      ])
-
-      this.handleSubmit()
+      this.handleSubmit(true)
     },
     async submitNode() {
       if (this.type === "add") {
