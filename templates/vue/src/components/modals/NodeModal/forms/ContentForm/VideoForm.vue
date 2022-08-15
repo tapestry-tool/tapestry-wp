@@ -303,7 +303,7 @@ export default {
       })
     },
     removeCaption(index, caption) {
-      this.captions = this.captions.filter((c, i) => i != index)
+      this.captions = this.captions.splice(index, 1)
       if (caption.id === this.defaultCaptionId) {
         this.defaultCaptionId = null
       }
@@ -325,7 +325,7 @@ export default {
       this.removePendingCaption(index)
     },
     removePendingCaption(index) {
-      this.pendingCaptions = this.pendingCaptions.filter((c, i) => i != index)
+      this.pendingCaptions.splice(index, 1)
     },
   },
 }
