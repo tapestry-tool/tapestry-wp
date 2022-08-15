@@ -80,7 +80,7 @@
         <b-overlay :show="isLoadingKalturaCaptions">
           <b-form-group label="Captions">
             <b-form-checkbox
-              v-model="useCaptions"
+              :checked="useCaptions"
               data-qa="node-captions-toggle"
               switch
               @change="handleToggleCaptions"
@@ -150,13 +150,11 @@ export default {
     CaptionRow,
   },
   data() {
-    const captions = this.$store.state.currentEditingNode.typeData.captions ?? []
     return {
       useKaltura: false,
       kalturaId: this.$store.state.currentEditingNode.typeData.kalturaId,
       editingKalturaId: false,
-      captions: captions,
-      useCaptions: captions.length > 0,
+      captions: this.$store.state.currentEditingNode.typeData.captions ?? [],
       pendingCaptions:
         this.$store.state.currentEditingNode.typeData.pendingCaptions ?? [],
       isLoadingKalturaCaptions: false,
@@ -182,6 +180,9 @@ export default {
       set(value) {
         this.update("typeData.mediaURL", value)
       },
+    },
+    useCaptions() {
+      return this.captions.length > 0
     },
     youtubeId() {
       return Helpers.getYoutubeID(this.mediaURL)
@@ -281,14 +282,12 @@ export default {
 
         this.defaultCaptionId = result.defaultCaptionId
         this.captions = result.captions
-        this.useCaptions = result.captions.length > 0
 
         this.isLoadingKalturaCaptions = false
       }
     },
     clearCaptions() {
       this.captions = []
-      this.useCaptions = false
       this.defaultCaptionId = null
     },
     addCaption() {
@@ -303,7 +302,7 @@ export default {
       })
     },
     removeCaption(index, caption) {
-      this.captions = this.captions.splice(index, 1)
+      this.captions.splice(index, 1)
       if (caption.id === this.defaultCaptionId) {
         this.defaultCaptionId = null
       }
@@ -319,7 +318,6 @@ export default {
         this.captions = copy
       } else {
         this.captions = [...this.captions, caption]
-        this.useCaptions = true
       }
 
       this.removePendingCaption(index)
