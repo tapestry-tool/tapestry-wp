@@ -331,12 +331,11 @@ class TapestryHelpers
      * Delete a local video after it has been uploaded to Kaltura.
      *
      * @param TapestryNode  $node               Video node to update
-     * @param KalturaApi    $kalturaApi         Kaltura controller to use
      * @param MediaEntry    $kalturaData        Response from Kaltura API
      * @param boolean       $useKalturaPlayer   If true, also switch the video to use Kaltura player
      * @param string        $videoPath          Path to the video file.
      */
-    public static function saveAndDeleteLocalVideo($node, $kalturaApi, $kalturaData, $useKalturaPlayer, $videoPath)
+    public static function saveAndDeleteLocalVideo($node, $kalturaData, $useKalturaPlayer, $videoPath)
     {
         $typeData = $node->getTypeData();
         $typeData->mediaURL = $kalturaData->dataUrl.'?.mp4';

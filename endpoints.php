@@ -1764,7 +1764,7 @@ function perform_batched_upload_to_kaltura($videos, $use_kaltura_player)
 
                 if ($response->status === EntryStatus::READY) {
                     $node = save_video_upload_status($video, $videos_to_upload, UploadStatus::COMPLETE);
-                    TapestryHelpers::saveAndDeleteLocalVideo($node, $kalturaApi, $response, $use_kaltura_player, $video->file->file_path);
+                    TapestryHelpers::saveAndDeleteLocalVideo($node, $response, $use_kaltura_player, $video->file->file_path);
                     $num_successfully_uploaded++;
 
                     $failed_captions = TapestryHelpers::uploadVideoCaptions($node, $kalturaApi, $response);
@@ -1985,7 +1985,7 @@ function updateConvertingVideos($request)
                         TapestryHelpers::saveVideoUploadStatusInNode($node, UploadStatus::COMPLETE, $response);
 
                         $file_path = TapestryHelpers::getPathToMedia($node->getTypeData()->mediaURL)->file_path;
-                        TapestryHelpers::saveAndDeleteLocalVideo($node, $kaltura_api, $response, $use_kaltura_player, $file_path);
+                        TapestryHelpers::saveAndDeleteLocalVideo($node, $response, $use_kaltura_player, $file_path);
                         $video->currentStatus = UploadStatus::COMPLETE;
 
                         $failed_captions = TapestryHelpers::uploadVideoCaptions($node, $kaltura_api, $response);

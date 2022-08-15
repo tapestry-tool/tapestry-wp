@@ -135,7 +135,7 @@ import ISO6391 from "iso-639-1"
 import FileUpload from "@/components/modals/common/FileUpload"
 import client from "@/services/TapestryAPI"
 import Helpers from "@/utils/Helpers"
-import { mapMutations } from "vuex"
+import { mapMutations, mapState } from "vuex"
 import CaptionRow from "./CaptionRow"
 
 const defaultCaption = {
@@ -164,11 +164,9 @@ export default {
     }
   },
   computed: {
-    mediaFormat: {
-      get() {
-        return this.$store.state.currentEditingNode.mediaFormat
-      },
-    },
+    ...mapState({
+      mediaFormat: state => state.currentEditingNode.mediaFormat,
+    }),
     defaultCaptionId: {
       get() {
         return this.$store.state.currentEditingNode.typeData.defaultCaptionId ?? null
@@ -294,13 +292,10 @@ export default {
       this.defaultCaptionId = null
     },
     addCaption() {
-      this.captions = [
-        ...this.captions,
-        {
-          ...Helpers.deepCopy(defaultCaption),
-          id: Helpers.createUUID(),
-        },
-      ]
+      this.captions.push({
+        ...Helpers.deepCopy(defaultCaption),
+        id: Helpers.createUUID(),
+      })
       this.$nextTick(() => {
         document
           .getElementById(`caption-${this.captions.length - 1}-container-toggle`)
