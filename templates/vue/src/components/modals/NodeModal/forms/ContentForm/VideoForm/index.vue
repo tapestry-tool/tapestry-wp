@@ -116,6 +116,7 @@
             v-for="(caption, index) in pendingCaptions"
             :key="caption.id"
             :value="caption"
+            :index="index"
             is-removable
             is-pending
             :languages="languages"
