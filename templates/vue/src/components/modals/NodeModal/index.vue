@@ -582,6 +582,17 @@ export default {
     })
     this.initialize()
   },
+  beforeDestroy() {
+    for (const event of [
+      "node-modal::uploading",
+      "fileID",
+      "add-node",
+      "remove-thumbnail",
+    ]) {
+      // since this component is the only one listening to these events, we can simply remove all listeners with the event names without specifying the handler function
+      this.$root.$off(event)
+    }
+  },
   methods: {
     ...mapMutations([
       "updateRootNode",
