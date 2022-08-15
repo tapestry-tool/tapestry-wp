@@ -149,13 +149,12 @@ export default class Helpers {
     ) {
       for (let prop in src) {
         if (ignoreProps.includes(prop)) continue
-        if (prop in customCompareProps) {
-          if (other.hasOwnProperty(prop)) {
-            return customCompareProps[prop](src[prop], other[prop])
-          }
-        }
         if (other.hasOwnProperty(prop)) {
-          if (
+          if (prop in customCompareProps) {
+            if (!customCompareProps[prop](src[prop], other[prop])) {
+              return false
+            }
+          } else if (
             !Helpers.nodeEqual(
               src[prop],
               other[prop],
