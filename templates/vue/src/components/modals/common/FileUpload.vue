@@ -4,7 +4,6 @@
       :placeholder="placeholder"
       :value="value"
       :data-qa="inputTestId"
-      :data-testid="inputTestId"
       :disabled="isUploading"
       required
       @input="$emit('input', $event)"
