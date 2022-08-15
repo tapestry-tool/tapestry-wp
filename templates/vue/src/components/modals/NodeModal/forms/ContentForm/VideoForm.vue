@@ -120,7 +120,7 @@
             is-pending
             :languages="languages"
             :error-message="caption.errorMessage"
-            @input="pendingCaptions[index] = $event"
+            @input="pendingCaptions.splice(index, 1, $event)"
             @move="moveFromPending(index, caption)"
             @remove="removePendingCaption(index)"
           ></caption-row>
@@ -154,9 +154,6 @@ export default {
       useKaltura: false,
       kalturaId: this.$store.state.currentEditingNode.typeData.kalturaId,
       editingKalturaId: false,
-      captions: this.$store.state.currentEditingNode.typeData.captions ?? [],
-      pendingCaptions:
-        this.$store.state.currentEditingNode.typeData.pendingCaptions ?? [],
       isLoadingKalturaCaptions: false,
       languages: [],
     }
@@ -165,12 +162,28 @@ export default {
     ...mapState({
       mediaFormat: state => state.currentEditingNode.mediaFormat,
     }),
+    captions: {
+      get() {
+        return this.$store.state.currentEditingNode.typeData.captions ?? []
+      },
+      set(value) {
+        this.update("typeData.captions", value)
+      },
+    },
     defaultCaptionId: {
       get() {
         return this.$store.state.currentEditingNode.typeData.defaultCaptionId ?? null
       },
       set(value) {
         this.update("typeData.defaultCaptionId", value)
+      },
+    },
+    pendingCaptions: {
+      get() {
+        return this.$store.state.currentEditingNode.typeData.pendingCaptions ?? []
+      },
+      set(value) {
+        this.update("typeData.pendingCaptions", value)
       },
     },
     mediaURL: {
@@ -191,18 +204,6 @@ export default {
   watch: {
     youtubeId(id) {
       this.updateMediaFormat(id)
-    },
-    captions: {
-      handler(value) {
-        this.update("typeData.captions", value)
-      },
-      deep: true,
-    },
-    pendingCaptions: {
-      handler(value) {
-        this.update("typeData.pendingCaptions", value)
-      },
-      deep: true,
     },
   },
   async created() {
@@ -317,7 +318,7 @@ export default {
         copy[existingCaptionIndex] = caption
         this.captions = copy
       } else {
-        this.captions = [...this.captions, caption]
+        this.captions.push(caption)
       }
 
       this.removePendingCaption(index)
