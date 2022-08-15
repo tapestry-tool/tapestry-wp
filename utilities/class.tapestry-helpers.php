@@ -422,7 +422,7 @@ class TapestryHelpers
             return true;
         }
 
-        $user_defined_max_upload_size = wp_convert_hr_to_bytes(TAPESTRY_VIDEO_UPLOAD_MAX_FILE_SIZE);
+        $user_defined_max_upload_size = wp_convert_hr_to_bytes(TAPESTRY_KALTURA_UPLOAD_MAX_FILE_SIZE);
 
         if ($user_defined_max_upload_size >= wp_max_upload_size()) {
             return true;
