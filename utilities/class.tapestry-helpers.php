@@ -403,7 +403,7 @@ class TapestryHelpers
     {
         $nodeMeta = $node->getMeta();
         $nodeTypeData = $node->getTypeData();
-        $upload_dir_url = wp_upload_dir()['url'];
+        $upload_dir_url = wp_upload_dir()['baseurl'];
 
         return $nodeMeta->mediaType == "video" && substr($nodeTypeData->mediaURL, 0, strlen($upload_dir_url)) === $upload_dir_url;
     }
