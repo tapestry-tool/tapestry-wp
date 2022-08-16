@@ -22,6 +22,7 @@
         <b-form-checkbox
           :checked="useKaltura"
           switch
+          :disabled="!kalturaAvailable && !useKaltura"
           data-qa="use-kaltura-toggle"
           style="display:inline-block;"
           @change="handleFormatChange($event)"
@@ -30,104 +31,111 @@
         </b-form-checkbox>
       </b-col>
     </b-row>
-    <b-row v-if="useKaltura" class="mb-3 align-items-center">
-      <b-col cols="3">
-        Kaltura ID:
-      </b-col>
-      <b-col>
-        <b-input-group>
-          <b-form-input
-            v-model="kalturaId"
-            :disabled="isLoadingKalturaCaptions || !editingKalturaId"
-            class="rounded-left"
-            data-qa="node-video-kaltura-id"
-            name="text-input"
-            :placeholder="
-              editingKalturaId ? 'Enter Kaltura video ID' : 'Click Change to edit'
-            "
-            required
-          />
-          <b-input-group-append is-text>
-            <i
-              id="kaltura-info"
-              class="far fa-question-circle"
-              tabindex="0"
-              aria-label="Kaltura ID hint"
-            ></i>
-            <b-tooltip role="tooltip" target="kaltura-info">
-              Video ID can be found in the Kaltura managment console under
-              Content->Entries.
-            </b-tooltip>
-          </b-input-group-append>
-          <b-input-group-append>
-            <b-button
-              variant="primary"
-              data-qa="edit-kaltura-id-button"
-              :aria-label="editingKalturaId ? 'Submit' : 'Edit Kaltura ID'"
-              :disabled="isLoadingKalturaCaptions"
-              @click="handleKalturaIdEdit"
-            >
-              {{ editingKalturaId ? "Submit" : "Change" }}
-            </b-button>
-          </b-input-group-append>
-        </b-input-group>
-      </b-col>
-    </b-row>
-    <b-row>
-      <b-col>
-        <b-overlay :show="isLoadingKalturaCaptions">
-          <b-form-group label="Captions">
-            <b-form-checkbox
-              :checked="useCaptions"
-              data-qa="node-captions-toggle"
-              switch
-              @change="handleToggleCaptions"
-            >
-              {{ useCaptions ? "On" : "Off" }}
-            </b-form-checkbox>
-            <template v-if="useCaptions">
-              <caption-row
-                v-for="(caption, index) in captions"
-                :key="caption.id"
-                :value="caption"
-                :index="index"
-                :is-kaltura="useKaltura"
-                :is-removable="captions.length >= 2"
-                :is-default="caption.id === defaultCaptionId"
-                :languages="languages"
-                @input="captions.splice(index, 1, $event)"
-                @setDefault="defaultCaptionId = $event"
-                @remove="removeCaption(index, caption)"
-              ></caption-row>
+    <b-overlay :show="useKaltura && !kalturaAvailable">
+      <template #overlay>
+        <div class="no-kaltura-notice">
+          This video cannot be edited because Kaltura is not available on the server.
+        </div>
+      </template>
+      <b-row v-if="useKaltura" class="mb-3 align-items-center">
+        <b-col cols="3">
+          Kaltura ID:
+        </b-col>
+        <b-col>
+          <b-input-group>
+            <b-form-input
+              v-model="kalturaId"
+              :disabled="isLoadingKalturaCaptions || !editingKalturaId"
+              class="rounded-left"
+              data-qa="node-video-kaltura-id"
+              name="text-input"
+              :placeholder="
+                editingKalturaId ? 'Enter Kaltura video ID' : 'Click Change to edit'
+              "
+              required
+            />
+            <b-input-group-append is-text>
+              <i
+                id="kaltura-info"
+                class="far fa-question-circle"
+                tabindex="0"
+                aria-label="Kaltura ID hint"
+              ></i>
+              <b-tooltip role="tooltip" target="kaltura-info">
+                Video ID can be found in the Kaltura managment console under
+                Content->Entries.
+              </b-tooltip>
+            </b-input-group-append>
+            <b-input-group-append>
               <b-button
-                class="mt-3"
-                data-qa="add-caption-button"
-                @click="addCaption"
+                variant="primary"
+                data-qa="edit-kaltura-id-button"
+                :aria-label="editingKalturaId ? 'Submit' : 'Edit Kaltura ID'"
+                :disabled="isLoadingKalturaCaptions"
+                @click="handleKalturaIdEdit"
               >
-                <i class="fas fa-plus icon"></i>
-                Add caption
+                {{ editingKalturaId ? "Submit" : "Change" }}
               </b-button>
-            </template>
+            </b-input-group-append>
+          </b-input-group>
+        </b-col>
+      </b-row>
+      <b-row>
+        <b-col>
+          <b-overlay :show="isLoadingKalturaCaptions">
+            <b-form-group label="Captions">
+              <b-form-checkbox
+                :checked="useCaptions"
+                data-qa="node-captions-toggle"
+                switch
+                @change="handleToggleCaptions"
+              >
+                {{ useCaptions ? "On" : "Off" }}
+              </b-form-checkbox>
+              <template v-if="useCaptions">
+                <caption-row
+                  v-for="(caption, index) in captions"
+                  :key="caption.id"
+                  :value="caption"
+                  :index="index"
+                  :is-kaltura="useKaltura"
+                  :is-removable="captions.length >= 2"
+                  :is-default="caption.id === defaultCaptionId"
+                  :languages="languages"
+                  @input="captions.splice(index, 1, $event)"
+                  @setDefault="defaultCaptionId = $event"
+                  @remove="removeCaption(index, caption)"
+                ></caption-row>
+                <b-button
+                  class="mt-3"
+                  data-qa="add-caption-button"
+                  @click="addCaption"
+                >
+                  <i class="fas fa-plus icon"></i>
+                  Add caption
+                </b-button>
+              </template>
+            </b-form-group>
+          </b-overlay>
+          <b-form-group v-if="pendingCaptions.length > 0" label="Pending captions">
+            <caption-row
+              v-for="(caption, index) in pendingCaptions"
+              :key="caption.id"
+              :value="caption"
+              :index="index"
+              is-removable
+              is-pending
+              :is-kaltura="useKaltura"
+              :languages="languages"
+              :error-message="caption.errorMessage"
+              @input="pendingCaptions.splice(index, 1, $event)"
+              @move="moveFromPending(index, caption)"
+              @remove="removePendingCaption(index)"
+            ></caption-row>
           </b-form-group>
-        </b-overlay>
-        <b-form-group v-if="pendingCaptions.length > 0" label="Pending captions">
-          <caption-row
-            v-for="(caption, index) in pendingCaptions"
-            :key="caption.id"
-            :value="caption"
-            :index="index"
-            is-removable
-            is-pending
-            :is-kaltura="useKaltura"
-            :languages="languages"
-            :error-message="caption.errorMessage"
-            @input="pendingCaptions.splice(index, 1, $event)"
-            @move="moveFromPending(index, caption)"
-            @remove="removePendingCaption(index)"
-          ></caption-row>
-        </b-form-group>
-      </b-col>
-    </b-row>
+        </b-col>
+      </b-row>
+    </b-overlay>
   </div>
 </template>
 
@@ -135,6 +143,7 @@
 import ISO6391 from "iso-639-1"
 import FileUpload from "@/components/modals/common/FileUpload"
 import client from "@/services/TapestryAPI"
+import { getKalturaStatus } from "@/services/wp"
 import Helpers from "@/utils/Helpers"
 import { mapMutations, mapState } from "vuex"
 import CaptionRow from "./CaptionRow"
@@ -164,6 +173,9 @@ export default {
     ...mapState({
       mediaFormat: state => state.currentEditingNode.mediaFormat,
     }),
+    kalturaAvailable() {
+      return getKalturaStatus()
+    },
     captions: {
       get() {
         return this.$store.state.currentEditingNode.typeData.captions ?? []
@@ -223,7 +235,9 @@ export default {
     },
     async getAllLanguages() {
       const iso6391LanguageNames = ISO6391.getAllNames()
-      const kalturaLanguageNames = await client.getKalturaAvailableLanguages()
+      const kalturaLanguageNames = getKalturaStatus()
+        ? await client.getKalturaAvailableLanguages()
+        : []
       const allLanguageNames = Array.from(
         new Set(iso6391LanguageNames.concat(kalturaLanguageNames))
       )
@@ -254,12 +268,14 @@ export default {
       this.editingKalturaId = !this.editingKalturaId
     },
     async setKalturaVideo(kalturaId) {
-      const validKalturaVideo = await client.checkKalturaVideo(kalturaId)
-      if (validKalturaVideo) {
-        this.update("typeData.kalturaId", kalturaId)
-        await this.getKalturaCaptions(kalturaId)
-      } else {
-        this.addApiError({ error: "Please enter a valid Kaltura video ID." })
+      if (this.kalturaAvailable) {
+        const validKalturaVideo = await client.checkKalturaVideo(kalturaId)
+        if (validKalturaVideo) {
+          this.update("typeData.kalturaId", kalturaId)
+          await this.getKalturaCaptions(kalturaId)
+        } else {
+          this.addApiError({ error: "Please enter a valid Kaltura video ID." })
+        }
       }
     },
     updateMediaFormat(id) {
@@ -279,7 +295,7 @@ export default {
       }
     },
     async getKalturaCaptions(kalturaId) {
-      if (kalturaId) {
+      if (kalturaId && this.kalturaAvailable) {
         this.isLoadingKalturaCaptions = true
 
         const result = await client.getKalturaVideoCaptions(kalturaId)
@@ -335,3 +351,13 @@ export default {
   },
 }
 </script>
+
+<style lang="scss" scoped>
+.no-kaltura-notice {
+  text-align: center;
+  background: #fff;
+  border-radius: 0.5em;
+  padding: 1em;
+  max-width: 500px;
+}
+</style>
