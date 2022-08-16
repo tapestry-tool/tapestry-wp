@@ -341,6 +341,13 @@ class TapestryHelpers
         $typeData->mediaURL = $kalturaData->dataUrl.'?.mp4';
         $typeData->kalturaId = $kalturaData->id;
 
+        // Save Kaltura account info so we can still show Kaltura player, even if LOAD_KALTURA is currently false
+        if (!isset($typeData->kalturaData)) {
+            $typeData->kalturaData = [];
+        }
+        $typeData->kalturaData['partnerId'] = KALTURA_PARTNER_ID;
+        $typeData->kalturaData['uniqueConfiguration'] = KALTURA_UNIQUE_CONFIG;
+
         if ($useKalturaPlayer) {
             $node->set((object) ['mediaFormat' => 'kaltura']);
         }

@@ -62,7 +62,6 @@ import CompletedIcon from "@/components/common/CompletedIcon"
 import { COMPLETION_THRESHOLD } from "./video.config"
 import Loading from "@/components/common/Loading"
 import client from "@/services/TapestryAPI"
-import * as wp from "@/services/wp"
 
 /**
  * Video states and events as defined by the state machine diagram on Notion.
@@ -147,7 +146,10 @@ export default {
         case "h5p":
           return "h5p-video-media"
         case "kaltura":
-          return wp.getKalturaStatus() ? "kaltura-video-media" : "url-video-media"
+          return this.node.typeData.kalturaData?.partnerId &&
+            this.node.typeData.kalturaData?.uniqueConfiguration
+            ? "kaltura-video-media"
+            : "url-video-media"
         default:
           throw new Error(`Unknown video type: ${this.node.mediaFormat}`)
       }
