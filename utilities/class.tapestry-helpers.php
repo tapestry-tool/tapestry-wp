@@ -383,6 +383,7 @@ class TapestryHelpers
         $file_obj = new stdClass();
         $file_obj->file_path = $upload_folder.'/'.$file_name;
         $file_obj->name = $file_name;
+        $file_obj->extension = pathinfo($file_name, PATHINFO_EXTENSION);
 
         return $file_obj;
     }

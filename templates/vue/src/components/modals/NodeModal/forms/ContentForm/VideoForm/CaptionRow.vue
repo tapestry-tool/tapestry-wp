@@ -67,9 +67,11 @@
             <b-form-group label="Source">
               <file-upload
                 v-model="caption.captionUrl"
-                file-types=".vtt"
+                :file-types="isKaltura ? '.vtt, .srt' : '.vtt'"
                 compact-mode
-                placeholder="Enter URL or upload a VTT file"
+                :placeholder="
+                  `Enter URL or upload a VTT${isKaltura ? '/SRT' : ''} file`
+                "
                 :is-image="false"
                 :file-upload-id="
                   `caption-file-upload-${isPending ? 'pending' : ''}-${caption.id}`
@@ -124,6 +126,10 @@ export default {
     },
     value: {
       type: Object,
+      required: true,
+    },
+    isKaltura: {
+      type: Boolean,
       required: true,
     },
     isDefault: {

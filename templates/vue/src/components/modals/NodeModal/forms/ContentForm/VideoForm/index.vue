@@ -20,13 +20,11 @@
     <b-row class="mb-3">
       <b-col>
         <b-form-checkbox
-          v-model="useKaltura"
+          :checked="useKaltura"
           switch
           data-qa="use-kaltura-toggle"
-          :value="true"
-          :unchecked-value="false"
           style="display:inline-block;"
-          @change="handleFormatChange"
+          @change="handleFormatChange($event)"
         >
           Use Kaltura Player
         </b-form-checkbox>
@@ -83,7 +81,7 @@
               :checked="useCaptions"
               data-qa="node-captions-toggle"
               switch
-              @input="handleToggleCaptions"
+              @change="handleToggleCaptions"
             >
               {{ useCaptions ? "On" : "Off" }}
             </b-form-checkbox>
@@ -93,6 +91,7 @@
                 :key="caption.id"
                 :value="caption"
                 :index="index"
+                :is-kaltura="useKaltura"
                 :is-removable="captions.length >= 2"
                 :is-default="caption.id === defaultCaptionId"
                 :languages="languages"
@@ -119,6 +118,7 @@
             :index="index"
             is-removable
             is-pending
+            :is-kaltura="useKaltura"
             :languages="languages"
             :error-message="caption.errorMessage"
             @input="pendingCaptions.splice(index, 1, $event)"
@@ -234,15 +234,16 @@ export default {
     handleUploadChange(state) {
       this.$root.$emit("node-modal::uploading", state)
     },
-    handleFormatChange() {
+    handleFormatChange(value) {
       // If Kaltura is checked or unchecked, the mediaURL should be cleared as it depends on the Kaltura ID
       this.update("typeData.mediaURL", "")
-      this.clearCaptions()
+      this.useKaltura = value
 
-      if (this.useKaltura) {
+      if (value) {
         this.update("mediaFormat", "kaltura")
         this.getKalturaCaptions(this.kalturaId)
       } else {
+        this.clearCaptions()
         this.updateMediaFormat(this.youtubeId)
       }
     },
@@ -290,8 +291,8 @@ export default {
       }
     },
     clearCaptions() {
-      this.captions = []
       this.defaultCaptionId = null
+      this.captions = []
     },
     addCaption() {
       this.captions = [

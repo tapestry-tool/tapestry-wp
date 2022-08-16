@@ -212,7 +212,7 @@
                 'label' => $captionAsset->label,
                 'language' => $captionAsset->language,
                 'displayOnPlayer' => $captionAsset->displayOnPlayer,
-                'captionUrl' => $overrideCaptionUrl ?? $this->_getCaptionUrl($kclient, $captionAsset->id).'?.vtt',
+                'captionUrl' => $overrideCaptionUrl ?? $this->_getCaptionUrl($kclient, $captionAsset->id).'?.'.$captionAsset->fileExt,
             ];
             if (!empty($errorMessage)) {
                 $caption->errorMessage = $errorMessage;
@@ -274,17 +274,18 @@
             }
             foreach ($toAdd as $caption) {
                 $captionAssetId = $this->_createCaptionAsset($kclient, $caption, $videoEntryId);
-                $tokenId = $this->_uploadFile($kclient, $caption->file, ['vtt']);
+                $tokenId = $this->_uploadFile($kclient, $caption->file, ['vtt', 'srt']);
                 $this->_setCaptionAssetContent($kclient, $caption, $captionAssetId, $tokenId);
             }
             foreach ($toUpdate as $caption) {
                 $this->_updateCaptionAsset($kclient, $caption);
                 if (isset($caption->file)) {
-                    $tokenId = $this->_uploadFile($kclient, $caption->file, ['vtt']);
+                    $tokenId = $this->_uploadFile($kclient, $caption->file, ['vtt', 'srt']);
                 }
                 if (isset($tokenId)) {
                     $this->_setCaptionAssetContent($kclient, $caption, $caption->id, $tokenId);
                 }
+                $tokenId = null;    // Clear token ID from previous loop to prevent reuse
             }
 
             // Send all changes in one request
@@ -385,7 +386,7 @@
          */
         private function _uploadFile($kclient, $file, $allowedExtensions)
         {
-            if (empty($file) || !in_array(pathinfo($file->name, PATHINFO_EXTENSION), $allowedExtensions)) {
+            if (empty($file) || !in_array($file->extension, $allowedExtensions)) {
                 return null;
             }
 
@@ -410,7 +411,9 @@
             $captionAsset->label = $caption->label;
             $captionAsset->language = $caption->language;
             $captionAsset->displayOnPlayer = $caption->displayOnPlayer;
-            $captionAsset->format = CaptionType::WEBVTT;
+            if ($caption->file) {
+                $captionAsset->format = 'vtt' === $caption->file->extension ? CaptionType::WEBVTT : CaptionType::SRT;
+            }
 
             $response = $captionPlugin->captionAsset->add($videoEntryId, $captionAsset);
 

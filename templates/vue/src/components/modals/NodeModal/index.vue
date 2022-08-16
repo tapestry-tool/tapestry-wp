@@ -1045,16 +1045,19 @@ export default {
       if (!this.node.mediaType) {
         errMsgs.push("Please select a Content Type")
       } else if (this.node.mediaType === "video") {
-        if (this.node.typeData.captions) {
+        const captions = this.node.typeData.captions
+
+        if (this.node.mediaFormat === "kaltura") {
           if (
-            this.node.typeData.captions.some(
-              caption => !caption.captionUrl?.endsWith(".vtt")
+            captions &&
+            captions.some(
+              caption =>
+                !caption.captionUrl?.endsWith(".vtt") &&
+                !caption.captionUrl?.endsWith(".srt")
             )
           ) {
-            errMsgs.push("Please upload a WebVTT file for each caption")
+            errMsgs.push("Please upload a WebVTT or SRT file for each caption")
           }
-        }
-        if (this.node.mediaFormat === "kaltura") {
           const validKalturaVideo = await client.checkKalturaVideo(
             this.node.typeData.kalturaId
           )
@@ -1062,6 +1065,12 @@ export default {
             errMsgs.push("Please enter a valid Kaltura video ID")
           }
         } else {
+          if (
+            captions &&
+            captions.some(caption => !caption.captionUrl?.endsWith(".vtt"))
+          ) {
+            errMsgs.push("Please upload a WebVTT file for each caption")
+          }
           if (!this.isValidVideo(this.node.typeData)) {
             errMsgs.push("Please enter a valid Video URL")
           }
@@ -1315,15 +1324,22 @@ export default {
       // For Kaltura videos, the Kaltura ID determines the mediaURL, so let's ensure they are in sync
 
       const oldNode = this.getNode(this.nodeId)
-      const { kalturaId: oldKalturaId, mediaURL: oldMediaURL } = oldNode.typeData
 
-      if (this.node.typeData.kalturaId !== oldKalturaId) {
+      if (oldNode) {
+        const { kalturaId: oldKalturaId, mediaURL: oldMediaURL } = oldNode.typeData
+        if (this.node.typeData.kalturaId !== oldKalturaId) {
+          const { mediaURL } = await client.getKalturaVideoUrl(
+            this.node.typeData.kalturaId
+          )
+          this.update("typeData.mediaURL", mediaURL)
+        } else if (this.node.typeData.mediaURL !== oldMediaURL) {
+          this.update("typeData.mediaURL", oldMediaURL)
+        }
+      } else {
         const { mediaURL } = await client.getKalturaVideoUrl(
           this.node.typeData.kalturaId
         )
         this.update("typeData.mediaURL", mediaURL)
-      } else if (this.node.typeData.mediaURL !== oldMediaURL) {
-        this.update("typeData.mediaURL", oldMediaURL)
       }
     },
     async updateKalturaVideoCaptions() {
