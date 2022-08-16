@@ -1335,13 +1335,17 @@ export default {
           this.node.typeData.defaultCaptionId
         )
 
+        // Merge old pending captions and new pending captions by caption ID
         const currentPendingCaptions = this.node.typeData.pendingCaptions ?? []
+        const newPendingCaptions = result.pendingCaptions
+        for (let caption of currentPendingCaptions) {
+          if (newPendingCaptions.every(c => c.id !== caption.id)) {
+            newPendingCaptions.push(caption)
+          }
+        }
 
         this.update("typeData.captions", result.captions)
-        this.update(
-          "typeData.pendingCaptions",
-          currentPendingCaptions.concat(result.pendingCaptions)
-        ) // Persist old pending captions
+        this.update("typeData.pendingCaptions", newPendingCaptions)
         this.update("typeData.defaultCaptionId", result.defaultCaptionId)
       }
     },
