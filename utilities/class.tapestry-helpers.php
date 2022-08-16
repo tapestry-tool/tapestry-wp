@@ -452,7 +452,7 @@ class TapestryHelpers
     public static function getH5PIdFromMediaURL($mediaURL)
     {
         $urlParts = explode('&id=', $mediaURL);
-        return count($urlParts) >= 2 ? $urlParts[1] : null; // TODO: cast to int?
+        return count($urlParts) >= 2 ? $urlParts[1] : null;
     }
 
     private static function _getH5PVideoURL($node)
@@ -527,7 +527,7 @@ class TapestryHelpers
     private static function _realFileSize($path)
     {
         if (!$path) {
-            return PHP_INT_MAX; // TODO:
+            return PHP_INT_MAX;
         }
 
         $fp = fopen($path, 'r');
