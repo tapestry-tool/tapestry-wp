@@ -110,6 +110,10 @@ class TapestryError extends Error
             'MESSAGE' => 'The Tapestry is not empty',
             'STATUS' => ['status' => 400],
         ],
+        'KALTURA_NOT_AVAILABLE' => [
+            'MESSAGE' => 'Kaltura is not enabled on the server.',
+            'STATUS' => ['status' => 500],      // TODO: should this be a 400 or 500 error?
+        ],
         'FAILED_TO_SAVE_CAPTIONS' => [
             'MESSAGE' => 'Failed to save captions to Kaltura.',
             'STATUS' => ['status' => 500],
