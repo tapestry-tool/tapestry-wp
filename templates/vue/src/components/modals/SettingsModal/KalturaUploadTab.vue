@@ -17,7 +17,7 @@
         empty-text="There are no videos to upload in this Tapestry."
         selected-variant=""
         primary-key="nodeID"
-        :fields="['selected', 'nodeID', 'nodeTitle']"
+        :fields="['selected', 'nodeID', 'nodeTitle', 'nodeType']"
         :items="getVideosToUpload"
         @row-selected="handleVideoSelected"
       >
@@ -50,7 +50,8 @@
       </b-table>
       <b-form-group>
         <b-form-checkbox v-model="useKalturaPlayer">
-          Switch uploaded videos to use Kaltura media player
+          Switch uploaded videos to use Kaltura media player (only applies to Video
+          nodes)
         </b-form-checkbox>
       </b-form-group>
     </b-overlay>

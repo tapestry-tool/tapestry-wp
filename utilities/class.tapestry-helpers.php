@@ -2,6 +2,9 @@
 
 require_once dirname(__FILE__).'/class.tapestry-node-permissions.php';
 
+// TODO: check for the existence of this file
+include_once __DIR__.'/../../h5p/public/class-h5p-plugin.php';
+
 /**
  * Tapestry Helper Functions.
  */
@@ -337,12 +340,19 @@ class TapestryHelpers
      */
     public static function saveAndDeleteLocalVideo($node, $kalturaData, $useKalturaPlayer, $videoPath)
     {
-        $typeData = $node->getTypeData();
-        $typeData->mediaURL = $kalturaData->dataUrl.'?.mp4';
+        $newVideoUrl = $kalturaData->dataUrl.'?.mp4';
 
-        if ($useKalturaPlayer) {
-            $typeData->kalturaId = $kalturaData->id;
-            $node->set((object) ['mediaFormat' => 'kaltura']);
+        $nodeMeta = $node->getMeta();
+        if ($nodeMeta->mediaType === 'video') {
+            $typeData = $node->getTypeData();
+            $typeData->mediaURL = $newVideoUrl;
+    
+            if ($useKalturaPlayer) {
+                $typeData->kalturaId = $kalturaData->id;
+                $node->set((object) ['mediaFormat' => 'kaltura']);
+            }
+        } else if ($nodeMeta->mediaType === 'h5p') {
+            self::_updateH5PVideoURL($node, $newVideoUrl);
         }
 
         $node->save();
@@ -351,16 +361,17 @@ class TapestryHelpers
     }
 
     /**
-     * Assumes the node's mediaURL is a local upload, and gets its file path
-     *
-     * @param TapestryNode  $node
+     * Get the file path of a local WordPress upload by its URL.
+     * 
+     * @param string $url
+     * @return object|null     Returns null if the URL is not a local upload.
      */
-    public static function getPathToMedia($node)
+    public static function getPathToMedia($url)
     {
-        $upload_folder = wp_upload_dir()['path'];
+        $upload_folder = wp_upload_dir()['basedir'];
 
-        $file_name = pathinfo($node->getTypeData()->mediaURL)['basename'];
-        $file_obj = new StdClass();
+        $file_name = pathinfo($url)['basename'];
+        $file_obj = new stdClass();
         $file_obj->file_path = $upload_folder.'/'.$file_name;
         $file_obj->name = $file_name;
 
@@ -402,10 +413,81 @@ class TapestryHelpers
     public static function videoCanBeUploaded($node)
     {
         $nodeMeta = $node->getMeta();
-        $nodeTypeData = $node->getTypeData();
-        $upload_dir_url = wp_upload_dir()['url'];
 
-        return $nodeMeta->mediaType == "video" && substr($nodeTypeData->mediaURL, 0, strlen($upload_dir_url)) === $upload_dir_url;
+        if ($nodeMeta->mediaType === 'video') {
+            // Videos can be uploaded if mediaURL is a local upload on this site
+            $upload_dir_url = wp_upload_dir()['url'];
+            return substr($node->getTypeData()->mediaURL, 0, strlen($upload_dir_url)) === $upload_dir_url;
+        } else if ($nodeMeta->mediaType === 'h5p') {
+            // H5Ps can be uploaded if the video 'path' attribute is a relative path
+            $videoPathOrUrl = self::_getH5PVideoURL($node);
+            if ($videoPathOrUrl) {
+                return !filter_var($videoPathOrUrl, FILTER_VALIDATE_URL);
+            }
+        }
+
+        return false;
+    }
+
+    // Assumes node is valid local upload
+    public static function getPathToH5PVideo($node)
+    {
+        $h5pPlugin = H5P_Plugin::get_instance();
+
+        $h5pId = self::getH5PIdFromMediaURL($node->getTypeData()->mediaURL);
+        $videoRelativePath = self::_getH5PVideoURL($node);
+        if (substr($videoRelativePath, -4) === '#tmp') {
+            // Trim the #tmp suffix on the field
+            $videoRelativePath = substr($videoRelativePath, 0, strlen($videoRelativePath) - 4);
+        }
+
+        $videoPath = $h5pPlugin->get_h5p_path() . '/content/' . $h5pId . '/' . $videoRelativePath;
+
+        return (object) [
+            'file_path' => $videoPath,
+            'name' => pathinfo($videoPath)['basename'],
+        ];
+    }
+
+    public static function getH5PIdFromMediaURL($mediaURL)
+    {
+        $urlParts = explode('&id=', $mediaURL);
+        return count($urlParts) >= 2 ? $urlParts[1] : null; // TODO: cast to int?
+    }
+
+    private static function _getH5PVideoURL($node)
+    {
+        $h5pId = self::getH5PIdFromMediaURL($node->getTypeData()->mediaURL);
+        $controller = new TapestryH5P();
+        $content = json_decode($controller->getMetadata($h5pId)->parameters);
+
+        if (isset($content->interactiveVideo)) {
+            return $content->interactiveVideo->video->files[0]->path;
+        }
+        return null;
+    }
+
+    private static function _updateH5PVideoURL($node, $newVideoUrl) {
+        $controller = new TapestryH5P();
+        $h5pId = self::getH5PIdFromMediaURL($node->getTypeData()->mediaURL);
+
+        $metadata = $controller->getMetadata($h5pId);
+        $params = json_decode($metadata->parameters);
+        $params->interactiveVideo->video->files[0]->path = $newVideoUrl;
+
+        $h5pInterface = H5P_Plugin::get_instance()->get_h5p_instance('interface');
+        $h5pInterface->updateContent([
+            'id' => $h5pId,
+            'metadata' => $metadata,
+            'params' => json_encode($params),
+            'disable' => $metadata->disable,
+            'library' => [
+                'libraryId' => $metadata->library_id,
+                'machineName' => $metadata->library_name,
+                'majorVersion' => $metadata->major_version,
+                'minorVersion' => $metadata->minor_version,
+            ],
+        ]);
     }
 
     /**
@@ -422,14 +504,20 @@ class TapestryHelpers
             return true;
         }
 
-        $user_defined_max_upload_size = wp_convert_hr_to_bytes(TAPESTRY_VIDEO_UPLOAD_MAX_FILE_SIZE);
+        $user_defined_max_upload_size = wp_convert_hr_to_bytes(TAPESTRY_KALTURA_UPLOAD_MAX_FILE_SIZE);
 
         if ($user_defined_max_upload_size >= wp_max_upload_size()) {
             return true;
         }
 
-        $file = self::getPathToMedia($node);
-        $filesize = self::_realFileSize($file->file_path);
+        $nodeMeta = $node->getMeta();
+        if ($nodeMeta->mediaType === 'video') {
+            $file_obj = self::getPathToMedia($node->getTypeData()->mediaURL);
+        } else if ($nodeMeta->mediaType === 'h5p') {
+            $file_obj = self::getPathToH5PVideo($node);
+        }
+
+        $filesize = self::_realFileSize($file_obj->file_path);
 
         return $filesize <= $user_defined_max_upload_size;
     }
@@ -438,6 +526,10 @@ class TapestryHelpers
     // https://www.php.net/manual/en/function.filesize.php#113457
     private static function _realFileSize($path)
     {
+        if (!$path) {
+            return PHP_INT_MAX; // TODO:
+        }
+
         $fp = fopen($path, 'r');
 
         $pos = 0;
@@ -476,6 +568,7 @@ class TapestryHelpers
                     'tapestryID' => (int) $tapestryPostId,
                     'nodeID' => $nodeID,
                     'nodeTitle' => $node->getTitle(),
+                    'nodeType' => $node->getMeta()->mediaType === 'video' ? 'Video' : 'H5P',
                     'withinSizeLimit' => self::checkVideoFileSize($node),
                 ];
                 array_push($videos_to_upload, $video);

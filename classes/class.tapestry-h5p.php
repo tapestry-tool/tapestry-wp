@@ -23,4 +23,20 @@ class TapestryH5P implements ITapestryH5P
 
         return $content;
     }
+
+    public function getMetadata($id)
+    {
+        global $wpdb;
+
+        // Library fields have nothing to do with the content metadata, but updateContent requires them for event logging so return them anyway
+        $sql = $wpdb->prepare('SELECT content.*, libraries.name as library_name, libraries.major_version, libraries.minor_version
+                                FROM '.$wpdb->prefix.'h5p_contents content
+                                JOIN '.$wpdb->prefix.'h5p_libraries libraries
+                                ON content.library_id = libraries.id
+                                WHERE content.id = %d;', (int) $id);
+
+        $result = $wpdb->get_row($sql);
+
+        return $result;
+    }
 }

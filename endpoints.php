@@ -1796,10 +1796,17 @@ function create_upload_log($videos)
                 'nodeID' => $video->nodeID,
                 'nodeTitle' => $node->getTitle(),
                 'uploadStatus' => UploadStatus::NOT_STARTED,
-                'file' => TapestryHelpers::getPathToMedia($node),
                 'kalturaID' => '',
                 'additionalInfo' => '',
             ];
+
+            $nodeMeta = $node->getMeta();
+            if ($nodeMeta->mediaType === 'video') {
+                $video_info->file = TapestryHelpers::getPathToMedia($node->getTypeData()->mediaURL);
+            } else if ($nodeMeta->mediaType === 'h5p') {
+                $video_info->file = TapestryHelpers::getPathToH5PVideo($node);
+            }
+
             array_push($upload_log, $video_info);
 
             $node->getTypeData()->kalturaData = array('uploadStatus' => UploadStatus::NOT_STARTED);
@@ -1953,7 +1960,7 @@ function updateConvertingVideos($request)
                 if ($response->status === EntryStatus::READY) {
                     TapestryHelpers::saveVideoUploadStatusInNode($node, UploadStatus::COMPLETE, $response);
 
-                    $file_path = TapestryHelpers::getPathToMedia($node)->file_path;
+                    $file_path = TapestryHelpers::getPathToMedia($node->getTypeData()->mediaURL)->file_path;
                     TapestryHelpers::saveAndDeleteLocalVideo($node, $response, $use_kaltura_player, $file_path);
 
                     $video->currentStatus = UploadStatus::COMPLETE;
