@@ -211,6 +211,7 @@
                 'id' => $captionAsset->id,
                 'label' => $captionAsset->label,
                 'language' => $captionAsset->language,
+                'displayOnPlayer' => $captionAsset->displayOnPlayer,
                 'captionUrl' => $overrideCaptionUrl ?? $this->_getCaptionUrl($kclient, $captionAsset->id).'?.vtt',
             ];
             if (!empty($errorMessage)) {
@@ -305,6 +306,7 @@
                     'captionUrl' => $caption->captionUrl,
                     'label' => $caption->label ?? ($caption->language ?? $language),
                     'language' => $language,
+                    'displayOnPlayer' => $caption->displayOnPlayer,
                 ];
             }
 
@@ -407,6 +409,7 @@
             $captionAsset = new CaptionAsset();
             $captionAsset->label = $caption->label;
             $captionAsset->language = $caption->language;
+            $captionAsset->displayOnPlayer = $caption->displayOnPlayer;
             $captionAsset->format = CaptionType::WEBVTT;
 
             $response = $captionPlugin->captionAsset->add($videoEntryId, $captionAsset);
@@ -451,6 +454,7 @@
             $captionAsset->id = $caption->id;
             $captionAsset->label = $caption->label;
             $captionAsset->language = $caption->language;
+            $captionAsset->displayOnPlayer = $caption->displayOnPlayer;
 
             $response = $captionPlugin->captionAsset->update($captionAsset->id, $captionAsset);
 

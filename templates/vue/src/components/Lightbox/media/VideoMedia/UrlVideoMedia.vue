@@ -17,7 +17,7 @@
       @error="handleError"
     >
       <track
-        v-for="caption in captions"
+        v-for="caption in visibleCaptions"
         :key="caption.id"
         :default="caption.id === defaultCaptionId"
         kind="captions"
@@ -70,8 +70,9 @@ export default {
     }
   },
   computed: {
-    captions() {
-      return this.node.typeData.captions ?? []
+    visibleCaptions() {
+      const captions = this.node.typeData.captions ?? []
+      return captions.filter(c => c.displayOnPlayer)
     },
     defaultCaptionId() {
       return this.node.typeData.defaultCaptionId

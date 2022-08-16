@@ -143,6 +143,7 @@ const defaultCaption = {
   captionUrl: "",
   language: "English",
   label: undefined,
+  displayOnPlayer: true,
 }
 
 export default {
