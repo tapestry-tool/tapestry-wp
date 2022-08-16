@@ -451,7 +451,6 @@
             $captionAsset->id = $caption->id;
             $captionAsset->label = $caption->label;
             $captionAsset->language = $caption->language;
-            $captionAsset->format = CaptionType::WEBVTT;
 
             $response = $captionPlugin->captionAsset->update($captionAsset->id, $captionAsset);
 
