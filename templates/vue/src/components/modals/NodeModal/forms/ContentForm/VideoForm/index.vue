@@ -83,7 +83,7 @@
               :checked="useCaptions"
               data-qa="node-captions-toggle"
               switch
-              @change="handleToggleCaptions"
+              @input="handleToggleCaptions"
             >
               {{ useCaptions ? "On" : "Off" }}
             </b-form-checkbox>
@@ -294,10 +294,13 @@ export default {
       this.defaultCaptionId = null
     },
     addCaption() {
-      this.captions.push({
-        ...Helpers.deepCopy(defaultCaption),
-        id: Helpers.createUUID(),
-      })
+      this.captions = [
+        ...this.captions,
+        {
+          ...Helpers.deepCopy(defaultCaption),
+          id: Helpers.createUUID(),
+        },
+      ]
       this.$nextTick(() => {
         document
           .getElementById(`caption-${this.captions.length - 1}-container-toggle`)
