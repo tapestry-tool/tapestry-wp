@@ -278,6 +278,7 @@
                 $this->_setCaptionAssetContent($kclient, $caption, $captionAssetId, $tokenId);
             }
             foreach ($toUpdate as $caption) {
+                $tokenId = null;    // Clear token ID from previous loop to prevent reuse
                 $this->_updateCaptionAsset($kclient, $caption);
                 if (isset($caption->file)) {
                     $tokenId = $this->_uploadFile($kclient, $caption->file, ['vtt', 'srt']);
@@ -285,7 +286,6 @@
                 if (isset($tokenId)) {
                     $this->_setCaptionAssetContent($kclient, $caption, $caption->id, $tokenId);
                 }
-                $tokenId = null;    // Clear token ID from previous loop to prevent reuse
             }
 
             // Send all changes in one request
