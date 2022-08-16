@@ -114,13 +114,13 @@ export default {
       "currentDepth",
       "scaleConstants",
     ]),
-    ...mapGetters(["getNode", "getNodeNavId", "getNodeNavParent"]),
+    ...mapGetters(["getNode", "getNodeNavId", "getNodeNavLink"]),
     nodeNavLinkMode: {
       get() {
         return this.$store.state.nodeNavigation.linkMode
       },
       set(linkMode) {
-        this.$store.commit("setNodeNavigation", { linkMode })
+        this.setNavLinkMode(linkMode)
       },
     },
     focused() {
@@ -128,11 +128,8 @@ export default {
         return null
       }
       if (this.nodeNavLinkMode) {
-        return {
-          type: "link",
-          source: this.getNodeNavParent,
-          target: this.getNodeNavId,
-        }
+        const link = this.getNodeNavLink
+        return link ? { ...link, type: "link" } : null
       } else {
         return {
           type: "node",
@@ -275,10 +272,11 @@ export default {
   methods: {
     ...mapMutations(["select", "unselect", "clearSelection"]),
     ...mapActions([
-      "goToNodeChildren",
-      "goToNodeParent",
-      "goToNodeSibling",
+      "goToLinkedNode",
+      "goToPreviousNode",
+      "goToNextLink",
       "resetNodeNavigation",
+      "setNavLinkMode",
     ]),
     addRootNode() {
       this.$root.$emit("add-node", null)
@@ -472,67 +470,47 @@ export default {
     handleKey(evt) {
       const { code } = evt
       const node = this.getNode(this.selectedId)
-      if (code === "Enter") {
-        if (this.nodeNavLinkMode) {
-          this.$router.push({
-            name: names.LINKMODAL,
-            params: {
-              source: this.getNodeNavParent,
-              target: this.selectedId,
-            },
-            query: this.$route.query,
-          })
-        } else if (
-          node.accessible ||
-          Helpers.hasPermission(node, "edit", this.settings.showRejected)
-        ) {
-          this.$root.$emit("open-node", node.id)
-        }
-      } else if (code === "Tab") {
-        // ? potentially let the user tab out of the main tapestry view, since the user should be fully capable of navigating through all the nodes by using just arrow keys
-      } else if (code === "KeyE") {
-        if (this.nodeNavLinkMode) {
+      if (node.id !== this.getNodeNavId) {
+        this.resetNodeNavigation(node.id)
+      }
+      console.log(code)
+      if (this.nodeNavLinkMode) {
+        if (code === "Enter") {
+          evt.preventDefault()
+          this.goToLinkedNode().then(this.setSelectedNode)
+        } else if (code === "Tab") {
+          evt.preventDefault()
+          this.goToNextLink(evt.shiftKey ? -1 : 1)
+        } else if (code === "Escape") {
+          evt.preventDefault()
+          this.nodeNavLinkMode = false
+        } else if (code === "KeyE" && this.isLoggedIn) {
+          evt.preventDefault()
           this.openSelectedLinkModal()
-        } else if (Helpers.hasPermission(node, "edit", this.settings.showRejected)) {
-          this.$root.$emit("edit-node", node.id)
         }
-      } else if (code === "KeyQ" || code === "Escape") {
-        // focus the next element after the main
-        document.querySelector(".minimap-button button")?.focus()
       } else {
-        if (node.id === this.getNodeNavId) {
-          if (this.nodeNavLinkMode) {
-            if (code === "ArrowDown") {
-              evt.preventDefault()
-              this.nodeNavLinkMode = false
-              return
-            } else if (code === "ArrowUp") {
-              this.nodeNavLinkMode = false
-            }
-          } else if (evt.shiftKey && this.isLoggedIn) {
-            if (code === "ArrowDown") {
-              this.nodeNavLinkMode = true
-            } else if (code === "ArrowUp" && this.getNodeNavParent !== -1) {
-              evt.preventDefault()
-              this.nodeNavLinkMode = true
-              return
-            }
+        if (code === "Enter") {
+          if (
+            node.accessible ||
+            Helpers.hasPermission(node, "edit", this.settings.showRejected)
+          ) {
+            evt.preventDefault()
+            this.$root.$emit("open-node", node.id)
           }
-          if (code === "ArrowDown") {
+        } else if (code === "KeyE") {
+          if (Helpers.hasPermission(node, "edit", this.settings.showRejected)) {
             evt.preventDefault()
-            this.goToNodeChildren().then(this.setSelectedNode)
-          } else if (code === "ArrowUp") {
-            evt.preventDefault()
-            this.goToNodeParent().then(this.setSelectedNode)
-          } else if (code === "ArrowRight") {
-            evt.preventDefault()
-            this.goToNodeSibling(1).then(this.setSelectedNode)
-          } else if (code === "ArrowLeft") {
-            evt.preventDefault()
-            this.goToNodeSibling(-1).then(this.setSelectedNode)
+            this.$root.$emit("edit-node", node.id)
           }
-        } else {
-          this.resetNodeNavigation(node.id)
+        } else if (code === "KeyQ" || code === "Escape") {
+          // focus the next element after the main
+          document.querySelector(".minimap-button button")?.focus()
+        } else if (code === "KeyL") {
+          evt.preventDefault()
+          this.nodeNavLinkMode = true
+        } else if (code === "Backspace") {
+          evt.preventDefault()
+          this.goToPreviousNode().then(this.setSelectedNode)
         }
       }
     },
@@ -555,14 +533,14 @@ export default {
       )
     },
     openSelectedLinkModal() {
-      this.$router.push({
-        name: names.LINKMODAL,
-        params: {
-          source: this.getNodeNavParent,
-          target: this.selectedId,
-        },
-        query: this.$route.query,
-      })
+      const link = this.getNodeNavLink
+      if (link) {
+        this.$router.push({
+          name: names.LINKMODAL,
+          params: link,
+          query: this.$route.query,
+        })
+      }
     },
   },
 }

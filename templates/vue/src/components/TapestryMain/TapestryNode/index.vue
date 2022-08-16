@@ -219,26 +219,26 @@ export default {
     ]),
     ariaLabel() {
       let label = `${this.node.title}. You are on a level ${this.node.level} node. `
-      if (
-        this.node.id ===
-        this.nodeNavigation.stack[this.nodeNavigation.stack.length - 1]
-      ) {
-        const childrenCount = this.getDirectChildren(this.node.id).length
-        if (childrenCount === 0) {
-          label += `This node has no children. To view this node, press Enter. To go back up, press the Up Arrow Key. To go to its siblings, press the Left or Right Arrow Key. `
-        } else {
-          label += `This node has ${childrenCount} ${
-            childrenCount === 1 ? "child" : "children"
-          }. To view this node, press Enter. To go to its${
-            childrenCount === 1 ? "" : " first"
-          } child, press the Down Arrow Key. To go back up, press the Up Arrow Key. To go to its siblings, press the Left or Right Arrow Key. `
+      if (this.node.id === this.getNodeNavId) {
+        const childrenCount = this.nodeNavigation.linked.children.length
+        const parentsCount = this.nodeNavigation.linked.parents.length
+        label += `This node has ${childrenCount === 0 ? "no" : childrenCount} child${
+          childrenCount === 1 ? "" : "ren"
+        } and ${parentsCount === 0 ? "no" : parentsCount} parent${
+          parentsCount === 1 ? "" : "s"
+        }. To view this node, press Enter. `
+        if (childrenCount + parentsCount > 0) {
+          label += `To view the links attached to this node, press the L Key. `
+        }
+        if (this.nodeNavigation.stack.length > 1) {
+          label += `To go to the previous node, press Backspace. `
         }
       } else {
         label +=
           "You are not on the node navigation route. To view this node, press Enter. "
       }
       if (this.hasPermission("edit")) {
-        label += "To edit this node, press E. "
+        label += "To edit this node, press the E Key. "
       }
       label += "To exit the Main Tapestry view, press the Q Key or the Escape Key."
       return label

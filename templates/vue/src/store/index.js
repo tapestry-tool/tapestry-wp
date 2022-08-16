@@ -34,8 +34,14 @@ export const store = {
     currentEditingNode: null,
     nodeNavigation: {
       stack: [],
-      siblings: [],
-      siblingPosition: -1,
+      linked: {
+        children: [],
+        parents: [],
+      },
+      currentLinked: {
+        type: null,
+        index: 0,
+      },
       linkMode: false,
     },
     // * DEV: temporarily allow editing constants.js/scaleConstants

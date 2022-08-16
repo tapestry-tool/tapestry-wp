@@ -405,68 +405,82 @@ export function setTapestryErrorReporting({ commit }, isEnabled) {
   commit("setTapestryErrorReporting", isEnabled)
 }
 
-export function resetNodeNavigation({ commit }, nodeId) {
+export function resetNodeNavigation({ commit, getters }, nodeId) {
   commit("setNodeNavigation", {
+    ...getters.getLinkNavigation(nodeId),
     stack: [nodeId],
-    siblings: [],
-    siblingPosition: -1,
     linkMode: false,
   })
 }
 
-export function goToNodeChildren({ commit, state, getters }) {
-  if (state.nodeNavigation.stack.length > 0) {
-    const nodeId = state.nodeNavigation.stack[state.nodeNavigation.stack.length - 1]
-    const childrenIds = getters.getDirectChildren(nodeId)
-    if (childrenIds.length > 0) {
-      commit("setNodeNavigation", {
-        stack: [...state.nodeNavigation.stack, childrenIds[0]],
-        siblings: childrenIds,
-        siblingPosition: 0,
-      })
-      return childrenIds[0]
-    }
+export function setNavLinkMode({ commit, state }, linkMode) {
+  if (linkMode && state.nodeNavigation.currentLinked.type === null) {
+    return false
   }
-  return false
+  commit("setNodeNavigation", {
+    linkMode: linkMode,
+  })
+  return true
 }
 
-export function goToNodeParent({ commit, dispatch, state, getters }) {
-  const len = state.nodeNavigation.stack.length
-  if (len >= 2) {
-    const parentId = state.nodeNavigation.stack[len - 2]
-    const newStack = state.nodeNavigation.stack.slice(0, len - 1)
-    if (len >= 3) {
-      const grandParentId = state.nodeNavigation.stack[len - 3]
-      const parentSiblings = getters.getDirectChildren(grandParentId)
-      commit("setNodeNavigation", {
-        stack: newStack,
-        siblings: parentSiblings,
-        siblingPosition: parentSiblings.indexOf(parentId),
-      })
-    } else {
-      dispatch("resetNodeNavigation", parentId)
-    }
-    return parentId
-  }
-  return false
-}
-
-export function goToNodeSibling({ commit, state }, offset) {
-  const newPosition = state.nodeNavigation.siblingPosition + offset
-  if (newPosition >= 0 && newPosition < state.nodeNavigation.siblings.length) {
-    const nodeId = state.nodeNavigation.siblings[newPosition]
+export function goToLinkedNode({ commit, state, getters }) {
+  const nav = state.nodeNavigation
+  const { type, index } = nav.currentLinked
+  if (nav.stack.length > 0 && type !== null) {
+    const nodeId = nav.linked[type][index]
     commit("setNodeNavigation", {
-      ...state.nodeNavigation,
-      stack: [
-        ...state.nodeNavigation.stack.slice(
-          0,
-          state.nodeNavigation.stack.length - 1
-        ),
-        nodeId,
-      ],
-      siblingPosition: newPosition,
+      ...getters.getLinkNavigation(nodeId),
+      stack: [...nav.stack, nodeId],
+      linkMode: false,
     })
     return nodeId
   }
   return false
+}
+
+export function goToPreviousNode({ commit, state, getters }) {
+  const stack = state.nodeNavigation.stack
+  if (stack.length >= 2) {
+    const nodeId = stack[stack.length - 2]
+    commit("setNodeNavigation", {
+      ...getters.getLinkNavigation(nodeId),
+      stack: stack.slice(0, stack.length - 1),
+      linkMode: false,
+    })
+    return nodeId
+  }
+  return false
+}
+
+export function goToNextLink({ commit, state }, offset) {
+  const nav = state.nodeNavigation
+  const currentType = nav.currentLinked.type
+  if (currentType === null || !nav.linkMode) {
+    return false
+  }
+  let nextIndex = nav.currentLinked.index + offset
+  let nextType = currentType
+  if (nextIndex >= nav.linked[currentType].length) {
+    nextType = currentType === "children" ? "parents" : "children"
+    nextIndex = 0
+    if (nav.linked[nextType].length === 0) {
+      nextType = currentType
+      nextIndex = 0
+    }
+  } else if (nextIndex < 0) {
+    nextType = currentType === "children" ? "parents" : "children"
+    nextIndex = nav.linked[nextType].length - 1
+    if (nav.linked[nextType].length === 0) {
+      nextType = currentType
+      nextIndex = nav.linked[nextType].length - 1
+    }
+  }
+  const nextLinked = {
+    type: nextType,
+    index: nextIndex,
+  }
+  commit("setNodeNavigation", {
+    currentLinked: nextLinked,
+  })
+  return nextLinked
 }

@@ -206,17 +206,45 @@ export function getTheme(state) {
 }
 
 export function getNodeNavId(state) {
-  return state.nodeNavigation.stack.length === 0
-    ? -1
-    : state.nodeNavigation.stack[state.nodeNavigation.stack.length - 1]
+  const stack = state.nodeNavigation.stack
+  return stack.length === 0 ? -1 : stack[stack.length - 1]
 }
 
-export function getNodeNavParent(state) {
-  return state.nodeNavigation.stack.length < 2
-    ? -1
-    : state.nodeNavigation.stack[state.nodeNavigation.stack.length - 2]
+export function getNodeNavLink(state, { getNodeNavId }) {
+  const nav = state.nodeNavigation
+  const nodeId = getNodeNavId
+  const { type, index } = nav.currentLinked
+  if (nodeId === -1 || !nav.linkMode || !type) {
+    return null
+  }
+  if (type === "children") {
+    return {
+      source: nodeId,
+      target: nav.linked[type][index],
+    }
+  } else {
+    return {
+      source: nav.linked[type][index],
+      target: nodeId,
+    }
+  }
 }
 
-export function getNodeNavIsLinkMode(state) {
-  return state.nodeNavigation.linkMode
+export function getLinkNavigation(_, { getDirectChildren, getDirectParents }) {
+  return id => {
+    const children = getDirectChildren(id)
+    const parents = getDirectParents(id)
+    const currentLinked = {
+      type:
+        children.length !== 0 ? "children" : parents.length !== 0 ? "parents" : null,
+      index: 0,
+    }
+    return {
+      linked: {
+        children: children,
+        parents: parents,
+      },
+      currentLinked,
+    }
+  }
 }

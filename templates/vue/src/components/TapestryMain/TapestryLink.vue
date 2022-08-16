@@ -3,9 +3,7 @@
     <polygon
       v-show="show"
       :id="`link-${source.id}-${target.id}`"
-      :aria-label="
-        `Link from ${source.title} to ${target.title}. To edit this link, press Enter. To go to the source node ${source.title}, press the Up Arrow Key. To go to the target node ${target.title}, press the Down Arrow Key. To go to a sibling link, press the Left or Right Arrow Key. To exit the Main Tapestry view, press the Q Key or the Escape Key.`
-      "
+      :aria-label="ariaLabel"
       :data-qa="`link-${source.id}-${target.id}`"
       :class="{
         'half-opaque':
@@ -53,7 +51,23 @@ export default {
   },
   computed: {
     ...mapState(["visibleNodes", "rootId", "maxLevel", "currentDepth"]),
-    ...mapGetters(["getNeighbours", "isVisible"]),
+    ...mapGetters(["getNeighbours", "isVisible", "getNodeNavId"]),
+    ariaLabel() {
+      let label = ""
+      if (this.source.id === this.getNodeNavId) {
+        label += `Link to ${this.target.title}, child node. `
+      } else if (this.target.id === this.getNodeNavId) {
+        label += `Link to ${this.source.title}, parent node. `
+      } else {
+        label += `You are not on the node navigation route. `
+      }
+      label +=
+        "You are on a link. To follow this link, press Enter. To go to the next link, press Tab. To exit link navigation mode, press the Escape Key. "
+      if (this.isLoggedIn) {
+        label += "To edit this link, press the E Key. "
+      }
+      return label
+    },
     show() {
       return (
         this.isVisible(this.source.id) &&
