@@ -54,7 +54,7 @@
 <script>
 import FileUpload from "@/components/modals/common/FileUpload"
 import Helpers from "@/utils/Helpers"
-import { mapMutations } from "vuex"
+import { mapMutations, mapState } from "vuex"
 
 export default {
   components: {
@@ -66,6 +66,9 @@ export default {
     }
   },
   computed: {
+    ...mapState({
+      mediaFormat: state => state.currentEditingNode.mediaFormat,
+    }),
     mediaURL: {
       get() {
         return this.$store.state.currentEditingNode.typeData.mediaURL
@@ -92,11 +95,10 @@ export default {
     },
   },
   created() {
-    if (this.kalturaId === undefined) {
-      this.update("typeData.kalturaId", "")
-      this.updateMediaFormat(this.youtubeId)
-    } else if (this.kalturaId !== "") {
+    if (this.mediaFormat === "kaltura") {
       this.useKaltura = true
+    } else {
+      this.updateMediaFormat(this.youtubeId)
     }
   },
   methods: {
@@ -108,12 +110,9 @@ export default {
       this.$root.$emit("node-modal::uploading", state)
     },
     handleKalturaCheck() {
-      // If Kaltura is checked or unchecked, the mediaURL should be cleared as it depends on the Kaltura ID
-      this.update("typeData.mediaURL", "")
       if (this.useKaltura) {
         this.update("mediaFormat", "kaltura")
       } else {
-        this.update("typeData.kalturaId", "")
         this.updateMediaFormat(this.youtubeId)
       }
     },

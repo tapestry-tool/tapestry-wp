@@ -339,9 +339,9 @@ class TapestryHelpers
     {
         $typeData = $node->getTypeData();
         $typeData->mediaURL = $kalturaData->dataUrl.'?.mp4';
+        $typeData->kalturaId = $kalturaData->id;
 
         if ($useKalturaPlayer) {
-            $typeData->kalturaId = $kalturaData->id;
             $node->set((object) ['mediaFormat' => 'kaltura']);
         }
 
