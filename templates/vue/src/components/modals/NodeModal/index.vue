@@ -1284,18 +1284,10 @@ export default {
     },
     async updateKalturaVideoMediaURL() {
       // For Kaltura videos, the Kaltura ID determines the mediaURL, so let's ensure they are in sync
-
-      const oldNode = this.getNode(this.nodeId)
-      const { kalturaId: oldKalturaId, mediaURL: oldMediaURL } = oldNode.typeData
-
-      if (this.node.typeData.kalturaId !== oldKalturaId) {
-        const { mediaURL } = await client.getKalturaVideoUrl(
-          this.node.typeData.kalturaId
-        )
-        this.update("typeData.mediaURL", mediaURL)
-      } else if (this.node.typeData.mediaURL !== oldMediaURL) {
-        this.update("typeData.mediaURL", oldMediaURL)
-      }
+      const { mediaURL } = await client.getKalturaVideoUrl(
+        this.node.typeData.kalturaId
+      )
+      this.update("typeData.mediaURL", mediaURL)
     },
   },
 }

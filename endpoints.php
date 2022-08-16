@@ -2076,7 +2076,7 @@ function getKalturaVideoUrl($request)
         $result = $kaltura_api->getVideo($entryId);
 
         if ($result != null) {
-            return array("mediaURL" => $result->dataUrl);
+            return array("mediaURL" => $result->dataUrl.'?.mp4');
         }
         return false;
     }
