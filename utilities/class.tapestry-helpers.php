@@ -357,12 +357,13 @@ class TapestryHelpers
      */
     public static function getPathToMedia($node)
     {
-        $upload_folder = wp_upload_dir()['path'];
+        $upload_folder = wp_upload_dir()['basedir'];
+        $upload_folder_url = wp_upload_dir()['baseurl'];
+        $mediaURL = $node->getTypeData()->mediaURL;
 
-        $file_name = pathinfo($node->getTypeData()->mediaURL)['basename'];
         $file_obj = new StdClass();
-        $file_obj->file_path = $upload_folder.'/'.$file_name;
-        $file_obj->name = $file_name;
+        $file_obj->file_path = substr_replace($mediaURL, $upload_folder, 0, strlen($upload_folder_url));
+        $file_obj->name = pathinfo($mediaURL)['basename'];
 
         return $file_obj;
     }
