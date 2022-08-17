@@ -114,10 +114,6 @@ class TapestryError extends Error
             'MESSAGE' => 'File was not found on the server',
             'STATUS' => ['status' => 500],
         ],
-        'FAILED_TO_SAVE_CAPTIONS' => [
-            'MESSAGE' => 'Failed to save captions to Kaltura.',
-            'STATUS' => ['status' => 500],
-        ],
     ];
 
     /**

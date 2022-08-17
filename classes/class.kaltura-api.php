@@ -231,26 +231,22 @@
                 return null;
             }
 
-            try {
-                $kclient = $this->getKClient(SessionType::ADMIN);
+            $kclient = $this->getKClient(SessionType::ADMIN);
 
-                $result = $this->setCaptions($kclient, $videoEntryId, $captions);
-                $updatedCaptions = $result->captions;
+            $result = $this->setCaptions($kclient, $videoEntryId, $captions);
+            $updatedCaptions = $result->captions;
 
-                if (!empty($defaultCaptionId) && is_string($defaultCaptionId) && isset($updatedCaptions[$defaultCaptionId])) {
-                    // Map default caption ID to its (possibly) new ID after being uploaded
-                    $newDefaultCaptionId = $updatedCaptions[$defaultCaptionId]->id;
-                    $this->setCaptionAsDefault($kclient, $newDefaultCaptionId);
-                }
-
-                return (object) [
-                    'captions' => array_values($updatedCaptions),
-                    'pendingCaptions' => $result->pendingCaptions,
-                    'defaultCaptionId' => $newDefaultCaptionId,
-                ];
-            } catch (Exception $e) {
-                throw new TapestryError('FAILED_TO_SAVE_CAPTIONS');
+            if (!empty($defaultCaptionId) && is_string($defaultCaptionId) && isset($updatedCaptions[$defaultCaptionId])) {
+                // Map default caption ID to its (possibly) new ID after being uploaded
+                $newDefaultCaptionId = $updatedCaptions[$defaultCaptionId]->id;
+                $this->setCaptionAsDefault($kclient, $newDefaultCaptionId);
             }
+
+            return (object) [
+                'captions' => array_values($updatedCaptions),
+                'pendingCaptions' => $result->pendingCaptions,
+                'defaultCaptionId' => $newDefaultCaptionId,
+            ];
         }
 
         public function setCaptionAsDefault($kclient, $captionAssetId)
@@ -392,6 +388,9 @@
         {
             if (empty($file) || !in_array($file->extension, $allowedExtensions)) {
                 return null;
+            }
+            if (!file_exists($file->file_path)) {
+                throw new TapestryError('UPLOAD_FILE_NOT_FOUND');
             }
 
             $uploadToken = new UploadToken();
