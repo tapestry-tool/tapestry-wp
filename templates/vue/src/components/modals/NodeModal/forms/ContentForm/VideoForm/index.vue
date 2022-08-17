@@ -250,9 +250,9 @@ export default {
     },
     async getAllLanguages() {
       const iso6391LanguageNames = ISO6391.getAllNames()
-      const kalturaLanguageNames = getKalturaStatus()
+      const kalturaLanguageNames = this.kalturaAvailable
         ? await client.getKalturaAvailableLanguages()
-        : []
+        : ["Select a language"]
       const allLanguageNames = Array.from(
         new Set(iso6391LanguageNames.concat(kalturaLanguageNames))
       )
@@ -272,7 +272,10 @@ export default {
       } else {
         if (this.kalturaAvailable) {
           this.clearCaptions()
-        } // Keep captions if Kaltura not available
+        } else {
+          // Keep captions if Kaltura not available
+          this.validateCaptionLanguages()
+        }
         this.updateMediaFormat(this.youtubeId)
       }
     },
@@ -324,6 +327,17 @@ export default {
     clearCaptions() {
       this.defaultCaptionId = null
       this.captions = []
+    },
+    validateCaptionLanguages() {
+      // Unset any languages that are only available in Kaltura
+      for (let i = 0; i < this.captions.length; i++) {
+        if (!this.languages.includes(this.captions[i].language)) {
+          this.captions.splice(i, 1, {
+            ...this.captions[i],
+            language: "Select a language",
+          })
+        }
+      }
     },
     addCaption() {
       this.captions = [
