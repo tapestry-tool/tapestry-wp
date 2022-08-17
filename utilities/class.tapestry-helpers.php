@@ -346,6 +346,7 @@ class TapestryHelpers
             $typeData->kalturaData = [];
         }
         $typeData->kalturaData['partnerId'] = KALTURA_PARTNER_ID;
+        $typeData->kalturaData['serviceUrl'] = KALTURA_SERVICE_URL;
         $typeData->kalturaData['uniqueConfiguration'] = KALTURA_UNIQUE_CONFIG;
 
         if ($useKalturaPlayer) {

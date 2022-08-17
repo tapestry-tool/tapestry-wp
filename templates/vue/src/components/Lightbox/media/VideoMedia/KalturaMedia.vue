@@ -70,8 +70,9 @@ export default {
   created() {
     const kalturaScript = document.createElement("script")
     const partnerId = this.node.typeData.kalturaData.partnerId
+    const serviceUrl = this.node.typeData.kalturaData.serviceUrl
     const uniqueConfiguration = this.node.typeData.kalturaData.uniqueConfiguration
-    kalturaScript.src = `https://admin.video.ubc.ca/p/${partnerId}/sp/${partnerId}00/embedIframeJs/uiconf_id/${uniqueConfiguration}/partner_id/${partnerId}`
+    kalturaScript.src = `${serviceUrl}/p/${partnerId}/sp/${partnerId}00/embedIframeJs/uiconf_id/${uniqueConfiguration}/partner_id/${partnerId}`
 
     kalturaScript.id = "kaltura-script"
 

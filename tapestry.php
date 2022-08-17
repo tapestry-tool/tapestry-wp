@@ -185,9 +185,11 @@ function tapestry_enqueue_vue_app()
         global $wp_roles;
 
         $kaltura_partner_id = null;
+        $kaltura_service_url = null;
         $kaltura_unique_configuration = null;
         if (LOAD_KALTURA) {
             $kaltura_partner_id = KALTURA_PARTNER_ID;
+            $kaltura_service_url = KALTURA_SERVICE_URL;
             $kaltura_unique_configuration = KALTURA_UNIQUE_CONFIG;
         }
 
@@ -227,6 +229,7 @@ function tapestry_enqueue_vue_app()
                 'kaltura' => array(
                     'kalturaStatus' => LOAD_KALTURA,
                     "partnerId" => $kaltura_partner_id,
+                    "serviceUrl" => $kaltura_service_url,
                     "uniqueConfiguration" => $kaltura_unique_configuration,
                 ),
             ]
