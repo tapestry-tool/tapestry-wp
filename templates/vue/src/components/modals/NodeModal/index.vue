@@ -837,7 +837,7 @@ export default {
               wp.data.kaltura.uniqueConfiguration
             )
           }
-          await this.updateKalturaVideoMediaURL()
+          this.updateKalturaVideoMediaURL()
         }
 
         if (
@@ -1301,7 +1301,7 @@ export default {
       )
       this.loadDuration = false
     },
-    async updateKalturaVideoMediaURL() {
+    updateKalturaVideoMediaURL() {
       // For Kaltura videos, the Kaltura ID determines the mediaURL, so let's ensure they are in sync
       const partnerId = wp.data.kaltura.partnerId
       const serviceUrl = wp.data.kaltura.serviceUrl
