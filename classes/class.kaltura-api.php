@@ -74,6 +74,10 @@
             $filepath = $file->file_path;
             $filename = $file->name;
 
+            if (!file_exists($filepath)) {
+                throw new TapestryError('UPLOAD_FILE_NOT_FOUND');
+            }
+
             $kclient = $this->getKClient();
 
             /*
