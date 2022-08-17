@@ -387,13 +387,6 @@ $REST_API_ENDPOINTS = [
             'callback' => 'getKalturaVideoMeta',
         ],
     ],
-    'GET_KALTURA_VIDEO_URL' => (object) [
-        'ROUTE' => '/kaltura/video/mediaURL',
-        'ARGUMENTS' => [
-            'methods' => $REST_API_GET_METHOD,
-            'callback' => 'getKalturaVideoUrl',
-        ],
-    ],
 ];
 
 /*
@@ -1710,7 +1703,7 @@ function perform_batched_upload_to_kaltura($videos, $use_kaltura_player)
             $kaltura_data = null;
             try {
                 $kaltura_data = $kalturaApi->uploadVideo($video->file, $current_date);
-            } catch (Exception $e) {
+            } catch (Error $e) {
                 $error_msg = "Unable to upload video '".$video->file->name."' to Kaltura due to: ".$e->getMessage();
 
                 error_log($error_msg."\nStack trace: \n".$e->getTraceAsString());
@@ -2059,31 +2052,6 @@ function getKalturaVideoMeta($request)
 
         if ($result != null) {
             return array("image" => $result->thumbnailUrl, "duration" => $result->duration);
-        }
-        return false;
-    }
-}
-
-/**
- * If a Kaltura video with given entry id exists, returns the video's URL.
- *
- * Example body:
- * {
- *   "mediaURL": "https://admin.video.ubc.ca/p/186/sp/18600/playManifest/entryId/0_p5er0usa/format/url/protocol/https"
- * }
- *
- * @return - HTTP response: an object containing the URL if the entry id is valid, and false otherwise.
- */
-function getKalturaVideoUrl($request)
-{
-    if (LOAD_KALTURA) {
-        $entryId = $request['entry_id'];
-
-        $kaltura_api = new KalturaApi();
-        $result = $kaltura_api->getVideo($entryId);
-
-        if ($result != null) {
-            return array("mediaURL" => $result->dataUrl);
         }
         return false;
     }

@@ -110,6 +110,10 @@ class TapestryError extends Error
             'MESSAGE' => 'The Tapestry is not empty',
             'STATUS' => ['status' => 400],
         ],
+        'UPLOAD_FILE_NOT_FOUND' => [
+            'MESSAGE' => 'File was not found on the server',
+            'STATUS' => ['status' => 500],
+        ],
     ];
 
     /**

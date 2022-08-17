@@ -346,9 +346,17 @@ class TapestryHelpers
         if ($nodeMeta->mediaType === 'video') {
             $typeData = $node->getTypeData();
             $typeData->mediaURL = $newVideoUrl;
-    
+            $typeData->kalturaId = $kalturaData->id;
+
+            // Save Kaltura account info so we can still show Kaltura player, even if LOAD_KALTURA is currently false
+            if (!isset($typeData->kalturaData)) {
+                $typeData->kalturaData = [];
+            }
+            $typeData->kalturaData['partnerId'] = KALTURA_PARTNER_ID;
+            $typeData->kalturaData['serviceUrl'] = KALTURA_SERVICE_URL;
+            $typeData->kalturaData['uniqueConfiguration'] = KALTURA_UNIQUE_CONFIG;
+
             if ($useKalturaPlayer) {
-                $typeData->kalturaId = $kalturaData->id;
                 $node->set((object) ['mediaFormat' => 'kaltura']);
             }
         } else if ($nodeMeta->mediaType === 'h5p') {
@@ -369,11 +377,11 @@ class TapestryHelpers
     public static function getPathToMedia($url)
     {
         $upload_folder = wp_upload_dir()['basedir'];
+        $upload_folder_url = wp_upload_dir()['baseurl'];
 
-        $file_name = pathinfo($url)['basename'];
         $file_obj = new stdClass();
-        $file_obj->file_path = $upload_folder.'/'.$file_name;
-        $file_obj->name = $file_name;
+        $file_obj->file_path = substr_replace($url, $upload_folder, 0, strlen($upload_folder_url));
+        $file_obj->name = pathinfo($url)['basename'];
 
         return $file_obj;
     }
@@ -416,7 +424,7 @@ class TapestryHelpers
 
         if ($nodeMeta->mediaType === 'video') {
             // Videos can be uploaded if mediaURL is a local upload on this site
-            $upload_dir_url = wp_upload_dir()['url'];
+            $upload_dir_url = wp_upload_dir()['baseurl'];
             return substr($node->getTypeData()->mediaURL, 0, strlen($upload_dir_url)) === $upload_dir_url;
         } else if ($nodeMeta->mediaType === 'h5p') {
             // H5Ps can be uploaded if the video 'path' attribute is a relative path
