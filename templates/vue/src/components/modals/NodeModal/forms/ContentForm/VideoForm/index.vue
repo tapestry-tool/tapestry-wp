@@ -235,8 +235,6 @@ export default {
       this.$root.$emit("node-modal::uploading", state)
     },
     handleFormatChange(value) {
-      // If Kaltura is checked or unchecked, the mediaURL should be cleared as it depends on the Kaltura ID
-      this.update("typeData.mediaURL", "")
       this.useKaltura = value
 
       if (value) {

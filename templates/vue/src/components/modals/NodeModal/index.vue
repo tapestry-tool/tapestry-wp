@@ -835,6 +835,25 @@ export default {
         }
 
         if (this.node.mediaFormat === "kaltura") {
+          if (!this.node.typeData.kalturaData) {
+            this.update("typeData.kalturaData", {
+              id: this.node.typeData.kalturaId,
+              partnerId: wp.data.kaltura.partnerId,
+              serviceUrl: wp.data.kaltura.serviceUrl,
+              uniqueConfiguration: wp.data.kaltura.uniqueConfiguration,
+            })
+          } else {
+            this.update("typeData.kalturaData.id", this.node.typeData.kalturaId)
+            this.update("typeData.kalturaData.partnerId", wp.data.kaltura.partnerId)
+            this.update(
+              "typeData.kalturaData.serviceUrl",
+              wp.data.kaltura.serviceUrl
+            )
+            this.update(
+              "typeData.kalturaData.uniqueConfiguration",
+              wp.data.kaltura.uniqueConfiguration
+            )
+          }
           await Promise.all([
             this.updateKalturaVideoMediaURL(),
             this.updateKalturaVideoCaptions(),
@@ -1322,25 +1341,10 @@ export default {
     },
     async updateKalturaVideoMediaURL() {
       // For Kaltura videos, the Kaltura ID determines the mediaURL, so let's ensure they are in sync
-
-      const oldNode = this.getNode(this.nodeId)
-
-      if (oldNode) {
-        const { kalturaId: oldKalturaId, mediaURL: oldMediaURL } = oldNode.typeData
-        if (this.node.typeData.kalturaId !== oldKalturaId) {
-          const { mediaURL } = await client.getKalturaVideoUrl(
-            this.node.typeData.kalturaId
-          )
-          this.update("typeData.mediaURL", mediaURL)
-        } else if (this.node.typeData.mediaURL !== oldMediaURL) {
-          this.update("typeData.mediaURL", oldMediaURL)
-        }
-      } else {
-        const { mediaURL } = await client.getKalturaVideoUrl(
-          this.node.typeData.kalturaId
-        )
-        this.update("typeData.mediaURL", mediaURL)
-      }
+      const partnerId = wp.data.kaltura.partnerId
+      const serviceUrl = wp.data.kaltura.serviceUrl
+      const mediaURL = `${serviceUrl}/p/${partnerId}/sp/${partnerId}00/playManifest/entryId/${this.node.typeData.kalturaId}/format/url/protocol/https?.mp4`
+      this.update("typeData.mediaURL", mediaURL)
     },
     async updateKalturaVideoCaptions() {
       // "Push" changes made to Kaltura captions to Kaltura, then save results in node
