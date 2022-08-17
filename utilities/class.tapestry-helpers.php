@@ -2,8 +2,14 @@
 
 require_once dirname(__FILE__).'/class.tapestry-node-permissions.php';
 
-// TODO: check for the existence of this file
-include_once __DIR__.'/../../h5p/public/class-h5p-plugin.php';
+define(
+    'H5P_DEFINED',
+    file_exists(__DIR__.'/../../h5p/public/class-h5p-plugin.php')
+);
+
+if (H5P_DEFINED) {
+    include_once __DIR__.'/../../h5p/public/class-h5p-plugin.php';
+}
 
 /**
  * Tapestry Helper Functions.
@@ -333,9 +339,9 @@ class TapestryHelpers
     /**
      * Delete a local video after it has been uploaded to Kaltura.
      *
-     * @param TapestryNode  $node               Video node to update
+     * @param TapestryNode  $node               Node to update (video or H5P)
      * @param MediaEntry    $kalturaData        Response from Kaltura API
-     * @param boolean       $useKalturaPlayer   If true, also switch the video to use Kaltura player
+     * @param boolean       $useKalturaPlayer   If true, switch node to use Kaltura player. Video nodes only.
      * @param string        $videoPath          Path to the video file.
      */
     public static function saveAndDeleteLocalVideo($node, $kalturaData, $useKalturaPlayer, $videoPath)
@@ -372,7 +378,6 @@ class TapestryHelpers
      * Get the file path of a local WordPress upload by its URL.
      * 
      * @param string $url
-     * @return object|null     Returns null if the URL is not a local upload.
      */
     public static function getPathToMedia($url)
     {
@@ -423,12 +428,13 @@ class TapestryHelpers
         $nodeMeta = $node->getMeta();
 
         if ($nodeMeta->mediaType === 'video') {
-            // Videos can be uploaded if mediaURL is a local upload on this site
+            // URL videos can be uploaded if mediaURL is a local upload on this site
             $upload_dir_url = wp_upload_dir()['baseurl'];
             return substr($node->getTypeData()->mediaURL, 0, strlen($upload_dir_url)) === $upload_dir_url;
         } else if ($nodeMeta->mediaType === 'h5p') {
-            // H5Ps can be uploaded if the video 'path' attribute is a relative path
-            $videoPathOrUrl = self::_getH5PVideoURL($node);
+            // H5P videos can be uploaded if the video 'path' attribute is a relative path
+            $h5pId = self::getH5PIdFromMediaURL($node->getTypeData()->mediaURL);
+            $videoPathOrUrl = self::_getH5PVideoURL($h5pId);
             if ($videoPathOrUrl) {
                 return !filter_var($videoPathOrUrl, FILTER_VALIDATE_URL);
             }
@@ -440,10 +446,13 @@ class TapestryHelpers
     // Assumes node is valid local upload
     public static function getPathToH5PVideo($node)
     {
-        $h5pPlugin = H5P_Plugin::get_instance();
+        if (!H5P_DEFINED) {
+            return null;
+        }
 
+        $h5pPlugin = H5P_Plugin::get_instance();
         $h5pId = self::getH5PIdFromMediaURL($node->getTypeData()->mediaURL);
-        $videoRelativePath = self::_getH5PVideoURL($node);
+        $videoRelativePath = self::_getH5PVideoURL($h5pId);
         if (substr($videoRelativePath, -4) === '#tmp') {
             // Trim the #tmp suffix on the field
             $videoRelativePath = substr($videoRelativePath, 0, strlen($videoRelativePath) - 4);
@@ -463,9 +472,8 @@ class TapestryHelpers
         return count($urlParts) >= 2 ? $urlParts[1] : null;
     }
 
-    private static function _getH5PVideoURL($node)
+    private static function _getH5PVideoURL($h5pId)
     {
-        $h5pId = self::getH5PIdFromMediaURL($node->getTypeData()->mediaURL);
         $controller = new TapestryH5P();
         $content = json_decode($controller->getMetadata($h5pId)->parameters);
 
@@ -476,26 +484,27 @@ class TapestryHelpers
     }
 
     private static function _updateH5PVideoURL($node, $newVideoUrl) {
-        $controller = new TapestryH5P();
-        $h5pId = self::getH5PIdFromMediaURL($node->getTypeData()->mediaURL);
-
-        $metadata = $controller->getMetadata($h5pId);
-        $params = json_decode($metadata->parameters);
-        $params->interactiveVideo->video->files[0]->path = $newVideoUrl;
-
-        $h5pInterface = H5P_Plugin::get_instance()->get_h5p_instance('interface');
-        $h5pInterface->updateContent([
-            'id' => $h5pId,
-            'metadata' => $metadata,
-            'params' => json_encode($params),
-            'disable' => $metadata->disable,
-            'library' => [
-                'libraryId' => $metadata->library_id,
-                'machineName' => $metadata->library_name,
-                'majorVersion' => $metadata->major_version,
-                'minorVersion' => $metadata->minor_version,
-            ],
-        ]);
+        if (H5P_DEFINED) {
+            $controller = new TapestryH5P();
+            $h5pId = self::getH5PIdFromMediaURL($node->getTypeData()->mediaURL);
+            $metadata = $controller->getMetadata($h5pId);
+            $params = json_decode($metadata->parameters);
+            $params->interactiveVideo->video->files[0]->path = $newVideoUrl;
+    
+            $h5pInterface = H5P_Plugin::get_instance()->get_h5p_instance('interface');
+            $h5pInterface->updateContent([
+                'id' => $h5pId,
+                'metadata' => $metadata,
+                'params' => json_encode($params),
+                'disable' => $metadata->disable,
+                'library' => [
+                    'libraryId' => $metadata->library_id,
+                    'machineName' => $metadata->library_name,
+                    'majorVersion' => $metadata->major_version,
+                    'minorVersion' => $metadata->minor_version,
+                ],
+            ]);
+        }
     }
 
     /**
