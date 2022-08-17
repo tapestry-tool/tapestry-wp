@@ -473,7 +473,6 @@ export default {
       if (node.id !== this.getNodeNavId) {
         this.resetNodeNavigation(node.id)
       }
-      console.log(code)
       if (this.nodeNavLinkMode) {
         if (code === "Enter") {
           evt.preventDefault()
