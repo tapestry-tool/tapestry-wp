@@ -854,10 +854,8 @@ export default {
               wp.data.kaltura.uniqueConfiguration
             )
           }
-          await Promise.all([
-            this.updateKalturaVideoMediaURL(),
-            this.updateKalturaVideoCaptions(),
-          ])
+          this.updateKalturaVideoMediaURL()
+          await this.updateKalturaVideoCaptions()
         }
 
         if (
@@ -1339,7 +1337,7 @@ export default {
       )
       this.loadDuration = false
     },
-    async updateKalturaVideoMediaURL() {
+    updateKalturaVideoMediaURL() {
       // For Kaltura videos, the Kaltura ID determines the mediaURL, so let's ensure they are in sync
       const partnerId = wp.data.kaltura.partnerId
       const serviceUrl = wp.data.kaltura.serviceUrl
@@ -1347,26 +1345,32 @@ export default {
       this.update("typeData.mediaURL", mediaURL)
     },
     async updateKalturaVideoCaptions() {
-      // "Push" changes made to Kaltura captions to Kaltura, then save results in node
       if (this.node.typeData.captions) {
-        const result = await client.updateKalturaVideoCaptions(
-          this.node.typeData.kalturaId,
-          this.node.typeData.captions,
-          this.node.typeData.defaultCaptionId
-        )
+        // "Push" changes made to Kaltura captions to Kaltura, then save results in node
+        try {
+          const result = await client.updateKalturaVideoCaptions(
+            this.node.typeData.kalturaId,
+            this.node.typeData.captions,
+            this.node.typeData.defaultCaptionId
+          )
 
-        // Merge old pending captions and new pending captions by caption ID
-        const currentPendingCaptions = this.node.typeData.pendingCaptions ?? []
-        const newPendingCaptions = result.pendingCaptions
-        for (let caption of currentPendingCaptions) {
-          if (newPendingCaptions.every(c => c.id !== caption.id)) {
-            newPendingCaptions.push(caption)
+          // Merge old pending captions and new pending captions by caption ID
+          const currentPendingCaptions = this.node.typeData.pendingCaptions ?? []
+          const newPendingCaptions = result.pendingCaptions
+          for (let caption of currentPendingCaptions) {
+            if (newPendingCaptions.every(c => c.id !== caption.id)) {
+              newPendingCaptions.push(caption)
+            }
           }
-        }
 
-        this.update("typeData.captions", result.captions)
-        this.update("typeData.pendingCaptions", newPendingCaptions)
-        this.update("typeData.defaultCaptionId", result.defaultCaptionId)
+          this.update("typeData.captions", result.captions)
+          this.update("typeData.pendingCaptions", newPendingCaptions)
+          this.update("typeData.defaultCaptionId", result.defaultCaptionId)
+        } catch (error) {
+          this.errors.push(
+            "Error uploading captions to Kaltura. Please re-upload or check the provided information."
+          )
+        }
       }
     },
   },
