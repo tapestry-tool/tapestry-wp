@@ -1703,7 +1703,7 @@ function perform_batched_upload_to_kaltura($videos, $use_kaltura_player)
             $kaltura_data = null;
             try {
                 $kaltura_data = $kalturaApi->uploadVideo($video->file, $current_date);
-            } catch (Exception $e) {
+            } catch (Error $e) {
                 $error_msg = "Unable to upload video '".$video->file->name."' to Kaltura due to: ".$e->getMessage();
 
                 error_log($error_msg."\nStack trace: \n".$e->getTraceAsString());
