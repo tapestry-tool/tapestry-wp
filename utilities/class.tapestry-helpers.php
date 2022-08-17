@@ -339,8 +339,16 @@ class TapestryHelpers
     {
         $typeData = $node->getTypeData();
         $typeData->mediaURL = $kalturaData->dataUrl.'?.mp4';
-
         $typeData->kalturaId = $kalturaData->id;
+        
+        // Save Kaltura account info so we can still show Kaltura player, even if LOAD_KALTURA is currently false
+        if (!isset($typeData->kalturaData)) {
+            $typeData->kalturaData = [];
+        }
+        $typeData->kalturaData['partnerId'] = KALTURA_PARTNER_ID;
+        $typeData->kalturaData['serviceUrl'] = KALTURA_SERVICE_URL;
+        $typeData->kalturaData['uniqueConfiguration'] = KALTURA_UNIQUE_CONFIG;
+
         if ($useKalturaPlayer) {
             $node->set((object) ['mediaFormat' => 'kaltura']);
         }
@@ -378,12 +386,12 @@ class TapestryHelpers
         }
 
         $upload_folder = wp_upload_dir()['basedir'];
+        $upload_folder_url = wp_upload_dir()['baseurl'];
 
-        $file_name = pathinfo($url)['basename'];
         $file_obj = new stdClass();
-        $file_obj->file_path = $upload_folder.'/'.$file_name;
-        $file_obj->name = $file_name;
-        $file_obj->extension = pathinfo($file_name, PATHINFO_EXTENSION);
+        $file_obj->file_path = substr_replace($url, $upload_folder, 0, strlen($upload_folder_url));
+        $file_obj->name = pathinfo($url, PATHINFO_BASENAME);
+        $file_obj->extension = pathinfo($url, PATHINFO_EXTENSION);
 
         return $file_obj;
     }
@@ -451,7 +459,7 @@ class TapestryHelpers
             return true;
         }
 
-        $user_defined_max_upload_size = wp_convert_hr_to_bytes(TAPESTRY_VIDEO_UPLOAD_MAX_FILE_SIZE);
+        $user_defined_max_upload_size = wp_convert_hr_to_bytes(TAPESTRY_KALTURA_UPLOAD_MAX_FILE_SIZE);
 
         if ($user_defined_max_upload_size >= wp_max_upload_size()) {
             return true;

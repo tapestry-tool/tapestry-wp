@@ -114,8 +114,8 @@ class TapestryError extends Error
             'MESSAGE' => 'Kaltura is not enabled on the server.',
             'STATUS' => ['status' => 500],      // TODO: should this be a 400 or 500 error?
         ],
-        'FAILED_TO_SAVE_CAPTIONS' => [
-            'MESSAGE' => 'Failed to save captions to Kaltura.',
+        'UPLOAD_FILE_NOT_FOUND' => [
+            'MESSAGE' => 'File was not found on the server',
             'STATUS' => ['status' => 500],
         ],
     ];

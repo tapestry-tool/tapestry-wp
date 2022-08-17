@@ -23,12 +23,7 @@
         </span>
       </div>
       <div class="ml-auto d-flex align-items-center">
-        <b-form-checkbox
-          v-model="caption.displayOnPlayer"
-          switch
-          :data-qa="`caption-display-toggle-${index}`"
-          class="mr-3"
-        >
+        <b-form-checkbox v-model="caption.displayOnPlayer" switch class="mr-3">
           Display in player
         </b-form-checkbox>
         <b-button
