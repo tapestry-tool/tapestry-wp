@@ -11,6 +11,7 @@
               input-test-id="node-video-url"
               placeholder="Enter URL for MP4 or YouTube video"
               required
+              :disabled="useKaltura"
               @isUploading="handleUploadChange"
             />
           </b-form-group>
@@ -22,7 +23,7 @@
         <b-form-checkbox
           :checked="useKaltura"
           switch
-          :disabled="!kalturaAvailable && !useKaltura"
+          :disabled="disableKalturaToggle"
           data-qa="use-kaltura-toggle"
           style="display:inline-block;"
           @change="handleFormatChange($event)"
@@ -31,13 +32,18 @@
         </b-form-checkbox>
       </b-col>
     </b-row>
-    <b-overlay :show="useKaltura && !kalturaAvailable">
+    <b-overlay :show="disableFields">
       <template #overlay>
         <div class="no-kaltura-notice">
-          This video cannot be edited because Kaltura is not available on the server.
+          This information cannot be edited because Kaltura is not available on the
+          server.
         </div>
       </template>
-      <b-row v-if="useKaltura" class="mb-3 align-items-center">
+      <b-row
+        v-if="useKaltura"
+        :aria-hidden="disableFields"
+        class="mb-3 align-items-center"
+      >
         <b-col cols="3">
           Kaltura ID:
         </b-col>
@@ -58,8 +64,8 @@
               <i
                 id="kaltura-info"
                 class="far fa-question-circle"
-                tabindex="0"
                 aria-label="Kaltura ID hint"
+                :tabindex="disableFields ? -1 : 0"
               ></i>
               <b-tooltip role="tooltip" target="kaltura-info">
                 Video ID can be found in the Kaltura managment console under
@@ -71,7 +77,7 @@
                 variant="primary"
                 data-qa="edit-kaltura-id-button"
                 :aria-label="editingKalturaId ? 'Submit' : 'Edit Kaltura ID'"
-                :disabled="isLoadingKalturaCaptions"
+                :disabled="disableFields || isLoadingKalturaCaptions"
                 @click="handleKalturaIdEdit"
               >
                 {{ editingKalturaId ? "Submit" : "Change" }}
@@ -80,7 +86,7 @@
           </b-input-group>
         </b-col>
       </b-row>
-      <b-row>
+      <b-row :aria-hidden="disableFields">
         <b-col>
           <b-overlay :show="isLoadingKalturaCaptions">
             <b-form-group label="Captions">
@@ -88,6 +94,7 @@
                 :checked="useCaptions"
                 data-qa="node-captions-toggle"
                 switch
+                :disabled="disableFields"
                 @change="handleToggleCaptions"
               >
                 {{ useCaptions ? "On" : "Off" }}
@@ -98,6 +105,7 @@
                   :key="caption.id"
                   :value="caption"
                   :index="index"
+                  :disabled="disableFields"
                   :is-kaltura="useKaltura"
                   :is-removable="captions.length >= 2"
                   :is-default="caption.id === defaultCaptionId"
@@ -109,6 +117,7 @@
                 <b-button
                   class="mt-3"
                   data-qa="add-caption-button"
+                  :disabled="disableFields"
                   @click="addCaption"
                 >
                   <i class="fas fa-plus icon"></i>
@@ -125,6 +134,7 @@
               :index="index"
               is-removable
               is-pending
+              :disabled="disableFields"
               :is-kaltura="useKaltura"
               :languages="languages"
               :error-message="caption.errorMessage"
@@ -163,6 +173,7 @@ export default {
   data() {
     return {
       useKaltura: false,
+      disableKalturaToggle: false,
       kalturaId: this.$store.state.currentEditingNode.typeData.kalturaId,
       editingKalturaId: false,
       isLoadingKalturaCaptions: false,
@@ -175,6 +186,9 @@ export default {
     }),
     kalturaAvailable() {
       return getKalturaStatus()
+    },
+    disableFields() {
+      return this.useKaltura && !this.kalturaAvailable
     },
     captions: {
       get() {
@@ -227,6 +241,7 @@ export default {
       this.useKaltura = true
       this.setKalturaVideo(this.kalturaId)
     }
+    this.disableKalturaToggle = !this.kalturaAvailable && !this.useKaltura
   },
   methods: {
     ...mapMutations(["setCurrentEditingNodeProperty", "addApiError"]),
@@ -255,7 +270,9 @@ export default {
         this.update("mediaFormat", "kaltura")
         this.getKalturaCaptions(this.kalturaId)
       } else {
-        this.clearCaptions()
+        if (this.kalturaAvailable) {
+          this.clearCaptions()
+        } // Keep captions if Kaltura not available
         this.updateMediaFormat(this.youtubeId)
       }
     },
