@@ -818,6 +818,12 @@ export default {
         }
 
         if (this.node.mediaFormat === "kaltura") {
+          this.update("typeData.kalturaData.id", this.node.typeData.kalturaId)
+          this.update("typeData.kalturaData.partnerId", wp.data.kaltura.partnerId)
+          this.update(
+            "typeData.kalturaData.uniqueConfiguration",
+            wp.data.kaltura.uniqueConfiguration
+          )
           await this.updateKalturaVideoMediaURL()
         }
 

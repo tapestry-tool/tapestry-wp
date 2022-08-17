@@ -11,7 +11,6 @@
 /*global kWidget*/
 
 import client from "@/services/TapestryAPI"
-import { data as wpData } from "@/services/wp"
 
 export default {
   name: "kaltura-video-media",
@@ -70,8 +69,8 @@ export default {
   },
   created() {
     const kalturaScript = document.createElement("script")
-    const partnerId = wpData.kaltura.partnerId
-    const uniqueConfiguration = wpData.kaltura.uniqueConfiguration
+    const partnerId = this.node.typeData.kalturaData.partnerId
+    const uniqueConfiguration = this.node.typeData.kalturaData.uniqueConfiguration
     kalturaScript.src = `https://admin.video.ubc.ca/p/${partnerId}/sp/${partnerId}00/embedIframeJs/uiconf_id/${uniqueConfiguration}/partner_id/${partnerId}`
 
     kalturaScript.id = "kaltura-script"
