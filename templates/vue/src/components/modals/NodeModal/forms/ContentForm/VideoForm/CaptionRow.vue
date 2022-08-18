@@ -24,7 +24,7 @@
       </div>
       <div class="ml-auto d-flex align-items-center">
         <b-form-checkbox v-model="caption.displayOnPlayer" switch class="mr-3">
-          Display in player
+          {{ caption.displayOnPlayer ? "Show in player" : "Hide in player" }}
         </b-form-checkbox>
         <b-button
           class="mr-1"
