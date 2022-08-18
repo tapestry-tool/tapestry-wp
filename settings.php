@@ -74,7 +74,7 @@ function tapestry_kaltura_section_cb()
         <br/>
         <label for="use_kaltura_player">
             <input type="checkbox" id="use_kaltura_player" name="use_kaltura_player" value="1"/>
-            Switch videos that uploaded successfully to use Kaltura media player
+            Switch videos that uploaded successfully to use Kaltura media player (only applies to Video nodes)
         </label>
     </p>
     <p>
