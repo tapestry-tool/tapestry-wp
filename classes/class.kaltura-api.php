@@ -325,9 +325,9 @@
             $results = [];
             $pending = [];
 
-            // Caption metadata (language, label) and content (VTT file) are set in separate requests, so address errors separately.
+            // Caption metadata (language, label) and content (VTT/SRT file) are set in separate requests, so address errors separately.
             $metadataErrorMessage = 'Please check the language and label.';
-            $contentErrorMessage = 'Please check the .vtt file you provided.';
+            $contentErrorMessage = 'Please check the .vtt or .srt file you provided.';
 
             foreach ($toAdd as $caption) {
                 $metadataResponse = $responses[$caption->metadataRequestIndex];
