@@ -1950,7 +1950,7 @@ function updateConvertingVideos($request)
                     TapestryHelpers::saveAndDeleteLocalVideo($node, $response, $use_kaltura_player, $file_path);
 
                     $video->currentStatus = UploadStatus::COMPLETE;
-                } else {
+                } elseif ($response->status !== EntryStatus::PRECONVERT) {
                     TapestryHelpers::saveVideoUploadStatusInNode($node, UploadStatus::ERROR, $response);
                     $video->currentStatus = UploadStatus::ERROR;
                     if ($response->status === EntryStatus::ERROR_CONVERTING) {
