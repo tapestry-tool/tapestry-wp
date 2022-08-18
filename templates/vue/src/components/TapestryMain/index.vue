@@ -183,6 +183,7 @@ export default {
     if (y && !isNaN(y)) {
       this.offset.y = Number(y)
     }
+    this.clampOffset()
   },
   mounted() {
     if (this.dragSelectEnabled) {
@@ -231,6 +232,23 @@ export default {
         this.scaleConstants.minTapestrySizeToScreen
       )
     },
+    clampOffset() {
+      const maxOffsetProportion = 0.1
+      const minOffsetX = Math.min(0, -1 * this.viewBox[2] * maxOffsetProportion)
+      const maxOffsetX = Math.max(
+        0,
+        this.viewBox[2] * (this.scale - (1 - maxOffsetProportion))
+      )
+      // console.log("x:", this.offset.x, minOffsetX, maxOffsetX)
+      this.offset.x = Math.max(Math.min(this.offset.x, maxOffsetX), minOffsetX)
+      const minOffsetY = Math.min(0, -1 * this.viewBox[3] * maxOffsetProportion)
+      const maxOffsetY = Math.max(
+        0,
+        this.viewBox[3] * (this.scale - (1 - maxOffsetProportion))
+      )
+      // console.log("y:", this.offset.y, minOffsetY, maxOffsetY)
+      this.offset.y = Math.max(Math.min(this.offset.y, maxOffsetY), minOffsetY)
+    },
     fetchAppDimensions() {
       const { width, height } = this.$refs.app.getBoundingClientRect()
       this.appDimensions = {
@@ -264,6 +282,7 @@ export default {
       // update the offset so that it zooms in to the cursor position
       this.offset.x += newRelativeX - relativeX
       this.offset.y += newRelativeY - relativeY
+      this.clampOffset()
 
       this.scale = newScale
     },
@@ -279,11 +298,13 @@ export default {
       dy = (dy / height) * this.viewBox[3]
       this.offset.x -= dx
       this.offset.y -= dy
+      this.clampOffset()
     },
     handleMinimapPanBy({ dx, dy }) {
       // dx, dy passed here is in viewBox dimensions, not screen pixels; we apply the changes to the offset directly, bypassing the calculations in handlePan
       this.offset.x -= dx * this.scaleConstants.panSensitivity * this.scale
       this.offset.y -= dy * this.scaleConstants.panSensitivity * this.scale
+      this.clampOffset()
       this.zoomPanHelper.onPanEnd()
     },
     handleMinimapPanTo({ x, y }) {
@@ -293,6 +314,7 @@ export default {
       const scaledY = y * this.scale
       this.offset.x = scaledX - this.viewBox[2] / 2
       this.offset.y = scaledY - this.viewBox[3] / 2
+      this.clampOffset()
       this.updateOffset()
     },
     updateScale() {
