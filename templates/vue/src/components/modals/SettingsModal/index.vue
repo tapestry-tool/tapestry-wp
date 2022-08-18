@@ -347,6 +347,7 @@ import ImportExportWarnings from "@/components/common/ImportExportWarnings"
 import DragSelectModular from "@/utils/dragSelectModular"
 import { data as wpData } from "@/services/wp"
 import client from "@/services/TapestryAPI"
+import WordpressApi from "@/services/WordpressApi"
 
 const defaultPermissions = Object.fromEntries(
   [
@@ -542,6 +543,10 @@ export default {
     },
     async exportTapestryAsZip() {
       this.isExporting = true
+
+      // Rebuild H5P cache before exporting to ensure H5P export files are up to date
+      await WordpressApi.rebuildAllH5PCache()
+
       const exportedTapestry = await this.getTapestryExportAsZip()
       if (!exportedTapestry) {
         this.isExporting = false
