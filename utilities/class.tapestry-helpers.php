@@ -445,7 +445,7 @@ class TapestryHelpers
             // URL videos can be uploaded if mediaURL is a local upload on this site
             $upload_dir_url = wp_upload_dir()['baseurl'];
             return substr($node->getTypeData()->mediaURL, 0, strlen($upload_dir_url)) === $upload_dir_url;
-        } elseif ($nodeMeta->mediaType === 'h5p') {
+        } elseif (H5P_DEFINED && $nodeMeta->mediaType === 'h5p') {
             // H5P videos can be uploaded if the video 'path' attribute is a relative path
             $h5pId = self::getH5PIdFromMediaURL($node->getTypeData()->mediaURL);
             $videoPathOrUrl = self::_getH5PVideoURL($h5pId);
