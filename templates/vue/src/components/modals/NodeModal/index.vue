@@ -834,7 +834,7 @@ export default {
           await this.setLinkData()
         }
 
-        if (this.node.mediaFormat === "kaltura") {
+        if (this.node.mediaFormat === "kaltura" && wp.getKalturaStatus()) {
           if (!this.node.typeData.kalturaData) {
             this.update("typeData.kalturaData", {
               id: this.node.typeData.kalturaId,
@@ -1075,11 +1075,13 @@ export default {
           ) {
             errMsgs.push("Please upload a WebVTT or SRT file for each caption")
           }
-          const validKalturaVideo = await client.checkKalturaVideo(
-            this.node.typeData.kalturaId
-          )
-          if (!validKalturaVideo) {
-            errMsgs.push("Please enter a valid Kaltura video ID")
+          if (wp.getKalturaStatus()) {
+            const validKalturaVideo = await client.checkKalturaVideo(
+              this.node.typeData.kalturaId
+            )
+            if (!validKalturaVideo) {
+              errMsgs.push("Please enter a valid Kaltura video ID")
+            }
           }
         } else {
           if (
@@ -1234,7 +1236,9 @@ export default {
         let data
 
         if (this.node.mediaFormat === "kaltura") {
-          data = await client.getKalturaVideoMeta(this.node.typeData.kalturaId)
+          if (wp.getKalturaStatus()) {
+            data = await client.getKalturaVideoMeta(this.node.typeData.kalturaId)
+          }
         } else {
           const url = this.node.typeData.mediaURL
           data = (await getLinkMetadata(url)).data
