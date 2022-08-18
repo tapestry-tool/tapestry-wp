@@ -33,7 +33,7 @@
           :disabled="disabled"
           class="mr-3"
         >
-          Display in player
+          {{ caption.displayOnPlayer ? "Show in player" : "Hide in player" }}
         </b-form-checkbox>
         <b-button
           class="mr-1"
@@ -48,6 +48,7 @@
           v-if="isPending"
           size="sm"
           variant="primary"
+          class="mr-1"
           :disabled="disabled"
           @click="$emit('move')"
         >
@@ -57,11 +58,23 @@
           v-else
           size="sm"
           variant="primary"
+          class="mr-1"
           :disabled="disabled || isDefault"
           :data-qa="`caption-set-default-button-${index}`"
           @click="$emit('setDefault', caption.id)"
         >
           Set as default
+        </b-button>
+        <b-button
+          size="sm"
+          variant="primary"
+          class="download-button"
+          :href="caption.captionUrl"
+          :disabled="!caption.captionUrl"
+          target="_blank"
+          download
+        >
+          Download
         </b-button>
       </div>
     </b-row>
@@ -205,3 +218,13 @@ export default {
   },
 }
 </script>
+
+<style lang="scss" scoped>
+.download-button {
+  color: inherit !important; // Override Tapestry link styling
+
+  &:focus {
+    text-decoration: none; // Prevent underline when focused
+  }
+}
+</style>

@@ -28,7 +28,7 @@
           style="display:inline-block;"
           @change="handleFormatChange($event)"
         >
-          Use Kaltura Player
+          {{ useKaltura ? "Use Kaltura Player" : "Use Regular Player" }}
         </b-form-checkbox>
       </b-col>
     </b-row>
