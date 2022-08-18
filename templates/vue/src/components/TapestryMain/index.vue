@@ -67,6 +67,7 @@ import Helpers from "@/utils/Helpers"
 import ZoomPanHelper from "@/utils/ZoomPanHelper"
 import { names } from "@/config/routes"
 import * as wp from "@/services/wp"
+import { interpolateDelta } from "@/utils/interpolate"
 // import { scaleConstants } from "@/utils/constants"
 
 export default {
@@ -211,7 +212,8 @@ export default {
         this.updateOffset()
         this.fetchAppDimensions()
       },
-      [this.$refs.minimap.$el]
+      [this.$refs.minimap.$el],
+      ["vue-svg"]
     )
     this.zoomPanHelper.register()
   },
@@ -390,11 +392,22 @@ export default {
       return box
     },
     handleNodeClick({ event, level }) {
+      // zoom to the level that the node is on, and pan towards the node
       const baseRadius = Helpers.getNodeBaseRadius(level, this.maxLevel)
       const targetScale = 140 / baseRadius
       const deltaScale = targetScale - this.scale
-      this.handleZoom(deltaScale, event.offsetX, event.offsetY)
-      this.updateScale()
+      const { offsetX, offsetY } = event
+      interpolateDelta(
+        0,
+        deltaScale,
+        Math.abs(deltaScale * 600),
+        delta => {
+          this.handleZoom(delta, offsetX, offsetY)
+        },
+        () => {
+          this.updateScale()
+        }
+      )
     },
     handleMouseover(id) {
       const node = this.nodes[id]
