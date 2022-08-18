@@ -417,8 +417,8 @@ class TapestryHelpers
     }
 
     /**
-     * Checks if a video can be uploaded to Kaltura.
-     * Only videos added via upload to WordPress can be transferred to Kaltura.
+     * Checks if a node with video content can be uploaded to Kaltura.
+     * Only H5P or Video nodes whose videos are local uploads can be transferred to Kaltura.
      *
      * @param TapestryNode  $node
      * @return bool
@@ -443,7 +443,12 @@ class TapestryHelpers
         return false;
     }
 
-    // Assumes node is valid local upload
+    /**
+     * Gets the file path of the video file in an H5P video.
+     * Assumes that the video is stored locally (check before calling this function).
+     * 
+     * @param TapestryNode $node    H5P node.
+     */
     public static function getPathToH5PVideo($node)
     {
         if (!H5P_DEFINED) {
@@ -466,12 +471,25 @@ class TapestryHelpers
         ];
     }
 
+    /**
+     * Gets the H5P id from the mediaURL of an H5P node
+     * Example: extracts '3' from 'http://localhost/wordpress/wp-admin/admin-ajax.php?action=h5p_embed&id=3'
+     * 
+     * @param string $mediaURL
+     * @return string
+     */
     public static function getH5PIdFromMediaURL($mediaURL)
     {
         $urlParts = explode('&id=', $mediaURL);
         return count($urlParts) >= 2 ? $urlParts[1] : null;
     }
 
+    /**
+     * Gets the video source (URL or path) from an H5P content, by the H5P ID
+     * 
+     * @param string|int $h5pId
+     * @return string|null          Returns null if the H5P ID is invalid or the H5P an interactive video
+     */
     private static function _getH5PVideoURL($h5pId)
     {
         $controller = new TapestryH5P();
@@ -483,6 +501,12 @@ class TapestryHelpers
         return null;
     }
 
+    /**
+     * Updates the video source of an H5P content
+     * 
+     * @param TapestryNode $node    H5P node
+     * @param string $newVideoUrl   New video source
+     */
     private static function _updateH5PVideoURL($node, $newVideoUrl) {
         if (H5P_DEFINED) {
             $controller = new TapestryH5P();
