@@ -465,7 +465,7 @@ class TapestryHelpers
             return true;
         }
 
-        $file = self::getPathToMedia($node);
+        $file = self::getPathToMedia($node->getTypeData()->mediaURL);
         $filesize = self::_realFileSize($file->file_path);
 
         return $filesize <= $user_defined_max_upload_size;
