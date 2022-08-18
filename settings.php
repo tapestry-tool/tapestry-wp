@@ -88,6 +88,7 @@ function tapestry_kaltura_section_cb()
             <th>Tapestry ID</th>
             <th>Node ID</th>
             <th>Node Title</th>
+            <th>Node Type</th>
             <th>Kaltura ID</th>
             <th>Previous Status</th>
             <th>Current Status</th>

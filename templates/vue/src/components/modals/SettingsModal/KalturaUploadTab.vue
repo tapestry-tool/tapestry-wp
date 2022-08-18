@@ -109,6 +109,10 @@
           class: 'align-top',
         },
         {
+          key: 'nodeType',
+          class: 'align-top',
+        },
+        {
           key: 'uploadStatus',
           class: 'align-top',
         },

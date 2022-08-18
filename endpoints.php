@@ -1788,6 +1788,7 @@ function create_upload_log($videos)
                 'tapestryID' => $video->tapestryID,
                 'nodeID' => $video->nodeID,
                 'nodeTitle' => $node->getTitle(),
+                'nodeType' => $node->getMeta()->mediaType === 'video' ? 'Video' : 'H5P',
                 'uploadStatus' => UploadStatus::NOT_STARTED,
                 'kalturaID' => '',
                 'additionalInfo' => '',
@@ -1828,6 +1829,7 @@ function update_upload_log($videos)
             'tapestryID' => $video->tapestryID,
             'nodeID' => $video->nodeID,
             'nodeTitle' => $video->nodeTitle,
+            'nodeType' => $video->nodeType,
             'uploadStatus' => $video->uploadStatus,
             'kalturaID' => $video->kalturaID,
             'additionalInfo' => $video->additionalInfo,
@@ -1851,7 +1853,8 @@ function update_upload_log($videos)
  *   {
  *     tapestryID: 7746,
  *     nodeID: 13004,
- *     nodeTitle: "Video",
+ *     nodeTitle: "My Video",
+ *     nodeType: "Video",
  *     uploadStatus: "Converting",
  *     kalturaID: "0_c7syr9zv",
  *     additionalInfo: ""
@@ -1944,6 +1947,7 @@ function updateConvertingVideos($request)
                     'tapestryID' => $post->ID,
                     'nodeID' => $nodeID,
                     'nodeTitle' => $node->getTitle(),
+                    'nodeType' => $node->getMeta()->mediaType === 'video' ? 'Video' : 'H5P',
                     'kalturaID' => $kalturaID,
                     'previousStatus' => UploadStatus::CONVERTING,
                     'currentStatus' => UploadStatus::CONVERTING,
