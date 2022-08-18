@@ -1979,6 +1979,7 @@ function updateConvertingVideos($request)
 
                         $file_path = TapestryHelpers::getPathToMedia($node->getTypeData()->mediaURL)->file_path;
                         TapestryHelpers::saveAndDeleteLocalVideo($node, $response, $use_kaltura_player, $file_path);
+
                         $video->currentStatus = UploadStatus::COMPLETE;
 
                         $failed_captions = TapestryHelpers::uploadVideoCaptions($node, $kaltura_api, $response);
