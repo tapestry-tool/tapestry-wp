@@ -1953,7 +1953,13 @@ function updateConvertingVideos($request)
                 if ($response->status === EntryStatus::READY) {
                     TapestryHelpers::saveVideoUploadStatusInNode($node, UploadStatus::COMPLETE, $response);
 
-                    $file_path = TapestryHelpers::getPathToMedia($node->getTypeData()->mediaURL)->file_path;
+                    $nodeMeta = $node->getMeta();
+                    if ($nodeMeta->mediaType === 'video') {
+                        $file_path = TapestryHelpers::getPathToMedia($node->getTypeData()->mediaURL)->file_path;
+                    } else if ($nodeMeta->mediaType === 'h5p') {
+                        $file_path = TapestryHelpers::getPathToH5PVideo($node)->file_path;
+                    }
+
                     TapestryHelpers::saveAndDeleteLocalVideo($node, $response, $use_kaltura_player, $file_path);
 
                     $video->currentStatus = UploadStatus::COMPLETE;
