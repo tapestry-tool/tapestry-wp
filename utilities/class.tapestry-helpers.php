@@ -346,12 +346,10 @@ class TapestryHelpers
      */
     public static function saveAndDeleteLocalVideo($node, $kalturaData, $useKalturaPlayer, $videoPath)
     {
-        $newVideoUrl = $kalturaData->dataUrl.'?.mp4';
-
         $nodeMeta = $node->getMeta();
         if ($nodeMeta->mediaType === 'video') {
             $typeData = $node->getTypeData();
-            $typeData->mediaURL = $newVideoUrl;
+            $typeData->mediaURL = $kalturaData->dataUrl.'?.mp4';
             $typeData->kalturaId = $kalturaData->id;
 
             // Save Kaltura account info so we can still show Kaltura player, even if LOAD_KALTURA is currently false
@@ -365,8 +363,8 @@ class TapestryHelpers
             if ($useKalturaPlayer) {
                 $node->set((object) ['mediaFormat' => 'kaltura']);
             }
-        } else if ($nodeMeta->mediaType === 'h5p') {
-            self::_updateH5PVideoURL($node, $newVideoUrl);
+        } elseif ($nodeMeta->mediaType === 'h5p') {
+            self::_updateH5PVideoURL($node, $kalturaData->dataUrl);
         }
 
         $node->save();
@@ -375,8 +373,24 @@ class TapestryHelpers
     }
 
     /**
-     * Get the file path of a local WordPress upload by its URL.
+     * Returns the path to the video in a H5P or Video node.
      * 
+     * @param TapestryNode $node
+     */
+    public static function getVideoPath($node)
+    {
+        $nodeMeta = $node->getMeta();
+        if ($nodeMeta->mediaType === 'video') {
+            return self::getPathToMedia($node->getTypeData()->mediaURL);
+        } elseif ($nodeMeta->mediaType === 'h5p') {
+            return self::getPathToH5PVideo($node);
+        }
+        return null;
+    }
+
+    /**
+     * Get the file path of a local WordPress upload by its URL.
+     *
      * @param string $url
      */
     public static function getPathToMedia($url)
@@ -431,7 +445,7 @@ class TapestryHelpers
             // URL videos can be uploaded if mediaURL is a local upload on this site
             $upload_dir_url = wp_upload_dir()['baseurl'];
             return substr($node->getTypeData()->mediaURL, 0, strlen($upload_dir_url)) === $upload_dir_url;
-        } else if ($nodeMeta->mediaType === 'h5p') {
+        } elseif ($nodeMeta->mediaType === 'h5p') {
             // H5P videos can be uploaded if the video 'path' attribute is a relative path
             $h5pId = self::getH5PIdFromMediaURL($node->getTypeData()->mediaURL);
             $videoPathOrUrl = self::_getH5PVideoURL($h5pId);
@@ -445,8 +459,8 @@ class TapestryHelpers
 
     /**
      * Gets the file path of the video file in an H5P video.
-     * Assumes that the video is stored locally (check before calling this function).
-     * 
+     * Assumes that the video is a local upload.
+     *
      * @param TapestryNode $node    H5P node.
      */
     public static function getPathToH5PVideo($node)
@@ -474,7 +488,7 @@ class TapestryHelpers
     /**
      * Gets the H5P id from the mediaURL of an H5P node
      * Example: extracts '3' from 'http://localhost/wordpress/wp-admin/admin-ajax.php?action=h5p_embed&id=3'
-     * 
+     *
      * @param string $mediaURL
      * @return string
      */
@@ -486,7 +500,7 @@ class TapestryHelpers
 
     /**
      * Gets the video source (URL or path) from an H5P content, by the H5P ID
-     * 
+     *
      * @param string|int $h5pId
      * @return string|null          Returns null if the H5P ID is invalid or the H5P an interactive video
      */
@@ -503,18 +517,19 @@ class TapestryHelpers
 
     /**
      * Updates the video source of an H5P content
-     * 
+     *
      * @param TapestryNode $node    H5P node
      * @param string $newVideoUrl   New video source
      */
-    private static function _updateH5PVideoURL($node, $newVideoUrl) {
+    private static function _updateH5PVideoURL($node, $newVideoUrl)
+    {
         if (H5P_DEFINED) {
             $controller = new TapestryH5P();
             $h5pId = self::getH5PIdFromMediaURL($node->getTypeData()->mediaURL);
             $metadata = $controller->getMetadata($h5pId);
             $params = json_decode($metadata->parameters);
             $params->interactiveVideo->video->files[0]->path = $newVideoUrl;
-    
+
             $h5pInterface = H5P_Plugin::get_instance()->get_h5p_instance('interface');
             $h5pInterface->updateContent([
                 'id' => $h5pId,
@@ -534,7 +549,7 @@ class TapestryHelpers
     /**
      * Checks if the user has defined a maximum video upload size for Kaltura that is smaller than the WordPress max upload size,
      * and if so, whether a video is too large to be uploaded.
-     * 
+     *
      * @param TapestryNode  $node
      * @return boolean  True if the user has defined no maximum video upload size, or it is not smaller than the WordPress max upload size.
      *                  Otherwise, returns true if the video is within the user-defined limit.
@@ -551,13 +566,7 @@ class TapestryHelpers
             return true;
         }
 
-        $nodeMeta = $node->getMeta();
-        if ($nodeMeta->mediaType === 'video') {
-            $file_obj = self::getPathToMedia($node->getTypeData()->mediaURL);
-        } else if ($nodeMeta->mediaType === 'h5p') {
-            $file_obj = self::getPathToH5PVideo($node);
-        }
-
+        $file_obj = self::getVideoPath($node);
         $filesize = self::_realFileSize($file_obj->file_path);
 
         return $filesize <= $user_defined_max_upload_size;

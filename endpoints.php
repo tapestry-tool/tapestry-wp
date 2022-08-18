@@ -1671,7 +1671,7 @@ function cleanUpKalturaUpload()
  *                              [nodeID] => 123,
  *                          )
  *                          Nodes are checked to be videos and to be local Wordpress uploads before being uploaded to Kaltura.
- * @param bool $use_kaltura_player   Whether to switch uploaded videos to use the Kaltura media player.
+ * @param bool $use_kaltura_player   Whether to switch uploaded videos to use the Kaltura media player (Video nodes only).
  *
  * @return int The number of videos that were successfully uploaded.
  */
@@ -1789,17 +1789,11 @@ function create_upload_log($videos)
                 'nodeID' => $video->nodeID,
                 'nodeTitle' => $node->getTitle(),
                 'nodeType' => $node->getMeta()->mediaType === 'video' ? 'Video' : 'H5P',
+                'file' => TapestryHelpers::getVideoPath($node),
                 'uploadStatus' => UploadStatus::NOT_STARTED,
                 'kalturaID' => '',
                 'additionalInfo' => '',
             ];
-
-            $nodeMeta = $node->getMeta();
-            if ($nodeMeta->mediaType === 'video') {
-                $video_info->file = TapestryHelpers::getPathToMedia($node->getTypeData()->mediaURL);
-            } else if ($nodeMeta->mediaType === 'h5p') {
-                $video_info->file = TapestryHelpers::getPathToH5PVideo($node);
-            }
 
             array_push($upload_log, $video_info);
 
@@ -1957,12 +1951,7 @@ function updateConvertingVideos($request)
                 if ($response->status === EntryStatus::READY) {
                     TapestryHelpers::saveVideoUploadStatusInNode($node, UploadStatus::COMPLETE, $response);
 
-                    $nodeMeta = $node->getMeta();
-                    if ($nodeMeta->mediaType === 'video') {
-                        $file_path = TapestryHelpers::getPathToMedia($node->getTypeData()->mediaURL)->file_path;
-                    } else if ($nodeMeta->mediaType === 'h5p') {
-                        $file_path = TapestryHelpers::getPathToH5PVideo($node)->file_path;
-                    }
+                    $file_path = TapestryHelpers::getVideoPath($node)->file_path;
 
                     TapestryHelpers::saveAndDeleteLocalVideo($node, $response, $use_kaltura_player, $file_path);
 
