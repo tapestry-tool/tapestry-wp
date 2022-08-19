@@ -233,21 +233,35 @@ export default {
       )
     },
     clampOffset() {
-      const maxOffsetProportion = 0.1
-      const minOffsetX = Math.min(0, -1 * this.viewBox[2] * maxOffsetProportion)
-      const maxOffsetX = Math.max(
-        0,
-        this.viewBox[2] * (this.scale - (1 - maxOffsetProportion))
-      )
-      // console.log("x:", this.offset.x, minOffsetX, maxOffsetX)
-      this.offset.x = Math.max(Math.min(this.offset.x, maxOffsetX), minOffsetX)
-      const minOffsetY = Math.min(0, -1 * this.viewBox[3] * maxOffsetProportion)
-      const maxOffsetY = Math.max(
-        0,
-        this.viewBox[3] * (this.scale - (1 - maxOffsetProportion))
-      )
-      // console.log("y:", this.offset.y, minOffsetY, maxOffsetY)
-      this.offset.y = Math.max(Math.min(this.offset.y, maxOffsetY), minOffsetY)
+      if (this.scaleConstants.disableOffsetClamp) {
+        return
+      }
+      const maxNodeSize = Helpers.getNodeRadius(1, this.maxLevel, this.scale)
+      if (this.scale < 1) {
+        const centerX = (-1 * this.viewBox[2] * (1 - this.scale)) / 2
+        this.offset.x = Math.max(
+          Math.min(this.offset.x, centerX + maxNodeSize),
+          centerX - maxNodeSize
+        )
+        const centerY = (-1 * this.viewBox[3] * (1 - this.scale)) / 2
+        this.offset.y = Math.max(
+          Math.min(this.offset.y, centerY + maxNodeSize),
+          centerY - maxNodeSize
+        )
+      } else {
+        const minOffsetX = Math.min(0, -1 * maxNodeSize)
+        const maxOffsetX =
+          this.scale >= 1
+            ? this.viewBox[2] * (this.scale - 1) + maxNodeSize
+            : this.viewBox[2] - this.viewBox[2] * this.scale + maxNodeSize
+        this.offset.x = Math.max(Math.min(this.offset.x, maxOffsetX), minOffsetX)
+        const minOffsetY = Math.min(0, -1 * maxNodeSize)
+        const maxOffsetY =
+          this.scale >= 1
+            ? this.viewBox[3] * (this.scale - 1) + maxNodeSize
+            : maxNodeSize
+        this.offset.y = Math.max(Math.min(this.offset.y, maxOffsetY), minOffsetY)
+      }
     },
     fetchAppDimensions() {
       const { width, height } = this.$refs.app.getBoundingClientRect()
