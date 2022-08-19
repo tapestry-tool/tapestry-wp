@@ -9,7 +9,7 @@
  */
 
 // Used to force-refresh assets and run updates
-$TAPESTRY_VERSION_NUMBER = '2.55.0-beta';
+$TAPESTRY_VERSION_NUMBER = '2.56.0-beta';
 
 error_reporting(E_ERROR | E_PARSE);
 
