@@ -95,7 +95,7 @@ export default {
       */
     },
     maxDepth() {
-      return this.maxLevel
+      return this.maxLevel - 1
       // return this.levels.length
     },
     zoomInBg() {

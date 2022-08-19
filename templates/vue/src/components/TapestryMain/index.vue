@@ -75,6 +75,7 @@ import Helpers from "@/utils/Helpers"
 import ZoomPanHelper from "@/utils/ZoomPanHelper"
 import { names } from "@/config/routes"
 import * as wp from "@/services/wp"
+import { interpolateDelta } from "@/utils/interpolate"
 // import { scaleConstants } from "@/utils/constants"
 
 export default {
@@ -233,6 +234,7 @@ export default {
     if (y && !isNaN(y)) {
       this.offset.y = Number(y)
     }
+    this.clampOffset()
   },
   mounted() {
     if (this.dragSelectEnabled) {
@@ -262,7 +264,8 @@ export default {
         this.updateOffset()
         this.fetchAppDimensions()
       },
-      [this.$refs.minimap.$el]
+      [this.$refs.minimap.$el],
+      ["vue-svg"]
     )
     this.zoomPanHelper.register()
 
@@ -291,6 +294,37 @@ export default {
         Math.min(scale, this.maxScale),
         this.scaleConstants.minTapestrySizeToScreen
       )
+    },
+    clampOffset() {
+      if (this.scaleConstants.disableOffsetClamp) {
+        return
+      }
+      const maxNodeSize = Helpers.getNodeRadius(1, this.maxLevel, this.scale)
+      if (this.scale < 1) {
+        const centerX = (-1 * this.viewBox[2] * (1 - this.scale)) / 2
+        this.offset.x = Math.max(
+          Math.min(this.offset.x, centerX + maxNodeSize),
+          centerX - maxNodeSize
+        )
+        const centerY = (-1 * this.viewBox[3] * (1 - this.scale)) / 2
+        this.offset.y = Math.max(
+          Math.min(this.offset.y, centerY + maxNodeSize),
+          centerY - maxNodeSize
+        )
+      } else {
+        const minOffsetX = Math.min(0, -1 * maxNodeSize)
+        const maxOffsetX =
+          this.scale >= 1
+            ? this.viewBox[2] * (this.scale - 1) + maxNodeSize
+            : this.viewBox[2] - this.viewBox[2] * this.scale + maxNodeSize
+        this.offset.x = Math.max(Math.min(this.offset.x, maxOffsetX), minOffsetX)
+        const minOffsetY = Math.min(0, -1 * maxNodeSize)
+        const maxOffsetY =
+          this.scale >= 1
+            ? this.viewBox[3] * (this.scale - 1) + maxNodeSize
+            : maxNodeSize
+        this.offset.y = Math.max(Math.min(this.offset.y, maxOffsetY), minOffsetY)
+      }
     },
     fetchAppDimensions() {
       const { width, height } = this.$refs.app.getBoundingClientRect()
@@ -325,6 +359,7 @@ export default {
       // update the offset so that it zooms in to the cursor position
       this.offset.x += newRelativeX - relativeX
       this.offset.y += newRelativeY - relativeY
+      this.clampOffset()
 
       this.scale = newScale
     },
@@ -340,11 +375,13 @@ export default {
       dy = (dy / height) * this.viewBox[3]
       this.offset.x -= dx
       this.offset.y -= dy
+      this.clampOffset()
     },
     handleMinimapPanBy({ dx, dy }) {
       // dx, dy passed here is in viewBox dimensions, not screen pixels; we apply the changes to the offset directly, bypassing the calculations in handlePan
-      this.offset.x -= dx * this.scaleConstants.panSensitivity
-      this.offset.y -= dy * this.scaleConstants.panSensitivity
+      this.offset.x -= dx * this.scaleConstants.panSensitivity * this.scale
+      this.offset.y -= dy * this.scaleConstants.panSensitivity * this.scale
+      this.clampOffset()
       this.zoomPanHelper.onPanEnd()
     },
     handleMinimapPanTo({ x, y }) {
@@ -354,6 +391,7 @@ export default {
       const scaledY = y * this.scale
       this.offset.x = scaledX - this.viewBox[2] / 2
       this.offset.y = scaledY - this.viewBox[3] / 2
+      this.clampOffset()
       this.updateOffset()
     },
     updateScale() {
@@ -453,11 +491,22 @@ export default {
       return box
     },
     handleNodeClick({ event, level }) {
+      // zoom to the level that the node is on, and pan towards the node
       const baseRadius = Helpers.getNodeBaseRadius(level, this.maxLevel)
       const targetScale = 140 / baseRadius
       const deltaScale = targetScale - this.scale
-      this.handleZoom(deltaScale, event.offsetX, event.offsetY)
-      this.updateScale()
+      const { offsetX, offsetY } = event
+      interpolateDelta(
+        0,
+        deltaScale,
+        Math.abs(deltaScale * 600),
+        delta => {
+          this.handleZoom(delta, offsetX, offsetY)
+        },
+        () => {
+          this.updateScale()
+        }
+      )
     },
     handleMouseover(id) {
       const node = this.nodes[id]

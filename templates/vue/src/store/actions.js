@@ -233,10 +233,20 @@ async function unlockNodes({ commit, getters, dispatch }) {
   }
 }
 
-export async function deleteNode({ commit, dispatch }, id) {
+export async function deleteNode({ commit, dispatch, state, getters }, id) {
   try {
+    const level = getters.getNode(id).level
+
     await client.deleteNode(id)
     commit("deleteNode", id)
+
+    if (level === state.maxLevel) {
+      const remainingLevels = Object.values(state.nodes).map(node => node.level ?? 1)
+      const remainingMaxLevel = remainingLevels.length
+        ? Math.max(...remainingLevels)
+        : 1
+      commit("setMaxLevel", remainingMaxLevel)
+    }
   } catch (error) {
     dispatch("addApiError", error)
   }
