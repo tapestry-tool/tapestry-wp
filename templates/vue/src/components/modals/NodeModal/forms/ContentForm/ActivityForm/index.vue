@@ -399,7 +399,9 @@ export default {
       ]
       // focus the question text input of newly added question
       this.$nextTick(() => {
-        document.getElementById(`question-text${this.questions.length - 1}`)?.focus()
+        document
+          .getElementById(`question-text-${this.questions.length - 1}`)
+          ?.focus()
       })
     },
     deleteQuestion(id) {

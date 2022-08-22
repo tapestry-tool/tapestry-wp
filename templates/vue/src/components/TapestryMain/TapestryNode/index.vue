@@ -329,13 +329,10 @@ export default {
       if (!this.show) {
         return 0
       }
-      if (this.isGrandChild) {
-        return 40
-      }
-      return (
+      const radius =
         Helpers.getNodeRadius(this.node.level, this.maxLevel, this.scale) *
         (this.root ? 1.2 : 1)
-      )
+      return this.isGrandChild ? Math.min(40, radius) : radius
     },
     fill() {
       const showImages = this.settings.hasOwnProperty("renderImages")

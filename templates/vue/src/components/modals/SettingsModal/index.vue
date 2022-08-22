@@ -72,7 +72,7 @@
               v-model="defaultDepth"
               class="depth-slider"
               type="range"
-              min="0"
+              min="1"
               :max="maxDepth || 3"
             ></b-form-input>
             <p class="my-2 p-0 text-muted small">
@@ -80,7 +80,7 @@
               You will need to refresh the page to see this change applied.
             </p>
             <div class="depth-slider-description">
-              Set to 0 to disable depth change. Selected depth: {{ defaultDepth }}
+              Selected depth: {{ defaultDepth }}
             </div>
           </b-form-group>
         </b-tab>
@@ -434,20 +434,26 @@ export default {
   },
   mounted() {
     this.getSettings()
-    this.$root.$on("bv::modal::show", (_, modalId) => {
+    this.$root.$on("bv::modal::show", this.handleModalShow)
+    this.$root.$on("bv::modal::hide", this.handleModalHide)
+  },
+  beforeDestroy() {
+    this.$root.$off("bv::modal::show", this.handleModalShow)
+    this.$root.$off("bv::modal::hide", this.handleModalHide)
+  },
+  methods: {
+    ...mapActions(["getTapestryExport"]),
+    handleModalShow(_, modalId) {
       if (modalId === "settings-modal") {
         DragSelectModular.removeDragSelectListener()
       }
-    })
-    this.$root.$on("bv::modal::hide", (_, modalId) => {
+    },
+    handleModalHide(_, modalId) {
       if (modalId === "settings-modal") {
         DragSelectModular.addDragSelectListener()
         this.$emit("close")
       }
-    })
-  },
-  methods: {
-    ...mapActions(["getTapestryExport"]),
+    },
     closeModal() {
       this.$emit("close")
     },
