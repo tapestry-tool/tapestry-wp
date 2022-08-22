@@ -13,6 +13,7 @@
     </div>
     <svg
       v-else
+      id="vue-svg"
       ref="vue-svg"
       role="application"
       aria-label="Main Tapestry View"
