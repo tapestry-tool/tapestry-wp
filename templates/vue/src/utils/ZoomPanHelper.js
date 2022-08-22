@@ -209,7 +209,8 @@ class ZoomPanHelper {
         },
         () => {
           this.onZoomEnd()
-        }
+        },
+        "easeOut"
       )
       this.lastClickTime = null // to prevent triple clicks...
     } else {

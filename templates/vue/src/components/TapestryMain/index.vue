@@ -75,7 +75,7 @@ import Helpers from "@/utils/Helpers"
 import ZoomPanHelper from "@/utils/ZoomPanHelper"
 import { names } from "@/config/routes"
 import * as wp from "@/services/wp"
-import { interpolateDelta } from "@/utils/interpolate"
+import { interpolate, interpolateDelta } from "@/utils/interpolate"
 // import { scaleConstants } from "@/utils/constants"
 
 export default {
@@ -296,34 +296,40 @@ export default {
       )
     },
     clampOffset() {
+      const { x, y } = this.clampOffsetValue(this.offset)
+      this.offset.x = x
+      this.offset.y = y
+    },
+    clampOffsetValue(offset, scale) {
       if (this.scaleConstants.disableOffsetClamp) {
-        return
+        return offset
       }
-      const maxNodeSize = Helpers.getNodeRadius(1, this.maxLevel, this.scale)
-      if (this.scale < 1) {
-        const centerX = (-1 * this.viewBox[2] * (1 - this.scale)) / 2
-        this.offset.x = Math.max(
-          Math.min(this.offset.x, centerX + maxNodeSize),
-          centerX - maxNodeSize
-        )
-        const centerY = (-1 * this.viewBox[3] * (1 - this.scale)) / 2
-        this.offset.y = Math.max(
-          Math.min(this.offset.y, centerY + maxNodeSize),
-          centerY - maxNodeSize
-        )
+      if (!scale) {
+        scale = this.scale
+      }
+      const maxNodeSize = Helpers.getNodeRadius(1, this.maxLevel, scale)
+      if (scale < 1) {
+        const centerX = (-1 * this.viewBox[2] * (1 - scale)) / 2
+        const centerY = (-1 * this.viewBox[3] * (1 - scale)) / 2
+        return {
+          x: Math.max(
+            Math.min(offset.x, centerX + maxNodeSize),
+            centerX - maxNodeSize
+          ),
+          y: Math.max(
+            Math.min(offset.y, centerY + maxNodeSize),
+            centerY - maxNodeSize
+          ),
+        }
       } else {
         const minOffsetX = Math.min(0, -1 * maxNodeSize)
-        const maxOffsetX =
-          this.scale >= 1
-            ? this.viewBox[2] * (this.scale - 1) + maxNodeSize
-            : this.viewBox[2] - this.viewBox[2] * this.scale + maxNodeSize
-        this.offset.x = Math.max(Math.min(this.offset.x, maxOffsetX), minOffsetX)
+        const maxOffsetX = this.viewBox[2] * (scale - 1) + maxNodeSize
         const minOffsetY = Math.min(0, -1 * maxNodeSize)
-        const maxOffsetY =
-          this.scale >= 1
-            ? this.viewBox[3] * (this.scale - 1) + maxNodeSize
-            : maxNodeSize
-        this.offset.y = Math.max(Math.min(this.offset.y, maxOffsetY), minOffsetY)
+        const maxOffsetY = this.viewBox[3] * (scale - 1) + maxNodeSize
+        return {
+          x: Math.max(Math.min(offset.x, maxOffsetX), minOffsetX),
+          y: Math.max(Math.min(offset.y, maxOffsetY), minOffsetY),
+        }
       }
     },
     fetchAppDimensions() {
@@ -393,6 +399,57 @@ export default {
       this.offset.y = scaledY - this.viewBox[3] / 2
       this.clampOffset()
       this.updateOffset()
+    },
+    zoomToAndCenterNode(node) {
+      const baseRadius = Helpers.getNodeBaseRadius(node.level, this.maxLevel)
+      const targetScale = 140 / baseRadius
+
+      const targetRadius = Helpers.getNodeRadius(
+        node.level,
+        this.maxLevel,
+        targetScale
+      )
+      const targetViewBoxX = this.unscaledViewBox[0] * targetScale
+      const targetViewBoxY = this.unscaledViewBox[1] * targetScale
+      let targetOffset = {
+        x:
+          node.coordinates.x * targetScale -
+          targetViewBoxX -
+          (this.viewBox[2] - targetRadius) / 2,
+        y:
+          node.coordinates.y * targetScale -
+          targetViewBoxY -
+          (this.viewBox[3] - targetRadius) / 2,
+      }
+      targetOffset = this.clampOffsetValue(targetOffset, targetScale)
+
+      interpolate(
+        {
+          scale: this.scale,
+          offsetX: this.offset.x,
+          offsetY: this.offset.y,
+          viewBoxX: this.viewBox[0],
+          viewBoxY: this.viewBox[1],
+        },
+        {
+          scale: targetScale,
+          offsetX: targetOffset.x,
+          offsetY: targetOffset.y,
+          viewBoxX: targetViewBoxX,
+          viewBoxY: targetViewBoxY,
+        },
+        300,
+        ({ scale, offsetX, offsetY, viewBoxX, viewBoxY }) => {
+          this.scale = scale
+          this.offset.x = offsetX
+          this.offset.y = offsetY
+          this.viewBox[0] = viewBoxX
+          this.viewBox[1] = viewBoxY
+        },
+        () => {
+          this.updateScale()
+        }
+      )
     },
     updateScale() {
       this.$router.push({
@@ -505,7 +562,8 @@ export default {
         },
         () => {
           this.updateScale()
-        }
+        },
+        "easeOut"
       )
     },
     handleMouseover(id) {
@@ -595,6 +653,7 @@ export default {
         query: this.$route.query,
         path: `/nodes/${nodeId}`,
       })
+      this.zoomToAndCenterNode(this.getNode(nodeId))
     },
     getFocusableElement(focused) {
       return document.querySelector(
