@@ -77,9 +77,7 @@
                 v-model="caption.captionUrl"
                 :file-types="isKaltura ? '.vtt, .srt' : '.vtt'"
                 compact-mode
-                :placeholder="
-                  `Enter URL or upload a VTT${isKaltura ? '/SRT' : ''} file`
-                "
+                :placeholder="`Upload a VTT${isKaltura ? ' or SRT' : ''} file`"
                 :is-image="false"
                 :file-upload-id="
                   `caption-file-upload-${isPending ? 'pending' : ''}-${caption.id}`

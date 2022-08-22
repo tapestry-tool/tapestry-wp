@@ -111,7 +111,7 @@ class TapestryError extends Error
             'STATUS' => ['status' => 400],
         ],
         'UPLOAD_FILE_NOT_FOUND' => [
-            'MESSAGE' => 'File was not found on the server',
+            'MESSAGE' => 'Uploaded file was not found on the server',
             'STATUS' => ['status' => 500],
         ],
     ];

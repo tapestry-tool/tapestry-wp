@@ -603,6 +603,7 @@ export default {
       "updateNode",
       "updateLockedStatus",
       "setTapestryErrorReporting",
+      "addApiError",
     ]),
     update(property, value) {
       this.setCurrentEditingNodeProperty({ property, value })
@@ -1347,13 +1348,18 @@ export default {
     async updateKalturaVideoCaptions() {
       if (this.node.typeData.captions) {
         // "Push" changes made to Kaltura captions to Kaltura, then save results in node
+        let result = null
         try {
-          const result = await client.updateKalturaVideoCaptions(
+          result = await client.updateKalturaVideoCaptions(
             this.node.typeData.kalturaId,
             this.node.typeData.captions,
             this.node.typeData.defaultCaptionId
           )
+        } catch (error) {
+          this.addApiError(error)
+        }
 
+        if (result) {
           // Merge old pending captions and new pending captions by caption ID
           const currentPendingCaptions = this.node.typeData.pendingCaptions ?? []
           const newPendingCaptions = result.pendingCaptions
@@ -1366,10 +1372,6 @@ export default {
           this.update("typeData.captions", result.captions)
           this.update("typeData.pendingCaptions", newPendingCaptions)
           this.update("typeData.defaultCaptionId", result.defaultCaptionId)
-        } catch (error) {
-          this.errors.push(
-            "Error uploading captions to Kaltura. Please re-upload or check the provided information."
-          )
         }
       }
     },
