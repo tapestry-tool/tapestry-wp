@@ -1,4 +1,5 @@
 import Helpers from "./Helpers"
+import { interpolateDelta } from "./interpolate"
 class ZoomPanHelper {
   onZoom
   onZoomEnd
@@ -12,8 +13,17 @@ class ZoomPanHelper {
   panPoint
   lastClickTime
   excludedElements
+  clickableDOMIds
 
-  constructor(targetDOMId, onZoom, onZoomEnd, onPan, onPanEnd, excludedElements) {
+  constructor(
+    targetDOMId,
+    onZoom,
+    onZoomEnd,
+    onPan,
+    onPanEnd,
+    excludedElements = [],
+    clickableDOMIds = []
+  ) {
     this.onZoom = onZoom
     this.onZoomEnd = Helpers.debounce(onZoomEnd)
     this.onPan = onPan
@@ -29,7 +39,8 @@ class ZoomPanHelper {
     this.panPoint = { x: 0, y: 0 }
 
     this.lastClickTime = null
-    this.excludedElements = excludedElements ?? []
+    this.excludedElements = excludedElements
+    this.clickableDOMIds = clickableDOMIds
   }
 
   register() {
@@ -174,15 +185,33 @@ class ZoomPanHelper {
   }
 
   clickHandler(e) {
-    if (!e.target.id || e.target.id !== this.targetDOMId) {
+    if (
+      !e.target.id ||
+      !(
+        e.target.id === this.targetDOMId ||
+        this.clickableDOMIds.includes(e.target.id)
+      )
+    ) {
       return
     }
     const time = Date.now()
     if (this.lastClickTime && time - this.lastClickTime <= 300) {
       // the second click of double click
       const scaleDelta = 1
-      this.onZoom(scaleDelta, e.offsetX, e.offsetY)
-      this.onZoomEnd()
+      const { offsetX, offsetY } = e
+      interpolateDelta(
+        0,
+        scaleDelta,
+        600,
+        delta => {
+          this.onZoom(delta, offsetX, offsetY)
+          this.lastClickTime = null
+        },
+        () => {
+          this.onZoomEnd()
+        },
+        "easeOut"
+      )
       this.lastClickTime = null // to prevent triple clicks...
     } else {
       this.lastClickTime = time

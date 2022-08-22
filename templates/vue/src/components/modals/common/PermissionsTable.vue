@@ -29,7 +29,7 @@
                 placeholder="Enter user ID"
               ></b-form-input>
               <b-button variant="secondary" @click="addUserPermissionRow">
-                <span class="fas fa-plus mr-1"></span>
+                <span class="fas fa-plus mr-1" aria-label="Add"></span>
                 User
               </b-button>
             </b-input-group>

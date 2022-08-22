@@ -25,6 +25,7 @@
           :source="nodes[link.source]"
           :target="nodes[link.target]"
           :scale="scale"
+          tabindex="-1"
         ></tapestry-link>
       </g>
       <g v-if="!dragSelectEnabled || dragSelectReady" class="nodes">
@@ -37,6 +38,7 @@
           :class="{ selectable: true }"
           :data-id="id"
           :root="id == selectedId"
+          tabindex="-1"
           @dragend="updateViewBox"
           @mouseover="handleMouseover(id)"
           @mouseleave="activeNode = null"
@@ -80,6 +82,7 @@ import Helpers from "@/utils/Helpers"
 import ZoomPanHelper from "@/utils/ZoomPanHelper"
 import { names } from "@/config/routes"
 import * as wp from "@/services/wp"
+import { interpolate, interpolateDelta } from "@/utils/interpolate"
 // import { scaleConstants } from "@/utils/constants"
 
 export default {
@@ -121,7 +124,32 @@ export default {
       "currentDepth",
       "scaleConstants",
     ]),
-    ...mapGetters(["getNode", "getCurrentNodeNav"]),
+    ...mapGetters(["getNode", "getNodeNavId", "getNodeNavParent"]),
+    nodeNavLinkMode: {
+      get() {
+        return this.$store.state.nodeNavigation.linkMode
+      },
+      set(linkMode) {
+        this.$store.commit("setNodeNavigation", { linkMode })
+      },
+    },
+    focused() {
+      if (this.getNodeNavId === -1) {
+        return null
+      }
+      if (this.nodeNavLinkMode) {
+        return {
+          type: "link",
+          source: this.getNodeNavParent,
+          target: this.getNodeNavId,
+        }
+      } else {
+        return {
+          type: "node",
+          id: this.getNodeNavId,
+        }
+      }
+    },
     computedViewBox() {
       // return this.viewBox.join(" ")
       return `${this.viewBox[0] + this.offset.x} ${this.viewBox[1] +
@@ -190,7 +218,7 @@ export default {
                 }
           )
         }
-        if (nodeId !== this.getCurrentNodeNav) {
+        if (nodeId !== this.getNodeNavId) {
           this.resetNodeNavigation(nodeId)
         }
         this.updateViewBox()
@@ -208,6 +236,17 @@ export default {
         // this.focusSelectedNode()
       }
     },
+    focused: {
+      deep: true,
+      handler(newFocused, oldFocused) {
+        if (oldFocused) {
+          this.getFocusableElement(oldFocused)?.setAttribute("tabindex", "-1")
+        }
+        const el = this.getFocusableElement(newFocused)
+        el?.setAttribute("tabindex", "0")
+        el?.focus()
+      },
+    },
   },
   created() {
     const { scale, x, y } = this.$route.query
@@ -220,6 +259,7 @@ export default {
     if (y && !isNaN(y)) {
       this.offset.y = Number(y)
     }
+    this.clampOffset()
   },
   mounted() {
     if (this.dragSelectEnabled) {
@@ -249,7 +289,8 @@ export default {
         this.updateOffset()
         this.fetchAppDimensions()
       },
-      [this.$refs.minimap.$el]
+      [this.$refs.minimap.$el],
+      ["vue-svg"]
     )
     this.zoomPanHelper.register()
     this.$refs.app.addEventListener("keydown", this.handleKey)
@@ -273,11 +314,8 @@ export default {
     addRootNode() {
       this.$root.$emit("add-node", null)
     },
-    clampScale(scale) {
-      return Math.max(
-        Math.min(scale, this.maxScale),
-        this.scaleConstants.minTapestrySizeToScreen
-      )
+    isLoggedIn() {
+      return wp.isLoggedIn()
     },
     updateAppHeight() {
       if (this.$refs.app) {
@@ -293,6 +331,49 @@ export default {
       this.$nextTick(() => {
         this.updateViewBox()
       })
+    },
+    clampScale(scale) {
+      return Math.max(
+        Math.min(scale, this.maxScale),
+        this.scaleConstants.minTapestrySizeToScreen
+      )
+    },
+    clampOffset() {
+      const { x, y } = this.clampOffsetValue(this.offset)
+      this.offset.x = x
+      this.offset.y = y
+    },
+    clampOffsetValue(offset, scale) {
+      if (this.scaleConstants.disableOffsetClamp) {
+        return offset
+      }
+      if (!scale) {
+        scale = this.scale
+      }
+      const maxNodeSize = Helpers.getNodeRadius(1, this.maxLevel, scale)
+      if (scale < 1) {
+        const centerX = (-1 * this.viewBox[2] * (1 - scale)) / 2
+        const centerY = (-1 * this.viewBox[3] * (1 - scale)) / 2
+        return {
+          x: Math.max(
+            Math.min(offset.x, centerX + maxNodeSize),
+            centerX - maxNodeSize
+          ),
+          y: Math.max(
+            Math.min(offset.y, centerY + maxNodeSize),
+            centerY - maxNodeSize
+          ),
+        }
+      } else {
+        const minOffsetX = Math.min(0, -1 * maxNodeSize)
+        const maxOffsetX = this.viewBox[2] * (scale - 1) + maxNodeSize
+        const minOffsetY = Math.min(0, -1 * maxNodeSize)
+        const maxOffsetY = this.viewBox[3] * (scale - 1) + maxNodeSize
+        return {
+          x: Math.max(Math.min(offset.x, maxOffsetX), minOffsetX),
+          y: Math.max(Math.min(offset.y, maxOffsetY), minOffsetY),
+        }
+      }
     },
     fetchAppDimensions() {
       const { width, height } = this.$refs.app.getBoundingClientRect()
@@ -327,6 +408,7 @@ export default {
       // update the offset so that it zooms in to the cursor position
       this.offset.x += newRelativeX - relativeX
       this.offset.y += newRelativeY - relativeY
+      this.clampOffset()
 
       this.scale = newScale
     },
@@ -342,11 +424,13 @@ export default {
       dy = (dy / height) * this.viewBox[3]
       this.offset.x -= dx
       this.offset.y -= dy
+      this.clampOffset()
     },
     handleMinimapPanBy({ dx, dy }) {
       // dx, dy passed here is in viewBox dimensions, not screen pixels; we apply the changes to the offset directly, bypassing the calculations in handlePan
-      this.offset.x -= dx * this.scaleConstants.panSensitivity
-      this.offset.y -= dy * this.scaleConstants.panSensitivity
+      this.offset.x -= dx * this.scaleConstants.panSensitivity * this.scale
+      this.offset.y -= dy * this.scaleConstants.panSensitivity * this.scale
+      this.clampOffset()
       this.zoomPanHelper.onPanEnd()
     },
     handleMinimapPanTo({ x, y }) {
@@ -356,7 +440,59 @@ export default {
       const scaledY = y * this.scale
       this.offset.x = scaledX - this.viewBox[2] / 2
       this.offset.y = scaledY - this.viewBox[3] / 2
+      this.clampOffset()
       this.updateOffset()
+    },
+    zoomToAndCenterNode(node) {
+      const baseRadius = Helpers.getNodeBaseRadius(node.level, this.maxLevel)
+      const targetScale = 140 / baseRadius
+
+      const targetRadius = Helpers.getNodeRadius(
+        node.level,
+        this.maxLevel,
+        targetScale
+      )
+      const targetViewBoxX = this.unscaledViewBox[0] * targetScale
+      const targetViewBoxY = this.unscaledViewBox[1] * targetScale
+      let targetOffset = {
+        x:
+          node.coordinates.x * targetScale -
+          targetViewBoxX -
+          (this.viewBox[2] - targetRadius) / 2,
+        y:
+          node.coordinates.y * targetScale -
+          targetViewBoxY -
+          (this.viewBox[3] - targetRadius) / 2,
+      }
+      targetOffset = this.clampOffsetValue(targetOffset, targetScale)
+
+      interpolate(
+        {
+          scale: this.scale,
+          offsetX: this.offset.x,
+          offsetY: this.offset.y,
+          viewBoxX: this.viewBox[0],
+          viewBoxY: this.viewBox[1],
+        },
+        {
+          scale: targetScale,
+          offsetX: targetOffset.x,
+          offsetY: targetOffset.y,
+          viewBoxX: targetViewBoxX,
+          viewBoxY: targetViewBoxY,
+        },
+        300,
+        ({ scale, offsetX, offsetY, viewBoxX, viewBoxY }) => {
+          this.scale = scale
+          this.offset.x = offsetX
+          this.offset.y = offsetY
+          this.viewBox[0] = viewBoxX
+          this.viewBox[1] = viewBoxY
+        },
+        () => {
+          this.updateScale()
+        }
+      )
     },
     updateScale() {
       this.$router.push({
@@ -379,7 +515,7 @@ export default {
       DragSelectModular.updateSelectableNodes()
     },
     nodeIsEditable(node) {
-      return wp.isLoggedIn() && Helpers.hasPermission(node, "edit")
+      return this.isLoggedIn && Helpers.hasPermission(node, "edit")
     },
     updateViewBox() {
       const MAX_RADIUS = 240
@@ -464,11 +600,23 @@ export default {
       return box
     },
     handleNodeClick({ event, level }) {
+      // zoom to the level that the node is on, and pan towards the node
       const baseRadius = Helpers.getNodeBaseRadius(level, this.maxLevel)
       const targetScale = 140 / baseRadius
       const deltaScale = targetScale - this.scale
-      this.handleZoom(deltaScale, event.offsetX, event.offsetY)
-      this.updateScale()
+      const { offsetX, offsetY } = event
+      interpolateDelta(
+        0,
+        deltaScale,
+        Math.abs(deltaScale * 600),
+        delta => {
+          this.handleZoom(delta, offsetX, offsetY)
+        },
+        () => {
+          this.updateScale()
+        },
+        "easeOut"
+      )
     },
     handleMouseover(id) {
       const node = this.nodes[id]
@@ -489,7 +637,16 @@ export default {
       const { code } = evt
       const node = this.getNode(this.selectedId)
       if (code === "Enter") {
-        if (
+        if (this.nodeNavLinkMode) {
+          this.$router.push({
+            name: names.LINKMODAL,
+            params: {
+              source: this.getNodeNavParent,
+              target: this.selectedId,
+            },
+            query: this.$route.query,
+          })
+        } else if (
           node.accessible ||
           Helpers.hasPermission(node, "edit", this.settings.showRejected)
         ) {
@@ -498,11 +655,33 @@ export default {
       } else if (code === "Tab") {
         // ? potentially let the user tab out of the main tapestry view, since the user should be fully capable of navigating through all the nodes by using just arrow keys
       } else if (code === "KeyE") {
-        if (Helpers.hasPermission(node, "edit", this.settings.showRejected)) {
+        if (this.nodeNavLinkMode) {
+          this.openSelectedLinkModal()
+        } else if (Helpers.hasPermission(node, "edit", this.settings.showRejected)) {
           this.$root.$emit("edit-node", node.id)
         }
+      } else if (code === "KeyQ" || code === "Escape") {
+        // focus the next element after the main
+        document.querySelector(".minimap-button button")?.focus()
       } else {
-        if (node.id === this.getCurrentNodeNav) {
+        if (node.id === this.getNodeNavId) {
+          if (this.nodeNavLinkMode) {
+            if (code === "ArrowDown") {
+              evt.preventDefault()
+              this.nodeNavLinkMode = false
+              return
+            } else if (code === "ArrowUp") {
+              this.nodeNavLinkMode = false
+            }
+          } else if (evt.shiftKey && this.isLoggedIn) {
+            if (code === "ArrowDown") {
+              this.nodeNavLinkMode = true
+            } else if (code === "ArrowUp" && this.getNodeNavParent !== -1) {
+              evt.preventDefault()
+              this.nodeNavLinkMode = true
+              return
+            }
+          }
           if (code === "ArrowDown") {
             evt.preventDefault()
             this.goToNodeChildren().then(this.setSelectedNode)
@@ -531,14 +710,23 @@ export default {
         query: this.$route.query,
         path: `/nodes/${nodeId}`,
       })
-      this.focusSelectedNode()
+      this.zoomToAndCenterNode(this.getNode(nodeId))
     },
-    focusSelectedNode() {
-      this.$nextTick(() => {
-        const nodeElement = document.querySelector(
-          `.node[data-id='${this.selectedId}']`
-        )
-        nodeElement && nodeElement.focus()
+    getFocusableElement(focused) {
+      return document.querySelector(
+        focused.type === "node"
+          ? `.node[data-id='${focused.id}']`
+          : `#link-${focused.source}-${focused.target}`
+      )
+    },
+    openSelectedLinkModal() {
+      this.$router.push({
+        name: names.LINKMODAL,
+        params: {
+          source: this.getNodeNavParent,
+          target: this.selectedId,
+        },
+        query: this.$route.query,
       })
     },
   },

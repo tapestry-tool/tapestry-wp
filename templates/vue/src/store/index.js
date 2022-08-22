@@ -36,6 +36,7 @@ export const store = {
       stack: [],
       siblings: [],
       siblingPosition: -1,
+      linkMode: false,
     },
     // * DEV: temporarily allow editing constants.js/scaleConstants
     scaleConstants: {
@@ -50,6 +51,7 @@ export const store = {
       panSensitivity: 1, // higher -> pans faster (keep it at 1 for natural pan)
       maxNodeSizeToScreen: 0.15, // max. allowed value of: (radius of the deepest node) / min(viewWidth, viewHeight)
       minTapestrySizeToScreen: 0.6, // min. allowed value of: tapestryWidth / viewWidth
+      disableOffsetClamp: false,
     },
   },
   getters,

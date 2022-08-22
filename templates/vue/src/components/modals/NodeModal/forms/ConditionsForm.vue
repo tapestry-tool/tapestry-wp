@@ -24,8 +24,9 @@
         <button class="condition-close-button" @click="removeCondition(idx)">
           <i class="fas fa-times"></i>
         </button>
-        <b-form-group label="Unlock this node">
+        <b-form-group label="Unlock this node" :label-for="`condition-type-${idx}`">
           <b-form-select
+            :id="`condition-type-${idx}`"
             v-model="condition.type"
             data-qa="condition-type"
             :options="conditionOptions"
@@ -34,8 +35,10 @@
         <b-form-group
           v-if="condition.type === conditionTypes.NODE_COMPLETED"
           label="Node"
+          :label-for="`condition-id-${idx}`"
         >
           <b-form-select
+            :id="`condition-id-${idx}`"
             v-model="condition.nodeId"
             data-qa="condition-id"
             :options="nodeOptions"
@@ -48,8 +51,9 @@
           "
         >
           <b-col>
-            <b-form-group label="Date">
+            <b-form-group label="Date" :label-for="`condition-date-${idx}`">
               <b-form-datepicker
+                :id="`condition-date-${idx}`"
                 v-model="condition.date"
                 data-qa="condition-date"
                 class="datepicker"
@@ -57,16 +61,18 @@
             </b-form-group>
           </b-col>
           <b-col>
-            <b-form-group label="Time">
+            <b-form-group label="Time" :label-for="`condition-time-${idx}`">
               <b-form-timepicker
+                :id="`condition-time-${idx}`"
                 v-model="condition.time"
                 class="datepicker"
               ></b-form-timepicker>
             </b-form-group>
           </b-col>
           <b-col>
-            <b-form-group label="Timezone">
+            <b-form-group label="Timezone" :label-for="`condition-timezone-${idx}`">
               <b-form-select
+                :id="`condition-timezone-${idx}`"
                 v-model="condition.timezone"
                 :options="timezoneOptions"
               ></b-form-select>
@@ -172,9 +178,13 @@ export default {
     update(property, value) {
       this.setCurrentEditingNodeProperty({ property, value })
     },
-    addCondition(e) {
+    addCondition() {
       this.conditions.push({ ...baseCondition })
-      e.target.blur()
+      this.$nextTick(() => {
+        document
+          .getElementById(`condition-type-${this.conditions.length - 1}`)
+          ?.focus()
+      })
     },
     removeCondition(idx) {
       this.conditions.splice(idx, 1)

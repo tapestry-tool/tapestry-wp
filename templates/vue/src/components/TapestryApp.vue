@@ -65,6 +65,10 @@ export default {
     })
     client.recordAnalyticsEvent("app", "load", "tapestry")
   },
+  beforeDestroy() {
+    this.$root.$off("open-node")
+    this.$root.$off("edit-node")
+  },
   methods: {
     ...mapMutations(["select", "unselect", "clearSelection"]),
     updateViewBox() {

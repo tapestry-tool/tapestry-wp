@@ -7,6 +7,14 @@
       saved, meaning they will be reverted after refreshing or going to another
       Tapestry.
     </b-alert>
+    <b-form-group
+      label="Disable Offset Clamp"
+      description="Disables the restriction on how far the user can pan."
+    >
+      <b-form-checkbox v-model="scaleConstants.disableOffsetClamp" switch>
+        Disable Offset Clamp
+      </b-form-checkbox>
+    </b-form-group>
     <b-row>
       <b-col>
         <b-form-group

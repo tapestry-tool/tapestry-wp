@@ -66,12 +66,13 @@
               {{ showAcceptedHighlight ? "Enabled" : "Disabled" }}
             </b-form-checkbox>
           </b-form-group>
-          <b-form-group label="Default Depth" class="mb-0">
+          <b-form-group label="Default Depth" label-for="default-depth" class="mb-0">
             <b-form-input
+              id="default-depth"
               v-model="defaultDepth"
               class="depth-slider"
               type="range"
-              min="0"
+              min="1"
               :max="maxLevel"
             ></b-form-input>
             <p class="my-2 p-0 text-muted small">
@@ -79,7 +80,7 @@
               You will need to refresh the page to see this change applied.
             </p>
             <div class="depth-slider-description">
-              Set to 0 to disable depth change. Selected depth: {{ defaultDepth }}
+              Selected depth: {{ defaultDepth }}
             </div>
           </b-form-group>
         </b-tab>
@@ -176,48 +177,76 @@
           <b-form-group v-if="renderMap">
             <b-row>
               <b-col sm="4" offset-sm="4">
-                <b-form-input
-                  v-model="mapBounds.neLat"
-                  placeholder="90"
-                  :state="
-                    latRangeValid && isValidLat(mapBounds.neLat) ? null : false
-                  "
-                />
-                <b-form-text>Northern Latitudinal Bound</b-form-text>
+                <b-form-group
+                  label="Northern Latitudinal Bound"
+                  label-sr-only
+                  label-for="northern-latitudinal-bound"
+                  description="Northern Latitudinal Bound"
+                >
+                  <b-form-input
+                    id="northern-latitudinal-bound"
+                    v-model="mapBounds.neLat"
+                    placeholder="90"
+                    :state="
+                      latRangeValid && isValidLat(mapBounds.neLat) ? null : false
+                    "
+                  />
+                </b-form-group>
               </b-col>
             </b-row>
             <b-row>
               <b-col sm="4">
-                <b-form-input
-                  v-model="mapBounds.swLng"
-                  placeholder="-180"
-                  :state="
-                    lngRangeValid && isValidLng(mapBounds.swLng) ? null : false
-                  "
-                />
-                <b-form-text>Western Longitudinal Bound</b-form-text>
+                <b-form-group
+                  label="Western Longitudinal Bound"
+                  label-sr-only
+                  label-for="western-longitudinal-bound"
+                  description="Western Longitudinal Bound"
+                >
+                  <b-form-input
+                    id="western-longitudinal-bound"
+                    v-model="mapBounds.swLng"
+                    placeholder="-180"
+                    :state="
+                      lngRangeValid && isValidLng(mapBounds.swLng) ? null : false
+                    "
+                  />
+                </b-form-group>
               </b-col>
               <b-col sm="4" offset-sm="4">
-                <b-form-input
-                  v-model="mapBounds.neLng"
-                  placeholder="180"
-                  :state="
-                    lngRangeValid && isValidLng(mapBounds.neLng) ? null : false
-                  "
-                />
-                <b-form-text>Eastern Longitudinal Bound</b-form-text>
+                <b-form-group
+                  label="Eastern Longitudinal Bound"
+                  label-sr-only
+                  label-for="eastern-longitudinal-bound"
+                  description="Eastern Longitudinal Bound"
+                >
+                  <b-form-input
+                    id="eastern-longitudinal-bound"
+                    v-model="mapBounds.neLng"
+                    placeholder="180"
+                    :state="
+                      lngRangeValid && isValidLng(mapBounds.neLng) ? null : false
+                    "
+                  />
+                </b-form-group>
               </b-col>
             </b-row>
             <b-row>
               <b-col sm="4" offset-sm="4">
-                <b-form-input
-                  v-model="mapBounds.swLat"
-                  placeholder="-90"
-                  :state="
-                    latRangeValid && isValidLat(mapBounds.swLat) ? null : false
-                  "
-                />
-                <b-form-text>Southern Latitudinal Bound</b-form-text>
+                <b-form-group
+                  label="Southern Latitudinal Bound"
+                  label-sr-only
+                  label-for="southern-latitudinal-bound"
+                  description="Southern Latitudinal Bound"
+                >
+                  <b-form-input
+                    id="southern-latitudinal-bound"
+                    v-model="mapBounds.swLat"
+                    placeholder="-90"
+                    :state="
+                      latRangeValid && isValidLat(mapBounds.swLat) ? null : false
+                    "
+                  />
+                </b-form-group>
               </b-col>
             </b-row>
           </b-form-group>
@@ -401,20 +430,26 @@ export default {
   },
   mounted() {
     this.getSettings()
-    this.$root.$on("bv::modal::show", (_, modalId) => {
+    this.$root.$on("bv::modal::show", this.handleModalShow)
+    this.$root.$on("bv::modal::hide", this.handleModalHide)
+  },
+  beforeDestroy() {
+    this.$root.$off("bv::modal::show", this.handleModalShow)
+    this.$root.$off("bv::modal::hide", this.handleModalHide)
+  },
+  methods: {
+    ...mapActions(["getTapestryExport"]),
+    handleModalShow(_, modalId) {
       if (modalId === "settings-modal") {
         DragSelectModular.removeDragSelectListener()
       }
-    })
-    this.$root.$on("bv::modal::hide", (_, modalId) => {
+    },
+    handleModalHide(_, modalId) {
       if (modalId === "settings-modal") {
         DragSelectModular.addDragSelectListener()
         this.$emit("close")
       }
-    })
-  },
-  methods: {
-    ...mapActions(["getTapestryExport"]),
+    },
     closeModal() {
       this.$emit("close")
     },

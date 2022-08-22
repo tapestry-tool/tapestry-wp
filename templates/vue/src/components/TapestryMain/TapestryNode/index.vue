@@ -18,12 +18,9 @@
             ? 'pointer'
             : 'not-allowed',
       }"
-      tabindex="0"
       @focus="handleFocus"
       @blur="handleBlur"
       @click="handleClick"
-      @mousedown="isMouseDown = true"
-      @mouseup="isMouseDown = false"
       @mouseover="handleMouseover"
       @mouseleave="handleMouseleave"
     >
@@ -202,7 +199,6 @@ export default {
       transitioning: false,
       isHovered: false,
       isFocused: false,
-      isMouseDown: false,
     }
   },
   computed: {
@@ -219,7 +215,7 @@ export default {
       "getDirectChildren",
       "isVisible",
       "getParent",
-      "getCurrentNodeNav",
+      "getNodeNavId",
     ]),
     ariaLabel() {
       let label = `${this.node.title}. You are on a level ${this.node.level} node. `
@@ -244,6 +240,7 @@ export default {
       if (this.hasPermission("edit")) {
         label += "To edit this node, press E. "
       }
+      label += "To exit the Main Tapestry view, press the Q Key or the Escape Key."
       return label
     },
     canAddChild() {
@@ -329,13 +326,10 @@ export default {
       if (!this.show) {
         return 0
       }
-      if (this.isGrandChild) {
-        return 40
-      }
-      return (
+      const radius =
         Helpers.getNodeRadius(this.node.level, this.maxLevel, this.scale) *
         (this.root ? 1.2 : 1)
-      )
+      return this.isGrandChild ? Math.min(40, radius) : radius
     },
     fill() {
       const showImages = this.settings.hasOwnProperty("renderImages")
@@ -446,6 +440,9 @@ export default {
     this.$emit("mounted")
     this.$refs.circle.setAttribute("r", this.radius)
     const nodeRef = this.$refs.node
+    if (this.root) {
+      nodeRef.setAttribute("tabindex", "0")
+    }
     d3.select(nodeRef).call(
       d3
         .drag()
@@ -594,10 +591,8 @@ export default {
     },
     handleFocus() {
       this.isFocused = true
-      if (!this.root && !this.isMouseDown) {
-        this.updateRootNode()
-      }
-      if (this.getCurrentNodeNav !== this.node.id) {
+      // TODO: technically the next 3 lines are not needed, since the only way a node will be focused is through the keyboard node navigation which is managed by TapestryMain; nodes other than the focused node is not focusable (tabindex="-1")
+      if (this.getNodeNavId !== this.node.id) {
         this.resetNodeNavigation(this.node.id)
       }
     },

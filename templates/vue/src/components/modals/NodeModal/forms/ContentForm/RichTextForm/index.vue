@@ -1,105 +1,36 @@
 <template>
   <div class="editor">
     <editor-menu-bar v-slot="{ commands, isActive }" :editor="editor">
-      <div class="menubar">
+      <div
+        class="menubar"
+        role="toolbar"
+        aria-label="Rich text formatting"
+        @keydown="handleMenuKey"
+      >
         <button
+          v-for="(item, idx) in menubarItems"
+          :key="idx"
+          ref="menuItem"
           class="menubar__button"
-          :class="{ 'is-active': isActive.bold() }"
-          @click="commands.bold"
+          :class="{
+            'is-active': isActive[item.command]
+              ? isActive[item.command](item.args)
+              : false,
+          }"
+          :style="item.style"
+          :tabindex="focusedMenuItem === idx ? 0 : -1"
+          :aria-label="
+            (item.label ? item.label : item.command) +
+              (isActive[item.command] && isActive[item.command](item.args)
+                ? ', active'
+                : '')
+          "
+          @click="handleMenuClick(idx, item, commands[item.command])"
         >
-          <icon name="bold" />
-        </button>
-        <button
-          class="menubar__button"
-          :class="{ 'is-active': isActive.italic() }"
-          @click="commands.italic"
-        >
-          <icon name="italic" />
-        </button>
-        <button
-          class="menubar__button"
-          :class="{ 'is-active': isActive.strike() }"
-          @click="commands.strike"
-        >
-          <icon name="strike" />
-        </button>
-        <button
-          class="menubar__button"
-          :class="{ 'is-active': isActive.underline() }"
-          @click="commands.underline"
-        >
-          <icon name="underline" />
-        </button>
-        <button
-          class="menubar__button"
-          :class="{ 'is-active': isActive.code() }"
-          @click="commands.code"
-        >
-          <icon name="code" />
-        </button>
-        <button
-          class="menubar__button"
-          :class="{ 'is-active': isActive.link() }"
-          @click="setUrl(commands.link)"
-        >
-          <icon name="link" />
-        </button>
-        <button
-          :style="gapLeft"
-          class="menubar__button"
-          :class="{ 'is-active': isActive.heading({ level: 2 }) }"
-          @click="commands.heading({ level: 2 })"
-        >
-          H1
-        </button>
-        <button
-          class="menubar__button"
-          :class="{ 'is-active': isActive.heading({ level: 3 }) }"
-          @click="commands.heading({ level: 3 })"
-        >
-          H2
-        </button>
-        <button
-          :style="gapRight"
-          class="menubar__button"
-          :class="{ 'is-active': isActive.heading({ level: 4 }) }"
-          @click="commands.heading({ level: 4 })"
-        >
-          H3
-        </button>
-        <button
-          class="menubar__button"
-          :class="{ 'is-active': isActive.bullet_list() }"
-          @click="commands.bullet_list"
-        >
-          <icon name="ul" />
-        </button>
-        <button
-          class="menubar__button"
-          :class="{ 'is-active': isActive.ordered_list() }"
-          @click="commands.ordered_list"
-        >
-          <icon name="ol" />
-        </button>
-        <button
-          class="menubar__button"
-          :class="{ 'is-active': isActive.blockquote() }"
-          @click="commands.blockquote"
-        >
-          <icon name="quote" />
-        </button>
-        <button class="menubar__button" @click="commands.horizontal_rule">
-          —
-        </button>
-        <button
-          style="margin-left: auto;"
-          class="menubar__button"
-          @click="commands.undo"
-        >
-          <icon name="undo" />
-        </button>
-        <button class="menubar__button" @click="commands.redo">
-          <icon name="redo" />
+          <template v-if="item.text">
+            {{ item.text }}
+          </template>
+          <icon v-else :name="item.icon ? item.icon : item.command" />
         </button>
       </div>
     </editor-menu-bar>
@@ -160,19 +91,53 @@ export default {
       type: Number,
       default: null,
     },
+    autofocus: {
+      type: [String, Number, Boolean],
+      required: false,
+      default: false,
+    },
   },
   data() {
     return {
       editor: null,
       linkUrl: null,
       linkMenuIsActive: false,
-      gapLeft: {
-        marginLeft: "1em",
-      },
-      gapRight: {
-        marginRight: "1em",
-      },
       editorChange: false,
+      menubarItems: [
+        { command: "bold" },
+        { command: "italic" },
+        { command: "strike", label: "strikethrough" },
+        { command: "underline" },
+        { command: "code" },
+        { command: "link", label: "add link", clickHandler: this.setUrl },
+        {
+          command: "heading",
+          label: "heading level 1",
+          style: { marginLeft: "1em" },
+          args: { level: 2 },
+          text: "H1",
+        },
+        {
+          command: "heading",
+          label: "heading level 2",
+          args: { level: 3 },
+          text: "H2",
+        },
+        {
+          command: "heading",
+          label: "heading level 3",
+          style: { marginRight: "1em" },
+          args: { level: 4 },
+          text: "H3",
+        },
+        { command: "bullet_list", label: "bulleted list", icon: "ul" },
+        { command: "ordered_list", label: "ordered list", icon: "ol" },
+        { command: "blockquote", icon: "quote" },
+        { command: "horizontal_rule", label: "insert horizontal rule", text: "—" },
+        { command: "undo", style: { marginLeft: "auto" } },
+        { command: "redo" },
+      ],
+      focusedMenuItem: 0,
     }
   },
   computed: {
@@ -229,6 +194,7 @@ export default {
         this.editorChange = true
         this.$emit("input", getHTML())
       },
+      autoFocus: this.autofocus,
     })
 
     this.editor.setContent(this.value)
@@ -239,6 +205,39 @@ export default {
     }
   },
   methods: {
+    handleMenuClick(index, item, command) {
+      this.focusedMenuItem = index
+      this.$nextTick(() => {
+        this.$refs.menuItem[index].focus()
+      })
+      if (item.clickHandler) {
+        item.clickHandler(command)
+      } else if (item.args !== null) {
+        command(item.args)
+      } else {
+        command()
+      }
+    },
+    handleMenuKey(evt) {
+      const { code } = evt
+      if (code === "ArrowRight" || code === "ArrowDown") {
+        evt.preventDefault()
+        if (++this.focusedMenuItem >= this.menubarItems.length) {
+          this.focusedMenuItem = 0
+        }
+        this.$nextTick(() => {
+          this.$refs.menuItem[this.focusedMenuItem].focus()
+        })
+      } else if (code === "ArrowLeft" || code === "ArrowUp") {
+        evt.preventDefault()
+        if (--this.focusedMenuItem < 0) {
+          this.focusedMenuItem = this.menubarItems.length - 1
+        }
+        this.$nextTick(() => {
+          this.$refs.menuItem[this.focusedMenuItem].focus()
+        })
+      }
+    },
     showLinkMenu(attrs) {
       this.linkUrl = attrs.href
       this.linkMenuIsActive = true
