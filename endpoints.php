@@ -1680,7 +1680,7 @@ function perform_batched_upload_to_kaltura($videos, $use_kaltura_player)
     $current_date = date('Y/m/d');
 
     $videos_to_upload = create_upload_log($videos);
-    update_upload_log($videos_to_upload);
+    add_to_upload_log($videos_to_upload);
 
     $kalturaApi = new KalturaApi();
 
@@ -1776,6 +1776,7 @@ function perform_batched_upload_to_kaltura($videos, $use_kaltura_player)
 function create_upload_log($videos)
 {
     $upload_log = array();
+    $timestamp = time(); // Videos in the same upload should be identifiable by the upload time
 
     foreach ($videos as $video) {
         if (!is_object($video) || !isset($video->tapestryID) || !isset($video->nodeID)) {
@@ -1792,6 +1793,7 @@ function create_upload_log($videos)
                 'file' => TapestryHelpers::getPathToMedia($node),
                 'kalturaID' => '',
                 'additionalInfo' => '',
+                'timestamp' => $timestamp,
             ];
             array_push($upload_log, $video_info);
 
@@ -1813,10 +1815,10 @@ function save_video_upload_status($video, $videos_to_upload, $new_status, $kaltu
     return $node;
 }
 
-function update_upload_log($videos)
+// Filter the logged videos so that certain information (e.g. the file path of the videos) is not returned
+function filter_logged_videos($videos)
 {
-    // Filter the upload log objects so that certain information (e.g. the file path of the videos) is not returned
-    $filtered_upload_log = array_map(function ($video) {
+    return array_map(function ($video) {
         return (object) [
             'tapestryID' => $video->tapestryID,
             'nodeID' => $video->nodeID,
@@ -1824,16 +1826,37 @@ function update_upload_log($videos)
             'uploadStatus' => $video->uploadStatus,
             'kalturaID' => $video->kalturaID,
             'additionalInfo' => $video->additionalInfo,
+            'timestamp' => $video->timestamp,
         ];
     }, $videos);
+}
 
-    // This will create the option if it doesn't exist
-    update_option(KalturaUpload::UPLOAD_LOG_OPTION, $filtered_upload_log);
+function add_to_upload_log($videos)
+{
+    $upload_log = get_option(KalturaUpload::UPLOAD_LOG_OPTION);
+    if (!is_array($upload_log)) {
+        $upload_log = [];
+    }
+
+    array_push($upload_log, ...filter_logged_videos($videos));
+    update_option(KalturaUpload::UPLOAD_LOG_OPTION, $upload_log);
+}
+
+function update_upload_log($videos)
+{
+    $upload_log = get_option(KalturaUpload::UPLOAD_LOG_OPTION);
+    if (!is_array($upload_log)) {
+        $upload_log = [];
+    }
+
+    // Replace the same videos at the end of the list
+    array_splice($upload_log, -count($videos), count($upload_log), filter_logged_videos($videos));
+    update_option(KalturaUpload::UPLOAD_LOG_OPTION, $upload_log);
 }
 
 /**
- * Gets progress of ongoing Kaltura upload.
- * If tapestryPostId query parameter is set, only returns videos in this Tapestry.
+ * TODO: Gets progress of ongoing Kaltura upload.
+ * Only returns videos in this Tapestry.
  *
  * @param object $request   HTTP request
  * @return object
@@ -1848,6 +1871,7 @@ function update_upload_log($videos)
  *     uploadStatus: "Converting",
  *     kalturaID: "0_c7syr9zv",
  *     additionalInfo: ""
+ *     timestamp: "TODO:"
  *   }
  *  ]
  *  inProgress: true
@@ -1856,20 +1880,38 @@ function update_upload_log($videos)
 function getKalturaUploadStatus($request)
 {
     $tapestryPostId = $request['tapestryPostId'];
-
-    $videos = get_option(KalturaUpload::UPLOAD_LOG_OPTION, []);
-
     if (!empty($tapestryPostId)) {
-        $videos = array_filter($videos, function ($video) use ($tapestryPostId) {
-            return $video->tapestryID == $tapestryPostId;
-        });
+        // TODO: throw error
     }
 
-    $in_progress = get_option(KalturaUpload::IN_PROGRESS_OPTION) === KalturaUpload::YES_VALUE;
+    // Pagination
+    $page = (int) $request['page'];
+    $perPage = (int) $request['count'];
+
+    $videos = get_option(KalturaUpload::UPLOAD_LOG_OPTION, []);
+    $videos = array_filter($videos, function ($video) use ($tapestryPostId) {
+        return $video->tapestryID == $tapestryPostId;
+    });
+    $videos = array_reverse($videos); // Return records in reverse chronological order
+    $totalCount = count($videos);
+
+    if ($perPage > 0) {
+        $videos = array_slice($videos, ($page - 1) * $perPage, $perPage);
+    }
+
+    foreach($videos as $video) {
+        // Convert Unix timestamp to human-readable string
+        // TODO: follow site timezone
+        $video->uploadTime = date('Y/m/d g:i:s A', $video->timestamp);
+        unset($video->timestamp);
+    }
+
+    $inProgress = get_option(KalturaUpload::IN_PROGRESS_OPTION) === KalturaUpload::YES_VALUE;
     $error = get_option(KalturaUpload::UPLOAD_ERROR_OPTION, null);
     return (object) [
         'videos' => $videos,
-        'inProgress' => $in_progress,
+        'totalCount' => $totalCount,
+        'inProgress' => $inProgress,
         'error' => $error,
     ];
 }
@@ -1973,23 +2015,29 @@ function updateConvertingVideos($request)
     ];
 }
 
-function amend_upload_log($updatedVideos)
+function amend_upload_log($updated_videos)
 {
     $node_map = (object) [];
 
-    foreach ($updatedVideos as $video) {
+    foreach ($updated_videos as $video) {
         $node_key = $video->tapestryID.'-'.$video->nodeID;
         $node_map->{$node_key} = $video;
     }
 
     $upload_log = get_option(KalturaUpload::UPLOAD_LOG_OPTION, []);
-    foreach ($upload_log as $video) {
-        $node_key = $video->tapestryID.'-'.$video->nodeID;
-        $updatedNode = $node_map->{$node_key};
 
-        if ($updatedNode) {
-            $video->uploadStatus = $updatedNode->currentStatus;
-            $video->additionalInfo = $updatedNode->additionalInfo;
+    // Update the most recent entry in the upload log for each video
+    for (end($upload_log); key($upload_log) !== null && !empty($node_map); prev($upload_log)){
+        $video = current($upload_log);
+
+        $node_key = $video->tapestryID.'-'.$video->nodeID;
+        $updated_node = $node_map->{$node_key};
+
+        if ($updated_node) {
+            $video->uploadStatus = $updated_node->currentStatus;
+            $video->additionalInfo = $updated_node->additionalInfo;
+
+            unset($node_map->{$node_key});
         }
     }
     update_option(KalturaUpload::UPLOAD_LOG_OPTION, $upload_log);

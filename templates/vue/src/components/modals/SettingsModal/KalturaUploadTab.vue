@@ -84,21 +84,44 @@
       still be uploaded to Kaltura, but no more videos will be started. Please be
       patient as processing these videos could take some time.
     </b-alert>
-    <div class="mt-3">Upload Status</div>
+    <div class="mt-3">Upload Log</div>
     <b-form-text>
-      View the status of the latest upload. Automatically refreshes every 15 seconds;
-      you can also manually refresh.
+      Automatically refreshes every 15 seconds; you can also manually refresh.
       <br />
       Once the upload has completed, please reload the page to see the updated node
       content.
     </b-form-text>
+    <div class="my-3 d-flex flex-row align-items-center">
+      <b-form-select v-model="perPage" class="per-page-select mr-2">
+        <b-form-select-option :value="10">10 per page</b-form-select-option>
+        <b-form-select-option :value="25">25 per page</b-form-select-option>
+        <b-form-select-option :value="50">50 per page</b-form-select-option>
+        <b-form-select-option :value="100">100 per page</b-form-select-option>
+        <b-form-select-option :value="0">Show all entries</b-form-select-option>
+      </b-form-select>
+      <b-pagination
+        v-model="currentPage"
+        class="mb-0"
+        aria-controls="upload-log-table"
+        :total-rows="uploadLogLength"
+        :per-page="perPage"
+      ></b-pagination>
+      <b-button size="sm" class="ml-auto" @click="refreshVideoUploadStatus">
+        Refresh
+      </b-button>
+    </div>
     <b-table
+      id="upload-log-table"
       ref="uploadStatusTable"
-      class="my-3"
+      responsive
+      striped
       show-empty
       empty-text="No videos were uploaded from this Tapestry."
-      primary-key="nodeID"
       :fields="[
+        {
+          key: 'uploadTime',
+          class: 'align-top',
+        },
         {
           key: 'nodeID',
           class: 'align-top',
@@ -121,6 +144,8 @@
         },
       ]"
       :items="getVideoUploadStatus"
+      :current-page="currentPage"
+      :per-page="perPage"
     ></b-table>
     <b-alert :show="!!uploadError" variant="danger">
       <p>
@@ -135,11 +160,6 @@
         under the WordPress Settings > Tapestry.
       </p>
     </b-alert>
-    <div class="mb-2 text-right">
-      <b-button size="sm" @click="refreshVideoUploadStatus">
-        Refresh
-      </b-button>
-    </div>
   </div>
 </template>
 
@@ -157,6 +177,9 @@ export default {
       selectedVideos: [],
       uploadStatusRefreshTimer: 0,
       hasRequestedStop: false,
+      uploadLogLength: 0,
+      currentPage: 1,
+      perPage: 10,
     }
   },
   computed: {
@@ -232,9 +255,10 @@ export default {
     },
     getVideoUploadStatus(ctx, callback) {
       client
-        .getKalturaUploadStatus()
+        .getKalturaUploadStatus(ctx.currentPage, ctx.perPage)
         .then(data => {
           callback(data.videos)
+          this.uploadLogLength = data.totalCount
           this.videosUploading = data.inProgress
           this.uploadError = data.error
         })
@@ -253,3 +277,9 @@ export default {
   },
 }
 </script>
+
+<style lang="scss" scoped>
+.per-page-select {
+  width: inherit !important;
+}
+</style>

@@ -336,8 +336,8 @@ class TapestryApi {
     return response
   }
 
-  async getKalturaUploadStatus() {
-    const url = `/kaltura/upload_status?tapestryPostId=${this.postId}`
+  async getKalturaUploadStatus(page, perPage) {
+    const url = `/kaltura/upload_status?tapestryPostId=${this.postId}&page=${page}&count=${perPage}`
     const response = await this.client.get(url)
     return response.data
   }
