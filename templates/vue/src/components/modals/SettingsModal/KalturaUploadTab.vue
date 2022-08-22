@@ -91,6 +91,19 @@
       Once the upload has completed, please reload the page to see the updated node
       content.
     </b-form-text>
+    <b-alert :show="!!uploadError" variant="danger">
+      <p>
+        The upload did not complete due to an error in the server: "{{
+          uploadError
+        }}".
+      </p>
+      <p class="mb-1">
+        If any videos are still Converting, to avoid re-uploading them, we recommend
+        running
+        <b>Clean Uploaded Videos</b>
+        under the WordPress Settings > Tapestry.
+      </p>
+    </b-alert>
     <div class="my-3 d-flex flex-row align-items-center">
       <b-form-select v-model="perPage" class="per-page-select mr-2">
         <b-form-select-option :value="10">10 per page</b-form-select-option>
@@ -147,19 +160,6 @@
       :current-page="currentPage"
       :per-page="perPage"
     ></b-table>
-    <b-alert :show="!!uploadError" variant="danger">
-      <p>
-        The upload did not complete due to an error in the server: "{{
-          uploadError
-        }}".
-      </p>
-      <p class="mb-1">
-        If any videos are still Converting, to avoid re-uploading them, we recommend
-        running
-        <b>Clean Uploaded Videos</b>
-        under the WordPress Settings > Tapestry.
-      </p>
-    </b-alert>
   </div>
 </template>
 

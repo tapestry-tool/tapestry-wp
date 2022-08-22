@@ -1876,7 +1876,7 @@ function update_upload_log($videos)
  *     uploadStatus: "Converting",
  *     kalturaID: "0_c7syr9zv",
  *     additionalInfo: ""
- *     timestamp: "TODO:"
+ *     timestamp: "2022-08-22 13:39:23"
  *   }
  *  ],
  *  totalCount: 10,
