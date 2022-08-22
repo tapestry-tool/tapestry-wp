@@ -113,23 +113,32 @@ export default {
         return
       }
 
-      this.frameHeight = this.$refs.h5p.contentWindow.document.activeElement.children[0].clientHeight
-      this.$emit("change:dimensions", { height: this.frameHeight })
+      const h5pDocument = this.$refs.h5p.contentWindow.document
+      const h5pContent =
+        h5pDocument.querySelector(".h5p-content") ??
+        h5pDocument.activeElement.children[0]
+      const h5pContentHeight = h5pContent.clientHeight
+      if (h5pContentHeight > 0) {
+        this.frameHeight = h5pContentHeight
+        this.$emit("change:dimensions", { height: this.frameHeight })
+      }
 
       // Watch for changes in the body of the iframe and update dimensions to match that
-      const h5pBodyContent = this.$refs.h5p.contentWindow.document.body.children[0]
       let that = this
       let heightChangeTimeout
       var ro = new ResizeObserver(entries => {
         for (let entry of entries) {
-          clearTimeout(heightChangeTimeout)
-          that.frameHeight = entry.contentRect.height
-          heightChangeTimeout = setTimeout(() => {
-            this.$emit("change:dimensions", { height: that.frameHeight })
-          }, 1000)
+          const height = entry.contentRect.height
+          if (height > 0) {
+            clearTimeout(heightChangeTimeout)
+            that.frameHeight = height
+            heightChangeTimeout = setTimeout(() => {
+              this.$emit("change:dimensions", { height: that.frameHeight })
+            }, 1000)
+          }
         }
       })
-      ro.observe(h5pBodyContent)
+      ro.observe(h5pContent)
 
       switch (this.library) {
         case "H5P.ThreeImage":

@@ -576,6 +576,17 @@ export default {
     })
     this.initialize()
   },
+  beforeDestroy() {
+    for (const event of [
+      "node-modal::uploading",
+      "fileID",
+      "add-node",
+      "remove-thumbnail",
+    ]) {
+      // since this component is the only one listening to these events, we can simply remove all listeners with the event names without specifying the handler function
+      this.$root.$off(event)
+    }
+  },
   methods: {
     ...mapMutations([
       "setReturnRoute",
@@ -842,7 +853,7 @@ export default {
         this.close("delete")
       })
     },
-    async handleSubmit() {
+    async handleSubmit(isForReview = false) {
       this.errors = this.validateNode()
       if (!this.hasSubmissionError) {
         this.loading = true
@@ -855,6 +866,16 @@ export default {
 
         if (this.linkHasThumbnailData) {
           await this.setLinkData()
+        }
+
+        if (isForReview) {
+          this.update("reviewComments", [
+            ...this.node.reviewComments,
+            Comment.createComment(Comment.types.STATUS_CHANGE, {
+              from: null,
+              to: nodeStatus.SUBMIT,
+            }),
+          ])
         }
 
         if (
@@ -886,16 +907,7 @@ export default {
       }
       this.update("reviewStatus", nodeStatus.SUBMIT)
       this.update("status", nodeStatus.DRAFT)
-
-      this.update("reviewComments", [
-        ...this.node.reviewComments,
-        Comment.createComment(Comment.types.STATUS_CHANGE, {
-          from: null,
-          to: nodeStatus.SUBMIT,
-        }),
-      ])
-
-      this.handleSubmit()
+      this.handleSubmit(true)
     },
     async submitNode() {
       if (this.type === "add") {

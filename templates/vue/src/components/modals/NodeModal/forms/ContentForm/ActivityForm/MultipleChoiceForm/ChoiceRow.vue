@@ -28,7 +28,7 @@
           class="form-input"
           :class="{ 'm-2': useImage }"
           :data-qa="`choice-row-input-${index}`"
-          @keyup.enter="$emit('add')"
+          @keypress.enter="$emit('add')"
         ></b-form-input>
         <b-input-group-append>
           <b-button
