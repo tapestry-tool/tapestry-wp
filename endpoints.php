@@ -1855,10 +1855,15 @@ function update_upload_log($videos)
 }
 
 /**
- * TODO: Gets progress of ongoing Kaltura upload.
+ * Gets progress of ongoing Kaltura upload.
  * Only returns videos in this Tapestry.
  *
+ * Query parameters (pagination):
+ * - page = which page to return
+ * - count = number of entries per page
+ *
  * @param object $request   HTTP request
+ *
  * @return object
  *
  * Example response body:
@@ -1873,47 +1878,54 @@ function update_upload_log($videos)
  *     additionalInfo: ""
  *     timestamp: "TODO:"
  *   }
- *  ]
+ *  ],
+ *  totalCount: 10,
  *  inProgress: true
  * }
  */
 function getKalturaUploadStatus($request)
 {
     $tapestryPostId = $request['tapestryPostId'];
-    if (!empty($tapestryPostId)) {
-        // TODO: throw error
-    }
 
     // Pagination
     $page = (int) $request['page'];
     $perPage = (int) $request['count'];
 
-    $videos = get_option(KalturaUpload::UPLOAD_LOG_OPTION, []);
-    $videos = array_filter($videos, function ($video) use ($tapestryPostId) {
-        return $video->tapestryID == $tapestryPostId;
-    });
-    $videos = array_reverse($videos); // Return records in reverse chronological order
-    $totalCount = count($videos);
+    try {
+        if (empty($tapestryPostId) || !TapestryHelpers::isValidTapestry($tapestryPostId)) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
 
-    if ($perPage > 0) {
-        $videos = array_slice($videos, ($page - 1) * $perPage, $perPage);
+        $videos = get_option(KalturaUpload::UPLOAD_LOG_OPTION, []);
+        $videos = array_filter($videos, function ($video) use ($tapestryPostId) {
+            return $video->tapestryID == $tapestryPostId;
+        });
+        $videos = array_reverse($videos); // Return entries in reverse chronological order
+        $totalCount = count($videos);
+
+        if ($perPage > 0) {
+            $videos = array_slice($videos, ($page - 1) * $perPage, $perPage);
+        }
+
+        $datetime = new DateTime("now", wp_timezone());
+        foreach ($videos as $video) {
+            // Convert Unix timestamp to human-readable string, following Wordpress site timezone
+            $datetime->setTimestamp($video->timestamp);
+            $video->uploadTime = $datetime->format('Y-m-d G:i:s');
+            unset($video->timestamp);
+        }
+
+        $inProgress = get_option(KalturaUpload::IN_PROGRESS_OPTION) === KalturaUpload::YES_VALUE;
+        $error = get_option(KalturaUpload::UPLOAD_ERROR_OPTION, null);
+        return (object) [
+            'videos' => $videos,
+            'totalCount' => $totalCount,    // Number of videos in all pages
+            'inProgress' => $inProgress,
+            'error' => $error,
+        ];
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
-
-    foreach($videos as $video) {
-        // Convert Unix timestamp to human-readable string
-        // TODO: follow site timezone
-        $video->uploadTime = date('Y/m/d g:i:s A', $video->timestamp);
-        unset($video->timestamp);
-    }
-
-    $inProgress = get_option(KalturaUpload::IN_PROGRESS_OPTION) === KalturaUpload::YES_VALUE;
-    $error = get_option(KalturaUpload::UPLOAD_ERROR_OPTION, null);
-    return (object) [
-        'videos' => $videos,
-        'totalCount' => $totalCount,
-        'inProgress' => $inProgress,
-        'error' => $error,
-    ];
 }
 
 /**
@@ -2027,7 +2039,7 @@ function amend_upload_log($updated_videos)
     $upload_log = get_option(KalturaUpload::UPLOAD_LOG_OPTION, []);
 
     // Update the most recent entry in the upload log for each video
-    for (end($upload_log); key($upload_log) !== null && !empty($node_map); prev($upload_log)){
+    for (end($upload_log); key($upload_log) !== null && !empty($node_map); prev($upload_log)) {
         $video = current($upload_log);
 
         $node_key = $video->tapestryID.'-'.$video->nodeID;
