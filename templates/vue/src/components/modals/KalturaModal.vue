@@ -133,11 +133,9 @@
         ]"
         :items="getVideoUploadStatus"
       ></b-table>
-      <b-alert :show="!!uploadError" variant="danger">
+      <b-alert :show="uploadError" variant="danger">
         <p>
-          The upload did not complete due to an error in the server: "{{
-            uploadError
-          }}".
+          The upload did not complete due to an error in the server.
         </p>
         <p class="mb-1">
           If any videos are still Converting, to avoid re-uploading them, we
@@ -173,7 +171,7 @@ export default {
   data() {
     return {
       videosUploading: false,
-      uploadError: null,
+      uploadError: false,
       useKalturaPlayer: false,
       allVideos: [],
       selectedVideos: [],

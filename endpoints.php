@@ -1866,11 +1866,11 @@ function getKalturaUploadStatus($request)
     }
 
     $in_progress = get_option(KalturaUpload::IN_PROGRESS_OPTION) === KalturaUpload::YES_VALUE;
-    $error = get_option(KalturaUpload::UPLOAD_ERROR_OPTION, null);
+    $error = get_option(KalturaUpload::UPLOAD_ERROR_OPTION, '');
     return (object) [
         'videos' => $videos,
         'inProgress' => $in_progress,
-        'error' => $error,
+        'error' => !empty($error),
     ];
 }
 
