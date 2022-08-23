@@ -78,6 +78,7 @@
             :y="-(140 * 5) / 6"
           >
             <div class="meta" :style="{ color: node.textColor }">
+              <i v-if="node.hideWhenLocked" class="fas fa-eye-slash"></i>
               <p class="title">{{ node.title }}</p>
               <p v-if="node.mediaDuration" class="timecode">
                 {{ formatDuration() }}
@@ -280,7 +281,7 @@ export default {
       if (this.selected) {
         return "var(--highlight-color)8a"
       } else if (!this.node.unlocked) {
-        return this.node.hideWhenLocked ? "#656567" : "#8a8a8cb3"
+        return "#8a8a8cb3"
       }
       return this.thumbnailURL ? "#33333366" : "transparent"
     },
