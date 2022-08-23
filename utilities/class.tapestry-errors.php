@@ -112,7 +112,7 @@ class TapestryError extends Error
         ],
         'KALTURA_NOT_AVAILABLE' => [
             'MESSAGE' => 'Kaltura is not enabled on the server.',
-            'STATUS' => ['status' => 500],      // TODO: should this be a 400 or 500 error?
+            'STATUS' => ['status' => 400],
         ],
         'UPLOAD_FILE_NOT_FOUND' => [
             'MESSAGE' => 'Uploaded file was not found on the server',
