@@ -204,18 +204,21 @@ export default {
         this.refreshVideosToUpload()
       }
     },
-    show(show) {
-      if (show) {
-        this.uploadStatusRefreshTimer = setInterval(
-          this.refreshVideoUploadStatus,
-          15 * 1000
-        )
-        setTimeout(() => {
-          this.refreshVideoUploadStatus()
-        }, 0)
-      } else {
-        this.cancelUploadStatusRefresh()
-      }
+    show: {
+      immediate: true,
+      handler(show) {
+        if (show) {
+          this.uploadStatusRefreshTimer = setInterval(
+            this.refreshVideoUploadStatus,
+            15 * 1000
+          )
+          setTimeout(() => {
+            this.refreshVideoUploadStatus()
+          }, 0)
+        } else {
+          this.cancelUploadStatusRefresh()
+        }
+      },
     },
   },
   beforeDestroy() {
