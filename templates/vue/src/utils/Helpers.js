@@ -35,6 +35,15 @@ export default class Helpers {
     return Math.max(document.documentElement.clientHeight, window.innerHeight || 0)
   }
 
+  /**
+   * Check if user is on a touch enabled device
+   *
+   * @returns {Boolean}
+   */
+  static isTouchEnabledDevice() {
+    return "ontouchstart" in window || navigator.maxTouchPoints > 0
+  }
+
   static getAspectRatio() {
     const browserHeight = this.getBrowserHeight()
     const browserWidth = this.getBrowserWidth()
