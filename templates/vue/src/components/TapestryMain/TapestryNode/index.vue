@@ -78,7 +78,10 @@
             :y="-(140 * 5) / 6"
           >
             <div class="meta" :style="{ color: node.textColor }">
-              <i v-if="node.hideWhenLocked" class="fas fa-eye-slash"></i>
+              <i
+                v-if="!node.unlocked && node.hideWhenLocked"
+                class="fas fa-eye-slash"
+              ></i>
               <p class="title">{{ node.title }}</p>
               <p v-if="node.mediaDuration" class="timecode">
                 {{ formatDuration() }}
