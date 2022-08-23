@@ -502,7 +502,7 @@ class TapestryHelpers
      * Gets the video source (URL or path) from an H5P content, by the H5P ID
      *
      * @param string|int $h5pId
-     * @return string|null          Returns null if the H5P ID is invalid or the H5P an interactive video
+     * @return string|null          Returns null if the H5P ID is invalid or the H5P is not an interactive video
      */
     private static function _getH5PVideoURL($h5pId)
     {
