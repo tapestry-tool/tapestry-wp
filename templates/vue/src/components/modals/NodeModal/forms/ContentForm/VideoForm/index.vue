@@ -155,7 +155,7 @@ import FileUpload from "@/components/modals/common/FileUpload"
 import client from "@/services/TapestryAPI"
 import { getKalturaStatus } from "@/services/wp"
 import Helpers from "@/utils/Helpers"
-import { mapMutations, mapState } from "vuex"
+import { mapMutations, mapState, mapActions } from "vuex"
 import CaptionRow from "./CaptionRow"
 
 const defaultCaption = {
@@ -244,21 +244,31 @@ export default {
     this.disableKalturaToggle = !this.kalturaAvailable && !this.useKaltura
   },
   methods: {
-    ...mapMutations(["setCurrentEditingNodeProperty", "addApiError"]),
+    ...mapMutations(["setCurrentEditingNodeProperty"]),
+    ...mapMutations({ addError: "addApiError" }),
+    ...mapActions(["addApiError"]),
     update(property, value) {
       this.setCurrentEditingNodeProperty({ property, value })
     },
     async getAllLanguages() {
       const iso6391LanguageNames = ISO6391.getAllNames()
-      const kalturaLanguageNames = this.kalturaAvailable
-        ? await client.getKalturaAvailableLanguages()
-        : []
+      const kalturaLanguageNames = await this.getKalturaAvailableLanguages()
       const allLanguageNames = Array.from(
         new Set(iso6391LanguageNames.concat(kalturaLanguageNames))
       )
       allLanguageNames.sort()
 
       return allLanguageNames
+    },
+    async getKalturaAvailableLanguages() {
+      if (this.kalturaAvailable) {
+        try {
+          return await client.getKalturaAvailableLanguages()
+        } catch (error) {
+          // Kaltura availability changed unexpectedly
+        }
+      }
+      return []
     },
     handleUploadChange(state) {
       this.$root.$emit("node-modal::uploading", state)
@@ -268,7 +278,9 @@ export default {
 
       if (value) {
         this.update("mediaFormat", "kaltura")
-        this.getKalturaCaptions(this.kalturaId)
+        if (this.kalturaId) {
+          this.setKalturaVideo(this.kalturaId)
+        }
       } else {
         if (this.kalturaAvailable) {
           this.clearCaptions()
@@ -284,12 +296,17 @@ export default {
     },
     async setKalturaVideo(kalturaId) {
       if (this.kalturaAvailable) {
-        const validKalturaVideo = await client.checkKalturaVideo(kalturaId)
-        if (validKalturaVideo) {
-          this.update("typeData.kalturaId", kalturaId)
-          await this.getKalturaCaptions(kalturaId)
-        } else {
-          this.addApiError({ error: "Please enter a valid Kaltura video ID." })
+        try {
+          const validKalturaVideo = await client.checkKalturaVideo(kalturaId)
+          if (validKalturaVideo) {
+            this.update("typeData.kalturaId", kalturaId)
+            await this.getKalturaCaptions(kalturaId)
+          } else {
+            this.addError({ error: "Please enter a valid Kaltura video ID." })
+          }
+        } catch (error) {
+          // Kaltura availability changed unexpectedly
+          this.addApiError(error)
         }
       }
     },
@@ -310,16 +327,15 @@ export default {
       }
     },
     async getKalturaCaptions(kalturaId) {
-      if (kalturaId && this.kalturaAvailable) {
-        this.isLoadingKalturaCaptions = true
+      // Loads captions, assuming Kaltura is available on the server
+      this.isLoadingKalturaCaptions = true
 
-        const result = await client.getKalturaVideoCaptions(kalturaId)
+      const result = await client.getKalturaVideoCaptions(kalturaId)
 
-        this.defaultCaptionId = result.defaultCaptionId
-        this.captions = result.captions
+      this.defaultCaptionId = result.defaultCaptionId
+      this.captions = result.captions
 
-        this.isLoadingKalturaCaptions = false
-      }
+      this.isLoadingKalturaCaptions = false
     },
     clearCaptions() {
       this.defaultCaptionId = null
