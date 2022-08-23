@@ -554,7 +554,7 @@ export default {
       },
     },
     hasSubmissionApiError() {
-      if (this.apiError) {
+      if (this.apiError && !this.errors.includes(this.apiError.error)) {
         this.errors.push(this.apiError.error)
       }
     },
