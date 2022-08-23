@@ -23,12 +23,14 @@
       >
         <template #head(selected)="{clearSelected}">
           <b-form-checkbox
+            aria-label="Select all videos"
             :checked="allVideosSelected"
             @change="$event ? selectAllVideos() : clearSelected()"
           ></b-form-checkbox>
         </template>
         <template #cell(selected)="{rowSelected, selectRow, unselectRow, item}">
           <b-form-checkbox
+            :aria-label="`Select node ${item.nodeID}, ${item.nodeTitle}`"
             :checked="rowSelected"
             :disabled="!item.withinSizeLimit"
             class="d-inline"
