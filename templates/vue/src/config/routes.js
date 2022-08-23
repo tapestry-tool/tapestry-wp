@@ -15,6 +15,8 @@ export const names = {
   LINKMODAL: "linkmodal",
   USERSETTINGS: "userSettings",
   HELP: "help",
+  EXPORTDUPLICATE: "exportDuplicate",
+  OTHEROPERATIONS: "otherOperations",
 }
 
 const ROOT_PATH = `/nodes/:nodeId(\\d+)`
@@ -70,6 +72,14 @@ export default [
       {
         path: `help`,
         name: names.HELP,
+      },
+      {
+        path: `export-duplicate`,
+        name: names.EXPORTDUPLICATE,
+      },
+      {
+        path: `other-operations`,
+        name: names.OTHEROPERATIONS,
       },
     ],
   },
