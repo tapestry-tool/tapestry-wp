@@ -576,10 +576,6 @@ class TapestryHelpers
     // https://www.php.net/manual/en/function.filesize.php#113457
     private static function _realFileSize($path)
     {
-        if (!$path) {
-            return PHP_INT_MAX;
-        }
-
         $fp = fopen($path, 'r');
 
         $pos = 0;
