@@ -337,6 +337,6 @@ export default {
 
 <style lang="scss" scoped>
 .edit-kaltura-id-button {
-  z-index: 1; // Prevent button from appearing above NodeModal error banner
+  z-index: 1 !important; // Prevent button from appearing above NodeModal error banner
 }
 </style>
