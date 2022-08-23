@@ -670,9 +670,8 @@ class Tapestry implements ITapestry
         $allH5Ps = $controller->get();
         foreach ($nodes as $i => $node) {
             if ('h5p' == $node->mediaType && $node->typeData->mediaURL) {
-                $H5PURLParts = explode('&id=', $node->typeData->mediaURL);
-                if (count($H5PURLParts) >= 2) {
-                    $H5PId = $H5PURLParts[1];
+                $H5PId = TapestryHelpers::getH5PIdFromMediaURL($node->typeData->mediaURL);
+                if ($H5PId) {
                     $H5PIndex = array_search($H5PId, array_column($allH5Ps, 'id'));
                     if ($H5PIndex || 0 == $H5PIndex) {
                         $nodes[$i]->typeData->h5pMeta = $allH5Ps[$H5PIndex];
