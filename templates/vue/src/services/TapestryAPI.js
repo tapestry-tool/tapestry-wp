@@ -364,6 +364,11 @@ class TapestryApi {
     const url = `/kaltura/stop_upload`
     await this.client.post(url)
   }
+
+  async clearKalturaUploadError() {
+    const url = `/kaltura/upload_status/clear_error`
+    await this.client.post(url)
+  }
 }
 
 export default new TapestryApi(postId)
