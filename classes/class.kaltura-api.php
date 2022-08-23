@@ -209,10 +209,10 @@
         /**
          * Filter caption asset fields to return to the user.
          */
-        private function _filterCaptionAsset($kclient, $captionAsset, $overrideCaptionUrl = null, $errorMessage = null)
+        private function _filterCaptionAsset($kclient, $captionAsset, $overrideCaptionUrl = null, $overrideId = null, $errorMessage = null)
         {
             $caption = (object) [
-                'id' => $captionAsset->id,
+                'id' => $overrideId ?? $captionAsset->id,
                 'label' => $captionAsset->label,
                 'language' => $captionAsset->language,
                 'displayOnPlayer' => $captionAsset->displayOnPlayer,
@@ -225,7 +225,7 @@
             return $caption;
         }
 
-        public function setCaptionsAndDefaultCaption($videoEntryId, $captions, $defaultCaptionId)
+        public function setCaptionsAndDefaultCaption($videoEntryId, $captions, $defaultCaptionId, $throwErrors = false)
         {
             if (!isset($captions) || !is_array($captions)) {
                 return null;
@@ -233,7 +233,7 @@
 
             $kclient = $this->getKClient(SessionType::ADMIN);
 
-            $result = $this->setCaptions($kclient, $videoEntryId, $captions);
+            $result = $this->setCaptions($kclient, $videoEntryId, $captions, $throwErrors);
             $updatedCaptions = $result->captions;
 
             if (!empty($defaultCaptionId) && is_string($defaultCaptionId) && isset($updatedCaptions[$defaultCaptionId])) {
@@ -255,7 +255,7 @@
             $captionPlugin->captionAsset->setAsDefault($captionAssetId);
         }
 
-        public function setCaptions($kclient, $videoEntryId, $captions)
+        public function setCaptions($kclient, $videoEntryId, $captions, $throwErrors)
         {
             // Get existing captions
             $oldCaptions = $this->getCaptionsAndDefaultCaption($videoEntryId)->captions;
@@ -274,14 +274,14 @@
             }
             foreach ($toAdd as $caption) {
                 $captionAssetId = $this->_createCaptionAsset($kclient, $caption, $videoEntryId);
-                $tokenId = $this->_uploadFile($kclient, $caption->file, ['vtt', 'srt'], true);
+                $tokenId = $this->_uploadFile($kclient, $caption->file, ['vtt', 'srt'], $throwErrors, true);
                 $this->_setCaptionAssetContent($kclient, $caption, $captionAssetId, $tokenId);
             }
             foreach ($toUpdate as $caption) {
                 $tokenId = null;    // Clear token ID from previous loop to prevent reuse
                 $this->_updateCaptionAsset($kclient, $caption);
                 if (isset($caption->file)) {
-                    $tokenId = $this->_uploadFile($kclient, $caption->file, ['vtt', 'srt']);
+                    $tokenId = $this->_uploadFile($kclient, $caption->file, ['vtt', 'srt'], $throwErrors);
                 }
                 if (isset($tokenId)) {
                     $this->_setCaptionAssetContent($kclient, $caption, $caption->id, $tokenId);
@@ -336,9 +336,9 @@
                 $contentError = is_a($contentResponse, ApiException::class);
 
                 if ($metadataError) {
-                    array_push($pending, $this->_filterCaptionAsset($kclient, $caption, $caption->captionUrl, $metadataErrorMessage));
+                    array_push($pending, $this->_filterCaptionAsset($kclient, $caption, $caption->captionUrl, null, $metadataErrorMessage));
                 } elseif ($contentError) {
-                    array_push($pending, $this->_filterCaptionAsset($kclient, $caption, $caption->captionUrl, $contentErrorMessage));
+                    array_push($pending, $this->_filterCaptionAsset($kclient, $caption, $caption->captionUrl, $metadataResponse->id, $contentErrorMessage));
                 } else {
                     $results[$caption->id] = $this->_filterCaptionAsset($kclient, $metadataResponse);
                     $this->_deleteLocalUpload($caption->file);
@@ -353,9 +353,9 @@
 
                 if ($contentError) {
                     // Failed to upload - keep URL of local caption file and do not delete it
-                    array_push($pending, $this->_filterCaptionAsset($kclient, $caption, $caption->captionUrl, $contentErrorMessage));
+                    array_push($pending, $this->_filterCaptionAsset($kclient, $caption, $caption->captionUrl, null, $contentErrorMessage));
                 } elseif ($metadataError) {
-                    array_push($pending, $this->_filterCaptionAsset($kclient, $caption, null, $metadataErrorMessage));
+                    array_push($pending, $this->_filterCaptionAsset($kclient, $caption, null, null, $metadataErrorMessage));
                     $this->_deleteLocalUpload($caption->file);
                 } else {
                     $results[$caption->id] = $this->_filterCaptionAsset($kclient, $metadataResponse);
@@ -381,21 +381,27 @@
          *
          * @param object $file              object containing file name and path information
          * @param array  $allowedExtensions list of valid file extensions to upload
-         * @param bool   $errorIfInvalid    whether to throw an error if the file is not a local upload
+         * @param bool   $throwErrors       whether to throw an error if the file is invalid
+         * @param bool   $errorIfNotLocal   whether to throw an error if the file is not a local upload (only applies if $throwErrors)
          *
          * @return string|null the upload token ID or null if given file is invalid
          */
-        private function _uploadFile($kclient, $file, $allowedExtensions, $errorIfInvalid = false)
+        private function _uploadFile($kclient, $file, $allowedExtensions, $throwErrors, $errorIfNotLocal = false)
         {
-            if (empty($file) || !in_array($file->extension, $allowedExtensions)) {
-                if ($errorIfInvalid) {
+            if (empty($file)) {
+                // File is not a local upload
+                if ($throwErrors && $errorIfNotLocal) {
                     throw new TapestryError('UPLOAD_FILE_NOT_FOUND');
                 } else {
                     return null;
                 }
-            }
-            if (!file_exists($file->file_path)) {
-                throw new TapestryError('UPLOAD_FILE_NOT_FOUND');
+            } elseif (!in_array($file->extension, $allowedExtensions) || !file_exists($file->file_path)) {
+                // File is a local upload, but does not exist/has invalid extension
+                if ($throwErrors) {
+                    throw new TapestryError('UPLOAD_FILE_NOT_FOUND');
+                } else {
+                    return null;
+                }
             }
 
             $uploadToken = new UploadToken();

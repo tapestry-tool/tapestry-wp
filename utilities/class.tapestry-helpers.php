@@ -362,15 +362,19 @@ class TapestryHelpers
     public static function uploadVideoCaptions($node, $kalturaApi, $kalturaData)
     {
         $typeData = $node->getTypeData();
-        $captionData = $kalturaApi->setCaptionsAndDefaultCaption($kalturaData->id, $typeData->captions, $typeData->defaultCaptionId);
+        $captionData = $kalturaApi->setCaptionsAndDefaultCaption($kalturaData->id, $typeData->captions, $typeData->defaultCaptionId, false);
 
-        $typeData->captions = $captionData->captions;
-        $typeData->pendingCaptions = $captionData->pendingCaptions;
-        $typeData->defaultCaptionId = $captionData->defaultCaptionId;
+        if ($captionData) {
+            $typeData->captions = $captionData->captions;
+            $typeData->pendingCaptions = $captionData->pendingCaptions;
+            $typeData->defaultCaptionId = $captionData->defaultCaptionId;
+    
+            $node->save();
+    
+            return count($captionData->pendingCaptions);    
+        }
 
-        $node->save();
-
-        return count($captionData->pendingCaptions);
+        return 0;
     }
 
     /**

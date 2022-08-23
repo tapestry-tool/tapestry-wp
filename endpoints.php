@@ -2173,7 +2173,7 @@ function updateKalturaVideoCaptions($request)
 
         try {
             $kaltura_api = new KalturaApi();
-            return $kaltura_api->setCaptionsAndDefaultCaption($video_entry_id, $captions, $default_caption_id);
+            return $kaltura_api->setCaptionsAndDefaultCaption($video_entry_id, $captions, $default_caption_id, true);
         } catch (TapestryError $e) {
             return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
         }
