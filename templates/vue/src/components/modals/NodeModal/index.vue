@@ -1078,11 +1078,15 @@ export default {
             errMsgs.push("Please upload a WebVTT or SRT file for each caption")
           }
           if (wp.getKalturaStatus()) {
-            const validKalturaVideo = await client.checkKalturaVideo(
-              this.node.typeData.kalturaId
-            )
-            if (!validKalturaVideo) {
-              errMsgs.push("Please enter a valid Kaltura video ID")
+            try {
+              const validKalturaVideo = await client.checkKalturaVideo(
+                this.node.typeData.kalturaId
+              )
+              if (!validKalturaVideo) {
+                errMsgs.push("Please enter a valid Kaltura video ID")
+              }
+            } catch (error) {
+              errMsgs.push("Kaltura is not enabled on the server.")
             }
           }
         } else {
@@ -1239,7 +1243,11 @@ export default {
 
         if (this.node.mediaFormat === "kaltura") {
           if (wp.getKalturaStatus()) {
-            data = await client.getKalturaVideoMeta(this.node.typeData.kalturaId)
+            try {
+              data = await client.getKalturaVideoMeta(this.node.typeData.kalturaId)
+            } catch (error) {
+              this.addApiError(error)
+            }
           }
         } else {
           const url = this.node.typeData.mediaURL
