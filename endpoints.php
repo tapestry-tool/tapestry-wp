@@ -349,6 +349,14 @@ $REST_API_ENDPOINTS = [
             'permission_callback' => 'TapestryPermissions::kalturaUpload',
         ],
     ],
+    'GET_KALTURA_UPLOAD_LOG' => (object) [
+        'ROUTE' => '/kaltura/upload_log',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => 'getKalturaUploadLog',
+            'permission_callback' => 'TapestryPermissions::kalturaUpload',
+        ],
+    ],
     'RESET_UPLOAD_STATUS' => (object) [
         'ROUTE' => '/kaltura/upload_status/reset',
         'ARGUMENTS' => [
@@ -1863,12 +1871,24 @@ function update_upload_log($videos)
 }
 
 /**
- * Gets progress of ongoing Kaltura upload.
- * Only returns videos in this Tapestry.
+ * Gets status of Kaltura upload.
+ */
+function getKalturaUploadStatus($request)
+{
+    $inProgress = get_option(KalturaUpload::IN_PROGRESS_OPTION) === KalturaUpload::YES_VALUE;
+    $error = get_option(KalturaUpload::UPLOAD_ERROR_OPTION, '');
+    return (object) [
+        'inProgress' => $inProgress,
+        'error' => !empty($error),
+    ];
+}
+
+/**
+ * Gets Kaltura upload log for a particular Tapestry.
  *
  * Query parameters (pagination):
  * - page = which page to return
- * - count = number of entries per page
+ * - count = number of entries per page; if count = 0, returns all entries
  *
  * @param object $request   HTTP request
  *
@@ -1888,10 +1908,9 @@ function update_upload_log($videos)
  *   }
  *  ],
  *  totalCount: 10,
- *  inProgress: true
  * }
  */
-function getKalturaUploadStatus($request)
+function getKalturaUploadLog($request)
 {
     $tapestryPostId = $request['tapestryPostId'];
 
@@ -1905,6 +1924,10 @@ function getKalturaUploadStatus($request)
         }
 
         $videos = get_option(KalturaUpload::UPLOAD_LOG_OPTION, []);
+        if (!is_array($videos)) {
+            $videos = [];
+        }
+
         $videos = array_filter($videos, function ($video) use ($tapestryPostId) {
             return $video->tapestryID == $tapestryPostId;
         });
@@ -1923,13 +1946,9 @@ function getKalturaUploadStatus($request)
             unset($video->timestamp);
         }
 
-        $inProgress = get_option(KalturaUpload::IN_PROGRESS_OPTION) === KalturaUpload::YES_VALUE;
-        $error = get_option(KalturaUpload::UPLOAD_ERROR_OPTION, '');
         return (object) [
             'videos' => $videos,
             'totalCount' => $totalCount,    // Number of videos in all pages
-            'inProgress' => $inProgress,
-            'error' => !empty($error),
         ];
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());

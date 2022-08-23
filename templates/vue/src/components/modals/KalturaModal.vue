@@ -103,6 +103,7 @@
         content.
       </b-form-text>
       <b-alert
+        class="mt-2"
         dismissible
         :show="uploadError"
         variant="danger"
@@ -145,7 +146,6 @@
         striped
         show-empty
         empty-text="No videos were uploaded from this Tapestry."
-        primary-key="nodeID"
         :fields="[
           {
             key: 'uploadTime',
@@ -172,7 +172,7 @@
             class: 'align-top',
           },
         ]"
-        :items="getVideoUploadStatus"
+        :items="getUploadLog"
         :current-page="currentPage"
         :per-page="perPage"
       ></b-table>
@@ -292,14 +292,12 @@ export default {
 
       return null
     },
-    getVideoUploadStatus(ctx, callback) {
+    getUploadLog(ctx, callback) {
       client
-        .getKalturaUploadStatus(ctx.currentPage, ctx.perPage)
+        .getKalturaUploadLog(ctx.currentPage, ctx.perPage)
         .then(data => {
           callback(data.videos)
           this.uploadLogLength = data.totalCount
-          this.videosUploading = data.inProgress
-          this.uploadError = data.error
         })
         .catch(() => {
           callback([])
@@ -312,6 +310,10 @@ export default {
     },
     refreshVideoUploadStatus() {
       this.$refs.uploadStatusTable.refresh()
+      client.getKalturaUploadStatus().then(data => {
+        this.videosUploading = data.inProgress
+        this.uploadError = data.error
+      })
     },
     async clearUploadError() {
       this.uploadError = false
