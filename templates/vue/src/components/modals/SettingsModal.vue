@@ -89,7 +89,6 @@
           @click="$emit('change:tab', 'advanced')"
         >
           <b-form-group
-            class="mt-4"
             label="Show thumbnails"
             description="When disabled, node thumbnails will not be rendered on the screen. Turning this off may improve performance."
           >
@@ -241,8 +240,8 @@
 
 <script>
 import { mapGetters, mapState } from "vuex"
-import FileUpload from "../common/FileUpload"
-import PermissionsTable from "../common/PermissionsTable"
+import FileUpload from "./common/FileUpload"
+import PermissionsTable from "./common/PermissionsTable"
 import DragSelectModular from "@/utils/dragSelectModular"
 import { data as wpData } from "@/services/wp"
 
