@@ -88,85 +88,7 @@
           :active="tab === 'advanced'"
           @click="$emit('change:tab', 'advanced')"
         >
-          <b-form-group label="Export Tapestry">
-            <template #description>
-              <strong>Note:</strong>
-              WordPress post nodes in your tapestry must be exported separately. To
-              export, export all WordPress posts as well as the tapestry. To import,
-              first import the WordPress posts by going to Tools -> Import in the
-              WordPress dashboard, then import the tapestry.
-            </template>
-            <b-dropdown
-              block
-              split
-              variant="light"
-              menu-class="w-100"
-              data-qa="export-tapestry-button"
-              :toggle-attrs="{
-                'data-qa': 'export-type-toggle',
-              }"
-              :split-class="{
-                'export-button': true,
-                disabled: isExporting,
-              }"
-              :disabled="isExporting"
-              @click="exportTapestry"
-            >
-              <template #button-content>
-                <b-spinner v-if="isExporting" small></b-spinner>
-                <div :style="isExporting ? 'opacity: 50%;' : ''">
-                  Export Tapestry
-                </div>
-              </template>
-              <b-dropdown-item-button @click="exportTapestry">
-                Export as JSON
-              </b-dropdown-item-button>
-              <b-dropdown-item-button @click="exportTapestryAsZip">
-                Export as ZIP (include uploaded media)
-              </b-dropdown-item-button>
-            </b-dropdown>
-            <b-alert
-              v-if="apiError == null"
-              :show="hasExported"
-              :variant="exportWarnings ? 'warning' : 'success'"
-              style="margin-top: 1em;"
-            >
-              <div v-if="!exportWarnings">
-                Your content has been exported! Find the
-                {{ exportedFileType }} file in your downloads.
-              </div>
-              <export-warnings
-                v-else
-                :warnings="exportWarnings"
-                action="export"
-              ></export-warnings>
-              <div v-if="hasExportedWpPosts">
-                The WordPress posts in this Tapestry have also been exported. Find
-                the .xml file in your downloads.
-              </div>
-            </b-alert>
-            <b-alert
-              v-else
-              :show="hasExported"
-              variant="danger"
-              style="margin-top: 1em;"
-            >
-              {{ apiError.error }}
-            </b-alert>
-            <b-form-text class="my-2">
-              Export the contents of your tapestry to a file, which you can then
-              import on another site.
-            </b-form-text>
-          </b-form-group>
           <b-form-group
-            class="mt-4"
-            label="Duplicate Tapestry"
-            description="Duplicating will create a copy of this tapestry on this site."
-          >
-            <duplicate-tapestry-button />
-          </b-form-group>
-          <b-form-group
-            class="mt-4"
             label="Show thumbnails"
             description="When disabled, node thumbnails will not be rendered on the screen. Turning this off may improve performance."
           >
@@ -174,28 +96,6 @@
               {{ renderImages ? "Enabled" : "Disabled" }}
             </b-form-checkbox>
           </b-form-group>
-          <b-form-group
-            class="mt-4"
-            label="Thumbnail optimization"
-            description="This will convert all existing thumbnails into optimized thumbnails"
-          >
-            <b-button
-              id="optimize-thumbnails-button"
-              block
-              variant="light"
-              :class="isOptimizing ? 'disabled' : ''"
-              :disabled="isOptimizing"
-              @click="optimizeThumbnails"
-            >
-              <b-spinner v-if="isOptimizing" small></b-spinner>
-              <div :style="isOptimizing ? 'opacity: 50%;' : ''">
-                Optimize All Thumbnails
-              </div>
-            </b-button>
-          </b-form-group>
-          <b-alert :show="hasOptimized" variant="success" style="margin-top: 1em;">
-            Thumbnails have been successfully optimized!
-          </b-alert>
           <b-form-group
             label="Geography map"
             :description="
@@ -339,15 +239,11 @@
 </template>
 
 <script>
-import { mapGetters, mapState, mapActions } from "vuex"
-import FileUpload from "../common/FileUpload"
-import DuplicateTapestryButton from "./DuplicateTapestryButton"
-import PermissionsTable from "../common/PermissionsTable"
-import ImportExportWarnings from "@/components/common/ImportExportWarnings"
+import { mapGetters, mapState } from "vuex"
+import FileUpload from "./common/FileUpload"
+import PermissionsTable from "./common/PermissionsTable"
 import DragSelectModular from "@/utils/dragSelectModular"
 import { data as wpData } from "@/services/wp"
-import client from "@/services/TapestryAPI"
-import WordpressApi from "@/services/WordpressApi"
 
 const defaultPermissions = Object.fromEntries(
   [
@@ -363,9 +259,7 @@ export default {
   name: "settings-modal",
   components: {
     FileUpload,
-    DuplicateTapestryButton,
     PermissionsTable,
-    "export-warnings": ImportExportWarnings,
   },
   props: {
     show: {
@@ -393,19 +287,12 @@ export default {
       showRejected: false,
       showAcceptedHighlight: true,
       defaultDepth: 3,
-      isExporting: false,
-      exportedFileType: "",
-      exportWarnings: null,
       renderImages: true,
       analyticsEnabled: false,
       draftNodesEnabled: true,
       submitNodesEnabled: true,
       renderMap: false,
       mapBounds: { neLat: 90, neLng: 180, swLat: -90, swLng: -180 },
-      hasExported: false,
-      hasExportedWpPosts: false,
-      isOptimizing: false,
-      hasOptimized: false,
     }
   },
   computed: {
@@ -457,7 +344,6 @@ export default {
     })
   },
   methods: {
-    ...mapActions(["getTapestryExport", "getTapestryExportAsZip"]),
     closeModal() {
       this.$emit("close")
     },
@@ -516,110 +402,6 @@ export default {
     isUploading(status) {
       this.fileUploading = status
     },
-    async exportTapestry() {
-      this.isExporting = true
-      const exportedTapestry = await this.getTapestryExport()
-      if (!exportedTapestry) {
-        this.isExporting = false
-        this.hasExported = true
-        return
-      }
-      const exportId = exportedTapestry.exportId
-      const blob = new Blob([JSON.stringify(exportedTapestry.json, null, 2)], {
-        type: "application/json",
-      })
-      const fileUrl = URL.createObjectURL(blob)
-      this.showFileDownload(fileUrl, `${this.settings.title}_${exportId}.json`)
-      URL.revokeObjectURL(fileUrl)
-
-      if (exportedTapestry.wpPosts) {
-        this.downloadWpPosts(exportedTapestry.wpPosts, exportId)
-        this.hasExportedWpPosts = true
-      }
-
-      this.isExporting = false
-      this.hasExported = true
-      this.exportedFileType = ".json"
-    },
-    async exportTapestryAsZip() {
-      this.isExporting = true
-
-      // Rebuild H5P cache before exporting to ensure H5P export files are up to date
-      await WordpressApi.rebuildAllH5PCache()
-
-      const exportedTapestry = await this.getTapestryExportAsZip()
-      if (!exportedTapestry) {
-        this.isExporting = false
-        this.hasExported = true
-        return
-      }
-      const exportId = exportedTapestry.exportId
-      const fileUrl = exportedTapestry.zipUrl
-      this.showFileDownload(fileUrl, `${this.settings.title}_${exportId}.zip`)
-
-      if (exportedTapestry.wpPosts) {
-        this.downloadWpPosts(exportedTapestry.wpPosts, exportId)
-        this.hasExportedWpPosts = true
-      }
-
-      this.isExporting = false
-      this.hasExported = true
-      this.exportedFileType = ".zip"
-
-      if (this.hasWarnings(exportedTapestry)) {
-        this.exportWarnings = exportedTapestry.warnings
-      } else {
-        this.exportWarnings = null
-      }
-    },
-    hasWarnings(exportedTapestry) {
-      return (
-        exportedTapestry.warnings.nodes.length > 0 ||
-        exportedTapestry.warnings.settings.length > 0
-      )
-    },
-    downloadWpPosts(exportedPosts, exportId) {
-      const blob = new Blob([exportedPosts], {
-        type: "application/xml",
-      })
-      const fileUrl = URL.createObjectURL(blob)
-      this.showFileDownload(
-        fileUrl,
-        `${this.settings.title}-WP-Posts_${exportId}.xml`
-      )
-      URL.revokeObjectURL(fileUrl)
-    },
-    showFileDownload(fileUrl, fileName) {
-      const a = document.createElement("a")
-      a.style.display = "none"
-      a.href = fileUrl
-      a.download = fileName
-      document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
-    },
-    async optimizeThumbnails() {
-      this.isOptimizing = true
-      client
-        .optimizeNodeThumbnails()
-        .finally(() => {
-          this.isOptimizing = false
-          this.hasOptimized = true
-          setTimeout(() => {
-            this.hasOptimized = false
-          }, 10000)
-        })
-        .catch(err => {
-          console.log(err)
-          this.$bvToast.toast(
-            "Sorry, an error occurred. Some or all of the nodes were not optimized.",
-            {
-              title: "Optimization did not complete",
-              variant: "danger",
-            }
-          )
-        })
-    },
     isValidLat(coord) {
       return this.getCoord(coord, 0) <= 90 && this.getCoord(coord, 0) >= -90
     },
@@ -653,32 +435,6 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.export-button {
-  position: relative;
-  > span {
-    position: absolute;
-    height: 1.5em;
-    width: 1.5em;
-  }
-  &.disabled {
-    pointer-events: none;
-    cursor: not-allowed;
-  }
-}
-
-#optimize-thumbnails-button {
-  position: relative;
-  > span {
-    position: absolute;
-    height: 1.5em;
-    width: 1.5em;
-  }
-  &.disabled {
-    pointer-events: none;
-    cursor: not-allowed;
-  }
 }
 
 #save-button {

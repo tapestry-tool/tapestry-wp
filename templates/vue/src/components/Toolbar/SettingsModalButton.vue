@@ -98,8 +98,4 @@ export default {
   color: var(--highlight-color);
   transform: scale(1.1);
 }
-
-.settings-button:only-child {
-  margin-right: 12px;
-}
 </style>

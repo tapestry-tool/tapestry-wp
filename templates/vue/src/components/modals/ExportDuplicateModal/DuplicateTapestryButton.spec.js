@@ -2,7 +2,7 @@ import { fireEvent } from "@testing-library/vue"
 import { render } from "@/utils/test"
 
 import oneNodeTapestry from "@/fixtures/one-node.json"
-import DuplicateTapestryButton from "./DuplicateTapestryButton.vue"
+import DuplicateTapestryButton from "../ExportDuplicateModal/DuplicateTapestryButton.vue"
 import client from "@/services/TapestryAPI"
 
 jest.mock("@/services/TapestryAPI", () => {
