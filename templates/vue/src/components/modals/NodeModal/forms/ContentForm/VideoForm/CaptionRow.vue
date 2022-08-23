@@ -70,7 +70,7 @@
           variant="primary"
           class="download-button"
           :href="caption.captionUrl"
-          :disabled="!caption.captionUrl"
+          :disabled="disabled || !caption.captionUrl"
           target="_blank"
           download
         >
