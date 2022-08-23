@@ -6,6 +6,12 @@
     <b-dropdown-item-button @click="open(names.EXPORTDUPLICATE)">
       Export/Duplicate Tapestry
     </b-dropdown-item-button>
+    <b-dropdown-item-button
+      v-if="showKalturaOption"
+      @click="open(names.KALTURAMODAL)"
+    >
+      Kaltura Sync
+    </b-dropdown-item-button>
     <b-dropdown-item-button @click="open(names.OTHEROPERATIONS)">
       Other Operations
     </b-dropdown-item-button>
@@ -13,6 +19,11 @@
       :show="openOperation === names.EXPORTDUPLICATE"
       @close="close(names.EXPORTDUPLICATE)"
     ></export-duplicate-modal>
+    <kaltura-modal
+      v-if="showKalturaOption"
+      :show="openOperation === names.KALTURAMODAL"
+      @close="close(names.KALTURAMODAL)"
+    ></kaltura-modal>
     <other-operations-modal
       :show="openOperation === names.OTHEROPERATIONS"
       @close="close(names.OTHEROPERATIONS)"
@@ -23,18 +34,27 @@
 <script>
 import client from "@/services/TapestryAPI"
 import ExportDuplicateModal from "@/components/modals/ExportDuplicateModal"
+import KalturaModal from "@/components/modals/KalturaModal"
 import OtherOperationsModal from "@/components/modals/OtherOperationsModal"
 import { names } from "@/config/routes"
+import { getKalturaStatus } from "@/services/wp"
+import Helpers from "@/utils/Helpers"
 
-const operationModalNames = [names.EXPORTDUPLICATE, names.OTHEROPERATIONS]
+const operationModalNames = [
+  names.EXPORTDUPLICATE,
+  names.OTHEROPERATIONS,
+  names.KALTURAMODAL,
+]
 const operationAnalyticsNames = {
   [names.EXPORTDUPLICATE]: "export-duplicate",
+  [names.KALTURAMODAL]: "kaltura-modal",
   [names.OTHEROPERATIONS]: "other-operations",
 }
 
 export default {
   components: {
     ExportDuplicateModal,
+    KalturaModal,
     OtherOperationsModal,
   },
   data: function() {
@@ -56,6 +76,9 @@ export default {
           query: this.$route.query,
         })
       },
+    },
+    showKalturaOption() {
+      return Helpers.hasKalturaUploadPermission() && getKalturaStatus()
     },
   },
   methods: {

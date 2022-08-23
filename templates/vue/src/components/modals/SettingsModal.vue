@@ -217,14 +217,6 @@
             </b-form-checkbox>
           </b-form-group>
         </b-tab>
-        <b-tab
-          v-if="showKalturaTab"
-          title="Kaltura"
-          :active="tab === 'kaltura'"
-          @click="$emit('change:tab', 'kaltura')"
-        >
-          <kaltura-upload-tab></kaltura-upload-tab>
-        </b-tab>
       </b-tabs>
     </b-container>
     <template slot="modal-footer">
@@ -251,9 +243,7 @@ import { mapGetters, mapState } from "vuex"
 import FileUpload from "./common/FileUpload"
 import PermissionsTable from "./common/PermissionsTable"
 import DragSelectModular from "@/utils/dragSelectModular"
-import Helpers from "@/utils/Helpers"
-import KalturaUploadTab from "./KalturaUploadTab"
-import { data as wpData, getKalturaStatus } from "@/services/wp"
+import { data as wpData } from "@/services/wp"
 
 const defaultPermissions = Object.fromEntries(
   [
@@ -270,7 +260,6 @@ export default {
   components: {
     FileUpload,
     PermissionsTable,
-    KalturaUploadTab,
   },
   props: {
     show: {
@@ -333,9 +322,6 @@ export default {
         )
       }
       return true
-    },
-    showKalturaTab() {
-      return Helpers.hasKalturaUploadPermission() && getKalturaStatus()
     },
   },
   created() {
