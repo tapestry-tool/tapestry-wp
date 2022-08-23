@@ -138,7 +138,12 @@
         ]"
         :items="getVideoUploadStatus"
       ></b-table>
-      <b-alert :show="uploadError" variant="danger">
+      <b-alert
+        dismissible
+        :show="uploadError"
+        variant="danger"
+        @dismissed="clearUploadError"
+      >
         <p>
           The upload did not complete due to an error in the server.
         </p>
@@ -283,6 +288,10 @@ export default {
     },
     refreshVideoUploadStatus() {
       this.$refs.uploadStatusTable.refresh()
+    },
+    async clearUploadError() {
+      this.uploadError = false
+      await client.clearKalturaUploadError()
     },
   },
 }

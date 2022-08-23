@@ -357,6 +357,14 @@ $REST_API_ENDPOINTS = [
             'permission_callback' => 'TapestryPermissions::kalturaUpload',
         ],
     ],
+    'CLEAR_UPLOAD_ERROR' => (object) [
+        'ROUTE' => '/kaltura/upload_status/clear_error',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_POST_METHOD,
+            'callback' => 'clearUploadError',
+            'permission_callback' => 'TapestryPermissions::kalturaUpload',
+        ],
+    ],
     'STOP_KALTURA_UPLOAD' => (object) [
         'ROUTE' => '/kaltura/stop_upload',
         'ARGUMENTS' => [
@@ -1891,6 +1899,17 @@ function forceResetUploadStatus($request)
 }
 
 /**
+ * Clear the upload error.
+ */
+function clearUploadError($request)
+{
+    update_option(KalturaUpload::UPLOAD_ERROR_OPTION, '');
+    return (object) [
+        'success' => get_option(KalturaUpload::UPLOAD_ERROR_OPTION) === '',
+    ];
+}
+
+/**
  * Gets all videos in a Tapestry that can be uploaded to Kaltura.
  * If tapestryPostId query parameter is not set, gets uploadable videos in all Tapestries.
  *
@@ -1973,6 +1992,9 @@ function updateConvertingVideos($request)
 
     // Update the upload log so the user sees the latest statuses
     amend_upload_log($videos);
+
+    // Clear the upload error
+    update_option(KalturaUpload::UPLOAD_ERROR_OPTION, '');
 
     return (object) [
         'processedVideos' => $videos,
