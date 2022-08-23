@@ -274,7 +274,7 @@
             }
             foreach ($toAdd as $caption) {
                 $captionAssetId = $this->_createCaptionAsset($kclient, $caption, $videoEntryId);
-                $tokenId = $this->_uploadFile($kclient, $caption->file, ['vtt', 'srt']);
+                $tokenId = $this->_uploadFile($kclient, $caption->file, ['vtt', 'srt'], true);
                 $this->_setCaptionAssetContent($kclient, $caption, $captionAssetId, $tokenId);
             }
             foreach ($toUpdate as $caption) {
@@ -381,13 +381,18 @@
          *
          * @param object $file              object containing file name and path information
          * @param array  $allowedExtensions list of valid file extensions to upload
+         * @param bool   $errorIfInvalid    whether to throw an error if the file is not a local upload
          *
          * @return string|null the upload token ID or null if given file is invalid
          */
-        private function _uploadFile($kclient, $file, $allowedExtensions)
+        private function _uploadFile($kclient, $file, $allowedExtensions, $errorIfInvalid = false)
         {
             if (empty($file) || !in_array($file->extension, $allowedExtensions)) {
-                return null;
+                if ($errorIfInvalid) {
+                    throw new TapestryError('UPLOAD_FILE_NOT_FOUND');
+                } else {
+                    return null;
+                }
             }
             if (!file_exists($file->file_path)) {
                 throw new TapestryError('UPLOAD_FILE_NOT_FOUND');

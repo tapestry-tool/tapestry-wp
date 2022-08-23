@@ -88,9 +88,7 @@
                 compact-mode
                 :disabled="disabled"
                 :file-types="isKaltura ? '.vtt, .srt' : '.vtt'"
-                :placeholder="
-                  `Enter URL or upload a VTT${isKaltura ? '/SRT' : ''} file`
-                "
+                :placeholder="`Upload a VTT${isKaltura ? ' or SRT' : ''} file`"
                 :is-image="false"
                 :file-upload-id="
                   `caption-file-upload-${isPending ? 'pending' : ''}-${caption.id}`
