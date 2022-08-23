@@ -450,6 +450,7 @@ export default {
       d3
         .drag()
         .on("start", () => {
+          this.$emit("dragstart")
           this.dragCoordinates = {}
           if (this.selection.length) {
             this.dragCoordinates = this.selection.reduce((coordinates, nodeId) => {
@@ -468,6 +469,10 @@ export default {
           }
         })
         .on("drag", () => {
+          this.$emit("drag", {
+            x: d3.event.x,
+            y: d3.event.y,
+          })
           for (const id of Object.keys(this.dragCoordinates)) {
             const node = this.getNode(id)
             node.coordinates.x += d3.event.dx / this.scale

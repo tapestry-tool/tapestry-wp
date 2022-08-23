@@ -32,7 +32,9 @@
           :data-id="id"
           :root="id == selectedId"
           tabindex="-1"
-          @dragend="updateViewBox"
+          @dragstart="handleNodeDragStart"
+          @drag="handleNodeDrag"
+          @dragend="handleNodeDragEnd"
           @mouseover="handleMouseover(id)"
           @mouseleave="activeNode = null"
           @mounted="dragSelectEnabled ? updateSelectableNodes(node) : null"
@@ -99,6 +101,9 @@ export default {
       appDimensions: null,
       zoomPanHelper: null,
       isPanning: false,
+
+      dragTimer: null,
+      dragEdgeDirection: { x: 0, y: 0 },
 
       showMinimap: true,
     }
@@ -594,6 +599,49 @@ export default {
         },
         "easeOut"
       )
+    },
+    handleNodeDragStart() {
+      const speed = 20
+      clearInterval(this.dragTimer)
+      this.dragTimer = setInterval(() => {
+        this.offset.x += speed * this.dragEdgeDirection.x
+        this.offset.y += speed * this.dragEdgeDirection.y
+      }, 50)
+    },
+    handleNodeDrag({ x, y }) {
+      const marginRatio = 0.1
+      if (
+        Math.abs(x - this.viewBox[0] - this.offset.x) <=
+        this.viewBox[2] * marginRatio
+      ) {
+        this.dragEdgeDirection.x = -1
+      } else if (
+        Math.abs(this.viewBox[0] + this.offset.x + this.viewBox[2] - x) <=
+        this.viewBox[2] * marginRatio
+      ) {
+        this.dragEdgeDirection.x = 1
+      } else {
+        this.dragEdgeDirection.x = 0
+      }
+      if (
+        Math.abs(y - this.viewBox[1] - this.offset.y) <=
+        this.viewBox[3] * marginRatio
+      ) {
+        this.dragEdgeDirection.y = -1
+      } else if (
+        Math.abs(this.viewBox[1] + this.offset.y + this.viewBox[3] - y) <=
+        this.viewBox[3] * marginRatio
+      ) {
+        this.dragEdgeDirection.y = 1
+      } else {
+        this.dragEdgeDirection.y = 0
+      }
+    },
+    handleNodeDragEnd() {
+      clearInterval(this.dragTimer)
+      this.dragTimer = null
+      this.updateViewBox()
+      this.clampOffset()
     },
     handleMouseover(id) {
       const node = this.nodes[id]
