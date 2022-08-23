@@ -582,10 +582,7 @@ export default {
       ) {
         this.selected ? this.unselect(this.node.id) : this.select(this.node.id)
       } else if (this.node.unlocked || this.hasPermission("edit")) {
-        this.$emit("click", {
-          event: evt,
-          level: this.node.level,
-        })
+        this.$emit("click", this.node)
         this.root && this.node.hideMedia
           ? this.openNode(this.node.id)
           : this.updateRootNode()
