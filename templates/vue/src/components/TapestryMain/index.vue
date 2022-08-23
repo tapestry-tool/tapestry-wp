@@ -32,7 +32,9 @@
           :data-id="id"
           :root="id == selectedId"
           tabindex="-1"
-          @dragend="updateViewBox"
+          @dragstart="handleNodeDragStart"
+          @drag="handleNodeDrag"
+          @dragend="handleNodeDragEnd"
           @mouseover="handleMouseover(id)"
           @mouseleave="activeNode = null"
           @mounted="dragSelectEnabled ? updateSelectableNodes(node) : null"
@@ -75,7 +77,7 @@ import Helpers from "@/utils/Helpers"
 import ZoomPanHelper from "@/utils/ZoomPanHelper"
 import { names } from "@/config/routes"
 import * as wp from "@/services/wp"
-import { interpolate, interpolateDelta } from "@/utils/interpolate"
+import { interpolate } from "@/utils/interpolate"
 // import { scaleConstants } from "@/utils/constants"
 
 export default {
@@ -99,6 +101,9 @@ export default {
       appDimensions: null,
       zoomPanHelper: null,
       isPanning: false,
+
+      dragTimer: null,
+      dragEdgeDirection: { x: 0, y: 0 },
 
       showMinimap: true,
     }
@@ -545,24 +550,96 @@ export default {
 
       return box
     },
-    handleNodeClick({ event, level }) {
+    handleNodeClick(node) {
       // zoom to the level that the node is on, and pan towards the node
-      const baseRadius = Helpers.getNodeBaseRadius(level, this.maxLevel)
+      const baseRadius = Helpers.getNodeBaseRadius(node.level, this.maxLevel)
       const targetScale = 140 / baseRadius
       const deltaScale = targetScale - this.scale
-      const { offsetX, offsetY } = event
-      interpolateDelta(
-        0,
-        deltaScale,
+
+      const targetViewBoxX = this.unscaledViewBox[0] * targetScale
+      const targetViewBoxY = this.unscaledViewBox[1] * targetScale
+
+      let targetOffset = {
+        x:
+          this.offset.x +
+          (node.coordinates.x - this.unscaledViewBox[0]) * deltaScale,
+        y:
+          this.offset.y +
+          (node.coordinates.y - this.unscaledViewBox[1]) * deltaScale,
+      }
+      targetOffset = this.clampOffsetValue(targetOffset, targetScale)
+
+      interpolate(
+        {
+          scale: this.scale,
+          offsetX: this.offset.x,
+          offsetY: this.offset.y,
+          viewBoxX: this.viewBox[0],
+          viewBoxY: this.viewBox[1],
+        },
+        {
+          scale: targetScale,
+          offsetX: targetOffset.x,
+          offsetY: targetOffset.y,
+          viewBoxX: targetViewBoxX,
+          viewBoxY: targetViewBoxY,
+        },
         Math.abs(deltaScale * 600),
-        delta => {
-          this.handleZoom(delta, offsetX, offsetY)
+        ({ scale, offsetX, offsetY, viewBoxX, viewBoxY }) => {
+          this.scale = scale
+          this.offset.x = offsetX
+          this.offset.y = offsetY
+          this.viewBox[0] = viewBoxX
+          this.viewBox[1] = viewBoxY
         },
         () => {
           this.updateScale()
         },
         "easeOut"
       )
+    },
+    handleNodeDragStart() {
+      const speed = 20
+      clearInterval(this.dragTimer)
+      this.dragTimer = setInterval(() => {
+        this.offset.x += speed * this.dragEdgeDirection.x
+        this.offset.y += speed * this.dragEdgeDirection.y
+      }, 50)
+    },
+    handleNodeDrag({ x, y }) {
+      const marginRatio = 0.1
+      if (
+        Math.abs(x - this.viewBox[0] - this.offset.x) <=
+        this.viewBox[2] * marginRatio
+      ) {
+        this.dragEdgeDirection.x = -1
+      } else if (
+        Math.abs(this.viewBox[0] + this.offset.x + this.viewBox[2] - x) <=
+        this.viewBox[2] * marginRatio
+      ) {
+        this.dragEdgeDirection.x = 1
+      } else {
+        this.dragEdgeDirection.x = 0
+      }
+      if (
+        Math.abs(y - this.viewBox[1] - this.offset.y) <=
+        this.viewBox[3] * marginRatio
+      ) {
+        this.dragEdgeDirection.y = -1
+      } else if (
+        Math.abs(this.viewBox[1] + this.offset.y + this.viewBox[3] - y) <=
+        this.viewBox[3] * marginRatio
+      ) {
+        this.dragEdgeDirection.y = 1
+      } else {
+        this.dragEdgeDirection.y = 0
+      }
+    },
+    handleNodeDragEnd() {
+      clearInterval(this.dragTimer)
+      this.dragTimer = null
+      this.updateViewBox()
+      this.clampOffset()
     },
     handleMouseover(id) {
       const node = this.nodes[id]

@@ -450,6 +450,7 @@ export default {
       d3
         .drag()
         .on("start", () => {
+          this.$emit("dragstart")
           this.dragCoordinates = {}
           if (this.selection.length) {
             this.dragCoordinates = this.selection.reduce((coordinates, nodeId) => {
@@ -468,6 +469,10 @@ export default {
           }
         })
         .on("drag", () => {
+          this.$emit("drag", {
+            x: d3.event.x,
+            y: d3.event.y,
+          })
           for (const id of Object.keys(this.dragCoordinates)) {
             const node = this.getNode(id)
             node.coordinates.x += d3.event.dx / this.scale
@@ -582,10 +587,7 @@ export default {
       ) {
         this.selected ? this.unselect(this.node.id) : this.select(this.node.id)
       } else if (this.node.unlocked || this.hasPermission("edit")) {
-        this.$emit("click", {
-          event: evt,
-          level: this.node.level,
-        })
+        this.$emit("click", this.node)
         this.root && this.node.hideMedia
           ? this.openNode(this.node.id)
           : this.updateRootNode()
