@@ -421,6 +421,8 @@ class TapestryHelpers
      * Checks if the user has defined a maximum video upload size for Kaltura that is smaller than the WordPress max upload size,
      * and if so, whether a video is too large to be uploaded.
      * 
+     * Assumes that the input video can be uploaded to Kaltura (check before calling).
+     * 
      * @param TapestryNode  $node
      * @return boolean  True if the user has defined no maximum video upload size, or it is not smaller than the WordPress max upload size.
      *                  Otherwise, returns true if the video is within the user-defined limit.

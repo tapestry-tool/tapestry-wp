@@ -1916,12 +1916,12 @@ function getKalturaUploadStatus($request)
         }
 
         $inProgress = get_option(KalturaUpload::IN_PROGRESS_OPTION) === KalturaUpload::YES_VALUE;
-        $error = get_option(KalturaUpload::UPLOAD_ERROR_OPTION, null);
+        $error = get_option(KalturaUpload::UPLOAD_ERROR_OPTION, '');
         return (object) [
             'videos' => $videos,
             'totalCount' => $totalCount,    // Number of videos in all pages
             'inProgress' => $inProgress,
-            'error' => $error,
+            'error' => !empty($error),
         ];
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
