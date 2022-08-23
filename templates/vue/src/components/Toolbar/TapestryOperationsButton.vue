@@ -1,5 +1,5 @@
 <template>
-  <b-dropdown right toggle-class="operations-button">
+  <b-dropdown right variant="none" toggle-class="operations-button">
     <template #button-content>
       <i class="fas fa-ellipsis-h"></i>
     </template>
@@ -85,27 +85,26 @@ export default {
 
 <style lang="scss">
 .operations-button {
-  padding: 0.5rem !important;
-  background-color: transparent !important;
-  border: 0 !important;
-  font-size: 1.2em !important;
-  transition: all 0.2s ease !important;
-  color: #999 !important;
-
-  &:focus,
-  &:active,
-  &:hover {
-    background-color: transparent !important;
-    outline: none;
-    box-shadow: none !important;
-  }
-  &:hover {
-    color: var(--highlight-color) !important;
-    transform: scale(1.1);
-  }
+  padding: 0.5rem !important; // Override Bootstrap button padding
+  background: none;
+  font-size: 1.2em;
+  transition: all 0.2s ease;
 
   &::after {
-    content: none !important;
+    content: none !important; // Remove Bootstrap dropdown arrow
+  }
+
+  &:focus {
+    background: none;
+    color: #999 !important;
+    outline: none;
+    box-shadow: none !important; // Remove Bootstrap focus outline
+  }
+
+  &:hover {
+    background: none;
+    color: var(--highlight-color);
+    transform: scale(1.1);
   }
 }
 
