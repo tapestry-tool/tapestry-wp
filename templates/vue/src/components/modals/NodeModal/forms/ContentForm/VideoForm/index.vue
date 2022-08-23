@@ -2,7 +2,7 @@
   <div>
     <b-row>
       <b-col>
-        <b-overlay :show="useKaltura">
+        <b-overlay :show="useKaltura" z-index="1">
           <template #overlay><div></div></template>
           <b-form-group label="Video source">
             <file-upload
@@ -62,6 +62,7 @@
           <b-input-group-append>
             <b-button
               variant="primary"
+              class="edit-kaltura-id-button"
               data-qa="edit-kaltura-id-button"
               :aria-label="editingKalturaId ? 'Submit' : 'Edit Kaltura ID'"
               :disabled="isLoadingKalturaCaptions"
@@ -333,3 +334,9 @@ export default {
   },
 }
 </script>
+
+<style lang="scss" scoped>
+.edit-kaltura-id-button {
+  z-index: 1; // Prevent button from appearing above NodeModal error banner
+}
+</style>
