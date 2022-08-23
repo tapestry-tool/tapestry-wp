@@ -11,22 +11,26 @@
     </b-dropdown-item-button>
     <export-duplicate-modal
       :show="openOperation === names.EXPORTDUPLICATE"
-      @close="close"
+      @close="close(names.EXPORTDUPLICATE)"
     ></export-duplicate-modal>
     <other-operations-modal
       :show="openOperation === names.OTHEROPERATIONS"
-      @close="close"
+      @close="close(names.OTHEROPERATIONS)"
     ></other-operations-modal>
   </b-dropdown>
 </template>
 
 <script>
-// import client from "@/services/TapestryAPI"
+import client from "@/services/TapestryAPI"
 import ExportDuplicateModal from "@/components/modals/ExportDuplicateModal"
 import OtherOperationsModal from "@/components/modals/OtherOperationsModal"
 import { names } from "@/config/routes"
 
 const operationModalNames = [names.EXPORTDUPLICATE, names.OTHEROPERATIONS]
+const operationAnalyticsNames = {
+  [names.EXPORTDUPLICATE]: "export-duplicate",
+  [names.OTHEROPERATIONS]: "other-operations",
+}
 
 export default {
   components: {
@@ -57,11 +61,23 @@ export default {
   methods: {
     open(operation) {
       this.openOperation = operation
-      // TODO: record analytics event
+      if (operation && operationAnalyticsNames[operation]) {
+        client.recordAnalyticsEvent(
+          "user",
+          "open",
+          operationAnalyticsNames[operation]
+        )
+      }
     },
-    close() {
+    close(operation) {
       this.openOperation = null
-      // TODO: record analytics event
+      if (operation && operationAnalyticsNames[operation]) {
+        client.recordAnalyticsEvent(
+          "user",
+          "close",
+          operationAnalyticsNames[operation]
+        )
+      }
     },
   },
 }
