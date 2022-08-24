@@ -233,6 +233,11 @@ export default {
       immediate: true,
       handler(show) {
         if (show) {
+          this.selectedVideos = []
+          setTimeout(() => {
+            this.refreshVideosToUpload()
+          }, 0)
+
           this.uploadStatusRefreshTimer = setInterval(
             this.refreshVideoUploadStatus,
             15 * 1000
