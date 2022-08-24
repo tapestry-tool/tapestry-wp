@@ -39,7 +39,9 @@
           </template>
           <template #cell(selected)="{rowSelected, selectRow, unselectRow, item}">
             <b-form-checkbox
-              :aria-label="`Select node ${item.nodeID}, ${item.nodeTitle}`"
+              :aria-label="
+                `Select node ${item.nodeID}, ${item.nodeTitle}, ${item.nodeType} node`
+              "
               :checked="rowSelected"
               :disabled="!item.withinSizeLimit"
               class="d-inline"
