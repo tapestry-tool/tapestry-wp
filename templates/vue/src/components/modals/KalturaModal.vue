@@ -9,6 +9,15 @@
     @hidden="$emit('close')"
   >
     <b-container fluid class="px-1">
+      <b-alert
+        dismissible
+        class="mt-2 sticky-top"
+        variant="danger"
+        :show="!!apiError"
+        @dismissed="apiError = null"
+      >
+        Error: {{ apiError }}
+      </b-alert>
       <b-overlay :show="videosUploading" variant="white">
         <template #overlay><div></div></template>
         <div>Upload Videos to Kaltura</div>
@@ -165,6 +174,7 @@
 
 <script>
 import client from "@/services/TapestryAPI"
+import ErrorHelper from "@/utils/errorHelper"
 
 export default {
   props: {
@@ -177,6 +187,7 @@ export default {
     return {
       videosUploading: false,
       uploadError: false,
+      apiError: null,
       useKalturaPlayer: false,
       allVideos: [],
       selectedVideos: [],
@@ -249,7 +260,13 @@ export default {
     },
     startVideoUpload() {
       this.videosUploading = true
-      client.startKalturaUpload(this.selectedVideos, this.useKalturaPlayer)
+
+      client
+        .startKalturaUpload(this.selectedVideos, this.useKalturaPlayer)
+        .catch(error => {
+          // Kaltura availability changed unexpectedly
+          this.apiError = ErrorHelper.getErrorMessage(error)
+        })
 
       setTimeout(this.refreshVideoUploadStatus, 500)
     },
