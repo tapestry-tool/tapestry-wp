@@ -407,63 +407,21 @@ export default {
       d3
         .drag()
         .on("start", () => {
-          this.$emit("dragstart")
-          this.dragCoordinates = {}
-          if (this.selection.length) {
-            this.dragCoordinates = this.selection.reduce((coordinates, nodeId) => {
-              const node = this.getNode(nodeId)
-              coordinates[nodeId] = {
-                x: node.coordinates.x,
-                y: node.coordinates.y,
-              }
-              return coordinates
-            }, {})
-          } else {
-            this.dragCoordinates[this.node.id] = {
-              x: this.node.coordinates.x,
-              y: this.node.coordinates.y,
-            }
-          }
+          this.$emit("dragstart", this.node)
         })
         .on("drag", () => {
           this.$emit("drag", {
             x: d3.event.x,
             y: d3.event.y,
+            dx: d3.event.dx,
+            dy: d3.event.dy,
           })
-          for (const id of Object.keys(this.dragCoordinates)) {
-            const node = this.getNode(id)
-            node.coordinates.x += d3.event.dx / this.scale
-            node.coordinates.y += d3.event.dy / this.scale
-          }
         })
         .on("end", () => {
-          for (const [id, originalCoordinates] of Object.entries(
-            this.dragCoordinates
-          )) {
-            const node = this.getNode(id)
-            node.coordinates.x += d3.event.dx / this.scale
-            node.coordinates.y += d3.event.dy / this.scale
-            let coordinates = {
-              x: node.coordinates.x,
-              y: node.coordinates.y,
-            }
-            if (
-              originalCoordinates.x == coordinates.x &&
-              originalCoordinates.y == coordinates.y
-            ) {
-              continue
-            }
-            this.$emit("dragend")
-            if (this.hasPermission("edit") || this.hasPermission("move")) {
-              this.updateNodeCoordinates({
-                id,
-                coordinates,
-                originalCoordinates,
-              }).catch(() => {
-                this.$emit("dragend")
-              })
-            }
-          }
+          this.$emit("dragend", {
+            dx: d3.event.dx,
+            dy: d3.event.dy,
+          })
         })
     )
   },
