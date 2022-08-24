@@ -157,7 +157,7 @@
 
 <script>
 import * as d3 from "d3"
-import { mapGetters, mapState, mapMutations } from "vuex"
+import { mapGetters, mapState, mapMutations, mapActions } from "vuex"
 import TapestryIcon from "@/components/common/TapestryIcon"
 import { names } from "@/config/routes"
 import { bus } from "@/utils/event-bus"
