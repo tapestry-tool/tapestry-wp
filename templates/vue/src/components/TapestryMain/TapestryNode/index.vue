@@ -157,7 +157,7 @@
 
 <script>
 import * as d3 from "d3"
-import { mapActions, mapGetters, mapState, mapMutations } from "vuex"
+import { mapGetters, mapState, mapMutations } from "vuex"
 import TapestryIcon from "@/components/common/TapestryIcon"
 import { names } from "@/config/routes"
 import { bus } from "@/utils/event-bus"
@@ -426,7 +426,6 @@ export default {
     )
   },
   methods: {
-    ...mapActions(["updateNodeCoordinates"]),
     ...mapMutations(["select", "unselect"]),
     updateRootNode() {
       if (!this.root) {
