@@ -1,5 +1,13 @@
 <template>
-  <b-dropdown right variant="none" toggle-class="operations-button">
+  <b-dropdown
+    id="operations-button"
+    right
+    variant="none"
+    toggle-class="operations-button"
+    :toggle-attrs="{
+      'aria-label': 'Tapestry Operations',
+    }"
+  >
     <template #button-content>
       <i class="fas fa-ellipsis-h"></i>
     </template>
