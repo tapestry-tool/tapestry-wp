@@ -566,6 +566,6 @@ export default class Helpers {
   }
 
   static getLinkElementId(sourceId, targetId) {
-    return `tapestry-link-${sourceId}-${targetId}`
+    return `link-${sourceId}-${targetId}`
   }
 }
