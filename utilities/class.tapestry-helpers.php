@@ -453,11 +453,18 @@ class TapestryHelpers
      */
     public static function checkVideoFileSize($node)
     {
-        if (!defined('TAPESTRY_KALTURA_UPLOAD_MAX_FILE_SIZE')) {
+        // Overridden value in WordPress settings
+        $max_file_size_setting = get_option('tapestry_kaltura_upload_max_file_size');
+
+        // Value defined in wp-config.php
+        $max_file_size_constant = defined('TAPESTRY_KALTURA_UPLOAD_MAX_FILE_SIZE') ? TAPESTRY_KALTURA_UPLOAD_MAX_FILE_SIZE : null;
+
+        $user_defined_size_string = !empty($max_file_size_setting) ? $max_file_size_setting : $max_file_size_constant;
+        if (empty($user_defined_size_string)) {
             return true;
         }
 
-        $user_defined_max_upload_size = wp_convert_hr_to_bytes(TAPESTRY_KALTURA_UPLOAD_MAX_FILE_SIZE);
+        $user_defined_max_upload_size = wp_convert_hr_to_bytes($user_defined_size_string);
 
         if ($user_defined_max_upload_size >= wp_max_upload_size()) {
             return true;

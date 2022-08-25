@@ -23,11 +23,11 @@ function register_tapestry_settings()
         'sanitize_callback' => 'trim',  // Trim whitespace from user input
         'default' => null,
     ];
-    register_setting('tapestry_kaltura_config', 'kaltura_admin_secret', array_merge($args, ['description' => 'Kaltura Admin Secret']));
+    register_setting('tapestry_kaltura_config', 'kaltura_admin_secret', array_merge($args, ['description' => 'Kaltura Administrator Secret']));
     register_setting('tapestry_kaltura_config', 'kaltura_partner_id', array_merge($args, ['description' => 'Kaltura Partner ID']));
     register_setting('tapestry_kaltura_config', 'kaltura_service_url', array_merge($args, ['description' => 'Kaltura Service URL']));
     register_setting('tapestry_kaltura_config', 'kaltura_unique_config', array_merge($args, ['description' => 'Kaltura Unique Configuration']));
-    // TODO: can the user override the max upload size too?
+    register_setting('tapestry_kaltura_config', 'tapestry_kaltura_upload_max_file_size', array_merge($args, ['description' => 'Maximum file size for Kaltura upload']));
 }
 
 function tapestry_settings_init()
@@ -78,6 +78,7 @@ function tapestry_kaltura_config_section_cb()
     $kaltura_partner_id = get_option('kaltura_partner_id', '');
     $kaltura_service_url = get_option('kaltura_service_url', '');
     $kaltura_unique_config = get_option('kaltura_unique_config', '');
+    $kaltura_upload_max_file_size = get_option('tapestry_kaltura_upload_max_file_size', '');
 
     ?>
     <p>
@@ -114,7 +115,21 @@ function tapestry_kaltura_config_section_cb()
                     <th scope="row">Kaltura Unique Configuration</th>
                     <td>
                         <input type="text" name="kaltura_unique_config" value="<?php echo $kaltura_unique_config ?>">
-                        <p class="description">The Kaltura Unique Configuration sets the media player design. It can be found in the Studio tab in the Kaltura admin dashboard.</p>
+                        <p class="description">
+                            The Kaltura Unique Configuration sets the media player design.
+                            It can be found in the Studio tab in the Kaltura admin dashboard.
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">Kaltura Upload Max File Size</th>
+                    <td>
+                        <input type="text" placeholder="Examples: 20M, 500K" name="tapestry_kaltura_upload_max_file_size" value="<?php echo $kaltura_upload_max_file_size ?>">
+                        <p class="description">
+                            If specified, videos larger than this file size cannot be uploaded to Kaltura.
+                            <br/>
+                            (Advanced: This uses the same shorthand byte notation as php.ini files.)
+                        </p>
                     </td>
                 </tr>
             </tbody>
