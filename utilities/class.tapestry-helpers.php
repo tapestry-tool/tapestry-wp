@@ -309,6 +309,30 @@ class TapestryHelpers
     }
 
     /**
+     * Getters for Kaltura configuration variables.
+     * Return null if LOAD_KALTURA is false.
+     */
+    public static function getKalturaAdminSecret()
+    {
+        return KALTURA_OVERRIDE_CONFIG ? get_option('kaltura_admin_secret') : (KALTURA_DEFAULT_CONFIG ? KALTURA_ADMIN_SECRET : null);
+    }
+
+    public static function getKalturaPartnerId()
+    {
+        return KALTURA_OVERRIDE_CONFIG ? get_option('kaltura_partner_id') : (KALTURA_DEFAULT_CONFIG ? KALTURA_PARTNER_ID : null);
+    }
+
+    public static function getKalturaServiceUrl()
+    {
+        return KALTURA_OVERRIDE_CONFIG ? get_option('kaltura_service_url') : (KALTURA_DEFAULT_CONFIG ? KALTURA_SERVICE_URL : null);
+    }
+
+    public static function getKalturaUniqueConfig()
+    {
+        return KALTURA_OVERRIDE_CONFIG ? get_option('kaltura_unique_config') : (KALTURA_DEFAULT_CONFIG ? KALTURA_UNIQUE_CONFIG : null);
+    }
+
+    /**
      * Update the Kaltura upload status of a video node.
      *
      * @param TapestryNode      $node           Video node to update
@@ -340,14 +364,14 @@ class TapestryHelpers
         $typeData = $node->getTypeData();
         $typeData->mediaURL = $kalturaData->dataUrl.'?.mp4';
         $typeData->kalturaId = $kalturaData->id;
-        
+
         // Save Kaltura account info so we can still show Kaltura player, even if LOAD_KALTURA is currently false
         if (!isset($typeData->kalturaData)) {
             $typeData->kalturaData = [];
         }
-        $typeData->kalturaData['partnerId'] = KALTURA_PARTNER_ID;
-        $typeData->kalturaData['serviceUrl'] = KALTURA_SERVICE_URL;
-        $typeData->kalturaData['uniqueConfiguration'] = KALTURA_UNIQUE_CONFIG;
+        $typeData->kalturaData['partnerId'] = self::getKalturaPartnerId();
+        $typeData->kalturaData['serviceUrl'] = self::getKalturaServiceUrl();
+        $typeData->kalturaData['uniqueConfiguration'] = self::getKalturaUniqueConfig();
 
         if ($useKalturaPlayer) {
             $node->set((object) ['mediaFormat' => 'kaltura']);
@@ -420,9 +444,9 @@ class TapestryHelpers
     /**
      * Checks if the user has defined a maximum video upload size for Kaltura that is smaller than the WordPress max upload size,
      * and if so, whether a video is too large to be uploaded.
-     * 
+     *
      * Assumes that the input video can be uploaded to Kaltura (check before calling).
-     * 
+     *
      * @param TapestryNode  $node
      * @return boolean  True if the user has defined no maximum video upload size, or it is not smaller than the WordPress max upload size.
      *                  Otherwise, returns true if the video is within the user-defined limit.
