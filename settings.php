@@ -82,7 +82,8 @@ function tapestry_kaltura_config_section_cb()
 
     ?>
     <p>
-        Override defaults with your own Kaltura configuration variables for this site.
+        Use a different set of Kaltura configuration variables on this site only.
+        If you wish to do this, all four configuration variables must be provided.
     </p>
     <form action="options.php" method="post">
         <?php
