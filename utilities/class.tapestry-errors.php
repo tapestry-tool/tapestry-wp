@@ -110,6 +110,10 @@ class TapestryError extends Error
             'MESSAGE' => 'The Tapestry is not empty',
             'STATUS' => ['status' => 400],
         ],
+        'FAILED_TO_ESTABLISH_KALTURA_SESSION' => [
+            'MESSAGE' => 'Unable to establish Kaltura session',
+            'STATUS' => ['status' => 401],
+        ],
         'UPLOAD_FILE_NOT_FOUND' => [
             'MESSAGE' => 'File was not found on the server',
             'STATUS' => ['status' => 500],
