@@ -40,7 +40,7 @@ import moment from "moment"
 import TapestryIcon from "@/components/common/TapestryIcon"
 import { names } from "@/config/routes"
 import { nodeStatus } from "@/utils/constants"
-import * as Comment from "@/utils/comments"
+import * as Comment from "@/utils/reviewComments"
 
 export default {
   components: {
