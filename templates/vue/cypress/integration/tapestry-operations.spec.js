@@ -1,6 +1,6 @@
 import { TEST_TAPESTRY_NAME } from "../support/constants"
 
-describe("Settings", () => {
+describe("Operations", () => {
   beforeEach(() => {
     cy.fixture("three-nodes.json").as("tapestry")
     cy.setup("@tapestry")

@@ -11,8 +11,7 @@
     <b-container fluid class="px-1">
       <b-form-group
         label="Export/Duplicate"
-        description="Export your tapestry to a file and then you can import it on another site.
-              Duplicating will create a copy of this tapestry on this site."
+        description="Export your tapestry to a file and then you can import it on another site. Duplicating will create a copy of this tapestry on this site."
       >
         <b-row class="mb-2">
           <b-col>

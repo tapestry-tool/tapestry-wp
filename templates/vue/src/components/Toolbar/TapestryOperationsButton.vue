@@ -7,6 +7,7 @@
     :toggle-attrs="{
       'aria-label': 'Tapestry Operations',
     }"
+    menu-class="operations-menu"
   >
     <template #button-content>
       <i class="fas fa-ellipsis-h"></i>
@@ -92,6 +93,13 @@ export default {
 </script>
 
 <style lang="scss">
+.operations-menu {
+  button:active {
+    background: var(--highlight-color);
+    color: #fff !important;
+  }
+}
+
 .operations-button {
   padding: 0.5rem !important; // Override Bootstrap button padding
   background: none;
