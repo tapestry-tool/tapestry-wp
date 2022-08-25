@@ -26,7 +26,13 @@
             :condition-node="conditionNode"
           ></locked-content>
         </button>
-        <a v-if="canEditNode" aria-label="Edit this node" @click="editNode">
+        <a
+          v-if="canEditNode"
+          aria-label="Edit this node"
+          role="button"
+          tabindex="0"
+          @click="editNode"
+        >
           <i class="fas fa-pencil-alt fa-sm pr-2"></i>
         </a>
         <a
@@ -36,6 +42,7 @@
           :aria-label="
             `${isFavourite(node.id) ? 'Remove from' : 'Add to'} favourites`
           "
+          role="button"
           tabindex="0"
           @click="toggleFavourite(node.id)"
         >
@@ -45,7 +52,13 @@
       <div v-else class="title-row-icon">
         <i v-if="disabled" class="fas fa-lock fa-sm" aria-hidden="true"></i>
         <span v-else>
-          <a v-if="canEditNode" aria-label="Edit this node" @click="editNode">
+          <a
+            v-if="canEditNode"
+            aria-label="Edit this node"
+            role="button"
+            tabindex="0"
+            @click="editNode"
+          >
             <i class="fas fa-pencil-alt fa-sm pr-2"></i>
           </a>
           <a
@@ -55,6 +68,7 @@
             :aria-label="
               `${isFavourite(node.id) ? 'Remove from' : 'Add to'} favourites`
             "
+            role="button"
             tabindex="0"
             @click="toggleFavourite(node.id)"
           >
@@ -284,10 +298,12 @@ button[disabled] {
     opacity: 0.25;
   }
   a:hover,
+  a:focus,
   a:active {
     i {
       opacity: 1;
     }
+    outline: none;
   }
 
   .trigger-row-btn {

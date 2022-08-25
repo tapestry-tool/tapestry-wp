@@ -68,14 +68,18 @@ export default {
     },
   },
   mounted() {
-    this.$root.$on("bv::modal::hide", (_, modalId) => {
-      if (modalId === "user-settings-modal") {
-        this.$emit("close")
-      }
-    })
+    this.$root.$on("bv::modal::hide", this.handleModalHide)
+  },
+  beforeDestroy() {
+    this.$root.$off("bv::modal::hide", this.handleModalHide)
   },
   methods: {
     ...mapActions(["updateUserSettings"]),
+    handleModalHide(_, modalId) {
+      if (modalId === "user-settings-modal") {
+        this.$emit("close")
+      }
+    },
     closeModal() {
       this.$root.$emit("bv::hide::modal", "user-settings-modal")
     },

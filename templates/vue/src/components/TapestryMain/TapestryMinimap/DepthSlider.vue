@@ -58,7 +58,7 @@ export default {
       return Number(this.$route.params.nodeId)
     },
     maxDepth() {
-      return this.maxLevel
+      return this.maxLevel - 1
     },
     zoomInBg() {
       return "url(" + Helpers.getImagePath(ZoomIn) + ")"

@@ -19,7 +19,6 @@
             ? 'pointer'
             : 'not-allowed',
       }"
-      tabindex="0"
       @focus="handleFocus"
       @blur="handleBlur"
       @click="handleClick"
@@ -161,7 +160,7 @@
 
 <script>
 import * as d3 from "d3"
-import { mapActions, mapGetters, mapState, mapMutations } from "vuex"
+import { mapGetters, mapState, mapMutations, mapActions } from "vuex"
 import TapestryIcon from "@/components/common/TapestryIcon"
 import { names } from "@/config/routes"
 import { bus } from "@/utils/event-bus"
@@ -203,7 +202,6 @@ export default {
       transitioning: false,
       isHovered: false,
       isFocused: false,
-      isMouseDown: false,
     }
   },
   computed: {
@@ -220,7 +218,7 @@ export default {
       "getDirectChildren",
       "isVisible",
       "getParent",
-      "getCurrentNodeNav",
+      "getNodeNavId",
     ]),
     ariaLabel() {
       let label = `${this.node.title}. You are on a level ${this.node.level} node. `
@@ -245,6 +243,7 @@ export default {
       if (this.hasPermission("edit")) {
         label += "To edit this node, press E. "
       }
+      label += "To exit the Main Tapestry view, press the Q Key or the Escape Key."
       return label
     },
     canAddChild() {
@@ -333,13 +332,10 @@ export default {
       if (!this.show) {
         return 0
       }
-      if (this.isGrandChild) {
-        return 40
-      }
-      return (
+      const radius =
         Helpers.getNodeRadius(this.node.level, this.maxLevel, this.scale) *
         (this.root ? 1.2 : 1)
-      )
+      return this.isGrandChild ? Math.min(40, radius) : radius
     },
     fill() {
       const showImages = this.settings.hasOwnProperty("renderImages")
@@ -450,67 +446,33 @@ export default {
     this.$emit("mounted")
     this.$refs.circle.setAttribute("r", this.radius)
     const nodeRef = this.$refs.node
+    if (this.root) {
+      nodeRef.setAttribute("tabindex", "0")
+    }
     d3.select(nodeRef).call(
       d3
         .drag()
         .on("start", () => {
-          this.dragCoordinates = {}
-          if (this.selection.length) {
-            this.dragCoordinates = this.selection.reduce((coordinates, nodeId) => {
-              const node = this.getNode(nodeId)
-              coordinates[nodeId] = {
-                x: node.coordinates.x,
-                y: node.coordinates.y,
-              }
-              return coordinates
-            }, {})
-          } else {
-            this.dragCoordinates[this.node.id] = {
-              x: this.node.coordinates.x,
-              y: this.node.coordinates.y,
-            }
-          }
+          this.$emit("dragstart", this.node)
         })
         .on("drag", () => {
-          for (const id of Object.keys(this.dragCoordinates)) {
-            const node = this.getNode(id)
-            node.coordinates.x += d3.event.dx / this.scale
-            node.coordinates.y += d3.event.dy / this.scale
-          }
+          this.$emit("drag", {
+            x: d3.event.x,
+            y: d3.event.y,
+            dx: d3.event.dx,
+            dy: d3.event.dy,
+          })
         })
         .on("end", () => {
-          for (const [id, originalCoordinates] of Object.entries(
-            this.dragCoordinates
-          )) {
-            const node = this.getNode(id)
-            node.coordinates.x += d3.event.dx / this.scale
-            node.coordinates.y += d3.event.dy / this.scale
-            let coordinates = {
-              x: node.coordinates.x,
-              y: node.coordinates.y,
-            }
-            if (
-              originalCoordinates.x == coordinates.x &&
-              originalCoordinates.y == coordinates.y
-            ) {
-              continue
-            }
-            this.$emit("dragend")
-            if (this.hasPermission("edit") || this.hasPermission("move")) {
-              this.updateNodeCoordinates({
-                id,
-                coordinates,
-                originalCoordinates,
-              }).catch(() => {
-                this.$emit("dragend")
-              })
-            }
-          }
+          this.$emit("dragend", {
+            dx: d3.event.dx,
+            dy: d3.event.dy,
+          })
         })
     )
   },
   methods: {
-    ...mapActions(["updateNodeCoordinates", "resetNodeNavigation"]),
+    ...mapActions(["resetNodeNavigation"]),
     ...mapMutations(["select", "unselect"]),
     updateRootNode() {
       if (!this.root) {
@@ -592,10 +554,7 @@ export default {
       ) {
         this.selected ? this.unselect(this.node.id) : this.select(this.node.id)
       } else if (this.node.unlocked || this.hasPermission("edit")) {
-        this.$emit("click", {
-          event: evt,
-          level: this.node.level,
-        })
+        this.$emit("click", this.node)
         this.root && this.node.hideMedia
           ? this.openNode(this.node.id)
           : this.updateRootNode()
@@ -605,10 +564,8 @@ export default {
     },
     handleFocus() {
       this.isFocused = true
-      if (!this.root && !this.isMouseDown) {
-        this.updateRootNode()
-      }
-      if (this.getCurrentNodeNav !== this.node.id) {
+      // TODO: technically the next 3 lines are not needed, since the only way a node will be focused is through the keyboard node navigation which is managed by TapestryMain; nodes other than the focused node is not focusable (tabindex="-1")
+      if (this.getNodeNavId !== this.node.id) {
         this.resetNodeNavigation(this.node.id)
       }
     },
