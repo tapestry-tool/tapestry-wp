@@ -2,6 +2,7 @@
 
 add_action('init', 'run_db_commands');
 add_action('admin_init', 'tapestry_settings_init');
+add_action('admin_init', 'register_tapestry_settings');
 add_action('admin_menu', 'add_tapestry_settings_page');
 
 function add_tapestry_settings_page()
@@ -13,10 +14,27 @@ function add_tapestry_settings_page()
     });
 }
 
+function register_tapestry_settings()
+{
+    // Register Kaltura configuration variables
+    $args = [
+        'type' => 'string',
+        'show_in_rest' => false,
+        'sanitize_callback' => 'trim',  // Trim whitespace from user input
+        'default' => null,
+    ];
+    register_setting('tapestry_kaltura_config', 'kaltura_admin_secret', array_merge($args, ['description' => 'Kaltura Admin Secret']));
+    register_setting('tapestry_kaltura_config', 'kaltura_partner_id', array_merge($args, ['description' => 'Kaltura Partner ID']));
+    register_setting('tapestry_kaltura_config', 'kaltura_service_url', array_merge($args, ['description' => 'Kaltura Service URL']));
+    register_setting('tapestry_kaltura_config', 'kaltura_unique_config', array_merge($args, ['description' => 'Kaltura Unique Configuration']));
+    // TODO: can the user override the max upload size too?
+}
+
 function tapestry_settings_init()
 {
     add_settings_section('tapestry_db_settings', 'Database Settings', 'tapestry_db_section_cb', 'tapestry_settings_page');
-    add_settings_section('tapestry_kaltura_settings', 'Kaltura Upload', 'tapestry_kaltura_section_cb', 'tapestry_settings_page');
+    add_settings_section('tapestry_kaltura_config_section', 'Kaltura Configuration', 'tapestry_kaltura_config_section_cb', 'tapestry_settings_page');
+    add_settings_section('tapestry_kaltura_upload_settings', 'Kaltura Upload', 'tapestry_kaltura_upload_section_cb', 'tapestry_settings_page');
 }
 
 function load_tapestry_settings_page_scripts($hook_suffix, $tapestry_settings_page_hook_suffix)
@@ -54,7 +72,60 @@ function tapestry_db_section_cb()
     <?php
 }
 
-function tapestry_kaltura_section_cb()
+function tapestry_kaltura_config_section_cb()
+{
+    $kaltura_admin_secret = get_option('kaltura_admin_secret', '');
+    $kaltura_partner_id = get_option('kaltura_partner_id', '');
+    $kaltura_service_url = get_option('kaltura_service_url', '');
+    $kaltura_unique_config = get_option('kaltura_unique_config', '');
+
+    ?>
+    <p>
+        Override defaults with your own Kaltura configuration variables for this site.
+    </p>
+    <form action="options.php" method="post">
+        <?php
+            settings_fields('tapestry_kaltura_config');
+        ?>
+        <table class="form-table" role="presentation">
+            <tbody>
+                <tr>
+                    <th scope="row">Kaltura Administrator Secret</th>
+                    <td>
+                        <input type="password" name="kaltura_admin_secret" value="<?php echo $kaltura_admin_secret ?>">
+                        <p class="description">The Kaltura Admininstrator Secret can be found in the Settings > Integration tab in the Kaltura admin dashboard.</p>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">Kaltura Partner ID</th>
+                    <td>
+                        <input type="text" name="kaltura_partner_id" value="<?php echo $kaltura_partner_id ?>">
+                        <p class="description">The Kaltura Partner ID can be found in the Kaltura Settings > Integration tab in the Kaltura admin dashboard.</p>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">Kaltura Service URL</th>
+                    <td>
+                        <input type="text" name="kaltura_service_url" value="<?php echo $kaltura_service_url ?>">
+                        <p class="description">The Kaltura Service URL is the main domain where your Kaltura videos are hosted.</p>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">Kaltura Unique Configuration</th>
+                    <td>
+                        <input type="text" name="kaltura_unique_config" value="<?php echo $kaltura_unique_config ?>">
+                        <p class="description">The Kaltura Unique Configuration sets the media player design. It can be found in the Studio tab in the Kaltura admin dashboard.</p>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <?php 
+            submit_button('Save Changes', 'primary', 'save-kaltura-config', false); ?>
+    </form>
+    <?php
+}
+
+function tapestry_kaltura_upload_section_cb()
 {
     ?>
     <h4>Clean Uploaded Videos</h4>
