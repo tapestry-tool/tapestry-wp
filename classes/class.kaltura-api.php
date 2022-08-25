@@ -1,5 +1,6 @@
 <?php
 
+    require_once dirname(__FILE__).'/../utilities/class.tapestry-errors.php';
     require_once dirname(__FILE__).'/../utilities/class.tapestry-helpers.php';
 
     if (defined('LOAD_KALTURA') && LOAD_KALTURA) {
@@ -44,7 +45,7 @@
             }
 
             if (!isset($ksession)) {
-                throw new TapestryError('Unable to establish Kaltura session.');
+                throw new TapestryError('FAILED_TO_ESTABLISH_KALTURA_SESSION');
             }
 
             $kclient->setKs($ksession);
