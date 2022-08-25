@@ -39,7 +39,7 @@
             }
 
             if (!isset($ksession)) {
-                throw new TapestryError('Unable to establish Kaltura session.');
+                throw new TapestryError('FAILED_TO_ESTABLISH_KALTURA_SESSION');
             }
 
             $kclient->setKs($ksession);
