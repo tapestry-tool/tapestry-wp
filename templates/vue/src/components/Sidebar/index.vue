@@ -30,6 +30,13 @@
         <tapestry-icon icon="comment-dots" />
       </button>
       <button
+        :class="['anchor-button', { active: active === 'comments' }]"
+        aria-label="comments"
+        @click.stop="scrollToRef('comments')"
+      >
+        <tapestry-icon icon="comments" />
+      </button>
+      <button
         :aria-label="closed ? 'open sidebar' : 'close sidebar'"
         :class="['toggle-button', { closed: closed }]"
         @click.stop="active = closed ? 'info' : undefined"
@@ -108,6 +115,10 @@
           <h2 class="content-header">Review</h2>
           <node-review :node="node"></node-review>
         </section>
+        <section ref="comments" data-name="comments">
+          <h2 class="content-header">Comments</h2>
+          <node-comments :node="node"></node-comments>
+        </section>
       </div>
     </aside>
   </div>
@@ -122,6 +133,7 @@ import { licenseTypes, licenses } from "@/utils/constants"
 import * as wp from "@/services/wp"
 import TapestryIcon from "@/components/common/TapestryIcon"
 import NodeReview from "./NodeReview"
+import NodeComments from "./NodeComments"
 
 const PADDING_OFFSET = 48
 
@@ -130,6 +142,7 @@ const tabOrder = ["info", "copyright", "review"]
 export default {
   components: {
     NodeReview,
+    NodeComments,
     TapestryIcon,
   },
   computed: {
