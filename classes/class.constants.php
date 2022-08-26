@@ -29,6 +29,7 @@ class KalturaUpload
     public const STOP_UPLOAD_OPTION = 'tapestry_kaltura_stop_upload_requested';
 
     public const IN_PROGRESS_OPTION = 'tapestry_kaltura_upload_in_progress';
+    public const LATEST_TAPESTRY_OPTION = 'tapestry_kaltura_upload_tapestry_id';
     public const UPLOAD_LOG_OPTION = 'tapestry_kaltura_upload_log';
     public const UPLOAD_ERROR_OPTION = 'tapestry_kaltura_upload_error';
     public const YES_VALUE = 'yes';

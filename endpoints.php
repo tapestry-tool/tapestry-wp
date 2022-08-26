@@ -1611,21 +1611,24 @@ function getQuestionHasAnswers($request)
  *
  * Example request body:
  * {
- *  videos: [
- *   { tapestryID: 7746, nodeID: 13004 }
- *  ],
+ *  tapestryID: 7746,
+ *  nodeIDs: [13004, 13005]
  *  useKalturaPlayer: false
  * }
  */
 function uploadVideosToKaltura($request)
 {
     $upload_request = json_decode($request->get_body());
-    if (!is_object($upload_request) || !isset($upload_request->videos) || !isset($upload_request->useKalturaPlayer)) {
+    if (!is_object($upload_request)) {
         return;
     }
 
-    $videos = $upload_request->videos;
+    $tapestry_id = (int) $upload_request->tapestryID;
+    $node_ids = $upload_request->nodeIDs;
     $use_kaltura_player = $upload_request->useKalturaPlayer;
+    if (empty($tapestry_id) || empty($node_ids) || !isset($use_kaltura_player)) {
+        return;
+    }
 
     if (LOAD_KALTURA) {
         $is_upload_in_progress = get_option(KalturaUpload::IN_PROGRESS_OPTION);
@@ -1638,13 +1641,14 @@ function uploadVideosToKaltura($request)
         }
 
         update_option(KalturaUpload::IN_PROGRESS_OPTION, KalturaUpload::YES_VALUE);
+        update_option(KalturaUpload::LATEST_TAPESTRY_OPTION, $tapestry_id);
         update_option(KalturaUpload::STOP_UPLOAD_OPTION, KalturaUpload::NO_VALUE, false);
         update_option(KalturaUpload::UPLOAD_ERROR_OPTION, '');
 
         add_action('shutdown', 'cleanUpKalturaUpload');
 
         try {
-            perform_batched_upload_to_kaltura($videos, $use_kaltura_player);
+            perform_batched_upload_to_kaltura($tapestry_id, $node_ids, $use_kaltura_player);
         } catch (Exception $e) {
             error_log($e->getMessage());
         } finally {
@@ -1673,21 +1677,18 @@ function cleanUpKalturaUpload()
  * At the end of each batch, waits synchronously for all videos in the batch to finish converting (or error),
  * before uploading the next batch.
  *
- * @param array $videos     List of video nodes to upload. These should be objects with the following interface:
- *                          (
- *                              [tapestryID] => 123,
- *                              [nodeID] => 123,
- *                          )
- *                          Nodes are checked to be videos and to be local Wordpress uploads before being uploaded to Kaltura.
+ * @param string $tapestry_id        ID of the Tapestry for which the upload request is being made.
+ * @param array $node_ids            IDs of the nodes to upload.
+ *                                   Nodes are checked to be videos and to be local Wordpress uploads before being uploaded to Kaltura.
  * @param bool $use_kaltura_player   Whether to switch uploaded videos to use the Kaltura media player (Video nodes only).
  *
  * @return int The number of videos that were successfully uploaded.
  */
-function perform_batched_upload_to_kaltura($videos, $use_kaltura_player)
+function perform_batched_upload_to_kaltura($tapestry_id, $node_ids, $use_kaltura_player)
 {
     $current_date = date('Y/m/d');
 
-    $videos_to_upload = create_upload_log($videos);
+    $videos_to_upload = create_upload_log($tapestry_id, $node_ids);
     update_upload_log($videos_to_upload);
 
     $kalturaApi = new KalturaApi();
@@ -1781,20 +1782,16 @@ function perform_batched_upload_to_kaltura($videos, $use_kaltura_player)
  * Initializes the list of videos to upload.
  * Silently excludes provided videos that are not suitable for upload.
  */
-function create_upload_log($videos)
+function create_upload_log($tapestry_id, $node_ids)
 {
     $upload_log = array();
 
-    foreach ($videos as $video) {
-        if (!is_object($video) || !isset($video->tapestryID) || !isset($video->nodeID)) {
-            continue;
-        }
-
-        $node = new TapestryNode($video->tapestryID, $video->nodeID);
+    foreach ($node_ids as $node_id) {
+        $node = new TapestryNode($tapestry_id, $node_id);
         if (TapestryHelpers::videoCanBeUploaded($node) && TapestryHelpers::checkVideoFileSize($node)) {
             $video_info = (object) [
-                'tapestryID' => $video->tapestryID,
-                'nodeID' => $video->nodeID,
+                'tapestryID' => $tapestry_id,
+                'nodeID' => $node_id,
                 'nodeTitle' => $node->getTitle(),
                 'nodeType' => $node->getMeta()->mediaType === 'video' ? 'Video' : 'H5P',
                 'file' => TapestryHelpers::getVideoPath($node),
@@ -1878,10 +1875,12 @@ function getKalturaUploadStatus($request)
     }
 
     $in_progress = get_option(KalturaUpload::IN_PROGRESS_OPTION) === KalturaUpload::YES_VALUE;
+    $latest_tapestry_id = get_option(KalturaUpload::LATEST_TAPESTRY_OPTION, '');
     $error = get_option(KalturaUpload::UPLOAD_ERROR_OPTION, '');
     return (object) [
         'videos' => $videos,
         'inProgress' => $in_progress,
+        'latestTapestryID' => $latest_tapestry_id,
         'error' => !empty($error),
     ];
 }
@@ -1918,7 +1917,7 @@ function clearUploadError($request)
  *
  * Example response body:
  * [
- *  { tapestryID: 7746, nodeID: 13004, nodeTitle: "Video" }
+ *  { tapestryID: 7746, nodeID: 13004, nodeTitle: "Video", withinSizeLimit: true }
  * ]
  */
 function getVideosToUpload($request)
