@@ -83,7 +83,7 @@ function tapestry_kaltura_config_section_cb()
     ?>
     <p>
         Use a different set of Kaltura configuration variables on this site only.
-        If you wish to do this, all four configuration variables must be provided.
+        If you wish to do this, the first four configuration variables must be provided.
     </p>
     <form action="options.php" method="post">
         <?php
@@ -92,30 +92,42 @@ function tapestry_kaltura_config_section_cb()
         <table class="form-table" role="presentation">
             <tbody>
                 <tr>
-                    <th scope="row">Kaltura Administrator Secret</th>
+                    <th scope="row">
+                        <label for="kaltura_admin_secret">Kaltura Administrator Secret</label>
+                    </th>
                     <td>
-                        <input type="password" name="kaltura_admin_secret" value="<?php echo $kaltura_admin_secret ?>">
-                        <p class="description">The Kaltura Admininstrator Secret can be found in the Settings > Integration tab in the Kaltura admin dashboard.</p>
+                        <input type="password" id="kaltura_admin_secret" name="kaltura_admin_secret" value="<?php echo $kaltura_admin_secret ?>">
+                        <p class="description">
+                            The Kaltura Admininstrator Secret can be found in the Settings > Integration tab in the Kaltura admin dashboard.
+                        </p>
                     </td>
                 </tr>
                 <tr>
-                    <th scope="row">Kaltura Partner ID</th>
+                    <th scope="row">
+                        <label for="kaltura_partner_id">Kaltura Partner ID</label>
+                    </th>
                     <td>
-                        <input type="text" name="kaltura_partner_id" value="<?php echo $kaltura_partner_id ?>">
-                        <p class="description">The Kaltura Partner ID can be found in the Kaltura Settings > Integration tab in the Kaltura admin dashboard.</p>
+                        <input type="text" id="kaltura_partner_id" name="kaltura_partner_id" value="<?php echo $kaltura_partner_id ?>">
+                        <p class="description">
+                            The Kaltura Partner ID can be found in the Kaltura Settings > Integration tab in the Kaltura admin dashboard.
+                        </p>
                     </td>
                 </tr>
                 <tr>
-                    <th scope="row">Kaltura Service URL</th>
+                    <th scope="row">
+                        <label for="kaltura_service_url">Kaltura Service URL</label>
+                    </th>
                     <td>
-                        <input type="text" name="kaltura_service_url" value="<?php echo $kaltura_service_url ?>">
+                        <input type="text" id="kaltura_service_url" name="kaltura_service_url" value="<?php echo $kaltura_service_url ?>">
                         <p class="description">The Kaltura Service URL is the main domain where your Kaltura videos are hosted.</p>
                     </td>
                 </tr>
                 <tr>
-                    <th scope="row">Kaltura Unique Configuration</th>
+                    <th scope="row">
+                        <label for="kaltura_unique_config">Kaltura Unique Configuration</label>
+                    </th>
                     <td>
-                        <input type="text" name="kaltura_unique_config" value="<?php echo $kaltura_unique_config ?>">
+                        <input type="text" id="kaltura_unique_config" name="kaltura_unique_config" value="<?php echo $kaltura_unique_config ?>">
                         <p class="description">
                             The Kaltura Unique Configuration sets the media player design.
                             It can be found in the Studio tab in the Kaltura admin dashboard.
@@ -123,9 +135,11 @@ function tapestry_kaltura_config_section_cb()
                     </td>
                 </tr>
                 <tr>
-                    <th scope="row">Kaltura Upload Max File Size</th>
+                    <th scope="row">
+                        <label for="kaltura_upload_max_file_size">Kaltura Upload Max File Size</label>
+                    </th>
                     <td>
-                        <input type="text" placeholder="Examples: 20M, 500K" name="tapestry_kaltura_upload_max_file_size" value="<?php echo $kaltura_upload_max_file_size ?>">
+                        <input type="text" placeholder="Examples: 20M, 500K" id="kaltura_upload_max_file_size" name="tapestry_kaltura_upload_max_file_size" value="<?php echo $kaltura_upload_max_file_size ?>">
                         <p class="description">
                             If specified, videos larger than this file size cannot be uploaded to Kaltura.
                             <br/>
