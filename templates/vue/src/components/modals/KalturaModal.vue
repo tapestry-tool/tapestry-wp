@@ -249,7 +249,10 @@ export default {
     },
     startVideoUpload() {
       this.videosUploading = true
-      client.startKalturaUpload(this.selectedVideos, this.useKalturaPlayer)
+      client.startKalturaUpload(
+        this.selectedVideos.map(video => video.nodeID),
+        this.useKalturaPlayer
+      )
 
       setTimeout(this.refreshVideoUploadStatus, 500)
     },
