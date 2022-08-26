@@ -1677,9 +1677,9 @@ function cleanUpKalturaUpload()
  * At the end of each batch, waits synchronously for all videos in the batch to finish converting (or error),
  * before uploading the next batch.
  *
- * @param string $tapestry_id       ID of the Tapestry for which the upload request is being made.
- * @param array $node_ids           IDs of the nodes to upload.
- *                                  Nodes are checked to be videos and to be local Wordpress uploads before being uploaded to Kaltura.
+ * @param string $tapestry_id        ID of the Tapestry for which the upload request is being made.
+ * @param array $node_ids            IDs of the nodes to upload.
+ *                                   Nodes are checked to be videos and to be local Wordpress uploads before being uploaded to Kaltura.
  * @param bool $use_kaltura_player   Whether to switch uploaded videos to use the Kaltura media player.
  *
  * @return int The number of videos that were successfully uploaded.
@@ -1913,7 +1913,7 @@ function clearUploadError($request)
  *
  * Example response body:
  * [
- *  { tapestryID: 7746, nodeID: 13004, nodeTitle: "Video" }
+ *  { tapestryID: 7746, nodeID: 13004, nodeTitle: "Video", withinSizeLimit: true }
  * ]
  */
 function getVideosToUpload($request)
