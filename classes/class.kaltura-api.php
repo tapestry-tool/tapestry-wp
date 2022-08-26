@@ -210,6 +210,11 @@
 
         /**
          * Filter caption asset fields to return to the user.
+         *
+         * @param string $overrideCaptionUrl Use this URL instead of requesting the caption URL from Kaltura. Use this for pending captions,
+         *                                   to preserve the original user-provided URL.
+         * @param string $overrideId         Use this ID instead of $captionAsset->id. Use this for pending captions that were successfully
+         *                                   created on Kaltura, to replace the UUID generated on the frontend with the Kaltura ID.
          */
         private function _filterCaptionAsset($kclient, $captionAsset, $overrideCaptionUrl = null, $overrideId = null, $errorMessage = null)
         {
@@ -275,18 +280,19 @@
                 $this->_deleteCaptionAsset($kclient, $caption->id);
             }
             foreach ($toAdd as $caption) {
-                $captionAssetId = $this->_createCaptionAsset($kclient, $caption, $videoEntryId);
                 $tokenId = $this->_uploadFile($kclient, $caption->file, ['vtt', 'srt'], $throwErrors, true);
-                $this->_setCaptionAssetContent($kclient, $caption, $captionAssetId, $tokenId);
+                if (isset($tokenId)) {
+                    $captionAssetId = $this->_createCaptionAsset($kclient, $caption, $videoEntryId);
+                    $this->_setCaptionAssetContent($kclient, $caption, $captionAssetId, $tokenId);
+                }
             }
             foreach ($toUpdate as $caption) {
-                $tokenId = null;    // Clear token ID from previous loop to prevent reuse
                 $this->_updateCaptionAsset($kclient, $caption);
                 if (isset($caption->file)) {
                     $tokenId = $this->_uploadFile($kclient, $caption->file, ['vtt', 'srt'], $throwErrors);
-                }
-                if (isset($tokenId)) {
-                    $this->_setCaptionAssetContent($kclient, $caption, $caption->id, $tokenId);
+                    if (isset($tokenId)) {
+                        $this->_setCaptionAssetContent($kclient, $caption, $caption->id, $tokenId);
+                    }
                 }
             }
 
@@ -332,6 +338,12 @@
             $contentErrorMessage = 'Please check the .vtt or .srt file you provided.';
 
             foreach ($toAdd as $caption) {
+                if (!isset($caption->metadataRequestIndex)) {
+                    // Caption was not added due to invalid file
+                    array_push($pending, $this->_filterCaptionAsset($kclient, $caption, $caption->captionUrl, null, $contentErrorMessage));
+                    continue;
+                }
+
                 $metadataResponse = $responses[$caption->metadataRequestIndex];
                 $contentResponse = $responses[$caption->contentRequestIndex];
                 $metadataError = is_a($metadataResponse, ApiException::class);
