@@ -45,7 +45,7 @@ import ExportDuplicateModal from "@/components/modals/ExportDuplicateModal"
 import KalturaModal from "@/components/modals/KalturaModal"
 import OtherOperationsModal from "@/components/modals/OtherOperationsModal"
 import { names } from "@/config/routes"
-import { getKalturaStatus } from "@/services/wp"
+import * as wp from "@/services/wp"
 import Helpers from "@/utils/Helpers"
 
 const operationModalNames = [
@@ -86,7 +86,7 @@ export default {
       },
     },
     showKalturaOption() {
-      return Helpers.hasKalturaUploadPermission() && getKalturaStatus()
+      return Helpers.hasKalturaUploadPermission() && wp.getKalturaStatus()
     },
   },
   methods: {

@@ -345,10 +345,11 @@ class TapestryApi {
     return response.data
   }
 
-  async startKalturaUpload(videos, useKalturaPlayer) {
+  async startKalturaUpload(nodeIds, useKalturaPlayer) {
     const url = `/kaltura/upload_videos`
     const response = await this.client.post(url, {
-      videos: videos,
+      tapestryID: this.postId,
+      nodeIDs: nodeIds,
       useKalturaPlayer: useKalturaPlayer,
     })
     return response
