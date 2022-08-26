@@ -7,6 +7,7 @@
       </p>
       <textarea
         v-model="comment"
+        data-qa="review-comment-textarea"
         aria-label="comment"
         placeholder="Leave a comment..."
         @keydown.stop
@@ -21,6 +22,7 @@
       ></review-buttons>
       <b-button
         v-else
+        data-qa="submit-review-comment"
         class="submit-button"
         variant="info"
         :aria-hidden="loading"

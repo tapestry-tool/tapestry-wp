@@ -46,7 +46,7 @@ describe("Review Nodes", () => {
           cy.contains(/accepted/i).should("be.visible")
 
           // hide the review form once accepted
-          cy.findByRole("textbox", { "aria-label": /comment/i }).should("not.exist")
+          cy.getByTestId("review-comment-textarea").should("not.exist")
         })
     })
 
@@ -96,12 +96,12 @@ describe("Review Nodes", () => {
       cy.getByTestId("sidebar-content")
         .should("be.visible")
         .within(() => {
-          cy.findByRole("textbox", { name: /comment/i }).type(comment)
+          cy.getByTestId("review-comment-textarea").type(comment)
           cy.contains(/reject/i).click()
           cy.contains(/reject/i).should("be.hidden")
           cy.contains(/rejected/i).should("be.visible")
           cy.contains(comment).should("be.visible")
-          cy.findByRole("textbox", { "aria-label": /comment/i }).should("not.exist")
+          cy.getByTestId("review-comment-textarea").should("not.exist")
         })
       cy.getNodeById(node.id).should("not.be.visible")
     })
@@ -142,12 +142,10 @@ describe("Review Nodes", () => {
 
     const comment = "This is my best work!"
     cy.findByLabelText("open sidebar").click()
-    cy.findByRole("textbox", { name: /comment/i }).type(comment)
-    cy.sidebar()
-      .contains(/add comment/i)
-      .click()
+    cy.getByTestId("review-comment-textarea").type(comment)
+    cy.getByTestId("submit-review-comment").click()
 
-    cy.findByRole("textbox", { name: /comment/i }).should("be.hidden")
+    cy.getByTestId("review-comment-textarea").should("be.hidden")
     cy.sidebar()
       .contains(comment)
       .should("be.visible")
