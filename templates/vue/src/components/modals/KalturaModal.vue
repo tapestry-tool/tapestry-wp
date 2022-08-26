@@ -38,6 +38,7 @@
             <b-form-checkbox
               aria-label="Select all videos"
               :checked="allVideosSelected"
+              :disabled="videosUploading"
               @change="$event ? selectAllVideos() : clearSelected()"
             ></b-form-checkbox>
           </template>
@@ -45,7 +46,7 @@
             <b-form-checkbox
               :aria-label="`Select node ${item.nodeID}, ${item.nodeTitle}`"
               :checked="rowSelected"
-              :disabled="!item.withinSizeLimit"
+              :disabled="videosUploading || !item.withinSizeLimit"
               class="d-inline"
               @change="$event ? selectRow() : unselectRow()"
             ></b-form-checkbox>
@@ -64,7 +65,7 @@
           </template>
         </b-table>
         <b-form-group>
-          <b-form-checkbox v-model="useKalturaPlayer">
+          <b-form-checkbox v-model="useKalturaPlayer" :disabled="videosUploading">
             Switch uploaded videos to use Kaltura media player
           </b-form-checkbox>
         </b-form-group>
