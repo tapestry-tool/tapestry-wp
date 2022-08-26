@@ -1641,6 +1641,7 @@ function uploadVideosToKaltura($request)
         }
 
         update_option(KalturaUpload::IN_PROGRESS_OPTION, KalturaUpload::YES_VALUE);
+        update_option(KalturaUpload::LATEST_TAPESTRY_OPTION, $tapestry_id);
         update_option(KalturaUpload::STOP_UPLOAD_OPTION, KalturaUpload::NO_VALUE, false);
         update_option(KalturaUpload::UPLOAD_ERROR_OPTION, '');
 
@@ -1870,10 +1871,12 @@ function getKalturaUploadStatus($request)
     }
 
     $in_progress = get_option(KalturaUpload::IN_PROGRESS_OPTION) === KalturaUpload::YES_VALUE;
+    $latest_tapestry_id = get_option(KalturaUpload::LATEST_TAPESTRY_OPTION, '');
     $error = get_option(KalturaUpload::UPLOAD_ERROR_OPTION, '');
     return (object) [
         'videos' => $videos,
         'inProgress' => $in_progress,
+        'latestTapestryID' => $latest_tapestry_id,
         'error' => !empty($error),
     ];
 }
