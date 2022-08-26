@@ -10,7 +10,11 @@
   >
     <b-container fluid class="px-1">
       <b-overlay :show="videosUploading" variant="white">
-        <template #overlay><div></div></template>
+        <template #overlay>
+          <div v-show="!isLatestTapestry" class="different-tapestry-notice">
+            Please wait: videos are currently being uploaded from another Tapestry.
+          </div>
+        </template>
         <div>Upload Videos to Kaltura</div>
         <b-form-text>
           Select videos in this Tapestry that you would like to upload to Kaltura.
@@ -34,6 +38,7 @@
             <b-form-checkbox
               aria-label="Select all videos"
               :checked="allVideosSelected"
+              :disabled="videosUploading"
               @change="$event ? selectAllVideos() : clearSelected()"
             ></b-form-checkbox>
           </template>
@@ -41,7 +46,7 @@
             <b-form-checkbox
               :aria-label="`Select node ${item.nodeID}, ${item.nodeTitle}`"
               :checked="rowSelected"
-              :disabled="!item.withinSizeLimit"
+              :disabled="videosUploading || !item.withinSizeLimit"
               class="d-inline"
               @change="$event ? selectRow() : unselectRow()"
             ></b-form-checkbox>
@@ -60,7 +65,7 @@
           </template>
         </b-table>
         <b-form-group>
-          <b-form-checkbox v-model="useKalturaPlayer">
+          <b-form-checkbox v-model="useKalturaPlayer" :disabled="videosUploading">
             Switch uploaded videos to use Kaltura media player
           </b-form-checkbox>
         </b-form-group>
@@ -69,12 +74,12 @@
         id="start-upload-button"
         block
         variant="light"
-        :class="videosUploading ? 'disabled' : ''"
-        :disabled="videosUploading || !canStartUpload"
+        :class="startButtonDisabled ? 'disabled' : ''"
+        :disabled="startButtonDisabled"
         @click="startVideoUpload"
       >
-        <b-spinner v-if="videosUploading" small></b-spinner>
-        <div :style="videosUploading || !canStartUpload ? 'opacity: 50%;' : ''">
+        <b-spinner v-if="videosUploading && isLatestTapestry" small></b-spinner>
+        <div :style="startButtonDisabled ? 'opacity: 50%;' : ''">
           Start Upload
         </div>
       </b-button>
@@ -82,11 +87,11 @@
         id="stop-upload-button"
         block
         variant="light"
-        :class="!videosUploading ? 'disabled' : ''"
-        :disabled="!videosUploading"
+        :class="stopButtonDisabled ? 'disabled' : ''"
+        :disabled="stopButtonDisabled"
         @click="requestStopVideoUpload"
       >
-        <div :style="!videosUploading ? 'opacity: 50%;' : ''">
+        <div :style="stopButtonDisabled ? 'opacity: 50%;' : ''">
           Stop Upload
         </div>
       </b-button>
@@ -135,7 +140,7 @@
       ></b-table>
       <b-alert
         dismissible
-        :show="uploadError"
+        :show="uploadError && isLatestTapestry"
         variant="danger"
         @dismissed="clearUploadError"
       >
@@ -165,6 +170,7 @@
 
 <script>
 import client from "@/services/TapestryAPI"
+import { data as wpData } from "@/services/wp"
 
 export default {
   props: {
@@ -182,6 +188,7 @@ export default {
       selectedVideos: [],
       uploadStatusRefreshTimer: 0,
       hasRequestedStop: false,
+      latestTapestryID: "",
     }
   },
   computed: {
@@ -196,6 +203,15 @@ export default {
     },
     canStartUpload() {
       return this.selectedVideos.length > 0
+    },
+    isLatestTapestry() {
+      return this.latestTapestryID === wpData.postId
+    },
+    startButtonDisabled() {
+      return this.videosUploading || !this.canStartUpload
+    },
+    stopButtonDisabled() {
+      return !this.videosUploading || !this.isLatestTapestry
     },
   },
   watch: {
@@ -249,7 +265,12 @@ export default {
     },
     startVideoUpload() {
       this.videosUploading = true
-      client.startKalturaUpload(this.selectedVideos, this.useKalturaPlayer)
+      this.latestTapestryID = wpData.postId
+
+      client.startKalturaUpload(
+        this.selectedVideos.map(video => video.nodeID),
+        this.useKalturaPlayer
+      )
 
       setTimeout(this.refreshVideoUploadStatus, 500)
     },
@@ -279,6 +300,7 @@ export default {
           callback(data.videos)
           this.videosUploading = data.inProgress
           this.uploadError = data.error
+          this.latestTapestryID = data.latestTapestryID
         })
         .catch(() => {
           callback([])
@@ -299,3 +321,30 @@ export default {
   },
 }
 </script>
+
+<style lang="scss" scoped>
+#start-upload-button {
+  position: relative;
+  > span {
+    position: absolute;
+    height: 1.5em;
+    width: 1.5em;
+  }
+}
+
+#start-upload-button,
+#stop-upload-button {
+  &.disabled {
+    pointer-events: none;
+    cursor: not-allowed;
+  }
+}
+
+.different-tapestry-notice {
+  text-align: center;
+  background: #fff;
+  border-radius: 0.5em;
+  padding: 1em;
+  max-width: 500px;
+}
+</style>
