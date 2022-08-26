@@ -42,6 +42,7 @@ class TapestryNode implements ITapestryNode
     private $fullscreen;
     private $childOrdering;
     private $fitWindow;
+    private $comments;
     private $reviewComments;
     private $license;
     private $references;
@@ -91,6 +92,7 @@ class TapestryNode implements ITapestryNode
         $this->fullscreen = false;
         $this->childOrdering = [];
         $this->fitWindow = true;
+        $this->comments = [];
         $this->reviewComments = [];
         $this->license = '';
         $this->references = '';
@@ -104,6 +106,7 @@ class TapestryNode implements ITapestryNode
             $node = $this->_loadFromDatabase();
             $this->set($node);
             $this->author = $this->_getAuthorInfo(get_post_field('post_author', $this->nodePostId));
+            $this->comments = $this->_getComments();
         }
     }
 
@@ -387,6 +390,23 @@ class TapestryNode implements ITapestryNode
         return $nodeMeta->author->id == $userId;
     }
 
+    public function addComment($comment)
+    {
+        $currentUser = wp_get_current_user();
+        $commentId = wp_new_comment([
+            'comment_author' => $currentUser->user_nicename,
+            'comment_author_email' => $currentUser->user_email,
+            'comment_author_url' => $currentUser->user_url,
+            'user_id' => $currentUser->ID,
+            'comment_post_ID' => $this->nodePostId,
+            'comment_content' => $comment,
+        ], true);
+        if ($commentId === false || is_wp_error($commentId)) {
+            throw new TapestryError('FAILED_TO_CREATE_COMMENT');
+        }
+        return $this->_getComments();
+    }
+
     public function addReview($comments)
     {
         if (NodeStatus::PUBLISH === $this->status) {
@@ -400,11 +420,11 @@ class TapestryNode implements ITapestryNode
 
         // Validate _all_ comments before adding them in
         foreach ($comments as $comment) {
-            $this->_validateComment($comment);
+            $this->_validateReviewComment($comment);
         }
 
         foreach ($comments as $comment) {
-            if (CommentTypes::STATUS_CHANGE === $comment->type) {
+            if (ReviewCommentTypes::STATUS_CHANGE === $comment->type) {
                 $this->reviewStatus = $comment->to;
                 if (NodeStatus::ACCEPT === $comment->to) {
                     $this->status = NodeStatus::PUBLISH;
@@ -422,7 +442,7 @@ class TapestryNode implements ITapestryNode
         ];
     }
 
-    private function _validateComment($review)
+    private function _validateReviewComment($review)
     {
         $canEditTapestry = current_user_can('edit_post', $this->tapestryPostId);
 
@@ -435,12 +455,12 @@ class TapestryNode implements ITapestryNode
         }
 
         switch ($review->type) {
-            case CommentTypes::COMMENT:
+            case ReviewCommentTypes::COMMENT:
                 if (!isset($review->comment) || !is_string($review->comment) || 0 === strlen($review->comment)) {
                     throw new TapestryError('INVALID_REVIEW_COMMENT', 'A review comment must be a non-empty string.', 400);
                 }
                 break;
-            case CommentTypes::STATUS_CHANGE:
+            case ReviewCommentTypes::STATUS_CHANGE:
                 $validStatuses = [NodeStatus::SUBMIT, NodeStatus::REJECT, NodeStatus::ACCEPT];
 
                 if (!in_array($review->to, $validStatuses)) {
@@ -462,8 +482,8 @@ class TapestryNode implements ITapestryNode
                 $message = sprintf(
                     'Unknown review type %s. A review type can only be one of %s or %s.',
                     $review->type,
-                    CommentTypes::COMMENT,
-                    CommentTypes::STATUS_CHANGE
+                    ReviewCommentTypes::COMMENT,
+                    ReviewCommentTypes::STATUS_CHANGE
                 );
                 throw new TapestryError('INVALID_REVIEW', $message, 400);
         }
@@ -577,6 +597,7 @@ class TapestryNode implements ITapestryNode
             'conditions' => $this->conditions,
             'childOrdering' => $this->childOrdering,
             'fitWindow' => $this->fitWindow,
+            'comments' => $this->comments,
             'reviewComments' => $this->reviewComments,
             'license' => $this->license,
             'references' => $this->references,
@@ -647,5 +668,24 @@ class TapestryNode implements ITapestryNode
             'original_author_name' => '',
             'original_author_email' => '',
         ];
+    }
+
+    private function _getComments()
+    {
+        $comments = get_comments([
+            'post_id' => $this->nodePostId,
+        ]);
+        $filteredComments = array_map(function ($comment) {
+            return (object) [
+                'id' => (int) $comment->comment_ID,
+                'content' => $comment->comment_content,
+                'author' => $comment->comment_author,
+                'authorId' => (int) $comment->user_id,
+                'approved' => $comment->comment_approved,
+                'date' => $comment->comment_date,
+                'parent' => (int) $comment->comment_parent,
+            ];
+        }, $comments);
+        return $filteredComments;
     }
 }

@@ -515,6 +515,7 @@ export default {
             DragSelectModular.removeDragSelectListener()
             this.loading = false
             this.initialize()
+            this.setTapestryErrorReporting(false)
           }
         } else {
           DragSelectModular.addDragSelectListener()
@@ -649,7 +650,6 @@ export default {
         }
       }
       this.setCurrentEditingNode(copy)
-      this.setTapestryErrorReporting(false)
     },
     validateTab(requestedTab) {
       // Tabs that are valid for ALL node types and modal types

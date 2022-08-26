@@ -291,6 +291,22 @@ export async function reviewNode({ commit, dispatch }, { id, comments }) {
   }
 }
 
+export async function addCommentToNode({ commit, dispatch }, { id, comment }) {
+  try {
+    const { comments } = await client.addCommentToNode(id, comment)
+    commit("updateNode", {
+      id,
+      newNode: {
+        comments,
+      },
+    })
+    return true
+  } catch (error) {
+    dispatch("addApiError", error)
+  }
+  return false
+}
+
 // links
 export async function addLink({ commit, dispatch, getters }, newLink) {
   try {

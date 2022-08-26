@@ -145,6 +145,12 @@ class TapestryApi {
     return response.data
   }
 
+  async addCommentToNode(id, comment) {
+    const url = `/tapestries/${this.postId}/nodes/${id}/comments`
+    const response = await this.client.post(url, comment)
+    return response.data
+  }
+
   async optimizeNodeThumbnails() {
     const url = `${apiUrl}/tapestries/${this.postId}/optimize_thumbnails`
     return await this.client.post(url)

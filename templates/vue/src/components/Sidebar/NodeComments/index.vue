@@ -1,5 +1,10 @@
 <template>
   <b-overlay class="loading" bg-color="#5d656c" :show="loading">
+    <ul class="comment-list">
+      <li v-for="comment in node.comments" :key="comment.id">
+        <node-comment :comment="comment"></node-comment>
+      </li>
+    </ul>
     <div v-if="isLoggedIn" class="comment-form" :aria-hidden="loading">
       <p class="commenter-name">
         {{ username }}
@@ -24,8 +29,13 @@
 
 <script>
 import * as wp from "@/services/wp"
+import { mapActions } from "vuex"
+import NodeComment from "./NodeComment"
 
 export default {
+  components: {
+    NodeComment,
+  },
   props: {
     node: {
       type: Object,
@@ -47,12 +57,38 @@ export default {
     },
   },
   methods: {
-    submitComment() {},
+    ...mapActions(["addCommentToNode"]),
+    async submitComment() {
+      this.loading = true
+      const success = await this.addCommentToNode({
+        id: this.node.id,
+        comment: this.comment,
+      })
+      if (success) {
+        this.comment = ""
+      }
+      this.loading = false
+    },
   },
 }
 </script>
 
 <style lang="scss" scoped>
+::v-deep {
+  --light-gray: #dce4ea;
+}
+
+.comment-list {
+  line-height: 1.5;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  li {
+    margin-bottom: 0.75rem;
+  }
+}
+
 .commenter-name {
   color: var(--light-gray);
   font-weight: bold;

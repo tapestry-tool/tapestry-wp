@@ -94,6 +94,10 @@ class TapestryError extends Error
             'MESSAGE' => 'Failed to save audio to the server.',
             'STATUS' => ['status' => 500],
         ],
+        'FAILED_TO_CREATE_COMMENT' => [
+            'MESSAGE' => 'Failed to create the comment',
+            'STATUS' => ['status' => 500],
+        ],
         'CANNOT_DELETE_ROOT' => [
             'MESSAGE' => 'Root node can only be deleted if there are no other nodes in the tapestry',
             'STATUS' => ['status' => 400],
