@@ -85,15 +85,27 @@
                 $parentCategory = $kAdminClient->category->add($createdParentCategory);
             }
 
-            // Find or create the category with the desired name under 'Tapestry'
-            $videoCategoryIndex = array_search($categoryName, array_column($categories->objects, 'name'));
-            $videoCategory = null;
+            // Find or create the 'Tapestry>{site URL}' category
+            $site_url = get_bloginfo('url');
+            $siteCategoryFullName = $parentCategoryName.'>'.$site_url;
+            $siteCategoryIndex = array_search($siteCategoryFullName, array_column($categories->objects, 'fullName'));
+            $siteCategory = (false !== $siteCategoryIndex ? $categories->objects[$siteCategoryIndex] : null);
 
-            if ($videoCategoryIndex) {
-                $videoCategory = (false !== $videoCategoryIndex ? $categories->objects[$videoCategoryIndex] : null);
-            } else {
+            if (null === $siteCategory) {
+                $createdSiteCategory = new Category();
+                $createdSiteCategory->parentId = $parentCategory->id;
+                $createdSiteCategory->name = $site_url;
+                $kAdminClient = $this->getKClient(SessionType::ADMIN);  // TODO: reuse sessions
+                $siteCategory = $kAdminClient->category->add($createdSiteCategory);
+            }
+
+            // Find or create the category with the desired name under 'Tapestry>{site URL}'
+            $videoCategoryIndex = array_search($siteCategoryFullName.'>'.$categoryName, array_column($categories->objects, 'fullName'));
+            $videoCategory = (false !== $videoCategoryIndex ? $categories->objects[$videoCategoryIndex] : null);
+
+            if (null === $videoCategory) {
                 $category = new Category();
-                $category->parentId = $parentCategory->id;
+                $category->parentId = $siteCategory->id;
                 $category->name = $categoryName;
                 $kAdminClient = $this->getKClient(SessionType::ADMIN);
                 $videoCategory = $kAdminClient->category->add($category);
@@ -114,7 +126,7 @@
             $mediaEntry = new MediaEntry();
             $mediaEntry->name = $filename;
             $mediaEntry->mediaType = MediaType::VIDEO;
-            $mediaEntry->categoriesIds = $videoCategory->id.','.$parentCategory->id;
+            $mediaEntry->categoriesIds = $videoCategory->id.','.$siteCategory->id.','.$parentCategory->id; // TODO: reverse order?
             $entry = $kclient->media->add($mediaEntry);
 
             // 4. Attach the uploaded video to the Media Entry
