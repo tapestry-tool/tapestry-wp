@@ -81,7 +81,7 @@ function tapestry_kaltura_section_cb()
     ?>
     <h4>Categorization</h4>
     <p>
-        Choose a category structure for videos uploaded to Kaltura.
+        Choose how to categorize videos uploaded to Kaltura.
     </p>
     <form action="options.php" method="post">
         <?php
