@@ -846,6 +846,13 @@ export default {
         }
 
         if (this.node.mediaFormat === "kaltura" && wp.getKalturaStatus()) {
+          try {
+            await this.updateKalturaVideoCaptions()
+          } catch (error) {
+            this.addApiError(error)
+            return
+          }
+
           if (!this.node.typeData.kalturaData) {
             this.update("typeData.kalturaData", {
               id: this.node.typeData.kalturaId,
@@ -866,7 +873,6 @@ export default {
             )
           }
           this.updateKalturaVideoMediaURL()
-          await this.updateKalturaVideoCaptions()
         }
 
         if (
@@ -1353,31 +1359,24 @@ export default {
     async updateKalturaVideoCaptions() {
       if (this.node.typeData.captions) {
         // "Push" changes made to Kaltura captions to Kaltura, then save results in node
-        let result = null
-        try {
-          result = await client.updateKalturaVideoCaptions(
-            this.node.typeData.kalturaId,
-            this.node.typeData.captions,
-            this.node.typeData.defaultCaptionId
-          )
-        } catch (error) {
-          this.addApiError(error)
-        }
+        const result = await client.updateKalturaVideoCaptions(
+          this.node.typeData.kalturaId,
+          this.node.typeData.captions,
+          this.node.typeData.defaultCaptionId
+        )
 
-        if (result) {
-          // Merge old pending captions and new pending captions by caption ID
-          const currentPendingCaptions = this.node.typeData.pendingCaptions ?? []
-          const newPendingCaptions = result.pendingCaptions
-          for (let caption of currentPendingCaptions) {
-            if (newPendingCaptions.every(c => c.id !== caption.id)) {
-              newPendingCaptions.push(caption)
-            }
+        // Merge old pending captions and new pending captions by caption ID
+        const currentPendingCaptions = this.node.typeData.pendingCaptions ?? []
+        const newPendingCaptions = result.pendingCaptions
+        for (let caption of currentPendingCaptions) {
+          if (newPendingCaptions.every(c => c.id !== caption.id)) {
+            newPendingCaptions.push(caption)
           }
-
-          this.update("typeData.captions", result.captions)
-          this.update("typeData.pendingCaptions", newPendingCaptions)
-          this.update("typeData.defaultCaptionId", result.defaultCaptionId)
         }
+
+        this.update("typeData.captions", result.captions)
+        this.update("typeData.pendingCaptions", newPendingCaptions)
+        this.update("typeData.defaultCaptionId", result.defaultCaptionId)
       }
     },
   },
