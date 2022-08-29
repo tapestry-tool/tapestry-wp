@@ -1633,7 +1633,7 @@ function getQuestionHasAnswers($request)
  * Example request body:
  * {
  *  tapestryID: 7746,
- *  nodeIDs: [13004, 13005]
+ *  nodeIDs: [13004, 13005],
  *  useKalturaPlayer: false
  * }
  */
@@ -1651,32 +1651,40 @@ function uploadVideosToKaltura($request)
         return;
     }
 
-    if (LOAD_KALTURA) {
-        $is_upload_in_progress = get_option(KalturaUpload::IN_PROGRESS_OPTION);
-
-        if ($is_upload_in_progress === false) {
-            // False return value means option does not exist in database yet
-            add_option(KalturaUpload::IN_PROGRESS_OPTION, KalturaUpload::NO_VALUE);
-        } elseif ($is_upload_in_progress !== KalturaUpload::NO_VALUE) {
-            return;
+    try {
+        if (!TapestryHelpers::isValidTapestry($tapestry_id)) {
+            throw new TapestryError('INVALID_POST_ID');
         }
 
-        update_option(KalturaUpload::IN_PROGRESS_OPTION, KalturaUpload::YES_VALUE);
-        update_option(KalturaUpload::LATEST_TAPESTRY_OPTION, $tapestry_id);
-        update_option(KalturaUpload::STOP_UPLOAD_OPTION, KalturaUpload::NO_VALUE, false);
-        update_option(KalturaUpload::UPLOAD_ERROR_OPTION, '');
+        if (LOAD_KALTURA) {
+            $is_upload_in_progress = get_option(KalturaUpload::IN_PROGRESS_OPTION);
 
-        add_action('shutdown', 'cleanUpKalturaUpload');
+            if ($is_upload_in_progress === false) {
+                // False return value means option does not exist in database yet
+                add_option(KalturaUpload::IN_PROGRESS_OPTION, KalturaUpload::NO_VALUE);
+            } elseif ($is_upload_in_progress !== KalturaUpload::NO_VALUE) {
+                return;
+            }
 
-        try {
-            perform_batched_upload_to_kaltura($tapestry_id, $node_ids, $use_kaltura_player);
-        } catch (Exception $e) {
-            error_log($e->getMessage());
-        } finally {
-            update_option(KalturaUpload::IN_PROGRESS_OPTION, KalturaUpload::NO_VALUE);
+            update_option(KalturaUpload::IN_PROGRESS_OPTION, KalturaUpload::YES_VALUE);
+            update_option(KalturaUpload::LATEST_TAPESTRY_OPTION, $tapestry_id);
             update_option(KalturaUpload::STOP_UPLOAD_OPTION, KalturaUpload::NO_VALUE, false);
             update_option(KalturaUpload::UPLOAD_ERROR_OPTION, '');
+
+            add_action('shutdown', 'cleanUpKalturaUpload');
+
+            try {
+                perform_batched_upload_to_kaltura($tapestry_id, $node_ids, $use_kaltura_player);
+            } catch (Exception $e) {
+                error_log($e->getMessage());
+            } finally {
+                update_option(KalturaUpload::IN_PROGRESS_OPTION, KalturaUpload::NO_VALUE);
+                update_option(KalturaUpload::STOP_UPLOAD_OPTION, KalturaUpload::NO_VALUE, false);
+                update_option(KalturaUpload::UPLOAD_ERROR_OPTION, '');
+            }
         }
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
 }
 
@@ -1707,7 +1715,13 @@ function cleanUpKalturaUpload()
  */
 function perform_batched_upload_to_kaltura($tapestry_id, $node_ids, $use_kaltura_player)
 {
-    $current_date = date('Y/m/d');
+    if (get_option('kaltura_category_structure') === 'tapestry_name') {
+        $tapestry = new Tapestry($tapestry_id);
+        $category = $tapestry->getSettings()->title;
+    } else {
+        // Categorize by date by default
+        $category = date('Y/m/d');
+    }
 
     $videos_to_upload = create_upload_log($tapestry_id, $node_ids);
     update_upload_log($videos_to_upload);
@@ -1732,7 +1746,7 @@ function perform_batched_upload_to_kaltura($tapestry_id, $node_ids, $use_kaltura
 
             $kaltura_data = null;
             try {
-                $kaltura_data = $kalturaApi->uploadVideo($video->file, $current_date);
+                $kaltura_data = $kalturaApi->uploadVideo($video->file, $category);
             } catch (Error $e) {
                 $error_msg = "Unable to upload video '".$video->file->name."' to Kaltura due to: ".$e->getMessage();
 
