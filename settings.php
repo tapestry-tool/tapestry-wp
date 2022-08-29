@@ -34,7 +34,7 @@ function tapestry_settings_init()
 {
     add_settings_section('tapestry_db_settings', 'Database Settings', 'tapestry_db_section_cb', 'tapestry_settings_page');
     add_settings_section('tapestry_kaltura_config_section', 'Kaltura Configuration', 'tapestry_kaltura_config_section_cb', 'tapestry_settings_page');
-    add_settings_section('tapestry_kaltura_upload_settings', 'Kaltura Upload', 'tapestry_kaltura_upload_section_cb', 'tapestry_settings_page');
+    add_settings_section('tapestry_kaltura_upload_section', 'Kaltura Upload', 'tapestry_kaltura_upload_section_cb', 'tapestry_settings_page');
 }
 
 function load_tapestry_settings_page_scripts($hook_suffix, $tapestry_settings_page_hook_suffix)
