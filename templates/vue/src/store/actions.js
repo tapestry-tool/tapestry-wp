@@ -258,6 +258,14 @@ export async function getTapestryExport({ dispatch }) {
   }
 }
 
+export async function getTapestryExportAsZip({ dispatch }) {
+  try {
+    return await client.getTapestryExportAsZip()
+  } catch (error) {
+    dispatch("addApiError", error)
+  }
+}
+
 export async function completeQuestion(
   { commit, dispatch },
   { nodeId, questionId, answerType, answer }

@@ -165,8 +165,6 @@ class TapestryHelpers
         }
 
         // not an image in our gallery. let's upload it.
-        include_once(ABSPATH . 'wp-admin/includes/image.php');
-
         $imagetype = end(explode('/', getimagesize($imageURL)['mime']));
         $uniq_name = date('dmY').''.(int) microtime(true);
         $filename = $uniq_name.'.'.$imagetype;
@@ -178,7 +176,21 @@ class TapestryHelpers
         fwrite($savefile, $contents);
         fclose($savefile);
 
-        $wp_filetype = wp_check_filetype(basename($filename), null);
+        return self::createAttachment($uploadfile, true);
+    }
+
+    /**
+     * Add a media item (image, video) as a WordPress attachment.
+     * 
+     * @param string $filepath          Filepath of the file to add.
+     * @param bool $generate_metadata   If true, also generates metadata and image sub-sizes.
+     */
+    public static function createAttachment($filepath, $generate_metadata = false)
+    {
+        include_once(ABSPATH . 'wp-admin/includes/image.php');
+
+        $filename = basename($filepath);
+        $wp_filetype = wp_check_filetype($filename, null);
         $attachment = array(
             'post_mime_type' => $wp_filetype['type'],
             'post_title' => $filename,
@@ -186,11 +198,14 @@ class TapestryHelpers
             'post_status' => 'inherit'
         );
 
-        $attachment_id = wp_insert_attachment($attachment, $uploadfile);
-        $imagenew = get_post($attachment_id);
-        $fullsizepath = get_attached_file($imagenew->ID);
-        $attach_data = wp_generate_attachment_metadata($attachment_id, $fullsizepath);
-        wp_update_attachment_metadata($attachment_id, $attach_data);
+        $attachment_id = wp_insert_attachment($attachment, $filepath);
+
+        if ($generate_metadata) {
+            $imagenew = get_post($attachment_id);
+            $fullsizepath = get_attached_file($imagenew->ID);
+            $attach_data = wp_generate_attachment_metadata($attachment_id, $fullsizepath);
+            wp_update_attachment_metadata($attachment_id, $attach_data);
+        }
 
         return $attachment_id;
     }
