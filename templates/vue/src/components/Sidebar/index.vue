@@ -115,7 +115,7 @@
           <h2 class="content-header">Review</h2>
           <node-review :node="node"></node-review>
         </section>
-        <section ref="comments" data-name="comments">
+        <section v-else ref="comments" data-name="comments">
           <h2 class="content-header">Comments</h2>
           <node-comments :node="node"></node-comments>
         </section>
@@ -137,7 +137,7 @@ import NodeComments from "./NodeComments"
 
 const PADDING_OFFSET = 48
 
-const tabOrder = ["info", "copyright", "review"]
+const tabOrder = ["info", "copyright", "review", "comments"]
 
 export default {
   components: {

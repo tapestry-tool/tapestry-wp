@@ -401,9 +401,10 @@ class TapestryNode implements ITapestryNode
             'comment_post_ID' => $this->nodePostId,
             'comment_content' => $comment,
         ], true);
-        if ($commentId === false || is_wp_error($commentId)) {
+        if (false === $commentId || is_wp_error($commentId)) {
             throw new TapestryError('FAILED_TO_CREATE_COMMENT');
         }
+
         return $this->_getComments();
     }
 
@@ -661,6 +662,7 @@ class TapestryNode implements ITapestryNode
         if (!$user) {
             $user = get_user_by('id', 1);
         }
+
         return (object) [
             'id' => $id,
             'name' => $user->display_name,
@@ -676,16 +678,19 @@ class TapestryNode implements ITapestryNode
             'post_id' => $this->nodePostId,
         ]);
         $filteredComments = array_map(function ($comment) {
+            $datetime = new DateTime($comment->comment_date, wp_timezone());
+
             return (object) [
                 'id' => (int) $comment->comment_ID,
                 'content' => $comment->comment_content,
                 'author' => $comment->comment_author,
                 'authorId' => (int) $comment->user_id,
                 'approved' => $comment->comment_approved,
-                'date' => $comment->comment_date,
+                'timestamp' => $datetime->getTimestamp() * 1000,
                 'parent' => (int) $comment->comment_parent,
             ];
         }, $comments);
+
         return $filteredComments;
     }
 }

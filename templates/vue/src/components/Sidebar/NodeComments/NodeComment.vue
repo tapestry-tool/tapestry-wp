@@ -1,14 +1,20 @@
 <template>
-  <div>
-    <h3 class="title">
+  <div :class="{ 'pull-up': comment.collapsed }">
+    <h3 v-if="!comment.collapsed" class="title">
       {{ comment.author }}
-      <span class="timestamp">{{ comment.date }}</span>
+      <span class="timestamp" :title="formatDate(comment.timestamp, false)">
+        {{ formatDate(comment.timestamp) }}
+      </span>
     </h3>
-    <p class="comment">{{ comment.content }}</p>
+    <p class="comment" :title="`Posted on ${formatDate(comment.timestamp, false)}`">
+      {{ comment.content }}
+    </p>
   </div>
 </template>
 
 <script>
+import moment from "moment"
+
 export default {
   props: {
     comment: {
@@ -16,10 +22,20 @@ export default {
       required: true,
     },
   },
+  methods: {
+    formatDate(timestamp, relative = true) {
+      const time = moment(timestamp)
+      return relative ? time.fromNow() : time.format("MMMM DD, YYYY h:mm:ss a")
+    },
+  },
 }
 </script>
 
 <style lang="scss" scoped>
+.pull-up {
+  margin-top: -0.5rem;
+}
+
 .title {
   color: var(--light-gray);
   font-family: "Avenir", sans-serif;

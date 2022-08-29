@@ -1,7 +1,7 @@
 <template>
   <b-overlay class="loading" bg-color="#5d656c" :show="loading">
     <ul class="comment-list">
-      <li v-for="comment in node.comments" :key="comment.id">
+      <li v-for="comment in comments" :key="comment.id">
         <node-comment :comment="comment"></node-comment>
       </li>
     </ul>
@@ -49,6 +49,22 @@ export default {
     }
   },
   computed: {
+    comments() {
+      const anHour = 1000 * 60 * 60
+      let lastAuthorId = null
+      let lastTimestamp = 0
+      return this.node.comments.map(comment => {
+        const collapsed =
+          comment.authorId === lastAuthorId &&
+          Math.abs(comment.timestamp - lastTimestamp) <= anHour
+        lastAuthorId = comment.authorId
+        lastTimestamp = comment.timestamp
+        return {
+          ...comment,
+          collapsed,
+        }
+      })
+    },
     isLoggedIn() {
       return wp.isLoggedIn()
     },
