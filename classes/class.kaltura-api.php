@@ -68,36 +68,23 @@
 
             /*
             We organize uploaded videos into Kaltura Categories. The ancestor category of all videos is 'Tapestry'.
+            Under 'Tapestry', videos are categorized by the URL of the site they were uploaded from.
+            Under 'Tapestry>{site URL}', videos are categorized either by date or by Tapestry.
             */
             $parentCategoryName = 'Tapestry';
             $filter = new CategoryFilter();
             $filter->fullNameStartsWith = $parentCategoryName;
 
             $categories = $kclient->category->listAction($filter, null);
-            $parentCategoryIndex = array_search($parentCategoryName, array_column($categories->objects, 'fullName'));
-            $parentCategory = (false !== $parentCategoryIndex ? $categories->objects[$parentCategoryIndex] : null);
 
-            // Create the 'Tapestry' category if it doesn't exist
-            if (null === $parentCategory) {
-                $createdParentCategory = new Category();
-                $createdParentCategory->name = $parentCategoryName;
-                $kAdminClient = $this->getKClient(SessionType::ADMIN);
-                $parentCategory = $kAdminClient->category->add($createdParentCategory);
-            }
+            // Ensure the chain of categories 'Tapestry>{site URL}>{category name}' exists to place this video under
+            $kAdminClient = null;
+            $parentCategory = $this->_getOrCreateCategory($parentCategoryName, null, $categories, $kAdminClient);
 
-            // Find or create the category with the desired name under 'Tapestry'
-            $videoCategoryIndex = array_search($categoryName, array_column($categories->objects, 'name'));
-            $videoCategory = null;
+            $siteUrl = get_bloginfo('url');
+            $siteCategory = $this->_getOrCreateCategory($siteUrl, $parentCategory, $categories, $kAdminClient);
 
-            if ($videoCategoryIndex) {
-                $videoCategory = (false !== $videoCategoryIndex ? $categories->objects[$videoCategoryIndex] : null);
-            } else {
-                $category = new Category();
-                $category->parentId = $parentCategory->id;
-                $category->name = $categoryName;
-                $kAdminClient = $this->getKClient(SessionType::ADMIN);
-                $videoCategory = $kAdminClient->category->add($category);
-            }
+            $videoCategory = $this->_getOrCreateCategory($categoryName, $siteCategory, $categories, $kAdminClient);
 
             // Uploading Video Steps:
             // 1. Create upload token
@@ -114,7 +101,7 @@
             $mediaEntry = new MediaEntry();
             $mediaEntry->name = $filename;
             $mediaEntry->mediaType = MediaType::VIDEO;
-            $mediaEntry->categoriesIds = $videoCategory->id.','.$parentCategory->id;
+            $mediaEntry->categoriesIds = $parentCategory->id.','.$siteCategory->id.','.$videoCategory->id;
             $entry = $kclient->media->add($mediaEntry);
 
             // 4. Attach the uploaded video to the Media Entry
@@ -149,5 +136,25 @@
             } catch (ApiException $e) {
                 return null;
             }
+        }
+
+        private function _getOrCreateCategory($categoryName, $parentCategory, $categories, &$kAdminClient)
+        {
+            $categoryFullName = $parentCategory ? $parentCategory->fullName.'>'.$categoryName : $categoryName;
+            $categoryIndex = array_search($categoryFullName, array_column($categories->objects, 'fullName'));
+            $category = (false !== $categoryIndex ? $categories->objects[$categoryIndex] : null);
+
+            if (null === $category) {
+                $createdCategory = new Category();
+
+                if ($parentCategory) {
+                    $createdCategory->parentId = $parentCategory->id;
+                }
+                $createdCategory->name = $categoryName;
+                $kAdminClient = $kAdminClient ?? $this->getKClient(SessionType::ADMIN);  // Reuse Kaltura session if possible
+                $category = $kAdminClient->category->add($createdCategory);
+            }
+
+            return $category;
         }
     }

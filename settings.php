@@ -2,6 +2,7 @@
 
 add_action('init', 'run_db_commands');
 add_action('admin_init', 'tapestry_settings_init');
+add_action('admin_init', 'register_tapestry_settings');
 add_action('admin_menu', 'add_tapestry_settings_page');
 
 function add_tapestry_settings_page()
@@ -11,6 +12,17 @@ function add_tapestry_settings_page()
     add_action('admin_enqueue_scripts', function ($hook_suffix) use ($tapestry_settings_page_hook_suffix) {
         load_tapestry_settings_page_scripts($hook_suffix, $tapestry_settings_page_hook_suffix);
     });
+}
+
+function register_tapestry_settings()
+{
+    $args = [
+        'type' => 'string',
+        'show_in_rest' => false,
+        'sanitize_callback' => 'sanitize_kaltura_category_structure',
+        'default' => null,
+    ];
+    register_setting('tapestry_kaltura_upload_settings', 'kaltura_category_structure', array_merge($args, ['description' => 'Category structure of uploaded videos']));
 }
 
 function tapestry_settings_init()
@@ -54,9 +66,66 @@ function tapestry_db_section_cb()
     <?php
 }
 
+function sanitize_kaltura_category_structure($value) {
+    $category_values = ['date', 'tapestry_name'];
+    return in_array($value, $category_values) ? $value : $category_values[0]; // Default is 'date'
+}
+
 function tapestry_kaltura_section_cb()
 {
+    $kaltura_category_structure = sanitize_kaltura_category_structure(get_option('kaltura_category_structure'));
+
+    $site_url = get_bloginfo('url');
+    $current_date = date('Y/m/d');
+
     ?>
+    <h4>Categorization</h4>
+    <p>
+        Choose how to categorize videos uploaded to Kaltura.
+    </p>
+    <form action="options.php" method="post">
+        <?php
+            settings_fields('tapestry_kaltura_upload_settings');
+        ?>
+        <table class="form-table" role="presentation">
+            <tbody>
+                <tr>
+                    <th scope="row">
+                        <label>
+                            <input 
+                                name="kaltura_category_structure"
+                                type="radio"
+                                value="date"
+                                <?php checked('date', $kaltura_category_structure) ?>
+                            />
+                            By date (default)
+                        </label>
+                    </th>
+                    <td>
+                        <code>Tapestry > <?php echo $site_url ?> > <?php echo $current_date ?></code>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">
+                        <label>
+                            <input
+                                name="kaltura_category_structure"
+                                type="radio"
+                                value="tapestry_name"
+                                <?php checked('tapestry_name', $kaltura_category_structure) ?>
+                            />
+                            By Tapestry name
+                        </label>
+                    </th>
+                    <td>
+                        <code>Tapestry > <?php echo $site_url ?> > Sample Tapestry</code>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <?php 
+            submit_button('Save Changes', 'primary', 'save-kaltura-upload-settings', false); ?>
+    </form>
     <h4>Clean Uploaded Videos</h4>
     <div class="postbox tapestry-settings-notice" id="upload_in_progress_notice" style="display: none">
         <p>
