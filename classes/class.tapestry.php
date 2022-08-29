@@ -157,6 +157,20 @@ class Tapestry implements ITapestry
     }
 
     /**
+     * Get settings.
+     *
+     * @return object $settings
+     */
+    public function getSettings()
+    {
+        if (!$this->postId) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+
+        return $this->settings;
+    }
+
+    /**
      * Add a new node.
      *
      * @param object $node Tapestry node
