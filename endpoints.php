@@ -1633,7 +1633,7 @@ function getQuestionHasAnswers($request)
  * Example request body:
  * {
  *  tapestryID: 7746,
- *  nodeIDs: [13004, 13005]
+ *  nodeIDs: [13004, 13005],
  *  useKalturaPlayer: false
  * }
  */
@@ -1652,6 +1652,10 @@ function uploadVideosToKaltura($request)
     }
 
     try {
+        if (!TapestryHelpers::isValidTapestry($tapestry_id)) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+
         if (!LOAD_KALTURA) {
             throw new TapestryError('KALTURA_NOT_AVAILABLE');
         }
@@ -1713,7 +1717,13 @@ function cleanUpKalturaUpload()
  */
 function perform_batched_upload_to_kaltura($tapestry_id, $node_ids, $use_kaltura_player)
 {
-    $current_date = date('Y/m/d');
+    if (get_option('kaltura_category_structure') === 'tapestry_name') {
+        $tapestry = new Tapestry($tapestry_id);
+        $category = $tapestry->getSettings()->title;
+    } else {
+        // Categorize by date by default
+        $category = date('Y/m/d');
+    }
 
     $videos_to_upload = create_upload_log($tapestry_id, $node_ids);
     update_upload_log($videos_to_upload);
@@ -1738,7 +1748,7 @@ function perform_batched_upload_to_kaltura($tapestry_id, $node_ids, $use_kaltura
 
             $kaltura_data = null;
             try {
-                $kaltura_data = $kalturaApi->uploadVideo($video->file, $current_date);
+                $kaltura_data = $kalturaApi->uploadVideo($video->file, $category);
             } catch (Error $e) {
                 $error_msg = "Unable to upload video '".$video->file->name."' to Kaltura due to: ".$e->getMessage();
 
