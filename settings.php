@@ -16,13 +16,14 @@ function add_tapestry_settings_page()
 
 function register_tapestry_settings()
 {
-    $args = [
+    // Register Kaltura upload settings
+    register_setting('tapestry_kaltura_upload_settings', 'kaltura_category_structure', [
         'type' => 'string',
         'show_in_rest' => false,
         'sanitize_callback' => 'sanitize_kaltura_category_structure',
         'default' => null,
-    ];
-    register_setting('tapestry_kaltura_upload_settings', 'kaltura_category_structure', array_merge($args, ['description' => 'Category structure of uploaded videos']));
+        'description' => 'Category structure of uploaded videos'
+    ]);
 
     // Register Kaltura configuration variables
     $args = [
@@ -48,7 +49,7 @@ function tapestry_settings_init()
 function load_tapestry_settings_page_scripts($hook_suffix, $tapestry_settings_page_hook_suffix)
 {
     if ($hook_suffix === $tapestry_settings_page_hook_suffix) {
-        wp_enqueue_style( 'tapestry_settings_styles', plugin_dir_url(__FILE__).'settings.css');
+        wp_enqueue_style('tapestry_settings_styles', plugin_dir_url(__FILE__).'settings.css');
         wp_enqueue_script('tapestry_settings_script_js', plugin_dir_url(__FILE__).'settings.js');
 
         // Inject REST API url and WordPress nonce for use in JavaScript scripts
@@ -86,17 +87,14 @@ function tapestry_kaltura_config_section_cb()
     $kaltura_partner_id = get_option('kaltura_partner_id', '');
     $kaltura_service_url = get_option('kaltura_service_url', '');
     $kaltura_unique_config = get_option('kaltura_unique_config', '');
-    $kaltura_upload_max_file_size = get_option('tapestry_kaltura_upload_max_file_size', '');
-
-    ?>
+    $kaltura_upload_max_file_size = get_option('tapestry_kaltura_upload_max_file_size', ''); ?>
     <p>
         Use a different set of Kaltura configuration variables on this site only.
         If you wish to do this, the first four configuration variables must be provided.
     </p>
     <form action="options.php" method="post">
         <?php
-            settings_fields('tapestry_kaltura_config');
-        ?>
+            settings_fields('tapestry_kaltura_config'); ?>
         <table class="form-table" role="presentation">
             <tbody>
                 <tr>
@@ -157,13 +155,14 @@ function tapestry_kaltura_config_section_cb()
                 </tr>
             </tbody>
         </table>
-        <?php 
+        <?php
             submit_button('Save Changes', 'primary', 'save-kaltura-config', false); ?>
     </form>
     <?php
 }
 
-function sanitize_kaltura_category_structure($value) {
+function sanitize_kaltura_category_structure($value)
+{
     $category_values = ['date', 'tapestry_name'];
     return in_array($value, $category_values) ? $value : $category_values[0]; // Default is 'date'
 }
@@ -173,17 +172,14 @@ function tapestry_kaltura_upload_section_cb()
     $kaltura_category_structure = sanitize_kaltura_category_structure(get_option('kaltura_category_structure'));
 
     $site_url = get_bloginfo('url');
-    $current_date = date('Y/m/d');
-
-    ?>
+    $current_date = date('Y/m/d'); ?>
     <h4>Categorization</h4>
     <p>
         Choose how to categorize videos uploaded to Kaltura.
     </p>
     <form action="options.php" method="post">
         <?php
-            settings_fields('tapestry_kaltura_upload_settings');
-        ?>
+            settings_fields('tapestry_kaltura_upload_settings'); ?>
         <table class="form-table" role="presentation">
             <tbody>
                 <tr>
@@ -220,7 +216,7 @@ function tapestry_kaltura_upload_section_cb()
                 </tr>
             </tbody>
         </table>
-        <?php 
+        <?php
             submit_button('Save Changes', 'primary', 'save-kaltura-upload-settings', false); ?>
     </form>
     <h4>Clean Uploaded Videos</h4>
