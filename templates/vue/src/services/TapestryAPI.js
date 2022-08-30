@@ -157,9 +157,12 @@ class TapestryApi {
     return response.data
   }
 
-  async removeComment(id, commentId) {
+  async performCommentAction(id, commentId, action) {
     const url = `/tapestries/${this.postId}/nodes/${id}/comments`
-    const response = await this.client.delete(url, { data: commentId })
+    const response = await this.client.put(url, {
+      id: commentId,
+      action: action,
+    })
     return response.data
   }
 

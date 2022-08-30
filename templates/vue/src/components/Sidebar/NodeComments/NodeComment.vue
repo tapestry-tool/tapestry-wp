@@ -5,9 +5,15 @@
       <span class="timestamp" :title="formatDate(comment.timestamp, false)">
         {{ formatDate(comment.timestamp) }}
       </span>
+      <span v-if="!comment.approved" class="unapproved-text text-danger">
+        Held for moderation
+      </span>
     </h3>
     <div
       class="comment"
+      :class="{
+        unapproved: !comment.approved,
+      }"
       :title="`Posted on ${formatDate(comment.timestamp, false)}`"
     >
       <p>
@@ -23,8 +29,31 @@
           <template #button-content>
             <i class="fas fa-ellipsis-v"></i>
           </template>
-          <b-dropdown-item-button variant="danger" @click="$emit('delete', comment)">
-            Delete
+          <b-dropdown-item-button
+            v-if="comment.approved"
+            class="unapprove-action"
+            @click="$emit('action', comment, 'unapprove')"
+          >
+            Unapprove
+          </b-dropdown-item-button>
+          <b-dropdown-item-button
+            v-else
+            variant="success"
+            @click="$emit('action', comment, 'approve')"
+          >
+            Approve
+          </b-dropdown-item-button>
+          <b-dropdown-item-button
+            variant="danger"
+            @click="$emit('action', comment, 'spam')"
+          >
+            Spam
+          </b-dropdown-item-button>
+          <b-dropdown-item-button
+            variant="danger"
+            @click="$emit('action', comment, 'trash')"
+          >
+            Trash
           </b-dropdown-item-button>
         </b-dropdown>
       </div>
@@ -69,7 +98,8 @@ export default {
   margin-bottom: 0.25rem;
 }
 
-.timestamp {
+.timestamp,
+.unapproved-text {
   font-size: 0.8rem;
 }
 
@@ -83,21 +113,35 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
+
+  &.unapproved {
+    background: var(--light-yellow);
+  }
 }
 </style>
 
 <style lang="scss">
 .comment-action-btn {
+  padding: 0 !important;
+  height: 1rem;
+  margin-top: -7px;
+  margin-right: 3px;
+
   &,
   &:focus,
   &:hover,
-  &:active {
+  &:active,
+  i {
     color: #333;
     background: none;
   }
 }
 
-.comment-container .comment:not(:hover) .comment-action-btn {
-  // display: none;
+.comment-container:not(:hover) .comment-action-btn {
+  visibility: hidden;
+}
+
+.comment-container .unapprove-action button {
+  color: #996800;
 }
 </style>

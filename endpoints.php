@@ -153,11 +153,11 @@ $REST_API_ENDPOINTS = [
             'callback' => 'addTapestryNodeComment',
         ],
     ],
-    'DELETE_TAPESTRY_NODE_COMMENT' => (object) [
+    'PERFORM_TAPESTRY_NODE_COMMENT_ACTION' => (object) [
         'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/comments',
         'ARGUMENTS' => [
-            'methods' => $REST_API_DELETE_METHOD,
-            'callback' => 'deleteTapestryNodeComment',
+            'methods' => $REST_API_PUT_METHOD,
+            'callback' => 'performTapestryNodeCommentAction',
         ],
     ],
     'GET_TAPESTRY_NODE_HAS_DRAFT_CHILDREN' => (object) [
@@ -764,21 +764,20 @@ function addTapestryNodeComment($request) {
         }
 
         $node = new TapestryNode($postId, $nodeMetaId);
-        $comments = $node->addComment($comment);
-        return (object) [
-            'comments' => $comments,
-        ];
+        return $node->addComment($comment);
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
 }
 
-function deleteTapestryNodeComment($request) {
+function performTapestryNodeCommentAction($request) {
     $postId = $request['tapestryPostId'];
     $nodeMetaId = $request['nodeMetaId'];
-    $commentId = $request->get_body();
+    $data = json_decode($request->get_body());
+    $commentId = $data->id;
+    $action = $data->action;
 
-    error_log($commentId);
+    error_log($commentId . ':' . $action);
 
     try {
         if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
@@ -802,10 +801,13 @@ function deleteTapestryNodeComment($request) {
         if (!is_numeric($commentId)) {
             throw new TapestryError('INVALID_COMMENT_ID', 'Comment ID should be a number', 400);
         }
+        if (!isset($action)) {
+            throw new TapestryError('INVALID_ACTION', 'Comment action should not be empty', 400);
+        }
         $commentId = (int) $commentId;
 
         $node = new TapestryNode($postId, $nodeMetaId);
-        return $node->deleteComment($commentId);
+        return $node->performCommentAction($commentId, $action);
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }

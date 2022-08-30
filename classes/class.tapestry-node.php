@@ -408,17 +408,43 @@ class TapestryNode implements ITapestryNode
         return $this->_getComments();
     }
 
-    public function deleteComment($commentId)
+    public function performCommentAction($commentId, $action)
     {
-        if (1 !== get_comments([
-            'post_id' => $this->nodePostId,
-            'comment__in' => [$commentId],
-            'count' => true,
-        ])) {
-            throw new TapestryError('FAILED_TO_DELETE_COMMENT', 'Comment not found', 500);
+        $comment = get_comment($commentId);
+        if (is_null($comment)) {
+            throw new TapestryError('FAILED_TO_FIND_COMMENT', 'Comment not found', 500);
+        }
+        if ((int) $comment->comment_post_ID !== $this->nodePostId) {
+            throw new TapestryError('INVALID_COMMENT_ACTION', 'Comment does not belong to the node', 500);
         }
 
-        return wp_delete_comment($commentId);
+        switch ($action) {
+            case 'trash':
+                if (!wp_delete_comment($comment)) {
+                    throw new TapestryError('COMMENT_ACTION_FAILED', 'Comment cannot be moved to trash. Check if you have privileges to delete comments.', 500);
+                }
+                break;
+            case 'spam':
+                if (!wp_spam_comment($comment)) {
+                    throw new TapestryError('COMMENT_ACTION_FAILED', 'Failed to mark comment as spam', 500);
+                }
+                break;
+            case 'unapprove':
+                if (true !== wp_set_comment_status($comment, 'hold', true)) {
+                    throw new TapestryError('COMMENT_ACTION_FAILED', 'Failed to unapprove comment', 500);
+                }
+                break;
+            case 'approve':
+                if (true !== wp_set_comment_status($comment, 'approve', true)) {
+                    throw new TapestryError('COMMENT_ACTION_FAILED', 'Failed to approve comment', 500);
+                }
+                break;
+            default:
+                throw new TapestryError('COMMENT_ACTION_FAILED', 'Unknown comment action', 500);
+                break;
+        }
+
+        return $this->_getComments();
     }
 
     public function addReview($comments)
@@ -698,7 +724,7 @@ class TapestryNode implements ITapestryNode
                 'content' => $comment->comment_content,
                 'author' => $comment->comment_author,
                 'authorId' => (int) $comment->user_id,
-                'approved' => $comment->comment_approved,
+                'approved' => '1' === $comment->comment_approved ? true : false,
                 'timestamp' => $datetime->getTimestamp() * 1000,
                 'parent' => (int) $comment->comment_parent,
             ];

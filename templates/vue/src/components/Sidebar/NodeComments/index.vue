@@ -5,7 +5,7 @@
         <node-comment
           :comment="comment"
           :show-actions="showActions"
-          @delete="deleteComment"
+          @action="handleCommentAction"
         ></node-comment>
       </li>
     </ul>
@@ -55,14 +55,14 @@ export default {
   computed: {
     comments() {
       const anHour = 1000 * 60 * 60
-      let lastAuthorId = null
-      let lastTimestamp = 0
+      let lastComment = null
       return this.node.comments.map(comment => {
         const collapsed =
-          comment.authorId === lastAuthorId &&
-          Math.abs(comment.timestamp - lastTimestamp) <= anHour
-        lastAuthorId = comment.authorId
-        lastTimestamp = comment.timestamp
+          lastComment &&
+          comment.authorId === lastComment.authorId &&
+          Math.abs(comment.timestamp - lastComment.timestamp) <= anHour &&
+          comment.approved === lastComment.approved
+        lastComment = comment
         return {
           ...comment,
           collapsed,
@@ -80,7 +80,7 @@ export default {
     },
   },
   methods: {
-    ...mapActions(["addComment", "removeComment"]),
+    ...mapActions(["addComment", "performCommentAction"]),
     async submitComment() {
       this.loading = true
       const success = await this.addComment({
@@ -92,17 +92,14 @@ export default {
       }
       this.loading = false
     },
-    async deleteComment(comment) {
+    async handleCommentAction(comment, action) {
+      console.log(comment, action)
       this.loading = true
-      const success = await this.removeComment({
+      await this.performCommentAction({
         nodeId: this.node.id,
         commentId: comment.id,
+        action: action,
       })
-      if (!success) {
-        alert(
-          "Failed to delete comment. Check if you have privileges to delete Wordpress comments."
-        )
-      }
       this.loading = false
     },
   },
@@ -112,6 +109,7 @@ export default {
 <style lang="scss" scoped>
 ::v-deep {
   --light-gray: #dce4ea;
+  --light-yellow: #f7e9ae;
 }
 
 .comment-list {

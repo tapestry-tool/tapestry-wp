@@ -301,7 +301,7 @@ export async function reviewNode({ commit, dispatch }, { id, comments }) {
 
 export async function addComment({ commit, dispatch }, { nodeId, comment }) {
   try {
-    const { comments } = await client.addComment(nodeId, comment)
+    const comments = await client.addComment(nodeId, comment)
     commit("updateNode", {
       id: nodeId,
       newNode: {
@@ -315,24 +315,21 @@ export async function addComment({ commit, dispatch }, { nodeId, comment }) {
   return false
 }
 
-export async function removeComment(
-  { commit, dispatch, getters },
-  { nodeId, commentId }
+export async function performCommentAction(
+  { commit, dispatch },
+  { nodeId, commentId, action }
 ) {
   try {
-    const success = await client.removeComment(nodeId, commentId)
-    const node = getters.getNode(nodeId)
+    const comments = await client.performCommentAction(nodeId, commentId, action)
     commit("updateNode", {
       id: nodeId,
       newNode: {
-        comments: node.comments.filter(comment => comment.id !== commentId),
+        comments,
       },
     })
-    return success
   } catch (error) {
     dispatch("addApiError", error)
   }
-  return false
 }
 
 // links
