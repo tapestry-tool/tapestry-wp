@@ -10,6 +10,7 @@ describe("Video", () => {
     cy.getSelectedNode().then(node => {
       cy.openModal("edit", node.id)
       cy.changeMediaType("video")
+      cy.changeMediaFormat("youtube")
       cy.getByTestId(`node-video-url`).type(url)
       cy.submitModal() // automatically confirms
 
@@ -62,6 +63,7 @@ describe("Video", () => {
     cy.getSelectedNode().then(node => {
       cy.openModal("edit", node.id)
       cy.changeMediaType("video")
+      cy.changeMediaFormat("youtube")
       cy.getByTestId(`node-video-url`).type(url)
       cy.submitModal()
 
@@ -107,39 +109,64 @@ describe("Video", () => {
     })
   })
 
-  it("should be able to add a video node via Kaltura", () => {
-    const kalturaId = "0_lchbo276"
+  const kalturaId = "0_lchbo276"
 
+  it("should be able to add a video node via Kaltura and use regular player", () => {
     cy.getSelectedNode().then(node => {
       cy.openModal("edit", node.id)
       cy.changeMediaType("video")
-
-      cy.getByTestId("node-video-kaltura-id").should("not.be.visible")
-      cy.get(".b-overlay").should("not.exist")
-
-      cy.getByTestId("use-kaltura-checkbox").click({ force: true })
-      cy.get(".b-overlay").should("exist") // Checking that video URL field is greyed out by Bootstrap overlay
+      cy.changeMediaFormat("kaltura")
 
       cy.getByTestId("node-video-kaltura-id").type(kalturaId)
+      cy.get('input[name="node-video-player"]')
+        .first() // Choose regular player
+        .check({ force: true })
 
       cy.submitModal()
 
-      cy.openModal("edit", node.id)
-      cy.getByTestId("use-kaltura-checkbox").should("be.checked")
-      cy.getByTestId("node-video-kaltura-id")
-        .invoke("val")
-        .should("eq", kalturaId)
+      cy.openLightbox(node.id).within(() => {
+        // Check that the media URL comes from Kaltura. We just check that the URL includes the Kaltura ID
+        cy.get("video")
+          .invoke("attr", "src")
+          .should("include", kalturaId)
+      })
+    })
+  })
 
-      // Checking that mediaURL of Kaltura video matches. We just check that the URL includes the Kaltura ID
-      cy.getByTestId("node-video-url")
-        .invoke("val")
-        .should("include", kalturaId)
-      cy.get(".close").click()
+  it("should be able to add a video node via Kaltura and use Kaltura player", () => {
+    cy.getSelectedNode().then(node => {
+      cy.openModal("edit", node.id)
+      cy.changeMediaType("video")
+      cy.changeMediaFormat("kaltura")
+
+      cy.getByTestId("node-video-kaltura-id").type(kalturaId)
+      cy.get('input[name="node-video-player"]')
+        .last() // Switch to Kaltura player
+        .check({ force: true })
+
+      cy.submitModal()
 
       cy.openLightbox(node.id).within(() => {
         cy.get(`#kaltura-container-${node.id} > iframe`, { timeout: 10000 }).should(
           "be.visible"
         )
+      })
+    })
+  })
+
+  it("adding a kaltura video should also set a thumbnail", () => {
+    cy.getSelectedNode().then(node => {
+      cy.openModal("edit", node.id)
+      cy.changeMediaType("video")
+      cy.changeMediaFormat("kaltura")
+      cy.getByTestId("node-video-kaltura-id").type(kalturaId)
+      cy.submitModal() // automatically confirms
+
+      cy.getNodeById(node.id).within(() => {
+        // Check that the thumbnail URL comes from Kaltura. We just check that the URL includes the Kaltura ID
+        cy.get("image")
+          .invoke("attr", "href")
+          .should("include", kalturaId)
       })
     })
   })

@@ -51,6 +51,7 @@
           <b-form-radio-group
             id="node-video-player"
             v-model="videoPlayer"
+            data-qa="node-video-player"
             name="node-video-player"
             :options="[
               { text: 'Regular Player', value: 'regular' },
