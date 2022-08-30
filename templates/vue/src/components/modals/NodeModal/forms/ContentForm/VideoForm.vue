@@ -57,15 +57,18 @@
           label="Upload a video to Kaltura"
           description="Upload your video directly to Kaltura. The Kaltura ID will be automatically set when done."
         >
-          <b-form-file
-            placeholder="Choose a video or drop it here to upload"
-            drop-placeholder="Drop file here..."
-            accept="video/mp4"
-            :disabled="isUploading"
-            @dragover.prevent
-            @drop.prevent="uploadVideoToKaltura"
-            @change="uploadVideoToKaltura"
-          />
+          <div class="d-flex flex-row">
+            <b-form-file
+              v-model="videoFile"
+              placeholder="Choose a video or drop it here..."
+              drop-placeholder="Drop file here..."
+              accept="video/mp4"
+              :disabled="isUploading"
+            />
+            <b-button class="ml-2" variant="primary" @click="uploadVideoToKaltura">
+              Upload
+            </b-button>
+          </div>
         </b-form-group>
       </b-card>
     </b-overlay>
@@ -84,6 +87,7 @@ export default {
   },
   data() {
     return {
+      videoFile: null,
       useKaltura: false,
       isUploading: false,
     }
@@ -148,19 +152,16 @@ export default {
         this.update("typeData.youtubeID", undefined)
       }
     },
-    async uploadVideoToKaltura(event) {
-      const videoFile =
-        event.dataTransfer && event.dataTransfer.files
-          ? event.dataTransfer.files[0]
-          : event.target.files[0]
-
-      this.isUploading = true
-      try {
-        this.kalturaId = await client.uploadVideoToKaltura(videoFile)
-      } catch (error) {
-        this.addApiError(error)
+    async uploadVideoToKaltura() {
+      if (this.videoFile) {
+        this.isUploading = true
+        try {
+          this.kalturaId = await client.uploadVideoToKaltura(this.videoFile)
+        } catch (error) {
+          this.addApiError(error)
+        }
+        this.isUploading = false
       }
-      this.isUploading = false
     },
   },
 }
