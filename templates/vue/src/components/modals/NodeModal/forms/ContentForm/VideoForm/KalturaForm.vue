@@ -76,8 +76,9 @@
 </template>
 
 <script>
-import { mapMutations } from "vuex"
+import { mapMutations, mapState } from "vuex"
 import client from "@/services/TapestryAPI"
+import ErrorHelper from "@/utils/errorHelper"
 
 export default {
   data() {
@@ -87,6 +88,9 @@ export default {
     }
   },
   computed: {
+    ...mapState({
+      nodeId: state => state.currentEditingNode.id,
+    }),
     kalturaId: {
       get() {
         return this.$store.state.currentEditingNode.typeData.kalturaId
@@ -122,13 +126,14 @@ export default {
         this.$root.$emit("node-modal::uploading", true)
 
         try {
-          const kalturaId = await client.uploadVideoToKaltura(videoFile)
+          const kalturaId = await client.uploadVideoToKaltura(videoFile, this.nodeId)
           this.kalturaId = kalturaId
           this.uploadAlertText = `
             Upload completed successfully. Your video has Kaltura ID ${kalturaId}.
             Make sure to publish / save to keep this video.`
         } catch (error) {
-          this.addApiError(error)
+          const errorMessage = ErrorHelper.getErrorMessage(error)
+          this.addApiError({ error: `Unable to upload video: ${errorMessage}` })
         }
 
         this.isUploading = false

@@ -38,7 +38,7 @@ export default {
     },
   },
   methods: {
-    ...mapMutations(["setCurrentEditingNodeProperty", "addApiError"]),
+    ...mapMutations(["setCurrentEditingNodeProperty"]),
     update(property, value) {
       this.setCurrentEditingNodeProperty({ property, value })
     },

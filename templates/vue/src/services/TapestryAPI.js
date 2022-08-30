@@ -309,8 +309,10 @@ class TapestryApi {
     return response
   }
 
-  async uploadVideoToKaltura(videoFile) {
-    const url = `/kaltura/upload_video?tapestryPostId=${this.postId}`
+  async uploadVideoToKaltura(videoFile, nodeId) {
+    const url =
+      `/kaltura/upload_video?tapestryPostId=${this.postId}` +
+      (nodeId ? `&nodeMetaId=${nodeId}` : "")
 
     const formData = new FormData()
     formData.append("file", videoFile)

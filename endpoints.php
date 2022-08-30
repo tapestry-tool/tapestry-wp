@@ -1611,15 +1611,30 @@ function getQuestionHasAnswers($request)
 
 /**
  * Upload video to Kaltura and return Kaltura ID.
+ * 
+ * If nodeMetaId specified, requires permission to edit that node.
+ * Otherwise, requires same permissions as adding nodes.
  */
 function uploadVideoToKaltura($request)
 {
     $tapestryPostId = $request['tapestryPostId'];
-    $wait_for_duration = true;
+    $nodeMetaId = $request['nodeMetaId'];
 
     try {
         if (!TapestryHelpers::isValidTapestry($tapestryPostId)) {
             throw new TapestryError('INVALID_POST_ID');
+        }
+
+        if (empty($nodeMetaId)) {
+            $tapestry = new Tapestry($tapestryPostId);
+            if ($tapestry->isEmpty()) {
+                $user = new TapestryUser();
+                if (!$user->canEdit($tapestryPostId)) {
+                    throw new TapestryError('ADD_NODE_PERMISSION_DENIED');
+                }
+            }
+        } else if (!TapestryHelpers::userIsAllowed('EDIT', $nodeMetaId, $tapestryPostId)) {
+            throw new TapestryError('EDIT_NODE_PERMISSION_DENIED');
         }
 
         if (LOAD_KALTURA) {
@@ -1635,7 +1650,7 @@ function uploadVideoToKaltura($request)
             $kaltura_api = new KalturaApi();
             $response = $kaltura_api->uploadVideo($file_obj, $category);
 
-            while ($wait_for_duration && $response->status === EntryStatus::PRECONVERT && $response->duration === 0) {
+            while ($response->status === EntryStatus::PRECONVERT && $response->duration === 0) {
                 // Wait for the video's duration to load (or conversion to error out/complete)
                 sleep(5);
                 $response = $kaltura_api->getVideo($response->id);
