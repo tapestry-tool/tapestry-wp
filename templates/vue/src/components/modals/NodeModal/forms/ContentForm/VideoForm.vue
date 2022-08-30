@@ -31,6 +31,7 @@
           data-qa="use-kaltura-checkbox"
           :value="true"
           :unchecked-value="false"
+          :disabled="isUploading"
           style="display:inline-block;"
           @input="handleKalturaCheck"
         >
@@ -45,9 +46,29 @@
           name="text-input"
           placeholder="Enter Kaltura video ID"
           required
+          :disabled="isUploading"
         />
       </b-col>
     </b-row>
+    <b-overlay v-if="useKaltura" :show="isUploading">
+      <b-card class="mb-3">
+        <b-form-group
+          class="my-0"
+          label="Upload a video to Kaltura"
+          description="Upload your video directly to Kaltura. The Kaltura ID will be automatically set when done."
+        >
+          <b-form-file
+            placeholder="Choose a video or drop it here to upload"
+            drop-placeholder="Drop file here..."
+            accept="video/mp4"
+            :disabled="isUploading"
+            @dragover.prevent
+            @drop.prevent="uploadVideoToKaltura"
+            @change="uploadVideoToKaltura"
+          />
+        </b-form-group>
+      </b-card>
+    </b-overlay>
   </div>
 </template>
 
@@ -55,6 +76,7 @@
 import FileUpload from "@/components/modals/common/FileUpload"
 import Helpers from "@/utils/Helpers"
 import { mapMutations, mapState } from "vuex"
+import client from "@/services/TapestryAPI"
 
 export default {
   components: {
@@ -63,6 +85,7 @@ export default {
   data() {
     return {
       useKaltura: false,
+      isUploading: false,
     }
   },
   computed: {
@@ -102,7 +125,7 @@ export default {
     }
   },
   methods: {
-    ...mapMutations(["setCurrentEditingNodeProperty"]),
+    ...mapMutations(["setCurrentEditingNodeProperty", "addApiError"]),
     update(property, value) {
       this.setCurrentEditingNodeProperty({ property, value })
     },
@@ -124,6 +147,20 @@ export default {
         this.update("mediaFormat", "mp4")
         this.update("typeData.youtubeID", undefined)
       }
+    },
+    async uploadVideoToKaltura(event) {
+      const videoFile =
+        event.dataTransfer && event.dataTransfer.files
+          ? event.dataTransfer.files[0]
+          : event.target.files[0]
+
+      this.isUploading = true
+      try {
+        this.kalturaId = await client.uploadVideoToKaltura(videoFile)
+      } catch (error) {
+        this.addApiError(error)
+      }
+      this.isUploading = false
     },
   },
 }

@@ -309,6 +309,19 @@ class TapestryApi {
     return response
   }
 
+  async uploadVideoToKaltura(videoFile) {
+    const url = `/kaltura/upload_video?tapestryPostId=${this.postId}`
+
+    const formData = new FormData()
+    formData.append("file", videoFile)
+    const response = await this.client.post(url, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    })
+    return response.data
+  }
+
   async checkKalturaVideo(entryId) {
     const url = `/kaltura/video/status?entry_id=${entryId}`
     const response = await this.client.get(url)

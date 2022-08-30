@@ -325,6 +325,14 @@ $REST_API_ENDPOINTS = [
             'permission_callback' => 'TapestryPermissions::putTapestrySettings',
         ],
     ],
+    'UPLOAD_VIDEO_TO_KALTURA' => (object) [
+        'ROUTE' => '/kaltura/upload_video',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_POST_METHOD,
+            'callback' => 'uploadVideoToKaltura',
+            // TODO: what should the permissions be?
+        ],
+    ],
     'UPLOAD_VIDEOS_TO_KALTURA' => (object) [
         'ROUTE' => '/kaltura/upload_videos',
         'ARGUMENTS' => [
@@ -1596,6 +1604,45 @@ function getQuestionHasAnswers($request)
         }
 
         return TapestryUserProgress::questionsHasAnyAnswer($postId, $nodeMetaId, $questionId, $answerType);
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+/**
+ * Upload video to Kaltura and return Kaltura ID.
+ */
+function uploadVideoToKaltura($request)
+{
+    $tapestryPostId = $request['tapestryPostId'];
+
+    try {
+        if (!TapestryHelpers::isValidTapestry($tapestryPostId)) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+
+        if (LOAD_KALTURA) {
+            $file_params = $request->get_file_params();
+            $file_path = $file_params['file']['tmp_name'];
+
+            $file_obj = (object) [
+                'file_path' => $file_path,
+                'name' => $file_params['file']['name'],
+            ];
+
+            // TODO: reduce duplication
+            if (get_option('kaltura_category_structure') === 'tapestry_name') {
+                $tapestry = new Tapestry($tapestryPostId);
+                $category = $tapestry->getSettings()->title;
+            } else {
+                // Categorize by date by default
+                $category = date('Y/m/d');
+            }
+
+            $kaltura_api = new KalturaApi();
+            $response = $kaltura_api->uploadVideo($file_obj, $category);
+            return $response->id;
+        }
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
