@@ -19,7 +19,7 @@
       <p>
         {{ comment.content }}
       </p>
-      <div v-if="showActions">
+      <div v-if="showAllActions || isAuthor">
         <b-dropdown
           size="sm"
           variant="link"
@@ -29,26 +29,31 @@
           <template #button-content>
             <i class="fas fa-ellipsis-v"></i>
           </template>
-          <b-dropdown-item-button
-            v-if="comment.approved"
-            class="unapprove-action"
-            @click="$emit('action', comment, 'unapprove')"
-          >
-            Unapprove
+          <b-dropdown-item-button @click="$emit('set-reply', comment)">
+            Reply
           </b-dropdown-item-button>
-          <b-dropdown-item-button
-            v-else
-            variant="success"
-            @click="$emit('action', comment, 'approve')"
-          >
-            Approve
-          </b-dropdown-item-button>
-          <b-dropdown-item-button
-            variant="danger"
-            @click="$emit('action', comment, 'spam')"
-          >
-            Spam
-          </b-dropdown-item-button>
+          <template v-if="showAllActions">
+            <b-dropdown-item-button
+              v-if="comment.approved"
+              class="unapprove-action"
+              @click="$emit('action', comment, 'unapprove')"
+            >
+              Unapprove
+            </b-dropdown-item-button>
+            <b-dropdown-item-button
+              v-else
+              variant="success"
+              @click="$emit('action', comment, 'approve')"
+            >
+              Approve
+            </b-dropdown-item-button>
+            <b-dropdown-item-button
+              variant="danger"
+              @click="$emit('action', comment, 'spam')"
+            >
+              Spam
+            </b-dropdown-item-button>
+          </template>
           <b-dropdown-item-button
             variant="danger"
             @click="$emit('action', comment, 'trash')"
@@ -70,7 +75,11 @@ export default {
       type: Object,
       required: true,
     },
-    showActions: {
+    showAllActions: {
+      type: Boolean,
+      required: true,
+    },
+    isAuthor: {
       type: Boolean,
       required: true,
     },

@@ -4,7 +4,8 @@
       <li v-for="comment in comments" :key="comment.id">
         <node-comment
           :comment="comment"
-          :show-actions="showActions"
+          :show-all-actions="showAllActions"
+          :is-author="isAuthor(comment)"
           @action="handleCommentAction"
         ></node-comment>
       </li>
@@ -69,7 +70,7 @@ export default {
         }
       })
     },
-    showActions() {
+    showAllActions() {
       return wp.canEditTapestry()
     },
     isLoggedIn() {
@@ -81,6 +82,9 @@ export default {
   },
   methods: {
     ...mapActions(["addComment", "performCommentAction"]),
+    isAuthor(comment) {
+      return wp.isCurrentUser(comment.authorId)
+    },
     async submitComment() {
       this.loading = true
       const success = await this.addComment({
@@ -93,7 +97,6 @@ export default {
       this.loading = false
     },
     async handleCommentAction(comment, action) {
-      console.log(comment, action)
       this.loading = true
       await this.performCommentAction({
         nodeId: this.node.id,

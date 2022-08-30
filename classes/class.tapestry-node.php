@@ -2,6 +2,7 @@
 
 require_once dirname(__FILE__).'/../utilities/class.tapestry-errors.php';
 require_once dirname(__FILE__).'/../utilities/class.tapestry-helpers.php';
+require_once dirname(__FILE__).'/../utilities/class.tapestry-user.php';
 require_once dirname(__FILE__).'/../interfaces/interface.tapestry-node.php';
 require_once dirname(__FILE__).'/../classes/class.tapestry-user-progress.php';
 require_once dirname(__FILE__).'/../classes/class.constants.php';
@@ -713,23 +714,29 @@ class TapestryNode implements ITapestryNode
 
     private function _getComments()
     {
+        $user = new TapestryUser();
         $comments = get_comments([
             'post_id' => $this->nodePostId,
         ]);
-        $filteredComments = array_map(function ($comment) {
-            $datetime = new DateTime($comment->comment_date, wp_timezone());
 
-            return (object) [
-                'id' => (int) $comment->comment_ID,
-                'content' => $comment->comment_content,
-                'author' => $comment->comment_author,
-                'authorId' => (int) $comment->user_id,
-                'approved' => '1' === $comment->comment_approved ? true : false,
-                'timestamp' => $datetime->getTimestamp() * 1000,
-                'parent' => (int) $comment->comment_parent,
-            ];
-        }, $comments);
+        $renderedComments = [];
 
-        return $filteredComments;
+        foreach ($comments as $comment) {
+            if ('1' === $comment->comment_approved || (int) $comment->user_id === $user->getID() || $user->canEdit($this->tapestryPostId)) {
+                $datetime = new DateTime($comment->comment_date, wp_timezone());
+
+                $renderedComments[] = (object) [
+                    'id' => (int) $comment->comment_ID,
+                    'content' => $comment->comment_content,
+                    'author' => $comment->comment_author,
+                    'authorId' => (int) $comment->user_id,
+                    'approved' => '1' === $comment->comment_approved ? true : false,
+                    'timestamp' => $datetime->getTimestamp() * 1000,
+                    'parent' => (int) $comment->comment_parent,
+                ];
+            }
+        }
+
+        return $renderedComments;
     }
 }
