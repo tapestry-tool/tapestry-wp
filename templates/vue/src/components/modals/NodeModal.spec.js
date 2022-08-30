@@ -23,10 +23,13 @@ describe("node modal: content - video", () => {
     )
   })
 
-  async function testVideoSetup(screen, url) {
+  async function testVideoSetup(screen, format, url) {
     await fireEvent.update(screen.getByPlaceholderText(/title/i), "Test Title")
     await fireEvent.change(screen.getByTestId("node-media-type"), {
       target: { value: "video" },
+    })
+    await fireEvent.change(screen.getByTestId("node-media-format"), {
+      target: { value: format },
     })
     expect(screen.queryByText("Video")).toBeInTheDocument()
     expect(screen.queryByText("Video URL")).toBeInTheDocument()
@@ -39,7 +42,7 @@ describe("node modal: content - video", () => {
 
   it("should create video node for youtube video", async () => {
     const youtubeURL = "https://youtu.be/d63DL-Erz50"
-    await testVideoSetup(screen, youtubeURL)
+    await testVideoSetup(screen, "youtube", youtubeURL)
     expect(
       screen.queryByText("Please enter a valid Video URL")
     ).not.toBeInTheDocument()
@@ -47,7 +50,7 @@ describe("node modal: content - video", () => {
 
   it("should not create video node for invalid video url", async () => {
     const fakeURL = "www.testing.com"
-    await testVideoSetup(screen, fakeURL)
+    await testVideoSetup(screen, "mp4", fakeURL)
     expect(screen.queryByText("Please enter a valid Video URL")).toBeInTheDocument()
   })
 })
