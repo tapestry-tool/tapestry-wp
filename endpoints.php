@@ -1615,6 +1615,7 @@ function getQuestionHasAnswers($request)
 function uploadVideoToKaltura($request)
 {
     $tapestryPostId = $request['tapestryPostId'];
+    $wait_for_duration = true;
 
     try {
         if (!TapestryHelpers::isValidTapestry($tapestryPostId)) {
@@ -1633,6 +1634,13 @@ function uploadVideoToKaltura($request)
             $category = TapestryHelpers::getKalturaCategoryName($tapestryPostId);
             $kaltura_api = new KalturaApi();
             $response = $kaltura_api->uploadVideo($file_obj, $category);
+
+            while ($wait_for_duration && $response->status === EntryStatus::PRECONVERT && $response->duration === 0) {
+                // Wait for the video's duration to load (or conversion to error out/complete)
+                sleep(5);
+                $response = $kaltura_api->getVideo($response->id);
+            }
+
             return $response->id;
         }
     } catch (TapestryError $e) {
