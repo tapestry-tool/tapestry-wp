@@ -1791,7 +1791,7 @@ function perform_batched_upload_to_kaltura($tapestry_id, $node_ids, $use_kaltura
             $videos_to_remove = array();
 
             foreach ($remaining_videos as $video) {
-                $response = $kalturaApi->getVideoUploadStatus($video->kalturaID);
+                $response = $kalturaApi->getVideo($video->kalturaID);
 
                 if ($response->status === EntryStatus::PRECONVERT) {
                     // Still converting
