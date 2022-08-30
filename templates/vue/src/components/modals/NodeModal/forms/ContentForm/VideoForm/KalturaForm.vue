@@ -45,6 +45,17 @@
         </b-row>
       </b-form-group>
     </b-overlay>
+    <b-alert v-if="uploadAlertText" show variant="success">
+      <b-row>
+        <b-col>{{ uploadAlertText }}</b-col>
+        <b-col cols="1" class="d-flex align-items-center">
+          <b-button size="sm" variant="secondary" @click="uploadAlertText = ''">
+            OK
+          </b-button>
+        </b-col>
+      </b-row>
+    </b-alert>
+
     <b-row>
       <b-col>
         <b-form-group label="Video Player">
@@ -72,6 +83,7 @@ export default {
   data() {
     return {
       isUploading: false,
+      uploadAlertText: "",
     }
   },
   computed: {
@@ -110,7 +122,11 @@ export default {
         this.$root.$emit("node-modal::uploading", true)
 
         try {
-          this.kalturaId = await client.uploadVideoToKaltura(videoFile)
+          const kalturaId = await client.uploadVideoToKaltura(videoFile)
+          this.kalturaId = kalturaId
+          this.uploadAlertText = `
+            Upload completed successfully. Your video has Kaltura ID ${kalturaId}.
+            Make sure to publish / save to keep this video.`
         } catch (error) {
           this.addApiError(error)
         }
