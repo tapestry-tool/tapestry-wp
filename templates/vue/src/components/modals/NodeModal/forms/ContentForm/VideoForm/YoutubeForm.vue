@@ -5,7 +5,7 @@
         <b-form-input
           id="node-video-media-url"
           v-model="mediaURL"
-          data-qa="node-video-url"
+          data-qa="node-video-youtube-url"
           placeholder="Enter URL for YouTube video"
           required
         />

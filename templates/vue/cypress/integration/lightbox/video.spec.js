@@ -11,7 +11,7 @@ describe("Video", () => {
       cy.openModal("edit", node.id)
       cy.changeMediaType("video")
       cy.changeMediaFormat("youtube")
-      cy.getByTestId(`node-video-url`).type(url)
+      cy.getByTestId(`node-video-youtube-url`).type(url)
       cy.submitModal() // automatically confirms
 
       cy.getNodeById(node.id).within(() => {
@@ -64,7 +64,7 @@ describe("Video", () => {
       cy.openModal("edit", node.id)
       cy.changeMediaType("video")
       cy.changeMediaFormat("youtube")
-      cy.getByTestId(`node-video-url`).type(url)
+      cy.getByTestId(`node-video-youtube-url`).type(url)
       cy.submitModal()
 
       cy.openLightbox(node.id).within(() => {
