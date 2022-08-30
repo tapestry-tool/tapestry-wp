@@ -309,6 +309,19 @@ class TapestryHelpers
     }
 
     /**
+     * Return the name of the Kaltura category a video should be sorted under.
+     */
+    public static function getKalturaCategoryName($tapestryPostId) {
+        if (get_option('kaltura_category_structure') === 'tapestry_name') {
+            $tapestry = new Tapestry($tapestryPostId);
+            return $tapestry->getSettings()->title;
+        } else {
+            // Categorize by date by default
+            return date('Y/m/d');
+        }
+    }
+
+    /**
      * Update the Kaltura upload status of a video node.
      *
      * @param TapestryNode      $node           Video node to update

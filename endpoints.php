@@ -1630,15 +1630,7 @@ function uploadVideoToKaltura($request)
                 'name' => $file_params['file']['name'],
             ];
 
-            // TODO: reduce duplication
-            if (get_option('kaltura_category_structure') === 'tapestry_name') {
-                $tapestry = new Tapestry($tapestryPostId);
-                $category = $tapestry->getSettings()->title;
-            } else {
-                // Categorize by date by default
-                $category = date('Y/m/d');
-            }
-
+            $category = TapestryHelpers::getKalturaCategoryName($tapestryPostId);
             $kaltura_api = new KalturaApi();
             $response = $kaltura_api->uploadVideo($file_obj, $category);
             return $response->id;
@@ -1741,13 +1733,7 @@ function cleanUpKalturaUpload()
  */
 function perform_batched_upload_to_kaltura($tapestry_id, $node_ids, $use_kaltura_player)
 {
-    if (get_option('kaltura_category_structure') === 'tapestry_name') {
-        $tapestry = new Tapestry($tapestry_id);
-        $category = $tapestry->getSettings()->title;
-    } else {
-        // Categorize by date by default
-        $category = date('Y/m/d');
-    }
+    $category = TapestryHelpers::getKalturaCategoryName($tapestry_id);
 
     $videos_to_upload = create_upload_log($tapestry_id, $node_ids);
     update_upload_log($videos_to_upload);
