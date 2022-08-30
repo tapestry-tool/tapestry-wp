@@ -2,7 +2,11 @@
   <b-overlay class="loading" bg-color="#5d656c" :show="loading">
     <ul class="comment-list">
       <li v-for="comment in comments" :key="comment.id">
-        <node-comment :comment="comment"></node-comment>
+        <node-comment
+          :comment="comment"
+          :show-actions="showActions"
+          @delete="deleteComment"
+        ></node-comment>
       </li>
     </ul>
     <div v-if="isLoggedIn" class="comment-form" :aria-hidden="loading">
@@ -65,6 +69,9 @@ export default {
         }
       })
     },
+    showActions() {
+      return wp.canEditTapestry()
+    },
     isLoggedIn() {
       return wp.isLoggedIn()
     },
@@ -73,15 +80,28 @@ export default {
     },
   },
   methods: {
-    ...mapActions(["addCommentToNode"]),
+    ...mapActions(["addComment", "removeComment"]),
     async submitComment() {
       this.loading = true
-      const success = await this.addCommentToNode({
-        id: this.node.id,
+      const success = await this.addComment({
+        nodeId: this.node.id,
         comment: this.comment,
       })
       if (success) {
         this.comment = ""
+      }
+      this.loading = false
+    },
+    async deleteComment(comment) {
+      this.loading = true
+      const success = await this.removeComment({
+        nodeId: this.node.id,
+        commentId: comment.id,
+      })
+      if (!success) {
+        alert(
+          "Failed to delete comment. Check if you have privileges to delete Wordpress comments."
+        )
       }
       this.loading = false
     },

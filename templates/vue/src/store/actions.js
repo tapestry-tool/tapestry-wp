@@ -299,16 +299,36 @@ export async function reviewNode({ commit, dispatch }, { id, comments }) {
   }
 }
 
-export async function addCommentToNode({ commit, dispatch }, { id, comment }) {
+export async function addComment({ commit, dispatch }, { nodeId, comment }) {
   try {
-    const { comments } = await client.addCommentToNode(id, comment)
+    const { comments } = await client.addComment(nodeId, comment)
     commit("updateNode", {
-      id,
+      id: nodeId,
       newNode: {
         comments,
       },
     })
     return true
+  } catch (error) {
+    dispatch("addApiError", error)
+  }
+  return false
+}
+
+export async function removeComment(
+  { commit, dispatch, getters },
+  { nodeId, commentId }
+) {
+  try {
+    const success = await client.removeComment(nodeId, commentId)
+    const node = getters.getNode(nodeId)
+    commit("updateNode", {
+      id: nodeId,
+      newNode: {
+        comments: node.comments.filter(comment => comment.id !== commentId),
+      },
+    })
+    return success
   } catch (error) {
     dispatch("addApiError", error)
   }

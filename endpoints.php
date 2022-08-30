@@ -153,6 +153,13 @@ $REST_API_ENDPOINTS = [
             'callback' => 'addTapestryNodeComment',
         ],
     ],
+    'DELETE_TAPESTRY_NODE_COMMENT' => (object) [
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/comments',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_DELETE_METHOD,
+            'callback' => 'deleteTapestryNodeComment',
+        ],
+    ],
     'GET_TAPESTRY_NODE_HAS_DRAFT_CHILDREN' => (object) [
         'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/nodeHasDraftChildren',
         'ARGUMENTS' => [
@@ -761,6 +768,44 @@ function addTapestryNodeComment($request) {
         return (object) [
             'comments' => $comments,
         ];
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+function deleteTapestryNodeComment($request) {
+    $postId = $request['tapestryPostId'];
+    $nodeMetaId = $request['nodeMetaId'];
+    $commentId = $request->get_body();
+
+    error_log($commentId);
+
+    try {
+        if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+        if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
+            throw new TapestryError('INVALID_NODE_META_ID');
+        }
+        if (!TapestryHelpers::isChildNodeOfTapestry($nodeMetaId, $postId)) {
+            throw new TapestryError('INVALID_CHILD_NODE');
+        }
+        if (!is_user_logged_in()) {
+            throw new TapestryError('INVALID_USER_ID');
+        }
+        if (!current_user_can('edit_post', $postId)) {
+            throw new TapestryError('EDIT_TAPESTRY_PERMISSION_DENIED');
+        }
+        if (!isset($commentId)) {
+            throw new TapestryError('INVALID_COMMENT_ID', 'Comment ID should not be empty', 400);
+        }
+        if (!is_numeric($commentId)) {
+            throw new TapestryError('INVALID_COMMENT_ID', 'Comment ID should be a number', 400);
+        }
+        $commentId = (int) $commentId;
+
+        $node = new TapestryNode($postId, $nodeMetaId);
+        return $node->deleteComment($commentId);
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }

@@ -408,6 +408,19 @@ class TapestryNode implements ITapestryNode
         return $this->_getComments();
     }
 
+    public function deleteComment($commentId)
+    {
+        if (1 !== get_comments([
+            'post_id' => $this->nodePostId,
+            'comment__in' => [$commentId],
+            'count' => true,
+        ])) {
+            throw new TapestryError('FAILED_TO_DELETE_COMMENT', 'Comment not found', 500);
+        }
+
+        return wp_delete_comment($commentId);
+    }
+
     public function addReview($comments)
     {
         if (NodeStatus::PUBLISH === $this->status) {

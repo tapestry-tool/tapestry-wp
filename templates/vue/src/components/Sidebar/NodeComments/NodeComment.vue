@@ -1,14 +1,34 @@
 <template>
-  <div :class="{ 'pull-up': comment.collapsed }">
+  <div class="comment-container" :class="{ 'pull-up': comment.collapsed }">
     <h3 v-if="!comment.collapsed" class="title">
       {{ comment.author }}
       <span class="timestamp" :title="formatDate(comment.timestamp, false)">
         {{ formatDate(comment.timestamp) }}
       </span>
     </h3>
-    <p class="comment" :title="`Posted on ${formatDate(comment.timestamp, false)}`">
-      {{ comment.content }}
-    </p>
+    <div
+      class="comment"
+      :title="`Posted on ${formatDate(comment.timestamp, false)}`"
+    >
+      <p>
+        {{ comment.content }}
+      </p>
+      <div v-if="showActions">
+        <b-dropdown
+          size="sm"
+          variant="link"
+          no-caret
+          toggle-class="comment-action-btn"
+        >
+          <template #button-content>
+            <i class="fas fa-ellipsis-v"></i>
+          </template>
+          <b-dropdown-item-button variant="danger" @click="$emit('delete', comment)">
+            Delete
+          </b-dropdown-item-button>
+        </b-dropdown>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -19,6 +39,10 @@ export default {
   props: {
     comment: {
       type: Object,
+      required: true,
+    },
+    showActions: {
+      type: Boolean,
       required: true,
     },
   },
@@ -56,5 +80,24 @@ export default {
   padding: 0.5rem;
   border-radius: 0.5rem;
   border-top-left-radius: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+</style>
+
+<style lang="scss">
+.comment-action-btn {
+  &,
+  &:focus,
+  &:hover,
+  &:active {
+    color: #333;
+    background: none;
+  }
+}
+
+.comment-container .comment:not(:hover) .comment-action-btn {
+  // display: none;
 }
 </style>

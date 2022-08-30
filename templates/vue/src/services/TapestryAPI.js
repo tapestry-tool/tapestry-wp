@@ -151,9 +151,15 @@ class TapestryApi {
     return response.data
   }
 
-  async addCommentToNode(id, comment) {
+  async addComment(id, comment) {
     const url = `/tapestries/${this.postId}/nodes/${id}/comments`
     const response = await this.client.post(url, comment)
+    return response.data
+  }
+
+  async removeComment(id, commentId) {
+    const url = `/tapestries/${this.postId}/nodes/${id}/comments`
+    const response = await this.client.delete(url, { data: commentId })
     return response.data
   }
 
