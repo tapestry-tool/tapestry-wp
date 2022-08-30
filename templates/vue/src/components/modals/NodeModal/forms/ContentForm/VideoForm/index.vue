@@ -8,7 +8,7 @@
 
 <script>
 import Mp4Form from "./Mp4Form"
-import YoutubeForm from "./YouTubeForm"
+import YoutubeForm from "./YoutubeForm"
 import KalturaForm from "./KalturaForm"
 import { mapState } from "vuex"
 
