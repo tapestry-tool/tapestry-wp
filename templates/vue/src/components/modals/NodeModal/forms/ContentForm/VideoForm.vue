@@ -65,7 +65,12 @@
               accept="video/mp4"
               :disabled="isUploading"
             />
-            <b-button class="ml-2" variant="primary" @click="uploadVideoToKaltura">
+            <b-button
+              class="ml-2"
+              variant="primary"
+              :disabled="!videoFile || isUploading"
+              @click="uploadVideoToKaltura"
+            >
               Upload
             </b-button>
           </div>
@@ -161,6 +166,7 @@ export default {
           this.addApiError(error)
         }
         this.isUploading = false
+        this.videoFile = null
       }
     },
   },
