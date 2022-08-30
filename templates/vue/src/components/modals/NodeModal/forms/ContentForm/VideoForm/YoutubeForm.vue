@@ -3,7 +3,7 @@
     <b-col>
       <b-form-group label="Video URL">
         <b-form-input
-          id="node-video-media-url"
+          id="node-video-youtube-url"
           v-model="mediaURL"
           data-qa="node-video-youtube-url"
           placeholder="Enter URL for YouTube video"

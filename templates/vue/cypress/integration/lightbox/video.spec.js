@@ -27,7 +27,7 @@ describe("Video", () => {
     cy.getSelectedNode().then(node => {
       cy.openModal("edit", node.id)
       cy.changeMediaType("video")
-      cy.getByTestId(`node-video-url`).type(url)
+      cy.getByTestId(`node-video-mp4-url`).type(url)
       cy.submitModal()
 
       cy.openLightbox(node.id).within(() => {
@@ -81,7 +81,7 @@ describe("Video", () => {
     cy.getSelectedNode().then(selectedNode => {
       cy.openModal("edit", selectedNode.id)
       cy.changeMediaType("video")
-      cy.getByTestId(`node-video-url`).type(url)
+      cy.getByTestId(`node-video-mp4-url`).type(url)
       cy.submitModal()
     })
 
@@ -98,7 +98,7 @@ describe("Video", () => {
 
       // Assert that the url was changed
       cy.openModal("edit", selectedNode.id)
-      cy.getByTestId(`node-video-url`)
+      cy.getByTestId(`node-video-mp4-url`)
         .invoke("val")
         .should("eq", nonexistentUrl)
       cy.get(".close").click()

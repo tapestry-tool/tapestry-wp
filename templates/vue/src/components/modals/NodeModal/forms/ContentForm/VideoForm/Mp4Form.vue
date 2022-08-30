@@ -3,9 +3,9 @@
     <b-col>
       <b-form-group label="Video URL" class="mb-2">
         <file-upload
-          id="node-video-media-url"
+          id="node-video-mp4-url"
           v-model="mediaURL"
-          input-test-id="node-video-url"
+          input-test-id="node-video-mp4-url"
           placeholder="Enter URL for MP4 video"
           required
           @isUploading="handleUploadChange"
