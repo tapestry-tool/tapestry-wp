@@ -108,7 +108,6 @@
             $resource = new UploadedFileTokenResource();
             $resource->token = $token->id;
             $response = $kclient->media->addContent($entry->id, $resource);
-            $status = $response->status;
 
             return $response;
         }
