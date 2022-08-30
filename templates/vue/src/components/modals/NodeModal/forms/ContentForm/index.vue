@@ -68,9 +68,8 @@
     </b-form-group>
     <b-form-group v-if="node.mediaType === 'video'" label="Video Source">
       <b-form-select
-        id="node-media-type"
-        data-qa="node-media-type"
-        data-testid="node-media-type"
+        id="node-media-format"
+        data-qa="node-media-format"
         :value="node.mediaFormat"
         :options="[
           { value: 'mp4', text: 'URL' },
