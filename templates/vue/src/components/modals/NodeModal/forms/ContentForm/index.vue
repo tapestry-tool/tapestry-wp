@@ -66,6 +66,20 @@
         @change="handleTypeChange"
       ></b-form-select>
     </b-form-group>
+    <b-form-group v-if="node.mediaType === 'video'" label="Video Source">
+      <b-form-select
+        id="node-media-type"
+        data-qa="node-media-type"
+        data-testid="node-media-type"
+        :value="node.mediaFormat"
+        :options="[
+          { value: 'mp4', text: 'URL' },
+          { value: 'youtube', text: 'YouTube' },
+          { value: 'kaltura', text: 'Kaltura' },
+        ]"
+        @change="handleFormatChange"
+      ></b-form-select>
+    </b-form-group>
     <b-form-group label="Content Details">
       <b-card
         bg-variant="light"
@@ -240,6 +254,11 @@ export default {
         evt === "video" ? "mp4" : evt === "h5p" ? "h5p" : ""
       )
       this.$emit("type-changed", evt)
+    },
+    handleFormatChange(evt) {
+      this.update("mediaFormat", evt)
+      this.update("typeData.mediaURL", "")
+      this.update("typeData.youtubeID", undefined)
     },
     selectUnitChild() {
       if (this.isUnitChild) {
