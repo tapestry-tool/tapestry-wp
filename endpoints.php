@@ -330,7 +330,6 @@ $REST_API_ENDPOINTS = [
         'ARGUMENTS' => [
             'methods' => $REST_API_POST_METHOD,
             'callback' => 'uploadVideoToKaltura',
-            // TODO: what should the permissions be?
         ],
     ],
     'UPLOAD_VIDEOS_TO_KALTURA' => (object) [
