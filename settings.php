@@ -16,25 +16,40 @@ function add_tapestry_settings_page()
 
 function register_tapestry_settings()
 {
-    $args = [
+    // Register Kaltura upload settings
+    register_setting('tapestry_kaltura_upload_settings', 'kaltura_category_structure', [
         'type' => 'string',
         'show_in_rest' => false,
         'sanitize_callback' => 'sanitize_kaltura_category_structure',
         'default' => null,
+        'description' => 'Category structure of uploaded videos'
+    ]);
+
+    // Register Kaltura configuration variables
+    $args = [
+        'type' => 'string',
+        'show_in_rest' => false,
+        'sanitize_callback' => 'trim',  // Trim whitespace from user input
+        'default' => null,
     ];
-    register_setting('tapestry_kaltura_upload_settings', 'kaltura_category_structure', array_merge($args, ['description' => 'Category structure of uploaded videos']));
+    register_setting('tapestry_kaltura_config', 'kaltura_admin_secret', array_merge($args, ['description' => 'Kaltura Administrator Secret']));
+    register_setting('tapestry_kaltura_config', 'kaltura_partner_id', array_merge($args, ['description' => 'Kaltura Partner ID']));
+    register_setting('tapestry_kaltura_config', 'kaltura_service_url', array_merge($args, ['description' => 'Kaltura Service URL']));
+    register_setting('tapestry_kaltura_config', 'kaltura_unique_config', array_merge($args, ['description' => 'Kaltura Unique Configuration']));
+    register_setting('tapestry_kaltura_config', 'tapestry_kaltura_upload_max_file_size', array_merge($args, ['description' => 'Maximum file size for Kaltura upload']));
 }
 
 function tapestry_settings_init()
 {
     add_settings_section('tapestry_db_settings', 'Database Settings', 'tapestry_db_section_cb', 'tapestry_settings_page');
-    add_settings_section('tapestry_kaltura_settings', 'Kaltura Upload', 'tapestry_kaltura_section_cb', 'tapestry_settings_page');
+    add_settings_section('tapestry_kaltura_config_section', 'Kaltura Configuration', 'tapestry_kaltura_config_section_cb', 'tapestry_settings_page');
+    add_settings_section('tapestry_kaltura_upload_section', 'Kaltura Upload', 'tapestry_kaltura_upload_section_cb', 'tapestry_settings_page');
 }
 
 function load_tapestry_settings_page_scripts($hook_suffix, $tapestry_settings_page_hook_suffix)
 {
     if ($hook_suffix === $tapestry_settings_page_hook_suffix) {
-        wp_enqueue_style( 'tapestry_settings_styles', plugin_dir_url(__FILE__).'settings.css');
+        wp_enqueue_style('tapestry_settings_styles', plugin_dir_url(__FILE__).'settings.css');
         wp_enqueue_script('tapestry_settings_script_js', plugin_dir_url(__FILE__).'settings.js');
 
         // Inject REST API url and WordPress nonce for use in JavaScript scripts
@@ -66,27 +81,105 @@ function tapestry_db_section_cb()
     <?php
 }
 
-function sanitize_kaltura_category_structure($value) {
+function tapestry_kaltura_config_section_cb()
+{
+    $kaltura_admin_secret = get_option('kaltura_admin_secret', '');
+    $kaltura_partner_id = get_option('kaltura_partner_id', '');
+    $kaltura_service_url = get_option('kaltura_service_url', '');
+    $kaltura_unique_config = get_option('kaltura_unique_config', '');
+    $kaltura_upload_max_file_size = get_option('tapestry_kaltura_upload_max_file_size', ''); ?>
+    <p>
+        Use a different set of Kaltura configuration variables on this site only.
+        If you wish to do this, the first four configuration variables must be provided.
+    </p>
+    <form action="options.php" method="post">
+        <?php
+            settings_fields('tapestry_kaltura_config'); ?>
+        <table class="form-table" role="presentation">
+            <tbody>
+                <tr>
+                    <th scope="row">
+                        <label for="kaltura_admin_secret">Kaltura Administrator Secret</label>
+                    </th>
+                    <td>
+                        <input type="password" id="kaltura_admin_secret" name="kaltura_admin_secret" value="<?php echo $kaltura_admin_secret ?>">
+                        <p class="description">
+                            The Kaltura Admininstrator Secret can be found in the Settings > Integration tab in the Kaltura admin dashboard.
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">
+                        <label for="kaltura_partner_id">Kaltura Partner ID</label>
+                    </th>
+                    <td>
+                        <input type="text" id="kaltura_partner_id" name="kaltura_partner_id" value="<?php echo $kaltura_partner_id ?>">
+                        <p class="description">
+                            The Kaltura Partner ID can be found in the Kaltura Settings > Integration tab in the Kaltura admin dashboard.
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">
+                        <label for="kaltura_service_url">Kaltura Service URL</label>
+                    </th>
+                    <td>
+                        <input type="text" id="kaltura_service_url" name="kaltura_service_url" value="<?php echo $kaltura_service_url ?>">
+                        <p class="description">The Kaltura Service URL is the main domain where your Kaltura videos are hosted.</p>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">
+                        <label for="kaltura_unique_config">Kaltura Unique Configuration</label>
+                    </th>
+                    <td>
+                        <input type="text" id="kaltura_unique_config" name="kaltura_unique_config" value="<?php echo $kaltura_unique_config ?>">
+                        <p class="description">
+                            The Kaltura Unique Configuration sets the media player design.
+                            It can be found in the Studio tab in the Kaltura admin dashboard.
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">
+                        <label for="kaltura_upload_max_file_size">Kaltura Upload Max File Size</label>
+                    </th>
+                    <td>
+                        <input type="text" placeholder="Examples: 20M, 500K" id="kaltura_upload_max_file_size" name="tapestry_kaltura_upload_max_file_size" value="<?php echo $kaltura_upload_max_file_size ?>">
+                        <p class="description">
+                            If specified, videos larger than this file size cannot be uploaded to Kaltura.
+                            <br/>
+                            (Advanced: This uses the same shorthand byte notation as php.ini files.)
+                        </p>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <?php
+            submit_button('Save Changes', 'primary', 'save-kaltura-config', false); ?>
+    </form>
+    <?php
+}
+
+function sanitize_kaltura_category_structure($value)
+{
     $category_values = ['date', 'tapestry_name'];
     return in_array($value, $category_values) ? $value : $category_values[0]; // Default is 'date'
 }
 
-function tapestry_kaltura_section_cb()
+function tapestry_kaltura_upload_section_cb()
 {
     $kaltura_category_structure = sanitize_kaltura_category_structure(get_option('kaltura_category_structure'));
 
     $site_url = get_bloginfo('url');
-    $current_date = date('Y/m/d');
-
-    ?>
+    $current_date = date('Y/m/d'); ?>
     <h4>Categorization</h4>
     <p>
         Choose how to categorize videos uploaded to Kaltura.
     </p>
     <form action="options.php" method="post">
         <?php
-            settings_fields('tapestry_kaltura_upload_settings');
-        ?>
+            settings_fields('tapestry_kaltura_upload_settings'); ?>
         <table class="form-table" role="presentation">
             <tbody>
                 <tr>
@@ -123,7 +216,7 @@ function tapestry_kaltura_section_cb()
                 </tr>
             </tbody>
         </table>
-        <?php 
+        <?php
             submit_button('Save Changes', 'primary', 'save-kaltura-upload-settings', false); ?>
     </form>
     <h4>Clean Uploaded Videos</h4>
