@@ -1071,8 +1071,10 @@ export default {
         errMsgs.push("Please select a Content Type")
       } else if (this.node.mediaType === "video") {
         const captions = this.node.typeData.captions
-
-        if (this.node.mediaFormat === "kaltura") {
+        if (
+          this.node.mediaFormat === "kaltura" &&
+          this.node.typeData.videoPlayer === "kaltura"
+        ) {
           if (
             captions &&
             captions.some(
@@ -1083,6 +1085,16 @@ export default {
           ) {
             errMsgs.push("Please upload a WebVTT or SRT file for each caption")
           }
+        } else if (this.node.mediaFormat !== "youtube") {
+          if (
+            captions &&
+            captions.some(caption => !caption.captionUrl?.endsWith(".vtt"))
+          ) {
+            errMsgs.push("Please upload a WebVTT file for each caption")
+          }
+        }
+
+        if (this.node.mediaFormat === "kaltura") {
           const validKalturaVideo = await client.checkKalturaVideo(
             this.node.typeData.kalturaId
           )
@@ -1090,12 +1102,6 @@ export default {
             errMsgs.push("Please enter a valid Kaltura video ID")
           }
         } else {
-          if (
-            captions &&
-            captions.some(caption => !caption.captionUrl?.endsWith(".vtt"))
-          ) {
-            errMsgs.push("Please upload a WebVTT file for each caption")
-          }
           if (!this.isValidVideo(this.node.typeData)) {
             errMsgs.push("Please enter a valid Video URL")
           }

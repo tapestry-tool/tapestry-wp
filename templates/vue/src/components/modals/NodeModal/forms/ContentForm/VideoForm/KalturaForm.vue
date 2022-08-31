@@ -9,7 +9,7 @@
               placeholder="Select or drop video to upload"
               drop-placeholder="Drop file here..."
               accept="video/mp4"
-              :disabled="isUploading"
+              :disabled="isUploading || isLoadingKalturaData"
               @drop.prevent="uploadToKaltura"
               @change="uploadToKaltura"
             />
@@ -30,9 +30,7 @@
                     : 'Click Change to edit'
                 "
                 required
-                :disabled="
-                  isUploading || isLoadingKalturaCaptions || !editingKalturaId
-                "
+                :disabled="isUploading || isLoadingKalturaData || !editingKalturaId"
               />
               <b-input-group-append is-text>
                 <i
@@ -52,7 +50,7 @@
                   class="edit-kaltura-id-button"
                   data-qa="edit-kaltura-id-button"
                   :aria-label="editingKalturaId ? 'Submit' : 'Edit Kaltura ID'"
-                  :disabled="isLoadingKalturaCaptions"
+                  :disabled="isUploading || isLoadingKalturaData"
                   @click="handleKalturaIdEdit"
                 >
                   {{ editingKalturaId ? "Submit" : "Change" }}
@@ -100,8 +98,9 @@ import ErrorHelper from "@/utils/errorHelper"
 export default {
   data() {
     return {
+      kalturaId: this.$store.state.currentEditingNode.typeData.kalturaId,
       editingKalturaId: false,
-      isLoadingKalturaCaptions: false,
+      isLoadingKalturaData: false,
       isUploading: false,
       uploadAlertText: "",
     }
@@ -110,14 +109,6 @@ export default {
     ...mapState({
       nodeId: state => state.currentEditingNode.id,
     }),
-    kalturaId: {
-      get() {
-        return this.$store.state.currentEditingNode.typeData.kalturaId
-      },
-      set(value) {
-        this.update("typeData.kalturaId", value)
-      },
-    },
     videoPlayer: {
       get() {
         return this.$store.state.currentEditingNode.typeData.videoPlayer ?? "regular"
@@ -128,6 +119,11 @@ export default {
         }
       },
     },
+  },
+  created() {
+    if (this.kalturaId) {
+      this.setKalturaVideo(this.kalturaId)
+    }
   },
   methods: {
     ...mapMutations(["setCurrentEditingNodeProperty", "addApiError"]),
@@ -140,26 +136,27 @@ export default {
       }
       this.editingKalturaId = !this.editingKalturaId
     },
-    async setKalturaVideo(kalturaId) {
-      const validKalturaVideo = await client.checkKalturaVideo(kalturaId)
+    async setKalturaVideo(kalturaId, skipCheck) {
+      this.$emit("load-start")
+      this.isLoadingKalturaData = true
+
+      const validKalturaVideo =
+        skipCheck || (await client.checkKalturaVideo(kalturaId))
       if (validKalturaVideo) {
         this.update("typeData.kalturaId", kalturaId)
         await this.getKalturaCaptions(kalturaId)
       } else {
         this.addApiError({ error: "Please enter a valid Kaltura video ID." })
       }
+
+      this.$emit("load-end")
+      this.isLoadingKalturaData = false
     },
     async getKalturaCaptions(kalturaId) {
-      if (kalturaId) {
-        this.isLoadingKalturaCaptions = true
+      const result = await client.getKalturaVideoCaptions(kalturaId)
 
-        const result = await client.getKalturaVideoCaptions(kalturaId)
-
-        this.defaultCaptionId = result.defaultCaptionId
-        this.captions = result.captions
-
-        this.isLoadingKalturaCaptions = false
-      }
+      this.update("typeData.defaultCaptionId", result.defaultCaptionId)
+      this.update("typeData.captions", result.captions)
     },
     async uploadToKaltura(event) {
       const videoFile =
@@ -168,6 +165,7 @@ export default {
           : event.target.files[0]
 
       if (videoFile) {
+        this.editingKalturaId = false
         this.isUploading = true
         this.$root.$emit("node-modal::uploading", true)
 
@@ -177,6 +175,7 @@ export default {
           this.uploadAlertText = `
             Upload completed successfully. Your video has Kaltura ID ${kalturaId}.
             Make sure to publish / save to keep this video.`
+          this.setKalturaVideo(kalturaId, true)
         } catch (error) {
           const errorMessage = ErrorHelper.getErrorMessage(error)
           this.addApiError({ error: `Unable to upload video: ${errorMessage}` })
@@ -190,3 +189,9 @@ export default {
   },
 }
 </script>
+
+<style lang="scss" scoped>
+.edit-kaltura-id-button {
+  z-index: 1 !important; // Prevent button from appearing above NodeModal error banner
+}
+</style>

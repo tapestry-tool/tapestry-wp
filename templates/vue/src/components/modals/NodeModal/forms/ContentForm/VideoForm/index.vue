@@ -2,15 +2,20 @@
   <div>
     <mp4-form v-if="mediaFormat === 'mp4'"></mp4-form>
     <youtube-form v-else-if="mediaFormat === 'youtube'"></youtube-form>
-    <kaltura-form v-else-if="mediaFormat === 'kaltura'"></kaltura-form>
-    <b-row>
+    <kaltura-form
+      v-else-if="mediaFormat === 'kaltura'"
+      @load-start="handleLoadStart"
+      @load-end="handleLoadEnd"
+    ></kaltura-form>
+    <b-row v-if="mediaFormat === 'mp4' || mediaFormat === 'kaltura'">
       <b-col>
-        <b-overlay :show="isLoadingKalturaCaptions">
+        <b-overlay :show="loadingCaptions">
           <b-form-group label="Captions">
             <b-form-checkbox
               :checked="useCaptions"
               data-qa="node-captions-toggle"
               switch
+              :disabled="loadingCaptions"
               @change="handleToggleCaptions"
             >
               {{ useCaptions ? "On" : "Off" }}
@@ -21,7 +26,7 @@
                 :key="caption.id"
                 :value="caption"
                 :index="index"
-                :is-kaltura="useKaltura"
+                :is-kaltura="useKalturaPlayer"
                 :is-removable="captions.length >= 2"
                 :is-default="caption.id === defaultCaptionId"
                 :languages="languages"
@@ -48,7 +53,7 @@
             :index="index"
             is-removable
             is-pending
-            :is-kaltura="useKaltura"
+            :is-kaltura="useKalturaPlayer"
             :languages="languages"
             :error-message="caption.errorMessage"
             @input="pendingCaptions.splice(index, 1, $event)"
@@ -87,15 +92,19 @@ export default {
   },
   data() {
     return {
-      useKaltura: false,
-      isLoadingKalturaCaptions: false,
+      loadingCaptions: false,
       languages: [],
     }
   },
   computed: {
     ...mapState({
       mediaFormat: state => state.currentEditingNode.mediaFormat,
+      videoPlayer: state =>
+        state.currentEditingNode.typeData.videoPlayer ?? "regular",
     }),
+    useKalturaPlayer() {
+      return this.mediaFormat === "kaltura" && this.videoPlayer === "kaltura"
+    },
     captions: {
       get() {
         return this.$store.state.currentEditingNode.typeData.captions ?? []
@@ -124,6 +133,11 @@ export default {
       return this.captions.length > 0
     },
   },
+  watch: {
+    mediaFormat() {
+      this.clearCaptions()
+    },
+  },
   async created() {
     this.languages = await this.getAllLanguages()
   },
@@ -141,6 +155,12 @@ export default {
       allLanguageNames.sort()
 
       return allLanguageNames
+    },
+    handleLoadStart() {
+      this.loadingCaptions = true
+    },
+    handleLoadEnd() {
+      this.loadingCaptions = false
     },
     handleToggleCaptions() {
       if (this.captions.length === 0) {
