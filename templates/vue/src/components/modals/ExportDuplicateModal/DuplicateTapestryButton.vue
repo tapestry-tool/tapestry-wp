@@ -3,7 +3,7 @@
     <b-button
       data-qa="duplicate-tapestry-button"
       block
-      variant="light"
+      variant="primary"
       @click="duplicateTapestry"
     >
       <b-spinner v-if="loading" small data-qa="spinner"></b-spinner>
