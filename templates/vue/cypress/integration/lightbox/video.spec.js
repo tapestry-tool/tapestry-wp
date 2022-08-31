@@ -207,6 +207,9 @@ describe("Video", () => {
         .last()
         .attachFile("captions.vtt")
       cy.wait("@upload")
+      cy.getByTestId("caption-url-0")
+        .invoke("val")
+        .should("contain", ".vtt") // Wait for URL to be populated
 
       // Test a Kaltura-only language
       cy.getByTestId("caption-language-0").select("Nisgaa")
@@ -222,8 +225,11 @@ describe("Video", () => {
 
       cy.getByTestId("import-file-input")
         .last()
-        .attachFile("captions.vtt")
+        .attachFile("captions.vtt") // Wait for URL to be populated
       cy.wait("@upload")
+      cy.getByTestId("caption-url-1")
+        .invoke("val")
+        .should("contain", ".vtt")
 
       // Test an ISO 639-1 only language
       cy.getByTestId("caption-language-1").select("Divehi")
