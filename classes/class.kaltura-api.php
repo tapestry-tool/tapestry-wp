@@ -1,6 +1,7 @@
 <?php
 
     require_once dirname(__FILE__).'/../utilities/class.tapestry-errors.php';
+    require_once dirname(__FILE__).'/../utilities/class.tapestry-helpers.php';
 
     if (defined('LOAD_KALTURA') && LOAD_KALTURA) {
         require_once plugin_dir_path(dirname(__FILE__)).'vendor/autoload.php';
@@ -45,11 +46,16 @@
         public function getKClient($type = SessionType::USER)
         {
             $user = wp_get_current_user()->ID;
-            $kconf = new Configuration(KALTURA_PARTNER_ID);
-            $kconf->setServiceUrl(KALTURA_SERVICE_URL);
+
+            $kaltura_admin_secret = TapestryHelpers::getKalturaAdminSecret();
+            $kaltura_partner_id = TapestryHelpers::getKalturaPartnerId();
+            $kaltura_service_url = TapestryHelpers::getKalturaServiceUrl();
+
+            $kconf = new Configuration($kaltura_partner_id);
+            $kconf->setServiceUrl($kaltura_service_url);
             $kclient = new Client($kconf);
             try {
-                $ksession = $kclient->session->start(KALTURA_ADMIN_SECRET, $user, $type, KALTURA_PARTNER_ID);
+                $ksession = $kclient->session->start($kaltura_admin_secret, $user, $type, $kaltura_partner_id);
             } catch (Exception $e) {
                 error_log('Kaltura Client Error: '.$e);
             }
