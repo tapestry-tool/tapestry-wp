@@ -1,34 +1,58 @@
 <template>
   <b-overlay class="loading" bg-color="#5d656c" :show="loading">
+    <template v-if="isLoggedIn">
+      <b-button
+        v-if="!showCommentAuthoring"
+        class="submit-button"
+        variant="secondary"
+        :aria-hidden="loading"
+        @click="showCommentAuthoring = true"
+      >
+        Add comment
+      </b-button>
+      <div v-else class="comment-form" :aria-hidden="loading">
+        <p class="commenter-name">
+          {{ username }}
+        </p>
+        <div v-if="replyingTo" class="replying-to">
+          <div>
+            <strong>Replying to:</strong>
+            {{ replyingTo.content }}
+          </div>
+          <div>
+            <b-button link size="sm" @click="replyingTo = null">
+              <i class="fas fa-times"></i>
+            </b-button>
+          </div>
+        </div>
+        <textarea
+          ref="textarea"
+          v-model="comment"
+          aria-label="comment"
+          placeholder="Leave a comment..."
+          @keydown.stop
+        />
+        <b-button
+          class="submit-button"
+          variant="info"
+          :aria-hidden="loading"
+          @click="submitComment"
+        >
+          Post {{ replyingTo ? "reply" : "comment" }}
+        </b-button>
+      </div>
+    </template>
     <ul class="comment-list">
       <li v-for="comment in comments" :key="comment.id">
         <node-comment
           :comment="comment"
           :show-all-actions="showAllActions"
           :is-author="isAuthor(comment)"
+          @set-reply="replyingTo = $event"
           @action="handleCommentAction"
         ></node-comment>
       </li>
     </ul>
-    <div v-if="isLoggedIn" class="comment-form" :aria-hidden="loading">
-      <p class="commenter-name">
-        {{ username }}
-      </p>
-      <textarea
-        v-model="comment"
-        aria-label="comment"
-        placeholder="Leave a comment..."
-        @keydown.stop
-      />
-      <b-button
-        class="submit-button"
-        variant="info"
-        :aria-hidden="loading"
-        @click="submitComment"
-      >
-        Add comment
-      </b-button>
-    </div>
   </b-overlay>
 </template>
 
@@ -50,7 +74,9 @@ export default {
   data() {
     return {
       comment: "",
+      replyingTo: null,
       loading: false,
+      showCommentAuthoring: false,
     }
   },
   computed: {
@@ -80,6 +106,19 @@ export default {
       return wp.getCurrentUser().name
     },
   },
+  watch: {
+    replyingTo(val) {
+      if (val) {
+        this.showCommentAuthoring = true
+        this.$nextTick(() => {
+          this.$nextTick(() => {
+            // double $nextTick because Bootstrap focuses the dropdown toggle in the first $nextTick
+            this.$refs.textarea?.focus()
+          })
+        })
+      }
+    },
+  },
   methods: {
     ...mapActions(["addComment", "performCommentAction"]),
     isAuthor(comment) {
@@ -90,9 +129,12 @@ export default {
       const success = await this.addComment({
         nodeId: this.node.id,
         comment: this.comment,
+        replyingTo: this.replyingTo ? this.replyingTo.id : null,
       })
       if (success) {
         this.comment = ""
+        this.replyingTo = null
+        this.showCommentAuthoring = false
       }
       this.loading = false
     },
@@ -133,6 +175,16 @@ export default {
   margin-bottom: 0.25rem;
 }
 
+.replying-to {
+  font-size: 0.8rem;
+  margin: 0;
+  margin-bottom: 0.5rem;
+  display: flex;
+  justify-content: space-between;
+  border-left: 0.25rem solid var(--light-gray);
+  padding-left: 0.5rem;
+}
+
 textarea {
   display: block;
   border-radius: 0.5rem;
@@ -155,5 +207,6 @@ textarea {
   display: block;
   width: 100%;
   margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
 }
 </style>

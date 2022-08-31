@@ -299,9 +299,12 @@ export async function reviewNode({ commit, dispatch }, { id, comments }) {
   }
 }
 
-export async function addComment({ commit, dispatch }, { nodeId, comment }) {
+export async function addComment(
+  { commit, dispatch },
+  { nodeId, comment, replyingTo }
+) {
   try {
-    const comments = await client.addComment(nodeId, comment)
+    const comments = await client.addComment(nodeId, comment, replyingTo)
     commit("updateNode", {
       id: nodeId,
       newNode: {

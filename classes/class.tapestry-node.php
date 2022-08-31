@@ -391,17 +391,28 @@ class TapestryNode implements ITapestryNode
         return $nodeMeta->author->id == $userId;
     }
 
-    public function addComment($comment)
+    public function addComment($comment, $replyingTo)
     {
         $currentUser = wp_get_current_user();
-        $commentId = wp_new_comment([
+        $commentData = [
             'comment_author' => $currentUser->user_nicename,
             'comment_author_email' => $currentUser->user_email,
             'comment_author_url' => $currentUser->user_url,
             'user_id' => $currentUser->ID,
             'comment_post_ID' => $this->nodePostId,
             'comment_content' => $comment,
-        ], true);
+        ];
+
+        if (isset($replyingTo) && is_numeric($replyingTo)) {
+            $replyingTo = (int) $replyingTo;
+            $replyingComment = get_comment($replyingTo);
+            if (is_null($replyingComment) || (int) $replyingComment->comment_post_ID !== $this->nodePostId) {
+                throw new TapestryError('INVALID_COMMENT_REPLY', 'The comment you are replying to does not exist', 500);
+            }
+            $commentData['comment_parent'] = $replyingComment->comment_ID;
+        }
+
+        $commentId = wp_new_comment($commentData, true);
         if (false === $commentId || is_wp_error($commentId)) {
             throw new TapestryError('FAILED_TO_CREATE_COMMENT');
         }

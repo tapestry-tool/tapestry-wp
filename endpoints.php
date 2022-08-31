@@ -740,8 +740,10 @@ function addTapestryNode($request)
 function addTapestryNodeComment($request) {
     $postId = $request['tapestryPostId'];
     $nodeMetaId = $request['nodeMetaId'];
-    $comment = $request->get_body();
-
+    $data = json_decode($request->get_body());
+    $comment = $data->comment;
+    $replyingTo = $data->replyingTo;
+    
     try {
         if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
             throw new TapestryError('INVALID_POST_ID');
@@ -764,7 +766,7 @@ function addTapestryNodeComment($request) {
         }
 
         $node = new TapestryNode($postId, $nodeMetaId);
-        return $node->addComment($comment);
+        return $node->addComment($comment, $replyingTo);
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }

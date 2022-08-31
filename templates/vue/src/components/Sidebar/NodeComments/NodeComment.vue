@@ -5,7 +5,7 @@
       <span class="timestamp" :title="formatDate(comment.timestamp, false)">
         {{ formatDate(comment.timestamp) }}
       </span>
-      <span v-if="!comment.approved" class="unapproved-text text-danger">
+      <span v-if="!comment.approved" class="unapproved-text">
         Held for moderation
       </span>
     </h3>
@@ -110,6 +110,10 @@ export default {
 .timestamp,
 .unapproved-text {
   font-size: 0.8rem;
+}
+
+.unapproved-text {
+  color: var(--light-yellow);
 }
 
 .comment {

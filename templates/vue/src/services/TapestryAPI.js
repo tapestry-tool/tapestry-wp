@@ -151,9 +151,12 @@ class TapestryApi {
     return response.data
   }
 
-  async addComment(id, comment) {
+  async addComment(id, comment, replyingTo) {
     const url = `/tapestries/${this.postId}/nodes/${id}/comments`
-    const response = await this.client.post(url, comment)
+    const response = await this.client.post(url, {
+      comment,
+      replyingTo,
+    })
     return response.data
   }
 
