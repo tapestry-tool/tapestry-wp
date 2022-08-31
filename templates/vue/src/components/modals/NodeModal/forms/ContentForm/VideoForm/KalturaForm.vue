@@ -9,7 +9,7 @@
               placeholder="Select or drop video to upload"
               drop-placeholder="Drop file here..."
               accept="video/mp4"
-              :disabled="isUploading || isLoadingKalturaData"
+              :disabled="disableFields || isUploading || isLoadingKalturaData"
               @drop.prevent="uploadToKaltura"
               @change="uploadToKaltura"
             />
@@ -30,13 +30,18 @@
                     : 'Click Change to edit'
                 "
                 required
-                :disabled="isUploading || isLoadingKalturaData || !editingKalturaId"
+                :disabled="
+                  disableFields ||
+                    isUploading ||
+                    isLoadingKalturaData ||
+                    !editingKalturaId
+                "
               />
               <b-input-group-append is-text>
                 <i
                   id="kaltura-info"
                   class="far fa-question-circle"
-                  tabindex="0"
+                  :tabindex="disableFields ? -1 : 0"
                   aria-label="Kaltura ID hint"
                 ></i>
                 <b-tooltip role="tooltip" target="kaltura-info">
@@ -50,7 +55,7 @@
                   class="edit-kaltura-id-button"
                   data-qa="edit-kaltura-id-button"
                   :aria-label="editingKalturaId ? 'Submit' : 'Edit Kaltura ID'"
-                  :disabled="isUploading || isLoadingKalturaData"
+                  :disabled="disableFields || isUploading || isLoadingKalturaData"
                   @click="handleKalturaIdEdit"
                 >
                   {{ editingKalturaId ? "Submit" : "Change" }}
@@ -83,6 +88,7 @@
               { text: 'Regular Player', value: 'regular' },
               { text: 'Kaltura Player', value: 'kaltura' },
             ]"
+            :disabled="disableFields"
           ></b-form-radio-group>
         </b-form-group>
       </b-col>
@@ -91,11 +97,19 @@
 </template>
 
 <script>
-import { mapMutations, mapState } from "vuex"
+import { mapMutations, mapState, mapActions } from "vuex"
 import client from "@/services/TapestryAPI"
 import ErrorHelper from "@/utils/errorHelper"
+import * as wp from "@/services/wp"
 
 export default {
+  props: {
+    disableFields: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+  },
   data() {
     return {
       kalturaId: this.$store.state.currentEditingNode.typeData.kalturaId,
@@ -109,6 +123,9 @@ export default {
     ...mapState({
       nodeId: state => state.currentEditingNode.id,
     }),
+    kalturaAvailable() {
+      return wp.getKalturaStatus()
+    },
     videoPlayer: {
       get() {
         return this.$store.state.currentEditingNode.typeData.videoPlayer ?? "regular"
@@ -126,7 +143,9 @@ export default {
     }
   },
   methods: {
-    ...mapMutations(["setCurrentEditingNodeProperty", "addApiError"]),
+    ...mapMutations(["setCurrentEditingNodeProperty"]),
+    ...mapMutations({ addError: "addApiError" }),
+    ...mapActions(["addApiError"]),
     update(property, value) {
       this.setCurrentEditingNodeProperty({ property, value })
     },
@@ -140,19 +159,28 @@ export default {
       this.$emit("load-start")
       this.isLoadingKalturaData = true
 
-      const validKalturaVideo =
-        skipCheck || (await client.checkKalturaVideo(kalturaId))
-      if (validKalturaVideo) {
-        this.update("typeData.kalturaId", kalturaId)
-        await this.getKalturaCaptions(kalturaId)
-      } else {
-        this.addApiError({ error: "Please enter a valid Kaltura video ID." })
+      if (this.kalturaAvailable) {
+        try {
+          const validKalturaVideo =
+            skipCheck || (await client.checkKalturaVideo(kalturaId))
+
+          if (validKalturaVideo) {
+            this.update("typeData.kalturaId", kalturaId)
+            await this.getKalturaCaptions(kalturaId)
+          } else {
+            this.addError({ error: "Please enter a valid Kaltura video ID." })
+          }
+        } catch (error) {
+          // Kaltura availability changed unexpectedly
+          this.addApiError(error)
+        }
       }
 
       this.$emit("load-end")
       this.isLoadingKalturaData = false
     },
     async getKalturaCaptions(kalturaId) {
+      // Loads captions, assuming Kaltura is available on the server
       const result = await client.getKalturaVideoCaptions(kalturaId)
 
       this.update("typeData.defaultCaptionId", result.defaultCaptionId)
@@ -164,7 +192,7 @@ export default {
           ? event.dataTransfer.files[0]
           : event.target.files[0]
 
-      if (videoFile) {
+      if (videoFile && this.kalturaAvailable) {
         this.editingKalturaId = false
         this.isUploading = true
         this.$root.$emit("node-modal::uploading", true)
@@ -178,7 +206,7 @@ export default {
           this.setKalturaVideo(kalturaId, true)
         } catch (error) {
           const errorMessage = ErrorHelper.getErrorMessage(error)
-          this.addApiError({ error: `Unable to upload video: ${errorMessage}` })
+          this.addError({ error: `Unable to upload video: ${errorMessage}` })
         }
 
         this.isUploading = false

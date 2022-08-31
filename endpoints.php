@@ -1631,7 +1631,7 @@ function getQuestionHasAnswers($request)
 
 /**
  * Upload video to Kaltura and return Kaltura ID.
- * 
+ *
  * If nodeMetaId specified, requires permission to edit that node.
  * Otherwise, requires same permissions as adding nodes.
  */
@@ -1645,6 +1645,10 @@ function uploadVideoToKaltura($request)
             throw new TapestryError('INVALID_POST_ID');
         }
 
+        if (!LOAD_KALTURA) {
+            throw new TapestryError('KALTURA_NOT_AVAILABLE');
+        }
+
         if (empty($nodeMetaId)) {
             $tapestry = new Tapestry($tapestryPostId);
             if ($tapestry->isEmpty()) {
@@ -1653,31 +1657,29 @@ function uploadVideoToKaltura($request)
                     throw new TapestryError('ADD_NODE_PERMISSION_DENIED');
                 }
             }
-        } else if (!TapestryHelpers::userIsAllowed('EDIT', $nodeMetaId, $tapestryPostId)) {
+        } elseif (!TapestryHelpers::userIsAllowed('EDIT', $nodeMetaId, $tapestryPostId)) {
             throw new TapestryError('EDIT_NODE_PERMISSION_DENIED');
         }
 
-        if (LOAD_KALTURA) {
-            $file_params = $request->get_file_params();
-            $file_path = $file_params['file']['tmp_name'];
+        $file_params = $request->get_file_params();
+        $file_path = $file_params['file']['tmp_name'];
 
-            $file_obj = (object) [
-                'file_path' => $file_path,
-                'name' => $file_params['file']['name'],
-            ];
+        $file_obj = (object) [
+            'file_path' => $file_path,
+            'name' => $file_params['file']['name'],
+        ];
 
-            $category = TapestryHelpers::getKalturaCategoryName($tapestryPostId);
-            $kaltura_api = new KalturaApi();
-            $response = $kaltura_api->uploadVideo($file_obj, $category);
+        $category = TapestryHelpers::getKalturaCategoryName($tapestryPostId);
+        $kaltura_api = new KalturaApi();
+        $response = $kaltura_api->uploadVideo($file_obj, $category);
 
-            while ($response->status === EntryStatus::PRECONVERT && $response->duration === 0) {
-                // Wait for the video's duration to load (or conversion to error out/complete)
-                sleep(5);
-                $response = $kaltura_api->getVideo($response->id);
-            }
-
-            return $response->id;
+        while ($response->status === EntryStatus::PRECONVERT && $response->duration === 0) {
+            // Wait for the video's duration to load (or conversion to error out/complete)
+            sleep(5);
+            $response = $kaltura_api->getVideo($response->id);
         }
+
+        return $response->id;
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
@@ -1717,32 +1719,34 @@ function uploadVideosToKaltura($request)
             throw new TapestryError('INVALID_POST_ID');
         }
 
-        if (LOAD_KALTURA) {
-            $is_upload_in_progress = get_option(KalturaUpload::IN_PROGRESS_OPTION);
+        if (!LOAD_KALTURA) {
+            throw new TapestryError('KALTURA_NOT_AVAILABLE');
+        }
 
-            if ($is_upload_in_progress === false) {
-                // False return value means option does not exist in database yet
-                add_option(KalturaUpload::IN_PROGRESS_OPTION, KalturaUpload::NO_VALUE);
-            } elseif ($is_upload_in_progress !== KalturaUpload::NO_VALUE) {
-                return;
-            }
+        $is_upload_in_progress = get_option(KalturaUpload::IN_PROGRESS_OPTION);
 
-            update_option(KalturaUpload::IN_PROGRESS_OPTION, KalturaUpload::YES_VALUE);
-            update_option(KalturaUpload::LATEST_TAPESTRY_OPTION, $tapestry_id);
+        if ($is_upload_in_progress === false) {
+            // False return value means option does not exist in database yet
+            add_option(KalturaUpload::IN_PROGRESS_OPTION, KalturaUpload::NO_VALUE);
+        } elseif ($is_upload_in_progress !== KalturaUpload::NO_VALUE) {
+            return;
+        }
+
+        update_option(KalturaUpload::IN_PROGRESS_OPTION, KalturaUpload::YES_VALUE);
+        update_option(KalturaUpload::LATEST_TAPESTRY_OPTION, $tapestry_id);
+        update_option(KalturaUpload::STOP_UPLOAD_OPTION, KalturaUpload::NO_VALUE, false);
+        update_option(KalturaUpload::UPLOAD_ERROR_OPTION, '');
+
+        add_action('shutdown', 'cleanUpKalturaUpload');
+
+        try {
+            perform_batched_upload_to_kaltura($tapestry_id, $node_ids, $use_kaltura_player);
+        } catch (Exception $e) {
+            error_log($e->getMessage());
+        } finally {
+            update_option(KalturaUpload::IN_PROGRESS_OPTION, KalturaUpload::NO_VALUE);
             update_option(KalturaUpload::STOP_UPLOAD_OPTION, KalturaUpload::NO_VALUE, false);
             update_option(KalturaUpload::UPLOAD_ERROR_OPTION, '');
-
-            add_action('shutdown', 'cleanUpKalturaUpload');
-
-            try {
-                perform_batched_upload_to_kaltura($tapestry_id, $node_ids, $use_kaltura_player);
-            } catch (Exception $e) {
-                error_log($e->getMessage());
-            } finally {
-                update_option(KalturaUpload::IN_PROGRESS_OPTION, KalturaUpload::NO_VALUE);
-                update_option(KalturaUpload::STOP_UPLOAD_OPTION, KalturaUpload::NO_VALUE, false);
-                update_option(KalturaUpload::UPLOAD_ERROR_OPTION, '');
-            }
         }
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
@@ -2140,7 +2144,11 @@ function stopKalturaUpload($request)
  */
 function checkKalturaVideo($request)
 {
-    if (LOAD_KALTURA) {
+    try {
+        if (!LOAD_KALTURA) {
+            throw new TapestryError('KALTURA_NOT_AVAILABLE');
+        }
+
         $entryId = $request['entry_id'];
 
         $kaltura_api = new KalturaApi();
@@ -2150,6 +2158,8 @@ function checkKalturaVideo($request)
             return true;
         }
         return false;
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
 }
 
@@ -2166,7 +2176,11 @@ function checkKalturaVideo($request)
  */
 function getKalturaVideoMeta($request)
 {
-    if (LOAD_KALTURA) {
+    try {
+        if (!LOAD_KALTURA) {
+            throw new TapestryError('KALTURA_NOT_AVAILABLE');
+        }
+
         $entryId = $request['entry_id'];
 
         $kaltura_api = new KalturaApi();
@@ -2176,30 +2190,48 @@ function getKalturaVideoMeta($request)
             return array("image" => $result->thumbnailUrl, "duration" => $result->duration);
         }
         return false;
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
 }
 
 function getKalturaAvailableLanguages($request)
 {
-    if (LOAD_KALTURA) {
+    try {
+        if (!LOAD_KALTURA) {
+            throw new TapestryError('KALTURA_NOT_AVAILABLE');
+        }
+
         $kaltura_api = new KalturaApi();
         return $kaltura_api->getAvailableLanguages();
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
 }
 
 function getKalturaVideoCaptions($request)
 {
-    if (LOAD_KALTURA) {
+    try {
+        if (!LOAD_KALTURA) {
+            throw new TapestryError('KALTURA_NOT_AVAILABLE');
+        }
+
         $video_entry_id = $request['entry_id'];
 
         $kaltura_api = new KalturaApi();
         return $kaltura_api->getCaptionsAndDefaultCaption($video_entry_id);
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
 }
 
 function updateKalturaVideoCaptions($request)
 {
-    if (LOAD_KALTURA) {
+    try {
+        if (!LOAD_KALTURA) {
+            throw new TapestryError('KALTURA_NOT_AVAILABLE');
+        }
+
         $video_entry_id = $request['entry_id'];
         $body = json_decode($request->get_body());
         $captions = $body->captions;
@@ -2211,5 +2243,7 @@ function updateKalturaVideoCaptions($request)
         } catch (TapestryError $e) {
             return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
         }
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
 }

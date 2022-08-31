@@ -1,69 +1,81 @@
 <template>
-  <div>
-    <mp4-form v-if="mediaFormat === 'mp4'"></mp4-form>
-    <youtube-form v-else-if="mediaFormat === 'youtube'"></youtube-form>
-    <kaltura-form
-      v-else-if="mediaFormat === 'kaltura'"
-      @load-start="handleLoadStart"
-      @load-end="handleLoadEnd"
-    ></kaltura-form>
-    <b-row v-if="mediaFormat === 'mp4' || mediaFormat === 'kaltura'">
-      <b-col>
-        <b-overlay :show="loadingCaptions">
-          <b-form-group label="Captions">
-            <b-form-checkbox
-              :checked="useCaptions"
-              data-qa="node-captions-toggle"
-              switch
-              :disabled="loadingCaptions"
-              @change="handleToggleCaptions"
-            >
-              {{ useCaptions ? "On" : "Off" }}
-            </b-form-checkbox>
-            <template v-if="useCaptions">
-              <caption-row
-                v-for="(caption, index) in captions"
-                :key="caption.id"
-                :value="caption"
-                :index="index"
-                :is-kaltura="useKalturaPlayer"
-                :is-removable="captions.length >= 2"
-                :is-default="caption.id === defaultCaptionId"
-                :languages="languages"
-                @input="captions.splice(index, 1, $event)"
-                @setDefault="defaultCaptionId = $event"
-                @remove="removeCaption(index, caption)"
-              ></caption-row>
-              <b-button
-                class="mt-3"
-                data-qa="add-caption-button"
-                @click="addCaption"
+  <b-overlay :show="disableFields">
+    <template #overlay>
+      <div class="no-kaltura-notice">
+        This information cannot be edited because Kaltura is not available on the
+        server.
+      </div>
+    </template>
+    <div :aria-hidden="disableFields">
+      <mp4-form v-if="mediaFormat === 'mp4'"></mp4-form>
+      <youtube-form v-else-if="mediaFormat === 'youtube'"></youtube-form>
+      <kaltura-form
+        v-else-if="mediaFormat === 'kaltura'"
+        :disable-fields="disableFields"
+        @load-start="handleLoadStart"
+        @load-end="handleLoadEnd"
+      ></kaltura-form>
+      <b-row v-if="mediaFormat === 'mp4' || mediaFormat === 'kaltura'">
+        <b-col>
+          <b-overlay :show="loadingCaptions">
+            <b-form-group label="Captions">
+              <b-form-checkbox
+                :checked="useCaptions"
+                data-qa="node-captions-toggle"
+                switch
+                :disabled="disableFields || loadingCaptions"
+                @change="handleToggleCaptions"
               >
-                <i class="fas fa-plus icon"></i>
-                Add caption
-              </b-button>
-            </template>
+                {{ useCaptions ? "On" : "Off" }}
+              </b-form-checkbox>
+              <template v-if="useCaptions">
+                <caption-row
+                  v-for="(caption, index) in captions"
+                  :key="caption.id"
+                  :value="caption"
+                  :index="index"
+                  :disabled="disableFields"
+                  :is-kaltura="useKalturaPlayer"
+                  :is-removable="captions.length >= 2"
+                  :is-default="caption.id === defaultCaptionId"
+                  :languages="languages"
+                  @input="captions.splice(index, 1, $event)"
+                  @setDefault="defaultCaptionId = $event"
+                  @remove="removeCaption(index, caption)"
+                ></caption-row>
+                <b-button
+                  class="mt-3"
+                  data-qa="add-caption-button"
+                  :disabled="disableFields"
+                  @click="addCaption"
+                >
+                  <i class="fas fa-plus icon"></i>
+                  Add caption
+                </b-button>
+              </template>
+            </b-form-group>
+          </b-overlay>
+          <b-form-group v-if="pendingCaptions.length > 0" label="Pending captions">
+            <caption-row
+              v-for="(caption, index) in pendingCaptions"
+              :key="caption.id"
+              :value="caption"
+              :index="index"
+              is-removable
+              is-pending
+              :disabled="disableFields"
+              :is-kaltura="useKalturaPlayer"
+              :languages="languages"
+              :error-message="caption.errorMessage"
+              @input="pendingCaptions.splice(index, 1, $event)"
+              @move="moveFromPending(index, caption)"
+              @remove="removePendingCaption(index)"
+            ></caption-row>
           </b-form-group>
-        </b-overlay>
-        <b-form-group v-if="pendingCaptions.length > 0" label="Pending captions">
-          <caption-row
-            v-for="(caption, index) in pendingCaptions"
-            :key="caption.id"
-            :value="caption"
-            :index="index"
-            is-removable
-            is-pending
-            :is-kaltura="useKalturaPlayer"
-            :languages="languages"
-            :error-message="caption.errorMessage"
-            @input="pendingCaptions.splice(index, 1, $event)"
-            @move="moveFromPending(index, caption)"
-            @remove="removePendingCaption(index)"
-          ></caption-row>
-        </b-form-group>
-      </b-col>
-    </b-row>
-  </div>
+        </b-col>
+      </b-row>
+    </div>
+  </b-overlay>
 </template>
 
 <script>
@@ -73,6 +85,7 @@ import KalturaForm from "./KalturaForm"
 import { mapState, mapMutations } from "vuex"
 import ISO6391 from "iso-639-1"
 import client from "@/services/TapestryAPI"
+import * as wp from "@/services/wp"
 import Helpers from "@/utils/Helpers"
 import CaptionRow from "./CaptionRow"
 
@@ -104,6 +117,12 @@ export default {
     }),
     useKalturaPlayer() {
       return this.mediaFormat === "kaltura" && this.videoPlayer === "kaltura"
+    },
+    kalturaAvailable() {
+      return wp.getKalturaStatus()
+    },
+    disableFields() {
+      return this.mediaFormat === "kaltura" && !this.kalturaAvailable
     },
     captions: {
       get() {
@@ -148,13 +167,23 @@ export default {
     },
     async getAllLanguages() {
       const iso6391LanguageNames = ISO6391.getAllNames()
-      const kalturaLanguageNames = await client.getKalturaAvailableLanguages()
+      const kalturaLanguageNames = await this.getKalturaAvailableLanguages()
       const allLanguageNames = Array.from(
         new Set(iso6391LanguageNames.concat(kalturaLanguageNames))
       )
       allLanguageNames.sort()
 
       return allLanguageNames
+    },
+    async getKalturaAvailableLanguages() {
+      if (this.kalturaAvailable) {
+        try {
+          return await client.getKalturaAvailableLanguages()
+        } catch (error) {
+          // Kaltura availability changed unexpectedly
+        }
+      }
+      return []
     },
     handleLoadStart() {
       this.loadingCaptions = true
@@ -214,3 +243,12 @@ export default {
   },
 }
 </script>
+<style lang="scss" scoped>
+.no-kaltura-notice {
+  text-align: center;
+  background: #fff;
+  border-radius: 0.5em;
+  padding: 1em;
+  max-width: 500px;
+}
+</style>

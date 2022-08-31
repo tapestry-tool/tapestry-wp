@@ -6,7 +6,11 @@
     data-qa="caption-row"
   >
     <b-row align-v="center" class="mb-2 mx-0">
-      <div :id="`${captionContainerId}-toggle`" v-b-toggle="captionContainerId">
+      <div
+        :id="`${captionContainerId}-toggle`"
+        v-b-toggle="captionContainerId"
+        :tabindex="disabled ? -1 : 0"
+      >
         <b>{{ title }}</b>
         <span v-if="isDefault" class="ml-2">
           (default)
@@ -15,7 +19,7 @@
           <i
             :id="`caption-error-message-${caption.id}`"
             class="far fa-question-circle"
-            tabindex="0"
+            :tabindex="disabled ? -1 : 0"
           ></i>
           <b-tooltip :target="`caption-error-message-${caption.id}`">
             This caption could not be uploaded. {{ errorMessage }}
@@ -23,14 +27,19 @@
         </span>
       </div>
       <div class="ml-auto d-flex align-items-center">
-        <b-form-checkbox v-model="caption.displayOnPlayer" switch class="mr-3">
+        <b-form-checkbox
+          v-model="caption.displayOnPlayer"
+          switch
+          :disabled="disabled"
+          class="mr-3"
+        >
           {{ caption.displayOnPlayer ? "Show in player" : "Hide in player" }}
         </b-form-checkbox>
         <b-button
           class="mr-1"
           size="sm"
           :variant="isRemovable ? 'danger' : 'light'"
-          :disabled="!isRemovable"
+          :disabled="disabled || !isRemovable"
           @click="$emit('remove')"
         >
           Delete
@@ -40,6 +49,7 @@
           size="sm"
           variant="primary"
           class="mr-1"
+          :disabled="disabled"
           @click="$emit('move')"
         >
           Add back
@@ -49,7 +59,7 @@
           size="sm"
           variant="primary"
           class="mr-1"
-          :disabled="isDefault"
+          :disabled="disabled || isDefault"
           :data-qa="`caption-set-default-button-${index}`"
           @click="$emit('setDefault', caption.id)"
         >
@@ -60,7 +70,7 @@
           variant="primary"
           class="download-button"
           :href="caption.captionUrl"
-          :disabled="!caption.captionUrl"
+          :disabled="disabled || !caption.captionUrl"
           target="_blank"
           download
         >
@@ -75,8 +85,9 @@
             <b-form-group label="Source">
               <file-upload
                 v-model="caption.captionUrl"
-                :file-types="isKaltura ? '.vtt, .srt' : '.vtt'"
                 compact-mode
+                :disabled="disabled"
+                :file-types="isKaltura ? '.vtt, .srt' : '.vtt'"
                 :placeholder="`Upload a VTT${isKaltura ? ' or SRT' : ''} file`"
                 :is-image="false"
                 :input-test-id="`caption-url-${index}`"
@@ -90,6 +101,7 @@
             <b-form-group label="Language">
               <b-form-select
                 v-model="caption.language"
+                :disabled="disabled"
                 :data-qa="`caption-language-${index}`"
                 :options="languages"
               ></b-form-select>
@@ -99,6 +111,7 @@
             <b-form-checkbox
               switch
               :checked="customizeLabel"
+              :disabled="disabled"
               :data-qa="`caption-label-toggle-${index}`"
               @change="handleCustomizeLabel($event)"
             >
@@ -109,6 +122,7 @@
               v-model="caption.label"
               class="mt-2"
               aria-label="Caption label"
+              :disabled="disabled"
               :placeholder="caption.language"
               :data-qa="`caption-label-${index}`"
             />
@@ -133,6 +147,10 @@ export default {
     },
     value: {
       type: Object,
+      required: true,
+    },
+    disabled: {
+      type: Boolean,
       required: true,
     },
     isKaltura: {

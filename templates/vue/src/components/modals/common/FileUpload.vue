@@ -4,7 +4,7 @@
       :placeholder="placeholder"
       :value="value"
       :data-qa="inputTestId"
-      :disabled="isUploading"
+      :disabled="disabled || isUploading"
       required
       @input="$emit('input', $event)"
     />
@@ -15,7 +15,7 @@
       hidden
       name="async-upload"
       :accept="fileTypes"
-      :disabled="isUploading"
+      :disabled="disabled || isUploading"
       required
       data-qa="import-file-input"
       @dragover.prevent
@@ -27,6 +27,7 @@
       tag="label"
       :for="fileUploadId"
       class="mb-0 rounded-0"
+      :disabled="disabled"
     >
       {{ value ? "Change" : "Upload" }}
     </b-button>
@@ -118,7 +119,7 @@
             placeholder="Click to choose a file or drop file here to upload"
             drop-placeholder="Drop file here..."
             :accept="fileTypes"
-            :disabled="isUploading"
+            :disabled="disabled || isUploading"
             required
             data-qa="import-file-input"
             @dragover.prevent
@@ -167,7 +168,7 @@
                 placeholder="Choose a file or drop it here..."
                 drop-placeholder="Drop file here..."
                 :accept="fileTypes"
-                :disabled="isUploading"
+                :disabled="disabled || isUploading"
                 required
                 data-qa="import-file-input"
                 @dragover.prevent
@@ -186,7 +187,7 @@
                   :value="value"
                   :data-qa="inputTestId"
                   :data-testid="inputTestId"
-                  :disabled="isUploading"
+                  :disabled="disabled || isUploading"
                   required
                   @input="$emit('input', $event)"
                 />
@@ -229,6 +230,11 @@ export default {
       type: String,
       required: false,
       default: "",
+    },
+    disabled: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
     inputTestId: {
       type: String,
