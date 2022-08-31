@@ -24,8 +24,7 @@ describe("Review Nodes", () => {
       cy.getByTestId(`edit-node-${node.id}`).should("not.exist")
     })
 
-    cy.findByLabelText("open sidebar").click()
-    cy.sidebar().within(() => {
+    cy.openSidebar().within(() => {
       cy.findByText(/submitted/i).should("be.visible")
     })
 
@@ -113,8 +112,7 @@ describe("Review Nodes", () => {
     cy.login(roles.SUBSCRIBER).visitTapestry()
     cy.getNodeByTitle(node.title).then(node => {
       cy.getNodeById(node.id).click()
-      cy.findByLabelText("open sidebar").click()
-      cy.sidebar().within(() => {
+      cy.openSidebar().within(() => {
         cy.contains(/resubmit/i).should("be.visible")
       })
     })
@@ -141,13 +139,12 @@ describe("Review Nodes", () => {
     })
 
     const comment = "This is my best work!"
-    cy.findByLabelText("open sidebar").click()
-    cy.getByTestId("review-comment-textarea").type(comment)
-    cy.getByTestId("submit-review-comment").click()
+    cy.openSidebar().within(() => {
+      cy.getByTestId("review-comment-textarea").type(comment)
+      cy.getByTestId("submit-review-comment").click()
 
-    cy.getByTestId("review-comment-textarea").should("be.hidden")
-    cy.sidebar()
-      .contains(comment)
-      .should("be.visible")
+      cy.getByTestId("review-comment-textarea").should("be.hidden")
+      cy.contains(comment).should("be.visible")
+    })
   })
 })

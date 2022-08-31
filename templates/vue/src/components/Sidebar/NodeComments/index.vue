@@ -28,6 +28,7 @@
         <textarea
           ref="textarea"
           v-model="comment"
+          data-qa="comment-textarea"
           aria-label="comment"
           placeholder="Leave a comment..."
           @keydown.stop

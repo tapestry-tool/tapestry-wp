@@ -30,7 +30,7 @@
         <tapestry-icon icon="comment-dots" />
       </button>
       <button
-        v-else
+        v-if="showComments"
         :class="['anchor-button', { active: active === 'comments' }]"
         aria-label="comments"
         @click.stop="scrollToRef('comments')"
@@ -40,6 +40,7 @@
       <button
         :aria-label="closed ? 'open sidebar' : 'close sidebar'"
         :class="['toggle-button', { closed: closed }]"
+        data-qa="sidebar-toggle"
         @click.stop="active = closed ? 'info' : undefined"
       >
         <tapestry-icon :icon="closed ? 'chevron-left' : 'chevron-right'" />
@@ -116,7 +117,7 @@
           <h2 class="content-header">Review</h2>
           <node-review :node="node"></node-review>
         </section>
-        <section v-else ref="comments" data-name="comments">
+        <section v-if="showComments" ref="comments" data-name="comments">
           <h2 class="content-header">Comments</h2>
           <node-comments :node="node"></node-comments>
         </section>
@@ -160,9 +161,14 @@ export default {
       },
     },
     tabOrder() {
-      return this.isReviewParticipant
-        ? ["info", "copyright", "review"]
-        : ["info", "copyright", "comments"]
+      const tabOrder = ["info", "copyright"]
+      if (this.isReviewParticipant) {
+        tabOrder.push("review")
+      }
+      if (this.showComments) {
+        tabOrder.push("comments")
+      }
+      return tabOrder
     },
     closed() {
       return this.active === undefined
@@ -193,6 +199,9 @@ export default {
         return this.node.reviewStatus || this.node.status === nodeStatus.DRAFT
       }
       return false
+    },
+    showComments() {
+      return this.node.status === nodeStatus.PUBLISH
     },
   },
   watch: {
