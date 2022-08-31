@@ -43,7 +43,10 @@ function tapestry_settings_init()
 {
     add_settings_section('tapestry_db_settings', 'Database Settings', 'tapestry_db_section_cb', 'tapestry_settings_page');
     add_settings_section('tapestry_kaltura_config_section', 'Kaltura Configuration', 'tapestry_kaltura_config_section_cb', 'tapestry_settings_page');
-    add_settings_section('tapestry_kaltura_upload_section', 'Kaltura Upload', 'tapestry_kaltura_upload_section_cb', 'tapestry_settings_page');
+
+    if (LOAD_KALTURA) {
+        add_settings_section('tapestry_kaltura_upload_section', 'Kaltura Upload', 'tapestry_kaltura_upload_section_cb', 'tapestry_settings_page');
+    }
 }
 
 function load_tapestry_settings_page_scripts($hook_suffix, $tapestry_settings_page_hook_suffix)
@@ -219,31 +222,6 @@ function tapestry_kaltura_upload_section_cb()
         <?php
             submit_button('Save Changes', 'primary', 'save-kaltura-upload-settings', false); ?>
     </form>
-    <?php 
-    if (LOAD_KALTURA) {
-        do_clean_uploaded_videos_section();
-    }
-    ?>
-    <h4>Reset Upload Status</h4>
-    <p>
-        Forcefully mark the upload as no longer in progress.
-        This does not cancel any ongoing upload, but will allow you to try the upload again.
-        <br />
-        Please note: This action is dangerous and not recommended in most situations.
-    </p>
-    <p>
-        <button type="button" class="button button-secondary" onclick="forceResetUploadStatus()" id="reset_upload_status">
-            Reset Upload Status
-        </button>
-    </p>
-    <div class="notice" id="tapestry_reset_upload_status_notice" style="display: none">
-      <p></p>
-    </div>
-    <?php
-}
-
-function do_clean_uploaded_videos_section() {
-    ?>
     <h4>Clean Uploaded Videos</h4>
     <div class="postbox tapestry-settings-notice" id="upload_in_progress_notice" style="display: none">
         <p>
@@ -282,6 +260,21 @@ function do_clean_uploaded_videos_section() {
         </tr>
         </thead>
     </table>
+    <h4>Reset Upload Status</h4>
+    <p>
+        Forcefully mark the upload as no longer in progress.
+        This does not cancel any ongoing upload, but will allow you to try the upload again.
+        <br />
+        Please note: This action is dangerous and not recommended in most situations.
+    </p>
+    <p>
+        <button type="button" class="button button-secondary" onclick="forceResetUploadStatus()" id="reset_upload_status">
+            Reset Upload Status
+        </button>
+    </p>
+    <div class="notice" id="tapestry_reset_upload_status_notice" style="display: none">
+      <p></p>
+    </div>
     <?php
 }
 
