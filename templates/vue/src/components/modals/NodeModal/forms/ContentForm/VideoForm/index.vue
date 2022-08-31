@@ -155,6 +155,7 @@ export default {
   watch: {
     mediaFormat() {
       this.clearCaptions()
+      this.pendingCaptions = []
     },
   },
   async created() {
