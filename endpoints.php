@@ -325,6 +325,13 @@ $REST_API_ENDPOINTS = [
             'permission_callback' => 'TapestryPermissions::putTapestrySettings',
         ],
     ],
+    'UPLOAD_VIDEO_TO_KALTURA' => (object) [
+        'ROUTE' => '/kaltura/upload_video',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_POST_METHOD,
+            'callback' => 'uploadVideoToKaltura',
+        ],
+    ],
     'UPLOAD_VIDEOS_TO_KALTURA' => (object) [
         'ROUTE' => '/kaltura/upload_videos',
         'ARGUMENTS' => [
@@ -1602,6 +1609,60 @@ function getQuestionHasAnswers($request)
 }
 
 /**
+ * Upload video to Kaltura and return Kaltura ID.
+ * 
+ * If nodeMetaId specified, requires permission to edit that node.
+ * Otherwise, requires same permissions as adding nodes.
+ */
+function uploadVideoToKaltura($request)
+{
+    $tapestryPostId = $request['tapestryPostId'];
+    $nodeMetaId = $request['nodeMetaId'];
+
+    try {
+        if (!TapestryHelpers::isValidTapestry($tapestryPostId)) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+
+        if (empty($nodeMetaId)) {
+            $tapestry = new Tapestry($tapestryPostId);
+            if ($tapestry->isEmpty()) {
+                $user = new TapestryUser();
+                if (!$user->canEdit($tapestryPostId)) {
+                    throw new TapestryError('ADD_NODE_PERMISSION_DENIED');
+                }
+            }
+        } else if (!TapestryHelpers::userIsAllowed('EDIT', $nodeMetaId, $tapestryPostId)) {
+            throw new TapestryError('EDIT_NODE_PERMISSION_DENIED');
+        }
+
+        if (LOAD_KALTURA) {
+            $file_params = $request->get_file_params();
+            $file_path = $file_params['file']['tmp_name'];
+
+            $file_obj = (object) [
+                'file_path' => $file_path,
+                'name' => $file_params['file']['name'],
+            ];
+
+            $category = TapestryHelpers::getKalturaCategoryName($tapestryPostId);
+            $kaltura_api = new KalturaApi();
+            $response = $kaltura_api->uploadVideo($file_obj, $category);
+
+            while ($response->status === EntryStatus::PRECONVERT && $response->duration === 0) {
+                // Wait for the video's duration to load (or conversion to error out/complete)
+                sleep(5);
+                $response = $kaltura_api->getVideo($response->id);
+            }
+
+            return $response->id;
+        }
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+/**
  * Starts uploading a list of videos from local server to Kaltura.
  * Does nothing if an upload is already in progress.
  *
@@ -1694,13 +1755,7 @@ function cleanUpKalturaUpload()
  */
 function perform_batched_upload_to_kaltura($tapestry_id, $node_ids, $use_kaltura_player)
 {
-    if (get_option('kaltura_category_structure') === 'tapestry_name') {
-        $tapestry = new Tapestry($tapestry_id);
-        $category = $tapestry->getSettings()->title;
-    } else {
-        // Categorize by date by default
-        $category = date('Y/m/d');
-    }
+    $category = TapestryHelpers::getKalturaCategoryName($tapestry_id);
 
     $videos_to_upload = create_upload_log($tapestry_id, $node_ids);
     update_upload_log($videos_to_upload);
@@ -1750,7 +1805,7 @@ function perform_batched_upload_to_kaltura($tapestry_id, $node_ids, $use_kaltura
             $videos_to_remove = array();
 
             foreach ($remaining_videos as $video) {
-                $response = $kalturaApi->getVideoUploadStatus($video->kalturaID);
+                $response = $kalturaApi->getVideo($video->kalturaID);
 
                 if ($response->status === EntryStatus::PRECONVERT) {
                     // Still converting

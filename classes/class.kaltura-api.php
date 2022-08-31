@@ -114,15 +114,6 @@
             $resource = new UploadedFileTokenResource();
             $resource->token = $token->id;
             $response = $kclient->media->addContent($entry->id, $resource);
-            $status = $response->status;
-
-            return $response;
-        }
-
-        public function getVideoUploadStatus($entryId)
-        {
-            $kclient = $this->getKClient();
-            $response = $kclient->media->get($entryId);
 
             return $response;
         }
@@ -136,7 +127,7 @@
             $client = $this->getKClient();
 
             try {
-                $result = $client->media->get($entryId, -1);
+                $result = $client->media->get($entryId);
 
                 return $result;
             } catch (ApiException $e) {
