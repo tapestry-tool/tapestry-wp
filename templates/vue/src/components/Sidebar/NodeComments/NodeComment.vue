@@ -19,12 +19,13 @@
       <p>
         {{ comment.content }}
       </p>
-      <div v-if="showAllActions || isAuthor">
+      <div v-if="showAllActions || (isAuthor && comment.approved)">
         <b-dropdown
           size="sm"
           variant="link"
           no-caret
           toggle-class="comment-action-btn"
+          aria-label="Comment actions"
         >
           <template #button-content>
             <i class="fas fa-ellipsis-v"></i>
@@ -61,6 +62,30 @@
             Trash
           </b-dropdown-item-button>
         </b-dropdown>
+      </div>
+      <div v-else-if="isAuthor">
+        <b-button
+          size="sm"
+          variant="link"
+          class="comment-action-btn"
+          aria-label="Remove this comment"
+          title="Trash"
+          @click="$emit('action', comment, 'trash')"
+        >
+          <i class="fas fa-trash" aria-hidden="true"></i>
+        </b-button>
+      </div>
+      <div v-else>
+        <b-button
+          size="sm"
+          variant="link"
+          class="comment-action-btn"
+          aria-label="Reply to this comment"
+          title="Reply"
+          @click="$emit('set-reply', comment)"
+        >
+          <i class="fas fa-reply" aria-hidden="true"></i>
+        </b-button>
       </div>
     </div>
   </div>

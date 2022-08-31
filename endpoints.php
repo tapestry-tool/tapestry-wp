@@ -794,9 +794,6 @@ function performTapestryNodeCommentAction($request) {
         if (!is_user_logged_in()) {
             throw new TapestryError('INVALID_USER_ID');
         }
-        if (!current_user_can('edit_post', $postId)) {
-            throw new TapestryError('EDIT_TAPESTRY_PERMISSION_DENIED');
-        }
         if (!isset($commentId)) {
             throw new TapestryError('INVALID_COMMENT_ID', 'Comment ID should not be empty', 400);
         }
@@ -804,7 +801,7 @@ function performTapestryNodeCommentAction($request) {
             throw new TapestryError('INVALID_COMMENT_ID', 'Comment ID should be a number', 400);
         }
         if (!isset($action)) {
-            throw new TapestryError('INVALID_ACTION', 'Comment action should not be empty', 400);
+            throw new TapestryError('INVALID_COMMENT_ACTION', 'Comment action should not be empty', 400);
         }
         $commentId = (int) $commentId;
 

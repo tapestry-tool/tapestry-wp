@@ -430,6 +430,22 @@ class TapestryNode implements ITapestryNode
             throw new TapestryError('INVALID_COMMENT_ACTION', 'Comment does not belong to the node', 500);
         }
 
+        // check permissions
+        $user = new TapestryUser();
+        switch ($action) {
+            case 'trash':
+                if (!$user->canEdit($this->tapestryPostId) && (int) $comment->user_id !== $user->getID()) {
+                    throw new TapestryError('INVALID_COMMENT_ACTION', 'You do not have permission to move this comment to Trash', 403);
+                }
+                break;
+            default:
+                if (!$user->canEdit($this->tapestryPostId)) {
+                    throw new TapestryError('INVALID_COMMENT_ACTION', 'You do not have permission to '.$action.' this comment', 403);
+                }
+                break;
+        }
+
+        // perform action
         switch ($action) {
             case 'trash':
                 if (!wp_delete_comment($comment)) {

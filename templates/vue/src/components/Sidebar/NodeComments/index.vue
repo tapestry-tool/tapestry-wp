@@ -2,11 +2,11 @@
   <b-overlay class="loading" bg-color="#5d656c" :show="loading">
     <template v-if="isLoggedIn">
       <b-button
-        v-if="!showCommentAuthoring"
+        v-if="!showAuthoring"
         class="submit-button"
         variant="secondary"
         :aria-hidden="loading"
-        @click="showCommentAuthoring = true"
+        @click="showAuthoring = true"
       >
         Add comment
       </b-button>
@@ -76,7 +76,7 @@ export default {
       comment: "",
       replyingTo: null,
       loading: false,
-      showCommentAuthoring: false,
+      showAuthoring: false,
     }
   },
   computed: {
@@ -107,9 +107,16 @@ export default {
     },
   },
   watch: {
+    showAuthoring(val) {
+      if (val) {
+        this.$nextTick(() => {
+          this.$refs.textarea?.focus()
+        })
+      }
+    },
     replyingTo(val) {
       if (val) {
-        this.showCommentAuthoring = true
+        this.showAuthoring = true
         this.$nextTick(() => {
           this.$nextTick(() => {
             // double $nextTick because Bootstrap focuses the dropdown toggle in the first $nextTick
@@ -134,7 +141,7 @@ export default {
       if (success) {
         this.comment = ""
         this.replyingTo = null
-        this.showCommentAuthoring = false
+        this.showAuthoring = false
       }
       this.loading = false
     },
