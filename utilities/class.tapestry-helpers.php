@@ -387,9 +387,7 @@ class TapestryHelpers
         $typeData->kalturaData['serviceUrl'] = self::getKalturaServiceUrl();
         $typeData->kalturaData['uniqueConfiguration'] = self::getKalturaUniqueConfig();
 
-        if ($useKalturaPlayer) {
-            $typeData->videoPlayer = 'kaltura';
-        }
+        $typeData->videoPlayer = $useKalturaPlayer ? 'kaltura' : 'regular';
 
         $node->save();
 
