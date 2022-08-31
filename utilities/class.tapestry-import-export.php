@@ -205,7 +205,9 @@ class TapestryImportExport
             }
         }
 
-        self::_exportMedia($tapestry_data->settings->backgroundUrl, $zip, $export_warnings['settings']);
+        if ($tapestry_data->settings) {
+            self::_exportMedia($tapestry_data->settings->backgroundUrl, $zip, $export_warnings['settings']);            
+        }
 
         $tapestry_data->warnings = !empty($export_warnings['nodes']) || !empty($export_warnings['settings']);
 
@@ -524,7 +526,9 @@ class TapestryImportExport
             }
         }
 
-        self::_importMedia($tapestry_data->settings->backgroundUrl, $temp_dir, $warnings['settings'], $imported_media);
+        if ($tapestry_data->settings) {
+            self::_importMedia($tapestry_data->settings->backgroundUrl, $temp_dir, $warnings['settings'], $imported_media);
+        }
 
         return [
             'warnings' => $warnings,
