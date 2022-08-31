@@ -391,7 +391,7 @@ class TapestryNode implements ITapestryNode
         return $nodeMeta->author->id == $userId;
     }
 
-    public function addComment($comment, $replyingTo)
+    public function addComment($content, $replyingTo)
     {
         $currentUser = wp_get_current_user();
         $commentData = [
@@ -400,7 +400,7 @@ class TapestryNode implements ITapestryNode
             'comment_author_url' => $currentUser->user_url,
             'user_id' => $currentUser->ID,
             'comment_post_ID' => $this->nodePostId,
-            'comment_content' => $comment,
+            'comment_content' => $content,
         ];
 
         if (isset($replyingTo) && is_numeric($replyingTo)) {
