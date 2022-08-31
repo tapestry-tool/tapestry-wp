@@ -318,6 +318,19 @@ class TapestryHelpers
     }
 
     /**
+     * Return the name of the Kaltura category a video should be sorted under.
+     */
+    public static function getKalturaCategoryName($tapestryPostId) {
+        if (get_option('kaltura_category_structure') === 'tapestry_name') {
+            $tapestry = new Tapestry($tapestryPostId);
+            return $tapestry->getSettings()->title;
+        } else {
+            // Categorize by date by default
+            return date('Y/m/d');
+        }
+    }
+
+    /**
      * Update the Kaltura upload status of a video node.
      *
      * @param TapestryNode      $node           Video node to update
@@ -337,7 +350,7 @@ class TapestryHelpers
     }
 
     /**
-     * Delete a local video after it has been uploaded to Kaltura.
+     * Update video node data and delete the local video after it has been uploaded to Kaltura.
      *
      * @param TapestryNode  $node               Node to update (video or H5P)
      * @param MediaEntry    $kalturaData        Response from Kaltura API
@@ -348,6 +361,7 @@ class TapestryHelpers
     {
         $nodeMeta = $node->getMeta();
         if ($nodeMeta->mediaType === 'video') {
+            $node->set((object) ['mediaFormat' => 'kaltura']);
             $typeData = $node->getTypeData();
             $typeData->mediaURL = $kalturaData->dataUrl.'?.mp4';
             $typeData->kalturaId = $kalturaData->id;
@@ -361,7 +375,7 @@ class TapestryHelpers
             $typeData->kalturaData['uniqueConfiguration'] = KALTURA_UNIQUE_CONFIG;
 
             if ($useKalturaPlayer) {
-                $node->set((object) ['mediaFormat' => 'kaltura']);
+                $typeData->videoPlayer = 'kaltura';
             }
         } elseif ($nodeMeta->mediaType === 'h5p') {
             self::_updateH5PVideoURL($node, $kalturaData->dataUrl);
