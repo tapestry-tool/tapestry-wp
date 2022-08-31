@@ -103,21 +103,62 @@
         still be uploaded to Kaltura, but no more videos will be started. Please be
         patient as processing these videos could take some time.
       </b-alert>
-      <div class="mt-3">Upload Status</div>
+      <div class="mt-3">Upload Log</div>
       <b-form-text>
-        View the status of the latest upload. Automatically refreshes every 15
-        seconds; you can also manually refresh.
+        Automatically refreshes every 15 seconds; you can also manually refresh.
         <br />
         Once the upload has completed, please reload the page to see the updated node
         content.
       </b-form-text>
+      <b-alert
+        class="mt-2"
+        dismissible
+        :show="uploadError && isLatestTapestry"
+        variant="danger"
+        @dismissed="clearUploadError"
+      >
+        <p>
+          The upload did not complete due to an error in the server.
+        </p>
+        <p class="mb-1">
+          If any videos are still Converting, to avoid re-uploading them, we
+          recommend running
+          <b>Clean Uploaded Videos</b>
+          under the WordPress Settings > Tapestry.
+        </p>
+      </b-alert>
+      <div class="my-3 d-flex flex-row align-items-center">
+        <b-form-select v-model="perPage" class="per-page-select mr-2">
+          <b-form-select-option :value="10">10 per page</b-form-select-option>
+          <b-form-select-option :value="25">25 per page</b-form-select-option>
+          <b-form-select-option :value="50">50 per page</b-form-select-option>
+          <b-form-select-option :value="100">100 per page</b-form-select-option>
+          <b-form-select-option :value="0">Show all entries</b-form-select-option>
+        </b-form-select>
+        <b-pagination
+          v-model="currentPage"
+          class="mb-0"
+          aria-controls="upload-log-table"
+          :total-rows="uploadLogLength"
+          :per-page="perPage"
+        ></b-pagination>
+        <b-button size="sm" class="ml-auto" @click="refreshVideoUploadStatus">
+          Refresh
+        </b-button>
+      </div>
       <b-table
+        id="upload-log-table"
         ref="uploadStatusTable"
         class="my-3"
+        responsive
+        striped
         show-empty
         empty-text="No videos were uploaded from this Tapestry."
-        primary-key="nodeID"
         :fields="[
+          {
+            key: 'uploadTime',
+            class: 'align-top',
+          },
           {
             key: 'nodeID',
             class: 'align-top',
@@ -143,29 +184,10 @@
             class: 'align-top',
           },
         ]"
-        :items="getVideoUploadStatus"
+        :items="getUploadLog"
+        :current-page="currentPage"
+        :per-page="perPage"
       ></b-table>
-      <b-alert
-        dismissible
-        :show="uploadError && isLatestTapestry"
-        variant="danger"
-        @dismissed="clearUploadError"
-      >
-        <p>
-          The upload did not complete due to an error in the server.
-        </p>
-        <p class="mb-1">
-          If any videos are still Converting, to avoid re-uploading them, we
-          recommend running
-          <b>Clean Uploaded Videos</b>
-          under the WordPress Settings > Tapestry.
-        </p>
-      </b-alert>
-      <div class="mb-2 text-right">
-        <b-button size="sm" @click="refreshVideoUploadStatus">
-          Refresh
-        </b-button>
-      </div>
     </b-container>
     <template slot="modal-footer">
       <b-button size="sm" variant="secondary" @click="closeModal">
@@ -196,6 +218,9 @@ export default {
       uploadStatusRefreshTimer: 0,
       hasRequestedStop: false,
       latestTapestryID: "",
+      uploadLogLength: 0,
+      currentPage: 1,
+      perPage: 10,
     }
   },
   computed: {
@@ -300,14 +325,12 @@ export default {
 
       return null
     },
-    getVideoUploadStatus(ctx, callback) {
+    getUploadLog(ctx, callback) {
       client
-        .getKalturaUploadStatus()
+        .getKalturaUploadLog(ctx.currentPage, ctx.perPage)
         .then(data => {
           callback(data.videos)
-          this.videosUploading = data.inProgress
-          this.uploadError = data.error
-          this.latestTapestryID = data.latestTapestryID
+          this.uploadLogLength = data.totalCount
         })
         .catch(() => {
           callback([])
@@ -320,6 +343,11 @@ export default {
     },
     refreshVideoUploadStatus() {
       this.$refs.uploadStatusTable.refresh()
+      client.getKalturaUploadStatus().then(data => {
+        this.videosUploading = data.inProgress
+        this.uploadError = data.error
+        this.latestTapestryID = data.latestTapestryID
+      })
     },
     async clearUploadError() {
       this.uploadError = false
@@ -353,5 +381,9 @@ export default {
   border-radius: 0.5em;
   padding: 1em;
   max-width: 500px;
+}
+
+.per-page-select {
+  width: inherit !important;
 }
 </style>

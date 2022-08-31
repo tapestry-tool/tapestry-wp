@@ -4,7 +4,7 @@
     data-qa="other-operations-modal"
     :visible="show"
     size="lg"
-    title="Other Tapestry Operations"
+    title="Other Operations"
     scrollable
     @hidden="$emit('close')"
   >

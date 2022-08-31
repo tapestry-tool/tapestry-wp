@@ -1,28 +1,31 @@
 <template>
-  <b-dropdown
-    id="operations-button"
-    right
-    variant="none"
-    toggle-class="operations-button"
-    :toggle-attrs="{
-      'aria-label': 'Tapestry Operations',
-    }"
-  >
-    <template #button-content>
-      <i class="fas fa-ellipsis-h"></i>
-    </template>
-    <b-dropdown-item-button @click="open(names.EXPORTDUPLICATE)">
-      Export/Duplicate Tapestry
-    </b-dropdown-item-button>
-    <b-dropdown-item-button
-      v-if="showKalturaOption"
-      @click="open(names.KALTURAMODAL)"
+  <div>
+    <b-dropdown
+      id="operations-button"
+      right
+      variant="none"
+      toggle-class="operations-button"
+      :toggle-attrs="{
+        'aria-label': 'Operations',
+      }"
+      menu-class="operations-menu"
     >
-      Kaltura Sync
-    </b-dropdown-item-button>
-    <b-dropdown-item-button @click="open(names.OTHEROPERATIONS)">
-      Other Operations
-    </b-dropdown-item-button>
+      <template #button-content>
+        <i class="fas fa-ellipsis-h"></i>
+      </template>
+      <b-dropdown-item-button @click="open(names.EXPORTDUPLICATE)">
+        Export/Duplicate Tapestry
+      </b-dropdown-item-button>
+      <b-dropdown-item-button
+        v-if="showKalturaOption"
+        @click="open(names.KALTURAMODAL)"
+      >
+        Kaltura Sync
+      </b-dropdown-item-button>
+      <b-dropdown-item-button @click="open(names.OTHEROPERATIONS)">
+        Other Operations
+      </b-dropdown-item-button>
+    </b-dropdown>
     <export-duplicate-modal
       :show="openOperation === names.EXPORTDUPLICATE"
       @close="close(names.EXPORTDUPLICATE)"
@@ -36,7 +39,7 @@
       :show="openOperation === names.OTHEROPERATIONS"
       @close="close(names.OTHEROPERATIONS)"
     ></other-operations-modal>
-  </b-dropdown>
+  </div>
 </template>
 
 <script>
@@ -115,6 +118,13 @@ export default {
 </script>
 
 <style lang="scss">
+.operations-menu {
+  button:active {
+    background: var(--highlight-color);
+    color: #fff !important;
+  }
+}
+
 .operations-button {
   padding: 0.5rem !important; // Override Bootstrap button padding
   background: none;

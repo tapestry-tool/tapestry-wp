@@ -164,7 +164,7 @@ export default {
       }
     },
     validateTapestryJSON(upload) {
-      const properties = ["nodes", "links", "groups", "site-url"]
+      const properties = ["nodes", "links", "settings", "site-url"]
       properties.forEach(property => {
         if (!upload.hasOwnProperty(property)) {
           throw new Error(`Invalid Tapestry JSON: Missing property ${property}`)
