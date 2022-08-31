@@ -219,6 +219,31 @@ function tapestry_kaltura_upload_section_cb()
         <?php
             submit_button('Save Changes', 'primary', 'save-kaltura-upload-settings', false); ?>
     </form>
+    <?php 
+    if (LOAD_KALTURA) {
+        do_clean_uploaded_videos_section();
+    }
+    ?>
+    <h4>Reset Upload Status</h4>
+    <p>
+        Forcefully mark the upload as no longer in progress.
+        This does not cancel any ongoing upload, but will allow you to try the upload again.
+        <br />
+        Please note: This action is dangerous and not recommended in most situations.
+    </p>
+    <p>
+        <button type="button" class="button button-secondary" onclick="forceResetUploadStatus()" id="reset_upload_status">
+            Reset Upload Status
+        </button>
+    </p>
+    <div class="notice" id="tapestry_reset_upload_status_notice" style="display: none">
+      <p></p>
+    </div>
+    <?php
+}
+
+function do_clean_uploaded_videos_section() {
+    ?>
     <h4>Clean Uploaded Videos</h4>
     <div class="postbox tapestry-settings-notice" id="upload_in_progress_notice" style="display: none">
         <p>
@@ -257,21 +282,6 @@ function tapestry_kaltura_upload_section_cb()
         </tr>
         </thead>
     </table>
-    <h4>Reset Upload Status</h4>
-    <p>
-        Forcefully mark the upload as no longer in progress.
-        This does not cancel any ongoing upload, but will allow you to try the upload again.
-        <br />
-        Please note: This action is dangerous and not recommended in most situations.
-    </p>
-    <p>
-        <button type="button" class="button button-secondary" onclick="forceResetUploadStatus()" id="reset_upload_status">
-            Reset Upload Status
-        </button>
-    </p>
-    <div class="notice" id="tapestry_reset_upload_status_notice" style="display: none">
-      <p></p>
-    </div>
     <?php
 }
 
