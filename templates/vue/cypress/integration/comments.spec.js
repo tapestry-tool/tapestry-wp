@@ -5,7 +5,37 @@ describe("Comments", () => {
     cy.fixture("one-node.json").as("oneNode")
   })
 
-  it("should be able to post comments to a node as a logged in user", () => {
+  it("should be able to post comments to a node as admin", () => {
+    cy.setup("@oneNode", roles.ADMIN)
+
+    cy.store()
+      .its("state.nodes")
+      .then(nodes => {
+        const rootId = Object.keys(nodes)[0]
+        cy.getNodeById(rootId).click()
+
+        const comment = "Good job!"
+        cy.openSidebar().within(() => {
+          cy.contains(/add comment/i).click()
+          cy.getByTestId("comment-textarea").type(comment)
+          cy.contains(/post comment/i).click()
+
+          cy.getByTestId("comment-textarea").should("not.exist")
+          cy.contains(comment).should("be.visible")
+        })
+
+        cy.logout().visitTapestry()
+
+        cy.getNodeById(rootId).click()
+
+        cy.openSidebar().within(() => {
+          cy.contains(/add comment/i).should("not.exist")
+          cy.contains(comment).should("be.visible")
+        })
+      })
+  })
+
+  it("should be able to post comments to a node as subscriber", () => {
     cy.setup("@oneNode", roles.SUBSCRIBER)
 
     cy.store()
@@ -24,12 +54,12 @@ describe("Comments", () => {
           cy.contains(comment).should("be.visible")
         })
 
-        cy.logout().visitTapestry()
+        cy.logout()
+        cy.login(roles.ADMIN).visitTapestry()
 
         cy.getNodeById(rootId).click()
 
         cy.openSidebar().within(() => {
-          cy.contains(/add comment/i).should("not.exist")
           cy.contains(comment).should("be.visible")
         })
       })
