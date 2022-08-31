@@ -39,7 +39,7 @@ describe("node modal: content - video", () => {
       target: { value: format },
     })
     expect(screen.queryByText("Video")).toBeInTheDocument()
-    expect(screen.queryByText("Video source")).toBeInTheDocument()
+    expect(screen.queryByText("Video URL")).toBeInTheDocument()
 
     await fireEvent.update(screen.getByTestId(`node-video-${format}-url`), url)
     expect(screen.getByTestId(`node-video-${format}-url`).value).toMatch(url)

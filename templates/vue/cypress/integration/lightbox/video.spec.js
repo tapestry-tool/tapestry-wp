@@ -128,7 +128,7 @@ describe("Video", () => {
         .first() // Choose regular player
         .check({ force: true })
 
-      cy.submitModal()
+      cy.submitModal(15000)
 
       cy.openLightbox(node.id).within(() => {
         // Check that the media URL comes from Kaltura. We just check that the URL includes the Kaltura ID
@@ -140,17 +140,22 @@ describe("Video", () => {
   })
 
   it("should be able to add a video node via Kaltura and use Kaltura player", () => {
+    cy.intercept("**/kaltura/video/captions?**").as("getKalturaVideoData")
     cy.getSelectedNode().then(node => {
       cy.openModal("edit", node.id)
       cy.changeMediaType("video")
       cy.changeMediaFormat("kaltura")
 
+      cy.getByTestId("edit-kaltura-id-button").click()
       cy.getByTestId("node-video-kaltura-id").type(kalturaId)
+      cy.getByTestId("edit-kaltura-id-button").click()
+      cy.wait("@getKalturaVideoData")
+
       cy.get('input[name="node-video-player"]')
         .last() // Switch to Kaltura player
         .check({ force: true })
 
-      cy.submitModal()
+      cy.submitModal(15000)
 
       cy.openLightbox(node.id).within(() => {
         cy.get(`#kaltura-container-${node.id} > iframe`, { timeout: 10000 }).should(
@@ -161,12 +166,18 @@ describe("Video", () => {
   })
 
   it("adding a kaltura video should also set a thumbnail", () => {
+    cy.intercept("**/kaltura/video/captions?**").as("getKalturaVideoData")
     cy.getSelectedNode().then(node => {
       cy.openModal("edit", node.id)
       cy.changeMediaType("video")
       cy.changeMediaFormat("kaltura")
+
+      cy.getByTestId("edit-kaltura-id-button").click()
       cy.getByTestId("node-video-kaltura-id").type(kalturaId)
-      cy.submitModal() // automatically confirms
+      cy.getByTestId("edit-kaltura-id-button").click()
+      cy.wait("@getKalturaVideoData")
+
+      cy.submitModal(15000) // automatically confirms
 
       cy.getNodeById(node.id).within(() => {
         // Check that the thumbnail URL comes from Kaltura. We just check that the URL includes the Kaltura ID
@@ -187,7 +198,7 @@ describe("Video", () => {
     cy.getSelectedNode().then(node => {
       cy.openModal("edit", node.id)
       cy.changeMediaType("video")
-      cy.getByTestId(`node-video-url`).type(url)
+      cy.getByTestId(`node-video-mp4-url`).type(url)
 
       cy.getByTestId("node-captions-toggle").click({ force: true })
       cy.getByTestId("caption-row").should("have.length", 1)
