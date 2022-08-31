@@ -146,7 +146,8 @@ export default {
         case "h5p":
           return "h5p-video-media"
         case "kaltura":
-          return this.node.typeData.kalturaData?.partnerId &&
+          return this.node.typeData.videoPlayer === "kaltura" &&
+            this.node.typeData.kalturaData?.partnerId &&
             this.node.typeData.kalturaData?.serviceUrl &&
             this.node.typeData.kalturaData?.uniqueConfiguration
             ? "kaltura-video-media"
