@@ -30,6 +30,7 @@
         <tapestry-icon icon="comment-dots" />
       </button>
       <button
+        v-else
         :class="['anchor-button', { active: active === 'comments' }]"
         aria-label="comments"
         @click.stop="scrollToRef('comments')"
@@ -137,8 +138,6 @@ import NodeComments from "./NodeComments"
 
 const PADDING_OFFSET = 48
 
-const tabOrder = ["info", "copyright", "review", "comments"]
-
 export default {
   components: {
     NodeReview,
@@ -159,6 +158,11 @@ export default {
           })
         }
       },
+    },
+    tabOrder() {
+      return this.isReviewParticipant
+        ? ["info", "copyright", "review"]
+        : ["info", "copyright", "comments"]
     },
     closed() {
       return this.active === undefined
@@ -255,9 +259,9 @@ export default {
       }
     },
     nextTab() {
-      const nextTabIndex = tabOrder.indexOf(this.active)
-      if (nextTabIndex >= 0 && nextTabIndex < tabOrder.length - 1) {
-        return tabOrder[nextTabIndex + 1]
+      const nextTabIndex = this.tabOrder.indexOf(this.active)
+      if (nextTabIndex >= 0 && nextTabIndex < this.tabOrder.length - 1) {
+        return this.tabOrder[nextTabIndex + 1]
       }
       return this.active
     },
