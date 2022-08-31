@@ -122,6 +122,10 @@ class TapestryError extends Error
             'MESSAGE' => 'Uploaded file was not found on the server',
             'STATUS' => ['status' => 500],
         ],
+        'FAILED_TO_UPLOAD_CAPTIONS' => [
+            'MESSAGE' => 'An error occurred uploading captions to Kaltura',
+            'STATUS' => ['status' => 500],
+        ],
     ];
 
     /**

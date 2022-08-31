@@ -13,6 +13,7 @@
 
     use Kaltura\Client\ApiException;
     use Kaltura\Client\Client;
+    use Kaltura\Client\ClientException;
     use Kaltura\Client\Configuration;
     use Kaltura\Client\Enum\Language;
     use Kaltura\Client\Enum\MediaType;
@@ -243,22 +244,26 @@
                 return null;
             }
 
-            $kclient = $this->getKClient(SessionType::ADMIN);
+            try {
+                $kclient = $this->getKClient(SessionType::ADMIN);
 
-            $result = $this->setCaptions($kclient, $videoEntryId, $captions, $throwErrors);
-            $updatedCaptions = $result->captions;
+                $result = $this->setCaptions($kclient, $videoEntryId, $captions, $throwErrors);
+                $updatedCaptions = $result->captions;
 
-            if (!empty($defaultCaptionId) && is_string($defaultCaptionId) && isset($updatedCaptions[$defaultCaptionId])) {
-                // Map default caption ID to its (possibly) new ID after being uploaded
-                $newDefaultCaptionId = $updatedCaptions[$defaultCaptionId]->id;
-                $this->setCaptionAsDefault($kclient, $newDefaultCaptionId);
+                if (!empty($defaultCaptionId) && is_string($defaultCaptionId) && isset($updatedCaptions[$defaultCaptionId])) {
+                    // Map default caption ID to its (possibly) new ID after being uploaded
+                    $newDefaultCaptionId = $updatedCaptions[$defaultCaptionId]->id;
+                    $this->setCaptionAsDefault($kclient, $newDefaultCaptionId);
+                }
+
+                return (object) [
+                    'captions' => array_values($updatedCaptions),
+                    'pendingCaptions' => $result->pendingCaptions,
+                    'defaultCaptionId' => $newDefaultCaptionId,
+                ];
+            } catch (ClientException|ApiException $e) {
+                throw new TapestryError('FAILED_TO_UPLOAD_CAPTIONS');
             }
-
-            return (object) [
-                'captions' => array_values($updatedCaptions),
-                'pendingCaptions' => $result->pendingCaptions,
-                'defaultCaptionId' => $newDefaultCaptionId,
-            ];
         }
 
         public function setCaptionAsDefault($kclient, $captionAssetId)
