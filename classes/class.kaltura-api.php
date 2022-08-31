@@ -125,14 +125,6 @@
             return $response;
         }
 
-        public function getVideoUploadStatus($entryId)
-        {
-            $kclient = $this->getKClient();
-            $response = $kclient->media->get($entryId);
-
-            return $response;
-        }
-
         /**
          * Finds the Kaltura video with the given ID if it exists.
          * Returns null if not found.
@@ -142,7 +134,7 @@
             $client = $this->getKClient();
 
             try {
-                $result = $client->media->get($entryId, -1);
+                $result = $client->media->get($entryId);
 
                 return $result;
             } catch (ApiException $e) {

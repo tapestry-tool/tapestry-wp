@@ -90,6 +90,7 @@
                 :file-types="isKaltura ? '.vtt, .srt' : '.vtt'"
                 :placeholder="`Upload a VTT${isKaltura ? ' or SRT' : ''} file`"
                 :is-image="false"
+                :input-test-id="`caption-url-${index}`"
                 :file-upload-id="
                   `caption-file-upload-${isPending ? 'pending' : ''}-${caption.id}`
                 "
