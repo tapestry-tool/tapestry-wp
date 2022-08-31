@@ -1749,12 +1749,12 @@ function uploadVideosToKaltura($request)
 
         try {
             perform_batched_upload_to_kaltura($tapestry_id, $node_ids, $use_kaltura_player);
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             error_log($e->getMessage());
+            update_option(KalturaUpload::UPLOAD_ERROR_OPTION, $e->getMessage());
         } finally {
             update_option(KalturaUpload::IN_PROGRESS_OPTION, KalturaUpload::NO_VALUE);
             update_option(KalturaUpload::STOP_UPLOAD_OPTION, KalturaUpload::NO_VALUE, false);
-            update_option(KalturaUpload::UPLOAD_ERROR_OPTION, '');
         }
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
@@ -1814,7 +1814,7 @@ function perform_batched_upload_to_kaltura($tapestry_id, $node_ids, $use_kaltura
             $kaltura_data = null;
             try {
                 $kaltura_data = $kalturaApi->uploadVideo($video->file, $category);
-            } catch (Error $e) {
+            } catch (Throwable $e) {
                 $error_msg = "Unable to upload video '".$video->file->name."' to Kaltura due to: ".$e->getMessage();
 
                 error_log($error_msg."\nStack trace: \n".$e->getTraceAsString());
