@@ -4,21 +4,22 @@
     data-qa="export-duplicate-modal"
     :visible="show"
     size="lg"
-    title="Export/Duplicate Tapestry"
+    title="Export / Duplicate Tapestry"
     scrollable
+    hide-footer
     @hidden="$emit('close')"
   >
     <b-container fluid class="px-1">
-      <b-form-group
-        label="Export/Duplicate"
-        description="Export your tapestry to a file and then you can import it on another site. Duplicating will create a copy of this tapestry on this site."
-      >
-        <b-row class="mb-2">
-          <b-col>
+      <b-row>
+        <b-col>
+          <b-form-group
+            label="Export"
+            description="Export your tapestry to a file. You can then use that file to import this tapestry on another site."
+          >
             <b-button
               id="export-button"
               block
-              variant="light"
+              variant="primary"
               :class="isExporting ? 'disabled' : ''"
               :disabled="isExporting"
               @click="exportTapestry"
@@ -44,18 +45,18 @@
             >
               {{ apiError.error }}
             </b-alert>
-          </b-col>
-          <b-col>
+          </b-form-group>
+        </b-col>
+        <b-col>
+          <b-form-group
+            label="Duplicate"
+            description="Create a duplicate copy of this tapestry on this site."
+          >
             <duplicate-tapestry-button />
-          </b-col>
-        </b-row>
-      </b-form-group>
+          </b-form-group>
+        </b-col>
+      </b-row>
     </b-container>
-    <template slot="modal-footer">
-      <b-button size="sm" variant="secondary" @click="closeModal">
-        Close
-      </b-button>
-    </template>
   </b-modal>
 </template>
 
