@@ -211,11 +211,7 @@ export default {
           id: Helpers.createUUID(),
         },
       ]
-      this.$nextTick(() => {
-        document
-          .getElementById(`caption-${this.captions.length - 1}-container-toggle`)
-          .focus()
-      })
+      this.focusCaption(this.captions.length - 1)
     },
     removeCaption(index, caption) {
       this.captions.splice(index, 1)
@@ -232,14 +228,21 @@ export default {
         const copy = [...this.captions]
         copy[existingCaptionIndex] = caption
         this.captions = copy
+        this.focusCaption(existingCaptionIndex)
       } else {
         this.captions.push(caption)
+        this.focusCaption(this.captions.length - 1)
       }
 
       this.removePendingCaption(index)
     },
     removePendingCaption(index) {
       this.pendingCaptions.splice(index, 1)
+    },
+    focusCaption(index) {
+      this.$nextTick(() => {
+        document.getElementById(`caption-${index}-container-toggle`).focus()
+      })
     },
   },
 }
