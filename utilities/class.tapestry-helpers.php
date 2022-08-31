@@ -344,7 +344,8 @@ class TapestryHelpers
     /**
      * Return the name of the Kaltura category a video should be sorted under.
      */
-    public static function getKalturaCategoryName($tapestryPostId) {
+    public static function getKalturaCategoryName($tapestryPostId)
+    {
         if (get_option('kaltura_category_structure') === 'tapestry_name') {
             $tapestry = new Tapestry($tapestryPostId);
             return $tapestry->getSettings()->title;
@@ -390,17 +391,15 @@ class TapestryHelpers
             $typeData->mediaURL = $kalturaData->dataUrl.'?.mp4';
             $typeData->kalturaId = $kalturaData->id;
 
-        // Save Kaltura account info so we can still show Kaltura player, even if LOAD_KALTURA is currently false
-        if (!isset($typeData->kalturaData)) {
-            $typeData->kalturaData = [];
-        }
-        $typeData->kalturaData['partnerId'] = self::getKalturaPartnerId();
-        $typeData->kalturaData['serviceUrl'] = self::getKalturaServiceUrl();
-        $typeData->kalturaData['uniqueConfiguration'] = self::getKalturaUniqueConfig();
-
-            if ($useKalturaPlayer) {
-                $typeData->videoPlayer = 'kaltura';
+            // Save Kaltura account info so we can still show Kaltura player, even if LOAD_KALTURA is currently false
+            if (!isset($typeData->kalturaData)) {
+                $typeData->kalturaData = [];
             }
+            $typeData->kalturaData['partnerId'] = self::getKalturaPartnerId();
+            $typeData->kalturaData['serviceUrl'] = self::getKalturaServiceUrl();
+            $typeData->kalturaData['uniqueConfiguration'] = self::getKalturaUniqueConfig();
+
+            $typeData->videoPlayer = $useKalturaPlayer ? 'kaltura' : 'regular';
         } elseif ($nodeMeta->mediaType === 'h5p') {
             self::_updateH5PVideoURL($node, $kalturaData->dataUrl);
         }
@@ -412,7 +411,7 @@ class TapestryHelpers
 
     /**
      * Returns the path to the video in a H5P or Video node.
-     * 
+     *
      * @param TapestryNode $node
      */
     public static function getVideoPath($node)
