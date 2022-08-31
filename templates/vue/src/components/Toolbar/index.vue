@@ -23,7 +23,7 @@
               <settings-modal-button :max-depth="maxDepth"></settings-modal-button>
             </b-col>
             <b-col v-if="canEdit" class="p-0">
-              <tapestry-operations-button />
+              <operations-button />
             </b-col>
           </template>
           <tapestry-depth-slider
@@ -45,7 +45,7 @@ import UserSettingsButton from "./UserSettingsButton"
 import TapestryFilter from "./TapestryFilter"
 import ReviewNotifications from "./ReviewNotifications"
 import HelpButton from "./HelpButton"
-import TapestryOperationsButton from "./TapestryOperationsButton"
+import OperationsButton from "./OperationsButton"
 import * as wp from "@/services/wp"
 
 export default {
@@ -56,7 +56,7 @@ export default {
     ReviewNotifications,
     UserSettingsButton,
     HelpButton,
-    TapestryOperationsButton,
+    OperationsButton,
   },
   data() {
     return {

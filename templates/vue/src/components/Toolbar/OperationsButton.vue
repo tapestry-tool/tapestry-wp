@@ -5,7 +5,7 @@
     variant="none"
     toggle-class="operations-button"
     :toggle-attrs="{
-      'aria-label': 'Tapestry Operations',
+      'aria-label': 'Operations',
     }"
     menu-class="operations-menu"
   >
