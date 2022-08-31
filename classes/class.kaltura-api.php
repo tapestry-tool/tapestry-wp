@@ -262,7 +262,7 @@
                     'defaultCaptionId' => $newDefaultCaptionId,
                 ];
             } catch (ClientException|ApiException $e) {
-                throw new TapestryError('FAILED_TO_UPLOAD_CAPTIONS');
+                throw new TapestryError('KALTURA_ERROR');
             }
         }
 
