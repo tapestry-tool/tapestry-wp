@@ -9,6 +9,15 @@
     @hidden="$emit('close')"
   >
     <b-container fluid class="px-1">
+      <b-alert
+        dismissible
+        class="mt-2 sticky-top"
+        variant="danger"
+        :show="!!apiError"
+        @dismissed="apiError = null"
+      >
+        Error: {{ apiError }}
+      </b-alert>
       <b-overlay :show="videosUploading" variant="white">
         <template #overlay>
           <div v-show="!isLatestTapestry" class="different-tapestry-notice">
@@ -193,6 +202,7 @@
 <script>
 import client from "@/services/TapestryAPI"
 import { data as wpData } from "@/services/wp"
+import ErrorHelper from "@/utils/errorHelper"
 
 export default {
   props: {
@@ -205,6 +215,7 @@ export default {
     return {
       videosUploading: false,
       uploadError: false,
+      apiError: null,
       useKalturaPlayer: false,
       allVideos: [],
       selectedVideos: [],
@@ -292,10 +303,15 @@ export default {
       this.videosUploading = true
       this.latestTapestryID = wpData.postId
 
-      client.startKalturaUpload(
-        this.selectedVideos.map(video => video.nodeID),
-        this.useKalturaPlayer
-      )
+      client
+        .startKalturaUpload(
+          this.selectedVideos.map(video => video.nodeID),
+          this.useKalturaPlayer
+        )
+        .catch(error => {
+          // Kaltura availability changed unexpectedly
+          this.apiError = ErrorHelper.getErrorMessage(error)
+        })
 
       setTimeout(this.refreshVideoUploadStatus, 500)
     },

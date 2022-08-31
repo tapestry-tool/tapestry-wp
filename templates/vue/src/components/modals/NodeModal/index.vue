@@ -1046,11 +1046,17 @@ export default {
         errMsgs.push("Please select a Content Type")
       } else if (this.node.mediaType === "video") {
         if (this.node.mediaFormat === "kaltura") {
-          const validKalturaVideo = await client.checkKalturaVideo(
-            this.node.typeData.kalturaId
-          )
-          if (!validKalturaVideo) {
-            errMsgs.push("Please enter a valid Kaltura video ID")
+          if (wp.getKalturaStatus()) {
+            try {
+              const validKalturaVideo = await client.checkKalturaVideo(
+                this.node.typeData.kalturaId
+              )
+              if (!validKalturaVideo) {
+                errMsgs.push("Please enter a valid Kaltura video ID")
+              }
+            } catch (error) {
+              errMsgs.push("Kaltura is not enabled on the server.")
+            }
           }
         } else {
           if (!this.isValidVideo(this.node.typeData)) {
@@ -1199,7 +1205,14 @@ export default {
         let data
 
         if (this.node.mediaFormat === "kaltura") {
-          data = await client.getKalturaVideoMeta(this.node.typeData.kalturaId)
+          if (wp.getKalturaStatus()) {
+            try {
+              data = await client.getKalturaVideoMeta(this.node.typeData.kalturaId)
+            } catch (error) {
+              this.addApiError(error)
+              return
+            }
+          }
         } else {
           const url = this.node.typeData.mediaURL
           data = (await getLinkMetadata(url)).data

@@ -71,11 +71,7 @@
         id="node-media-format"
         data-qa="node-media-format"
         :value="node.mediaFormat"
-        :options="[
-          { value: 'mp4', text: 'URL' },
-          { value: 'youtube', text: 'YouTube' },
-          { value: 'kaltura', text: 'Kaltura' },
-        ]"
+        :options="mediaFormats"
         @change="handleFormatChange"
       ></b-form-select>
     </b-form-group>
@@ -117,6 +113,7 @@ import VideoForm from "./VideoForm"
 import WpPostForm from "./WpPostForm"
 import AnswerForm from "./AnswerForm"
 import SubItemTable from "./common/SubItemTable"
+import * as wp from "@/services/wp"
 
 export default {
   components: {
@@ -152,6 +149,7 @@ export default {
     return {
       addDesc: false,
       addMenuTitle: false,
+      disableKalturaOption: false,
     }
   },
 
@@ -192,6 +190,16 @@ export default {
           },
         ]
       }
+    },
+    mediaFormats() {
+      if (this.node.mediaType === "video") {
+        return [
+          { value: "mp4", text: "URL" },
+          { value: "youtube", text: "YouTube" },
+          { value: "kaltura", text: "Kaltura", disabled: this.disableKalturaOption },
+        ]
+      }
+      return []
     },
     isUnitChild() {
       return (
@@ -236,6 +244,8 @@ export default {
   },
   created() {
     this.selectUnitChild()
+    this.disableKalturaOption =
+      !wp.getKalturaStatus() && this.node.mediaFormat !== "kaltura"
   },
   methods: {
     ...mapMutations(["setCurrentEditingNodeProperty"]),

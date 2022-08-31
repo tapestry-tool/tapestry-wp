@@ -9,7 +9,7 @@
               placeholder="Select or drop video to upload"
               drop-placeholder="Drop file here..."
               accept="video/mp4"
-              :disabled="isUploading"
+              :disabled="disableFields || isUploading"
               @drop.prevent="uploadToKaltura"
               @change="uploadToKaltura"
             />
@@ -26,13 +26,13 @@
                 name="text-input"
                 placeholder="Enter Kaltura video ID"
                 required
-                :disabled="isUploading"
+                :disabled="disableFields || isUploading"
               />
               <b-input-group-append is-text>
                 <i
                   id="kaltura-info"
                   class="far fa-question-circle"
-                  tabindex="0"
+                  :tabindex="disableFields ? -1 : 0"
                   aria-label="Kaltura ID hint"
                 ></i>
                 <b-tooltip role="tooltip" target="kaltura-info">
@@ -55,7 +55,6 @@
         </b-col>
       </b-row>
     </b-alert>
-
     <b-row>
       <b-col>
         <b-form-group label="Video Player">
@@ -68,6 +67,7 @@
               { text: 'Regular Player', value: 'regular' },
               { text: 'Kaltura Player', value: 'kaltura' },
             ]"
+            :disabled="disableFields"
           ></b-form-radio-group>
         </b-form-group>
       </b-col>
@@ -79,8 +79,16 @@
 import { mapMutations, mapState } from "vuex"
 import client from "@/services/TapestryAPI"
 import ErrorHelper from "@/utils/errorHelper"
+import * as wp from "@/services/wp"
 
 export default {
+  props: {
+    disableFields: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+  },
   data() {
     return {
       isUploading: false,
@@ -98,6 +106,9 @@ export default {
       set(value) {
         this.update("typeData.kalturaId", value)
       },
+    },
+    kalturaAvailable() {
+      return wp.getKalturaStatus()
     },
     videoPlayer: {
       get() {
@@ -121,7 +132,7 @@ export default {
           ? event.dataTransfer.files[0]
           : event.target.files[0]
 
-      if (videoFile) {
+      if (videoFile && this.kalturaAvailable) {
         this.isUploading = true
         this.$root.$emit("node-modal::uploading", true)
 
