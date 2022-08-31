@@ -11,13 +11,28 @@
 // Used to force-refresh assets and run updates
 $TAPESTRY_VERSION_NUMBER = '2.56.0-beta';
 
+// Record whether user has specified site-specific Kaltura configuration variables
 define(
-    'LOAD_KALTURA',
+    'KALTURA_OVERRIDE_CONFIG',
+    !empty(get_option('kaltura_admin_secret')) &&
+    !empty(get_option('kaltura_partner_id')) &&
+    !empty(get_option('kaltura_service_url')) &&
+    !empty(get_option('kaltura_unique_config'))
+);
+
+// Record whether Kaltura configuration variables are defined in wp-config.php
+define(
+    'KALTURA_DEFAULT_CONFIG',
     (defined('KALTURA_ADMIN_SECRET') && !empty(KALTURA_ADMIN_SECRET)) &&
     (defined('KALTURA_PARTNER_ID') && !empty(KALTURA_PARTNER_ID)) &&
     (defined('KALTURA_SERVICE_URL') && !empty(KALTURA_SERVICE_URL)) &&
-    (defined('KALTURA_UNIQUE_CONFIG') && !empty(KALTURA_UNIQUE_CONFIG)) &&
-    file_exists(plugin_dir_path(__FILE__) . 'vendor/autoload.php')
+    (defined('KALTURA_UNIQUE_CONFIG') && !empty(KALTURA_UNIQUE_CONFIG))
+);
+
+define(
+    'LOAD_KALTURA',
+    file_exists(plugin_dir_path(__FILE__) . 'vendor/autoload.php') &&
+    (KALTURA_OVERRIDE_CONFIG || KALTURA_DEFAULT_CONFIG)
 );
 
 error_reporting(E_ERROR | E_PARSE);
@@ -26,6 +41,7 @@ error_reporting(E_ERROR | E_PARSE);
  * Register endpoints and perform other includes
  */
 require_once dirname(__FILE__).'/classes/class.tapestry-analytics.php';
+require_once dirname(__FILE__).'/utilities/class.tapestry-helpers.php';
 require_once dirname(__FILE__).'/endpoints.php';
 require_once dirname(__FILE__).'/settings.php';
 require_once dirname(__FILE__).'/plugin-updates.php';
@@ -155,14 +171,10 @@ function tapestry_enqueue_vue_app()
         global $post;
         global $wp_roles;
 
-        $kaltura_partner_id = null;
-        $kaltura_service_url = null;
-        $kaltura_unique_configuration = null;
-        if (LOAD_KALTURA) {
-            $kaltura_partner_id = KALTURA_PARTNER_ID;
-            $kaltura_service_url = KALTURA_SERVICE_URL;
-            $kaltura_unique_configuration = KALTURA_UNIQUE_CONFIG;
-        }
+        // pass Kaltura account variables to frontend; will be null if LOAD_KALTURA is false
+        $kaltura_partner_id = TapestryHelpers::getKalturaPartnerId();
+        $kaltura_service_url = TapestryHelpers::getKalturaServiceUrl();
+        $kaltura_unique_configuration = TapestryHelpers::getKalturaUniqueConfig();
 
         $currentUser = wp_get_current_user();
         $currentUser->data = (object) [
@@ -198,9 +210,9 @@ function tapestry_enqueue_vue_app()
                 'uploadDirArray' => wp_upload_dir(),
                 'kaltura' => array(
                     'kalturaStatus' => LOAD_KALTURA,
-                    "partnerId" => $kaltura_partner_id,
-                    "serviceUrl" => $kaltura_service_url,
-                    "uniqueConfiguration" => $kaltura_unique_configuration,
+                    'partnerId' => $kaltura_partner_id,
+                    'serviceUrl' => $kaltura_service_url,
+                    'uniqueConfiguration' => $kaltura_unique_configuration,
                 ),
             ]
         );

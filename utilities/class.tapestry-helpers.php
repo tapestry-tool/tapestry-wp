@@ -309,6 +309,30 @@ class TapestryHelpers
     }
 
     /**
+     * Getters for Kaltura configuration variables.
+     * Return null if LOAD_KALTURA is false.
+     */
+    public static function getKalturaAdminSecret()
+    {
+        return KALTURA_OVERRIDE_CONFIG ? get_option('kaltura_admin_secret') : (KALTURA_DEFAULT_CONFIG ? KALTURA_ADMIN_SECRET : null);
+    }
+
+    public static function getKalturaPartnerId()
+    {
+        return KALTURA_OVERRIDE_CONFIG ? get_option('kaltura_partner_id') : (KALTURA_DEFAULT_CONFIG ? KALTURA_PARTNER_ID : null);
+    }
+
+    public static function getKalturaServiceUrl()
+    {
+        return KALTURA_OVERRIDE_CONFIG ? get_option('kaltura_service_url') : (KALTURA_DEFAULT_CONFIG ? KALTURA_SERVICE_URL : null);
+    }
+
+    public static function getKalturaUniqueConfig()
+    {
+        return KALTURA_OVERRIDE_CONFIG ? get_option('kaltura_unique_config') : (KALTURA_DEFAULT_CONFIG ? KALTURA_UNIQUE_CONFIG : null);
+    }
+
+    /**
      * Return the name of the Kaltura category a video should be sorted under.
      */
     public static function getKalturaCategoryName($tapestryPostId) {
@@ -359,9 +383,9 @@ class TapestryHelpers
         if (!isset($typeData->kalturaData)) {
             $typeData->kalturaData = [];
         }
-        $typeData->kalturaData['partnerId'] = KALTURA_PARTNER_ID;
-        $typeData->kalturaData['serviceUrl'] = KALTURA_SERVICE_URL;
-        $typeData->kalturaData['uniqueConfiguration'] = KALTURA_UNIQUE_CONFIG;
+        $typeData->kalturaData['partnerId'] = self::getKalturaPartnerId();
+        $typeData->kalturaData['serviceUrl'] = self::getKalturaServiceUrl();
+        $typeData->kalturaData['uniqueConfiguration'] = self::getKalturaUniqueConfig();
 
         if ($useKalturaPlayer) {
             $typeData->videoPlayer = 'kaltura';
@@ -434,20 +458,27 @@ class TapestryHelpers
     /**
      * Checks if the user has defined a maximum video upload size for Kaltura that is smaller than the WordPress max upload size,
      * and if so, whether a video is too large to be uploaded.
-     * 
+     *
      * Assumes that the input video can be uploaded to Kaltura (check before calling).
-     * 
+     *
      * @param TapestryNode  $node
      * @return boolean  True if the user has defined no maximum video upload size, or it is not smaller than the WordPress max upload size.
      *                  Otherwise, returns true if the video is within the user-defined limit.
      */
     public static function checkVideoFileSize($node)
     {
-        if (!defined('TAPESTRY_KALTURA_UPLOAD_MAX_FILE_SIZE')) {
+        // Overridden value in WordPress settings
+        $max_file_size_setting = get_option('tapestry_kaltura_upload_max_file_size');
+
+        // Value defined in wp-config.php
+        $max_file_size_constant = defined('TAPESTRY_KALTURA_UPLOAD_MAX_FILE_SIZE') ? TAPESTRY_KALTURA_UPLOAD_MAX_FILE_SIZE : null;
+
+        $user_defined_size_string = !empty($max_file_size_setting) ? $max_file_size_setting : $max_file_size_constant;
+        if (empty($user_defined_size_string)) {
             return true;
         }
 
-        $user_defined_max_upload_size = wp_convert_hr_to_bytes(TAPESTRY_KALTURA_UPLOAD_MAX_FILE_SIZE);
+        $user_defined_max_upload_size = wp_convert_hr_to_bytes($user_defined_size_string);
 
         if ($user_defined_max_upload_size >= wp_max_upload_size()) {
             return true;
