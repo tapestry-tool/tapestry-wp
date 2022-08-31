@@ -1259,6 +1259,7 @@ export default {
               data = await client.getKalturaVideoMeta(this.node.typeData.kalturaId)
             } catch (error) {
               this.addApiError(error)
+              return
             }
           }
         } else {

@@ -1631,7 +1631,7 @@ function getQuestionHasAnswers($request)
 
 /**
  * Upload video to Kaltura and return Kaltura ID.
- * 
+ *
  * If nodeMetaId specified, requires permission to edit that node.
  * Otherwise, requires same permissions as adding nodes.
  */
@@ -1645,6 +1645,10 @@ function uploadVideoToKaltura($request)
             throw new TapestryError('INVALID_POST_ID');
         }
 
+        if (!LOAD_KALTURA) {
+            throw new TapestryError('KALTURA_NOT_AVAILABLE');
+        }
+
         if (empty($nodeMetaId)) {
             $tapestry = new Tapestry($tapestryPostId);
             if ($tapestry->isEmpty()) {
@@ -1653,31 +1657,29 @@ function uploadVideoToKaltura($request)
                     throw new TapestryError('ADD_NODE_PERMISSION_DENIED');
                 }
             }
-        } else if (!TapestryHelpers::userIsAllowed('EDIT', $nodeMetaId, $tapestryPostId)) {
+        } elseif (!TapestryHelpers::userIsAllowed('EDIT', $nodeMetaId, $tapestryPostId)) {
             throw new TapestryError('EDIT_NODE_PERMISSION_DENIED');
         }
 
-        if (LOAD_KALTURA) {
-            $file_params = $request->get_file_params();
-            $file_path = $file_params['file']['tmp_name'];
+        $file_params = $request->get_file_params();
+        $file_path = $file_params['file']['tmp_name'];
 
-            $file_obj = (object) [
-                'file_path' => $file_path,
-                'name' => $file_params['file']['name'],
-            ];
+        $file_obj = (object) [
+            'file_path' => $file_path,
+            'name' => $file_params['file']['name'],
+        ];
 
-            $category = TapestryHelpers::getKalturaCategoryName($tapestryPostId);
-            $kaltura_api = new KalturaApi();
-            $response = $kaltura_api->uploadVideo($file_obj, $category);
+        $category = TapestryHelpers::getKalturaCategoryName($tapestryPostId);
+        $kaltura_api = new KalturaApi();
+        $response = $kaltura_api->uploadVideo($file_obj, $category);
 
-            while ($response->status === EntryStatus::PRECONVERT && $response->duration === 0) {
-                // Wait for the video's duration to load (or conversion to error out/complete)
-                sleep(5);
-                $response = $kaltura_api->getVideo($response->id);
-            }
-
-            return $response->id;
+        while ($response->status === EntryStatus::PRECONVERT && $response->duration === 0) {
+            // Wait for the video's duration to load (or conversion to error out/complete)
+            sleep(5);
+            $response = $kaltura_api->getVideo($response->id);
         }
+
+        return $response->id;
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }

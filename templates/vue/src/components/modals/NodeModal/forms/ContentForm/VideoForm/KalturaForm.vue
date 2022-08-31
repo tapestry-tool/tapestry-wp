@@ -9,7 +9,7 @@
               placeholder="Select or drop video to upload"
               drop-placeholder="Drop file here..."
               accept="video/mp4"
-              :disabled="isUploading || isLoadingKalturaData"
+              :disabled="disableFields || isUploading || isLoadingKalturaData"
               @drop.prevent="uploadToKaltura"
               @change="uploadToKaltura"
             />
@@ -30,20 +30,21 @@
                     : 'Click Change to edit'
                 "
                 required
-                :disabled="isUploading || isLoadingKalturaData || !editingKalturaId"
+                :disabled="
+                  disableFields ||
+                    isUploading ||
+                    isLoadingKalturaData ||
+                    !editingKalturaId
+                "
               />
               <b-input-group-append is-text>
                 <i
                   id="kaltura-info"
                   class="far fa-question-circle"
-                  tabindex="0"
+                  :tabindex="disableFields ? -1 : 0"
                   aria-label="Kaltura ID hint"
                 ></i>
-                <b-tooltip
-                  role="tooltip"
-                  target="kaltura-info"
-                  :tabindex="disableFields ? -1 : 0"
-                >
+                <b-tooltip role="tooltip" target="kaltura-info">
                   Video ID can be found in the Kaltura managment console under
                   Content->Entries.
                 </b-tooltip>
@@ -87,6 +88,7 @@
               { text: 'Regular Player', value: 'regular' },
               { text: 'Kaltura Player', value: 'kaltura' },
             ]"
+            :disabled="disableFields"
           ></b-form-radio-group>
         </b-form-group>
       </b-col>
@@ -98,8 +100,16 @@
 import { mapMutations, mapState, mapActions } from "vuex"
 import client from "@/services/TapestryAPI"
 import ErrorHelper from "@/utils/errorHelper"
+import * as wp from "@/services/wp"
 
 export default {
+  props: {
+    disableFields: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+  },
   data() {
     return {
       kalturaId: this.$store.state.currentEditingNode.typeData.kalturaId,
@@ -113,6 +123,9 @@ export default {
     ...mapState({
       nodeId: state => state.currentEditingNode.id,
     }),
+    kalturaAvailable() {
+      return wp.getKalturaStatus()
+    },
     videoPlayer: {
       get() {
         return this.$store.state.currentEditingNode.typeData.videoPlayer ?? "regular"
@@ -150,6 +163,7 @@ export default {
         try {
           const validKalturaVideo =
             skipCheck || (await client.checkKalturaVideo(kalturaId))
+
           if (validKalturaVideo) {
             this.update("typeData.kalturaId", kalturaId)
             await this.getKalturaCaptions(kalturaId)
@@ -178,7 +192,7 @@ export default {
           ? event.dataTransfer.files[0]
           : event.target.files[0]
 
-      if (videoFile) {
+      if (videoFile && this.kalturaAvailable) {
         this.editingKalturaId = false
         this.isUploading = true
         this.$root.$emit("node-modal::uploading", true)
