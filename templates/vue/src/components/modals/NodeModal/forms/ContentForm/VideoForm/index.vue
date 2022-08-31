@@ -34,7 +34,7 @@
                   :key="caption.id"
                   :value="caption"
                   :index="index"
-                  :disabled="disableFields"
+                  :disabled="disableFields || loadingCaptions"
                   :is-kaltura="useKalturaPlayer"
                   :is-removable="captions.length >= 2"
                   :is-default="caption.id === defaultCaptionId"
@@ -46,7 +46,7 @@
                 <b-button
                   class="mt-3"
                   data-qa="add-caption-button"
-                  :disabled="disableFields"
+                  :disabled="disableFields || loadingCaptions"
                   @click="addCaption"
                 >
                   <i class="fas fa-plus icon"></i>
