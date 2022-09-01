@@ -1852,7 +1852,8 @@ function perform_batched_upload_to_kaltura($tapestry_id, $node_ids, $use_kaltura
 
                     $failed_captions = TapestryHelpers::uploadVideoCaptions($node, $kalturaApi, $response);
                     if ($failed_captions > 0) {
-                        $video->additionalInfo = $failed_captions . ' captions could not be uploaded. Please edit the node to check them.';
+                        $plural = $failed_captions !== 1 ? 's' : '';
+                        $video->additionalInfo = $failed_captions . ' caption' . $plural . ' failed to upload. Please edit the node to check.';
                         save_video_upload_status($video, $videos_to_upload, UploadStatus::COMPLETE, null, false);
                     }
                 } elseif ($response->status === EntryStatus::ERROR_CONVERTING) {
@@ -2315,6 +2316,10 @@ function updateKalturaVideoCaptions($request)
         $body = json_decode($request->get_body());
         $captions = $body->captions;
         $default_caption_id = $body->defaultCaptionId;
+
+        if (!isset($captions) || !is_array($captions)) {
+            return null;
+        }
 
         try {
             $kaltura_api = new KalturaApi();

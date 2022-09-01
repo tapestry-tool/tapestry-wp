@@ -392,25 +392,29 @@ class TapestryHelpers
         $node->save();
 
         wp_delete_file($videoPath);
-
     }
 
     public static function uploadVideoCaptions($node, $kalturaApi, $kalturaData)
     {
         $typeData = $node->getTypeData();
-        $captionData = $kalturaApi->setCaptionsAndDefaultCaption($kalturaData->id, $typeData->captions, $typeData->defaultCaptionId, false);
-
-        if ($captionData) {
-            $typeData->captions = $captionData->captions;
-            $typeData->pendingCaptions = $captionData->pendingCaptions;
-            $typeData->defaultCaptionId = $captionData->defaultCaptionId;
-    
-            $node->save();
-    
-            return count($captionData->pendingCaptions);    
+        $captions = $typeData->captions;
+        if (!isset($captions) || !is_array($captions)) {
+            return 0;
         }
 
-        return 0;
+        try {
+            $captionData = $kalturaApi->setCaptionsAndDefaultCaption($kalturaData->id, $captions, $typeData->defaultCaptionId, false);            
+
+            $typeData->captions = $captionData->captions;
+            $typeData->pendingCaptions = $captionData->pendingCaptions;
+            $typeData->defaultCaptionId = $captionData->defaultCaptionId;    
+        } catch (TapestryError $e) {
+            $typeData->pendingCaptions = $captions;
+        }
+
+        $node->save();
+
+        return count($typeData->pendingCaptions);
     }
 
     /**

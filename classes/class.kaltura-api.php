@@ -238,16 +238,12 @@
             return $caption;
         }
 
-        public function setCaptionsAndDefaultCaption($videoEntryId, $captions, $defaultCaptionId, $throwErrors = false)
+        public function setCaptionsAndDefaultCaption($videoEntryId, $captions, $defaultCaptionId, $throwUploadErrors = false)
         {
-            if (!isset($captions) || !is_array($captions)) {
-                return null;
-            }
-
             try {
                 $kclient = $this->getKClient(SessionType::ADMIN);
 
-                $result = $this->setCaptions($kclient, $videoEntryId, $captions, $throwErrors);
+                $result = $this->setCaptions($kclient, $videoEntryId, $captions, $throwUploadErrors);
                 $updatedCaptions = $result->captions;
 
                 if (!empty($defaultCaptionId) && is_string($defaultCaptionId) && isset($updatedCaptions[$defaultCaptionId])) {
