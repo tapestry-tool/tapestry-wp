@@ -114,7 +114,6 @@ export default {
 
   &:focus {
     background: none;
-    color: #999 !important;
     outline: none;
     box-shadow: none !important; // Remove Bootstrap focus outline
   }

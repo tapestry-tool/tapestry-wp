@@ -2,8 +2,8 @@
   <div>
     <b-button
       block
-      variant="light"
       data-qa="duplicate-tapestry-button"
+      variant="primary"
       @click="duplicateTapestry"
     >
       <b-spinner v-if="loading" small data-qa="spinner"></b-spinner>
