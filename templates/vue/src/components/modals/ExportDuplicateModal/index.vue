@@ -4,101 +4,102 @@
     data-qa="export-duplicate-modal"
     :visible="show"
     size="lg"
-    title="Export/Duplicate Tapestry"
+    title="Export / Duplicate Tapestry"
     scrollable
+    hide-footer
     @hidden="$emit('close')"
   >
     <b-container fluid class="px-1">
-      <b-form-group label="Export Tapestry">
-        <template #description>
-          <strong>Note:</strong>
-          WordPress post nodes in your tapestry must be exported separately. To
-          export, export all WordPress posts as well as the tapestry. To import,
-          first import the WordPress posts by going to Tools -> Import in the
-          WordPress dashboard, then import the tapestry.
-        </template>
-        <b-form-checkbox v-model="shouldExportComments" class="pb-1" switch>
-          {{
-            shouldExportComments
-              ? "Export comments on nodes"
-              : "Don't export comments"
-          }}
-        </b-form-checkbox>
-        <b-dropdown
-          block
-          split
-          variant="light"
-          menu-class="w-100"
-          data-qa="export-tapestry-button"
-          :toggle-attrs="{
-            'data-qa': 'export-type-toggle',
-          }"
-          :split-class="{
-            'export-button': true,
-            disabled: isExporting,
-          }"
-          :disabled="isExporting"
-          @click="exportTapestry"
-        >
-          <template #button-content>
-            <b-spinner v-if="isExporting" small></b-spinner>
-            <div :style="isExporting ? 'opacity: 50%;' : ''">
-              Export Tapestry
-            </div>
-          </template>
-          <b-dropdown-item-button @click="exportTapestry">
-            Export as JSON
-          </b-dropdown-item-button>
-          <b-dropdown-item-button @click="exportTapestryAsZip">
-            Export as ZIP (include uploaded media)
-          </b-dropdown-item-button>
-        </b-dropdown>
-        <b-alert
-          v-if="apiError == null"
-          :show="hasExported"
-          :variant="exportWarnings ? 'warning' : 'success'"
-          style="margin-top: 1em;"
-        >
-          <div v-if="!exportWarnings">
-            Your content has been exported! Find the
-            {{ exportedFileType }} file in your downloads.
-          </div>
-          <export-warnings
-            v-else
-            :warnings="exportWarnings"
-            action="export"
-          ></export-warnings>
-          <div v-if="hasExportedWpPosts">
-            The WordPress posts in this Tapestry have also been exported. Find the
-            .xml file in your downloads.
-          </div>
-        </b-alert>
-        <b-alert
-          v-else
-          :show="hasExported"
-          variant="danger"
-          style="margin-top: 1em;"
-        >
-          {{ apiError.error }}
-        </b-alert>
-        <b-form-text class="my-2">
-          Export the contents of your tapestry to a file, which you can then import
-          on another site.
-        </b-form-text>
-      </b-form-group>
-      <b-form-group
-        class="mt-4"
-        label="Duplicate Tapestry"
-        description="Duplicating will create a copy of this tapestry on this site."
-      >
-        <duplicate-tapestry-button />
-      </b-form-group>
+      <b-row>
+        <b-col>
+          <b-form-group label="Export">
+            <template #description>
+              <strong>Note:</strong>
+              WordPress post nodes in your tapestry must be exported separately. To
+              export, export all WordPress posts as well as the tapestry. To import,
+              first import the WordPress posts by going to Tools -> Import in the
+              WordPress dashboard, then import the tapestry.
+            </template>
+            <b-form-checkbox v-model="shouldExportComments" class="pb-1" switch>
+              {{
+                shouldExportComments
+                  ? "Export comments on nodes"
+                  : "Don't export comments"
+              }}
+            </b-form-checkbox>
+            <b-dropdown
+              block
+              split
+              variant="primary"
+              menu-class="w-100"
+              data-qa="export-tapestry-button"
+              :toggle-attrs="{
+                'data-qa': 'export-type-toggle',
+              }"
+              :split-class="{
+                'export-button': true,
+                disabled: isExporting,
+              }"
+              :disabled="isExporting"
+              @click="exportTapestry"
+            >
+              <template #button-content>
+                <b-spinner v-if="isExporting" small></b-spinner>
+                <div :style="isExporting ? 'opacity: 50%;' : ''">
+                  Export Tapestry
+                </div>
+              </template>
+              <b-dropdown-item-button @click="exportTapestry">
+                Export as JSON
+              </b-dropdown-item-button>
+              <b-dropdown-item-button @click="exportTapestryAsZip">
+                Export as ZIP (include uploaded media)
+              </b-dropdown-item-button>
+            </b-dropdown>
+            <b-alert
+              v-if="apiError == null"
+              :show="hasExported"
+              :variant="exportWarnings ? 'warning' : 'success'"
+              style="margin-top: 1em;"
+            >
+              <div v-if="!exportWarnings">
+                Your content has been exported! Find the
+                {{ exportedFileType }} file in your downloads.
+              </div>
+              <export-warnings
+                v-else
+                :warnings="exportWarnings"
+                action="export"
+              ></export-warnings>
+              <div v-if="hasExportedWpPosts">
+                The WordPress posts in this Tapestry have also been exported. Find
+                the .xml file in your downloads.
+              </div>
+            </b-alert>
+            <b-alert
+              v-else
+              :show="hasExported"
+              variant="danger"
+              style="margin-top: 1em;"
+            >
+              {{ apiError.error }}
+            </b-alert>
+            <b-form-text class="my-2">
+              Export your tapestry to a file. You can then use that file to import
+              this tapestry on another site.
+            </b-form-text>
+          </b-form-group>
+        </b-col>
+        <b-col>
+          <b-form-group
+            label="Duplicate"
+            description="Create a duplicate copy of this tapestry on this site."
+          >
+            <duplicate-tapestry-button />
+          </b-form-group>
+        </b-col>
+      </b-row>
     </b-container>
-    <template slot="modal-footer">
-      <b-button size="sm" variant="secondary" @click="closeModal">
-        Close
-      </b-button>
-    </template>
   </b-modal>
 </template>
 

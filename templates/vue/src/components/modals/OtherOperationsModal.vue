@@ -4,38 +4,38 @@
     data-qa="other-operations-modal"
     :visible="show"
     size="lg"
-    title="Other Tapestry Operations"
+    title="Other Operations"
     scrollable
+    hide-footer
     @hidden="$emit('close')"
   >
     <b-container fluid class="px-1">
       <b-form-group
         label="Thumbnail optimization"
-        description="This will convert all existing thumbnails into optimized thumbnails"
+        description="This will convert all existing thumbnails into optimized thumbnails to improve loading speed"
       >
-        <b-button
-          id="optimize-thumbnails-button"
-          block
-          variant="light"
-          :class="isOptimizing ? 'disabled' : ''"
-          :disabled="isOptimizing"
-          @click="optimizeThumbnails"
-        >
-          <b-spinner v-if="isOptimizing" small></b-spinner>
-          <div :style="isOptimizing ? 'opacity: 50%;' : ''">
-            Optimize All Thumbnails
-          </div>
-        </b-button>
+        <b-row>
+          <b-col lg="6">
+            <b-button
+              id="optimize-thumbnails-button"
+              block
+              variant="primary"
+              :class="isOptimizing ? 'disabled' : ''"
+              :disabled="isOptimizing"
+              @click="optimizeThumbnails"
+            >
+              <b-spinner v-if="isOptimizing" small></b-spinner>
+              <div :style="isOptimizing ? 'opacity: 50%;' : ''">
+                Optimize All Thumbnails
+              </div>
+            </b-button>
+          </b-col>
+        </b-row>
       </b-form-group>
       <b-alert :show="hasOptimized" variant="success" style="margin-top: 1em;">
         Thumbnails have been successfully optimized!
       </b-alert>
     </b-container>
-    <template slot="modal-footer">
-      <b-button size="sm" variant="secondary" @click="closeModal">
-        Close
-      </b-button>
-    </template>
   </b-modal>
 </template>
 
