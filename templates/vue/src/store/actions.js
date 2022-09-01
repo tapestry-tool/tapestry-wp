@@ -250,17 +250,17 @@ export async function getNodeHasDraftChildren({ dispatch }, id) {
   }
 }
 
-export async function getTapestryExport({ dispatch }) {
+export async function getTapestryExport({ dispatch }, shouldExportComments) {
   try {
-    return await client.getTapestryExport()
+    return await client.getTapestryExport(shouldExportComments)
   } catch (error) {
     dispatch("addApiError", error)
   }
 }
 
-export async function getTapestryExportAsZip({ dispatch }) {
+export async function getTapestryExportAsZip({ dispatch }, shouldExportComments) {
   try {
-    return await client.getTapestryExportAsZip()
+    return await client.getTapestryExportAsZip(shouldExportComments)
   } catch (error) {
     dispatch("addApiError", error)
   }

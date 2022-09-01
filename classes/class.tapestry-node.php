@@ -391,6 +391,57 @@ class TapestryNode implements ITapestryNode
         return $nodeMeta->author->id == $userId;
     }
 
+    /**
+     * Import comments into this node as Wordpress comments.
+     *
+     * @param array $comments The list of comments to import
+     */
+    public function importComments($comments)
+    {
+        $idMap = new stdClass();
+
+        error_log('======= IMPORT COMMENTS =======');
+        error_log(print_r($comments, true));
+
+        // add oldest comment first, to guarantee the "parent" field points to a valid comment
+        for (end($comments); null !== key($comments); prev($comments)) {
+            $comment = current($comments);
+            if (!isset($comment->timestamp) || !is_numeric($comment->timestamp) || isset($comment->content) || 0 === strlen($comment->content)) {
+                continue;
+            }
+
+            $author = get_user_by('id', $comment->authorId);
+            $datetime = new DateTime('now', wp_timezone());
+            $datetime->setTimestamp((int) $comment->timestamp);
+
+            $commentData = [
+                'comment_date' => $datetime->format('Y-m-d H:i:s'),
+                'comment_author' => $comment->author ? $comment->author : 'Anonymous',
+                'user_id' => 0,
+                'comment_post_ID' => $this->nodePostId,
+                'comment_content' => $content,
+            ];
+            if ($author && $author->user_nicename === $comment->author) {
+                $commentData['user_id'] = $author->ID;
+                $commentData['comment_author_email'] = $author->user_email;
+                $commentData['comment_author_url'] = $author->user_url;
+            }
+            if ($comment->parent && is_numeric($comment->parent) && isset($idMap->{$comment->parent})) {
+                $commentData['comment_parent'] = $idMap->{$comment->parent};
+            }
+
+            $newId = wp_new_comment($commentData, true);
+            if (false === $commentId || is_wp_error($commentId)) {
+                error_log('failed: '.print_r($commentData, true));
+                continue;
+            }
+
+            $idMap->{$comment->id} = $newId;
+        }
+
+        $this->comments = $this->_getComments();
+    }
+
     public function addComment($content, $replyingTo)
     {
         $currentUser = wp_get_current_user();
@@ -750,6 +801,7 @@ class TapestryNode implements ITapestryNode
 
         foreach ($comments as $comment) {
             if ('1' === $comment->comment_approved || (int) $comment->user_id === $user->getID() || $user->canEdit($this->tapestryPostId)) {
+                error_log($comment->comment_date);
                 $datetime = new DateTime($comment->comment_date, wp_timezone());
 
                 $renderedComments[] = (object) [

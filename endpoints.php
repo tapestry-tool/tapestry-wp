@@ -376,6 +376,8 @@ foreach ($REST_API_ENDPOINTS as $ENDPOINT) {
 function exportTapestry($request)
 {
     $postId = $request['tapestryPostId'];
+    $exportComments = isset($request['exportComments']) && $request['exportComments'] === '1';
+
     try {
         if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
             throw new TapestryError('INVALID_POST_ID');
@@ -384,7 +386,7 @@ function exportTapestry($request)
         $export_id = TapestryImportExport::getExportId();
 
         $tapestry = new Tapestry($postId);
-        $tapestry_data = $tapestry->export();
+        $tapestry_data = $tapestry->export($exportComments);
 
         // If the Tapestry contains WordPress posts, separately export them too
         $wp_posts = TapestryImportExport::exportWpPostsInTapestry($tapestry_data, $export_id);
@@ -413,6 +415,7 @@ function exportTapestry($request)
 function exportTapestryAsZip($request)
 {
     $postId = $request['tapestryPostId'];
+    $exportComments = isset($request['exportComments']) && $request['exportComments'] === '1';
 
     try {
         if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
@@ -424,7 +427,7 @@ function exportTapestryAsZip($request)
 
         // Export Tapestry to an object
         $tapestry = new Tapestry($postId);
-        $tapestry_data = $tapestry->export();
+        $tapestry_data = $tapestry->export($exportComments);
 
         // If the Tapestry contains WordPress posts, separately export them too
         $wp_posts = TapestryImportExport::exportWpPostsInTapestry($tapestry_data, $export_id);
@@ -678,6 +681,11 @@ function importTapestry($postId, $tapestryData)
             }
 
             $tapestryNode->set($node);
+
+            if (isset($node->comments)) {
+                $tapestryNode->importComments($node->comments);
+            }
+
             $tapestryNode->save();
         }
 

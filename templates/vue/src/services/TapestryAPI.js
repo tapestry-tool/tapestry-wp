@@ -64,14 +64,18 @@ class TapestryApi {
     return response.data
   }
 
-  async getTapestryExport() {
-    const url = `/tapestries/${this.postId}/export`
+  async getTapestryExport(shouldExportComments) {
+    const url = `/tapestries/${this.postId}/export?exportComments=${
+      shouldExportComments ? 1 : 0
+    }`
     const response = await this.client.get(url)
     return response.data
   }
 
-  async getTapestryExportAsZip() {
-    const url = `/tapestries/${this.postId}/export_zip`
+  async getTapestryExportAsZip(shouldExportComments) {
+    const url = `/tapestries/${this.postId}/export_zip?exportComments=${
+      shouldExportComments ? 1 : 0
+    }`
     const response = await this.client.get(url)
     return response.data
   }
