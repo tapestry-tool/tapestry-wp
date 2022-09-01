@@ -16,6 +16,8 @@ export const names = {
   USERSETTINGS: "userSettings",
   HELP: "help",
   EMBED: "embed",
+  EXPORTDUPLICATE: "exportDuplicate",
+  OTHEROPERATIONS: "otherOperations",
 }
 
 const ROOT_PATH = `/nodes/:nodeId(\\d+)`
@@ -75,6 +77,14 @@ export default [
       {
         path: `embed`,
         name: names.EMBED,
+      },
+      {
+        path: `export-duplicate`,
+        name: names.EXPORTDUPLICATE,
+      },
+      {
+        path: `other-operations`,
+        name: names.OTHEROPERATIONS,
       },
     ],
   },

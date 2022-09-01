@@ -2,7 +2,7 @@
   "name": "tapestry-d3-vue",
   "description": "A Vue.js project",
   "version": "1.0.0",
-  "author": "Tapestry Team, University of British Coloumbia",
+  "author": "Tapestry Team, University of British Columbia",
   "license": "MIT",
   "private": true,
   "scripts": {
@@ -33,7 +33,7 @@
     "dragselect": "^1.13.1",
     "leaflet": "^1.7.1",
     "match-sorter": "^5.0.0",
-    "moment": "^2.25.3",
+    "moment": "^2.29.4",
     "moment-timezone": "^0.5.28",
     "sass": "^1.51.0",
     "tinycolor2": "^1.4.2",

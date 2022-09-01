@@ -24,3 +24,6 @@ wp rewrite structure '/%postname%/'
 
 # Activate theme for Tapestry
 wp theme install twentynineteen --activate
+
+# Set TAPESTRY_USE_DEV_MODE to true
+wp config set TAPESTRY_USE_DEV_MODE true --raw
