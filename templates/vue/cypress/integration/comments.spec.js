@@ -5,7 +5,7 @@ describe("Comments", () => {
     cy.fixture("one-node.json").as("oneNode")
   })
 
-  it("should be able to post comments to a node as admin", () => {
+  it("should be able to add and delete comments to a node as admin", () => {
     cy.setup("@oneNode", roles.ADMIN)
 
     cy.store()
@@ -14,14 +14,26 @@ describe("Comments", () => {
         const rootId = Object.keys(nodes)[0]
         cy.getNodeById(rootId).click()
 
-        const comment = "Good job!"
+        const first = "Good job!"
+        const second = "Please keep doing this!"
         cy.openSidebar().within(() => {
           cy.contains(/add comment/i).click()
-          cy.getByTestId("comment-textarea").type(comment)
+          cy.getByTestId("comment-textarea").type(first)
           cy.contains(/post comment/i).click()
 
           cy.getByTestId("comment-textarea").should("not.exist")
-          cy.contains(comment).should("be.visible")
+          cy.contains(first).should("be.visible")
+
+          cy.contains(/add comment/i).click()
+          cy.getByTestId("comment-textarea").type(second)
+          cy.contains(/post comment/i).click()
+
+          cy.getByTestId("comment-textarea").should("not.exist")
+          cy.contains(second).should("be.visible")
+
+          // delete the first comment
+          clickCommentAction(first, /trash/i)
+          cy.contains(first).should("not.exist")
         })
 
         cy.logout().visitTapestry()
@@ -29,13 +41,20 @@ describe("Comments", () => {
         cy.getNodeById(rootId).click()
 
         cy.openSidebar().within(() => {
+          cy.contains(first).should("not.exist")
+          cy.contains(second).should("be.visible")
+
+          // check that logged out users cannot add or perform actions to a comment
           cy.contains(/add comment/i).should("not.exist")
-          cy.contains(comment).should("be.visible")
+          cy.contains(second)
+            .parent(".comment")
+            .find(".comment-action-btn")
+            .should("not.exist")
         })
       })
   })
 
-  it("should be able to post comments to a node as subscriber", () => {
+  it("should be able to add and delete comments to a node as subscriber", () => {
     cy.setup("@oneNode", roles.SUBSCRIBER)
 
     cy.store()
@@ -52,20 +71,57 @@ describe("Comments", () => {
 
           cy.getByTestId("comment-textarea").should("not.exist")
           cy.contains(comment).should("be.visible")
+
+          clickCommentAction(comment, /trash/i)
+          cy.contains(comment).should("not.exist")
+        })
+      })
+  })
+
+  it("should be able to approve and unapprove a comment as admin", () => {
+    cy.setup("@oneNode", roles.ADMIN)
+
+    cy.store()
+      .its("state.nodes")
+      .then(nodes => {
+        const rootId = Object.keys(nodes)[0]
+        cy.getNodeById(rootId).click()
+
+        const comment = "A pending comment."
+        cy.openSidebar().within(() => {
+          cy.contains(/add comment/i).click()
+          cy.getByTestId("comment-textarea").type(comment)
+          cy.contains(/post comment/i).click()
+
+          cy.getByTestId("comment-textarea").should("not.exist")
+          cy.contains(comment).should("be.visible")
+          cy.contains(/held for moderation/i).should("not.exist")
+
+          clickCommentAction(comment, /unapprove/i)
+
+          cy.contains(comment).should("be.visible")
+          cy.contains(/held for moderation/i).should("be.visible")
+        })
+
+        cy.logout().visitTapestry()
+
+        cy.getNodeById(rootId).click()
+        cy.openSidebar().within(() => {
+          cy.contains(comment).should("not.exist")
         })
 
         cy.logout()
         cy.login(roles.ADMIN).visitTapestry()
 
-        cy.getNodeById(rootId).click()
-
         cy.openSidebar().within(() => {
+          clickCommentAction(comment, /approve/i)
           cy.contains(comment).should("be.visible")
+          cy.contains(/held for moderation/i).should("not.exist")
         })
       })
   })
 
-  it("should not see the Comments section for a draft node", () => {
+  it("should not be able to see the Comments section for a draft node", () => {
     cy.setup("@oneNode", roles.SUBSCRIBER)
     const node = {
       title: "For Review",
@@ -94,7 +150,9 @@ describe("Comments", () => {
       cy.getNodeById(node.id).click()
       cy.openSidebar().within(() => {
         cy.contains(/comments/i).should("not.exist")
+
         cy.contains(/accept/i).click()
+
         cy.contains(/accept/i).should("be.hidden")
         cy.contains(/accepted/i).should("be.visible")
         cy.getByTestId("review-comment-textarea").should("not.exist")
@@ -104,3 +162,12 @@ describe("Comments", () => {
     })
   })
 })
+
+function clickCommentAction(comment, action) {
+  cy.contains(comment)
+    .parent(".comment")
+    .within(() => {
+      cy.get(".comment-action-btn").click({ force: true })
+      cy.contains(action).click()
+    })
+}
