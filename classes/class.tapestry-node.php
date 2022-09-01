@@ -794,6 +794,7 @@ class TapestryNode implements ITapestryNode
     private function _getComments()
     {
         $user = new TapestryUser();
+        $userId = $user->getID();
         $comments = get_comments([
             'post_id' => $this->nodePostId,
             'orderby' => 'comment_date',
@@ -802,7 +803,7 @@ class TapestryNode implements ITapestryNode
         $renderedComments = [];
 
         foreach ($comments as $comment) {
-            if ('1' === $comment->comment_approved || (int) $comment->user_id === $user->getID() || $user->canEdit($this->tapestryPostId)) {
+            if ('1' === $comment->comment_approved || (0 !== $userId && ((int) $comment->user_id === $userId || $user->canEdit($this->tapestryPostId)))) {
                 $datetime = new DateTime($comment->comment_date, wp_timezone());
 
                 $renderedComments[] = (object) [

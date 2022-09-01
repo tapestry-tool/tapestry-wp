@@ -19,79 +19,82 @@
       <p>
         {{ comment.content }}
       </p>
-      <div v-if="showAllActions || (isAuthor && comment.approved)">
-        <b-dropdown
-          size="sm"
-          variant="link"
-          no-caret
-          toggle-class="comment-action-btn"
-          aria-label="Comment actions"
-        >
-          <template #button-content>
-            <i class="fas fa-ellipsis-v"></i>
-          </template>
-          <b-dropdown-item-button @click="$emit('set-reply', comment)">
-            Reply
-          </b-dropdown-item-button>
-          <template v-if="showAllActions">
-            <b-dropdown-item-button
-              v-if="comment.approved"
-              class="unapprove-action"
-              @click="$emit('action', comment, 'unapprove')"
-            >
-              Unapprove
+      <template v-if="isLoggedIn">
+        <div v-if="showAllActions || (isAuthor && comment.approved)">
+          <b-dropdown
+            size="sm"
+            variant="link"
+            no-caret
+            toggle-class="comment-action-btn"
+            aria-label="Comment actions"
+          >
+            <template #button-content>
+              <i class="fas fa-ellipsis-v"></i>
+            </template>
+            <b-dropdown-item-button @click="$emit('set-reply', comment)">
+              Reply
             </b-dropdown-item-button>
-            <b-dropdown-item-button
-              v-else
-              variant="success"
-              @click="$emit('action', comment, 'approve')"
-            >
-              Approve
-            </b-dropdown-item-button>
+            <template v-if="showAllActions">
+              <b-dropdown-item-button
+                v-if="comment.approved"
+                class="unapprove-action"
+                @click="$emit('action', comment, 'unapprove')"
+              >
+                Unapprove
+              </b-dropdown-item-button>
+              <b-dropdown-item-button
+                v-else
+                variant="success"
+                @click="$emit('action', comment, 'approve')"
+              >
+                Approve
+              </b-dropdown-item-button>
+              <b-dropdown-item-button
+                variant="danger"
+                @click="$emit('action', comment, 'spam')"
+              >
+                Spam
+              </b-dropdown-item-button>
+            </template>
             <b-dropdown-item-button
               variant="danger"
-              @click="$emit('action', comment, 'spam')"
+              @click="$emit('action', comment, 'trash')"
             >
-              Spam
+              Trash
             </b-dropdown-item-button>
-          </template>
-          <b-dropdown-item-button
-            variant="danger"
+          </b-dropdown>
+        </div>
+        <div v-else-if="isAuthor">
+          <b-button
+            size="sm"
+            variant="link"
+            class="comment-action-btn"
+            aria-label="Remove this comment"
+            title="Trash"
             @click="$emit('action', comment, 'trash')"
           >
-            Trash
-          </b-dropdown-item-button>
-        </b-dropdown>
-      </div>
-      <div v-else-if="isAuthor">
-        <b-button
-          size="sm"
-          variant="link"
-          class="comment-action-btn"
-          aria-label="Remove this comment"
-          title="Trash"
-          @click="$emit('action', comment, 'trash')"
-        >
-          <i class="fas fa-trash" aria-hidden="true"></i>
-        </b-button>
-      </div>
-      <div v-else>
-        <b-button
-          size="sm"
-          variant="link"
-          class="comment-action-btn"
-          aria-label="Reply to this comment"
-          title="Reply"
-          @click="$emit('set-reply', comment)"
-        >
-          <i class="fas fa-reply" aria-hidden="true"></i>
-        </b-button>
-      </div>
+            <i class="fas fa-trash" aria-hidden="true"></i>
+          </b-button>
+        </div>
+        <div v-else>
+          <b-button
+            size="sm"
+            variant="link"
+            class="comment-action-btn"
+            aria-label="Reply to this comment"
+            title="Reply"
+            @click="$emit('set-reply', comment)"
+          >
+            <i class="fas fa-reply" aria-hidden="true"></i>
+          </b-button>
+        </div>
+      </template>
     </div>
   </div>
 </template>
 
 <script>
+import * as wp from "@/services/wp"
 import moment from "moment"
 
 export default {
@@ -107,6 +110,11 @@ export default {
     isAuthor: {
       type: Boolean,
       required: true,
+    },
+  },
+  computed: {
+    isLoggedIn() {
+      return wp.isLoggedIn()
     },
   },
   methods: {
