@@ -35,7 +35,8 @@
                   :value="caption"
                   :index="index"
                   :disabled="disableFields || loadingCaptions"
-                  :is-kaltura="useKalturaPlayer"
+                  :is-kaltura="isKaltura"
+                  :allow-srt="allowSrt"
                   :is-removable="captions.length >= 2"
                   :is-default="caption.id === defaultCaptionId"
                   :languages="languages"
@@ -64,7 +65,8 @@
               is-removable
               is-pending
               :disabled="disableFields"
-              :is-kaltura="useKalturaPlayer"
+              :is-kaltura="isKaltura"
+              :allow-srt="allowSrt"
               :languages="languages"
               :error-message="caption.errorMessage"
               @input="pendingCaptions.splice(index, 1, $event)"
@@ -115,8 +117,11 @@ export default {
       videoPlayer: state =>
         state.currentEditingNode.typeData.videoPlayer ?? "regular",
     }),
-    useKalturaPlayer() {
-      return this.mediaFormat === "kaltura" && this.videoPlayer === "kaltura"
+    isKaltura() {
+      return this.mediaFormat === "kaltura"
+    },
+    allowSrt() {
+      return this.isKaltura && this.videoPlayer === "kaltura"
     },
     kalturaAvailable() {
       return wp.getKalturaStatus()

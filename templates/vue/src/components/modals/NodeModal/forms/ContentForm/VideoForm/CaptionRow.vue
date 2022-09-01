@@ -59,11 +59,11 @@
           size="sm"
           variant="primary"
           class="mr-1"
-          :disabled="disabled || isDefault"
+          :disabled="disabled || (isDefault && isKaltura)"
           :data-qa="`caption-set-default-button-${index}`"
-          @click="$emit('setDefault', caption.id)"
+          @click="$emit('setDefault', isDefault ? null : caption.id)"
         >
-          Set as default
+          {{ !isDefault || isKaltura ? "Set as default" : "Remove default" }}
         </b-button>
         <b-button
           size="sm"
@@ -87,8 +87,8 @@
                 v-model="caption.captionUrl"
                 compact-mode
                 :disabled="disabled"
-                :file-types="isKaltura ? '.vtt, .srt' : '.vtt'"
-                :placeholder="`Upload a VTT${isKaltura ? ' or SRT' : ''} file`"
+                :file-types="allowSrt ? '.vtt, .srt' : '.vtt'"
+                :placeholder="`Upload a VTT${allowSrt ? ' or SRT' : ''} file`"
                 :is-image="false"
                 :input-test-id="`caption-url-${index}`"
                 :file-upload-id="
@@ -154,6 +154,10 @@ export default {
       required: true,
     },
     isKaltura: {
+      type: Boolean,
+      required: true,
+    },
+    allowSrt: {
       type: Boolean,
       required: true,
     },
