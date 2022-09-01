@@ -779,8 +779,6 @@ function performTapestryNodeCommentAction($request) {
     $commentId = $data->id;
     $action = $data->action;
 
-    error_log($commentId . ':' . $action);
-
     try {
         if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
             throw new TapestryError('INVALID_POST_ID');
