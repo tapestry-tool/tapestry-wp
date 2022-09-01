@@ -88,6 +88,7 @@ export default {
         const collapsed =
           lastComment &&
           comment.authorId === lastComment.authorId &&
+          comment.author === lastComment.author && // to separate anonymous comments with different author names (having authorId === 0)
           Math.abs(comment.timestamp - lastComment.timestamp) <= anHour &&
           comment.approved === lastComment.approved
         lastComment = comment

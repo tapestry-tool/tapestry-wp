@@ -648,12 +648,17 @@ function importTapestry($postId, $tapestryData)
     if (isset($tapestryData->nodes) && isset($tapestryData->links)) {
         $idMap = new stdClass();
 
-        // Construct ID map and add nodes to new Tapestry
+        // Construct ID map and add nodes to new Tapestry, as well as import comments associated with nodes (if any)
         foreach ($tapestryData->nodes as $node) {
             $oldNodeId = $node->id;
             $newNode = $tapestry->addNode($node);
             $newNodeId = $newNode->id;
             $idMap->$oldNodeId = $newNodeId;
+            
+            if (isset($node->comments)) {
+                $newTapestryNode = $tapestry->getNode($newNodeId);
+                $newTapestryNode->importComments($node->comments);
+            }
         }
 
         // Now update any node data that relies on IDs
@@ -681,11 +686,6 @@ function importTapestry($postId, $tapestryData)
             }
 
             $tapestryNode->set($node);
-
-            if (isset($node->comments)) {
-                $tapestryNode->importComments($node->comments);
-            }
-
             $tapestryNode->save();
         }
 
