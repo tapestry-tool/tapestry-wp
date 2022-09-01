@@ -431,7 +431,6 @@ class TapestryNode implements ITapestryNode
 
             $newId = wp_new_comment($commentData, true);
             if (false === $newId || is_wp_error($newId)) {
-                error_log('failed: '.print_r($commentData, true));
                 continue;
             }
             if (isset($comment->approved)) {
@@ -804,7 +803,6 @@ class TapestryNode implements ITapestryNode
 
         foreach ($comments as $comment) {
             if ('1' === $comment->comment_approved || (int) $comment->user_id === $user->getID() || $user->canEdit($this->tapestryPostId)) {
-                error_log($comment->comment_date);
                 $datetime = new DateTime($comment->comment_date, wp_timezone());
 
                 $renderedComments[] = (object) [
