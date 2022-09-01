@@ -61,6 +61,9 @@ const operationAnalyticsNames = {
   [names.KALTURAMODAL]: "kaltura-modal",
   [names.OTHEROPERATIONS]: "other-operations",
 }
+const defaultTabs = {
+  [names.KALTURAMODAL]: "upload",
+}
 
 export default {
   components: {
@@ -83,7 +86,7 @@ export default {
       set(operation) {
         this.$router.push({
           name: operation ?? names.APP,
-          params: { nodeId: this.$route.params.nodeId },
+          params: { nodeId: this.$route.params.nodeId, tab: defaultTabs[operation] },
           query: this.$route.query,
         })
       },
