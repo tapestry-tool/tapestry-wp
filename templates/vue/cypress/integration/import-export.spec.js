@@ -4,8 +4,8 @@ describe("Import Export", () => {
     cy.setup("@oneNode")
     cy.intercept("GET", "**/tapestries/**/export").as("export")
 
-    cy.get(".settings-button").click()
-    cy.contains(/advanced/i).click()
+    cy.get(".operations-button").click()
+    cy.contains(/export\/duplicate tapestry/i).click()
     cy.get("#export-button").click()
 
     cy.wait("@export")
