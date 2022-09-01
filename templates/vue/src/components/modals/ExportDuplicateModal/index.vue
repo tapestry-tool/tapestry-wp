@@ -12,10 +12,14 @@
     <b-container fluid class="px-1">
       <b-row>
         <b-col>
-          <b-form-group
-            label="Export"
-            description="Export your tapestry to a file. You can then use that file to import this tapestry on another site."
-          >
+          <b-form-group label="Export">
+            <template #description>
+              <strong>Note:</strong>
+              WordPress post nodes in your tapestry must be exported separately. To
+              export, export all WordPress posts as well as the tapestry. To import,
+              first import the WordPress posts by going to Tools -> Import in the
+              WordPress dashboard, then import the tapestry.
+            </template>
             <b-dropdown
               block
               split
@@ -74,11 +78,8 @@
               {{ apiError.error }}
             </b-alert>
             <b-form-text class="my-2">
-              <strong>Note:</strong>
-              WordPress post nodes in your tapestry must be exported separately. To
-              export, export all WordPress posts as well as the tapestry. To import,
-              first import the WordPress posts by going to Tools -> Import in the
-              WordPress dashboard, then import the tapestry.
+              Export your tapestry to a file. You can then use that file to import
+              this tapestry on another site.
             </b-form-text>
           </b-form-group>
         </b-col>
