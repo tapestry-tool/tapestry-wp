@@ -167,7 +167,13 @@ function clickCommentAction(comment, action) {
   cy.contains(comment)
     .parent(".comment")
     .within(() => {
-      cy.get(".comment-action-btn").click({ force: true })
-      cy.contains(action).click()
+      cy.get(".comment-action-btn").then($el => {
+        if ($el.hasClass("comment-action-dropdown")) {
+          cy.wrap($el).click({ force: true })
+          cy.contains(action).click()
+        } else {
+          cy.wrap($el).click({ force: true })
+        }
+      })
     })
 }

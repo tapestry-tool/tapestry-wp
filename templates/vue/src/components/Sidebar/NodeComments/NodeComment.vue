@@ -25,7 +25,7 @@
             size="sm"
             variant="link"
             no-caret
-            toggle-class="comment-action-btn"
+            toggle-class="comment-action-btn comment-action-dropdown"
             aria-label="Comment actions"
           >
             <template #button-content>
