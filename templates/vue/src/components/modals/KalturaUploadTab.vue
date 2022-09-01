@@ -95,13 +95,13 @@
         Stop Upload
       </div>
     </b-button>
-    <b-alert class="mt-2" :show="hasRequestedStop" variant="success">
+    <b-alert class="mt-3" :show="hasRequestedStop" variant="success">
       Successfully canceled the upload. Note: Videos already being processed will
       still be uploaded to Kaltura, but no more videos will be started. Please be
       patient as processing these videos could take some time.
     </b-alert>
     <b-alert
-      class="mt-2"
+      class="mt-3 mb-0"
       dismissible
       :show="uploadError && isLatestTapestry"
       variant="danger"
