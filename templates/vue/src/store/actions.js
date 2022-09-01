@@ -42,6 +42,7 @@ export async function addNode({ commit, dispatch, getters, state }, newNode) {
     const id = response.data.id
     nodeToAdd.id = id
     nodeToAdd.author = response.data.author
+    nodeToAdd.comments = response.data.comments
     nodeToAdd.permissions = response.data.permissions
     if (response.data.typeData.h5pMeta) {
       nodeToAdd.typeData.h5pMeta = response.data.typeData.h5pMeta
