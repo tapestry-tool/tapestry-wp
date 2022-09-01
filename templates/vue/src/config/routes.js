@@ -80,7 +80,13 @@ export default [
       },
       {
         path: `kalturamodal`,
-        name: names.KALTURAMODAL,
+        redirect: `${ROOT_PATH}/kalturamodal/upload`,
+        children: [
+          {
+            path: `:tab`,
+            name: names.KALTURAMODAL,
+          },
+        ],
       },
       {
         path: `other-operations`,
