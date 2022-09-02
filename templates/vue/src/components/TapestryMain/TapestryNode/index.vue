@@ -81,7 +81,7 @@
               class="meta"
               :style="{
                 color: node.textColor,
-                fontSize: Math.min(radius * 0.25, 30) + 'px',
+                fontSize: radius * 0.2 + 'px',
               }"
             >
               <p class="title">{{ node.title }}</p>
