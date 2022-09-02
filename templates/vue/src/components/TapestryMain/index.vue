@@ -748,8 +748,17 @@ export default {
         ) {
           this.$root.$emit("open-node", node.id)
         }
-      } else if (code === "Tab") {
-        // ? potentially let the user tab out of the main tapestry view, since the user should be fully capable of navigating through all the nodes by using just arrow keys
+      } else if (code === "KeyS") {
+        // focus the sidebar
+        if (!this.$route.query.sidebar) {
+          this.$router.push({
+            ...this.$route,
+            query: { ...this.$route.query, sidebar: "info" },
+          })
+        }
+        this.$nextTick(() => {
+          document.querySelector(".sidebar")?.focus()
+        })
       } else if (code === "KeyE") {
         if (this.nodeNavLinkMode) {
           this.openSelectedLinkModal()

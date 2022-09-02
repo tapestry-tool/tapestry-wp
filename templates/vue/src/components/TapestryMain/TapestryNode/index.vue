@@ -240,7 +240,8 @@ export default {
       if (this.hasPermission("edit")) {
         label += "To edit this node, press E. "
       }
-      label += "To exit the Main Tapestry view, press the Q Key or the Escape Key."
+      label +=
+        "To go to the sidebar for this node, press S. To exit the Main Tapestry view, press the Q Key or the Escape Key."
       return label
     },
     canAddChild() {
