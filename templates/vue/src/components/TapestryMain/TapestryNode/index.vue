@@ -290,8 +290,7 @@ export default {
         return 0
       }
       const radius =
-        Helpers.getNodeRadius(this.node.level, this.maxLevel, this.scale) *
-        (this.root ? 1.2 : 1)
+        Helpers.getNodeRadius(this.node.level, this.scale) * (this.root ? 1.2 : 1)
       return this.isGrandChild ? Math.min(40, radius) : radius
     },
     fill() {

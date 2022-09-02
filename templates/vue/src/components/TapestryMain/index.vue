@@ -140,11 +140,12 @@ export default {
         : this.nodes
     },
     maxScale() {
+      // TODO: may need to update how the smallest node size is calculated
       return Math.max(
         (this.scaleConstants.maxNodeSizeToScreen *
           Math.min(this.viewBox[2], this.viewBox[3])) /
-          Helpers.getNodeBaseRadius(this.maxLevel, this.maxLevel),
-        140 / Helpers.getNodeBaseRadius(this.maxLevel, this.maxLevel)
+          Helpers.getNodeBaseRadius(this.maxLevel),
+        140 / Helpers.getNodeBaseRadius(this.maxLevel)
       )
     },
   },
@@ -252,7 +253,7 @@ export default {
       if (!scale) {
         scale = this.scale
       }
-      const maxNodeSize = Helpers.getNodeRadius(1, this.maxLevel, scale)
+      const maxNodeSize = Helpers.getNodeRadius(1, scale)
       if (scale < 1) {
         const centerX = (-1 * this.viewBox[2] * (1 - scale)) / 2
         const centerY = (-1 * this.viewBox[3] * (1 - scale)) / 2
