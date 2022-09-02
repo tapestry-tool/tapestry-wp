@@ -446,8 +446,7 @@ export default {
     },
     handleNodeClick(node) {
       // zoom to the level that the node is on, and pan towards the node
-      const baseRadius = Helpers.getNodeBaseRadius(node.level, this.maxLevel)
-      const targetScale = 140 / baseRadius
+      const targetScale = Helpers.getTargetScale(node.level)
       const deltaScale = targetScale - this.scale
 
       const targetViewBoxX = this.unscaledViewBox[0] * targetScale

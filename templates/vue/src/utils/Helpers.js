@@ -463,6 +463,10 @@ export default class Helpers {
     return -1 // not visible
   }
 
+  static getTargetScale(level) {
+    return Math.max(1, level / store.state.scaleConstants.levelMultiplier)
+  }
+
   static getCurrentLevel(scale) {
     return Math.floor(scale * store.state.scaleConstants.levelMultiplier)
   }
