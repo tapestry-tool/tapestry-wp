@@ -1,5 +1,3 @@
-import { TEST_TAPESTRY_NAME } from "../support/constants"
-
 describe("Settings", () => {
   beforeEach(() => {
     cy.fixture("three-nodes.json").as("tapestry")
@@ -29,42 +27,17 @@ describe("Settings", () => {
   })
 
   it(`should be able to set a background image`, () => {
-    cy.server()
-    cy.route("POST", "**/async-upload.php").as("upload")
+    cy.intercept("POST", "**/async-upload.php").as("upload")
 
     cy.get("[name=async-upload]").attachFile("reddit.png")
     cy.wait("@upload")
-      .its("response.body.data.url")
+      .then(({ response }) => {
+        return JSON.parse(response.body).data.url
+      })
       .then(url => {
         cy.getByTestId("node-upload-input").should("have.value", url)
         cy.submitSettingsModal()
         cy.get("body").should("have.css", "background-image", `url("${url}")`)
       })
-  })
-
-  it(`should be able to duplicate a tapestry`, () => {
-    cy.contains(/advanced/i).click()
-
-    cy.server()
-    cy.route("POST", "**/tapestries").as("duplicate")
-
-    cy.contains(/duplicate tapestry/i).click()
-    cy.getByTestId("spinner").should("be.visible")
-    cy.wait("@duplicate")
-
-    cy.getByTestId("duplicate-tapestry-link")
-      .should("be.visible")
-      .then($el => {
-        const { href } = $el.get(0)
-        cy.visit(href)
-      })
-
-    cy.getByTestId("tapestry-loading").should("not.exist")
-    cy.get("@tapestry").then(({ nodes }) => {
-      cy.get("#tapestry").within(() => {
-        nodes.forEach(node => cy.contains(node.title).should("be.visible"))
-      })
-    })
-    cy.deleteTapestry(`${TEST_TAPESTRY_NAME} (1)`)
   })
 })

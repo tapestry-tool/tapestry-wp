@@ -12,8 +12,7 @@ class TapestryPermissions
      */
     public static function postTapestry()
     {
-        global $TAPESTRY_USE_DEV_MODE;
-        if ($TAPESTRY_USE_DEV_MODE) {
+        if (defined('TAPESTRY_USE_DEV_MODE') && !empty(TAPESTRY_USE_DEV_MODE)) {
             return true;
         }
 

@@ -156,7 +156,7 @@ export default {
       for (let node of data.nodes) {
         node.permissions = this.filterImportedPerms(node.permissions, wp_roles)
       }
-      if (data.settings) {
+      if (data.settings && data.settings.defaultPermissions) {
         data.settings.defaultPermissions = this.filterImportedPerms(
           data.settings.defaultPermissions,
           wp_roles
@@ -164,7 +164,7 @@ export default {
       }
     },
     validateTapestryJSON(upload) {
-      const properties = ["nodes", "links", "groups", "site-url"]
+      const properties = ["nodes", "links", "site-url"]
       properties.forEach(property => {
         if (!upload.hasOwnProperty(property)) {
           throw new Error(`Invalid Tapestry JSON: Missing property ${property}`)

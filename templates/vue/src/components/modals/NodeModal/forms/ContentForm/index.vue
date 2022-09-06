@@ -103,7 +103,7 @@ import UrlEmbedForm from "./UrlEmbedForm"
 import VideoForm from "./VideoForm"
 import WpPostForm from "./WpPostForm"
 import AnswerForm from "./AnswerForm"
-import SubItemTable from "./MultiContentForm/SubItemTable"
+import SubItemTable from "./common/SubItemTable"
 
 export default {
   components: {
@@ -230,6 +230,10 @@ export default {
       this.setCurrentEditingNodeProperty({ property, value })
     },
     handleTypeChange(evt) {
+      if (this.node.mediaType === "video") {
+        this.update("typeData.mediaURL", "")
+        this.update("typeData.youtubeID", undefined)
+      }
       this.update("mediaType", evt)
       this.update(
         "mediaFormat",

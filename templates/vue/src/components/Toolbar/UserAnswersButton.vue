@@ -84,7 +84,6 @@ export default {
 .user-answers-button:focus {
   padding: 0.5rem;
   background: none;
-  color: #999;
   font-size: 1.2em;
   transition: all 0.2s ease;
   outline: none;
@@ -93,8 +92,5 @@ export default {
   background: none;
   color: #11a6d8;
   transform: scale(1.1);
-}
-.user-answers-button:only-child {
-  margin-right: 12px;
 }
 </style>

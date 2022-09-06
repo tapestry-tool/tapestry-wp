@@ -27,6 +27,8 @@
           <i class="fas fa-chevron-right fa-xs mx-2" />
         </b-link>
       </span>
+      <i v-if="type === 'add'" class="fas fa-plus fa-xs mr-1" />
+      <i v-else-if="type === 'edit'" class="fas fa-pen fa-xs mr-1" />
       <span data-qa="node-modal-header">
         {{ title }}
       </span>
@@ -187,7 +189,7 @@
               :disabled="loading || fileUploading || fieldsInvalid"
               @click="handlePublish"
             >
-              <span>Publish</span>
+              <span>Save and Publish</span>
             </b-button>
             <b-button
               v-else-if="settings.submitNodesEnabled"
@@ -341,9 +343,7 @@ export default {
     },
     title() {
       if (this.type === "add") {
-        return this.parent
-          ? `Add new sub-topic to ${this.parent.title}`
-          : "Add root node"
+        return this.parent ? `Add node to ${this.parent.title}` : "Add root node"
       } else if (this.type === "edit") {
         return `Edit node: ${this.node.title}`
       }
@@ -453,7 +453,7 @@ export default {
       let parents = []
       let parentId
       let parent = this.parent
-      while (parent != null) {
+      while (parent != null && parent.mediaType == "multi-content") {
         parents.unshift(parent)
         parentId = this.getParent(parent.id)
         parent = parentId ? this.getNode(parentId) : null
@@ -643,6 +643,11 @@ export default {
           lng: "",
         }
       }
+      if (this.$route.query.popup && this.$route.query.popup == 1) {
+        copy.popup = {
+          time: 0,
+        }
+      }
       this.setCurrentEditingNode(copy)
       this.setTapestryErrorReporting(false)
     },
@@ -767,7 +772,7 @@ export default {
           this.$router.push({
             name: names.APP,
             params: { nodeId: this.nodeId },
-            query: { ...this.$route.query, nav: undefined },
+            query: { ...this.$route.query, nav: undefined, popup: undefined },
           })
         }
       }
@@ -799,7 +804,7 @@ export default {
         })
       }
     },
-    async handleSubmit() {
+    async handleSubmit(isForReview = false) {
       this.errors = this.validateNode()
       if (!this.hasSubmissionError) {
         this.loading = true
@@ -807,6 +812,24 @@ export default {
 
         if (this.linkHasThumbnailData) {
           await this.setLinkData()
+        }
+
+        if (isForReview) {
+          this.update("reviewComments", [
+            ...this.node.reviewComments,
+            Comment.createComment(Comment.types.STATUS_CHANGE, {
+              from: null,
+              to: nodeStatus.SUBMIT,
+            }),
+          ])
+        }
+
+        if (
+          this.node.mediaDuration &&
+          this.node.mediaType !== "video" &&
+          this.node.mediaType !== "h5p"
+        ) {
+          this.update("mediaDuration", undefined)
         }
 
         if (this.shouldReloadDuration()) {
@@ -830,16 +853,7 @@ export default {
       }
       this.update("reviewStatus", nodeStatus.SUBMIT)
       this.update("status", nodeStatus.DRAFT)
-
-      this.update("reviewComments", [
-        ...this.node.reviewComments,
-        Comment.createComment(Comment.types.STATUS_CHANGE, {
-          from: null,
-          to: nodeStatus.SUBMIT,
-        }),
-      ])
-
-      this.handleSubmit()
+      this.handleSubmit(true)
     },
     async submitNode() {
       if (this.type === "add") {
@@ -1134,7 +1148,7 @@ export default {
     isValidVideo(typeData) {
       return (
         typeData.mediaURL !== "" &&
-        (typeData.hasOwnProperty("youtubeID") || typeData.mediaURL.endsWith(".mp4"))
+        (typeData.youtubeID !== undefined || typeData.mediaURL.endsWith(".mp4"))
       )
     },
     updateOrderingArray(arr) {
@@ -1157,14 +1171,8 @@ export default {
               "Would you like to use the link preview image as the thumbnail image?"
             )
           ) {
+            this.update("thumbnailFileId", "")
             this.update("imageURL", data.image)
-          }
-          if (
-            confirm(
-              "Would you like to use the link preview image as the locked thumbnail image?"
-            )
-          ) {
-            this.update("lockedImageURL", data.image)
           }
         }
       }
@@ -1209,7 +1217,7 @@ export default {
       if (this.node.mediaType !== "video" && this.node.mediaType !== "h5p") {
         return false
       }
-      if (this.type === "add") {
+      if (this.type === "add" || !this.node.mediaDuration) {
         return true
       }
       const oldNode = this.getNode(this.nodeId)
