@@ -1062,6 +1062,9 @@ export default {
           if (!this.isValidVideo(this.node.typeData)) {
             errMsgs.push("Please enter a valid Video URL")
           }
+          if (this.node.mediaFormat === "youtube" && !this.node.typeData.youtubeID) {
+            errMsgs.push("Please enter a valid YouTube video URL")
+          }
           if (!Helpers.onlyContainsDigits(this.node.mediaDuration)) {
             this.update("mediaDuration", 0)
           }
