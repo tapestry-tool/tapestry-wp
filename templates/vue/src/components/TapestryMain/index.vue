@@ -6,6 +6,15 @@
     </div>
     <svg v-else id="vue-svg" :viewBox="computedViewBox">
       <g v-for="r in renderedLevels" :key="r.level">
+        <g class="node-shadows">
+          <tapestry-node-shadow
+            v-for="(node, id) in r.nodes"
+            :key="id"
+            :node="node"
+            :scale="scale"
+            :root="id == selectedId"
+          ></tapestry-node-shadow>
+        </g>
         <g class="links">
           <tapestry-link
             v-for="link in r.links"
@@ -63,6 +72,7 @@ import DragSelectModular from "@/utils/dragSelectModular"
 import { mapActions, mapGetters, mapMutations, mapState } from "vuex"
 import TapestryNode from "./TapestryNode"
 import TapestryLink from "./TapestryLink"
+import TapestryNodeShadow from "./TapestryNodeShadow"
 import TapestryMinimapButton from "./TapestryMinimap/TapestryMinimapButton"
 import TapestryMinimap from "./TapestryMinimap"
 import RootNodeButton from "./RootNodeButton"
@@ -78,6 +88,7 @@ export default {
   components: {
     TapestryNode,
     TapestryLink,
+    TapestryNodeShadow,
     TapestryMinimapButton,
     TapestryMinimap,
     RootNodeButton,

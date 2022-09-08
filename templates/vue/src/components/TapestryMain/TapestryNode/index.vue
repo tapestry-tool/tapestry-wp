@@ -26,14 +26,6 @@
         :data-qa="`node-circle-${node.id}`"
         :fill="fill"
         :stroke="progressBackgroundColor"
-        :style="{
-          filter: `drop-shadow(${4 * (maxLevel - node.level) * scale}px ${4 *
-            (maxLevel - node.level) *
-            scale}px ${Math.max(10 - node.level, 4)}px rgba(0, 0, 0, ${Math.max(
-            0.5 - node.level * 0.05,
-            0.2
-          )}))`,
-        }"
       ></circle>
       <transition name="fade">
         <circle
