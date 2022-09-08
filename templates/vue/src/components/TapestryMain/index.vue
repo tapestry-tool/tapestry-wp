@@ -5,33 +5,44 @@
       <div v-else class="empty-message">The requested Tapestry is empty.</div>
     </div>
     <svg v-else id="vue-svg" :viewBox="computedViewBox">
-      <g class="links">
-        <tapestry-link
-          v-for="link in links"
-          :key="`${link.source}-${link.target}`"
-          :source="nodes[link.source]"
-          :target="nodes[link.target]"
-          :scale="scale"
-        ></tapestry-link>
-      </g>
-      <g v-if="!dragSelectEnabled || dragSelectReady" class="nodes">
-        <tapestry-node
-          v-for="(node, id) in nodes"
-          :key="id"
-          :node="node"
-          :scale="scale"
-          class="node"
-          :class="{ selectable: true }"
-          :data-id="id"
-          :root="id == selectedId"
-          @dragstart="handleNodeDragStart"
-          @drag="handleNodeDrag"
-          @dragend="handleNodeDragEnd"
-          @mouseover="handleMouseover(id)"
-          @mouseleave="activeNode = null"
-          @mounted="dragSelectEnabled ? updateSelectableNodes(node) : null"
-          @click="handleNodeClick"
-        ></tapestry-node>
+      <g v-for="r in renderedLevels" :key="r.level">
+        <g class="node-shadows">
+          <tapestry-node-shadow
+            v-for="(node, id) in r.nodes"
+            :key="id"
+            :node="node"
+            :scale="scale"
+            :root="id == selectedId"
+          ></tapestry-node-shadow>
+        </g>
+        <g class="links">
+          <tapestry-link
+            v-for="link in r.links"
+            :key="`${link.source}-${link.target}`"
+            :source="nodes[link.source]"
+            :target="nodes[link.target]"
+            :scale="scale"
+          ></tapestry-link>
+        </g>
+        <g v-if="!dragSelectEnabled || dragSelectReady" class="nodes">
+          <tapestry-node
+            v-for="(node, id) in r.nodes"
+            :key="id"
+            :node="node"
+            :scale="scale"
+            class="node"
+            :class="{ selectable: true }"
+            :data-id="id"
+            :root="id == selectedId"
+            @dragstart="handleNodeDragStart"
+            @drag="handleNodeDrag"
+            @dragend="handleNodeDragEnd"
+            @mouseover="handleMouseover(id)"
+            @mouseleave="activeNode = null"
+            @mounted="dragSelectEnabled ? updateSelectableNodes(node) : null"
+            @click="handleNodeClick"
+          ></tapestry-node>
+        </g>
       </g>
       <locked-tooltip
         v-if="activeNode"
@@ -61,6 +72,7 @@ import DragSelectModular from "@/utils/dragSelectModular"
 import { mapActions, mapGetters, mapMutations, mapState } from "vuex"
 import TapestryNode from "./TapestryNode"
 import TapestryLink from "./TapestryLink"
+import TapestryNodeShadow from "./TapestryNodeShadow"
 import TapestryMinimapButton from "./TapestryMinimap/TapestryMinimapButton"
 import TapestryMinimap from "./TapestryMinimap"
 import RootNodeButton from "./RootNodeButton"
@@ -76,6 +88,7 @@ export default {
   components: {
     TapestryNode,
     TapestryLink,
+    TapestryNodeShadow,
     TapestryMinimapButton,
     TapestryMinimap,
     RootNodeButton,
@@ -114,6 +127,27 @@ export default {
       "scaleConstants",
     ]),
     ...mapGetters(["getNode"]),
+    renderedLevels() {
+      const levels = []
+      for (let i = 1; i <= this.maxLevel; i++) {
+        levels.push({
+          level: i,
+          nodes: {},
+          links: [],
+        })
+      }
+      for (const link of this.links) {
+        levels[
+          Math.max(this.nodes[link.source].level, this.nodes[link.target].level) - 1
+        ].links.push(link)
+      }
+      for (const id in this.nodes) {
+        const node = this.nodes[id]
+        levels[node.level - 1].nodes[id] = node
+      }
+      levels.reverse()
+      return levels
+    },
     computedViewBox() {
       // return this.viewBox.join(" ")
       return `${this.viewBox[0] + this.offset.x} ${this.viewBox[1] +
@@ -140,11 +174,12 @@ export default {
         : this.nodes
     },
     maxScale() {
+      // TODO: may need to update how the smallest node size is calculated
       return Math.max(
         (this.scaleConstants.maxNodeSizeToScreen *
           Math.min(this.viewBox[2], this.viewBox[3])) /
-          Helpers.getNodeBaseRadius(this.maxLevel, this.maxLevel),
-        140 / Helpers.getNodeBaseRadius(this.maxLevel, this.maxLevel)
+          Helpers.getNodeBaseRadius(this.maxLevel),
+        140 / Helpers.getNodeBaseRadius(this.maxLevel)
       )
     },
   },
@@ -252,7 +287,7 @@ export default {
       if (!scale) {
         scale = this.scale
       }
-      const maxNodeSize = Helpers.getNodeRadius(1, this.maxLevel, scale)
+      const maxNodeSize = Helpers.getNodeRadius(1, scale)
       if (scale < 1) {
         const centerX = (-1 * this.viewBox[2] * (1 - scale)) / 2
         const centerY = (-1 * this.viewBox[3] * (1 - scale)) / 2

@@ -26,14 +26,6 @@
         :data-qa="`node-circle-${node.id}`"
         :fill="fill"
         :stroke="progressBackgroundColor"
-        :style="{
-          filter: `drop-shadow(${4 * (maxLevel - node.level) * scale}px ${4 *
-            (maxLevel - node.level) *
-            scale}px ${Math.max(10 - node.level, 4)}px rgba(0, 0, 0, ${Math.max(
-            0.5 - node.level * 0.05,
-            0.2
-          )}))`,
-        }"
       ></circle>
       <transition name="fade">
         <circle
@@ -90,7 +82,7 @@
               class="meta"
               :style="{
                 color: node.textColor,
-                fontSize: Math.min(radius * 0.25, 30) + 'px',
+                fontSize: radius * 0.2 + 'px',
               }"
             >
               <p class="title">{{ node.title }}</p>
@@ -298,11 +290,7 @@ export default {
       if (!this.show) {
         return 0
       }
-      const radius = Helpers.getNodeRadius(
-        this.node.level,
-        this.maxLevel,
-        this.scale
-      )
+      const radius = Helpers.getNodeRadius(this.node.level, this.scale)
       return this.isGrandChild ? Math.min(40, radius) : radius
     },
     fill() {
