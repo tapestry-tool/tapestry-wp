@@ -576,6 +576,9 @@ export default {
       }
     },
     handleKey(evt) {
+      if (this.isEmptyTapestry) {
+        return
+      }
       const { code } = evt
       const node = this.getNode(this.selectedId)
       if (code === "Enter") {
