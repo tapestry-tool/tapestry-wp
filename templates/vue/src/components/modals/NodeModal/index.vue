@@ -1063,7 +1063,7 @@ export default {
             errMsgs.push("Please enter a valid Video URL")
           }
           if (this.node.mediaFormat === "youtube" && !this.node.typeData.youtubeID) {
-            errMsgs.push("Please enter a valid YouTube video URL")
+            this.update("mediaFormat", "mp4")
           }
           if (!Helpers.onlyContainsDigits(this.node.mediaDuration)) {
             this.update("mediaDuration", 0)
@@ -1192,7 +1192,7 @@ export default {
     isValidVideo(typeData) {
       return (
         typeData.mediaURL !== "" &&
-        (typeData.youtubeID !== undefined || typeData.mediaURL.endsWith(".mp4"))
+        (typeData.youtubeID || typeData.mediaURL.endsWith(".mp4"))
       )
     },
     updateOrderingArray(arr) {
