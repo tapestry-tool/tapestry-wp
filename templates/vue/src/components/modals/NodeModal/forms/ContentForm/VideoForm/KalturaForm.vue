@@ -135,6 +135,7 @@ export default {
       if (videoFile && this.kalturaAvailable) {
         this.isUploading = true
         this.$root.$emit("node-modal::uploading", true)
+        this.uploadAlertText = ""
 
         try {
           const kalturaId = await client.uploadVideoToKaltura(videoFile, this.nodeId)
