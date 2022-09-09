@@ -101,6 +101,14 @@
       patient as processing these videos could take some time.
     </b-alert>
     <b-alert
+      dismissible
+      class="mt-3"
+      :show="videosUploading && isLatestTapestry"
+      variant="primary"
+    >
+      Upload in progress... View the status of the current upload in the Log tab.
+    </b-alert>
+    <b-alert
       class="mt-3 mb-0"
       dismissible
       :show="uploadError && isLatestTapestry"
