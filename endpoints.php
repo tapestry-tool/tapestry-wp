@@ -2014,7 +2014,7 @@ function getKalturaUploadLog($request)
         foreach ($videos as $video) {
             // Convert Unix timestamp to human-readable string, following Wordpress site timezone
             $datetime->setTimestamp($video->timestamp);
-            $video->uploadTime = $datetime->format('Y-m-d G:i:s');
+            $video->uploadTime = $datetime->format('Y-m-d H:i:s');
             unset($video->timestamp);
         }
 
