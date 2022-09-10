@@ -1,9 +1,9 @@
 <template>
   <div data-qa="multi-content-rows" class="multi-content-rows">
-    <div v-if="allHidden">
-      Content in this node has not been unlocked yet.
-    </div>
-    <b-row v-else :class="(node.presentationStyle === 'page' ? 'mr' : 'ml') + '-0'">
+    <b-row
+      v-if="!allHidden"
+      :class="(node.presentationStyle === 'page' ? 'mr' : 'ml') + '-0'"
+    >
       <multi-content-row
         v-for="(row, index) in rows"
         :id="`row-${row.node.id}`"
