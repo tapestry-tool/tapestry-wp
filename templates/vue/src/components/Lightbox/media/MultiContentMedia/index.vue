@@ -20,11 +20,7 @@
       </header>
       <template v-if="node.presentationStyle">
         <div v-if="node.presentationStyle === 'unit'">
-          {{
-            node.childOrdering.length
-              ? "The content of this unit has not been unlocked yet."
-              : "There's currently no content here."
-          }}
+          There's currently no content here.
         </div>
         <template v-else>
           <div v-if="!node.accessible">

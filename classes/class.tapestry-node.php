@@ -646,6 +646,7 @@ class TapestryNode implements ITapestryNode
         if (!$user) {
             $user = get_user_by('id', 1);
         }
+
         return (object) [
             'id' => $id,
             'name' => $user->display_name,
