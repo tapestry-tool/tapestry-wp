@@ -263,10 +263,11 @@ export default {
       }
     },
     updateDimensions(dimensions) {
-      if (
-        dimensions.height > 0 &&
-        dimensions.height <= this.lightboxDimensions.height
-      ) {
+      if (dimensions.height > 0) {
+        dimensions.height = Math.min(
+          dimensions.height,
+          this.lightboxDimensions.height
+        )
         this.dimensions = {
           ...this.dimensions,
           ...dimensions,
