@@ -240,6 +240,7 @@ export default class Helpers {
      *  - Allow all actions for original author EXCEPT if the node is submitted for
      *    review
      *  - Allow "read" to reviewers only if the node is submitted for review
+     *  - Allow reviewers to add child nodes to a draft node
      */
     if (node.status === nodeStatus.DRAFT) {
       if (node.author && wp.isCurrentUser(node.author.id)) {
@@ -259,7 +260,7 @@ export default class Helpers {
             (showRejected && node.reviewStatus === nodeStatus.REJECT)
           )
         }
-        return false
+        return action === userActions.ADD
       }
       return false
     }
