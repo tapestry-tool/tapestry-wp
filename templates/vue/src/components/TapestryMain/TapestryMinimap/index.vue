@@ -171,8 +171,7 @@ export default {
         for (const link of this.links) {
           const [initialPoint, ...points] = Helpers.getMinimapLinePoints(
             this.nodes[link.source],
-            this.nodes[link.target],
-            this.maxLevel
+            this.nodes[link.target]
           ).map(this.transformCoordinates)
           c.beginPath()
           c.moveTo(initialPoint.x, initialPoint.y)
@@ -188,7 +187,7 @@ export default {
         for (const id in this.nodes) {
           const node = this.nodes[id]
           const { x, y } = this.transformCoordinates(node.coordinates)
-          const radius = Helpers.getNodeBaseRadius(node.level, this.maxLevel)
+          const radius = Helpers.getNodeBaseRadius(node.level)
           c.beginPath()
           c.arc(x, y, radius, 0, Math.PI * 2)
           c.fillStyle = node.backgroundColor

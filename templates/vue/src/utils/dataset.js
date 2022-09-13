@@ -40,6 +40,10 @@ function parseToStore(dataset) {
   if (!Array.isArray(dataset.nodes)) dataset.nodes = Object.values(dataset.nodes)
 
   for (const node of dataset.nodes) {
+    if (node.level === undefined || node.level === null) {
+      node.level = 1
+    }
+
     const { imageURL, lockedImageURL } = node
     const { mediaURL } = node.typeData
     if (imageURL) {

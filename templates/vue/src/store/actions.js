@@ -462,21 +462,20 @@ export function goToNodeParent({ commit, dispatch, state, getters }) {
 }
 
 export function goToNodeSibling({ commit, state }, offset) {
-  const newPosition = state.nodeNavigation.siblingPosition + offset
-  if (newPosition >= 0 && newPosition < state.nodeNavigation.siblings.length) {
-    const nodeId = state.nodeNavigation.siblings[newPosition]
-    commit("setNodeNavigation", {
-      ...state.nodeNavigation,
-      stack: [
-        ...state.nodeNavigation.stack.slice(
-          0,
-          state.nodeNavigation.stack.length - 1
-        ),
-        nodeId,
-      ],
-      siblingPosition: newPosition,
-    })
-    return nodeId
+  let newPosition = state.nodeNavigation.siblingPosition + offset
+  if (newPosition < 0) {
+    newPosition = state.nodeNavigation.siblings.length - 1
+  } else if (newPosition >= state.nodeNavigation.siblings.length) {
+    newPosition = 0
   }
-  return false
+  const nodeId = state.nodeNavigation.siblings[newPosition]
+  commit("setNodeNavigation", {
+    ...state.nodeNavigation,
+    stack: [
+      ...state.nodeNavigation.stack.slice(0, state.nodeNavigation.stack.length - 1),
+      nodeId,
+    ],
+    siblingPosition: newPosition,
+  })
+  return nodeId
 }

@@ -18,6 +18,9 @@
             <settings-modal-button></settings-modal-button>
           </b-col>
         </template>
+        <b-col v-if="canEdit" class="p-0">
+          <operations-button />
+        </b-col>
       </b-row>
     </b-container>
   </div>
@@ -29,6 +32,7 @@ import SettingsModalButton from "./SettingsModalButton"
 import UserSettingsButton from "./UserSettingsButton"
 import ReviewNotifications from "./ReviewNotifications"
 import HelpButton from "./HelpButton"
+import OperationsButton from "./OperationsButton"
 import * as wp from "@/services/wp"
 
 export default {
@@ -37,6 +41,7 @@ export default {
     ReviewNotifications,
     UserSettingsButton,
     HelpButton,
+    OperationsButton,
   },
   computed: {
     ...mapState(["settings"]),
