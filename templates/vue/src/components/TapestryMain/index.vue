@@ -1,7 +1,7 @@
 <template>
   <main id="tapestry" ref="app" :style="background" :class="{ panning: isPanning }">
     <div v-if="isEmptyTapestry">
-      <root-node-button v-if="canEdit"></root-node-button>
+      <root-node-button v-if="isLoggedIn"></root-node-button>
       <div v-else class="empty-message">The requested Tapestry is empty.</div>
     </div>
     <template v-else>
@@ -151,6 +151,9 @@ export default {
     background() {
       return this.settings.backgroundUrl
     },
+    isLoggedIn() {
+      return wp.isLoggedIn()
+    },
     canEdit() {
       return wp.canEditTapestry()
     },
@@ -285,9 +288,6 @@ export default {
       "goToNodeSibling",
       "resetNodeNavigation",
     ]),
-    isLoggedIn() {
-      return wp.isLoggedIn()
-    },
     clampScale(scale) {
       return Math.max(
         Math.min(scale, this.maxScale),

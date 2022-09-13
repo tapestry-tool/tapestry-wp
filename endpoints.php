@@ -563,12 +563,8 @@ function addTapestryNode($request)
         }
         $tapestry = new Tapestry($postId);
 
-        if ($tapestry->isEmpty()) {
-            $user = new TapestryUser();
-            if (!$user->canEdit($postId)) {
-                throw new TapestryError('ADD_NODE_PERMISSION_DENIED');
-            }
-        }
+        // TODO: throw the following error when checks for permissions are implemented
+        // throw new TapestryError('ADD_NODE_PERMISSION_DENIED');
 
         return $tapestry->addNode($node);
     } catch (TapestryError $e) {
