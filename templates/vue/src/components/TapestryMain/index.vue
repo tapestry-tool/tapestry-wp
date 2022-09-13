@@ -156,6 +156,9 @@ export default {
     background() {
       return this.settings.backgroundUrl
     },
+    isLoggedIn() {
+      return wp.isLoggedIn()
+    },
     canEdit() {
       return wp.canEditTapestry()
     },
@@ -293,9 +296,6 @@ export default {
     ]),
     addRootNode() {
       this.$root.$emit("add-node", null)
-    },
-    isLoggedIn() {
-      return wp.isLoggedIn()
     },
     clampScale(scale) {
       return Math.max(
