@@ -2,11 +2,12 @@
   <div class="comment-container">
     <h3 v-if="!comment.collapsed" class="title">
       {{ comment.author }}
-      <span class="timestamp" :title="formatDate(comment.timestamp, false)">
+      <span :title="formatDate(comment.timestamp, false)">
         {{ formatDate(comment.timestamp) }}
       </span>
+      <span v-if="replyingTo !== null">in reply to {{ replyingTo }}</span>
       <span v-if="!comment.approved" class="unapproved-text">
-        Held for moderation
+        (held for moderation)
       </span>
     </h3>
     <div
@@ -111,6 +112,10 @@ export default {
       type: Boolean,
       required: true,
     },
+    replyingTo: {
+      type: String,
+      default: null,
+    },
   },
   computed: {
     isLoggedIn() {
@@ -134,11 +139,10 @@ export default {
   font-weight: bold;
   margin: 0;
   margin-bottom: 0.25rem;
-}
 
-.timestamp,
-.unapproved-text {
-  font-size: 0.8rem;
+  span {
+    font-size: 0.8rem;
+  }
 }
 
 .unapproved-text {

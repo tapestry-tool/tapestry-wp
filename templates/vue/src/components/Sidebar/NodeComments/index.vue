@@ -69,6 +69,11 @@
               :comment="child"
               :show-all-actions="showAllActions"
               :is-author="isAuthor(child)"
+              :replying-to="
+                child.parent !== comment.id
+                  ? parentAuthor(child.parent, comment.id)
+                  : null
+              "
               @set-reply="replyingTo = $event"
               @action="handleCommentAction"
             ></node-comment>
@@ -119,19 +124,22 @@ export default {
         return {
           ...comment,
           collapsed,
-          children: comment.children.map(child => {
-            const collapsed =
-              !!lastChild &&
-              child.authorId === lastChild.authorId &&
-              child.author === lastChild.author &&
-              Math.abs(child.timestamp - lastChild.timestamp) <= anHour &&
-              child.approved === lastChild.approved
-            lastChild = child
-            return {
-              ...child,
-              collapsed,
-            }
-          }),
+          children: comment.children
+            .sort((a, b) => b.timestamp - a.timestamp)
+            .map(child => {
+              const collapsed =
+                !!lastChild &&
+                child.authorId === lastChild.authorId &&
+                child.author === lastChild.author &&
+                Math.abs(child.timestamp - lastChild.timestamp) <= anHour &&
+                child.approved === lastChild.approved &&
+                child.parent === lastChild.parent
+              lastChild = child
+              return {
+                ...child,
+                collapsed,
+              }
+            }),
         }
       })
     },
@@ -169,6 +177,14 @@ export default {
     ...mapActions(["addComment", "performCommentAction"]),
     isAuthor(comment) {
       return wp.isCurrentUser(comment.authorId)
+    },
+    parentAuthor(parentId, rootId) {
+      if (parentId === rootId) {
+        return this.node.comments.find(comment => comment.id === parentId).author
+      }
+      return this.node.comments
+        .find(comment => comment.id === rootId)
+        .children.find(comment => comment.id === parentId).author
     },
     async submitComment() {
       this.loading = true
