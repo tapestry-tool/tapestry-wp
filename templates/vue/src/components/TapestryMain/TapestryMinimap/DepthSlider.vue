@@ -1,9 +1,5 @@
 <template>
-  <div
-    v-if="maxDepth > 1 && settings.defaultDepth > 0"
-    class="depth-slider"
-    @mousedown="pauseDragSelect"
-  >
+  <div v-if="maxDepth > 1" class="depth-slider" @mousedown="pauseDragSelect">
     <div>
       <input
         v-model="currentDepth"

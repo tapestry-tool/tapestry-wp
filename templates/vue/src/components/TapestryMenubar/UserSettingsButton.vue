@@ -1,5 +1,5 @@
 <template>
-  <button aria-label="Open User Settings" class="user-settings-button" @click="open">
+  <button aria-label="Open User Settings" class="menubar-button" @click="open">
     <span class="fas fa-user fa-s"></span>
     <user-settings-modal
       :show="themeFormOpen"

@@ -4,7 +4,7 @@
       id="operations-button"
       right
       variant="none"
-      toggle-class="operations-button"
+      toggle-class="menubar-button operations-button"
       :toggle-attrs="{
         'aria-label': 'Operations',
       }"
@@ -104,9 +104,6 @@ export default {
 
 .operations-button {
   padding: 0.5rem !important; // Override Bootstrap button padding
-  background: none;
-  font-size: 1.2em;
-  transition: all 0.2s ease;
 
   &::after {
     content: none !important; // Remove Bootstrap dropdown arrow
@@ -116,12 +113,6 @@ export default {
     background: none;
     outline: none;
     box-shadow: none !important; // Remove Bootstrap focus outline
-  }
-
-  &:hover {
-    background: none;
-    color: var(--highlight-color);
-    transform: scale(1.1);
   }
 }
 
