@@ -85,6 +85,10 @@
                 fontSize: radius * 0.2 + 'px',
               }"
             >
+              <i
+                v-if="!node.unlocked && node.hideWhenLocked"
+                class="fas fa-eye-slash"
+              ></i>
               <p class="title">{{ node.title }}</p>
               <p style="font-size: 60%;">Level {{ node.level }}</p>
               <p v-if="node.mediaDuration" class="timecode">
@@ -320,7 +324,7 @@ export default {
       if (this.selected) {
         return "var(--highlight-color)8a"
       } else if (!this.node.unlocked) {
-        return this.node.hideWhenLocked ? "#656567" : "#8a8a8cb3"
+        return "#8a8a8cb3"
       }
       return this.thumbnailURL ? "#33333366" : "transparent"
     },

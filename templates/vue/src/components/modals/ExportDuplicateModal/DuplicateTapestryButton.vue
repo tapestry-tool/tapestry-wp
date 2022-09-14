@@ -1,6 +1,11 @@
 <template>
   <div>
-    <b-button block variant="light" @click="duplicateTapestry">
+    <b-button
+      data-qa="duplicate-tapestry-button"
+      block
+      variant="primary"
+      @click="duplicateTapestry"
+    >
       <b-spinner v-if="loading" small data-qa="spinner"></b-spinner>
       <div v-else>Duplicate Tapestry</div>
     </b-button>
