@@ -44,7 +44,11 @@
       </div>
     </template>
     <ul class="comment-list">
-      <li v-for="comment in comments" :key="comment.id">
+      <li
+        v-for="comment in comments"
+        :key="comment.id"
+        :class="{ collapsed: comment.collapsed }"
+      >
         <node-comment
           :comment="comment"
           :show-all-actions="showAllActions"
@@ -52,6 +56,24 @@
           @set-reply="replyingTo = $event"
           @action="handleCommentAction"
         ></node-comment>
+        <ul
+          v-if="comment.children && comment.children.length > 0"
+          class="replies-list"
+        >
+          <li
+            v-for="child in comment.children"
+            :key="child.id"
+            :class="{ collapsed: comment.collapsed }"
+          >
+            <node-comment
+              :comment="child"
+              :show-all-actions="showAllActions"
+              :is-author="isAuthor(child)"
+              @set-reply="replyingTo = $event"
+              @action="handleCommentAction"
+            ></node-comment>
+          </li>
+        </ul>
       </li>
     </ul>
   </b-overlay>
@@ -86,15 +108,30 @@ export default {
       let lastComment = null
       return this.node.comments.map(comment => {
         const collapsed =
-          lastComment &&
+          !!lastComment &&
           comment.authorId === lastComment.authorId &&
           comment.author === lastComment.author && // to separate anonymous comments with different author names (having authorId === 0)
           Math.abs(comment.timestamp - lastComment.timestamp) <= anHour &&
-          comment.approved === lastComment.approved
+          comment.approved === lastComment.approved &&
+          lastComment.children.length === 0
         lastComment = comment
+        let lastChild = null
         return {
           ...comment,
           collapsed,
+          children: comment.children.map(child => {
+            const collapsed =
+              !!lastChild &&
+              child.authorId === lastChild.authorId &&
+              child.author === lastChild.author &&
+              Math.abs(child.timestamp - lastChild.timestamp) <= anHour &&
+              child.approved === lastChild.approved
+            lastChild = child
+            return {
+              ...child,
+              collapsed,
+            }
+          }),
         }
       })
     },
@@ -166,14 +203,31 @@ export default {
   --light-yellow: #f7e9ae;
 }
 
-.comment-list {
+ul {
   line-height: 1.5;
   list-style: none;
   padding: 0;
   margin: 0;
+}
 
-  li {
-    margin-bottom: 0.75rem;
+.comment-list > li {
+  margin-bottom: 0.75rem;
+
+  &.collapsed {
+    margin-top: -0.5rem;
+  }
+}
+
+.replies-list {
+  margin-top: 0.5rem;
+  padding-left: 1rem;
+
+  & > li {
+    margin-bottom: 0.5rem;
+
+    &.collapsed {
+      margin-top: -0.25rem;
+    }
   }
 }
 

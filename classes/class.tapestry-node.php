@@ -795,29 +795,56 @@ class TapestryNode implements ITapestryNode
     {
         $user = new TapestryUser();
         $userId = $user->getID();
+        $canEditTapestry = $user->canEdit($this->tapestryPostId);
+
         $comments = get_comments([
             'post_id' => $this->nodePostId,
             'orderby' => 'comment_date',
+            'hierarchical' => 'threaded',
         ]);
 
         $renderedComments = [];
 
         foreach ($comments as $comment) {
-            if ('1' === $comment->comment_approved || (0 !== $userId && ((int) $comment->user_id === $userId || $user->canEdit($this->tapestryPostId)))) {
-                $datetime = new DateTime($comment->comment_date, wp_timezone());
+            $renderedComment = $this->_renderComment($comment, $userId, $canEditTapestry);
 
-                $renderedComments[] = (object) [
-                    'id' => (int) $comment->comment_ID,
-                    'content' => $comment->comment_content,
-                    'author' => $comment->comment_author,
-                    'authorId' => (int) $comment->user_id,
-                    'approved' => '1' === $comment->comment_approved ? true : false,
-                    'timestamp' => $datetime->getTimestamp() * 1000,
-                    'parent' => (int) $comment->comment_parent,
-                ];
+            if ($renderedComment) {
+                $renderedComment->children = [];
+
+                $children = $comment->get_children([
+                    'format' => 'flat',
+                    'orderby' => 'comment_date',
+                ]);
+                foreach ($children as $child) {
+                    $renderedChild = $this->_renderComment($child, $userId, $canEditTapestry);
+                    if ($renderedChild) {
+                        $renderedComment->children[] = $renderedChild;
+                    }
+                }
+
+                $renderedComments[] = $renderedComment;
             }
         }
 
         return $renderedComments;
+    }
+
+    private function _renderComment($comment, $userId, $canEditTapestry)
+    {
+        if ('1' === $comment->comment_approved || (0 !== $userId && ((int) $comment->user_id === $userId || $canEditTapestry))) {
+            $datetime = new DateTime($comment->comment_date, wp_timezone());
+
+            return (object) [
+                'id' => (int) $comment->comment_ID,
+                'content' => $comment->comment_content,
+                'author' => $comment->comment_author,
+                'authorId' => (int) $comment->user_id,
+                'approved' => '1' === $comment->comment_approved ? true : false,
+                'timestamp' => $datetime->getTimestamp() * 1000,
+                'parent' => (int) $comment->comment_parent,
+            ];
+        }
+
+        return null;
     }
 }

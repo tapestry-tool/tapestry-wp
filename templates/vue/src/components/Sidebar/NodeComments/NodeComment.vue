@@ -1,5 +1,5 @@
 <template>
-  <div class="comment-container" :class="{ 'pull-up': comment.collapsed }">
+  <div class="comment-container">
     <h3 v-if="!comment.collapsed" class="title">
       {{ comment.author }}
       <span class="timestamp" :title="formatDate(comment.timestamp, false)">
@@ -127,10 +127,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.pull-up {
-  margin-top: -0.5rem;
-}
-
 .title {
   color: var(--light-gray);
   font-family: "Avenir", sans-serif;
