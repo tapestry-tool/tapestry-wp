@@ -55,6 +55,10 @@
         @pan-to="handleMinimapPanTo"
         @close="showMinimap = false"
       ></tapestry-minimap>
+      <tapestry-minimap-button
+        v-else
+        @click="showMinimap = true"
+      ></tapestry-minimap-button>
     </template>
   </main>
 </template>
