@@ -88,12 +88,7 @@ export default {
       return wp.isLoggedIn()
     },
     polygonPoints() {
-      return Helpers.getLinePolygonPoints(
-        this.source,
-        this.target,
-        this.maxLevel,
-        this.scale
-      )
+      return Helpers.getLinePolygonPoints(this.source, this.target, this.scale)
     },
   },
   methods: {

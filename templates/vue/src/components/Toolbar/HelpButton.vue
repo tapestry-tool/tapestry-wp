@@ -47,7 +47,6 @@ export default {
 button {
   padding: 0.5rem;
   background: none;
-  color: #999;
   font-size: 1.2em;
   transition: all 0.2s ease;
 
