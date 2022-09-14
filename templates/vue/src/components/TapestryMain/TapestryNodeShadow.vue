@@ -9,13 +9,7 @@
       }"
       :fill="fill"
       :style="{
-        filter: `drop-shadow(${4 * (maxLevel - node.level) * scale + 3}px ${4 *
-          (maxLevel - node.level) *
-          scale +
-          3}px ${Math.max(10 - node.level, 4)}px rgba(0, 0, 0, ${Math.max(
-          0.5 - node.level * 0.05,
-          0.2
-        )}))`,
+        filter: dropShadow,
       }"
     ></circle>
   </transition>
@@ -113,6 +107,14 @@ export default {
     },
     selected() {
       return this.selection.includes(this.node.id)
+    },
+    dropShadow() {
+      const { offset, blur, opacity } = Helpers.getDropShadow(
+        this.node.level,
+        this.maxLevel,
+        this.scale
+      )
+      return `drop-shadow(${offset}px ${offset}px ${blur}px rgba(0, 0, 0, ${opacity}))`
     },
   },
   watch: {
