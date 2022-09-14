@@ -50,7 +50,7 @@ describe("Node Permissions", () => {
   })
 
   it("should not see add button or draft button if drafts disabled", () => {
-    cy.get(".settings-button").click()
+    cy.getByTestId("settings-button").click()
     cy.contains(/access/i).click()
     cy.getByTestId(`enable-draft`).click({ force: true })
     cy.submitSettingsModal()
@@ -71,7 +71,7 @@ describe("Node Permissions", () => {
       public: ["read"],
       authenticated: ["read"],
     })
-    cy.get(".settings-button").click()
+    cy.getByTestId("settings-button").click()
     cy.contains(/access/i).click()
     cy.getByTestId(`enable-submit-review`).click({ force: true })
     cy.submitSettingsModal()
