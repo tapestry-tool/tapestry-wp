@@ -269,8 +269,8 @@
 
 <script>
 import { mapGetters, mapState, mapActions } from "vuex"
-import FileUpload from "../common/FileUpload"
-import PermissionsTable from "../common/PermissionsTable"
+import FileUpload from "./common/FileUpload"
+import PermissionsTable from "./common/PermissionsTable"
 import { data as wpData } from "@/services/wp"
 
 const defaultPermissions = Object.fromEntries(
