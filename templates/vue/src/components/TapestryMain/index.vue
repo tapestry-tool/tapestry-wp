@@ -20,35 +20,47 @@
         aria-label="Main Tapestry View"
         :viewBox="computedViewBox"
       >
-        <g class="links">
-          <tapestry-link
-            v-for="link in links"
-            :key="`${link.source}-${link.target}`"
-            :source="nodes[link.source]"
-            :target="nodes[link.target]"
-            :scale="scale"
-            tabindex="-1"
-          ></tapestry-link>
-        </g>
-        <g class="nodes">
-          <tapestry-node
-            v-for="(node, id) in nodes"
-            :key="id"
-            :node="node"
-            :scale="scale"
-            class="node"
-            :class="{ selectable: true }"
-            :data-id="id"
-            :root="id == selectedId"
-            tabindex="-1"
-            @dragstart="handleNodeDragStart"
-            @drag="handleNodeDrag"
-            @dragend="handleNodeDragEnd"
-            @mouseover="handleMouseover(id)"
-            @mouseleave="activeNode = null"
-            @mounted="dragSelectEnabled ? updateSelectableNodes(node) : null"
-            @click="handleNodeClick"
-          ></tapestry-node>
+        <g v-for="r in renderedLevels" :key="r.level">
+          <g class="node-shadows">
+            <tapestry-node-shadow
+              v-for="(node, id) in r.nodes"
+              :key="id"
+              :node="node"
+              :scale="scale"
+              :root="id == selectedId"
+              tabindex="-1"
+            ></tapestry-node-shadow>
+          </g>
+          <g class="links">
+            <tapestry-link
+              v-for="link in r.links"
+              :key="`${link.source}-${link.target}`"
+              :source="nodes[link.source]"
+              :target="nodes[link.target]"
+              :scale="scale"
+              tabindex="-1"
+            ></tapestry-link>
+          </g>
+          <g v-if="!dragSelectEnabled || dragSelectReady" class="nodes">
+            <tapestry-node
+              v-for="(node, id) in r.nodes"
+              :key="id"
+              :node="node"
+              :scale="scale"
+              class="node"
+              :class="{ selectable: true }"
+              :data-id="id"
+              :root="id == selectedId"
+              tabindex="-1"
+              @dragstart="handleNodeDragStart"
+              @drag="handleNodeDrag"
+              @dragend="handleNodeDragEnd"
+              @mouseover="handleMouseover(id)"
+              @mouseleave="activeNode = null"
+              @mounted="dragSelectEnabled ? updateSelectableNodes(node) : null"
+              @click="handleNodeClick"
+            ></tapestry-node>
+          </g>
         </g>
         <locked-tooltip
           v-if="activeNode"
@@ -91,6 +103,7 @@ import TapestryLink from "./TapestryLink"
 import TapestryToolbar from "./TapestryToolbar"
 import TapestryNodeToolbar from "./TapestryNodeToolbar"
 import TapestryLinkToolbar from "./TapestryLinkToolbar"
+import TapestryNodeShadow from "./TapestryNodeShadow"
 import TapestryMinimapButton from "./TapestryMinimap/TapestryMinimapButton"
 import TapestryMinimap from "./TapestryMinimap"
 import RootNodeButton from "./RootNodeButton"
@@ -110,6 +123,7 @@ export default {
     TapestryToolbar,
     TapestryNodeToolbar,
     TapestryLinkToolbar,
+    TapestryNodeShadow,
     TapestryMinimapButton,
     TapestryMinimap,
     RootNodeButton,
@@ -177,6 +191,27 @@ export default {
         }
       }
     },
+    renderedLevels() {
+      const levels = []
+      for (let i = 1; i <= this.maxLevel; i++) {
+        levels.push({
+          level: i,
+          nodes: {},
+          links: [],
+        })
+      }
+      for (const link of this.links) {
+        levels[
+          Math.max(this.nodes[link.source].level, this.nodes[link.target].level) - 1
+        ].links.push(link)
+      }
+      for (const id in this.nodes) {
+        const node = this.nodes[id]
+        levels[node.level - 1].nodes[id] = node
+      }
+      levels.reverse()
+      return levels
+    },
     computedViewBox() {
       // return this.viewBox.join(" ")
       return `${this.viewBox[0] + this.offset.x} ${this.viewBox[1] +
@@ -184,6 +219,9 @@ export default {
     },
     background() {
       return this.settings.backgroundUrl
+    },
+    isLoggedIn() {
+      return wp.isLoggedIn()
     },
     canEdit() {
       return wp.canEditTapestry()
@@ -206,11 +244,12 @@ export default {
         : this.nodes
     },
     maxScale() {
+      // TODO: may need to update how the smallest node size is calculated
       return Math.max(
         (this.scaleConstants.maxNodeSizeToScreen *
           Math.min(this.viewBox[2], this.viewBox[3])) /
-          Helpers.getNodeBaseRadius(this.maxLevel, this.maxLevel),
-        140 / Helpers.getNodeBaseRadius(this.maxLevel, this.maxLevel)
+          Helpers.getNodeBaseRadius(this.maxLevel),
+        140 / Helpers.getNodeBaseRadius(this.maxLevel)
       )
     },
     routeName() {
@@ -372,9 +411,6 @@ export default {
     addRootNode() {
       this.$root.$emit("add-node", null)
     },
-    isLoggedIn() {
-      return wp.isLoggedIn()
-    },
     updateAppHeight() {
       if (this.$refs.app) {
         const bodyHeight = document.body.getBoundingClientRect().height
@@ -408,7 +444,7 @@ export default {
       if (!scale) {
         scale = this.scale
       }
-      const maxNodeSize = Helpers.getNodeRadius(1, this.maxLevel, scale)
+      const maxNodeSize = Helpers.getNodeRadius(1, scale)
       if (scale < 1) {
         const centerX = (-1 * this.viewBox[2] * (1 - scale)) / 2
         const centerY = (-1 * this.viewBox[3] * (1 - scale)) / 2
@@ -665,8 +701,7 @@ export default {
     },
     handleNodeClick(node) {
       // zoom to the level that the node is on, and pan towards the node
-      const baseRadius = Helpers.getNodeBaseRadius(node.level, this.maxLevel)
-      const targetScale = 140 / baseRadius
+      const targetScale = Helpers.getTargetScale(node.level)
       const deltaScale = targetScale - this.scale
 
       const targetViewBoxX = this.unscaledViewBox[0] * targetScale
@@ -858,8 +893,17 @@ export default {
         ) {
           this.$root.$emit("open-node", node.id)
         }
-      } else if (code === "Tab") {
-        // ? potentially let the user tab out of the main tapestry view, since the user should be fully capable of navigating through all the nodes by using just arrow keys
+      } else if (code === "KeyS") {
+        // focus the sidebar
+        if (!this.$route.query.sidebar) {
+          this.$router.push({
+            ...this.$route,
+            query: { ...this.$route.query, sidebar: "info" },
+          })
+        }
+        this.$nextTick(() => {
+          document.querySelector(".sidebar")?.focus()
+        })
       } else if (code === "KeyE") {
         if (this.nodeNavLinkMode) {
           this.openSelectedLinkModal()

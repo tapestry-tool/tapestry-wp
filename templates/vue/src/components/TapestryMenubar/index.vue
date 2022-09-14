@@ -7,15 +7,18 @@
             data-qa="user-settings-button"
           ></user-settings-button>
         </b-col>
-        <template v-if="canEdit || (!showMap && hasDepth)">
-          <b-col v-if="canEdit" class="p-0">
+        <template v-if="canEdit">
+          <b-col class="p-0">
             <help-button />
           </b-col>
-          <b-col v-if="canEdit && settings.submitNodesEnabled" class="p-0">
+          <b-col v-if="settings.submitNodesEnabled" class="p-0">
             <review-notifications />
           </b-col>
-          <b-col v-if="canEdit" class="p-0">
+          <b-col class="p-0">
             <settings-modal-button></settings-modal-button>
+          </b-col>
+          <b-col class="p-0">
+            <operations-button />
           </b-col>
         </template>
       </b-row>
@@ -29,6 +32,7 @@ import SettingsModalButton from "./SettingsModalButton"
 import UserSettingsButton from "./UserSettingsButton"
 import ReviewNotifications from "./ReviewNotifications"
 import HelpButton from "./HelpButton"
+import OperationsButton from "./OperationsButton"
 import * as wp from "@/services/wp"
 
 export default {
@@ -37,26 +41,15 @@ export default {
     ReviewNotifications,
     UserSettingsButton,
     HelpButton,
+    OperationsButton,
   },
   computed: {
     ...mapState(["settings"]),
     canEdit() {
       return wp.canEditTapestry()
     },
-    hasDepth() {
-      return this.maxLevel > 1 && this.settings.defaultDepth > 0
-    },
-    showMap() {
-      return this.settings.renderMap
-    },
     isLoggedIn() {
       return wp.isLoggedIn()
-    },
-  },
-  methods: {
-    hideMenubar() {
-      // TODO: if this is still needed, add the necessary CSS for hiding the menubar
-      return !(this.canEdit || (!this.showMap && this.hasDepth))
     },
   },
 }
@@ -71,7 +64,7 @@ export default {
   padding-right: 5vw;
   transition: all 0.2s ease-out;
 
-  button {
+  button.menubar-button {
     color: var(--text-color-tertiary);
     padding: 0.5rem;
     background: none;
@@ -83,26 +76,6 @@ export default {
       background: none;
       color: var(--highlight-color);
       transform: scale(1.1);
-    }
-  }
-
-  .slider-wrapper {
-    background: var(--bg-color-secondary);
-    box-shadow: 0 0 7px 0 var(--bg-color-primary);
-    display: flex;
-    align-items: center;
-    border-radius: 4px;
-    border-bottom-right-radius: 0;
-    border-bottom-left-radius: 0;
-    padding: 8px 6px 8px 12px;
-    margin-left: auto;
-    position: relative;
-
-    button {
-      color: var(--text-color-tertiary);
-      &:hover {
-        color: var(--highlight-color);
-      }
     }
   }
 }

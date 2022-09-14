@@ -268,14 +268,6 @@ li p {
     opacity: 0;
 }
 
-.links line {
-    stroke-opacity: 5;
-}
-
-.link-lines.deletable {
-    cursor: pointer;
-}
-
 /* MEDIA BUTTON */
 
 .mediaButton {

@@ -387,6 +387,7 @@ export default class Helpers {
       hideTitle: false,
       hideProgress: false,
       hideMedia: false,
+      hideWhenLocked: false,
       backgroundColor: "#8396a1",
       textColor: "white",
       skippable: true,
@@ -469,24 +470,20 @@ export default class Helpers {
     return -1 // not visible
   }
 
+  static getTargetScale(level) {
+    return Math.max(1, level / store.state.scaleConstants.levelMultiplier)
+  }
+
   static getCurrentLevel(scale) {
     return Math.floor(scale * store.state.scaleConstants.levelMultiplier)
   }
 
-  static getNodeBaseRadius(level, maxLevel) {
-    return (
-      140 *
-      Helpers.mapValue({
-        value: level,
-        maxValue: maxLevel,
-        from: 1,
-        to: Math.max(1 - maxLevel * 0.2, 0.2),
-      })
-    )
+  static getNodeBaseRadius(level) {
+    return 140 * Math.pow(0.75, level - 1)
   }
 
-  static getNodeRadius(level, maxLevel, scale) {
-    const baseRadius = Helpers.getNodeBaseRadius(level, maxLevel)
+  static getNodeRadius(level, scale) {
+    const baseRadius = Helpers.getNodeBaseRadius(level)
     const currentLevel = Helpers.getCurrentLevel(scale)
     if (level < currentLevel) {
       // growth rate should be slow for nodes higher than current level
@@ -501,16 +498,16 @@ export default class Helpers {
     }
   }
 
-  static getMinimapLinePoints(source, target, maxLevel) {
+  static getMinimapLinePoints(source, target) {
     const x1 = source.coordinates.x,
       y1 = source.coordinates.y,
       x2 = target.coordinates.x,
       y2 = target.coordinates.y
     let width1 =
-        Helpers.getNodeBaseRadius(source.level, maxLevel) *
+        Helpers.getNodeBaseRadius(source.level) *
         store.state.scaleConstants.lineWidthRatio,
       width2 =
-        Helpers.getNodeBaseRadius(target.level, maxLevel) *
+        Helpers.getNodeBaseRadius(target.level) *
         store.state.scaleConstants.lineWidthRatio
     // make width differences more dramatic for better visual aid
     if (source.level < target.level) {
@@ -533,16 +530,16 @@ export default class Helpers {
     ]
   }
 
-  static getLinePolygonPoints(source, target, maxLevel, scale = 1) {
+  static getLinePolygonPoints(source, target, scale = 1) {
     const x1 = source.coordinates.x * scale,
       y1 = source.coordinates.y * scale,
       x2 = target.coordinates.x * scale,
       y2 = target.coordinates.y * scale
     let width1 =
-        Helpers.getNodeRadius(source.level, maxLevel, scale) *
+        Helpers.getNodeRadius(source.level, scale) *
         store.state.scaleConstants.lineWidthRatio,
       width2 =
-        Helpers.getNodeRadius(target.level, maxLevel, scale) *
+        Helpers.getNodeRadius(target.level, scale) *
         store.state.scaleConstants.lineWidthRatio
     // make width differences more dramatic for better visual aid
     if (source.level < target.level) {

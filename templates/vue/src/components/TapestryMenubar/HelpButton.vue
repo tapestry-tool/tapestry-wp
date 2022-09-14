@@ -1,5 +1,5 @@
 <template>
-  <button aria-label="get help" @click="open">
+  <button aria-label="get help" class="menubar-button" @click="open">
     <tapestry-icon icon="question-circle" />
     <help-modal :show="helpModalOpen" @close="close"></help-modal>
   </button>

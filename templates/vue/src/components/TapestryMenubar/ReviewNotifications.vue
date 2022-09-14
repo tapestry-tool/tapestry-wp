@@ -3,6 +3,7 @@
     <button
       ref="toggle"
       aria-label="toggle pending nodes"
+      class="menubar-button"
       :class="{ active: showMenu }"
       @click="showMenu = !showMenu"
     >

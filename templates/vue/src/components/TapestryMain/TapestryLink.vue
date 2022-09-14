@@ -74,12 +74,7 @@ export default {
       return wp.isLoggedIn()
     },
     polygonPoints() {
-      return Helpers.getLinePolygonPoints(
-        this.source,
-        this.target,
-        this.maxLevel,
-        this.scale
-      )
+      return Helpers.getLinePolygonPoints(this.source, this.target, this.scale)
     },
     elementId() {
       return Helpers.getLinkElementId(this.source.id, this.target.id)

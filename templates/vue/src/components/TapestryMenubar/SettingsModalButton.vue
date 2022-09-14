@@ -2,7 +2,7 @@
   <button
     aria-label="Open Tapestry Settings"
     data-qa="settings-button"
-    class="settings-button"
+    class="menubar-button"
     @click="open"
   >
     <tapestry-icon icon="cog"></tapestry-icon>
@@ -79,9 +79,3 @@ export default {
   },
 }
 </script>
-
-<style lang="scss" scoped>
-.settings-button:only-child {
-  margin-right: 12px;
-}
-</style>

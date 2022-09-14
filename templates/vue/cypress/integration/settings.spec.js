@@ -1,5 +1,3 @@
-import { TEST_TAPESTRY_NAME } from "../support/constants"
-
 describe("Settings", () => {
   beforeEach(() => {
     cy.fixture("three-nodes.json").as("tapestry")
@@ -52,30 +50,5 @@ describe("Settings", () => {
         cy.submitSettingsModal()
         cy.get("body").should("have.css", "background-image", `url("${url}")`)
       })
-  })
-
-  it(`should be able to duplicate a tapestry`, () => {
-    cy.contains(/advanced/i).click()
-
-    cy.intercept("POST", "**/tapestries").as("duplicate")
-
-    cy.contains(/duplicate tapestry/i).click()
-    cy.getByTestId("spinner").should("be.visible")
-    cy.wait("@duplicate")
-
-    cy.getByTestId("duplicate-tapestry-link")
-      .should("be.visible")
-      .then($el => {
-        const { href } = $el.get(0)
-        cy.visit(href)
-      })
-
-    cy.getByTestId("tapestry-loading").should("not.exist")
-    cy.get("@tapestry").then(({ nodes }) => {
-      cy.get("#tapestry").within(() => {
-        nodes.forEach(node => cy.contains(node.title).should("be.visible"))
-      })
-    })
-    cy.deleteTapestry(`${TEST_TAPESTRY_NAME} (1)`)
   })
 })

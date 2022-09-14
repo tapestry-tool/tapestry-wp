@@ -32,14 +32,6 @@
         :data-qa="`node-circle-${node.id}`"
         :fill="fill"
         :stroke="progressBackgroundColor"
-        :style="{
-          filter: `drop-shadow(${4 * (maxLevel - node.level) * scale}px ${4 *
-            (maxLevel - node.level) *
-            scale}px ${Math.max(10 - node.level, 4)}px rgba(0, 0, 0, ${Math.max(
-            0.5 - node.level * 0.05,
-            0.2
-          )}))`,
-        }"
       ></circle>
       <transition name="fade">
         <circle
@@ -87,9 +79,13 @@
               class="meta"
               :style="{
                 color: node.textColor,
-                fontSize: Math.min(radius * 0.25, 30) + 'px',
+                fontSize: radius * 0.2 + 'px',
               }"
             >
+              <i
+                v-if="!node.unlocked && node.hideWhenLocked"
+                class="fas fa-eye-slash"
+              ></i>
               <p class="title">{{ node.title }}</p>
               <p style="font-size: 60%;">Level {{ node.level }}</p>
               <p v-if="node.mediaDuration" class="timecode">
@@ -243,7 +239,8 @@ export default {
       if (this.hasPermission("edit")) {
         label += "To edit this node, press E. "
       }
-      label += "To exit the Main Tapestry view, press the Q Key or the Escape Key."
+      label +=
+        "To go to the sidebar for this node, press S. To exit the Main Tapestry view, press the Q Key or the Escape Key."
       return label
     },
     canAddChild() {
@@ -333,8 +330,7 @@ export default {
         return 0
       }
       const radius =
-        Helpers.getNodeRadius(this.node.level, this.maxLevel, this.scale) *
-        (this.root ? 1.2 : 1)
+        Helpers.getNodeRadius(this.node.level, this.scale) * (this.root ? 1.2 : 1)
       return this.isGrandChild ? Math.min(40, radius) : radius
     },
     fill() {
@@ -364,7 +360,7 @@ export default {
       if (this.selected) {
         return "var(--highlight-color)8a"
       } else if (!this.node.unlocked) {
-        return this.node.hideWhenLocked ? "#656567" : "#8a8a8cb3"
+        return "#8a8a8cb3"
       }
       return this.thumbnailURL ? "#33333366" : "transparent"
     },
