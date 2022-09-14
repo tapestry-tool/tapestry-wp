@@ -11,33 +11,47 @@
         aria-label="Main Tapestry View"
         :viewBox="computedViewBox"
       >
-        <g class="links">
-          <tapestry-link
-            v-for="link in links"
-            :key="`${link.source}-${link.target}`"
-            :source="nodes[link.source]"
-            :target="nodes[link.target]"
-            :scale="scale"
-            tabindex="-1"
-          ></tapestry-link>
-        </g>
-        <g v-if="!dragSelectEnabled || dragSelectReady" class="nodes">
-          <tapestry-node
-            v-for="(node, id) in nodes"
-            :key="id"
-            :node="node"
-            :scale="scale"
-            class="node"
-            :class="{ selectable: true }"
-            :data-id="id"
-            :root="id == selectedId"
-            tabindex="-1"
-            @dragend="updateViewBox"
-            @mouseover="handleMouseover(id)"
-            @mouseleave="activeNode = null"
-            @mounted="dragSelectEnabled ? updateSelectableNodes(node) : null"
-            @click="handleNodeClick"
-          ></tapestry-node>
+        <g v-for="r in renderedLevels" :key="r.level">
+          <g class="node-shadows">
+            <tapestry-node-shadow
+              v-for="(node, id) in r.nodes"
+              :key="id"
+              :node="node"
+              :scale="scale"
+              :root="id == selectedId"
+              tabindex="-1"
+            ></tapestry-node-shadow>
+          </g>
+          <g class="links">
+            <tapestry-link
+              v-for="link in r.links"
+              :key="`${link.source}-${link.target}`"
+              :source="nodes[link.source]"
+              :target="nodes[link.target]"
+              :scale="scale"
+              tabindex="-1"
+            ></tapestry-link>
+          </g>
+          <g v-if="!dragSelectEnabled || dragSelectReady" class="nodes">
+            <tapestry-node
+              v-for="(node, id) in r.nodes"
+              :key="id"
+              :node="node"
+              :scale="scale"
+              class="node"
+              :class="{ selectable: true }"
+              :data-id="id"
+              :root="id == selectedId"
+              tabindex="-1"
+              @dragstart="handleNodeDragStart"
+              @drag="handleNodeDrag"
+              @dragend="handleNodeDragEnd"
+              @mouseover="handleMouseover(id)"
+              @mouseleave="activeNode = null"
+              @mounted="dragSelectEnabled ? updateSelectableNodes(node) : null"
+              @click="handleNodeClick"
+            ></tapestry-node>
+          </g>
         </g>
         <locked-tooltip
           v-if="activeNode"
@@ -68,6 +82,7 @@ import DragSelectModular from "@/utils/dragSelectModular"
 import { mapActions, mapGetters, mapMutations, mapState } from "vuex"
 import TapestryNode from "./TapestryNode"
 import TapestryLink from "./TapestryLink"
+import TapestryNodeShadow from "./TapestryNodeShadow"
 import TapestryMinimapButton from "./TapestryMinimap/TapestryMinimapButton"
 import TapestryMinimap from "./TapestryMinimap"
 import RootNodeButton from "./RootNodeButton"
@@ -76,13 +91,14 @@ import Helpers from "@/utils/Helpers"
 import ZoomPanHelper from "@/utils/ZoomPanHelper"
 import { names } from "@/config/routes"
 import * as wp from "@/services/wp"
-import { interpolate, interpolateDelta } from "@/utils/interpolate"
+import { interpolate } from "@/utils/interpolate"
 // import { scaleConstants } from "@/utils/constants"
 
 export default {
   components: {
     TapestryNode,
     TapestryLink,
+    TapestryNodeShadow,
     TapestryMinimapButton,
     TapestryMinimap,
     RootNodeButton,
@@ -100,6 +116,11 @@ export default {
       appDimensions: null,
       zoomPanHelper: null,
       isPanning: false,
+
+      dragCoordinates: {},
+      dragTimer: null,
+      dragEdgeDirection: { x: 0, y: 0 },
+      dragOffsetDelta: { x: 0, y: 0 },
 
       showMinimap: true,
     }
@@ -147,6 +168,27 @@ export default {
         }
       }
     },
+    renderedLevels() {
+      const levels = []
+      for (let i = 1; i <= this.maxLevel; i++) {
+        levels.push({
+          level: i,
+          nodes: {},
+          links: [],
+        })
+      }
+      for (const link of this.links) {
+        levels[
+          Math.max(this.nodes[link.source].level, this.nodes[link.target].level) - 1
+        ].links.push(link)
+      }
+      for (const id in this.nodes) {
+        const node = this.nodes[id]
+        levels[node.level - 1].nodes[id] = node
+      }
+      levels.reverse()
+      return levels
+    },
     computedViewBox() {
       // return this.viewBox.join(" ")
       return `${this.viewBox[0] + this.offset.x} ${this.viewBox[1] +
@@ -173,11 +215,12 @@ export default {
         : this.nodes
     },
     maxScale() {
+      // TODO: may need to update how the smallest node size is calculated
       return Math.max(
         (this.scaleConstants.maxNodeSizeToScreen *
           Math.min(this.viewBox[2], this.viewBox[3])) /
-          Helpers.getNodeBaseRadius(this.maxLevel, this.maxLevel),
-        140 / Helpers.getNodeBaseRadius(this.maxLevel, this.maxLevel)
+          Helpers.getNodeBaseRadius(this.maxLevel),
+        140 / Helpers.getNodeBaseRadius(this.maxLevel)
       )
     },
     routeName() {
@@ -285,6 +328,7 @@ export default {
     this.$refs.app.removeEventListener("keydown", this.handleKey)
   },
   methods: {
+    ...mapActions(["updateNodeCoordinates"]),
     ...mapMutations(["select", "unselect", "clearSelection"]),
     ...mapActions([
       "goToNodeChildren",
@@ -310,7 +354,7 @@ export default {
       if (!scale) {
         scale = this.scale
       }
-      const maxNodeSize = Helpers.getNodeRadius(1, this.maxLevel, scale)
+      const maxNodeSize = Helpers.getNodeRadius(1, scale)
       if (scale < 1) {
         const centerX = (-1 * this.viewBox[2] * (1 - scale)) / 2
         const centerY = (-1 * this.viewBox[3] * (1 - scale)) / 2
@@ -475,7 +519,10 @@ export default {
       DragSelectModular.updateSelectableNodes()
     },
     nodeIsEditable(node) {
-      return this.isLoggedIn && Helpers.hasPermission(node, "edit")
+      return this.isLoggedIn && this.hasPermission(node, "edit")
+    },
+    hasPermission(node, action) {
+      return Helpers.hasPermission(node, action, this.settings.showRejected)
     },
     updateViewBox() {
       const MAX_RADIUS = 240
@@ -550,24 +597,165 @@ export default {
 
       return box
     },
-    handleNodeClick({ event, level }) {
+    handleNodeClick(node) {
       // zoom to the level that the node is on, and pan towards the node
-      const baseRadius = Helpers.getNodeBaseRadius(level, this.maxLevel)
-      const targetScale = 140 / baseRadius
+      const targetScale = Helpers.getTargetScale(node.level)
       const deltaScale = targetScale - this.scale
-      const { offsetX, offsetY } = event
-      interpolateDelta(
-        0,
-        deltaScale,
+
+      const targetViewBoxX = this.unscaledViewBox[0] * targetScale
+      const targetViewBoxY = this.unscaledViewBox[1] * targetScale
+
+      let targetOffset = {
+        x:
+          this.offset.x +
+          (node.coordinates.x - this.unscaledViewBox[0]) * deltaScale,
+        y:
+          this.offset.y +
+          (node.coordinates.y - this.unscaledViewBox[1]) * deltaScale,
+      }
+      targetOffset = this.clampOffsetValue(targetOffset, targetScale)
+
+      interpolate(
+        {
+          scale: this.scale,
+          offsetX: this.offset.x,
+          offsetY: this.offset.y,
+          viewBoxX: this.viewBox[0],
+          viewBoxY: this.viewBox[1],
+        },
+        {
+          scale: targetScale,
+          offsetX: targetOffset.x,
+          offsetY: targetOffset.y,
+          viewBoxX: targetViewBoxX,
+          viewBoxY: targetViewBoxY,
+        },
         Math.abs(deltaScale * 600),
-        delta => {
-          this.handleZoom(delta, offsetX, offsetY)
+        ({ scale, offsetX, offsetY, viewBoxX, viewBoxY }) => {
+          this.scale = scale
+          this.offset.x = offsetX
+          this.offset.y = offsetY
+          this.viewBox[0] = viewBoxX
+          this.viewBox[1] = viewBoxY
         },
         () => {
           this.updateScale()
         },
         "easeOut"
       )
+    },
+    handleNodeDragStart(node) {
+      this.dragOffsetDelta = { x: 0, y: 0 }
+
+      // save initial coordinates of nodes
+      this.dragCoordinates = {}
+      if (this.selection.length) {
+        this.dragCoordinates = this.selection.reduce((coordinates, nodeId) => {
+          const node = this.getNode(nodeId)
+          coordinates[nodeId] = {
+            x: node.coordinates.x,
+            y: node.coordinates.y,
+          }
+          return coordinates
+        }, {})
+      } else {
+        this.dragCoordinates[node.id] = {
+          x: node.coordinates.x,
+          y: node.coordinates.y,
+        }
+      }
+
+      // initialize timer for automatic panning
+      const triggerInterval = 50 // interval of automatic panning trigger, in milliseconds
+      const speed = 20 // speed of automatic panning, in view pixels per triggerInterval
+      clearInterval(this.dragTimer)
+      this.dragTimer = setInterval(() => {
+        const deltaX = speed * this.dragEdgeDirection.x
+        const deltaY = speed * this.dragEdgeDirection.y
+
+        if (deltaX !== 0 || deltaY !== 0) {
+          this.offset.x += deltaX
+          this.offset.y += deltaY
+          this.dragOffsetDelta.x += deltaX
+          this.dragOffsetDelta.y += deltaY
+          for (const id of Object.keys(this.dragCoordinates)) {
+            const node = this.getNode(id)
+            node.coordinates.x += deltaX / this.scale
+            node.coordinates.y += deltaY / this.scale
+          }
+        }
+      }, triggerInterval)
+    },
+    handleNodeDrag({ x, y, dx, dy }) {
+      // take into account the offset changes from automatic panning, and reset the recorded changes immediately to avoid counting them more than once
+      const { x: offsetX, y: offsetY } = this.dragOffsetDelta
+      this.dragOffsetDelta.x = 0
+      this.dragOffsetDelta.y = 0
+      for (const id of Object.keys(this.dragCoordinates)) {
+        const node = this.getNode(id)
+        node.coordinates.x += (dx - offsetX) / this.scale
+        node.coordinates.y += (dy - offsetY) / this.scale
+      }
+
+      // detect dragging to edge of view
+      const marginRatio = 0.1
+      if (
+        Math.abs(x - this.viewBox[0] - this.offset.x) <=
+        this.viewBox[2] * marginRatio
+      ) {
+        this.dragEdgeDirection.x = -1
+      } else if (
+        Math.abs(this.viewBox[0] + this.offset.x + this.viewBox[2] - x) <=
+        this.viewBox[2] * marginRatio
+      ) {
+        this.dragEdgeDirection.x = 1
+      } else {
+        this.dragEdgeDirection.x = 0
+      }
+      if (
+        Math.abs(y - this.viewBox[1] - this.offset.y) <=
+        this.viewBox[3] * marginRatio
+      ) {
+        this.dragEdgeDirection.y = -1
+      } else if (
+        Math.abs(this.viewBox[1] + this.offset.y + this.viewBox[3] - y) <=
+        this.viewBox[3] * marginRatio
+      ) {
+        this.dragEdgeDirection.y = 1
+      } else {
+        this.dragEdgeDirection.y = 0
+      }
+    },
+    handleNodeDragEnd({ dx, dy }) {
+      clearInterval(this.dragTimer)
+      this.dragTimer = null
+
+      const { x: offsetX, y: offsetY } = this.dragOffsetDelta
+      for (const [id, originalCoordinates] of Object.entries(this.dragCoordinates)) {
+        const node = this.getNode(id)
+        node.coordinates.x += (dx - offsetX) / this.scale
+        node.coordinates.y += (dy - offsetY) / this.scale
+        const coordinates = {
+          x: node.coordinates.x,
+          y: node.coordinates.y,
+        }
+        if (
+          originalCoordinates.x == coordinates.x &&
+          originalCoordinates.y == coordinates.y
+        ) {
+          continue
+        }
+        if (this.hasPermission(node, "edit") || this.hasPermission(node, "move")) {
+          this.updateNodeCoordinates({
+            id,
+            coordinates,
+            originalCoordinates,
+          })
+        }
+      }
+
+      this.updateViewBox()
+      this.clampOffset()
     },
     handleMouseover(id) {
       const node = this.nodes[id]
@@ -601,8 +789,17 @@ export default {
         ) {
           this.$root.$emit("open-node", node.id)
         }
-      } else if (code === "Tab") {
-        // ? potentially let the user tab out of the main tapestry view, since the user should be fully capable of navigating through all the nodes by using just arrow keys
+      } else if (code === "KeyS") {
+        // focus the sidebar
+        if (!this.$route.query.sidebar) {
+          this.$router.push({
+            ...this.$route,
+            query: { ...this.$route.query, sidebar: "info" },
+          })
+        }
+        this.$nextTick(() => {
+          document.querySelector(".sidebar")?.focus()
+        })
       } else if (code === "KeyE") {
         if (this.nodeNavLinkMode) {
           this.openSelectedLinkModal()

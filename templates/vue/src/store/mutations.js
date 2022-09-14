@@ -10,15 +10,9 @@ export function init(state, dataset) {
       state.nodes = {}
       let maxLevel = 1
       Object.values(value).forEach(node => {
-        const level = node.level ?? 1
         // Has to call Vue.set so `state.nodes` is reactive
-        Vue.set(state.nodes, node.id, {
-          ...node,
-          level: level,
-        })
-        if (level > maxLevel) {
-          maxLevel = level
-        }
+        Vue.set(state.nodes, node.id, node)
+        maxLevel = Math.max(maxLevel, node.level)
       })
       state.maxLevel = maxLevel
     } else {
