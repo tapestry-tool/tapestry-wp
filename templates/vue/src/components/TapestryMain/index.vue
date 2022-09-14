@@ -41,7 +41,7 @@
               tabindex="-1"
             ></tapestry-link>
           </g>
-          <g v-if="!dragSelectEnabled || dragSelectReady" class="nodes">
+          <g class="nodes">
             <tapestry-node
               v-for="(node, id) in r.nodes"
               :key="id"
