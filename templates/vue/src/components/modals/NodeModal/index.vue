@@ -713,25 +713,46 @@ export default {
     },
     handleClose(event) {
       if (
-        this.hasUnsavedChanges &&
-        (event.trigger == "backdrop" ||
-          event.trigger == "headerclose" ||
-          event.trigger == "esc" ||
-          event instanceof MouseEvent) // cancel triggered
+        event.trigger == "backdrop" ||
+        event.trigger == "headerclose" ||
+        event.trigger == "esc" ||
+        event instanceof MouseEvent
       ) {
-        event.preventDefault()
-        this.$bvModal
-          .msgBoxConfirm("All unsaved changes will be lost.", {
-            modalClass: "node-modal-confirmation",
-            title: "Are you sure you want to continue?",
-            okTitle: "Close",
-          })
-          .then(close => {
-            if (close) {
-              this.close()
-            }
-          })
-          .catch(err => console.log(err))
+        if (this.hasUnsavedChanges) {
+          event.preventDefault()
+          this.$bvModal
+            .msgBoxConfirm("All unsaved changes will be lost.", {
+              modalClass: "node-modal-confirmation",
+              title: "Are you sure you want to continue?",
+              okTitle: "Close",
+            })
+            .then(close => {
+              if (close) {
+                this.close()
+              }
+            })
+            .catch(err => console.log(err))
+        } else if (this.fileUploading) {
+          event.preventDefault()
+          this.$bvModal
+            .msgBoxConfirm(
+              "An upload is in progress. If you close the modal now, the upload will still continue, but the uploaded file will not be applied to this node.",
+              {
+                modalClass: "node-modal-confirmation",
+                title: "Are you sure you want to continue?",
+                okTitle: "Close",
+              }
+            )
+            .then(close => {
+              if (close) {
+                this.fileUploading = false
+                this.close()
+              }
+            })
+            .catch(err => console.log(err))
+        } else {
+          this.close(event)
+        }
       } else {
         this.close(event)
       }
@@ -792,6 +813,26 @@ export default {
           })
           .then(close => {
             if (close) {
+              this.$router.push({
+                name: names.MODAL,
+                params: { nodeId, type: "edit", tab: "content" },
+              })
+            }
+          })
+          .catch(err => console.log(err))
+      } else if (this.fileUploading) {
+        this.$bvModal
+          .msgBoxConfirm(
+            "An upload is in progress. If you close the modal now, the upload will still continue, but the uploaded file will not be applied to this node.",
+            {
+              modalClass: "node-modal-confirmation",
+              title: "Are you sure you want to continue?",
+              okTitle: "Close",
+            }
+          )
+          .then(close => {
+            if (close) {
+              this.fileUploading = false
               this.$router.push({
                 name: names.MODAL,
                 params: { nodeId, type: "edit", tab: "content" },
