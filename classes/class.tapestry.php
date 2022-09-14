@@ -167,10 +167,21 @@ class Tapestry implements ITapestry
     {
         $tapestryNode = new TapestryNode($this->postId);
 
-        // Checks if user is logged in to prevent logged out user-0 from getting permissions
-        // Only add user permissions if it is not a review node
-        if (is_user_logged_in() && 'draft' !== $node->status) {
-            $userId = wp_get_current_user()->ID;
+        // Prevent guests from adding a node
+        if (!is_user_logged_in()) {
+            throw new TapestryError('INVALID_USER_ID', 'Please log in to add a node.', 403);
+        }
+
+        // Only add user-specific permissions to the author if it is not a review node
+        if (NodeStatus::DRAFT !== $node->status) {
+            $user = new TapestryUser();
+            
+            // Prevent non-admins from directly publishing a node
+            if (!$user->canEdit($this->postId)) {
+                throw new TapestryError('INVALID_USER_ID', 'Only admins can add a published node.', 403);
+            }
+
+            $userId = $user->getID();
             $node->permissions->{'user-'.$userId} = ['read', 'add', 'edit'];
         }
 
