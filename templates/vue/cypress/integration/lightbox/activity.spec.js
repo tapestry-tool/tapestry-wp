@@ -1,3 +1,5 @@
+import { roles } from "../../support/roles"
+
 describe("Activity", () => {
   it("should be able to complete drag and drop answer with items with background image and text ", () => {
     cy.fixture("one-node.json").as("oneNode")
@@ -629,7 +631,7 @@ describe("Activity", () => {
       cy.lightbox().should("not.exist")
     })
   })
-  it("should be able to view activity answers", () => {
+  it.only("should be able to view activity answers", () => {
     cy.fixture("one-node.json").as("oneNode")
     cy.setup("@oneNode")
     cy.getSelectedNode().then(node => {
@@ -645,8 +647,11 @@ describe("Activity", () => {
       cy.getByTestId("question-answer-text-single-placeholder-0").type(placeholder)
       cy.submitModal()
 
+      cy.logout()
+      cy.login("subscriber").visitTapestry()
+
       cy.openLightbox(node.id)
-      cy.route("POST", "/users/activity/**").as("submit")
+      cy.intercept("POST", "**/users/activity/**").as("submit")
       cy.lightbox().within(() => {
         cy.get(`[placeholder="${placeholder}"]`).should("be.visible")
         cy.get("input").type(answer)
@@ -657,6 +662,9 @@ describe("Activity", () => {
         cy.contains(/done/i).click()
       })
       cy.lightbox().should("not.exist")
+
+      cy.logout()
+      cy.login(roles.ADMIN).visitTapestry()
 
       cy.openModal("user-answers")
 
