@@ -422,6 +422,21 @@ class TapestryNode implements ITapestryNode
         ];
     }
 
+    public function getMediaType($node)
+    {
+        return $node->mediaType;
+    }
+
+    public function getTypeData($node)
+    {
+        return $node->typeData;
+    }
+
+    public function getNodeId($node)
+    {
+        return $node->nodeMetaId;
+    }
+
     private function _validateComment($review)
     {
         $canEditTapestry = current_user_can('edit_post', $this->tapestryPostId);
