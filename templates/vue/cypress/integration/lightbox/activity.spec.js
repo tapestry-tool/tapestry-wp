@@ -631,7 +631,7 @@ describe("Activity", () => {
       cy.lightbox().should("not.exist")
     })
   })
-  it.only("should be able to view activity answers", () => {
+  it("should be able to view activity answers", () => {
     cy.fixture("one-node.json").as("oneNode")
     cy.setup("@oneNode")
     cy.getSelectedNode().then(node => {
