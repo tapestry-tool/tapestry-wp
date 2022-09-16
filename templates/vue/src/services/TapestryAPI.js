@@ -209,6 +209,12 @@ class TapestryApi {
     return response
   }
 
+  async getAllUsersAnswers(nodeId) {
+    const url = `/users/answers?post_id=${this.postId}&node_id=${nodeId}`
+    const response = await this.client.get(url)
+    return response
+  }
+
   async getH5pSettings() {
     const url = `/users/h5pSettings?post_id=${this.postId}`
     const response = await this.client.get(url)

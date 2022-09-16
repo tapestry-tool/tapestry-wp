@@ -209,6 +209,13 @@ $REST_API_ENDPOINTS = [
             'callback' => 'completeQuestionById',
         ],
     ],
+    'GET_TAPESTRY_USER_ALL_ANSWERS' => (object) [
+        'ROUTE' => 'users/answers',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => 'getAllUsersAnswers',
+        ],
+    ],
     'GET_TAPESTRY_USER_H5P_SETTING' => (object) [
         'ROUTE' => 'users/h5psettings/(?P<tapestryPostId>[\d]+)',
         'ARGUMENTS' => [
@@ -1427,6 +1434,29 @@ function completeQuestionById($request)
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
 }
+
+/**
+ * Get all answers from all users for a question
+ * Example: /wp-json/tapestry-tool/v1/users/answers?post_id=44&node_id=3&question_id=abcd.
+ *
+ * @param object $request HTTP request
+ *
+ * @return object $response HTTP response
+ */
+function getAllUsersAnswers($request)
+{
+    $postId = $request['post_id'];
+    $nodeMetaId = $request['node_id'];
+
+    try {
+        $userProgress = new TapestryUserProgress($postId, $nodeMetaId);
+        return $userProgress->getAllUsersAnswers();
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+
 
 /**
  * Get user h5p video setting on a tapestry page by post id. Will need to pass these as query parameters
