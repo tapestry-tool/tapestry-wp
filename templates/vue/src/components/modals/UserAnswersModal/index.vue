@@ -248,7 +248,11 @@ export default {
             question: question.text,
             userId: userAnswer.ID,
             displayName: userAnswer.display_name,
-            text: userAnswer.text?.join(),
+            text: userAnswer.text
+              ? Array.isArray(userAnswer.text)
+                ? userAnswer.text.join()
+                : userAnswer.text
+              : "",
             audio: userAnswer.audio?.url,
             multipleChoice: this.formatMultipleChoiceAnswers(
               userAnswer.multipleChoice,
