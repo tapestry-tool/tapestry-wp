@@ -32,13 +32,11 @@
           </b-button>
         </b-row>
         <b-collapse :id="`question-${index}-container`" visible>
-          <b-card
-            sub-title="Show answer to a previous activity first"
-            bg-variant="light"
-            text-variant="dark"
-            class="mb-3"
-          >
-            <b-form-group>
+          <b-card bg-variant="light" text-variant="dark" class="mb-3">
+            <b-card-sub-title class="mb-0">
+              Show answer to a previous activity first
+            </b-card-sub-title>
+            <b-form-group class="topright-checkbox">
               <b-form-checkbox
                 v-model="question.followUp.enabled"
                 switch
@@ -50,6 +48,7 @@
             <b-form-group
               v-if="question.followUp.enabled"
               label="Show this text first:"
+              class="mt-3"
             >
               <b-form-input
                 v-model="question.followUp.text"
@@ -99,7 +98,7 @@
                 </span>
               </b-form-checkbox>
             </b-form-group>
-            <b-form-group label="Question text">
+            <b-form-group label="Question text" class="mt-3">
               <b-form-input
                 v-model="question.text"
                 :data-testid="`question-title-${index}`"
@@ -242,11 +241,10 @@
               </div>
             </b-form-group>
           </b-card>
-          <b-card
-            sub-title="Confirmation customization"
-            bg-variant="light"
-            text-variant="dark"
-          >
+          <b-card bg-variant="light" text-variant="dark">
+            <b-card-sub-title class="mb-0">
+              Customize confirmation screen
+            </b-card-sub-title>
             <b-form-group class="topright-checkbox">
               <b-form-checkbox
                 :checked="
@@ -259,8 +257,8 @@
                 {{
                   question.confirmation.title.length !== 0 ||
                   question.confirmation.message.length !== 0
-                    ? "Customized"
-                    : "Default"
+                    ? "Customize"
+                    : "Use default"
                 }}
               </b-form-checkbox>
             </b-form-group>
@@ -270,7 +268,7 @@
                   question.confirmation.message.length !== 0
               "
             >
-              <b-form-group label="Title">
+              <b-form-group label="Title" class="mt-3">
                 <b-form-input
                   v-model="question.confirmation.title"
                   :data-testid="`question-confirmation-title-${index}`"
@@ -458,12 +456,6 @@ export default {
 .activity {
   .icon {
     margin-right: 4px;
-  }
-
-  .topright-checkbox {
-    position: absolute;
-    right: 20px;
-    top: 10px;
   }
 
   .question-text {
