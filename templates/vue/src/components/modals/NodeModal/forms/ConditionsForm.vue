@@ -1,19 +1,21 @@
 <template>
-  <div>
-    <b-form-group class="mb-3">
-      <div class="lock-node-container">
-        <b-form-checkbox v-model="lock">
-          Prevent access until specified conditions are met
-        </b-form-checkbox>
-        <b-form-checkbox v-show="lock" v-model="hideWhenLocked" switch>
-          {{ hideWhenLocked ? "Hide" : "Grey out" }}
-        </b-form-checkbox>
-      </div>
-      <b-form-invalid-feedback :force-show="lock">
-        Please note: Currently, locked nodes cannot be unlocked by users who are not
-        logged in.
-      </b-form-invalid-feedback>
+  <b-card>
+    <b-card-sub-title>
+      <b-form-checkbox v-model="lock">
+        Prevent access until specified conditions are met
+      </b-form-checkbox>
+    </b-card-sub-title>
+    <b-form-group class="topright-checkbox mb-3">
+      <b-form-checkbox v-show="lock" v-model="hideWhenLocked" switch>
+        {{ hideWhenLocked ? "Hide" : "Grey out" }}
+      </b-form-checkbox>
     </b-form-group>
+    <b-alert :show="lock" variant="warning" class="mt-2">
+      <em>
+        Please note that locked nodes cannot be unlocked by users who are not logged
+        in.
+      </em>
+    </b-alert>
     <div v-if="lock">
       <b-card
         v-for="(condition, idx) in conditions"
@@ -74,14 +76,14 @@
           </b-col>
         </b-row>
       </b-card>
-      <b-row class="mx-0 mb-3">
+      <b-row class="mx-0">
         <b-button data-qa="add-condition" variant="primary" @click="addCondition">
           <i class="fas fa-plus icon"></i>
           Add Condition
         </b-button>
       </b-row>
     </div>
-  </div>
+  </b-card>
 </template>
 
 <script>
@@ -184,11 +186,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.lock-node-container {
-  display: flex;
-  justify-content: space-between;
-}
-
 .condition-container {
   position: relative;
 
