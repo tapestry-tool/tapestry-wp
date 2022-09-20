@@ -167,22 +167,22 @@ class Tapestry implements ITapestry
     {
         $tapestryNode = new TapestryNode($this->postId);
 
-        // Prevent guests from adding a node
-        if (!is_user_logged_in()) {
-            throw new TapestryError('INVALID_USER_ID', 'Please log in to add a node.', 403);
-        }
+        if (is_user_logged_in()) {
+            // Only add user-specific permissions to the author if it is not a review node
+            if (NodeStatus::DRAFT !== $node->status) {
+                $user = new TapestryUser();
 
-        // Only add user-specific permissions to the author if it is not a review node
-        if (NodeStatus::DRAFT !== $node->status) {
-            $user = new TapestryUser();
-            
-            // Prevent non-admins from directly publishing a node
-            if (!$user->canEdit($this->postId)) {
-                throw new TapestryError('INVALID_USER_ID', 'Only admins can add a published node.', 403);
+                // Prevent non-admins from directly publishing a node
+                if (!$user->canEdit($this->postId)) {
+                    throw new TapestryError('FAILED_TO_ADD_NODE', 'Only admins can add a published node.', 403);
+                }
+
+                $userId = $user->getID();
+                $node->permissions->{'user-'.$userId} = ['read', 'add', 'edit'];
             }
-
-            $userId = $user->getID();
-            $node->permissions->{'user-'.$userId} = ['read', 'add', 'edit'];
+        } elseif (!defined('TAPESTRY_USE_DEV_MODE') || empty(TAPESTRY_USE_DEV_MODE)) {
+            // Prevent guests from adding a node
+            throw new TapestryError('FAILED_TO_ADD_NODE', 'Please log in to add a node.', 403);
         }
 
         $tapestryNode->set($node);
