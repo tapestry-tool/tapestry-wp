@@ -1,75 +1,77 @@
 <template>
-  <div
-    ref="container"
-    class="media-container"
-    :style="navBarStyle"
-    data-qa="multi-content"
-  >
-    <header>
-      <h1
-        v-if="showTitle"
-        :class="{
-          title: true,
-          'nested-media-title': context === 'multi-content',
-        }"
-      >
-        {{ node.title }}
-        <completed-icon :node="node" class="mx-2" />
-      </h1>
-    </header>
-    <template v-if="node.presentationStyle">
-      <div v-if="node.presentationStyle === 'unit'">
-        There's currently no content here.
-      </div>
-      <template v-else>
-        <div v-if="!node.accessible">
-          <locked-content :node="node"></locked-content>
-        </div>
-        <multi-content-rows
-          v-else
-          :dimensions="dimensions"
-          :node="node"
-          :rowId="rowId"
-          :context="context"
-          :level="level"
-          @load="$emit('load')"
-          @change-row="changeRow"
-          @complete="complete"
-        />
-        <div v-if="isUnitChild && pageIndex !== -1" class="unit-navigation">
-          <button :disabled="pageIndex === 0" @click="prevPage">
-            <i class="fas fa-chevron-left" />
-            <div>Previous</div>
-          </button>
-          <button
-            :disabled="pageIndex === filteredPages.length - 1"
-            @click="nextPage"
-          >
-            <div>Next</div>
-            <i class="fas fa-chevron-right" />
-          </button>
-        </div>
-      </template>
-    </template>
-    <tapestry-modal
-      v-if="showCompletion"
-      :node-id="node.id"
-      :allow-close="false"
-      @close="handleCancel"
+  <div class="multicontent-media-container">
+    <div
+      ref="container"
+      class="media-container"
+      :style="navBarStyle"
+      data-qa="multi-content"
     >
-      <h1>{{ node.typeData.confirmationTitleText }}</h1>
-      <p>{{ node.typeData.confirmationBodyText }}</p>
-      <div class="button-container">
-        <button class="button-completion" @click="handleClose">
-          <i class="far fa-arrow-alt-circle-right fa-4x"></i>
-          <p>{{ node.typeData.continueButtonText }}</p>
-        </button>
-        <button class="button-completion" @click="handleCancel">
-          <i class="far fa-times-circle fa-4x"></i>
-          <p>{{ node.typeData.cancelLinkText }}</p>
-        </button>
-      </div>
-    </tapestry-modal>
+      <header>
+        <h1
+          v-if="showTitle"
+          :class="{
+            title: true,
+            'nested-media-title': context === 'multi-content',
+          }"
+        >
+          {{ node.title }}
+          <completed-icon :node="node" class="mx-2" />
+        </h1>
+      </header>
+      <template v-if="node.presentationStyle">
+        <div v-if="node.presentationStyle === 'unit'">
+          There's currently no content here.
+        </div>
+        <template v-else>
+          <div v-if="!node.accessible">
+            <locked-content :node="node"></locked-content>
+          </div>
+          <multi-content-rows
+            v-else
+            :dimensions="dimensions"
+            :node="node"
+            :rowId="rowId"
+            :context="context"
+            :level="level"
+            @load="$emit('load')"
+            @change-row="changeRow"
+            @complete="complete"
+          />
+          <div v-if="isUnitChild && pageIndex !== -1" class="unit-navigation">
+            <button :disabled="pageIndex === 0" @click="prevPage">
+              <i class="fas fa-chevron-left" />
+              <div>Previous</div>
+            </button>
+            <button
+              :disabled="pageIndex === filteredPages.length - 1"
+              @click="nextPage"
+            >
+              <div>Next</div>
+              <i class="fas fa-chevron-right" />
+            </button>
+          </div>
+        </template>
+      </template>
+      <tapestry-modal
+        v-if="showCompletion"
+        :node-id="node.id"
+        :allow-close="false"
+        @close="handleCancel"
+      >
+        <h1>{{ node.typeData.confirmationTitleText }}</h1>
+        <p>{{ node.typeData.confirmationBodyText }}</p>
+        <div class="button-container">
+          <button class="button-completion" @click="handleClose">
+            <i class="far fa-arrow-alt-circle-right fa-4x"></i>
+            <p>{{ node.typeData.continueButtonText }}</p>
+          </button>
+          <button class="button-completion" @click="handleCancel">
+            <i class="far fa-times-circle fa-4x"></i>
+            <p>{{ node.typeData.cancelLinkText }}</p>
+          </button>
+        </div>
+      </tapestry-modal>
+    </div>
     <page-menu
       v-if="showPageMenu"
       :node="node"
@@ -322,6 +324,14 @@ button[disabled] {
 
 .title {
   margin-bottom: 1em;
+}
+
+.multicontent-media-container {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: row-reverse;
+  padding: 24px;
 }
 
 .media-container {
