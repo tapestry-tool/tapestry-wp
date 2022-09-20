@@ -244,7 +244,9 @@ export default {
     scrollToTop(behavior = "smooth") {
       if (!this.node.id) return
       this.$nextTick(() => {
-        const container = document.getElementById(`multicontent-container`)
+        const container = document.querySelector(
+          `#multicontent-container .media-container`
+        )
         const element = document.getElementById(`row-${this.node.id}`)
         if (container && element) {
           const y = Helpers.getPositionOfElementInElement(element, container).y
