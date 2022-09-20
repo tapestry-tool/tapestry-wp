@@ -54,7 +54,7 @@
             :node="node"
             :question="question"
             :answer="answer || ''"
-            @skipQuestion="$emit('skipQuestion')"
+            @skip-question="$emit('skip-question')"
             @submit="handleSubmit"
           ></component>
         </div>
@@ -221,6 +221,8 @@ export default {
       if (!this.isLoggedIn) {
         return this.$emit("submit")
       }
+
+      this.$emit("before-submit")
 
       let submittedAnswer = null
 
