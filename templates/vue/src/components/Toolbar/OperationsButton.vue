@@ -12,6 +12,10 @@
     >
       <template #button-content>
         <i class="fas fa-ellipsis-h"></i>
+        <span
+          v-if="showKalturaOption && kalturaUploadNotification"
+          class="notification-dot"
+        ></span>
       </template>
       <b-dropdown-item-button @click="open(names.EXPORTDUPLICATE)">
         Export/Duplicate Tapestry
@@ -20,7 +24,13 @@
         v-if="showKalturaOption"
         @click="open(names.KALTURAMODAL)"
       >
-        Kaltura Sync
+        <div v-if="kalturaUploadNotification" class="kaltura-button">
+          <div>Upload to Kaltura</div>
+          <div class="large-notification-dot"></div>
+        </div>
+        <template v-else>
+          Upload to Kaltura
+        </template>
       </b-dropdown-item-button>
       <b-dropdown-item-button @click="open(names.OTHEROPERATIONS)">
         Other Operations
@@ -50,6 +60,7 @@ import OtherOperationsModal from "@/components/modals/OtherOperationsModal"
 import { names } from "@/config/routes"
 import * as wp from "@/services/wp"
 import Helpers from "@/utils/Helpers"
+import { mapState } from "vuex"
 
 const operationModalNames = [
   names.EXPORTDUPLICATE,
@@ -77,6 +88,7 @@ export default {
     }
   },
   computed: {
+    ...mapState(["kalturaUploadNotification"]),
     openOperation: {
       get() {
         return operationModalNames.includes(this.$route.name)
@@ -153,5 +165,28 @@ export default {
 
 .operations-button:only-child {
   margin-right: 12px;
+}
+
+.kaltura-button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.notification-dot {
+  position: absolute;
+  top: 0.4rem;
+  right: 0.2rem;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: red;
+}
+
+.large-notification-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: red;
 }
 </style>

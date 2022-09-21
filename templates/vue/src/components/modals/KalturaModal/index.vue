@@ -86,6 +86,7 @@ import { data as wpData } from "@/services/wp"
 import { names } from "@/config/routes"
 import KalturaUploadTab from "./KalturaUploadTab"
 import KalturaUploadLogTab from "./KalturaUploadLogTab"
+import { mapMutations } from "vuex"
 
 export default {
   components: {
@@ -126,8 +127,11 @@ export default {
         this.uploadCompleted = false
       }
     },
-    isUploading(isUploading) {
+    isUploading(isUploading, wasUploading) {
       this.uploadCompleted = !this.hasErrors && !isUploading
+      if (wasUploading && !isUploading && this.isLatestTapestry && !this.show) {
+        this.setKalturaUploadNotification(true)
+      }
     },
     tab: {
       immediate: true,
@@ -152,8 +156,13 @@ export default {
             this.refresh()
           }, 0)
 
+          if (this.refreshTimer !== 0) {
+            clearInterval(this.refreshTimer)
+          }
           this.refreshTimer = setInterval(this.refresh, 15 * 1000)
-        } else {
+
+          this.setKalturaUploadNotification(false)
+        } else if (!this.isUploading || !this.isLatestTapestry) {
           this.cancelRefresh()
         }
       },
@@ -163,6 +172,7 @@ export default {
     this.cancelRefresh()
   },
   methods: {
+    ...mapMutations(["setKalturaUploadNotification"]),
     closeModal() {
       this.$root.$emit("bv::hide::modal", "kaltura-modal")
     },
@@ -192,7 +202,7 @@ export default {
         this.latestTapestryID = data.latestTapestryID
       })
 
-      this.$refs.logTab.refresh()
+      this.$refs.logTab?.refresh()
     },
     async clearUploadError() {
       this.uploadError = false
