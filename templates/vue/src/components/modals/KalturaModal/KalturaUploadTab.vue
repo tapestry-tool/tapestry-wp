@@ -1,15 +1,6 @@
 <template>
   <div>
-    <b-alert
-      dismissible
-      class="mt-2 sticky-top"
-      variant="danger"
-      :show="!!apiError"
-      @dismissed="apiError = null"
-    >
-      Error: {{ apiError }}
-    </b-alert>
-    <b-overlay :show="videosUploading" variant="white">
+    <b-overlay :show="isUploading" variant="white">
       <template #overlay>
         <div v-show="!isLatestTapestry" class="different-tapestry-notice">
           Please wait: videos are currently being uploaded from another Tapestry.
@@ -38,7 +29,7 @@
           <b-form-checkbox
             aria-label="Select all videos"
             :checked="allVideosSelected"
-            :disabled="videosUploading"
+            :disabled="isUploading"
             @change="$event ? selectAllVideos() : clearSelected()"
           ></b-form-checkbox>
         </template>
@@ -46,7 +37,7 @@
           <b-form-checkbox
             :aria-label="`Select node ${item.nodeID}, ${item.nodeTitle}`"
             :checked="rowSelected"
-            :disabled="videosUploading || !item.withinSizeLimit"
+            :disabled="isUploading || !item.withinSizeLimit"
             class="d-inline"
             @change="$event ? selectRow() : unselectRow()"
           ></b-form-checkbox>
@@ -65,7 +56,7 @@
         </template>
       </b-table>
       <b-form-group>
-        <b-form-checkbox v-model="useKalturaPlayer" :disabled="videosUploading">
+        <b-form-checkbox v-model="useKalturaPlayer" :disabled="isUploading">
           Switch uploaded videos to use Kaltura media player
         </b-form-checkbox>
       </b-form-group>
@@ -78,7 +69,7 @@
       :disabled="startButtonDisabled"
       @click="startVideoUpload"
     >
-      <b-spinner v-if="videosUploading && isLatestTapestry" small></b-spinner>
+      <b-spinner v-if="isUploading && isLatestTapestry" small></b-spinner>
       <div :style="startButtonDisabled ? 'opacity: 50%;' : ''">
         Start Upload
       </div>
@@ -100,50 +91,30 @@
       still be uploaded to Kaltura, but no more videos will be started. Please be
       patient as processing these videos could take some time.
     </b-alert>
-    <b-alert
-      dismissible
-      class="mt-3"
-      :show="videosUploading && isLatestTapestry"
-      variant="primary"
-    >
-      Upload in progress... View the status of the current upload in the Log tab.
-    </b-alert>
-    <b-alert
-      class="mt-3 mb-0"
-      dismissible
-      :show="uploadError && isLatestTapestry"
-      variant="danger"
-      @dismissed="clearUploadError"
-    >
-      <p>
-        The upload did not complete due to an error in the server.
-      </p>
-      <p class="mb-1">
-        If any videos are still Converting, to avoid re-uploading them, we recommend
-        running
-        <b>Clean Uploaded Videos</b>
-        under the WordPress Settings > Tapestry.
-      </p>
-    </b-alert>
   </div>
 </template>
 
 <script>
 import client from "@/services/TapestryAPI"
-import { data as wpData } from "@/services/wp"
 import ErrorHelper from "@/utils/errorHelper"
 
 export default {
+  props: {
+    isLatestTapestry: {
+      type: Boolean,
+      required: true,
+    },
+    isUploading: {
+      type: Boolean,
+      required: true,
+    },
+  },
   data() {
     return {
-      videosUploading: false,
-      uploadError: false,
-      apiError: null,
       useKalturaPlayer: false,
       allVideos: [],
       selectedVideos: [],
       hasRequestedStop: false,
-      latestTapestryID: "",
     }
   },
   computed: {
@@ -159,19 +130,16 @@ export default {
     canStartUpload() {
       return this.selectedVideos.length > 0
     },
-    isLatestTapestry() {
-      return this.latestTapestryID === wpData.postId
-    },
     startButtonDisabled() {
-      return this.videosUploading || !this.canStartUpload
+      return this.isUploading || !this.canStartUpload
     },
     stopButtonDisabled() {
-      return !this.videosUploading || !this.isLatestTapestry
+      return !this.isUploading || !this.isLatestTapestry
     },
   },
   watch: {
-    videosUploading(inProgress) {
-      if (!inProgress) {
+    isUploading(isUploading) {
+      if (!isUploading) {
         this.refreshVideosToUpload()
       }
     },
@@ -188,9 +156,6 @@ export default {
       this.selectedVideos = rows
     },
     startVideoUpload() {
-      this.videosUploading = true
-      this.latestTapestryID = wpData.postId
-
       client
         .startKalturaUpload(
           this.selectedVideos.map(video => video.nodeID),
@@ -198,7 +163,7 @@ export default {
         )
         .catch(error => {
           // Kaltura availability changed unexpectedly
-          this.apiError = ErrorHelper.getErrorMessage(error)
+          this.$emit("api-error", ErrorHelper.getErrorMessage(error))
         })
 
       this.$emit("upload-start")
@@ -224,17 +189,6 @@ export default {
     },
     refreshVideosToUpload() {
       this.$refs.videoTable.refresh()
-    },
-    refresh() {
-      client.getKalturaUploadStatus().then(data => {
-        this.videosUploading = data.inProgress
-        this.uploadError = data.error
-        this.latestTapestryID = data.latestTapestryID
-      })
-    },
-    async clearUploadError() {
-      this.uploadError = false
-      await client.clearKalturaUploadError()
     },
   },
 }

@@ -10,13 +10,62 @@
     @hidden="$emit('close')"
   >
     <b-container fluid class="px-0">
+      <div class="alert-wrapper">
+        <b-alert
+          dismissible
+          class="mt-3"
+          :show="!hasErrors && isUploading && isLatestTapestry"
+          variant="primary"
+        >
+          Upload in progress... View the status of the current upload in the Log tab.
+        </b-alert>
+        <b-alert
+          dismissible
+          class="mt-3"
+          :show="!hasErrors && uploadCompleted && isLatestTapestry"
+          variant="success"
+        >
+          Upload completed. View details about the last upload in the Log tab.
+        </b-alert>
+        <b-alert
+          dismissible
+          class="mt-3"
+          variant="danger"
+          :show="!!apiError"
+          @dismissed="apiError = null"
+        >
+          Error: {{ apiError }}
+        </b-alert>
+        <b-alert
+          class="mt-3 mb-0"
+          dismissible
+          :show="uploadError && isLatestTapestry"
+          variant="danger"
+          @dismissed="clearUploadError"
+        >
+          <p>
+            The upload did not complete due to an error in the server.
+          </p>
+          <p class="mb-1">
+            If any videos are still Converting, to avoid re-uploading them, we
+            recommend running
+            <b>Clean Uploaded Videos</b>
+            under the WordPress Settings > Tapestry.
+          </p>
+        </b-alert>
+      </div>
       <b-tabs card>
         <b-tab
           title="Upload"
           :active="tab === 'upload'"
           @click="changeTab('upload')"
         >
-          <kaltura-upload-tab ref="uploadTab" @upload-start="handleUploadStart" />
+          <kaltura-upload-tab
+            :is-latest-tapestry="isLatestTapestry"
+            :is-uploading="isUploading"
+            @upload-start="handleUploadStart"
+            @api-error="apiError = $event"
+          />
         </b-tab>
         <b-tab title="Log" :active="tab === 'log'" @click="changeTab('log')">
           <kaltura-upload-log-tab ref="logTab" @refresh="refresh" />
@@ -32,6 +81,8 @@
 </template>
 
 <script>
+import client from "@/services/TapestryAPI"
+import { data as wpData } from "@/services/wp"
 import { names } from "@/config/routes"
 import KalturaUploadTab from "./KalturaUploadTab"
 import KalturaUploadLogTab from "./KalturaUploadLogTab"
@@ -50,14 +101,34 @@ export default {
   data() {
     return {
       refreshTimer: 0,
+
+      isUploading: false,
+      uploadError: false,
+      latestTapestryID: "",
+      uploadCompleted: false,
+      apiError: null,
     }
   },
   computed: {
+    hasErrors() {
+      return !!this.apiError || (this.uploadError && this.isLatestTapestry)
+    },
+    isLatestTapestry() {
+      return this.latestTapestryID === wpData.postId
+    },
     tab() {
       return this.$route.params.tab
     },
   },
   watch: {
+    hasErrors(hasErrors) {
+      if (hasErrors) {
+        this.uploadCompleted = false
+      }
+    },
+    isUploading(isUploading) {
+      this.uploadCompleted = !this.hasErrors && !isUploading
+    },
     tab: {
       immediate: true,
       handler(requestedTab) {
@@ -107,12 +178,36 @@ export default {
       this.refreshTimer = 0
     },
     handleUploadStart() {
+      this.isUploading = true
+      this.latestTapestryID = wpData.postId
+      this.uploadError = false
+      this.apiError = null
+
       setTimeout(this.refresh, 1000)
     },
     refresh() {
-      this.$refs.uploadTab.refresh()
+      client.getKalturaUploadStatus().then(data => {
+        this.isUploading = data.inProgress
+        this.uploadError = data.error
+        this.latestTapestryID = data.latestTapestryID
+      })
+
       this.$refs.logTab.refresh()
+    },
+    async clearUploadError() {
+      this.uploadError = false
+      await client.clearKalturaUploadError()
     },
   },
 }
 </script>
+
+<style lang="scss" scoped>
+.alert-wrapper {
+  position: sticky;
+  z-index: 2;
+  top: 0;
+  background-color: rgba(0, 0, 0, 0.03);
+  padding: 0 0.5rem;
+}
+</style>
