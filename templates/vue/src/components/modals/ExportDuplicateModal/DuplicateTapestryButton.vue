@@ -7,7 +7,7 @@
       @click="duplicateTapestry"
     >
       <b-spinner v-if="loading" small data-qa="spinner"></b-spinner>
-      <div v-else>Duplicate Tapestry</div>
+      <div v-else>Duplicate on this site</div>
     </b-button>
     <b-alert :show="showConfirmation" variant="success" style="margin-top: 1em;">
       Your new Tapestry is ready! Click on the link below to view it.

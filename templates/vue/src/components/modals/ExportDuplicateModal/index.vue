@@ -12,13 +12,13 @@
     <b-container fluid class="px-1">
       <b-row>
         <b-col>
-          <b-form-group label="Export">
-            <template #description>
+          <b-form-group label="Export Tapestry">
+            <template v-if="tapestryHasWpNodes" #description>
               <strong>Note:</strong>
-              WordPress post nodes in your tapestry must be exported separately. To
-              export, export all WordPress posts as well as the tapestry. To import,
-              first import the WordPress posts by going to Tools -> Import in the
-              WordPress dashboard, then import the tapestry.
+              Your Tapestry contains one or more nodes with WordPress posts. These
+              posts will be exported for you into a separate file. To import, first
+              import the WordPress posts by going to Tools -> Import in the WordPress
+              dashboard, then import the tapestry.
             </template>
             <b-dropdown
               block
@@ -39,7 +39,7 @@
               <template #button-content>
                 <b-spinner v-if="isExporting" small></b-spinner>
                 <div :style="isExporting ? 'opacity: 50%;' : ''">
-                  Export Tapestry
+                  Export as JSON
                 </div>
               </template>
               <b-dropdown-item-button @click="exportTapestry">
@@ -56,8 +56,30 @@
               style="margin-top: 1em;"
             >
               <div v-if="!exportWarnings">
-                Your content has been exported! Find the
-                {{ exportedFileType }} file in your downloads.
+                <p>
+                  This tapestry has been exported!
+                </p>
+                <p v-if="exportedFileType === '.zip'">
+                  Your ZIP file contains the following:
+                </p>
+                <ul>
+                  <li>
+                    tapestry.json
+                  </li>
+                  <li
+                    v-for="(logEntry, i) in exportLog['h5p']"
+                    :key="'export-log-' + i"
+                  >
+                    H5P: {{ logEntry }}
+                  </li>
+                  <li
+                    v-for="(logEntry, i) in exportLog['media']"
+                    :key="'export-log-' + i"
+                  >
+                    Media: {{ logEntry }}
+                  </li>
+                </ul>
+                <p>Find the {{ exportedFileType }} file in your downloads.</p>
               </div>
               <export-warnings
                 v-else
@@ -85,7 +107,7 @@
         </b-col>
         <b-col>
           <b-form-group
-            label="Duplicate"
+            label="Duplicate Tapestry"
             description="Create a duplicate copy of this tapestry on this site."
           >
             <duplicate-tapestry-button />
@@ -120,10 +142,17 @@ export default {
       hasExportedWpPosts: false,
       exportedFileType: "",
       exportWarnings: null,
+      exportLog: { h5p: [], media: [] },
     }
   },
   computed: {
-    ...mapState(["settings", "apiError"]),
+    ...mapState(["settings", "nodes", "apiError"]),
+    tapestryHasWpNodes() {
+      const wpNodes = Object.values(this.nodes).filter(
+        node => node.mediaType === "wp-post"
+      )
+      return wpNodes.length > 0
+    },
   },
   methods: {
     ...mapActions(["getTapestryExport", "getTapestryExportAsZip"]),
@@ -185,6 +214,8 @@ export default {
       } else {
         this.exportWarnings = null
       }
+
+      this.exportLog = exportedTapestry.log
     },
     hasWarnings(exportedTapestry) {
       return (
