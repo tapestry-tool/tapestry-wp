@@ -235,32 +235,33 @@ export default class Helpers {
 
     // Checks related to draft nodes
     /**
-     * If node is a draft:
-     *  - Allow author to move submitted and rejected nodes
-     *  - Allow all actions for original author EXCEPT if the node is submitted for
-     *    review
-     *  - Allow "read" to reviewers only if the node is submitted for review
-     *  - Allow reviewers to add child nodes to a draft node
+     * If node is a draft (accepted draft nodes are PUBLISHED nodes, so they are not considered here):
+     * - If node is not submitted for review:
+     *  - Allow all actions except "add" for original author
+     *  - Allow all actions except "edit" for reviewer if node is rejected and showRejected is true
+     * - If node is submitted for review:
+     *  - Only allow "read" and "move" for original author
+     *  - Allow all actions except "edit" for reviewer
      */
     if (node.status === nodeStatus.DRAFT) {
       if (node.author && wp.isCurrentUser(node.author.id)) {
-        if (action === "move" && node.reviewStatus !== nodeStatus.ACCEPT) {
+        if (
+          action === "move" ||
+          action === userActions.READ ||
+          wp.canEditTapestry()
+        ) {
           return true
         }
-        return (
-          wp.canEditTapestry() ||
-          action === userActions.READ ||
-          (node.reviewStatus !== nodeStatus.SUBMIT && action !== userActions.ADD)
-        )
+        return node.reviewStatus !== nodeStatus.SUBMIT && action !== userActions.ADD
       }
       if (wp.canEditTapestry()) {
-        if (action === userActions.READ) {
-          return (
-            node.reviewStatus === nodeStatus.SUBMIT ||
-            (showRejected && node.reviewStatus === nodeStatus.REJECT)
-          )
+        if (action === userActions.EDIT) {
+          return false
         }
-        return action === userActions.ADD
+        return (
+          node.reviewStatus === nodeStatus.SUBMIT ||
+          (showRejected && node.reviewStatus === nodeStatus.REJECT)
+        )
       }
       return false
     }
