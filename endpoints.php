@@ -563,8 +563,26 @@ function addTapestryNode($request)
         }
         $tapestry = new Tapestry($postId);
 
-        // TODO: throw the following error when checks for permissions are implemented
-        // throw new TapestryError('ADD_NODE_PERMISSION_DENIED');
+        if (!is_user_logged_in()) {
+            // Prevent guests from adding a node
+            throw new TapestryError('ADD_NODE_PERMISSION_DENIED', 'Please log in to add a node.');
+        }
+        if (NodeStatus::DRAFT !== $node->status) {
+            $user = new TapestryUser();
+
+            if ($tapestry->isEmpty() && !$user->canEdit($postId)) {
+                throw new TapestryError('ADD_NODE_PERMISSION_DENIED', 'You are not permitted to add nodes to the empty tapestry');
+            }
+
+            // TODO: Prevent non-admins from directly publishing a node (need to address this case: user with explicit ADD permission on a node should still be able to directly publish child nodes)
+            // if (!$user->canEdit($this->postId)) {
+            //     throw new TapestryError('FAILED_TO_ADD_NODE', 'Only admins can add a published node.', 403);
+            // }
+
+            // Add user-specific permissions to the author (only do this if it is not a draft node)
+            $userId = $user->getID();
+            $node->permissions->{'user-'.$userId} = ['read', 'add', 'edit'];
+        }
 
         return $tapestry->addNode($node);
     } catch (TapestryError $e) {
