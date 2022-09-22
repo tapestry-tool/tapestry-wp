@@ -378,14 +378,8 @@ function exportTapestry($request)
 
         $tapestry = new Tapestry($postId);
         $tapestry_data = $tapestry->export();
-
-        // If the Tapestry contains WordPress posts, separately export them too
-        $wp_posts = TapestryImportExport::exportWpPostsInTapestry($tapestry_data, $export_id);
         
         $result = ['json' => $tapestry_data, 'exportId' => $export_id];
-        if ($wp_posts) {
-            $result['wpPosts'] = $wp_posts;
-        }
 
         return $result;
     } catch (TapestryError $e) {
