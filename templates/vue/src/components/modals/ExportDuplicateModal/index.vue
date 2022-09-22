@@ -148,10 +148,7 @@ export default {
   computed: {
     ...mapState(["settings", "nodes", "apiError"]),
     tapestryHasWpNodes() {
-      const wpNodes = Object.values(this.nodes).filter(
-        node => node.mediaType === "wp-post"
-      )
-      return wpNodes.length > 0
+      return Object.values(this.nodes).some(node => node.mediaType === "wp-post")
     },
   },
   methods: {
@@ -183,6 +180,8 @@ export default {
       this.isExporting = false
       this.hasExported = true
       this.exportedFileType = ".json"
+      this.exportWarnings = null
+      this.exportLog = { h5p: [], media: [] }
     },
     async exportTapestryAsZip() {
       this.isExporting = true

@@ -271,7 +271,7 @@ class TapestryImportExport
      * @param ZipArchive $zip   Zip file to add the archive to
      * @param array &$warnings  (Modified) Export warnings generated so far
      */
-    private static function _exportH5PNode($node, $zip, &$log, &$warnings, $h5p_controller)
+    private static function _exportH5PNode($node, $zip, &$warnings, &$log, $h5p_controller)
     {
         // If H5P plugin files are not available, nothing to do
         if (empty(H5P_DEFINED)) {
