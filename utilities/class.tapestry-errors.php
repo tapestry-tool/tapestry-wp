@@ -119,8 +119,12 @@ class TapestryError extends Error
     {
         if (array_key_exists($code, self::ERRORS)) {
             $ERROR = (object) self::ERRORS[$code];
-            $message = $ERROR->MESSAGE;
-            $status = $ERROR->STATUS['status'];
+            if (empty($message)) {
+                $message = $ERROR->MESSAGE;
+            }
+            if (empty($status)) {
+                $status = $ERROR->STATUS['status'];
+            }
         }
 
         $this->code = $code;
