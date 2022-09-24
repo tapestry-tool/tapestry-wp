@@ -1873,6 +1873,7 @@ function perform_batched_upload_to_kaltura($tapestry_id, $node_ids, $use_kaltura
 
                 $video->additionalInfo = $error_msg;
                 save_video_upload_status($video, $videos_to_upload, UploadStatus::ERROR);
+                $num_uploaded_with_error++;
                 continue;
             }
 

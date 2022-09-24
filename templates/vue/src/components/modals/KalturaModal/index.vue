@@ -13,29 +13,30 @@
       <div class="alert-wrapper">
         <b-alert
           dismissible
-          class="mt-3"
+          class="my-1"
           :show="!hasErrors && isUploading && isLatestTapestry"
           variant="primary"
         >
           Upload in progress... View the status of the current upload in the Log tab.
         </b-alert>
-        <b-alert class="mt-3" :show="hasRequestedStop" variant="success">
+        <b-alert class="my-1" :show="hasRequestedStop" variant="success">
           Successfully canceled the upload. Note: Videos already being processed will
           still be uploaded to Kaltura, but no more videos will be started. Please be
           patient as processing these videos could take some time.
         </b-alert>
         <b-alert
           dismissible
-          class="mt-3"
+          class="my-1"
           :show="!hasErrors && latestUploadCount.total !== 0"
           variant="success"
         >
-          Successfully uploaded {{ latestUploadCount.success }} videos. View details
+          Successfully uploaded {{ latestUploadCount.success }}
+          {{ latestUploadCount.success > 1 ? "videos" : "video" }}. View details
           about the last upload in the Log tab.
         </b-alert>
         <b-alert
           dismissible
-          class="mt-3"
+          class="my-1"
           variant="danger"
           :show="!!apiError"
           @dismissed="apiError = null"
@@ -43,7 +44,7 @@
           Error: {{ apiError }}
         </b-alert>
         <b-alert
-          class="mt-3"
+          class="my-1"
           dismissible
           :show="uploadError && isLatestTapestry"
           variant="danger"
@@ -60,13 +61,14 @@
           </p>
         </b-alert>
         <b-alert
-          class="mt-3 mb-0"
+          class="my-1"
           dismissible
           :show="latestUploadCount.error !== 0"
           variant="danger"
         >
-          {{ latestUploadCount.error }} out of {{ latestUploadCount.total }} videos
-          were not successfully uploaded. View details in the Log tab.
+          {{ latestUploadCount.error }} out of {{ latestUploadCount.total }}
+          {{ latestUploadCount.total > 1 ? "videos" : "video" }}
+          failed to upload. View details in the Log tab.
         </b-alert>
       </div>
       <b-tabs card>
@@ -214,6 +216,12 @@ export default {
       this.latestTapestryID = wpData.postId
       this.uploadError = false
       this.apiError = null
+      this.hasRequestedStop = false
+      this.latestUploadCount = {
+        total: 0,
+        success: 0,
+        error: 0,
+      }
 
       setTimeout(this.refresh, 1000)
     },
@@ -270,5 +278,7 @@ export default {
   top: 0;
   background-color: rgba(0, 0, 0, 0.03);
   padding: 0 0.5rem;
+  display: flex; // so that margins from children don't collapse
+  flex-direction: column;
 }
 </style>
