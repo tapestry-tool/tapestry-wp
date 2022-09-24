@@ -75,7 +75,7 @@ $REST_API_ENDPOINTS = [
             'permission_callback' => 'TapestryPermissions::putTapestrySettings',
         ],
     ],
-    'UPDATE_TAPESTRY_NOTIFICATIONS' => (object) [
+    'PUT_TAPESTRY_NOTIFICATIONS' => (object) [
         'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/notifications',
         'ARGUMENTS' => [
             'methods' => $REST_API_PUT_METHOD,
@@ -897,7 +897,8 @@ function updateTapestryNotifications($request) {
         $tapestry = new Tapestry($postId);
         $tapestry->set((object) ['notifications' => $notifications]);
 
-        return $tapestry->save();
+        $tapestry->save();
+        return true;
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
