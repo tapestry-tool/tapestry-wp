@@ -405,11 +405,7 @@ export function setTapestryErrorReporting({ commit }, isEnabled) {
   commit("setTapestryErrorReporting", isEnabled)
 }
 
-export async function setNotifications(
-  { commit, state, dispatch },
-  changedNotifications
-) {
-  const notifications = { ...state.notifications, ...changedNotifications }
+export async function updateNotifications({ commit, dispatch }, notifications) {
   try {
     await client.updateNotifications(notifications)
     commit("setNotifications", notifications)

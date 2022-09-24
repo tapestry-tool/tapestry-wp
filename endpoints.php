@@ -75,6 +75,14 @@ $REST_API_ENDPOINTS = [
             'permission_callback' => 'TapestryPermissions::putTapestrySettings',
         ],
     ],
+    'GET_TAPESTRY_NOTIFICATIONS' => (object) [
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/notifications',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => 'getTapestryNotifications',
+            'permission_callback' => 'TapestryPermissions::putTapestrySettings',
+        ],
+    ],
     'PUT_TAPESTRY_NOTIFICATIONS' => (object) [
         'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/notifications',
         'ARGUMENTS' => [
@@ -874,6 +882,26 @@ function updateTapestrySettings($request)
         $tapestry->set((object) ['settings' => $settings]);
 
         return $tapestry->save();
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+/**
+ * Get Tapestry notifications.
+ *
+ * @param object $request HTTP request
+ *
+ * @return object $response   HTTP response
+ */
+function getTapestryNotifications($request) {
+    $postId = $request['tapestryPostId'];
+    try {
+        if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+        $tapestry = new Tapestry($postId);
+        return $tapestry->getNotifications();
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
@@ -1759,8 +1787,13 @@ function uploadVideosToKaltura($request)
 
         add_action('shutdown', 'cleanUpKalturaUpload');
 
+        $upload_count = (object) [
+            'total' => 1,
+            'success' => 0,
+            'error' => 1,
+        ];
         try {
-            perform_batched_upload_to_kaltura($tapestry_id, $node_ids, $use_kaltura_player);
+            $upload_count = perform_batched_upload_to_kaltura($tapestry_id, $node_ids, $use_kaltura_player);
         } catch (Throwable $e) {
             error_log($e->getMessage());
             update_option(KalturaUpload::UPLOAD_ERROR_OPTION, $e->getMessage());
@@ -1770,7 +1803,7 @@ function uploadVideosToKaltura($request)
 
             $tapestry = new Tapestry($tapestry_id);
             $tapestry->set((object) ['notifications' => (object) [
-                'kaltura' => 1,
+                'kaltura' => $upload_count,
             ]]);
             $tapestry->save();
         }
@@ -1814,6 +1847,7 @@ function perform_batched_upload_to_kaltura($tapestry_id, $node_ids, $use_kaltura
     $kalturaApi = new KalturaApi();
 
     $num_successfully_uploaded = 0;
+    $num_uploaded_with_error = 0;
     $batch_start = 0;
 
     for ($batch_start; $batch_start < count($videos_to_upload); $batch_start += KalturaUpload::UPLOAD_BATCH_SIZE) {
@@ -1870,9 +1904,11 @@ function perform_batched_upload_to_kaltura($tapestry_id, $node_ids, $use_kaltura
                 } elseif ($response->status === EntryStatus::ERROR_CONVERTING) {
                     $video->additionalInfo = 'An error occurred: Could not convert the video.';
                     save_video_upload_status($video, $videos_to_upload, UploadStatus::ERROR);
+                    $num_uploaded_with_error++;
                 } else {
                     $video->additionalInfo = 'An error occurred: Expected the video to be converting, but it was not.';
                     save_video_upload_status($video, $videos_to_upload, UploadStatus::ERROR);
+                    $num_uploaded_with_error++;
                 }
 
                 array_push($videos_to_remove, $video);
@@ -1895,7 +1931,11 @@ function perform_batched_upload_to_kaltura($tapestry_id, $node_ids, $use_kaltura
         save_video_upload_status($videos_to_upload[$i], $videos_to_upload, UploadStatus::CANCELED);
     }
 
-    return $num_successfully_uploaded;
+    return (object) [
+        'total' => $num_successfully_uploaded + $num_uploaded_with_error,
+        'success' => $num_successfully_uploaded,
+        'error' => $num_uploaded_with_error,
+    ];
 }
 
 /**

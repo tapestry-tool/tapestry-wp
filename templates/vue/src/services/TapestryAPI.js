@@ -176,6 +176,12 @@ class TapestryApi {
     return response
   }
 
+  async getNotifications() {
+    const url = `/tapestries/${this.postId}/notifications`
+    const response = await this.client.get(url)
+    return response.data
+  }
+
   async updateNotifications(notifications) {
     const url = `/tapestries/${this.postId}/notifications`
     const response = await this.client.put(url, notifications)

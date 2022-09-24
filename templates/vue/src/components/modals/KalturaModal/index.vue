@@ -19,13 +19,19 @@
         >
           Upload in progress... View the status of the current upload in the Log tab.
         </b-alert>
+        <b-alert class="mt-3" :show="hasRequestedStop" variant="success">
+          Successfully canceled the upload. Note: Videos already being processed will
+          still be uploaded to Kaltura, but no more videos will be started. Please be
+          patient as processing these videos could take some time.
+        </b-alert>
         <b-alert
           dismissible
           class="mt-3"
-          :show="!hasErrors && uploadCompleted && isLatestTapestry"
+          :show="!hasErrors && latestUploadCount.total !== 0"
           variant="success"
         >
-          Upload completed. View details about the last upload in the Log tab.
+          Successfully uploaded {{ latestUploadCount.success }} videos. View details
+          about the last upload in the Log tab.
         </b-alert>
         <b-alert
           dismissible
@@ -37,7 +43,7 @@
           Error: {{ apiError }}
         </b-alert>
         <b-alert
-          class="mt-3 mb-0"
+          class="mt-3"
           dismissible
           :show="uploadError && isLatestTapestry"
           variant="danger"
@@ -53,6 +59,15 @@
             under the WordPress Settings > Tapestry.
           </p>
         </b-alert>
+        <b-alert
+          class="mt-3 mb-0"
+          dismissible
+          :show="latestUploadCount.error !== 0"
+          variant="danger"
+        >
+          {{ latestUploadCount.error }} out of {{ latestUploadCount.total }} videos
+          were not successfully uploaded. View details in the Log tab.
+        </b-alert>
       </div>
       <b-tabs card>
         <b-tab
@@ -64,6 +79,7 @@
             :is-latest-tapestry="isLatestTapestry"
             :is-uploading="isUploading"
             @upload-start="handleUploadStart"
+            @request-stop="requestStopVideoUpload"
             @api-error="apiError = $event"
           />
         </b-tab>
@@ -86,7 +102,7 @@ import { data as wpData } from "@/services/wp"
 import { names } from "@/config/routes"
 import KalturaUploadTab from "./KalturaUploadTab"
 import KalturaUploadLogTab from "./KalturaUploadLogTab"
-import { mapActions, mapState } from "vuex"
+import { mapActions, mapMutations, mapState } from "vuex"
 
 export default {
   components: {
@@ -106,14 +122,24 @@ export default {
       isUploading: false,
       uploadError: false,
       latestTapestryID: "",
-      uploadCompleted: false,
       apiError: null,
+      hasRequestedStop: false,
+
+      latestUploadCount: {
+        total: 0,
+        success: 0,
+        error: 0,
+      },
     }
   },
   computed: {
     ...mapState(["notifications"]),
     hasErrors() {
-      return !!this.apiError || (this.uploadError && this.isLatestTapestry)
+      return (
+        !!this.apiError ||
+        (this.uploadError && this.isLatestTapestry) ||
+        this.latestUploadCount.error !== 0
+      )
     },
     isLatestTapestry() {
       return this.latestTapestryID === wpData.postId
@@ -123,25 +149,6 @@ export default {
     },
   },
   watch: {
-    hasErrors(hasErrors) {
-      if (hasErrors) {
-        this.uploadCompleted = false
-      }
-    },
-    isUploading(isUploading, wasUploading) {
-      this.uploadCompleted = !this.hasErrors && !isUploading
-      if (
-        wasUploading &&
-        !isUploading &&
-        this.isLatestTapestry &&
-        !this.show &&
-        this.notifications.kaltura === 0
-      ) {
-        this.setNotifications({
-          kaltura: 1,
-        })
-      }
-    },
     tab: {
       immediate: true,
       handler(requestedTab) {
@@ -169,14 +176,15 @@ export default {
             clearInterval(this.refreshTimer)
           }
           this.refreshTimer = setInterval(this.refresh, 15 * 1000)
-
-          if (this.notifications.kaltura !== 0) {
-            this.setNotifications({
-              kaltura: 0,
-            })
+        } else {
+          this.latestUploadCount = {
+            total: 0,
+            success: 0,
+            error: 0,
           }
-        } else if (!this.isUploading || !this.isLatestTapestry) {
-          this.cancelRefresh()
+          if (!this.isUploading || !this.isLatestTapestry) {
+            this.cancelRefresh()
+          }
         }
       },
     },
@@ -185,7 +193,8 @@ export default {
     this.cancelRefresh()
   },
   methods: {
-    ...mapActions(["setNotifications"]),
+    ...mapActions(["getNotifications", "updateNotifications"]),
+    ...mapMutations(["setNotifications"]),
     closeModal() {
       this.$root.$emit("bv::hide::modal", "kaltura-modal")
     },
@@ -209,13 +218,42 @@ export default {
       setTimeout(this.refresh, 1000)
     },
     refresh() {
-      client.getKalturaUploadStatus().then(data => {
-        this.isUploading = data.inProgress
-        this.uploadError = data.error
-        this.latestTapestryID = data.latestTapestryID
-      })
+      Promise.all([client.getKalturaUploadStatus(), client.getNotifications()]).then(
+        ([status, notifications]) => {
+          this.isUploading = status.inProgress
+          this.uploadError = status.error
+          this.latestTapestryID = status.latestTapestryID
+
+          if (notifications.kaltura.total !== 0) {
+            this.latestUploadCount = notifications.kaltura
+
+            if (this.show) {
+              this.clearKalturaNotifications()
+            }
+          }
+          if (!this.show || notifications.kaltura.total === 0) {
+            this.setNotifications(notifications)
+          }
+        }
+      )
 
       this.$refs.logTab?.refresh()
+    },
+    clearKalturaNotifications() {
+      this.updateNotifications({
+        kaltura: {
+          total: 0,
+          success: 0,
+          error: 0,
+        },
+      })
+    },
+    async requestStopVideoUpload() {
+      await client.requestStopKalturaUpload()
+      this.hasRequestedStop = true
+      setTimeout(() => {
+        this.hasRequestedStop = false
+      }, 10 * 1000)
     },
     async clearUploadError() {
       this.uploadError = false

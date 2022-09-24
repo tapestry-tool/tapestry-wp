@@ -80,17 +80,12 @@
       variant="light"
       :class="stopButtonDisabled ? 'disabled' : ''"
       :disabled="stopButtonDisabled"
-      @click="requestStopVideoUpload"
+      @click="$emit('request-stop')"
     >
       <div :style="stopButtonDisabled ? 'opacity: 50%;' : ''">
         Stop Upload
       </div>
     </b-button>
-    <b-alert class="mt-3" :show="hasRequestedStop" variant="success">
-      Successfully canceled the upload. Note: Videos already being processed will
-      still be uploaded to Kaltura, but no more videos will be started. Please be
-      patient as processing these videos could take some time.
-    </b-alert>
   </div>
 </template>
 
@@ -114,7 +109,6 @@ export default {
       useKalturaPlayer: false,
       allVideos: [],
       selectedVideos: [],
-      hasRequestedStop: false,
     }
   },
   computed: {
@@ -167,13 +161,6 @@ export default {
         })
 
       this.$emit("upload-start")
-    },
-    async requestStopVideoUpload() {
-      await client.requestStopKalturaUpload()
-      this.hasRequestedStop = true
-      setTimeout(() => {
-        this.hasRequestedStop = false
-      }, 10 * 1000)
     },
     getVideosToUpload(ctx, callback) {
       client

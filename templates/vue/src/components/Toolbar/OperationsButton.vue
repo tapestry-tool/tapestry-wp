@@ -13,7 +13,7 @@
       <template #button-content>
         <i class="fas fa-ellipsis-h"></i>
         <span
-          v-if="showKalturaOption && notifications.kaltura !== 0"
+          v-if="showKalturaOption && notifications.kaltura.total !== 0"
           class="notification-dot"
         ></span>
       </template>
@@ -24,7 +24,7 @@
         v-if="showKalturaOption"
         @click="open(names.KALTURAMODAL)"
       >
-        <div v-if="notifications.kaltura !== 0" class="kaltura-button">
+        <div v-if="notifications.kaltura.total !== 0" class="kaltura-button">
           <div>Upload to Kaltura</div>
           <div class="large-notification-dot"></div>
         </div>

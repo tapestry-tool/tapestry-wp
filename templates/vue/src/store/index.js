@@ -27,7 +27,11 @@ export const store = {
     returnRoute: null,
     currentEditingNode: null,
     notifications: {
-      kaltura: 0,
+      kaltura: {
+        total: 0,
+        success: 0,
+        error: 0,
+      },
     },
   },
   getters,

@@ -51,9 +51,7 @@ class Tapestry implements ITapestry
         // $this->groups = [];
         $this->rootId = 0;
         $this->settings = $this->_getDefaultSettings();
-        $this->notifications = (object) [
-            'kaltura' => 0,
-        ];
+        $this->notifications = $this->_getDefaultNotifications();
 
         if (TapestryHelpers::isValidTapestry($this->postId)) {
             $tapestry = $this->_loadFromDatabase();
@@ -175,6 +173,20 @@ class Tapestry implements ITapestry
         }
 
         return $this->settings;
+    }
+
+    /**
+     * Get notifications.
+     *
+     * @return object $notifications
+     */
+    public function getNotifications()
+    {
+        if (!$this->postId) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+
+        return $this->notifications;
     }
 
     /**
@@ -591,6 +603,17 @@ class Tapestry implements ITapestry
         $settings->permalink = get_permalink($this->postId);
 
         return $settings;
+    }
+
+    private function _getDefaultNotifications()
+    {
+        return (object) [
+            'kaltura' => (object) [
+                'total' => 0,
+                'success' => 0,
+                'error' => 0,
+            ],
+        ];
     }
 
     private function _getAuthor()
