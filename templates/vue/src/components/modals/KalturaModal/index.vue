@@ -86,7 +86,7 @@ import { data as wpData } from "@/services/wp"
 import { names } from "@/config/routes"
 import KalturaUploadTab from "./KalturaUploadTab"
 import KalturaUploadLogTab from "./KalturaUploadLogTab"
-import { mapMutations } from "vuex"
+import { mapActions, mapState } from "vuex"
 
 export default {
   components: {
@@ -111,6 +111,7 @@ export default {
     }
   },
   computed: {
+    ...mapState(["notifications"]),
     hasErrors() {
       return !!this.apiError || (this.uploadError && this.isLatestTapestry)
     },
@@ -129,8 +130,16 @@ export default {
     },
     isUploading(isUploading, wasUploading) {
       this.uploadCompleted = !this.hasErrors && !isUploading
-      if (wasUploading && !isUploading && this.isLatestTapestry && !this.show) {
-        this.setKalturaUploadNotification(true)
+      if (
+        wasUploading &&
+        !isUploading &&
+        this.isLatestTapestry &&
+        !this.show &&
+        this.notifications.kaltura === 0
+      ) {
+        this.setNotifications({
+          kaltura: 1,
+        })
       }
     },
     tab: {
@@ -161,7 +170,11 @@ export default {
           }
           this.refreshTimer = setInterval(this.refresh, 15 * 1000)
 
-          this.setKalturaUploadNotification(false)
+          if (this.notifications.kaltura !== 0) {
+            this.setNotifications({
+              kaltura: 0,
+            })
+          }
         } else if (!this.isUploading || !this.isLatestTapestry) {
           this.cancelRefresh()
         }
@@ -172,7 +185,7 @@ export default {
     this.cancelRefresh()
   },
   methods: {
-    ...mapMutations(["setKalturaUploadNotification"]),
+    ...mapActions(["setNotifications"]),
     closeModal() {
       this.$root.$emit("bv::hide::modal", "kaltura-modal")
     },

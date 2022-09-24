@@ -75,6 +75,14 @@ $REST_API_ENDPOINTS = [
             'permission_callback' => 'TapestryPermissions::putTapestrySettings',
         ],
     ],
+    'UPDATE_TAPESTRY_NOTIFICATIONS' => (object) [
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/notifications',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_PUT_METHOD,
+            'callback' => 'updateTapestryNotifications',
+            'permission_callback' => 'TapestryPermissions::putTapestrySettings',
+        ],
+    ],
     'POST_TAPESTRY_GROUP' => (object) [
         'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/groups',
         'ARGUMENTS' => [
@@ -864,6 +872,30 @@ function updateTapestrySettings($request)
         }
         $tapestry = new Tapestry($postId);
         $tapestry->set((object) ['settings' => $settings]);
+
+        return $tapestry->save();
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+/**
+ * Update Tapestry notifications.
+ *
+ * @param object $request HTTP request
+ *
+ * @return object $response   HTTP response
+ */
+function updateTapestryNotifications($request) {
+    $postId = $request['tapestryPostId'];
+    $notifications = json_decode($request->get_body());
+    // TODO: JSON validations should happen here
+    try {
+        if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+        $tapestry = new Tapestry($postId);
+        $tapestry->set((object) ['notifications' => $notifications]);
 
         return $tapestry->save();
     } catch (TapestryError $e) {
@@ -1734,6 +1766,12 @@ function uploadVideosToKaltura($request)
         } finally {
             update_option(KalturaUpload::IN_PROGRESS_OPTION, KalturaUpload::NO_VALUE);
             update_option(KalturaUpload::STOP_UPLOAD_OPTION, KalturaUpload::NO_VALUE, false);
+
+            $tapestry = new Tapestry($tapestry_id);
+            $tapestry->set((object) ['notifications' => (object) [
+                'kaltura' => 1,
+            ]]);
+            $tapestry->save();
         }
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());

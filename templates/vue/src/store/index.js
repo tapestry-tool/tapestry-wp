@@ -26,7 +26,9 @@ export const store = {
     userAnswers: {},
     returnRoute: null,
     currentEditingNode: null,
-    kalturaUploadNotification: false,
+    notifications: {
+      kaltura: 0,
+    },
   },
   getters,
   mutations,

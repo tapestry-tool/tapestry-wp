@@ -176,6 +176,12 @@ class TapestryApi {
     return response
   }
 
+  async updateNotifications(notifications) {
+    const url = `/tapestries/${this.postId}/notifications`
+    const response = await this.client.put(url, notifications)
+    return response
+  }
+
   /**
    * Upload audio to server
    *

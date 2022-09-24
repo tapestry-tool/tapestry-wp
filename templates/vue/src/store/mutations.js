@@ -206,6 +206,6 @@ export function setCurrentEditingNodeProperty(state, { property, value }) {
   }
 }
 
-export function setKalturaUploadNotification(state, notification) {
-  state.kalturaUploadNotification = notification
+export function setNotifications(state, notifications) {
+  state.notifications = notifications
 }

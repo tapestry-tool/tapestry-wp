@@ -13,7 +13,7 @@
       <template #button-content>
         <i class="fas fa-ellipsis-h"></i>
         <span
-          v-if="showKalturaOption && kalturaUploadNotification"
+          v-if="showKalturaOption && notifications.kaltura !== 0"
           class="notification-dot"
         ></span>
       </template>
@@ -24,7 +24,7 @@
         v-if="showKalturaOption"
         @click="open(names.KALTURAMODAL)"
       >
-        <div v-if="kalturaUploadNotification" class="kaltura-button">
+        <div v-if="notifications.kaltura !== 0" class="kaltura-button">
           <div>Upload to Kaltura</div>
           <div class="large-notification-dot"></div>
         </div>
@@ -88,7 +88,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(["kalturaUploadNotification"]),
+    ...mapState(["notifications"]),
     openOperation: {
       get() {
         return operationModalNames.includes(this.$route.name)

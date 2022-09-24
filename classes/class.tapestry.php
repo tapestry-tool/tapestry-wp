@@ -27,6 +27,7 @@ class Tapestry implements ITapestry
     private $settings;
     private $rootId;
     private $nodes;
+    private $notifications;
 
     private $nodeObjects; // Used only in the set up so we don't have to retrieve the nodes from the db multiple times
     private $visitedNodeIds; // Used in _recursivelySetAccessible function
@@ -50,6 +51,9 @@ class Tapestry implements ITapestry
         // $this->groups = [];
         $this->rootId = 0;
         $this->settings = $this->_getDefaultSettings();
+        $this->notifications = (object) [
+            'kaltura' => 0,
+        ];
 
         if (TapestryHelpers::isValidTapestry($this->postId)) {
             $tapestry = $this->_loadFromDatabase();
@@ -111,6 +115,9 @@ class Tapestry implements ITapestry
                 $this->settings->draftNodesEnabled = true;
                 $this->settings->submitNodesEnabled = true;
             }
+        }
+        if (isset($tapestry->notifications) && is_object($tapestry->notifications)) {
+            $this->notifications = $tapestry->notifications;
         }
     }
 
@@ -603,6 +610,7 @@ class Tapestry implements ITapestry
             'links' => $this->links,
             'settings' => $this->settings,
             'rootId' => $this->rootId,
+            'notifications' => $this->notifications,
         ];
     }
 
