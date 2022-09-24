@@ -12,10 +12,14 @@
     >
       <template #button-content>
         <i class="fas fa-ellipsis-h"></i>
-        <span
+        <b-badge
           v-if="showKalturaOption && notifications.kaltura.total !== 0"
-          class="notification-dot"
-        ></span>
+          class="notification-badge"
+          pill
+          variant="danger"
+        >
+          {{ notifications.kaltura.total }}
+        </b-badge>
       </template>
       <b-dropdown-item-button @click="open(names.EXPORTDUPLICATE)">
         Export/Duplicate Tapestry
@@ -26,7 +30,7 @@
       >
         <div v-if="notifications.kaltura.total !== 0" class="kaltura-button">
           <div>Upload to Kaltura</div>
-          <div class="large-notification-dot"></div>
+          <b-badge pill variant="danger">{{ notifications.kaltura.total }}</b-badge>
         </div>
         <template v-else>
           Upload to Kaltura
@@ -173,20 +177,10 @@ export default {
   align-items: center;
 }
 
-.notification-dot {
-  position: absolute;
-  top: 0.4rem;
-  right: 0.2rem;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: red;
-}
-
-.large-notification-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: red;
+.notification-badge {
+  position: absolute !important;
+  top: -2px !important;
+  right: -3px !important;
+  font-size: 0.7rem !important;
 }
 </style>
