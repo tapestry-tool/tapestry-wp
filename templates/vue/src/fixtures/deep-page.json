@@ -26,6 +26,7 @@
         "confirmationBodyText": "Would you like to continue?",
         "continueButtonText": "Continue",
         "cancelLinkText": "Cancel",
+        "showNavBar": true,
         "linkMetadata": null,
         "mediaURL": "",
         "mediaWidth": 960,

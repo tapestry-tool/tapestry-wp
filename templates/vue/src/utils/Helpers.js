@@ -370,6 +370,7 @@ export default class Helpers {
       hideTitle: false,
       hideProgress: false,
       hideMedia: false,
+      hideWhenLocked: false,
       backgroundColor: "#8396a1",
       textColor: "white",
       skippable: true,

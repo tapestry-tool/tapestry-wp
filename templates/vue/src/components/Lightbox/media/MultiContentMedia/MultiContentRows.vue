@@ -1,6 +1,9 @@
 <template>
   <div data-qa="multi-content-rows" class="multi-content-rows">
-    <b-row :class="(node.presentationStyle === 'page' ? 'mr' : 'ml') + '-0'">
+    <b-row
+      v-if="!allHidden"
+      :class="(node.presentationStyle === 'page' ? 'mr' : 'ml') + '-0'"
+    >
       <multi-content-row
         v-for="(row, index) in rows"
         :id="`row-${row.node.id}`"
@@ -70,6 +73,13 @@ export default {
         const nonPopupChildren = children.filter(childNode => !childNode.popup)
         return { node, children: nonPopupChildren }
       })
+    },
+    allHidden() {
+      return (
+        this.level === 0 &&
+        this.rows.length > 0 &&
+        this.rows.every(row => !row.node.unlocked && row.node.hideWhenLocked)
+      )
     },
     lockRows() {
       return this.node.typeData.lockRows

@@ -29,7 +29,7 @@
     <button
       v-if="question.optional"
       class="my-3 btn-link"
-      @click="$emit('skipQuestion')"
+      @click="$emit('skip-question')"
     >
       Skip
     </button>
