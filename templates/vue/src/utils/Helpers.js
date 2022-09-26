@@ -240,16 +240,12 @@ export default class Helpers {
      *  - Allow all actions except "add" for original author
      *  - Allow all actions except "edit" for reviewer if node is rejected and showRejected is true
      * - If node is submitted for review:
-     *  - Only allow "read" and "move" for original author
+     *  - Only allow "read" for original author
      *  - Allow all actions except "edit" for reviewer
      */
     if (node.status === nodeStatus.DRAFT) {
       if (node.author && wp.isCurrentUser(node.author.id)) {
-        if (
-          action === "move" ||
-          action === userActions.READ ||
-          wp.canEditTapestry()
-        ) {
+        if (action === userActions.READ || wp.canEditTapestry()) {
           return true
         }
         return node.reviewStatus !== nodeStatus.SUBMIT && action !== userActions.ADD
