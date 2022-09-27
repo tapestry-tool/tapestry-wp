@@ -197,6 +197,7 @@ class TapestryHelpers
 
     /**
      * Check if the current user is allowed to an action to a node.
+     * The checks are similar to the Helpers.hasPermission checks in the frontend.
      *
      * @param string $action         action to be performed
      * @param Number $nodeMetaId     node meta ID
@@ -206,18 +207,25 @@ class TapestryHelpers
      */
     public static function userIsAllowed($action, $nodeMetaId, $tapestryPostId, $superuser_override = true, $_userId = null)
     {
+        $userId = $_userId;
+        if (is_null($userId)) {
+            $userId = wp_get_current_user()->ID;
+        }
+        $user = new TapestryUser($userId);
+
+        // Check 0: node is null case - this should only apply to creating a standalone node
+        if ($nodeMetaId == null) {
+            return $user->canEdit($tapestryPostId);
+        }
+
+        // Fetch some information required by subsequent checks
         $options = TapestryNodePermissions::getNodePermissions();
         $nodePostId = get_metadata_by_mid('post', $nodeMetaId)->meta_value->post_id;
 
         $tapestry = new Tapestry($tapestryPostId);
         $node = $tapestry->getNode($nodeMetaId);
 
-        $userId = $_userId;
-        if (is_null($userId)) {
-            $userId = wp_get_current_user()->ID;
-        }
         $groupIds = self::getGroupIdsOfUser($userId, $tapestryPostId);
-        $user = new TapestryUser($userId);
 
         // If node is submitted or accepted, users without edit access cannot edit node
         $isEditableReviewStatus = isset($node->reviewStatus) && ($node->reviewStatus === "submitted" || $node->reviewStatus === "accepted");
