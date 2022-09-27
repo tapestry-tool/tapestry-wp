@@ -220,7 +220,7 @@ class TapestryHelpers
         }
 
         $user = new TapestryUser($userId);
-        $canEditTapestry = $user->canEditTapestry($tapestryPostId);
+        $canEditTapestry = $user->canEdit($tapestryPostId);
 
         // Standalone nodes - only admins can publish
         if ($nodeMetaId === null) {
