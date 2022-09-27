@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname(__FILE__).'/class.tapestry-node-permissions.php';
+require_once dirname(__FILE__).'/class.constants.php';
 
 /**
  * Tapestry Helper Functions.
@@ -211,11 +211,17 @@ class TapestryHelpers
         if (is_null($userId)) {
             $userId = wp_get_current_user()->ID;
         }
+
+        // Guests never have any permissions other than read
+        if ($userId === 0 && $action !== UserActions::READ) {
+            return false;
+        }
+
         $user = new TapestryUser($userId);
 
-        // Check 0: node is null case - this should only apply to creating a standalone node
-        if ($nodeMetaId == null) {
-            return $user->canEdit($tapestryPostId);
+        // Standalone nodes - only admins can publish
+        if ($nodeMetaId === null) {
+            return $action === UserActions::ADD && $user->canEdit($tapestryPostId);
         }
 
         // Fetch some information required by subsequent checks
@@ -228,7 +234,7 @@ class TapestryHelpers
 
         // If node is submitted or accepted, users without edit access cannot edit node
         $isEditableReviewStatus = isset($node->reviewStatus) && ($node->reviewStatus === "submitted" || $node->reviewStatus === "accepted");
-        if ($action === "edit" && $isEditableReviewStatus && !$user->canEdit($tapestryPostId)) {
+        if ($action === UserActions::EDIT && $isEditableReviewStatus && !$user->canEdit($tapestryPostId)) {
             return false;
         }
 
@@ -236,7 +242,7 @@ class TapestryHelpers
             return true;
         } elseif ($user->isAuthorOfThePost($nodePostId) && $node->getMeta()->status === "draft" && $node->getMeta()->reviewStatus !== "submitted") {
             return true;
-        } elseif ($user->isAuthorOfThePost($nodePostId) && $node->getMeta()->reviewStatus === "submitted" && $action === 'MOVE') {
+        } elseif ($user->isAuthorOfThePost($nodePostId) && $node->getMeta()->reviewStatus === "submitted" && $action === UserActions::MOVE) {
             return true;
         } else {
             $nodePermissions = get_metadata_by_mid('post', $nodeMetaId)->meta_value->permissions;

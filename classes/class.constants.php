@@ -21,3 +21,11 @@ class CommentTypes
     public const COMMENT = 'Comment';
     public const STATUS_CHANGE = 'StatusChange';
 }
+
+class UserActions
+{
+    public const READ = 'read';
+    public const ADD = 'add';
+    public const EDIT = 'edit';
+    public const MOVE = 'move';
+}
