@@ -28,7 +28,7 @@
       <b-button
         v-if="question.optional"
         variant="link"
-        @click="$emit('skipQuestion')"
+        @click="$emit('skip-question')"
       >
         Skip
       </b-button>

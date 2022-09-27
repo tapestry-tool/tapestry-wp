@@ -335,6 +335,7 @@ button[disabled] {
 }
 
 .media-container {
+  position: relative;
   height: 100%;
   width: 100%;
   max-width: 150vh;
