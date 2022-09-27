@@ -8,17 +8,10 @@
       v-if="state === 'completion-screen'"
       :question="activeQuestion"
     >
-      <button
-        v-if="hasNext"
-        class="button-completion"
-        data-qa="completion-next-button"
-        @click="next"
-      >
-        <i class="fas fa-arrow-circle-right fa-4x"></i>
-        <p>Next question</p>
-      </button>
-      <button v-else class="button-completion" @click="close">
-        <template v-if="context === 'lightbox'">
+      <button class="button-completion" @click="close">
+        <template
+          v-if="context === 'lightbox' && nextUnansweredQuestionIndex === -1"
+        >
           <i class="fas fa-times-circle fa-4x"></i>
           <p>Done</p>
         </template>
@@ -33,8 +26,9 @@
       class="activity-question"
       :question="activeQuestion"
       :node="questionNode"
+      @before-submit="scrollToTop('instant')"
       @submit="handleComplete('activity')"
-      @skipQuestion="skip"
+      @skip-question="skip"
       @back="$emit('close')"
     ></question>
     <answer-media
@@ -176,6 +170,13 @@ export default {
     hasPrev() {
       return this.activeQuestionIndex !== 0
     },
+    nextUnansweredQuestionIndex() {
+      let index = this.activeQuestionIndex
+      while (index !== this.questions.length - 1) {
+        if (!this.questions[++index].completed) return index
+      }
+      return -1
+    },
     hasAnswers() {
       return !!Object.entries(
         this.getAnswers(this.questionNode.id, this.activeQuestion.id)
@@ -198,27 +199,6 @@ export default {
   },
   watch: {
     activeQuestionId() {
-      if (this.node.id) {
-        this.$nextTick(() => {
-          const container = document.querySelector(
-            `#multicontent-container .media-container`
-          )
-          const element = document.getElementById(`row-${this.node.id}`)
-          if (element) {
-            const y = Helpers.getPositionOfElementInElement(element, container).y
-            container.scrollTo({ top: y, behavior: "smooth" })
-            client.recordAnalyticsEvent(
-              "app",
-              "scroll",
-              "multi-content",
-              this.node.id,
-              {
-                to: y,
-              }
-            )
-          }
-        })
-      }
       if (this.initialType === states.ACTIVITY) {
         if (this.hasAnswers && this.state === states.ACTIVITY) {
           this.state = states.ANSWER
@@ -226,6 +206,10 @@ export default {
           this.state = states.ACTIVITY
         }
       }
+      this.scrollToTop()
+    },
+    state(state) {
+      this.scrollToTop(state === states.COMPLETION_SCREEN ? "instant" : "smooth")
     },
   },
   mounted() {
@@ -249,6 +233,28 @@ export default {
   },
   methods: {
     ...mapActions(["updateNodeProgress"]),
+    scrollToTop(behavior = "smooth") {
+      if (!this.node.id) return
+      this.$nextTick(() => {
+        const container = document.querySelector(
+          `#multicontent-container .media-container`
+        )
+        const element = document.getElementById(`row-${this.node.id}`)
+        if (container && element) {
+          const y = Helpers.getPositionOfElementInElement(element, container).y
+          container.scrollTo({ top: y, behavior })
+          client.recordAnalyticsEvent(
+            "app",
+            "scroll",
+            "multi-content",
+            this.node.id,
+            {
+              to: y,
+            }
+          )
+        }
+      })
+    },
     markQuestionsComplete() {
       let numCompleted = 0
       this.questions.forEach(question => {
@@ -281,7 +287,11 @@ export default {
       })
 
       if (initiatingComponent === "activity") {
-        if (!this.activeQuestion.confirmation.message && this.hasNext) {
+        if (
+          !this.activeQuestion.confirmation.title &&
+          !this.activeQuestion.confirmation.message &&
+          this.hasNext
+        ) {
           if (this.questions[this.activeQuestionIndex + 1].completed) {
             this.state = states.ANSWER
           } else {
@@ -315,15 +325,20 @@ export default {
       this.hasNext ? this.next() : (this.state = states.COMPLETION_SCREEN)
     },
     close() {
-      client.recordAnalyticsEvent("user", "close", "activity", this.node.id)
-      if (
-        this.node.popup ||
-        (this.initialType === "activity" && this.context === "lightbox")
-      ) {
-        this.$emit("close")
+      if (this.nextUnansweredQuestionIndex !== -1) {
+        this.activeQuestionIndex = this.nextUnansweredQuestionIndex
+        this.state = states.ACTIVITY
       } else {
-        this.activeQuestionIndex = 0
-        this.state = states.ANSWER
+        client.recordAnalyticsEvent("user", "close", "activity", this.node.id)
+        if (
+          this.node.popup ||
+          (this.initialType === "activity" && this.context === "lightbox")
+        ) {
+          this.$emit("close")
+        } else {
+          this.activeQuestionIndex = 0
+          this.state = states.ANSWER
+        }
       }
     },
   },
