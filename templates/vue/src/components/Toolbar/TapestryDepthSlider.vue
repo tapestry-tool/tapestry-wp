@@ -42,9 +42,7 @@ export default {
         if (!Number.isInteger(depth)) {
           return
         }
-        if (depth > this.maxDepth) {
-          depth = this.maxDepth
-        }
+        depth = Math.max(1, Math.min(depth, this.maxDepth))
         if (depth !== this.currentDepth) {
           this.setCurrentDepth(depth)
           this.$router.push({

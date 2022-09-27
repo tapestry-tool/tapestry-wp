@@ -17,6 +17,11 @@
               <b-col v-if="canEdit && settings.submitNodesEnabled" class="p-0">
                 <review-notifications />
               </b-col>
+              <b-col v-if="isAdmin" class="p-0">
+                <user-answers-button
+                  data-qa="user-answers-button"
+                ></user-answers-button>
+              </b-col>
               <b-col v-if="canEdit" class="p-0">
                 <settings-modal-button :max-depth="maxDepth"></settings-modal-button>
               </b-col>
@@ -40,6 +45,7 @@
 import { mapMutations, mapState } from "vuex"
 import TapestryDepthSlider from "./TapestryDepthSlider"
 import SettingsModalButton from "./SettingsModalButton"
+import UserAnswersButton from "./UserAnswersButton"
 import UserSettingsButton from "./UserSettingsButton"
 import TapestryFilter from "./TapestryFilter"
 import ReviewNotifications from "./ReviewNotifications"
@@ -56,6 +62,7 @@ export default {
     UserSettingsButton,
     HelpButton,
     OperationsButton,
+    UserAnswersButton,
   },
   data() {
     return {
@@ -66,6 +73,10 @@ export default {
     ...mapState(["nodes", "links", "selection", "settings"]),
     canEdit() {
       return wp.canEditTapestry()
+    },
+    isAdmin() {
+      const currentUser = wp.getCurrentUser()
+      return currentUser.roles && currentUser.roles.includes("administrator")
     },
     hasDepth() {
       return this.maxDepth > 1 && this.settings.defaultDepth > 0

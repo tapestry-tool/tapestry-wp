@@ -1436,3 +1436,31 @@ button:disabled {
   margin: 0.25rem !important;
 }
 </style>
+
+<style lang="scss">
+.topright-checkbox {
+  position: absolute;
+  right: 20px;
+  top: 13px;
+  .custom-switch {
+    .custom-control-label {
+      margin-right: 35px;
+      text-align: right;
+
+      &::before {
+        right: -2.25rem !important;
+        left: unset;
+      }
+
+      &::after {
+        right: calc(-2.25rem + 2px) !important;
+        left: unset;
+      }
+    }
+    .custom-control-input:checked ~ .custom-control-label::after {
+      -webkit-transform: translateX(-0.75rem);
+      transform: translateX(-0.75rem);
+    }
+  }
+}
+</style>

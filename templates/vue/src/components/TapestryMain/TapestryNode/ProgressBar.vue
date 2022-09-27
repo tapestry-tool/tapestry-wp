@@ -60,7 +60,7 @@ export default {
       })
     },
     width() {
-      return 20
+      return this.radius * 0.14
     },
     pathStyle() {
       return "fill: " + this.fillColor
