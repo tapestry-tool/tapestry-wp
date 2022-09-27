@@ -914,18 +914,12 @@ export default {
     },
     async submitNode() {
       if (this.type === "add") {
-        const id = await this.addNode(this.node)
+        const id = await this.addNode({
+          node: this.node,
+          parentId: this.parentId,
+        })
         this.update("id", id)
         if (this.parent) {
-          // Add link from parent node to this node
-          const newLink = {
-            source: this.parent.id,
-            target: id,
-            value: 1,
-            type: "",
-            addedOnNodeCreation: true,
-          }
-          await this.addLink(newLink)
           // do not update parent's child ordering if the current node is a draft node since draft shouldn't appear in multi-content nodes
           if (this.node.status !== "draft") {
             this.$store.commit("updateNode", {

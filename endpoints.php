@@ -553,7 +553,12 @@ function deleteTapestry($request)
 function addTapestryNode($request)
 {
     $postId = $request['tapestryPostId'];
-    $node = json_decode($request->get_body());
+    $payload = json_decode($request->get_body());
+    $node = $payload->node;
+    $parentId = null;
+    if (isset($payload->parentId) && $payload->parentId !== null) {
+        $parentId = $payload->parentId;
+    }
     // TODO: JSON validations should happen here
     // make sure that we can only accept one node object at a time
     // adding multiple nodes would require multiple requests from the client
@@ -563,28 +568,43 @@ function addTapestryNode($request)
         }
         $tapestry = new Tapestry($postId);
 
+        // Permission checks
         if (!is_user_logged_in()) {
             // Prevent guests from adding a node
             throw new TapestryError('ADD_NODE_PERMISSION_DENIED', 'Please log in to add a node.');
         }
-        if (NodeStatus::DRAFT !== $node->status) {
+        if ($node->status !== NodeStatus::DRAFT) {
             $user = new TapestryUser();
 
-            if ($tapestry->isEmpty() && !$user->canEdit($postId)) {
-                throw new TapestryError('ADD_NODE_PERMISSION_DENIED', 'You are not permitted to add nodes to the empty tapestry');
+            if (!TapestryHelpers::userIsAllowed(UserActions::ADD, $parentId, $postId)) {
+                throw new TapestryError('ADD_NODE_PERMISSION_DENIED');
             }
-
-            // TODO: Prevent non-admins from directly publishing a node (need to address this case: user with explicit ADD permission on a node should still be able to directly publish child nodes)
-            // if (!$user->canEdit($this->postId)) {
-            //     throw new TapestryError('FAILED_TO_ADD_NODE', 'Only admins can add a published node.', 403);
-            // }
 
             // Add user-specific permissions to the author (only do this if it is not a draft node)
             $userId = $user->getID();
             $node->permissions->{'user-'.$userId} = ['read', 'add', 'edit'];
+        } else {
+            $settings = $tapestry->getSettings();
+            if (!$settings->draftNodesEnabled) {
+                throw new TapestryError('DRAFT_NODES_DISABLED', 'Draft nodes are disabled for this Tapestry.', 403);
+            }
+            if (!$settings->submitNodesEnabled && isset($node->reviewStatus) && !empty($node->reviewStatus)) {
+                throw new TapestryError('DRAFT_NODES_DISABLED', 'You cannot submit draft nodes for this Tapestry.', 403);
+            }
         }
 
-        return $tapestry->addNode($node);
+        $newNode = $tapestry->addNode($node, $parentId);
+        $result = (object) [
+            'node' => $newNode,
+        ];
+        if ($parentId) {
+            $result->link = $tapestry->addLink((object) [
+                'source' => $parentId,
+                'target' => $newNode->id,
+                'addedOnNodeCreation' => true,
+            ]);
+        }
+        return $result;
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
