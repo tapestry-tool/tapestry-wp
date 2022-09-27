@@ -375,19 +375,19 @@ export default {
     },
     canPublish() {
       if (this.type === "add") {
-        return Helpers.hasPermission(this.parent, this.type)
+        return this.hasPermission(this.parent, this.type)
       } else if (this.node.status === "draft" && this.type === "edit") {
         return (
-          Helpers.hasPermission(null, "add") ||
+          this.hasPermission(null, "add") ||
           this.getNeighbours(this.nodeId).some(neighbourId => {
             let neighbour = this.getNode(neighbourId)
             return (
-              neighbour.status !== "draft" && Helpers.hasPermission(neighbour, "add")
+              neighbour.status !== "draft" && this.hasPermission(neighbour, "add")
             )
           })
         )
       } else {
-        return Helpers.hasPermission(this.node, this.type)
+        return this.hasPermission(this.node, this.type)
       }
     },
     authoredNode() {
@@ -606,6 +606,9 @@ export default {
     update(property, value) {
       this.setCurrentEditingNodeProperty({ property, value })
     },
+    hasPermission(node, action) {
+      return Helpers.hasPermission(node, action, this.settings.showRejected)
+    },
     isValid() {
       const isNodeValid = this.validateNodeRoute(this.nodeId)
       if (!isNodeValid) {
@@ -634,7 +637,7 @@ export default {
       if (!this.getNode(nodeId)) {
         return false
       }
-      const isAllowed = Helpers.hasPermission(this.getNode(nodeId), this.type)
+      const isAllowed = this.hasPermission(this.getNode(nodeId), this.type)
       const messages = {
         edit: `You don't have permission to edit this node`,
         add: `You don't have permission to add to this node`,
@@ -844,7 +847,7 @@ export default {
       const parentId = this.parentId
       this.deleteNode(this.nodeId).then(() => {
         const parent = this.getNode(parentId)
-        if (parent && Helpers.hasPermission(parent, userActions.EDIT)) {
+        if (parent && this.hasPermission(parent, userActions.EDIT)) {
           this.setCurrentEditingNode(parent)
           this.keepOpen = parentId
         } else {
