@@ -745,8 +745,8 @@ class Tapestry implements ITapestry
 
     private function _userIsAllowed($node, $superuser_override, $userId)
     {
-        return TapestryHelpers::userIsAllowed('READ', $node, $this->postId, $superuser_override, $userId)
-        || TapestryHelpers::userIsAllowed('ADD', $node, $this->postId, $superuser_override, $userId)
-        || TapestryHelpers::userIsAllowed('EDIT', $node, $this->postId, $superuser_override, $userId);
+        return TapestryHelpers::userIsAllowed('read', $node, $this->postId, $superuser_override, $userId)
+        || TapestryHelpers::userIsAllowed('add', $node, $this->postId, $superuser_override, $userId)
+        || TapestryHelpers::userIsAllowed('edit', $node, $this->postId, $superuser_override, $userId);
     }
 }

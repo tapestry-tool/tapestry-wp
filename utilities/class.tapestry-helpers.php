@@ -219,7 +219,6 @@ class TapestryHelpers
         }
 
         // Fetch some information required by subsequent checks
-        $options = TapestryNodePermissions::getNodePermissions();
         $nodePostId = get_metadata_by_mid('post', $nodeMetaId)->meta_value->post_id;
 
         $tapestry = new Tapestry($tapestryPostId);
@@ -229,7 +228,7 @@ class TapestryHelpers
 
         // If node is submitted or accepted, users without edit access cannot edit node
         $isEditableReviewStatus = isset($node->reviewStatus) && ($node->reviewStatus === "submitted" || $node->reviewStatus === "accepted");
-        if ($action === "EDIT" && $isEditableReviewStatus && !$user->canEdit($tapestryPostId)) {
+        if ($action === "edit" && $isEditableReviewStatus && !$user->canEdit($tapestryPostId)) {
             return false;
         }
 
@@ -243,18 +242,18 @@ class TapestryHelpers
             $nodePermissions = get_metadata_by_mid('post', $nodeMetaId)->meta_value->permissions;
             if (
                 property_exists($nodePermissions, 'user-'.$userId) &&
-                in_array($options[$action], $nodePermissions->{'user-'.$userId})
+                in_array($action, $nodePermissions->{'user-'.$userId})
             ) {
                 return true;
             } elseif (
                 property_exists($nodePermissions, 'public') &&
-                in_array($options[$action], $nodePermissions->public)
+                in_array($action, $nodePermissions->public)
             ) {
                 return true;
             } elseif (
                 is_user_logged_in() &&
                 property_exists($nodePermissions, 'authenticated') &&
-                in_array($options[$action], $nodePermissions->authenticated)
+                in_array($action, $nodePermissions->authenticated)
             ) {
                 return true;
             } elseif (is_user_logged_in()) {
@@ -262,7 +261,7 @@ class TapestryHelpers
                 foreach ($roles as $role) {
                     if (
                         property_exists($nodePermissions, $role) &&
-                        in_array($options[$action], $nodePermissions->$role)
+                        in_array($action, $nodePermissions->$role)
                     ) {
                         return true;
                     }
@@ -271,7 +270,7 @@ class TapestryHelpers
                 foreach ($groupIds as $groupId) {
                     if (
                         (property_exists($nodePermissions, 'group-'.$groupId))
-                        && (in_array($options[$action], $nodePermissions->{'group-'.$groupId}))
+                        && (in_array($action, $nodePermissions->{'group-'.$groupId}))
                     ) {
                         return true;
                     }
