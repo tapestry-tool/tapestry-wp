@@ -8,7 +8,6 @@ require_once dirname(__FILE__).'/../classes/class.tapestry-user-progress.php';
 require_once dirname(__FILE__).'/../classes/class.tapestry-h5p.php';
 require_once dirname(__FILE__).'/../classes/class.constants.php';
 require_once dirname(__FILE__).'/../interfaces/interface.tapestry.php';
-require_once dirname(__FILE__).'/class.constants.php';
 
 /**
  * TODO: Implement group functionality. Currently all the group-related

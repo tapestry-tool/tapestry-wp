@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname(__FILE__).'/class.constants.php';
+require_once dirname(__FILE__).'/../classes/class.constants.php';
 
 /**
  * Tapestry Helper Functions.
