@@ -10,6 +10,7 @@ describe("Export", () => {
   it("should be able to export a Tapestry", () => {
     cy.get(".operations-button").click()
     cy.contains(/export\/duplicate tapestry/i).click()
+    cy.getByTestId("include-media").click({ force: true })
     cy.getByTestId("export-tapestry-button").click()
 
     cy.wait("@export")
@@ -25,10 +26,7 @@ describe("Export", () => {
   it("should be able to export a Tapestry as a zip file", () => {
     cy.get(".operations-button").click()
     cy.contains(/export\/duplicate tapestry/i).click()
-    cy.getByTestId("export-type-toggle").click()
-    cy.contains(/Export as ZIP/i)
-      .should("be.visible")
-      .click()
+    cy.getByTestId("export-tapestry-button").click()
 
     cy.wait("@export_zip")
       .its("response.body")
@@ -54,10 +52,7 @@ describe("Export", () => {
 
     cy.get(".operations-button").click()
     cy.contains(/export\/duplicate tapestry/i).click()
-    cy.getByTestId("export-type-toggle").click()
-    cy.contains(/Export as ZIP/i)
-      .should("be.visible")
-      .click()
+    cy.getByTestId("export-tapestry-button").click()
 
     cy.wait("@export_zip")
       .its("response.body")
@@ -149,10 +144,7 @@ describe("Export", () => {
 
     cy.get(".operations-button").click()
     cy.contains(/export\/duplicate tapestry/i).click()
-    cy.getByTestId("export-type-toggle").click()
-    cy.contains(/Export as ZIP/i)
-      .should("be.visible")
-      .click()
+    cy.getByTestId("export-tapestry-button").click()
 
     cy.wait("@export_zip")
       .its("response.body")

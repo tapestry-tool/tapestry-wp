@@ -215,7 +215,7 @@ class TapestryImportExport
 
         $tapestry_data->warnings = !empty($export_warnings['nodes']) || !empty($export_warnings['settings']);
 
-        $zip->addFromString('tapestry.json', json_encode($tapestry_data, JSON_PRETTY_PRINT));
+        $zip->addFromString('tapestry.json', json_encode($tapestry_data, JSON_PRETTY_PRINT | JSON_UNESCAPED_LINE_TERMINATORS | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
         $zip->close();
 
         return [
@@ -337,6 +337,7 @@ class TapestryImportExport
      */
     private static function _exportMedia(&$media_url, $zip, &$warnings, &$log, $file_id = null)
     {
+        $path_to_media = "";
         if (!empty($file_id)) {
             // Retrieve the original file, not the resized version
             $path_to_media = get_attached_file($file_id);
@@ -344,7 +345,9 @@ class TapestryImportExport
             if (!$path_to_media) {
                 array_push($warnings, 'Could not find WordPress attachment. A thumbnail may be missing.');
             }
-        } else {
+        }
+
+        if (!$path_to_media) {
             $path_to_media = self::_getLocalPath($media_url);
         }
 
@@ -726,8 +729,15 @@ class TapestryImportExport
         $wp_upload_dir_path = $wp_upload_dir['basedir'] . DIRECTORY_SEPARATOR;
         $wp_upload_dir_url = $wp_upload_dir['baseurl'] . '/';
 
+        $protocols = array("https:", "http:");
+        $wp_upload_dir_url_no_protocol = str_replace($protocols, '', $wp_upload_dir_url);
+
         if (self::_stringStartsWith($url, $wp_upload_dir_url)) {
             $path = $wp_upload_dir_path . substr($url, strlen($wp_upload_dir_url));
+            return $path;
+        }
+        if (self::_stringStartsWith($url, $wp_upload_dir_url_no_protocol)) {
+            $path = $wp_upload_dir_path . substr($url, strlen($wp_upload_dir_url_no_protocol));
             return $path;
         }
         return false;

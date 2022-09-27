@@ -313,7 +313,7 @@ $REST_API_ENDPOINTS = [
         'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/export',
         'ARGUMENTS' => [
             'methods' => $REST_API_GET_METHOD,
-            'callback' => 'exportTapestry',
+            'callback' => 'exportTapestryAsJson',
             'permission_callback' => 'TapestryPermissions::putTapestrySettings',
         ],
     ],
@@ -366,7 +366,7 @@ foreach ($REST_API_ENDPOINTS as $ENDPOINT) {
  *  - The JSON data of the Tapestry
  *  - The XML data of WordPress posts in the Tapestry, if any exist
  */
-function exportTapestry($request)
+function exportTapestryAsJson($request)
 {
     $postId = $request['tapestryPostId'];
     try {
