@@ -61,6 +61,16 @@ export async function addNode(
       },
     })
 
+    if (parentId) {
+      const parent = getters.getNode(parentId)
+      commit("updateNode", {
+        id: parentId,
+        newNode: {
+          childOrdering: [...parent.childOrdering, id],
+        },
+      })
+    }
+
     if (link) {
       commit("addLink", link)
     }

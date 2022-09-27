@@ -919,17 +919,6 @@ export default {
           parentId: this.parentId,
         })
         this.update("id", id)
-        if (this.parent) {
-          // do not update parent's child ordering if the current node is a draft node since draft shouldn't appear in multi-content nodes
-          if (this.node.status !== "draft") {
-            this.$store.commit("updateNode", {
-              id: this.parent.id,
-              newNode: {
-                childOrdering: [...this.parent.childOrdering],
-              },
-            })
-          }
-        }
       } else {
         await this.updateNode({
           id: this.node.id,
