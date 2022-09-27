@@ -430,28 +430,39 @@ export default class Helpers {
   }
 
   /**
-   * Map value from [minValue, maxValue] to [from, to]
-   * @param {Object} options
+   * Map value from [1, maxLevel] to [from, to]
+   * @param {Number} level the current level, in [1, maxLevel]
+   * @param {Number} maxLevel the maximum level
+   * @param {Number} from the minimum value
+   * @param {Number} to the maximum value
    * @return {number}
    */
-  static mapValue({ value, minValue = 1, maxValue, from, to }) {
-    if (maxValue === minValue) {
+  static mapLevel(level, maxLevel, from, to) {
+    if (maxLevel === 1) {
       return from
     }
-    return from + (to - from) * ((value - minValue) / (maxValue - minValue))
+    return from + (to - from) * ((level - 1) / (maxLevel - 1))
   }
 
   static darkenColor(color, level, maxLevel) {
     let hsl = TinyColor(color).toHsl()
-    const amount = Helpers.mapValue({
-      value: level,
-      maxValue: maxLevel,
-      from: 1,
-      to: Math.max(1 - maxLevel * 0.05, 0.7),
-    })
+    const amount = Helpers.mapLevel(
+      level,
+      maxLevel,
+      1,
+      Math.max(1 - maxLevel * 0.05, 0.7)
+    )
     hsl.s = hsl.s * amount
     hsl.l = hsl.l * amount
     return TinyColor(hsl).toHexString()
+  }
+
+  static getDropShadow(level, maxLevel, scale = 1) {
+    return {
+      offset: 4 * (maxLevel - level) * scale + 3,
+      blur: Helpers.mapLevel(level, maxLevel, 16, 5),
+      opacity: Helpers.mapLevel(level, maxLevel, 0.2, 0.5),
+    }
   }
 
   static getNodeVisibility(level, scale, depth) {
