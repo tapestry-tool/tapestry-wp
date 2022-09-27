@@ -32,13 +32,11 @@
           </b-button>
         </b-row>
         <b-collapse :id="`question-${index}-container`" visible>
-          <b-card
-            sub-title="Show answer to a previous activity first"
-            bg-variant="light"
-            text-variant="dark"
-            class="mb-3"
-          >
-            <b-form-group>
+          <b-card bg-variant="light" text-variant="dark" class="mb-3">
+            <b-card-sub-title class="mb-0">
+              Show answer to a previous activity first
+            </b-card-sub-title>
+            <b-form-group class="topright-checkbox">
               <b-form-checkbox
                 v-model="question.followUp.enabled"
                 switch
@@ -51,6 +49,7 @@
               v-if="question.followUp.enabled"
               label="Show this text first:"
               :label-for="`question-followup-text-${index}`"
+              class="mt-3"
             >
               <b-form-input
                 :id="`question-followup-text-${index}`"
@@ -86,7 +85,7 @@
             text-variant="dark"
             class="mb-3"
           >
-            <b-form-group class="optional-checkbox">
+            <b-form-group class="topright-checkbox">
               <b-form-checkbox
                 v-model="question.optional"
                 data-qa="question-optional-checkbox"
@@ -106,6 +105,7 @@
             <b-form-group
               label="Question text"
               :label-for="`question-text-${index}`"
+              class="mt-3"
             >
               <b-form-input
                 :id="`question-text-${index}`"
@@ -253,20 +253,45 @@
             bg-variant="light"
             text-variant="dark"
           >
-            <b-form-group
-              label="Title"
-              :label-for="`question-confirmation-title-${index}`"
-            >
-              <b-form-input
-                :id="`question-confirmation-title-${index}`"
-                v-model="question.confirmation.title"
-                placeholder="Thanks!"
-              />
+            <b-form-group class="topright-checkbox">
+              <b-form-checkbox
+                :checked="
+                  question.confirmation.title.length !== 0 ||
+                    question.confirmation.message.length !== 0
+                "
+                switch
+                @change="setCustomConfirmation(question, $event)"
+              >
+                {{
+                  question.confirmation.title.length !== 0 ||
+                  question.confirmation.message.length !== 0
+                    ? "Customize"
+                    : "Use default"
+                }}
+              </b-form-checkbox>
             </b-form-group>
-            <rich-text-form
-              v-model="question.confirmation.message"
-              placeholder="Your response has been recorded."
-            />
+            <template
+              v-if="
+                question.confirmation.title.length !== 0 ||
+                  question.confirmation.message.length !== 0
+              "
+            >
+              <b-form-group
+                label="Title"
+                class="mt-3"
+                :label-for="`question-confirmation-title-${index}`"
+              >
+                <b-form-input
+                  :id="`question-confirmation-title-${index}`"
+                  v-model="question.confirmation.title"
+                  placeholder="Thanks!"
+                />
+              </b-form-group>
+              <rich-text-form
+                v-model="question.confirmation.message"
+                placeholder="Your response has been recorded."
+              />
+            </template>
           </b-card>
         </b-collapse>
       </b-form-group>
@@ -415,6 +440,23 @@ export default {
       question.followUp.questionId = ""
       question.followUp.nodeId = ""
     },
+    setCustomConfirmation(question, enabled) {
+      /**
+       * We detect the presence of a custom confirmation by checking if either
+       * title or message is non-empty. Thus, when the toggle on the interface
+       * gets turned on, an empty <p> is set as the rich text content to
+       * reflect the enabling of a custom confirmation. We do not have a boolean
+       * property for enabled, as that would break backward compatibility
+       * with existing confirmation settings.
+       */
+      if (enabled) {
+        question.confirmation.title = ""
+        question.confirmation.message = "<p></p>"
+      } else {
+        question.confirmation.title = ""
+        question.confirmation.message = ""
+      }
+    },
     questionOptional(q) {
       return q.optional
     },
@@ -431,12 +473,6 @@ export default {
 .activity {
   .icon {
     margin-right: 4px;
-  }
-
-  .optional-checkbox {
-    position: absolute;
-    right: 20px;
-    top: 10px;
   }
 
   .question-text {
