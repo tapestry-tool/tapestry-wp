@@ -207,6 +207,8 @@ class TapestryHelpers
      */
     public static function userIsAllowed($action, $nodeMetaId, $tapestryPostId, $superuser_override = true, $_userId = null)
     {
+        // Section 1: Fetching of information & special cases
+
         $userId = $_userId;
         if (is_null($userId)) {
             $userId = wp_get_current_user()->ID;
@@ -218,69 +220,117 @@ class TapestryHelpers
         }
 
         $user = new TapestryUser($userId);
+        $canEditTapestry = $user->canEditTapestry($tapestryPostId);
 
         // Standalone nodes - only admins can publish
         if ($nodeMetaId === null) {
-            return $action === UserActions::ADD && $user->canEdit($tapestryPostId);
+            return $action === UserActions::ADD && $canEditTapestry;
         }
 
-        // Fetch some information required by subsequent checks
+        // Fetch information required by subsequent checks
         $nodePostId = get_metadata_by_mid('post', $nodeMetaId)->meta_value->post_id;
 
         $tapestry = new Tapestry($tapestryPostId);
         $node = $tapestry->getNode($nodeMetaId);
+        $nodeMeta = $node->getMeta();
 
         $groupIds = self::getGroupIdsOfUser($userId, $tapestryPostId);
 
-        // If node is submitted or accepted, users without edit access cannot edit node
-        $isEditableReviewStatus = isset($node->reviewStatus) && ($node->reviewStatus === "submitted" || $node->reviewStatus === "accepted");
-        if ($action === UserActions::EDIT && $isEditableReviewStatus && !$user->canEdit($tapestryPostId)) {
+        // Section 2: Checks related to draft nodes
+
+        /**
+         * If node is a draft (accepted draft nodes are PUBLISHED nodes, so they are not considered here):
+         * - If node is not submitted for review:
+         *  - Allow all actions except "add" for original author
+         *  - Allow all actions except "edit" for reviewer if node is rejected and showRejected is true
+         * - If node is submitted for review:
+         *  - Only allow "read" for original author
+         *  - Allow all actions except "edit" for reviewer
+         */
+        if ($nodeMeta->status === NodeStatus::DRAFT) {
+            if ($user->isAuthorOfThePost($nodePostId)) {
+                if ($action === UserActions::READ || $canEditTapestry) {
+                    return true;
+                }
+                return $nodeMeta->reviewStatus !== NodeStatus::SUBMIT && $action !== UserActions::ADD;
+            }
+            if ($canEditTapestry) {
+                if ($action === UserActions::EDIT) {
+                    return false;
+                }
+                return $nodeMeta->reviewStatus === NodeStatus::SUBMIT || $nodeMeta->reviewStatus === NodeStatus::REJECT;
+            }
             return false;
         }
 
+        // Section 3: Override for admins / authors
+
+        // User has edit permissions for Tapestry
         if ($user->canEdit($tapestryPostId) && $superuser_override) {
             return true;
-        } elseif ($user->isAuthorOfThePost($nodePostId) && $node->getMeta()->status === "draft" && $node->getMeta()->reviewStatus !== "submitted") {
+        }
+        
+        // User is the author of the node (unless node was submitted, then accepted)
+        if ($user->isAuthorOfThePost($nodePostId) && $nodeMeta->reviewStatus !== NodeStatus::ACCEPT) {
             return true;
-        } elseif ($user->isAuthorOfThePost($nodePostId) && $node->getMeta()->reviewStatus === "submitted" && $action === UserActions::MOVE) {
+        }
+
+        // Section 4: Node-specific permissions
+
+        $nodePermissions = get_metadata_by_mid('post', $nodeMetaId)->meta_value->permissions;
+
+        // User has a permission associated with its ID
+        if (
+            property_exists($nodePermissions, 'user-'.$userId) &&
+            in_array($action, $nodePermissions->{'user-'.$userId})
+        ) {
             return true;
-        } else {
-            $nodePermissions = get_metadata_by_mid('post', $nodeMetaId)->meta_value->permissions;
+        }
+
+        // Node has public permissions
+        if (
+            property_exists($nodePermissions, 'public') &&
+            in_array($action, $nodePermissions->public)
+        ) {
+            return true;
+        }
+        
+        // Node has authenticated permissions
+        if (
+            is_user_logged_in() &&
+            property_exists($nodePermissions, 'authenticated') &&
+            in_array($action, $nodePermissions->authenticated)
+        ) {
+            return true;
+        }
+        
+        // User has a role that is allowed in the node
+        if (is_user_logged_in()) {
+            $roles = wp_get_current_user()->roles;
+            $allowedRoles = ['administrator', 'editor', 'author'];
+            foreach ($roles as $role) {
+                // Node has role-specific permissions
+                if (
+                    property_exists($nodePermissions, $role) &&
+                    in_array($action, $nodePermissions->$role)
+                ) {
+                    return true;
+                }
+                // The role has general edit permissions
+                if (in_array($role, $allowedRoles)) {
+                    return true;
+                }
+            }
+        }
+        
+        // User is in a group that is allowed in the node
+        // ! This check is not implemented in the frontend
+        foreach ($groupIds as $groupId) {
             if (
-                property_exists($nodePermissions, 'user-'.$userId) &&
-                in_array($action, $nodePermissions->{'user-'.$userId})
+                (property_exists($nodePermissions, 'group-'.$groupId))
+                && (in_array($action, $nodePermissions->{'group-'.$groupId}))
             ) {
                 return true;
-            } elseif (
-                property_exists($nodePermissions, 'public') &&
-                in_array($action, $nodePermissions->public)
-            ) {
-                return true;
-            } elseif (
-                is_user_logged_in() &&
-                property_exists($nodePermissions, 'authenticated') &&
-                in_array($action, $nodePermissions->authenticated)
-            ) {
-                return true;
-            } elseif (is_user_logged_in()) {
-                $roles = wp_get_current_user()->roles;
-                foreach ($roles as $role) {
-                    if (
-                        property_exists($nodePermissions, $role) &&
-                        in_array($action, $nodePermissions->$role)
-                    ) {
-                        return true;
-                    }
-                }
-            } else {
-                foreach ($groupIds as $groupId) {
-                    if (
-                        (property_exists($nodePermissions, 'group-'.$groupId))
-                        && (in_array($action, $nodePermissions->{'group-'.$groupId}))
-                    ) {
-                        return true;
-                    }
-                }
             }
         }
 
