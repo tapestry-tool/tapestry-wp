@@ -30,7 +30,7 @@
 
 <script>
 import Helpers from "@/utils/Helpers"
-import { mapState } from "vuex"
+import { mapGetters, mapState } from "vuex"
 export default {
   name: "tapestry-minimap",
   props: {
@@ -62,6 +62,7 @@ export default {
   },
   computed: {
     ...mapState(["nodes", "links", "maxLevel"]),
+    ...mapGetters(["isVisible"]),
     aspectRatio() {
       return this.viewBox[2] / this.viewBox[3]
     },
@@ -158,6 +159,9 @@ export default {
 
         // 2. draw links
         for (const link of this.links) {
+          if (!this.isVisible(link.source) || !this.isVisible(link.target)) {
+            continue
+          }
           const [initialPoint, ...points] = Helpers.getMinimapLinePoints(
             this.nodes[link.source],
             this.nodes[link.target]
@@ -175,15 +179,20 @@ export default {
         // 3. draw nodes
         for (const id in this.nodes) {
           const node = this.nodes[id]
+          if (!this.isVisible(id)) {
+            continue
+          }
           const { x, y } = this.transformCoordinates(node.coordinates)
           const radius = Helpers.getNodeBaseRadius(node.level)
           c.beginPath()
           c.arc(x, y, radius, 0, Math.PI * 2)
           c.fillStyle = node.backgroundColor
-          c.shadowColor = `rgba(0, 0, 0, ${Math.max(0.5 - node.level * 0.05, 0.2)})`
-          c.shadowBlur = Math.max(10 - node.level, 4)
-          c.shadowOffsetX = 4 * (this.maxLevel - node.level)
-          c.shadowOffsetY = 4 * (this.maxLevel - node.level)
+
+          const shadow = Helpers.getDropShadow(node.level, this.maxLevel)
+          c.shadowColor = `rgba(0, 0, 0, ${shadow.opacity})`
+          c.shadowBlur = shadow.blur
+          c.shadowOffsetX = shadow.offset
+          c.shadowOffsetY = shadow.offset
           c.fill()
         }
         c.shadowColor = "rgba(0, 0, 0, 0)"
