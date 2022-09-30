@@ -1,5 +1,7 @@
 import * as wp from "@/services/wp"
+import TinyColor from "tinycolor2"
 import { nodeStatus, userActions } from "./constants"
+import store from "../store"
 
 /**
  * Helper Functions
@@ -18,6 +20,7 @@ export default class Helpers {
   }
 
   /**
+   * [DO NOT USE DIRECTLY! Use the browserDimensions Vuex state instead]
    * Get browser width
    *
    * @return {Number}
@@ -27,12 +30,26 @@ export default class Helpers {
   }
 
   /**
-   * Get browser height
+   * [DO NOT USE DIRECTLY! Use the browserDimensions Vuex state instead]
+   * Get browser height, taking the admin bar into account if the bar is visible
    *
    * @return {Number}
    */
   static getBrowserHeight() {
-    return Math.max(document.documentElement.clientHeight, window.innerHeight || 0)
+    const adminBar = document.getElementById("wpadminbar")
+    return (
+      Math.max(document.documentElement.clientHeight, window.innerHeight || 0) -
+      (adminBar && adminBar.clientHeight ? adminBar.clientHeight : 0)
+    )
+  }
+
+  /**
+   * Convert the number in css rem units to number in px
+   * @param {Number} rem
+   * @return {Number}
+   */
+  static remToPx(rem) {
+    return rem * parseFloat(getComputedStyle(document.documentElement).fontSize)
   }
 
   /**
@@ -58,15 +75,6 @@ export default class Helpers {
     }
 
     return tapestry.nodes.findIndex(helper)
-  }
-
-  static getAspectRatio() {
-    const browserHeight = this.getBrowserHeight()
-    const browserWidth = this.getBrowserWidth()
-    if (browserHeight < 10) {
-      return 0
-    }
-    return browserWidth / browserHeight
   }
 
   static normalizeUrl(url) {
@@ -394,6 +402,7 @@ export default class Helpers {
       accessible: true,
       reviewComments: [],
       popup: null,
+      level: 1,
     }
     return Helpers.deepMerge(baseNode, overrides)
   }
@@ -415,5 +424,148 @@ export default class Helpers {
     }
 
     return { x: xPosition, y: yPosition }
+  }
+
+  static debounce(func, wait = 300) {
+    let timeout
+    return function(...args) {
+      const context = this
+      clearTimeout(timeout)
+      timeout = setTimeout(() => func.apply(context, args), wait)
+    }
+  }
+
+  /**
+   * Map value from [1, maxLevel] to [from, to]
+   * @param {Number} level the current level, in [1, maxLevel]
+   * @param {Number} maxLevel the maximum level
+   * @param {Number} from the minimum value
+   * @param {Number} to the maximum value
+   * @return {number}
+   */
+  static mapLevel(level, maxLevel, from, to) {
+    if (maxLevel === 1) {
+      return from
+    }
+    return from + (to - from) * ((level - 1) / (maxLevel - 1))
+  }
+
+  static darkenColor(color, level, maxLevel) {
+    let hsl = TinyColor(color).toHsl()
+    const amount = Helpers.mapLevel(
+      level,
+      maxLevel,
+      1,
+      Math.max(1 - maxLevel * 0.05, 0.7)
+    )
+    hsl.s = hsl.s * amount
+    hsl.l = hsl.l * amount
+    return TinyColor(hsl).toHexString()
+  }
+
+  static getDropShadow(level, maxLevel, scale = 1) {
+    return {
+      offset: 4 * (maxLevel - level) * scale + 3,
+      blur: Helpers.mapLevel(level, maxLevel, 16, 5),
+      opacity: Helpers.mapLevel(level, maxLevel, 0.2, 0.5),
+    }
+  }
+
+  static getNodeVisibility(level, scale, depth) {
+    const levelDiff = level - Helpers.getCurrentLevel(scale)
+    if (levelDiff < depth) {
+      return 1 // fully visible
+    } else if (levelDiff === depth) {
+      return 0 // grandchild visible
+    }
+    return -1 // not visible
+  }
+
+  static getTargetScale(level) {
+    return Math.max(1, level / store.state.scaleConstants.levelMultiplier)
+  }
+
+  static getCurrentLevel(scale) {
+    return Math.floor(scale * store.state.scaleConstants.levelMultiplier)
+  }
+
+  static getNodeBaseRadius(level) {
+    return 140 * Math.pow(0.75, level - 1)
+  }
+
+  static getNodeRadius(level, scale) {
+    const baseRadius = Helpers.getNodeBaseRadius(level)
+    const currentLevel = Helpers.getCurrentLevel(scale)
+    if (level < currentLevel) {
+      // growth rate should be slow for nodes higher than current level
+      const baseScale = (level + 1) / store.state.scaleConstants.levelMultiplier
+      return (
+        baseRadius *
+        (baseScale +
+          (scale - baseScale) / store.state.scaleConstants.largeNodeGrowthSupressor)
+      )
+    } else {
+      return baseRadius * scale
+    }
+  }
+
+  static getMinimapLinePoints(source, target) {
+    const x1 = source.coordinates.x,
+      y1 = source.coordinates.y,
+      x2 = target.coordinates.x,
+      y2 = target.coordinates.y
+    let width1 =
+        Helpers.getNodeBaseRadius(source.level) *
+        store.state.scaleConstants.lineWidthRatio,
+      width2 =
+        Helpers.getNodeBaseRadius(target.level) *
+        store.state.scaleConstants.lineWidthRatio
+    // make width differences more dramatic for better visual aid
+    if (source.level < target.level) {
+      width1 *= store.state.scaleConstants.widthDifferenceEnhancer.grow
+      width2 *= store.state.scaleConstants.widthDifferenceEnhancer.shrink
+    } else if (source.level > target.level) {
+      width2 *= store.state.scaleConstants.widthDifferenceEnhancer.grow
+      width1 *= store.state.scaleConstants.widthDifferenceEnhancer.shrink
+    }
+    const angle = Math.atan((y2 - y1) / (x2 - x1))
+    const dx1 = -1 * width1 * Math.sin(angle),
+      dy1 = width1 * Math.cos(angle),
+      dx2 = -1 * width2 * Math.sin(angle),
+      dy2 = width2 * Math.cos(angle)
+    return [
+      { x: x1 + dx1, y: y1 + dy1 },
+      { x: x1 - dx1, y: y1 - dy1 },
+      { x: x2 - dx2, y: y2 - dy2 },
+      { x: x2 + dx2, y: y2 + dy2 },
+    ]
+  }
+
+  static getLinePolygonPoints(source, target, scale = 1) {
+    const x1 = source.coordinates.x * scale,
+      y1 = source.coordinates.y * scale,
+      x2 = target.coordinates.x * scale,
+      y2 = target.coordinates.y * scale
+    let width1 =
+        Helpers.getNodeRadius(source.level, scale) *
+        store.state.scaleConstants.lineWidthRatio,
+      width2 =
+        Helpers.getNodeRadius(target.level, scale) *
+        store.state.scaleConstants.lineWidthRatio
+    // make width differences more dramatic for better visual aid
+    if (source.level < target.level) {
+      width1 *= store.state.scaleConstants.widthDifferenceEnhancer.grow
+      width2 *= store.state.scaleConstants.widthDifferenceEnhancer.shrink
+    } else if (source.level > target.level) {
+      width2 *= store.state.scaleConstants.widthDifferenceEnhancer.grow
+      width1 *= store.state.scaleConstants.widthDifferenceEnhancer.shrink
+    }
+    const angle = Math.atan((y2 - y1) / (x2 - x1))
+    const dx1 = -1 * width1 * Math.sin(angle),
+      dy1 = width1 * Math.cos(angle),
+      dx2 = -1 * width2 * Math.sin(angle),
+      dy2 = width2 * Math.cos(angle)
+    return `${x1 + dx1},${y1 + dy1} ${x1 - dx1},${y1 - dy1} ${x2 - dx2},${y2 -
+      dy2} ${x2 + dx2},${y2 + dy2}`
   }
 }

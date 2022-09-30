@@ -93,15 +93,6 @@ export default {
     normalizedUrl() {
       return Helpers.normalizeUrl(this.node.typeData.mediaURL)
     },
-    previewStyles() {
-      const { height } = this.dimensions
-      if (height) {
-        return {
-          maxHeight: `${height - 32}px`,
-        }
-      }
-      return {}
-    },
     showTitle() {
       return (
         !this.hideTitle &&
@@ -123,10 +114,6 @@ export default {
       this.$emit("load")
       if (this.node.behaviour === "embed") {
         this.$emit("complete")
-      } else {
-        this.$emit("change:dimensions", {
-          height: this.$refs.preview.clientHeight,
-        })
       }
     },
     openLink() {

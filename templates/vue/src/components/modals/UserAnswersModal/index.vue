@@ -25,6 +25,7 @@
                   <div>
                     <b-form-group data-qa="select-activity" label="Activity">
                       <combobox
+                        id="activity-cb"
                         v-model="activityId"
                         :options="activityNodes"
                         data-qa="choose-activity"
@@ -41,6 +42,7 @@
                     </b-form-group>
                     <b-form-group data-qa="select-question" label="Question">
                       <combobox
+                        id="question-cb"
                         v-model="questionId"
                         :options="availableQuestions"
                         data-qa="choose-question"

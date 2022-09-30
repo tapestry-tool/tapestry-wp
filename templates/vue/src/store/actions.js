@@ -280,10 +280,20 @@ async function unlockNodes({ commit, getters, dispatch }) {
   }
 }
 
-export async function deleteNode({ commit, dispatch }, id) {
+export async function deleteNode({ commit, dispatch, state, getters }, id) {
   try {
+    const level = getters.getNode(id).level
+
     await client.deleteNode(id)
     commit("deleteNode", id)
+
+    if (level === state.maxLevel) {
+      const remainingLevels = Object.values(state.nodes).map(node => node.level ?? 1)
+      const remainingMaxLevel = remainingLevels.length
+        ? Math.max(...remainingLevels)
+        : 1
+      commit("setMaxLevel", remainingMaxLevel)
+    }
   } catch (error) {
     dispatch("addApiError", error)
   }
@@ -496,4 +506,69 @@ export function addApiError({ commit }, error) {
 
 export function setTapestryErrorReporting({ commit }, isEnabled) {
   commit("setTapestryErrorReporting", isEnabled)
+}
+
+export function resetNodeNavigation({ commit }, nodeId) {
+  commit("setNodeNavigation", {
+    stack: [nodeId],
+    siblings: [],
+    siblingPosition: -1,
+    linkMode: false,
+  })
+}
+
+export function goToNodeChildren({ commit, state, getters }) {
+  if (state.nodeNavigation.stack.length > 0) {
+    const nodeId = state.nodeNavigation.stack[state.nodeNavigation.stack.length - 1]
+    const childrenIds = getters.getDirectChildren(nodeId)
+    if (childrenIds.length > 0) {
+      commit("setNodeNavigation", {
+        stack: [...state.nodeNavigation.stack, childrenIds[0]],
+        siblings: childrenIds,
+        siblingPosition: 0,
+      })
+      return childrenIds[0]
+    }
+  }
+  return false
+}
+
+export function goToNodeParent({ commit, dispatch, state, getters }) {
+  const len = state.nodeNavigation.stack.length
+  if (len >= 2) {
+    const parentId = state.nodeNavigation.stack[len - 2]
+    const newStack = state.nodeNavigation.stack.slice(0, len - 1)
+    if (len >= 3) {
+      const grandParentId = state.nodeNavigation.stack[len - 3]
+      const parentSiblings = getters.getDirectChildren(grandParentId)
+      commit("setNodeNavigation", {
+        stack: newStack,
+        siblings: parentSiblings,
+        siblingPosition: parentSiblings.indexOf(parentId),
+      })
+    } else {
+      dispatch("resetNodeNavigation", parentId)
+    }
+    return parentId
+  }
+  return false
+}
+
+export function goToNodeSibling({ commit, state }, offset) {
+  let newPosition = state.nodeNavigation.siblingPosition + offset
+  if (newPosition < 0) {
+    newPosition = state.nodeNavigation.siblings.length - 1
+  } else if (newPosition >= state.nodeNavigation.siblings.length) {
+    newPosition = 0
+  }
+  const nodeId = state.nodeNavigation.siblings[newPosition]
+  commit("setNodeNavigation", {
+    ...state.nodeNavigation,
+    stack: [
+      ...state.nodeNavigation.stack.slice(0, state.nodeNavigation.stack.length - 1),
+      nodeId,
+    ],
+    siblingPosition: newPosition,
+  })
+  return nodeId
 }

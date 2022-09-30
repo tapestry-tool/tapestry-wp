@@ -47,20 +47,26 @@ export default {
     }
   },
   mounted() {
-    this.$root.$on("bv::modal::show", (_, modalId) => {
+    this.$root.$on("bv::modal::show", this.handleModalShow)
+    this.$root.$on("bv::modal::hide", this.handleModalHide)
+  },
+  beforeDestroy() {
+    this.$root.$off("bv::modal::show", this.handleModalShow)
+    this.$root.$off("bv::modal::hide", this.handleModalHide)
+  },
+  methods: {
+    handleModalShow(_, modalId) {
       if (modalId === "help-modal") {
         setTimeout(() => {
           this.loading = false
         }, loadingLimit)
       }
-    })
-    this.$root.$on("bv::modal::hide", (_, modalId) => {
+    },
+    handleModalHide(_, modalId) {
       if (modalId === "help-modal") {
         this.loading = true
       }
-    })
-  },
-  methods: {
+    },
     closeModal() {
       this.$emit("close")
     },

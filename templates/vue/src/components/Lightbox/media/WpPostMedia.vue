@@ -1,5 +1,9 @@
 <template>
-  <div>
+  <div
+    :class="{
+      'full-height-media': context === 'lightbox',
+    }"
+  >
     <h1 v-if="showTitle" class="wp-media-title">
       {{ node.title }}
       <completed-icon :node="node" class="mx-2" />
@@ -74,7 +78,7 @@ export default {
   text-align: left;
 
   &.context-lightbox {
-    padding: 25px;
+    padding: 2em;
 
     .wp-media-title {
       padding-left: 25px;

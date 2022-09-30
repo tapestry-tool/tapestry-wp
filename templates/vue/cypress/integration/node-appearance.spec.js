@@ -4,6 +4,22 @@ describe("Node Appearance", () => {
     cy.setup("@oneNode")
   })
 
+  it("should be able to focus on the Color Picker component", () => {
+    cy.getSelectedNode().then(node => {
+      cy.openModal("edit", node.id)
+      cy.contains(/appearance/i).click()
+
+      cy.contains(/Background Color/i)
+        .getByTestId(`node-backgroundcolor-${node.id}`)
+        .find(".vue-swatches__trigger")
+        .focus()
+      cy.contains(/Text Color/i)
+        .getByTestId(`node-textcolor-${node.id}`)
+        .find(".vue-swatches__trigger")
+        .focus()
+    })
+  })
+
   it("should be able to edit a node's appearance using the node modal", () => {
     // Check initial settings for render images
     cy.store()
@@ -71,12 +87,12 @@ describe("Node Appearance", () => {
       cy.getByTestId(`node-backgroundcolor-${node.id}`)
         .find(".swatch")
         .click()
-        .find(`[aria-label="#1FBC9C"]`)
+        .find(`[aria-label="Light Sea Green"]`)
         .click()
       cy.getByTestId(`node-textcolor-${node.id}`)
         .find(".swatch")
         .click()
-        .find(`[aria-label="#E84B3C"]`)
+        .find(`[aria-label="Red"]`)
         .click()
 
       cy.submitModal()
@@ -85,7 +101,9 @@ describe("Node Appearance", () => {
         cy.get(".meta").should("have.css", "color", "rgb(232, 75, 60)")
         // rgb(232, 75, 60) is same as #E84B3C
       })
-      cy.getByTestId(`node-circle-${node.id}`).should("have.attr", "fill", "#1FBC9C")
+      cy.getByTestId(`node-circle-${node.id}`)
+        .invoke("attr", "fill")
+        .should("match", /#1FBC9C/i)
     })
   })
 })

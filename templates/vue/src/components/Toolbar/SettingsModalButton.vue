@@ -1,5 +1,10 @@
 <template>
-  <button data-qa="settings-button" class="settings-button" @click="open">
+  <button
+    aria-label="Open Tapestry Settings"
+    data-qa="settings-button"
+    class="settings-button"
+    @click="open"
+  >
     <tapestry-icon icon="cog"></tapestry-icon>
     <settings-modal
       :show="settingsModalOpen"
@@ -89,7 +94,6 @@ export default {
   background: none;
   font-size: 1.2em;
   transition: all 0.2s ease;
-  outline: none;
 }
 
 .settings-button:hover {

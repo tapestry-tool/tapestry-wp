@@ -1,16 +1,20 @@
 import Vue from "vue"
 import * as getters from "./getters"
 import { parse } from "@/utils/dataset"
+import Helpers from "@/utils/Helpers"
 
 export function init(state, dataset) {
   const datasetWithProgress = parse(dataset, dataset["userProgress"])
   Object.entries(datasetWithProgress).forEach(([key, value]) => {
     if (key === "nodes") {
       state.nodes = {}
+      let maxLevel = 1
       Object.values(value).forEach(node => {
-        // Has to call this so `state.nodes` is reactive
+        // Has to call Vue.set so `state.nodes` is reactive
         Vue.set(state.nodes, node.id, node)
+        maxLevel = Math.max(maxLevel, node.level)
       })
+      state.maxLevel = maxLevel
     } else {
       state[key] = value
     }
@@ -177,6 +181,11 @@ export function setReturnRoute(state, route) {
   state.returnRoute = route
 }
 
+export function updateBrowserDimensions(state) {
+  state.browserDimensions.width = Helpers.getBrowserWidth()
+  state.browserDimensions.height = Helpers.getBrowserHeight()
+}
+
 export function setCurrentEditingNode(state, node) {
   state.currentEditingNode = node
 }
@@ -204,4 +213,23 @@ export function setCurrentEditingNodeProperty(state, { property, value }) {
       }
     }
   }
+}
+
+export function setNodeNavigation(state, nav) {
+  state.nodeNavigation = {
+    ...state.nodeNavigation,
+    ...nav,
+  }
+}
+
+export function setMaxLevel(state, maxLevel) {
+  state.maxLevel = maxLevel
+}
+
+export function setCurrentDepth(state, depth) {
+  state.currentDepth = depth
+}
+
+export function setScaleConstants(state, scaleConstants) {
+  state.scaleConstants = scaleConstants
 }

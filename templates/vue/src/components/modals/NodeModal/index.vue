@@ -8,6 +8,7 @@
     scrollable
     :header-class="isMultiContentNodeChild ? 'modal-header-small' : ''"
     body-class="p-0"
+    :aria-label="title"
     @hide="handleClose"
   >
     <template #modal-title>
@@ -35,7 +36,12 @@
     </template>
     <b-container fluid class="px-0" data-qa="node-modal">
       <b-overlay :show="loading" variant="white">
-        <div v-if="hasSubmissionError" class="error-wrapper">
+        <div
+          v-if="hasSubmissionError"
+          class="error-wrapper"
+          role="alert"
+          aria-live="assertive"
+        >
           <h5>Operation failed due to the following error(s):</h5>
           <ul>
             <li v-for="error in errors" :key="error">{{ error }}</li>
@@ -48,6 +54,15 @@
             style="overflow: hidden;"
             @click="changeTab('content')"
           >
+            <b-form-group label="Debug: Set Node Level">
+              <b-form-input
+                :value="node.level"
+                data-qa="node-level-input"
+                type="number"
+                number
+                @update="update('level', $event)"
+              />
+            </b-form-group>
             <content-form
               :parent="parent"
               :actionType="type"
@@ -331,6 +346,7 @@ export default {
       "visibleNodes",
       "apiError",
       "returnRoute",
+      "maxLevel",
     ]),
     ...mapState({
       node: "currentEditingNode",
@@ -571,12 +587,24 @@ export default {
     })
     this.initialize()
   },
+  beforeDestroy() {
+    for (const event of [
+      "node-modal::uploading",
+      "fileID",
+      "add-node",
+      "remove-thumbnail",
+    ]) {
+      // since this component is the only one listening to these events, we can simply remove all listeners with the event names without specifying the handler function
+      this.$root.$off(event)
+    }
+  },
   methods: {
     ...mapMutations([
       "updateRootNode",
       "setReturnRoute",
       "setCurrentEditingNode",
       "setCurrentEditingNodeProperty",
+      "setMaxLevel",
     ]),
     ...mapActions([
       "addNode",
@@ -810,6 +838,11 @@ export default {
         this.loading = true
         this.updateNodeCoordinates()
 
+        this.node.level = parseInt(this.node.level)
+        if (this.node.level > this.maxLevel) {
+          this.setMaxLevel(this.node.level)
+        }
+
         if (this.linkHasThumbnailData) {
           await this.setLinkData()
         }
@@ -992,6 +1025,10 @@ export default {
     },
     validateNode() {
       const errMsgs = []
+
+      if (!this.node.level || isNaN(this.node.level) || this.node.level < 1) {
+        errMsgs.push("Please enter a valid node level value")
+      }
 
       if (this.node.title.length == 0) {
         errMsgs.push("Please enter a title")
@@ -1282,10 +1319,6 @@ table {
     position: absolute;
     top: 15px;
     right: 12px;
-
-    &:focus {
-      outline: none;
-    }
   }
 }
 
@@ -1296,10 +1329,6 @@ table {
 .modal-title {
   font-size: 1.5rem;
   font-weight: 600;
-}
-
-.nav-link:focus {
-  outline: none;
 }
 </style>
 
@@ -1312,10 +1341,6 @@ table {
 }
 
 #node-modal-container {
-  * {
-    outline: none;
-  }
-
   .form-control {
     padding: 15px;
     border: none;

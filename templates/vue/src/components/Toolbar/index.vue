@@ -1,32 +1,31 @@
 <template>
-  <div class="toolbar">
+  <div class="toolbar" aria-label="Tapestry Toolbar">
     <tapestry-filter v-if="!showMap" style="z-index: 10" />
-    <div
-      v-show="isLoggedIn"
-      :class="[{ 'hide-toolbar': hideToolbar }, 'slider-wrapper']"
-    >
+    <div :class="[{ 'hide-toolbar': hideToolbar }, 'slider-wrapper']">
       <b-container class="can-edit">
         <b-row align-v="center">
-          <b-col class="p-0">
-            <user-settings-button
-              data-qa="user-settings-button"
-            ></user-settings-button>
-          </b-col>
-          <template v-if="canEdit || (!showMap && hasDepth)">
-            <b-col v-if="canEdit" class="p-0">
-              <help-button />
+          <template v-if="isLoggedIn">
+            <b-col class="p-0">
+              <user-settings-button
+                data-qa="user-settings-button"
+              ></user-settings-button>
             </b-col>
-            <b-col v-if="canEdit && settings.submitNodesEnabled" class="p-0">
-              <review-notifications />
-            </b-col>
-            <b-col v-if="isAdmin" class="p-0">
-              <user-answers-button
-                data-qa="user-answers-button"
-              ></user-answers-button>
-            </b-col>
-            <b-col v-if="canEdit" class="p-0">
-              <settings-modal-button :max-depth="maxDepth"></settings-modal-button>
-            </b-col>
+            <template v-if="canEdit || (!showMap && hasDepth)">
+              <b-col v-if="canEdit" class="p-0">
+                <help-button />
+              </b-col>
+              <b-col v-if="canEdit && settings.submitNodesEnabled" class="p-0">
+                <review-notifications />
+              </b-col>
+              <b-col v-if="isAdmin" class="p-0">
+                <user-answers-button
+                  data-qa="user-answers-button"
+                ></user-answers-button>
+              </b-col>
+              <b-col v-if="canEdit" class="p-0">
+                <settings-modal-button :max-depth="maxDepth"></settings-modal-button>
+              </b-col>
+            </template>
             <b-col v-if="canEdit" class="p-0">
               <operations-button />
             </b-col>

@@ -8,7 +8,7 @@ describe("lightbox", () => {
 
     const screen = render(Lightbox, {
       fixture: oneNodeTapestry,
-      props: { nodeId: node.id },
+      props: { nodeId: node.id, visible: true },
     })
     await screen.findByText(node.typeData.textContent)
   })

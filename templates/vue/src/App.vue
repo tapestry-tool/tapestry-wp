@@ -1,11 +1,16 @@
 <template>
   <loading v-if="loading" data-qa="tapestry-loading" style="height: 75vh;"></loading>
   <div v-else id="app">
-    <tapestry-app></tapestry-app>
+    <tapestry-app :aria-hidden="viewingNode ? 'true' : 'false'"></tapestry-app>
     <router-view></router-view>
     <node-modal></node-modal>
     <link-modal></link-modal>
-    <lightbox v-if="viewingNode" :node-id="nodeId"></lightbox>
+    <lightbox
+      v-if="node"
+      :visible="viewingNode"
+      :node-id="nodeId"
+      aria-hidden="false"
+    ></lightbox>
     <sidebar v-if="!isEmpty"></sidebar>
     <tapestry-error></tapestry-error>
     <b-modal
@@ -56,12 +61,15 @@ export default {
   },
   computed: {
     ...mapState(["nodes"]),
-    ...mapGetters(["getTheme"]),
+    ...mapGetters(["getNode", "getTheme"]),
     isEmpty() {
       return Object.keys(this.nodes).length === 0
     },
     nodeId() {
       return this.$route.params.nodeId
+    },
+    node() {
+      return this.getNode(this.nodeId)
     },
     viewingNode() {
       return (
@@ -96,6 +104,8 @@ export default {
 
     window.addEventListener("click", this.recordAnalytics)
     window.addEventListener("keydown", this.handleKeydown)
+    window.addEventListener("resize", this.updateBrowserDimensions)
+    this.updateBrowserDimensions()
 
     const data = [
       client.getTapestry(),
@@ -126,10 +136,11 @@ export default {
   beforeDestroy() {
     window.removeEventListener("click", this.recordAnalytics)
     window.removeEventListener("keydown", this.handleKeydown)
+    window.removeEventListener("resize", this.updateBrowserDimensions)
   },
   methods: {
     ...mapActions(["undo", "redo"]),
-    ...mapMutations(["init", "changeTheme"]),
+    ...mapMutations(["init", "changeTheme", "updateBrowserDimensions"]),
     refresh() {
       this.$router.go()
     },
@@ -204,7 +215,8 @@ html {
     }
   }
 
-  #app {
+  #app,
+  #lightbox {
     color: var(--text-color-primary);
     font-family: "Avenir", Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
@@ -223,10 +235,6 @@ html {
       &::before {
         display: none;
       }
-    }
-
-    button:focus {
-      outline: none;
     }
 
     .btn {

@@ -1,61 +1,104 @@
 <template>
-  <tapestry-modal
-    v-if="node"
+  <b-modal
     id="lightbox"
-    data-qa="lightbox"
-    :class="{
+    :visible="visible"
+    hide-header
+    hide-footer
+    hide-backdrop
+    :return-focus="`.node[data-id='${returnFocusTo}']`"
+    size="lg"
+    scrollable
+    :aria-label="`You're now in a modal, viewing the content of ${node.title}.`"
+    initial-focus="lightboxTitle"
+    :modal-class="{
       'full-screen': node.fullscreen,
+      'custom-dimensions': isUsingCustomDimensions,
       'content-text': node.mediaType === 'text' || node.mediaType === 'wp-post',
     }"
     :node="node"
-    :content-container-style="lightboxContentStyles"
-    :allow-close="canSkip"
+    @show="handleShow"
+    @shown="handleShown"
     @close="handleUserClose"
+    @hidden="handleHidden"
   >
-    <multi-content-media
-      v-if="node.mediaType === 'multi-content'"
-      id="multicontent-container"
-      context="lightbox"
-      :node="node"
-      :menu-dimensions="dimensions"
-      :row-id="rowId"
-      @close="handleAutoClose"
-      @complete="complete"
-    />
-    <tapestry-media
-      v-if="node.mediaType !== 'multi-content'"
-      :node-id="nodeId"
-      :dimensions="dimensions"
-      context="lightbox"
-      @load="handleLoad"
-      @close="handleAutoClose"
-      @complete="complete"
-      @change:dimensions="updateDimensions"
-    />
-  </tapestry-modal>
+    <template #default="{ close }">
+      <div class="buttons-container">
+        <modal-button
+          v-if="canSkip"
+          aria-label="Close lightbox."
+          data-qa="close-lightbox"
+          icon="times"
+          tabindex="0"
+          @clicked="close"
+        />
+        <modal-button
+          icon="heart"
+          icon-size="sm"
+          :title="isFavourite ? 'Remove from Favourites' : 'Add to Favourites'"
+          :icon-color="isFavourite ? 'red' : ''"
+          :bg-color="isFavourite ? '#fff' : ''"
+          :bg-hover-color="isFavourite ? '#fff' : 'red'"
+          tabindex="0"
+          @clicked="toggleFavourite(node.id)"
+        />
+        <modal-button
+          v-if="canEditNode"
+          aria-label="Edit this node."
+          icon="pencil-alt"
+          icon-size="sm"
+          title="Edit Node"
+          tabindex="0"
+          @clicked="editNode"
+        />
+      </div>
+      <div data-qa="lightbox-content" class="content" :style="contentStyles">
+        <multi-content-media
+          v-if="node.mediaType === 'multi-content'"
+          id="multicontent-container"
+          context="lightbox"
+          :node="node"
+          :row-id="rowId"
+          @close="handleAutoClose"
+          @complete="complete"
+        />
+        <tapestry-media
+          v-if="node.mediaType !== 'multi-content'"
+          :node-id="nodeId"
+          :dimensions="dimensions"
+          context="lightbox"
+          @load="handleLoad"
+          @close="handleAutoClose"
+          @complete="complete"
+          @change:dimensions="updateDimensions"
+        />
+      </div>
+    </template>
+  </b-modal>
 </template>
 
 <script>
-import { mapActions, mapGetters, mapState } from "vuex"
+import { mapActions, mapGetters, mapMutations, mapState } from "vuex"
 import client from "@/services/TapestryAPI"
-import TapestryModal from "./TapestryModal"
 import MultiContentMedia from "./media/MultiContentMedia"
 import TapestryMedia from "./media/TapestryMedia"
 import PageMenu from "./media/MultiContentMedia/PageMenu"
+import ModalButton from "./ModalButton"
 import { names } from "@/config/routes"
 import Helpers from "@/utils/Helpers"
-import { sizes } from "@/utils/constants"
-import DragSelectModular from "@/utils/dragSelectModular"
 
 export default {
   name: "lightbox",
   components: {
     MultiContentMedia,
     TapestryMedia,
-    TapestryModal,
     PageMenu,
+    ModalButton,
   },
   props: {
+    visible: {
+      type: Boolean,
+      required: true,
+    },
     nodeId: {
       type: [Number, String],
       required: true,
@@ -68,15 +111,12 @@ export default {
   },
   data() {
     return {
-      dimensions: {
-        top: 100,
-        left: 50,
-      },
-      showCompletionScreen: false,
+      dimensions: {},
+      isUsingCustomDimensions: false,
     }
   },
   computed: {
-    ...mapState(["h5pSettings", "rootId"]),
+    ...mapState(["h5pSettings", "rootId", "favourites", "browserDimensions"]),
     ...mapGetters(["getNode", "getParent", "isMultiContent", "isMultiContentRow"]),
     node() {
       const node = this.getNode(this.nodeId)
@@ -86,49 +126,44 @@ export default {
       const parentNodeId = this.getParent(this.node.id)
       return this.getNode(parentNodeId)
     },
+    returnFocusTo() {
+      return this.parentNode?.mediaType === "multi-content" &&
+        this.parentNode?.presentationStyle === "unit"
+        ? this.parentNode.id
+        : this.nodeId
+    },
+    isFavourite() {
+      return this.favourites.find(id => id == this.node.id)
+    },
     canSkip() {
       return this.node.completed || this.node.skippable !== false
     },
-    lightboxContentStyles() {
-      const styles = {
-        top: this.dimensions.top + "px",
-        left: this.dimensions.left + "px",
-        width: this.dimensions.width + "px",
-        height: this.dimensions.height + "px",
+    canEditNode() {
+      return Helpers.hasPermission(this.node, "edit")
+    },
+    shouldUseCustomDimensions() {
+      return !(
+        this.node.fullscreen ||
+        this.node.mediaType === "text" ||
+        this.node.mediaType === "wp-post" ||
+        this.node.mediaType === "multi-content" ||
+        this.node.mediaType === "url-embed"
+      )
+    },
+    contentStyles() {
+      const { width, height } = this.shouldUseCustomDimensions ? this.dimensions : {}
+      return {
+        width: width ? width + "px" : null,
+        height: height ? height + "px" : null,
       }
-
-      if (this.node.fullscreen) {
-        styles.top = "auto"
-        styles.left = "auto"
-        styles.width = "100vw"
-        styles.height = "100vh"
-        styles.position = "relative"
-
-        const adminBar = document.getElementById("wpadminbar")
-        if (adminBar) {
-          styles.top = `${adminBar.clientHeight}px`
-          styles.height = `calc(100vh - ${styles.top})`
-        }
-      }
-
-      if (this.node.mediaType === "text" || this.node.mediaType === "wp-post") {
-        return Object.assign(styles, {
-          background: "var(--background-color);",
-          padding: "1em",
-        })
-      }
-
-      return styles
     },
     lightboxDimensions() {
       if (!this.node) {
         return {}
       }
 
-      const width = this.node.typeData.mediaWidth ?? 960
-      const height = this.node.typeData.mediaHeight ?? 600
-      const browserWidth = Helpers.getBrowserWidth()
-      const browserHeight = Helpers.getBrowserHeight()
+      const browserWidth = this.browserDimensions.width
+      const browserHeight = this.browserDimensions.height
 
       if (this.node.fullscreen) {
         return {
@@ -137,41 +172,27 @@ export default {
         }
       }
 
-      let resizeRatio = 1
-      let videoWidth = width
-      let videoHeight = height
+      const width = this.node.typeData.mediaWidth ?? 960
+      const height = this.node.typeData.mediaHeight ?? 600
+      const aspectRatio = width / height
 
-      if (width > Helpers.getBrowserWidth()) {
-        resizeRatio *= browserWidth / width
-        videoWidth *= resizeRatio
-        videoHeight *= resizeRatio
+      // fit content within max. possible dimensions of modal while maintaining the aspect ratio of media
+      // marginSpace = 3rem for the b-modal default vert. margin
+      const marginSpace = Helpers.remToPx(3)
+      let adjustedHeight = height
+      let adjustedWidth = width
+      if (adjustedHeight > browserHeight - marginSpace) {
+        adjustedHeight = browserHeight - marginSpace
+        adjustedWidth = adjustedHeight * aspectRatio
+      }
+      if (adjustedWidth > browserWidth - marginSpace) {
+        adjustedWidth = browserWidth - marginSpace
+        adjustedHeight = adjustedWidth / aspectRatio
       }
 
-      if (videoHeight > browserHeight * resizeRatio) {
-        resizeRatio *= browserHeight / videoHeight
-        videoWidth *= resizeRatio
-        videoHeight *= resizeRatio
-      }
-
-      const nodeSpace = sizes.NODE_RADIUS * 2 * 1.3
-      const adjustedVideoHeight = Math.min(videoHeight, browserHeight - nodeSpace)
-      const adjustedVideoWidth = Math.min(videoWidth, browserWidth - nodeSpace)
-
-      const heightAdjustmentRatio = adjustedVideoHeight / videoHeight
-      const widthAdjustmentRatio = adjustedVideoWidth / videoWidth
-      let adjustmentRatio = widthAdjustmentRatio
-      let adjustedOn = "width"
-
-      if (Helpers.getAspectRatio() < 1) {
-        adjustedOn = "height"
-        adjustmentRatio = heightAdjustmentRatio
-      }
-
-      adjustmentRatio *= 0.95
       return {
-        adjustedOn,
-        width: videoWidth * adjustmentRatio,
-        height: videoHeight * adjustmentRatio,
+        width: adjustedWidth,
+        height: adjustedHeight,
       }
     },
   },
@@ -186,8 +207,6 @@ export default {
             params: { nodeId: this.rootId },
             query: this.$route.query,
           })
-        } else {
-          this.handleNodeChanged()
         }
       },
     },
@@ -208,15 +227,14 @@ export default {
         }
       },
     },
-  },
-  mounted() {
-    document.querySelector("body").classList.add("tapestry-lightbox-open")
-    DragSelectModular.removeDragSelectListener()
-    this.handleNodeChanged()
+    contentStyles: {
+      immediate: true,
+      handler() {
+        this.applyContentStyles()
+      },
+    },
   },
   beforeDestroy() {
-    document.querySelector("body").classList.remove("tapestry-lightbox-open")
-    DragSelectModular.addDragSelectListener()
     this.$router.push({
       ...this.$route,
       params: { ...this.$route.params, rowId: undefined },
@@ -224,7 +242,16 @@ export default {
     })
   },
   methods: {
-    ...mapActions(["completeNode", "updateNodeProgress"]),
+    ...mapActions(["completeNode", "updateNodeProgress", "toggleFavourite"]),
+    ...mapMutations(["setReturnRoute"]),
+    editNode() {
+      this.setReturnRoute(this.$route)
+      this.$router.push({
+        name: names.MODAL,
+        params: { nodeId: this.node.id, type: "edit", tab: "content" },
+        query: { from: "lightbox" },
+      })
+    },
     complete(nodeId) {
       const node = this.getNode(nodeId || this.nodeId)
       if (node.progress !== 1) {
@@ -234,25 +261,45 @@ export default {
         this.completeNode(node.id)
       }
     },
+    handleShow() {
+      // if opening a multi-content unit node, instead go to its first visible child
+      if (
+        this.node.mediaType === "multi-content" &&
+        this.node.presentationStyle === "unit" &&
+        this.node.childOrdering?.length
+      ) {
+        const firstVisible = this.node.childOrdering.find(id => {
+          const node = this.getNode(id)
+          return node.unlocked || !node.hideWhenLocked
+        })
+        if (firstVisible) {
+          this.$router.replace({
+            name: names.LIGHTBOX,
+            params: { nodeId: firstVisible },
+            query: this.$route.query,
+          })
+        }
+      }
+
+      this.applyDimensions()
+    },
+    handleShown() {
+      this.applyContentStyles()
+    },
+    handleHidden() {
+      this.close()
+    },
     handleUserClose() {
       client.recordAnalyticsEvent("user", "close", "lightbox", this.nodeId)
-      this.close()
     },
     handleAutoClose() {
       client.recordAnalyticsEvent("app", "close", "lightbox", this.nodeId)
       this.close()
     },
     close() {
-      let selectedNode = this.nodeId
-      if (
-        this.parentNode?.mediaType === "multi-content" &&
-        this.parentNode?.presentationStyle === "unit"
-      ) {
-        selectedNode = this.parentNode.id
-      }
       this.$router.push({
         name: names.APP,
-        params: { nodeId: selectedNode },
+        params: { nodeId: this.returnFocusTo },
         query: this.$route.query,
       })
     },
@@ -275,30 +322,21 @@ export default {
       }
     },
     applyDimensions() {
+      // use default Bootstrap modal width until applyContentStyles has succeeded
+      this.isUsingCustomDimensions = false
       this.dimensions = {
-        ...this.dimensions,
-        left: (Helpers.getBrowserWidth() - this.lightboxDimensions.width) / 2,
         width: this.lightboxDimensions.width,
         height: this.lightboxDimensions.height,
       }
     },
-    handleNodeChanged() {
-      if (
-        this.node.mediaType === "multi-content" &&
-        this.node.presentationStyle === "unit" &&
-        this.node.childOrdering?.length
-      ) {
-        const firstVisible = this.node.childOrdering.find(id => {
-          const node = this.getNode(id)
-          return node.unlocked || !node.hideWhenLocked
-        })
-        if (firstVisible) {
-          this.$root.$emit("open-node", firstVisible)
-        } else {
-          this.applyDimensions()
-        }
+    applyContentStyles() {
+      const dialogElement = document.querySelector("#lightbox .modal-dialog")
+      if (dialogElement) {
+        dialogElement.style.width = this.contentStyles.width
+        dialogElement.style.height = this.contentStyles.height
+        this.isUsingCustomDimensions = this.shouldUseCustomDimensions
       } else {
-        this.applyDimensions()
+        this.isUsingCustomDimensions = false
       }
     },
   },
@@ -309,6 +347,90 @@ export default {
 body.tapestry-lightbox-open {
   overflow: hidden;
 }
+
+#lightbox {
+  .modal-header {
+    padding: 0;
+  }
+
+  .modal-body {
+    position: unset;
+    padding: 0;
+  }
+
+  .modal-content {
+    overflow: unset;
+    background: var(--bg-color-secondary);
+    color: var(--text-color-primary);
+    background-position: 0 0;
+    background-size: cover;
+    box-shadow: 0 0 70px -40px #000;
+    border-radius: 15px;
+    border: unset;
+  }
+
+  .buttons-container {
+    position: absolute;
+    display: flex;
+    flex-direction: row-reverse;
+    top: -20px;
+    right: -20px;
+    z-index: 1000;
+  }
+
+  .content {
+    position: relative;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .full-height-media {
+    height: 100%;
+    min-height: 70vh;
+  }
+
+  &.full-screen {
+    background: var(--bg-color-primary);
+
+    .modal-dialog {
+      position: relative;
+      top: auto;
+      left: auto;
+      width: 100%;
+      height: 100%;
+      max-width: unset;
+      max-height: unset;
+      margin: 0;
+    }
+
+    .modal-content {
+      max-width: unset;
+      max-height: unset;
+      border-radius: 0;
+    }
+
+    .buttons-container {
+      top: 20px;
+      right: 30px;
+    }
+
+    .content {
+      border-radius: 0;
+    }
+  }
+
+  &.custom-dimensions {
+    .modal-dialog {
+      max-width: unset;
+      max-height: unset;
+    }
+
+    .modal-content {
+      max-width: unset;
+      max-height: unset;
+    }
+  }
+}
 </style>
 
 <style lang="scss" scoped>
@@ -316,18 +438,5 @@ body.tapestry-lightbox-open {
   .media-wrapper {
     overflow: auto;
   }
-}
-
-#lightbox {
-  &.full-screen {
-    background: var(--bg-color-primary);
-
-    .close-btn {
-      position: fixed;
-      top: 50px;
-      right: 50px;
-    }
-  }
-  height: 100%;
 }
 </style>

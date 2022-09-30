@@ -3,6 +3,8 @@
     class="modal-button"
     :style="buttonStyles"
     @click="$emit('clicked')"
+    @focus="focused = true"
+    @blur="focused = false"
     @mouseover="hovering = true"
     @mouseout="hovering = false"
   >
@@ -43,11 +45,12 @@ export default {
   data() {
     return {
       hovering: false,
+      focused: false,
     }
   },
   computed: {
     buttonStyles() {
-      if (this.hovering && this.bgHoverColor.length) {
+      if ((this.hovering || this.focused) && this.bgHoverColor.length) {
         return { backgroundColor: this.bgHoverColor }
       } else if (this.bgColor.length) {
         return { backgroundColor: this.bgColor }
@@ -75,7 +78,6 @@ export default {
 .modal-button {
   display: flex;
   flex-direction: column;
-  outline: none;
   margin: 3px;
   background: #666;
   color: white;

@@ -7,6 +7,7 @@
     title="User Settings"
     scrollable
     body-class="p-0"
+    aria-label="User Settings"
     @hidden="$emit('close')"
   >
     <b-container fluid class="px-0">
@@ -17,6 +18,13 @@
           @click="$emit('change:tab', 'theme')"
         >
           <theme-form ref="themeForm"></theme-form>
+        </b-tab>
+        <b-tab
+          title="Developer"
+          :active="tab === 'developer'"
+          @click="$emit('change:tab', 'developer')"
+        >
+          <developer-form ref="developerForm"></developer-form>
         </b-tab>
       </b-tabs>
     </b-container>
@@ -40,12 +48,14 @@
 <script>
 import DragSelectModular from "@/utils/dragSelectModular"
 import ThemeForm from "./ThemeForm"
+import DeveloperForm from "./DeveloperForm"
 import { mapActions } from "vuex"
 
 export default {
   name: "user-settings-modal",
   components: {
     ThemeForm,
+    DeveloperForm,
   },
   props: {
     show: {
@@ -59,25 +69,32 @@ export default {
     },
   },
   mounted() {
-    this.$root.$on("bv::modal::show", (_, modalId) => {
+    this.$root.$on("bv::modal::show", this.handleModalShow)
+    this.$root.$on("bv::modal::hide", this.handleModalHide)
+  },
+  beforeDestroy() {
+    this.$root.$off("bv::modal::show", this.handleModalShow)
+    this.$root.$off("bv::modal::hide", this.handleModalHide)
+  },
+  methods: {
+    ...mapActions(["updateUserSettings"]),
+    handleModalShow(_, modalId) {
       if (modalId === "user-settings-modal") {
         DragSelectModular.removeDragSelectListener()
       }
-    })
-    this.$root.$on("bv::modal::hide", (_, modalId) => {
+    },
+    handleModalHide(_, modalId) {
       if (modalId === "user-settings-modal") {
         DragSelectModular.addDragSelectListener()
         this.$emit("close")
       }
-    })
-  },
-  methods: {
-    ...mapActions(["updateUserSettings"]),
+    },
     closeModal() {
       this.$root.$emit("bv::hide::modal", "user-settings-modal")
     },
     saveSettings() {
       const theme = this.$refs.themeForm.getTheme()
+      this.$refs.developerForm.applyChanges()
       this.updateUserSettings({ theme })
       this.$root.$emit("bv::hide::modal", "user-settings-modal")
     },

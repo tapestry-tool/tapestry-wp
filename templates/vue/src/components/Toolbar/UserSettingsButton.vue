@@ -1,5 +1,5 @@
 <template>
-  <button class="user-settings-button" @click="open">
+  <button aria-label="Open User Settings" class="user-settings-button" @click="open">
     <span class="fas fa-user fa-s"></span>
     <user-settings-modal
       :show="themeFormOpen"
@@ -40,7 +40,7 @@ export default {
       immediate: true,
       handler(requestedTab) {
         if (this.settingsModalOpen) {
-          const acceptedTabs = ["theme"]
+          const acceptedTabs = ["theme", "developer"]
           if (!acceptedTabs.includes(requestedTab)) {
             this.$router.replace({
               name: names.USERSETTINGS,
@@ -79,7 +79,6 @@ export default {
   background: none;
   font-size: 1.2em;
   transition: all 0.2s ease;
-  outline: none;
 }
 .user-settings-button:hover {
   background: none;

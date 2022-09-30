@@ -1,7 +1,8 @@
 <template>
   <div>
-    <b-form-group label="H5P Content">
+    <b-form-group label="H5P Content" label-for="h5p-combobox">
       <combobox
+        id="h5p-combobox"
         v-model="selectedId"
         item-text="title"
         item-value="id"
@@ -16,8 +17,13 @@
         </template>
       </combobox>
     </b-form-group>
-    <b-form-group v-if="selectedH5p.library == 'H5P.ThreeImage'" label="Scene">
+    <b-form-group
+      v-if="selectedH5p.library == 'H5P.ThreeImage'"
+      label="Scene"
+      label-for="scene-combobox"
+    >
       <combobox
+        id="scene-combobox"
         v-model="scene"
         item-text="scenename"
         item-value="sceneId"

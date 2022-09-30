@@ -1,13 +1,22 @@
 <template>
   <div data-qa="multi-content-rows" class="multi-content-rows">
+    <div v-if="allHidden">
+      Content in this node has not been unlocked yet.
+    </div>
     <b-row
-      v-if="!allHidden"
+      v-else
       :class="(node.presentationStyle === 'page' ? 'mr' : 'ml') + '-0'"
+      :aria-label="
+        `Main section of a ${
+          level !== 0 ? 'nested' : ''
+        } multi-content. This multi-content has ${rows.length} rows.`
+      "
     >
       <multi-content-row
         v-for="(row, index) in rows"
         :id="`row-${row.node.id}`"
         :key="row.node.id"
+        :aria-label="`Multi-content row ${index + 1} of ${rows.length}`"
         class="my-2 mb-1"
         :node="row.node"
         :children="row.children"
@@ -57,7 +66,6 @@ export default {
   },
   data() {
     return {
-      showCompletion: false,
       numRowsLoaded: 0,
     }
   },

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-form-group label="Presentation Style">
+    <b-form-group label="Presentation Style" label-for="node-presentation-style">
       <b-form-select
         id="node-presentation-style"
         data-qa="node-presentation-style"
@@ -19,32 +19,40 @@
         Lock rows until previous row is completed
       </b-form-checkbox>
     </b-form-group>
-    <b-form-group label="Finish button text">
+    <b-form-group label="Finish button text" label-for="finish-button-text">
       <b-form-input
+        id="finish-button-text"
         :value="typeData.finishButtonText"
         @update="update('typeData.finishButtonText', $event)"
       ></b-form-input>
     </b-form-group>
-    <b-form-group label="Confirmation title text">
+    <b-form-group
+      label="Confirmation title text"
+      label-for="confirmation-title-text"
+    >
       <b-form-input
+        id="confirmation-title-text"
         :value="typeData.confirmationTitleText"
         @update="update('typeData.confirmationTitleText', $event)"
       ></b-form-input>
     </b-form-group>
-    <b-form-group label="Confirmation body text">
+    <b-form-group label="Confirmation body text" label-for="confirmation-body-text">
       <b-form-input
+        id="confirmation-body-text"
         :value="typeData.confirmationBodyText"
         @update="update('typeData.confirmationBodyText', $event)"
       ></b-form-input>
     </b-form-group>
-    <b-form-group label="Continue button text">
+    <b-form-group label="Continue button text" label-for="continue-button-text">
       <b-form-input
+        id="continue-button-text"
         :value="typeData.continueButtonText"
         @update="update('typeData.continueButtonText', $event)"
       ></b-form-input>
     </b-form-group>
-    <b-form-group label="Cancel link text">
+    <b-form-group label="Cancel link text" label-for="cancel-link-text">
       <b-form-input
+        id="cancel-link-text"
         :value="typeData.cancelLinkText"
         @update="update('typeData.cancelLinkText', $event)"
       ></b-form-input>

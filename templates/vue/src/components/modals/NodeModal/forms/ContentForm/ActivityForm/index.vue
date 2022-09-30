@@ -48,9 +48,11 @@
             <b-form-group
               v-if="question.followUp.enabled"
               label="Show this text first:"
+              :label-for="`question-followup-text-${index}`"
               class="mt-3"
             >
               <b-form-input
+                :id="`question-followup-text-${index}`"
                 v-model="question.followUp.text"
                 placeholder="Previously, you said:"
               ></b-form-input>
@@ -58,8 +60,10 @@
             <b-form-group
               v-if="question.followUp.enabled"
               label="Then show user answer to the following activity:"
+              label-for="followup-combobox"
             >
               <combobox
+                id="followup-combobox"
                 v-model="question.followUp.questionId"
                 class="mb-0"
                 :options="getPreviousQuestions(question)"
@@ -98,10 +102,14 @@
                 </span>
               </b-form-checkbox>
             </b-form-group>
-            <b-form-group label="Question text" class="mt-3">
+            <b-form-group
+              label="Question text"
+              :label-for="`question-text-${index}`"
+              class="mt-3"
+            >
               <b-form-input
+                :id="`question-text-${index}`"
                 v-model="question.text"
-                :data-testid="`question-title-${index}`"
                 :data-qa="`question-text-${index}`"
               />
             </b-form-group>
@@ -169,7 +177,6 @@
                           content-cols-lg="6"
                           description="How many entries would you like users to enter?"
                           label="Number of entries"
-                          label-for="input-horizontal"
                         >
                           <b-input-group prepend="Min:">
                             <b-form-input
@@ -241,10 +248,11 @@
               </div>
             </b-form-group>
           </b-card>
-          <b-card bg-variant="light" text-variant="dark">
-            <b-card-sub-title class="mb-0">
-              Customize confirmation screen
-            </b-card-sub-title>
+          <b-card
+            sub-title="Confirmation customization"
+            bg-variant="light"
+            text-variant="dark"
+          >
             <b-form-group class="topright-checkbox">
               <b-form-checkbox
                 :checked="
@@ -268,16 +276,19 @@
                   question.confirmation.message.length !== 0
               "
             >
-              <b-form-group label="Title" class="mt-3">
+              <b-form-group
+                label="Title"
+                class="mt-3"
+                :label-for="`question-confirmation-title-${index}`"
+              >
                 <b-form-input
+                  :id="`question-confirmation-title-${index}`"
                   v-model="question.confirmation.title"
-                  :data-testid="`question-confirmation-title-${index}`"
                   placeholder="Thanks!"
                 />
               </b-form-group>
               <rich-text-form
                 v-model="question.confirmation.message"
-                :data-testid="`question-confirmation-message-${index}`"
                 placeholder="Your response has been recorded."
               />
             </template>
@@ -287,7 +298,7 @@
     </b-card>
     <b-row class="mx-0">
       <b-button variant="primary" @click="addQuestion">
-        <i class="fas fa-plus icon"></i>
+        <i class="fas fa-plus icon" aria-hidden="true"></i>
         Add Question
       </b-button>
     </b-row>
@@ -411,6 +422,12 @@ export default {
         ...this.questions,
         { ...Helpers.deepCopy(defaultQuestion), id: Helpers.createUUID() },
       ]
+      // focus the question text input of newly added question
+      this.$nextTick(() => {
+        document
+          .getElementById(`question-text-${this.questions.length - 1}`)
+          ?.focus()
+      })
     },
     deleteQuestion(id) {
       this.questions = this.questions.filter(question => question.id !== id)

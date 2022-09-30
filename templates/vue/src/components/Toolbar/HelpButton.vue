@@ -49,7 +49,6 @@ button {
   background: none;
   font-size: 1.2em;
   transition: all 0.2s ease;
-  outline: none;
 
   &.active,
   &:hover {

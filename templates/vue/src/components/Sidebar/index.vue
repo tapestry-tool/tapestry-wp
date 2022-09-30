@@ -46,6 +46,7 @@
     <aside
       ref="content"
       data-qa="sidebar-content"
+      tabindex="0"
       :class="['sidebar', { closed: closed }]"
     >
       <header ref="info" class="sidebar-header" data-name="info">

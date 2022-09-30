@@ -204,3 +204,19 @@ export function getNeighbouringLinks(state) {
 export function getTheme(state) {
   return state.theme ? state.theme : "light"
 }
+
+export function getNodeNavId(state) {
+  return state.nodeNavigation.stack.length === 0
+    ? -1
+    : state.nodeNavigation.stack[state.nodeNavigation.stack.length - 1]
+}
+
+export function getNodeNavParent(state) {
+  return state.nodeNavigation.stack.length < 2
+    ? -1
+    : state.nodeNavigation.stack[state.nodeNavigation.stack.length - 2]
+}
+
+export function getNodeNavIsLinkMode(state) {
+  return state.nodeNavigation.linkMode
+}

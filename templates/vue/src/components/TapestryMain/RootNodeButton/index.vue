@@ -1,10 +1,10 @@
 <template>
   <div id="root-node-button">
     <import-changelog :changes="changes" />
-    <div data-qa="root-node-button" @click="addRootNode">
-      <i class="fas fa-plus-circle fa-5x"></i>
+    <button class="root-node-button" data-qa="root-node-button" @click="addRootNode">
+      <i class="fas fa-plus-circle fa-5x" aria-hidden="true"></i>
       <div>Add Root Node</div>
-    </div>
+    </button>
     <p>Or</p>
     <b-button class="import-button" @click="openFileBrowser">
       <b-spinner v-if="isImporting"></b-spinner>
@@ -13,7 +13,7 @@
         Import a Tapestry
       </div>
     </b-button>
-    <div v-if="error" style="margin-top: 16px;">
+    <div v-if="error" style="margin-top: 16px;" role="alert" aria-live="polite">
       {{ error.message }}
       <br />
       Please try with another file.
@@ -183,7 +183,9 @@ export default {
   flex-direction: column;
   z-index: 0;
 
-  > div:first-child {
+  .root-node-button {
+    background: none;
+    color: inherit;
     display: inline-block;
     margin-top: 20vh;
     text-align: center;
@@ -192,6 +194,7 @@ export default {
     z-index: 10;
 
     &:hover,
+    &:focus,
     &:active {
       transform: scale(1.1);
       color: var(--highlight-color);

@@ -8,6 +8,9 @@
   >
     <div
       class="page-menu-item-wrapper"
+      tabindex="0"
+      @focus="focused = true"
+      @blur="focused = false"
       @mouseover="hovered = true"
       @mouseleave="hovered = false"
       @click="handleTitleClick"
@@ -17,7 +20,7 @@
           :class="
             disabled
               ? 'fas fa-lock'
-              : hovered || contentSelected
+              : hovered || focused || contentSelected
               ? 'fas fa-circle'
               : 'far fa-circle'
           "
@@ -76,6 +79,7 @@ export default {
     return {
       showChildren: false,
       hovered: false,
+      focused: false,
       childrenSelected: [],
     }
   },

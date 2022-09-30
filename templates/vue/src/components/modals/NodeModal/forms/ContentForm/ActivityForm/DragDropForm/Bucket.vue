@@ -79,11 +79,5 @@ export default {
       return this.items.length > 1
     },
   },
-  mounted() {
-    this.$nextTick(() => {
-      let self = this
-      self.$refs.input.$el.focus()
-    })
-  },
 }
 </script>

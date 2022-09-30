@@ -14,8 +14,15 @@ body {
 }
 
 body.admin-bar .modal[role="dialog"] {
-    top: 3em;
-    height: calc(100vh - 3em);
+    top: 32px;
+    height: calc(100vh - 32px);
+}
+
+@media screen and (max-width: 782px) {
+    body.admin-bar .modal[role="dialog"] {
+        top: 46px;
+        height: calc(100vh - 46px);
+    }
 }
 
 body.single-tapestry .btn-link:hover,
@@ -116,7 +123,6 @@ li p {
     color: #999;
     font-size: 1.2em;
     transition: all 0.2s ease;
-    outline: none;
 }
 
 .settings-button:hover {
@@ -129,7 +135,6 @@ li p {
 
 #tapestry-depth-slider {
     margin-top: 6px;
-    outline: none;
     background: #d3d3d3;
     height: 10px;
     opacity: 0.8;
@@ -276,14 +281,6 @@ li p {
 
 .node:hover .imageOverlay:not(.locked) {
     opacity: 0;
-}
-
-.links line {
-    stroke-opacity: 5;
-}
-
-.link-lines.deletable {
-    cursor: pointer;
 }
 
 /* MEDIA BUTTON */

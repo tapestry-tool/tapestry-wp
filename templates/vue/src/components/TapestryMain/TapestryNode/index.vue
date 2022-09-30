@@ -3,9 +3,10 @@
     <g
       v-show="show"
       ref="node"
+      :aria-label="ariaLabel"
       :data-qa="`node-${node.id}`"
       :data-locked="!node.unlocked"
-      :transform="`translate(${node.coordinates.x}, ${node.coordinates.y})`"
+      :transform="`translate(${coordinates.x}, ${coordinates.y})`"
       :class="{
         opaque: !visibleNodes.includes(node.id),
         'has-thumbnail': node.thumbnailURL,
@@ -17,6 +18,8 @@
             ? 'pointer'
             : 'not-allowed',
       }"
+      @focus="handleFocus"
+      @blur="handleBlur"
       @click="handleClick"
       @mouseover="handleMouseover"
       @mouseleave="handleMouseleave"
@@ -37,13 +40,9 @@
         ></circle>
       </transition>
       <progress-bar
-        v-if="
-          node.nodeType !== 'grandchild' &&
-            node.nodeType !== '' &&
-            !node.hideProgress
-        "
-        :x="node.coordinates.x"
-        :y="node.coordinates.y"
+        v-if="!isGrandChild && node.nodeType !== '' && !node.hideProgress"
+        :x="coordinates.x"
+        :y="coordinates.y"
         :radius="radius"
         :background-color="progressBackgroundColor"
         :data-qa="`node-progress-${node.id}`"
@@ -51,13 +50,9 @@
         :locked="!node.unlocked"
       ></progress-bar>
       <status-bar
-        v-if="
-          node.nodeType !== 'grandchild' &&
-            node.nodeType !== '' &&
-            !node.hideProgress
-        "
-        :x="node.coordinates.x"
-        :y="node.coordinates.y"
+        v-if="!isGrandChild && node.nodeType !== '' && !node.hideProgress"
+        :x="coordinates.x"
+        :y="coordinates.y"
         :radius="radius"
         :locked="!node.unlocked"
         :status="node.status"
@@ -65,31 +60,38 @@
         :enableHighlight="highlightNode"
         :data-qa="`node-status-${node.id}`"
       ></status-bar>
-      <g v-show="node.nodeType !== 'grandchild' && node.nodeType !== ''">
+      <g v-show="!isGrandChild && node.nodeType !== ''">
         <transition name="fade">
           <foreignObject
             v-if="!node.hideTitle"
             v-show="!isHovered || !thumbnailURL || selected || !node.unlocked"
             :data-qa="`node-title-${node.id}`"
             class="metaWrapper"
-            :width="(140 * 2 * 5) / 6"
-            :height="(140 * 2 * 5) / 6"
-            :x="-(140 * 5) / 6"
-            :y="-(140 * 5) / 6"
+            :width="(radius * 2 * 5) / 6"
+            :height="(radius * 2 * 5) / 6"
+            :x="-(radius * 5) / 6"
+            :y="-(radius * 5) / 6"
           >
-            <div class="meta" :style="{ color: node.textColor }">
+            <div
+              class="meta"
+              :style="{
+                color: node.textColor,
+                fontSize: radius * 0.2 + 'px',
+              }"
+            >
               <i
                 v-if="!node.unlocked && node.hideWhenLocked"
                 class="fas fa-eye-slash"
               ></i>
               <p class="title">{{ node.title }}</p>
+              <p style="font-size: 60%;">Level {{ node.level }}</p>
               <p v-if="node.mediaDuration" class="timecode">
                 {{ formatDuration() }}
               </p>
             </div>
           </foreignObject>
         </transition>
-        <g v-show="!transitioning">
+        <g v-show="radius >= 80">
           <node-button
             v-if="!node.hideMedia"
             :x="0"
@@ -103,10 +105,7 @@
           </node-button>
           <template v-if="isLoggedIn">
             <add-child-button
-              v-if="
-                (node.mediaType === 'multi-content' || !hasTooManyLevels) &&
-                  (hasPermission('add') || settings.draftNodesEnabled)
-              "
+              v-if="canAddChild"
               :node="node"
               :fill="buttonBackgroundColor"
               :x="canReview || hasPermission('edit') ? -35 : 0"
@@ -154,7 +153,7 @@
 
 <script>
 import * as d3 from "d3"
-import { mapActions, mapGetters, mapState, mapMutations } from "vuex"
+import { mapGetters, mapState, mapMutations, mapActions } from "vuex"
 import TapestryIcon from "@/components/common/TapestryIcon"
 import { names } from "@/config/routes"
 import { bus } from "@/utils/event-bus"
@@ -186,16 +185,67 @@ export default {
       type: Boolean,
       required: true,
     },
+    scale: {
+      type: Number,
+      required: true,
+    },
   },
   data() {
     return {
       transitioning: false,
       isHovered: false,
+      isFocused: false,
     }
   },
   computed: {
-    ...mapState(["selection", "settings", "visibleNodes"]),
-    ...mapGetters(["getNode", "getDirectChildren", "isVisible", "getParent"]),
+    ...mapState([
+      "selection",
+      "settings",
+      "visibleNodes",
+      "maxLevel",
+      "currentDepth",
+      "nodeNavigation",
+    ]),
+    ...mapGetters([
+      "getNode",
+      "getDirectChildren",
+      "isVisible",
+      "getParent",
+      "getNodeNavId",
+    ]),
+    ariaLabel() {
+      let label = `${this.node.title}. You are on a level ${this.node.level} node. `
+      if (
+        this.node.id ===
+        this.nodeNavigation.stack[this.nodeNavigation.stack.length - 1]
+      ) {
+        const childrenCount = this.getDirectChildren(this.node.id).length
+        if (childrenCount === 0) {
+          label += `This node has no children. To view this node, press Enter. To go back up, press the Up Arrow Key. To go to its siblings, press the Left or Right Arrow Key. `
+        } else {
+          label += `This node has ${childrenCount} ${
+            childrenCount === 1 ? "child" : "children"
+          }. To view this node, press Enter. To go to its${
+            childrenCount === 1 ? "" : " first"
+          } child, press the Down Arrow Key. To go back up, press the Up Arrow Key. To go to its siblings, press the Left or Right Arrow Key. `
+        }
+      } else {
+        label +=
+          "You are not on the node navigation route. To view this node, press Enter. "
+      }
+      if (this.hasPermission("edit")) {
+        label += "To edit this node, press E. "
+      }
+      label +=
+        "To go to the sidebar for this node, press S. To exit the Main Tapestry view, press the Q Key or the Escape Key."
+      return label
+    },
+    canAddChild() {
+      return (
+        (this.node.mediaType === "multi-content" || !this.hasTooManyLevels) &&
+        (this.hasPermission("add") || this.settings.draftNodesEnabled)
+      )
+    },
     canReview() {
       if (!this.isLoggedIn) {
         return false
@@ -249,35 +299,58 @@ export default {
       }
     },
     show() {
-      return this.isVisible(this.node.id)
+      return this.isVisible(this.node.id) && this.visibility >= 0
+    },
+    visibility() {
+      return Helpers.getNodeVisibility(
+        this.node.level,
+        this.scale,
+        this.currentDepth
+      )
+    },
+    coordinates() {
+      return {
+        x: this.node.coordinates.x * this.scale,
+        y: this.node.coordinates.y * this.scale,
+      }
+    },
+    currentLevel() {
+      return Helpers.getCurrentLevel(this.scale)
+    },
+    isGrandChild() {
+      // return this.node.nodeType === "grandchild"
+      // make it grandchild when not visible too, to prevent buttons showing up while transitioning to hidden
+      return this.visibility <= 0
     },
     radius() {
       if (!this.show) {
         return 0
       }
-      if (this.root) {
-        return 210
-      }
-      if (this.node.nodeType === "grandchild") {
-        return 40
-      }
-      return 140
+      const radius =
+        Helpers.getNodeRadius(this.node.level, this.scale) * (this.root ? 1.2 : 1)
+      return this.isGrandChild ? Math.min(40, radius) : radius
     },
     fill() {
       const showImages = this.settings.hasOwnProperty("renderImages")
         ? this.settings.renderImages
         : true
 
-      if (this.node.nodeType !== "grandchild") {
+      const backgroundColor = Helpers.darkenColor(
+        this.node.backgroundColor,
+        this.node.level,
+        this.maxLevel
+      )
+
+      if (!this.isGrandChild) {
         if (showImages && this.thumbnailURL) {
           return `url(#node-image-${this.node.id})`
         } else {
-          return this.node.backgroundColor
+          return backgroundColor
         }
       } else if (this.selected) {
         return "var(--highlight-color)"
       } else {
-        return TinyColor(this.node.backgroundColor)
+        return backgroundColor
       }
     },
     overlayFill() {
@@ -351,7 +424,7 @@ export default {
     radius(newRadius) {
       d3.select(this.$refs.circle)
         .transition()
-        .duration(800)
+        .duration(350)
         .ease(d3.easePolyOut)
         .on("start", () => {
           this.transitioning = true
@@ -366,65 +439,33 @@ export default {
     this.$emit("mounted")
     this.$refs.circle.setAttribute("r", this.radius)
     const nodeRef = this.$refs.node
+    if (this.root) {
+      nodeRef.setAttribute("tabindex", "0")
+    }
     d3.select(nodeRef).call(
       d3
         .drag()
         .on("start", () => {
-          this.coordinates = {}
-          if (this.selection.length) {
-            this.coordinates = this.selection.reduce((coordinates, nodeId) => {
-              const node = this.getNode(nodeId)
-              coordinates[nodeId] = {
-                x: node.coordinates.x,
-                y: node.coordinates.y,
-              }
-              return coordinates
-            }, {})
-          } else {
-            this.coordinates[this.node.id] = {
-              x: this.node.coordinates.x,
-              y: this.node.coordinates.y,
-            }
-          }
+          this.$emit("dragstart", this.node)
         })
         .on("drag", () => {
-          for (const id of Object.keys(this.coordinates)) {
-            const node = this.getNode(id)
-            node.coordinates.x += d3.event.dx
-            node.coordinates.y += d3.event.dy
-          }
+          this.$emit("drag", {
+            x: d3.event.x,
+            y: d3.event.y,
+            dx: d3.event.dx,
+            dy: d3.event.dy,
+          })
         })
         .on("end", () => {
-          for (const [id, originalCoordinates] of Object.entries(this.coordinates)) {
-            const node = this.getNode(id)
-            node.coordinates.x += d3.event.dx
-            node.coordinates.y += d3.event.dy
-            let coordinates = {
-              x: node.coordinates.x,
-              y: node.coordinates.y,
-            }
-            if (
-              originalCoordinates.x == coordinates.x &&
-              originalCoordinates.y == coordinates.y
-            ) {
-              continue
-            }
-            this.$emit("dragend")
-            if (this.hasPermission("edit") || this.hasPermission("move")) {
-              this.updateNodeCoordinates({
-                id,
-                coordinates,
-                originalCoordinates,
-              }).catch(() => {
-                this.$emit("dragend")
-              })
-            }
-          }
+          this.$emit("dragend", {
+            dx: d3.event.dx,
+            dy: d3.event.dy,
+          })
         })
     )
   },
   methods: {
-    ...mapActions(["updateNodeCoordinates"]),
+    ...mapActions(["resetNodeNavigation"]),
     ...mapMutations(["select", "unselect"]),
     updateRootNode() {
       if (!this.root) {
@@ -480,9 +521,11 @@ export default {
     handleMouseover() {
       this.isHovered = true
 
-      // Move node to end of svg document so it appears on top
-      const node = this.$refs.node
-      node.parentNode.appendChild(node)
+      // Move node to end of svg document so it appears on top, but do not do this when the node is in focus since it will blur the node
+      if (!this.isFocused) {
+        const node = this.$refs.node
+        node.parentNode.appendChild(node)
+      }
 
       bus.$emit("mouseover", this.node.id)
       this.$emit("mouseover")
@@ -498,11 +541,22 @@ export default {
       ) {
         this.selected ? this.unselect(this.node.id) : this.select(this.node.id)
       } else if (this.node.unlocked || this.hasPermission("edit")) {
+        this.$emit("click", this.node)
         this.root && this.node.hideMedia
           ? this.openNode(this.node.id)
           : this.updateRootNode()
       }
       client.recordAnalyticsEvent("user", "click", "node", this.node.id)
+    },
+    handleFocus() {
+      this.isFocused = true
+      // TODO: technically the next 3 lines are not needed, since the only way a node will be focused is through the keyboard node navigation which is managed by TapestryMain; nodes other than the focused node is not focusable (tabindex="-1")
+      if (this.getNodeNavId !== this.node.id) {
+        this.resetNodeNavigation(this.node.id)
+      }
+    },
+    handleBlur() {
+      this.isFocused = false
     },
     hasPermission(action) {
       return Helpers.hasPermission(this.node, action, this.settings.showRejected)
@@ -518,7 +572,7 @@ export default {
 
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.5s;
+  transition: opacity 0.2s;
 }
 
 .fade-enter,

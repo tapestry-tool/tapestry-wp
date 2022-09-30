@@ -1,6 +1,7 @@
 <template>
-  <b-form-group label="Post Name">
+  <b-form-group label="Post Name" label-for="post-combobox">
     <combobox
+      id="post-combobox"
       v-model="mediaURL"
       data-qa="wp-combobox"
       item-text="title"
