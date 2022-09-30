@@ -3,6 +3,7 @@
 /**
  * Tapestry Endpoints.
  */
+require_once __DIR__.'/utilities/class.tapestry-helpers.php';
 require_once __DIR__.'/utilities/class.tapestry-permissions.php';
 require_once __DIR__.'/classes/class.tapestry.php';
 require_once __DIR__.'/classes/class.tapestry-node.php';
