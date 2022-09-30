@@ -557,7 +557,7 @@ function addTapestryNode($request)
     $payload = json_decode($request->get_body());
     $node = $payload->node;
     $parentId = null;
-    if (isset($payload->parentId) && $payload->parentId !== null) {
+    if (isset($payload->parentId) && $payload->parentId !== null && $payload->parentId !== 0) {
         $parentId = $payload->parentId;
     }
     // TODO: JSON validations should happen here
