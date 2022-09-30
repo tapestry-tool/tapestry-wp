@@ -20,7 +20,9 @@ export default class CommandHistory {
     this.history.push(command)
     this.position++
 
-    await command.execute()
+    if (!command.skipExecute) {
+      await command.execute()
+    }
   }
 
   async undo() {

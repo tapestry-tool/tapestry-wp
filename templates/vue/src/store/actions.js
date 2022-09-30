@@ -7,6 +7,7 @@ const LOCAL_PROGRESS_ID = "tapestry-progress"
 
 // undo / redo
 export async function command({ state }, command) {
+  // do not call this action directly; instead call buildCommand
   await state.commandHistory.doCommand(command)
 }
 
@@ -20,17 +21,25 @@ export async function redo({ state }) {
 
 export async function buildCommand(
   { dispatch },
-  { name, executeAction, undoAction, executePayload, undoPayload }
+  {
+    name,
+    executeAction,
+    undoAction,
+    executePayload,
+    undoPayload,
+    skipExecute = false,
+  }
 ) {
-  // NOTE: undoAction and undoPayload are optional; they default to the execute counterpart
+  // NOTE: undoAction and undoPayload are optional; they default to their execute counterparts
   await dispatch("command", {
     name,
     execute: async () => {
-      dispatch(executeAction, executePayload)
+      await dispatch(executeAction, executePayload)
     },
     undo: async () => {
-      dispatch(undoAction ?? executeAction, undoPayload ?? executePayload)
+      await dispatch(undoAction ?? executeAction, undoPayload ?? executePayload)
     },
+    skipExecute,
   })
 }
 
@@ -82,9 +91,16 @@ export async function doUpdateUserSettings({ commit, dispatch }, userSettings) {
 }
 
 // nodes
-export async function addNode(
+export async function addNode({ dispatch }, payload) {
+  await dispatch("doAddNode", {
+    ...payload,
+    isCommand: true,
+  })
+}
+
+export async function doAddNode(
   { commit, dispatch, getters, state },
-  { node, parentId }
+  { node, parentId, isCommand = false }
 ) {
   try {
     const response = await client.addNode({ node, parentId })
@@ -120,6 +136,17 @@ export async function addNode(
 
     if (link) {
       commit("addLink", link)
+    }
+
+    if (isCommand) {
+      await dispatch("buildCommand", {
+        name: "add node",
+        executeAction: "doAddNode",
+        executePayload: { node, parentId },
+        skipExecute: true,
+        undoAction: "doDeleteNode",
+        undoPayload: id,
+      })
     }
 
     return id
@@ -299,7 +326,17 @@ async function unlockNodes({ commit, getters, dispatch }) {
   }
 }
 
-export async function deleteNode({ commit, dispatch, state, getters }, id) {
+export async function deleteNode({ dispatch, getters }, id) {
+  await dispatch("buildCommand", {
+    name: "delete node",
+    executeAction: "doDeleteNode",
+    executePayload: id,
+    undoAction: "doAddNode", // may customize the undo action to recreate the links associated with the node
+    undoPayload: { node: { ...getters.getNode(id) }, parentId: null },
+  })
+}
+
+export async function doDeleteNode({ commit, dispatch, state, getters }, id) {
   try {
     const level = getters.getNode(id).level
 
