@@ -41,11 +41,11 @@ export function updateH5pSettings(state, newSettings) {
   state.h5pSettings = newSettings
 }
 
+// nodes
 export function updateRootNode(state, newNodeId) {
   state.rootId = newNodeId
 }
 
-// nodes
 export function addNode(state, node) {
   Vue.set(state.nodes, node.id, node)
 }

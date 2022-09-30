@@ -166,16 +166,15 @@
       <b-overlay :show="loading || fileUploading" variant="white" class="w-100">
         <template>
           <div class="buttons-container d-flex w-100">
-            <delete-node-button
+            <b-button
               v-if="type === 'edit'"
-              :node-id="Number(nodeId)"
               :disabled="loading || fileUploading"
-              :isMultiContentNodeChild="isMultiContentNodeChild"
-              @submit="loading = true"
-              @setLoading="setLoading"
-              @message="setDisabledMessage"
-              @complete="handleDeleteComplete"
-            ></delete-node-button>
+              size="sm"
+              variant="danger"
+              @click="handleRemoveNode"
+            >
+              Delete Node
+            </b-button>
             <span style="flex-grow:1;"></span>
             <b-button
               size="sm"
@@ -186,7 +185,7 @@
               Cancel
             </b-button>
             <b-button
-              v-if="rootId !== 0 && canMakeDraft"
+              v-if="canMakeDraft"
               id="draft-button"
               size="sm"
               variant="secondary"
@@ -222,8 +221,6 @@
           </div>
           <b-form-invalid-feedback :state="canMakeDraft">
             {{ warningText }}
-            <br v-if="warningText" />
-            {{ deleteWarningText }}
           </b-form-invalid-feedback>
           <b-form-invalid-feedback
             :state="!hasUnsavedChanges"
@@ -284,11 +281,10 @@ import ContentForm from "./forms/ContentForm"
 import CopyrightForm from "./forms/CopyrightForm"
 import ReferencesForm from "./forms/ReferencesForm"
 import PermissionsTable from "../common/PermissionsTable"
-import DeleteNodeButton from "./DeleteNodeButton"
 import { names } from "@/config/routes"
 import Helpers from "@/utils/Helpers"
 import * as Comment from "@/utils/comments"
-import { sizes, nodeStatus } from "@/utils/constants"
+import { sizes, nodeStatus, userActions } from "@/utils/constants"
 import { getLinkMetadata } from "@/services/LinkPreviewApi"
 import DragSelectModular from "@/utils/dragSelectModular"
 import * as wp from "@/services/wp"
@@ -315,7 +311,6 @@ export default {
     SlickItem,
     SlickList,
     PermissionsTable,
-    DeleteNodeButton,
   },
   data() {
     return {
@@ -327,7 +322,6 @@ export default {
       fileUploading: false,
       loadDuration: false,
       warningText: "",
-      deleteWarningText: "",
       keepOpen: false,
     }
   },
@@ -338,28 +332,23 @@ export default {
       "getParent",
       "getNode",
       "getNeighbours",
+      "getInitialNodeId",
+      "isEmptyTapestry",
     ]),
-    ...mapState([
-      "nodes",
-      "rootId",
-      "settings",
-      "visibleNodes",
-      "apiError",
-      "returnRoute",
-      "maxLevel",
-    ]),
+    ...mapState(["settings", "visibleNodes", "apiError", "returnRoute", "maxLevel"]),
     ...mapState({
       node: "currentEditingNode",
     }),
+    parentId() {
+      return this.type === "add" ? this.nodeId : this.getParent(this.nodeId)
+    },
     parent() {
-      const parent = this.getNode(
-        this.type === "add" ? this.nodeId : this.getParent(this.nodeId)
-      )
+      const parent = this.getNode(this.parentId)
       return parent ? parent : null
     },
     title() {
       if (this.type === "add") {
-        return this.parent ? `Add node to ${this.parent.title}` : "Add root node"
+        return this.parent ? `Add node to ${this.parent.title}` : "Add node"
       } else if (this.type === "edit") {
         return `Edit node: ${this.node.title}`
       }
@@ -386,19 +375,19 @@ export default {
     },
     canPublish() {
       if (this.type === "add") {
-        return (
-          Helpers.hasPermission(this.parent, this.type) &&
-          (!this.parent || this.parent.status !== "draft")
-        )
+        return this.hasPermission(this.parent, this.type)
       } else if (this.node.status === "draft" && this.type === "edit") {
-        return this.getNeighbours(this.nodeId).some(neighbourId => {
-          let neighbour = this.getNode(neighbourId)
-          return (
-            neighbour.status !== "draft" && Helpers.hasPermission(neighbour, "add")
-          )
-        })
+        return (
+          this.hasPermission(null, "add") ||
+          this.getNeighbours(this.nodeId).some(neighbourId => {
+            let neighbour = this.getNode(neighbourId)
+            return (
+              neighbour.status !== "draft" && this.hasPermission(neighbour, "add")
+            )
+          })
+        )
       } else {
-        return Helpers.hasPermission(this.node, this.type)
+        return this.hasPermission(this.node, this.type)
       }
     },
     authoredNode() {
@@ -600,7 +589,6 @@ export default {
   },
   methods: {
     ...mapMutations([
-      "updateRootNode",
       "setReturnRoute",
       "setCurrentEditingNode",
       "setCurrentEditingNodeProperty",
@@ -611,13 +599,15 @@ export default {
       "addLink",
       "updateNode",
       "updateLockedStatus",
+      "deleteNode",
+      "getNodeHasDraftChildren",
       "setTapestryErrorReporting",
     ]),
     update(property, value) {
       this.setCurrentEditingNodeProperty({ property, value })
     },
-    setLoading(status) {
-      this.loading = status
+    hasPermission(node, action) {
+      return Helpers.hasPermission(node, action, this.settings.showRejected)
     },
     isValid() {
       const isNodeValid = this.validateNodeRoute(this.nodeId)
@@ -640,14 +630,14 @@ export default {
     },
     validateNodeRoute(nodeId) {
       if (this.type === "add") {
-        if (Object.keys(this.nodes).length === 0 || this.isAuthenticated) {
+        if (this.isEmptyTapestry || this.isAuthenticated) {
           return true
         }
       }
-      if (!this.nodes.hasOwnProperty(nodeId)) {
+      if (!this.getNode(nodeId)) {
         return false
       }
-      const isAllowed = Helpers.hasPermission(this.getNode(nodeId), this.type)
+      const isAllowed = this.hasPermission(this.getNode(nodeId), this.type)
       const messages = {
         edit: `You don't have permission to edit this node`,
         add: `You don't have permission to add to this node`,
@@ -718,9 +708,6 @@ export default {
       }
       return node.mediaType === "multi-content"
     },
-    setDisabledMessage(msg) {
-      this.deleteWarningText = msg
-    },
     changeTab(tab) {
       // Prevent multiple clicks
       if (tab !== this.tab) {
@@ -730,12 +717,6 @@ export default {
           query: this.$route.query,
         })
       }
-    },
-    handleDeleteComplete() {
-      this.setCurrentEditingNode(this.parent)
-      this.loading = false
-      this.keepOpen = true
-      this.close("delete")
     },
     handleClose(event) {
       if (
@@ -764,22 +745,26 @@ export default {
     },
     close(event = null) {
       if (this.show) {
-        if (Object.keys(this.nodes).length === 0) {
+        if (this.isEmptyTapestry) {
           this.$router.push({ path: "/", query: this.$route.query })
         } else if (this.returnRoute) {
           this.$router.push(this.returnRoute)
         } else if (this.keepOpen) {
-          // Switch to edit mode if multi-content just added
           this.$router.push({
             name: names.MODAL,
-            params: { nodeId: this.node.id, type: "edit", tab: "content" },
+            params: {
+              nodeId: this.keepOpen === true ? this.node.id : this.keepOpen,
+              type: "edit",
+              tab: "content",
+            },
             query: this.$route.query,
           })
-        } else if (this.rootId && !this.nodeId) {
-          // We just added a root node
+          this.loading = false
+        } else if (!this.nodeId || event === "delete") {
+          // Should close modal but cannot determine a node to return to
           this.$router.push({
             name: names.APP,
-            params: { nodeId: this.rootId },
+            params: { nodeId: this.getInitialNodeId },
             query: this.$route.query,
           })
         } else if (
@@ -831,6 +816,45 @@ export default {
           params: { nodeId, type: "edit", tab: "content" },
         })
       }
+    },
+    async handleRemoveNode() {
+      this.loading = true
+      const nodeHasDraftChildren = await this.getNodeHasDraftChildren(this.nodeId)
+      if (nodeHasDraftChildren.hasDraft) {
+        this.$bvModal
+          .msgBoxConfirm(
+            "There are draft nodes attached to this node. Deleting this node will break the links to the draft nodes. Are you sure you want to continue?",
+            {
+              modalClass: "node-modal-confirmation",
+              title: "Are you sure you want to continue?",
+              okTitle: "Yes, Delete!",
+              okVariant: "danger",
+            }
+          )
+          .then(close => {
+            if (close) {
+              this.removeNode()
+            } else {
+              this.loading = false
+            }
+          })
+          .catch(err => console.log(err))
+      } else {
+        this.removeNode()
+      }
+    },
+    removeNode() {
+      const parentId = this.parentId
+      this.deleteNode(this.nodeId).then(() => {
+        const parent = this.getNode(parentId)
+        if (parent && this.hasPermission(parent, userActions.EDIT)) {
+          this.setCurrentEditingNode(parent)
+          this.keepOpen = parentId
+        } else {
+          this.keepOpen = false
+        }
+        this.close("delete")
+      })
     },
     async handleSubmit(isForReview = false) {
       this.errors = this.validateNode()
@@ -890,30 +914,11 @@ export default {
     },
     async submitNode() {
       if (this.type === "add") {
-        const id = await this.addNode(this.node)
+        const id = await this.addNode({
+          node: this.node,
+          parentId: this.parentId,
+        })
         this.update("id", id)
-        if (this.parent) {
-          // Add link from parent node to this node
-          const newLink = {
-            source: this.parent.id,
-            target: id,
-            value: 1,
-            type: "",
-            addedOnNodeCreation: true,
-          }
-          await this.addLink(newLink)
-          // do not update parent's child ordering if the current node is a draft node since draft shouldn't appear in multi-content nodes
-          if (this.node.status !== "draft") {
-            this.$store.commit("updateNode", {
-              id: this.parent.id,
-              newNode: {
-                childOrdering: [...this.parent.childOrdering],
-              },
-            })
-          }
-        } else {
-          this.updateRootNode(id)
-        }
       } else {
         await this.updateNode({
           id: this.node.id,

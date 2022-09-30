@@ -3,6 +3,7 @@
 /**
  * Tapestry Endpoints.
  */
+require_once __DIR__.'/utilities/class.tapestry-helpers.php';
 require_once __DIR__.'/utilities/class.tapestry-permissions.php';
 require_once __DIR__.'/classes/class.tapestry.php';
 require_once __DIR__.'/classes/class.tapestry-node.php';
@@ -560,7 +561,12 @@ function deleteTapestry($request)
 function addTapestryNode($request)
 {
     $postId = $request['tapestryPostId'];
-    $node = json_decode($request->get_body());
+    $payload = json_decode($request->get_body());
+    $node = $payload->node;
+    $parentId = null;
+    if (isset($payload->parentId) && $payload->parentId !== null && $payload->parentId !== 0) {
+        $parentId = $payload->parentId;
+    }
     // TODO: JSON validations should happen here
     // make sure that we can only accept one node object at a time
     // adding multiple nodes would require multiple requests from the client
@@ -570,14 +576,43 @@ function addTapestryNode($request)
         }
         $tapestry = new Tapestry($postId);
 
-        if ($tapestry->isEmpty()) {
+        // Permission checks
+        if (!is_user_logged_in()) {
+            // Prevent guests from adding a node
+            throw new TapestryError('ADD_NODE_PERMISSION_DENIED', 'Please log in to add a node.');
+        }
+        if ($node->status !== NodeStatus::DRAFT) {
             $user = new TapestryUser();
-            if (!$user->canEdit($postId)) {
+
+            if (!TapestryHelpers::userIsAllowed(UserActions::ADD, $parentId, $postId)) {
                 throw new TapestryError('ADD_NODE_PERMISSION_DENIED');
+            }
+
+            // Add user-specific permissions to the author (only do this if it is not a draft node)
+            $userId = $user->getID();
+            $node->permissions->{'user-'.$userId} = ['read', 'add', 'edit'];
+        } else {
+            $settings = $tapestry->getSettings();
+            if (!$settings->draftNodesEnabled) {
+                throw new TapestryError('DRAFT_NODES_DISABLED', 'Draft nodes are disabled for this Tapestry.', 403);
+            }
+            if (!$settings->submitNodesEnabled && isset($node->reviewStatus) && !empty($node->reviewStatus)) {
+                throw new TapestryError('DRAFT_NODES_DISABLED', 'You cannot submit draft nodes for this Tapestry.', 403);
             }
         }
 
-        return $tapestry->addNode($node);
+        $newNode = $tapestry->addNode($node, $parentId);
+        $result = (object) [
+            'node' => $newNode,
+        ];
+        if ($parentId) {
+            $result->link = $tapestry->addLink((object) [
+                'source' => $parentId,
+                'target' => $newNode->id,
+                'addedOnNodeCreation' => true,
+            ]);
+        }
+        return $result;
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
@@ -688,11 +723,10 @@ function addTapestryLink($request)
             $tapestry = new Tapestry($postId);
             return $tapestry->addLink($link);
         }
-        if (!TapestryHelpers::userIsAllowed('ADD', $link->source, $postId)) {
+        if (!TapestryHelpers::userIsAllowed(UserActions::ADD, $link->source, $postId)) {
             throw new TapestryError('ADD_LINK_PERMISSION_DENIED');
         }
-        if (!TapestryHelpers::userIsAllowed('ADD', $link->target, $postId)
-            && (!isset($link->addedOnNodeCreation) || !$link->addedOnNodeCreation)) {
+        if (!TapestryHelpers::userIsAllowed(UserActions::ADD, $link->target, $postId)) {
             throw new TapestryError('ADD_LINK_PERMISSION_DENIED');
         }
         $tapestry = new Tapestry($postId);
@@ -723,8 +757,8 @@ function reverseTapestryLink($request)
         if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
             throw new TapestryError('INVALID_POST_ID');
         }
-        if (!TapestryHelpers::userIsAllowed('ADD', $newLink->source, $postId)
-            || !TapestryHelpers::userIsAllowed('ADD', $newLink->target, $postId)) {
+        if (!TapestryHelpers::userIsAllowed(UserActions::ADD, $newLink->source, $postId)
+            || !TapestryHelpers::userIsAllowed(UserActions::ADD, $newLink->target, $postId)) {
             throw new TapestryError('ADD_LINK_PERMISSION_DENIED');
         }
         $tapestry = new Tapestry($postId);
@@ -750,10 +784,10 @@ function deleteTapestryLink($request)
             throw new TapestryError('INVALID_POST_ID');
         }
         if (!TapestryHelpers::nodeIsDraft($link->target, $postId) && !TapestryHelpers::nodeIsDraft($link->source, $postId)) {
-            if (!TapestryHelpers::userIsAllowed('ADD', $link->source, $postId)) {
+            if (!TapestryHelpers::userIsAllowed(UserActions::ADD, $link->source, $postId)) {
                 throw new TapestryError('DELETE_LINK_PERMISSION_DENIED');
             }
-            if (!TapestryHelpers::userIsAllowed('ADD', $link->target, $postId)) {
+            if (!TapestryHelpers::userIsAllowed(UserActions::ADD, $link->target, $postId)) {
                 throw new TapestryError('DELETE_LINK_PERMISSION_DENIED');
             }
         }
@@ -811,15 +845,11 @@ function updateTapestryNode($request)
         if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
             throw new TapestryError('INVALID_NODE_META_ID');
         }
-        if (!TapestryHelpers::userIsAllowed('EDIT', $nodeMetaId, $postId)) {
+        if (!TapestryHelpers::userIsAllowed(UserActions::EDIT, $nodeMetaId, $postId)) {
             throw new TapestryError('EDIT_NODE_PERMISSION_DENIED');
         }
         if (!TapestryHelpers::isChildNodeOfTapestry($nodeMetaId, $postId)) {
             throw new TapestryError('INVALID_CHILD_NODE');
-        }
-        if (TapestryHelpers::nodeIsDraft($nodeMetaId, $postId) &&
-            !TapestryHelpers::nodeNeighbourIsPublished($nodeMetaId, $postId)) {
-            throw new TapestryError('NODE_APPROVAL_DENIED');
         }
 
         $tapestry = new Tapestry($postId);
@@ -854,7 +884,7 @@ function deleteTapestryNode($request)
         if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
             throw new TapestryError('INVALID_NODE_META_ID');
         }
-        if (!TapestryHelpers::userIsAllowed('EDIT', $nodeMetaId, $postId)) {
+        if (!TapestryHelpers::userIsAllowed(UserActions::EDIT, $nodeMetaId, $postId)) {
             throw new TapestryError('EDIT_NODE_PERMISSION_DENIED');
         }
         if (!TapestryHelpers::isChildNodeOfTapestry($nodeMetaId, $postId)) {
@@ -890,7 +920,7 @@ function updateTapestryNodeSize($request)
         if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
             throw new TapestryError('INVALID_NODE_META_ID');
         }
-        if (!TapestryHelpers::userIsAllowed('EDIT', $nodeMetaId, $postId)) {
+        if (!TapestryHelpers::userIsAllowed(UserActions::EDIT, $nodeMetaId, $postId)) {
             throw new TapestryError('EDIT_NODE_PERMISSION_DENIED');
         }
         if (!TapestryHelpers::isChildNodeOfTapestry($nodeMetaId, $postId)) {
@@ -929,7 +959,7 @@ function updateTapestryNodeDescription($request)
         if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
             throw new TapestryError('INVALID_NODE_META_ID');
         }
-        if (!TapestryHelpers::userIsAllowed('EDIT', $nodeMetaId, $postId)) {
+        if (!TapestryHelpers::userIsAllowed(UserActions::EDIT, $nodeMetaId, $postId)) {
             throw new TapestryError('EDIT_NODE_PERMISSION_DENIED');
         }
         if (!TapestryHelpers::isChildNodeOfTapestry($nodeMetaId, $postId)) {
@@ -968,7 +998,7 @@ function updateTapestryNodeTitle($request)
         if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
             throw new TapestryError('INVALID_NODE_META_ID');
         }
-        if (!TapestryHelpers::userIsAllowed('EDIT', $nodeMetaId, $postId)) {
+        if (!TapestryHelpers::userIsAllowed(UserActions::EDIT, $nodeMetaId, $postId)) {
             throw new TapestryError('EDIT_NODE_PERMISSION_DENIED');
         }
         if (!TapestryHelpers::isChildNodeOfTapestry($nodeMetaId, $postId)) {
@@ -1007,7 +1037,7 @@ function updateTapestryNodeImageURL($request)
         if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
             throw new TapestryError('INVALID_NODE_META_ID');
         }
-        if (!TapestryHelpers::userIsAllowed('EDIT', $nodeMetaId, $postId)) {
+        if (!TapestryHelpers::userIsAllowed(UserActions::EDIT, $nodeMetaId, $postId)) {
             throw new TapestryError('EDIT_NODE_PERMISSION_DENIED');
         }
         if (!TapestryHelpers::isChildNodeOfTapestry($nodeMetaId, $postId)) {
@@ -1046,7 +1076,7 @@ function updateTapestryNodeLockedImageURL($request)
         if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
             throw new TapestryError('INVALID_NODE_META_ID');
         }
-        if (!TapestryHelpers::userIsAllowed('EDIT', $nodeMetaId, $postId)) {
+        if (!TapestryHelpers::userIsAllowed(UserActions::EDIT, $nodeMetaId, $postId)) {
             throw new TapestryError('EDIT_NODE_PERMISSION_DENIED');
         }
         if (!TapestryHelpers::isChildNodeOfTapestry($nodeMetaId, $postId)) {
@@ -1122,7 +1152,7 @@ function updateTapestryNodeTypeData($request)
         if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
             throw new TapestryError('INVALID_NODE_META_ID');
         }
-        if (!TapestryHelpers::userIsAllowed('EDIT', $nodeMetaId, $postId)) {
+        if (!TapestryHelpers::userIsAllowed(UserActions::EDIT, $nodeMetaId, $postId)) {
             throw new TapestryError('EDIT_NODE_PERMISSION_DENIED');
         }
         if (!TapestryHelpers::isChildNodeOfTapestry($nodeMetaId, $postId)) {
@@ -1161,8 +1191,8 @@ function updateTapestryNodeCoordinates($request)
         if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
             throw new TapestryError('INVALID_NODE_META_ID');
         }
-        if (!TapestryHelpers::userIsAllowed('EDIT', $nodeMetaId, $postId) &&
-            !TapestryHelpers::userIsAllowed('MOVE', $nodeMetaId, $postId)) {
+        if (!TapestryHelpers::userIsAllowed(UserActions::EDIT, $nodeMetaId, $postId) &&
+            !TapestryHelpers::userIsAllowed(UserActions::MOVE, $nodeMetaId, $postId)) {
             throw new TapestryError('EDIT_NODE_PERMISSION_DENIED');
         }
         if (!TapestryHelpers::isChildNodeOfTapestry($nodeMetaId, $postId)) {
@@ -1195,7 +1225,7 @@ function getTapestryNodeHasDraftChildren($request)
         if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
             throw new TapestryError('INVALID_NODE_META_ID');
         }
-        if (!TapestryHelpers::userIsAllowed('EDIT', $nodeMetaId, $postId)) {
+        if (!TapestryHelpers::userIsAllowed(UserActions::EDIT, $nodeMetaId, $postId)) {
             throw new TapestryError('EDIT_NODE_PERMISSION_DENIED');
         }
         if (!TapestryHelpers::isChildNodeOfTapestry($nodeMetaId, $postId)) {
@@ -1548,7 +1578,7 @@ function getQuestionHasAnswers($request)
         if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
             throw new TapestryError('INVALID_NODE_META_ID');
         }
-        if (!TapestryHelpers::userIsAllowed('EDIT', $nodeMetaId, $postId)) {
+        if (!TapestryHelpers::userIsAllowed(UserActions::EDIT, $nodeMetaId, $postId)) {
             throw new TapestryError('EDIT_NODE_PERMISSION_DENIED');
         }
 

@@ -116,8 +116,14 @@ export default {
     }
   },
   computed: {
-    ...mapState(["h5pSettings", "rootId", "favourites", "browserDimensions"]),
-    ...mapGetters(["getNode", "getParent", "isMultiContent", "isMultiContentRow"]),
+    ...mapState(["h5pSettings", "favourites", "browserDimensions"]),
+    ...mapGetters([
+      "getNode",
+      "getParent",
+      "isMultiContent",
+      "isMultiContentRow",
+      "getInitialNodeId",
+    ]),
     node() {
       const node = this.getNode(this.nodeId)
       return node
@@ -204,7 +210,7 @@ export default {
           // Node ID doesn't exist, so reroute to default selected node
           this.$router.replace({
             name: names.APP,
-            params: { nodeId: this.rootId },
+            params: { nodeId: this.getInitialNodeId },
             query: this.$route.query,
           })
         }

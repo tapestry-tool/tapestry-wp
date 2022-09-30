@@ -136,7 +136,7 @@ export default {
       "isFavourite",
       "isMultiContent",
     ]),
-    ...mapState(["favourites", "rootId"]),
+    ...mapState(["favourites"]),
     parentNode() {
       const parentNodeId = this.getParent(this.node.id)
       return this.getNode(parentNodeId)

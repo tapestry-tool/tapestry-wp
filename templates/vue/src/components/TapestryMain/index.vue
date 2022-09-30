@@ -7,80 +7,81 @@
       height: appHeight,
     }"
   >
-    <div v-if="empty">
-      <root-node-button v-if="canEdit" @click="addRootNode"></root-node-button>
+    <div v-if="isEmptyTapestry">
+      <root-node-button v-if="isLoggedIn"></root-node-button>
       <div v-else class="empty-message">The requested Tapestry is empty.</div>
     </div>
-    <svg
-      v-else
-      id="vue-svg"
-      ref="vue-svg"
-      role="application"
-      aria-label="Main Tapestry View"
-      :viewBox="computedViewBox"
-    >
-      <g v-for="r in renderedLevels" :key="r.level">
-        <g class="node-shadows">
-          <tapestry-node-shadow
-            v-for="(node, id) in r.nodes"
-            :key="id"
-            :node="node"
-            :scale="scale"
-            :root="id == selectedId"
-            tabindex="-1"
-          ></tapestry-node-shadow>
-        </g>
-        <g class="links">
-          <tapestry-link
-            v-for="link in r.links"
-            :key="`${link.source}-${link.target}`"
-            :source="nodes[link.source]"
-            :target="nodes[link.target]"
-            :scale="scale"
-            tabindex="-1"
-          ></tapestry-link>
-        </g>
-        <g v-if="!dragSelectEnabled || dragSelectReady" class="nodes">
-          <tapestry-node
-            v-for="(node, id) in r.nodes"
-            :key="id"
-            :node="node"
-            :scale="scale"
-            class="node"
-            :class="{ selectable: true }"
-            :data-id="id"
-            :root="id == selectedId"
-            tabindex="-1"
-            @dragstart="handleNodeDragStart"
-            @drag="handleNodeDrag"
-            @dragend="handleNodeDragEnd"
-            @mouseover="handleMouseover(id)"
-            @mouseleave="activeNode = null"
-            @mounted="dragSelectEnabled ? updateSelectableNodes(node) : null"
-            @click="handleNodeClick"
-          ></tapestry-node>
-        </g>
-      </g>
-      <locked-tooltip
-        v-if="activeNode"
-        :node="nodes[activeNode]"
+    <template v-else>
+      <svg
+        id="vue-svg"
+        ref="vue-svg"
+        role="application"
+        aria-label="Main Tapestry View"
         :viewBox="computedViewBox"
-      ></locked-tooltip>
-    </svg>
-    <tapestry-minimap
-      v-if="showMinimap"
-      ref="minimap"
-      :view-box="unscaledViewBox"
-      :scale="scale"
-      :offset="offset"
-      @pan-by="handleMinimapPanBy"
-      @pan-to="handleMinimapPanTo"
-      @close="showMinimap = false"
-    ></tapestry-minimap>
-    <tapestry-minimap-button
-      v-else
-      @click="showMinimap = true"
-    ></tapestry-minimap-button>
+      >
+        <g v-for="r in renderedLevels" :key="r.level">
+          <g class="node-shadows">
+            <tapestry-node-shadow
+              v-for="(node, id) in r.nodes"
+              :key="id"
+              :node="node"
+              :scale="scale"
+              :root="id == selectedId"
+              tabindex="-1"
+            ></tapestry-node-shadow>
+          </g>
+          <g class="links">
+            <tapestry-link
+              v-for="link in r.links"
+              :key="`${link.source}-${link.target}`"
+              :source="nodes[link.source]"
+              :target="nodes[link.target]"
+              :scale="scale"
+              tabindex="-1"
+            ></tapestry-link>
+          </g>
+          <g v-if="!dragSelectEnabled || dragSelectReady" class="nodes">
+            <tapestry-node
+              v-for="(node, id) in r.nodes"
+              :key="id"
+              :node="node"
+              :scale="scale"
+              class="node"
+              :class="{ selectable: true }"
+              :data-id="id"
+              :root="id == selectedId"
+              tabindex="-1"
+              @dragstart="handleNodeDragStart"
+              @drag="handleNodeDrag"
+              @dragend="handleNodeDragEnd"
+              @mouseover="handleMouseover(id)"
+              @mouseleave="activeNode = null"
+              @mounted="dragSelectEnabled ? updateSelectableNodes(node) : null"
+              @click="handleNodeClick"
+            ></tapestry-node>
+          </g>
+        </g>
+        <locked-tooltip
+          v-if="activeNode"
+          :node="nodes[activeNode]"
+          :viewBox="computedViewBox"
+        ></locked-tooltip>
+      </svg>
+      <tapestry-minimap
+        v-if="showMinimap"
+        ref="minimap"
+        :view-box="unscaledViewBox"
+        :scale="scale"
+        :offset="offset"
+        @pan-by="handleMinimapPanBy"
+        @pan-to="handleMinimapPanTo"
+        @close="showMinimap = false"
+      ></tapestry-minimap>
+      <tapestry-minimap-button
+        v-else
+        @click="showMinimap = true"
+      ></tapestry-minimap-button>
+    </template>
   </main>
 </template>
 
@@ -140,13 +141,18 @@ export default {
       "links",
       "selection",
       "settings",
-      "rootId",
       "browserDimensions",
       "maxLevel",
       "currentDepth",
       "scaleConstants",
     ]),
-    ...mapGetters(["getNode", "getNodeNavId", "getNodeNavParent"]),
+    ...mapGetters([
+      "isEmptyTapestry",
+      "getNode",
+      "getInitialNodeId",
+      "getNodeNavId",
+      "getNodeNavParent",
+    ]),
     nodeNavLinkMode: {
       get() {
         return this.$store.state.nodeNavigation.linkMode
@@ -207,9 +213,6 @@ export default {
     canEdit() {
       return wp.canEditTapestry()
     },
-    empty() {
-      return Object.keys(this.nodes).length === 0
-    },
     selectedId() {
       return Number(this.$route.params.nodeId)
     },
@@ -238,7 +241,7 @@ export default {
     },
   },
   watch: {
-    empty(empty) {
+    isEmptyTapestry(empty) {
       if (!empty) {
         this.zoomPanHelper.unregister()
         this.zoomPanHelper.register()
@@ -251,16 +254,19 @@ export default {
         document.body.style.backgroundImage = background ? `url(${background})` : ""
       },
     },
+    nodes() {
+      this.updateViewBox()
+    },
     selectedId: {
       immediate: true,
       handler(nodeId) {
         if (this.$route.name === names.APP && !this.nodes.hasOwnProperty(nodeId)) {
           this.$router.replace(
-            Object.keys(this.nodes).length === 0
+            this.isEmptyTapestry
               ? { path: "/", query: this.$route.query }
               : {
                   name: names.APP,
-                  params: { nodeId: this.rootId },
+                  params: { nodeId: this.getInitialNodeId },
                   query: this.$route.query,
                 }
           )
@@ -336,7 +342,7 @@ export default {
         this.updateOffset()
         this.fetchAppDimensions()
       },
-      [this.$refs.minimap.$el],
+      () => (this.$refs.minimap ? [this.$refs.minimap.$el] : []),
       ["vue-svg"]
     )
     this.zoomPanHelper.register()
@@ -359,9 +365,6 @@ export default {
       "goToNodeSibling",
       "resetNodeNavigation",
     ]),
-    addRootNode() {
-      this.$root.$emit("add-node", null)
-    },
     updateAppHeight() {
       if (this.$refs.app) {
         const bodyHeight = document.body.getBoundingClientRect().height
@@ -823,6 +826,9 @@ export default {
         return
       }
 
+      if (this.isEmptyTapestry) {
+        return
+      }
       const { code } = evt
       const node = this.getNode(this.selectedId)
       if (code === "Enter") {
