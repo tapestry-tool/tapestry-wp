@@ -82,10 +82,6 @@ class TapestryError extends Error
             'MESSAGE' => 'You are not permitted to edit this tapestry',
             'STATUS' => ['status' => 403],
         ],
-        'NODE_APPROVAL_DENIED' => [
-            'MESSAGE' => 'You are not permitted to approve this node',
-            'STATUS' => ['status' => 403],
-        ],
         'POST_ID_ALREADY_SET' => [
             'MESSAGE' => 'PostID should not be passed in when creating a new Tapestry',
             'STATUS' => ['status' => 500],
@@ -123,8 +119,12 @@ class TapestryError extends Error
     {
         if (array_key_exists($code, self::ERRORS)) {
             $ERROR = (object) self::ERRORS[$code];
-            $message = $ERROR->MESSAGE;
-            $status = $ERROR->STATUS['status'];
+            if (empty($message)) {
+                $message = $ERROR->MESSAGE;
+            }
+            if (empty($status)) {
+                $status = $ERROR->STATUS['status'];
+            }
         }
 
         $this->code = $code;

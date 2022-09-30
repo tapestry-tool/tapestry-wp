@@ -98,7 +98,8 @@ function parseFixture(fixture, settings) {
   if (fixture) {
     const state = parse(fixture, makeMockProgress(fixture))
     state.settings = { ...Helpers.deepCopy(mockSettings), ...settings }
-    state.rootId = Object.keys(state.nodes)[0]
+    // when rootId is null, the getInitialNodeId getter will return the first node automatically
+    state.rootId = null
     state.favourites = fixture.favourites || []
     return state
   }

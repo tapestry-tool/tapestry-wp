@@ -47,7 +47,7 @@ export default {
     },
   },
   computed: {
-    ...mapState(["visibleNodes", "rootId", "maxLevel", "currentDepth"]),
+    ...mapState(["visibleNodes", "maxLevel", "currentDepth"]),
     ...mapGetters(["getNeighbours", "isVisible"]),
     show() {
       return (

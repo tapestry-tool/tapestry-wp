@@ -327,7 +327,7 @@ export default {
   },
   computed: {
     ...mapGetters(["tapestryJson"]),
-    ...mapState(["settings", "rootId", "nodes", "apiError"]),
+    ...mapState(["settings", "nodes", "apiError"]),
     latRangeValid() {
       return (
         this.getCoord(this.mapBounds.neLat, 90) >

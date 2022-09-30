@@ -11,7 +11,7 @@
       :node-id="nodeId"
       aria-hidden="false"
     ></lightbox>
-    <sidebar v-if="!isEmpty"></sidebar>
+    <sidebar v-if="!isEmptyTapestry"></sidebar>
     <tapestry-error></tapestry-error>
     <b-modal
       id="loggedOutModal"
@@ -29,7 +29,7 @@
 </template>
 
 <script>
-import { mapState, mapMutations, mapGetters, mapActions } from "vuex"
+import { mapMutations, mapGetters, mapActions } from "vuex"
 import { names } from "@/config/routes"
 import Lightbox from "@/components/Lightbox"
 import LinkModal from "@/components/modals/LinkModal"
@@ -60,11 +60,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(["nodes"]),
-    ...mapGetters(["getNode", "getTheme"]),
-    isEmpty() {
-      return Object.keys(this.nodes).length === 0
-    },
+    ...mapGetters(["getNode", "isEmptyTapestry", "getTheme", "getInitialNodeId"]),
     nodeId() {
       return this.$route.params.nodeId
     },
@@ -119,7 +115,7 @@ export default {
       this.init(tapestryData)
       this.loading = false
       if (!this.$route.params.nodeId && tapestryData.nodes.length > 0) {
-        let path = `/nodes/${tapestryData.rootId}`
+        let path = `/nodes/${this.getInitialNodeId}`
         if (selectedNode) {
           path = `/nodes/${selectedNode.nodeId}`
           if (selectedNode.rowId) {

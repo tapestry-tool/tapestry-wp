@@ -8,7 +8,6 @@ require_once dirname(__FILE__).'/../classes/class.tapestry-user-progress.php';
 require_once dirname(__FILE__).'/../classes/class.tapestry-h5p.php';
 require_once dirname(__FILE__).'/../classes/class.constants.php';
 require_once dirname(__FILE__).'/../interfaces/interface.tapestry.php';
-require_once dirname(__FILE__).'/class.constants.php';
 
 /**
  * TODO: Implement group functionality. Currently all the group-related
@@ -157,6 +156,20 @@ class Tapestry implements ITapestry
     }
 
     /**
+     * Get settings.
+     *
+     * @return object $settings
+     */
+    public function getSettings()
+    {
+        if (!$this->postId) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+
+        return $this->settings;
+    }
+
+    /**
      * Add a new node.
      *
      * @param object $node Tapestry node
@@ -167,21 +180,14 @@ class Tapestry implements ITapestry
     {
         $tapestryNode = new TapestryNode($this->postId);
 
-        // Checks if user is logged in to prevent logged out user-0 from getting permissions
-        // Only add user permissions if it is not a review node
-        if (is_user_logged_in() && 0 === count($node->reviewComments)) {
-            $userId = wp_get_current_user()->ID;
-            $node->permissions->{'user-'.$userId} = ['read', 'add', 'edit'];
-        }
-
         $tapestryNode->set($node);
         $node = $tapestryNode->save($node);
 
-        array_push($this->nodes, $node->id);
-
-        if (empty($this->rootId)) {
+        if ($this->isEmpty()) {
             $this->rootId = $node->id;
         }
+
+        array_push($this->nodes, $node->id);
 
         $this->_saveToDatabase();
 
@@ -199,11 +205,6 @@ class Tapestry implements ITapestry
     {
         // Remove the rootId field
         if ($nodeId == $this->rootId) {
-            foreach ($this->nodes as $node) {
-                if ($node !== $this->rootId && !TapestryHelpers::nodeIsDraft($node, $this->postId)) {
-                    throw new TapestryError('CANNOT_DELETE_ROOT');
-                }
-            }
             $this->rootId = 0;
         }
 
@@ -220,7 +221,7 @@ class Tapestry implements ITapestry
         // Delete associated links with this node
         foreach ($this->links as $index => $link) {
             if ($link->source == $nodeId || $link->target == $nodeId) {
-                $this->removeLink([
+                $this->removeLink((object) [
                     'source' => $link->source,
                     'target' => $link->target,
                     ]);
@@ -344,11 +345,11 @@ class Tapestry implements ITapestry
     /**
      * Returns true if the tapestry is empty.
      *
-     * @return bool true if there is no root node, false otherwise
+     * @return bool true if there are no nodes, false otherwise
      */
     public function isEmpty()
     {
-        return empty($this->rootId);
+        return empty($this->nodes);
     }
 
     public function getNodesDataForRender()
@@ -757,8 +758,8 @@ class Tapestry implements ITapestry
 
     private function _userIsAllowed($node, $superuser_override, $userId)
     {
-        return TapestryHelpers::userIsAllowed('READ', $node, $this->postId, $superuser_override, $userId)
-        || TapestryHelpers::userIsAllowed('ADD', $node, $this->postId, $superuser_override, $userId)
-        || TapestryHelpers::userIsAllowed('EDIT', $node, $this->postId, $superuser_override, $userId);
+        return TapestryHelpers::userIsAllowed(UserActions::READ, $node, $this->postId, $superuser_override, $userId)
+        || TapestryHelpers::userIsAllowed(UserActions::ADD, $node, $this->postId, $superuser_override, $userId)
+        || TapestryHelpers::userIsAllowed(UserActions::EDIT, $node, $this->postId, $superuser_override, $userId);
     }
 }

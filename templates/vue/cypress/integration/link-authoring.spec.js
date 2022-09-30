@@ -31,20 +31,6 @@ describe("Link Authoring", () => {
       })
   })
 
-  it("should not be able to delete a node's only link", () => {
-    cy.store()
-      .its("state.nodes")
-      .then(nodes => {
-        const [root, child] = Object.values(nodes)
-
-        cy.link(root.id, child.id).click()
-        cy.getByTestId("delete-link-btn").should("be.disabled")
-        cy.contains(/Save/i).click()
-
-        cy.link(root.id, child.id).should("exist")
-      })
-  })
-
   it("should not be able to delete a link without add permission", () => {
     cy.store()
       .its("state.nodes")

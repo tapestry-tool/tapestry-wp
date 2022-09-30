@@ -3,7 +3,7 @@
     <import-changelog :changes="changes" />
     <button class="root-node-button" data-qa="root-node-button" @click="addRootNode">
       <i class="fas fa-plus-circle fa-5x" aria-hidden="true"></i>
-      <div>Add Root Node</div>
+      <div>Add a Node</div>
     </button>
     <p>Or</p>
     <b-button class="import-button" @click="openFileBrowser">

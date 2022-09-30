@@ -15,7 +15,7 @@ import client from "../services/TapestryAPI"
 import { names } from "@/config/routes"
 import Toolbar from "./Toolbar"
 import TapestryMain from "./TapestryMain"
-import { mapMutations, mapState } from "vuex"
+import { mapGetters, mapMutations, mapState } from "vuex"
 import TapestryMap from "./TapestryMap"
 
 export default {
@@ -28,9 +28,10 @@ export default {
     return {}
   },
   computed: {
-    ...mapState(["nodes", "links", "selection", "settings", "rootId"]),
+    ...mapState(["nodes", "links", "selection", "settings"]),
+    ...mapGetters(["isEmptyTapestry"]),
     isSidebarOpen() {
-      return Boolean(this.$route.query.sidebar)
+      return Boolean(this.$route.query.sidebar) && !this.isEmptyTapestry
     },
     viewingTapestry() {
       return (
