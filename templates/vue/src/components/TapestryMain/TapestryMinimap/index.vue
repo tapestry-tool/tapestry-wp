@@ -36,7 +36,7 @@
 
 <script>
 import Helpers from "@/utils/Helpers"
-import { mapState } from "vuex"
+import { mapGetters, mapState } from "vuex"
 import DepthIndicator from "./DepthIndicator"
 
 export default {
@@ -73,6 +73,7 @@ export default {
   },
   computed: {
     ...mapState(["nodes", "links", "maxLevel", "browserDimensions"]),
+    ...mapGetters(["isVisible"]),
     aspectRatio() {
       return this.viewBox[2] / this.viewBox[3]
     },
@@ -169,6 +170,9 @@ export default {
 
         // 2. draw links
         for (const link of this.links) {
+          if (!this.isVisible(link.source) || !this.isVisible(link.target)) {
+            continue
+          }
           const [initialPoint, ...points] = Helpers.getMinimapLinePoints(
             this.nodes[link.source],
             this.nodes[link.target]
@@ -186,6 +190,9 @@ export default {
         // 3. draw nodes
         for (const id in this.nodes) {
           const node = this.nodes[id]
+          if (!this.isVisible(id)) {
+            continue
+          }
           const { x, y } = this.transformCoordinates(node.coordinates)
           const radius = Helpers.getNodeBaseRadius(node.level)
           c.beginPath()
