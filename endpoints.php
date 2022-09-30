@@ -726,8 +726,7 @@ function addTapestryLink($request)
         if (!TapestryHelpers::userIsAllowed(UserActions::ADD, $link->source, $postId)) {
             throw new TapestryError('ADD_LINK_PERMISSION_DENIED');
         }
-        if (!TapestryHelpers::userIsAllowed(UserActions::ADD, $link->target, $postId)
-            && (!isset($link->addedOnNodeCreation) || !$link->addedOnNodeCreation)) {
+        if (!TapestryHelpers::userIsAllowed(UserActions::ADD, $link->target, $postId)) {
             throw new TapestryError('ADD_LINK_PERMISSION_DENIED');
         }
         $tapestry = new Tapestry($postId);
