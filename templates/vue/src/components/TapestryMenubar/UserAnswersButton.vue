@@ -1,5 +1,5 @@
 <template>
-  <button class="user-answers-button" @click="open">
+  <button class="menubar-button" @click="open">
     <span :class="`${iconClass}`"></span>
     <user-answers-modal
       :show="userAnswersFormOpen"
@@ -78,19 +78,3 @@ export default {
   },
 }
 </script>
-
-<style lang="scss" scoped>
-.user-answers-button,
-.user-answers-button:focus {
-  padding: 0.5rem;
-  background: none;
-  font-size: 1.2em;
-  transition: all 0.2s ease;
-  outline: none;
-}
-.user-answers-button:hover {
-  background: none;
-  color: #11a6d8;
-  transform: scale(1.1);
-}
-</style>
