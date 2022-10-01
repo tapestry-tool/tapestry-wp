@@ -956,6 +956,7 @@ export default {
   }
 
   .vertical-center {
+    position: relative;
     padding-top: 50px;
     height: 100%;
     display: flex;
