@@ -180,6 +180,7 @@ export default {
   z-index: 0;
 
   .root-node-button {
+    position: relative;
     background: none;
     color: inherit;
     display: inline-block;
