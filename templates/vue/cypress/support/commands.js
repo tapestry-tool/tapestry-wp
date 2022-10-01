@@ -49,7 +49,12 @@ Cypress.Commands.add("visitTapestry", ({ skipClosingMinimap = false } = {}) => {
   cy.visit(`/tapestry/${TEST_TAPESTRY_NAME}`)
   cy.getByTestId("tapestry-loading").should("not.exist")
   if (!skipClosingMinimap) {
-    cy.getByTestId("close-minimap").click()
+    cy.get("body").then($body => {
+      const $button = $body.find(`[data-qa="close-minimap"]`)
+      if ($button.length > 0) {
+        $button.first().trigger("click")
+      }
+    })
   }
 })
 
