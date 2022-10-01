@@ -828,7 +828,7 @@ export default {
     },
     handleKey(evt) {
       // Ignore key events if focus is outside Tapestry view
-      if (!this.$refs["vue-svg"].contains(document.activeElement)) {
+      if (!this.$refs["vue-svg"]?.contains(document.activeElement)) {
         return
       }
 
