@@ -7,7 +7,7 @@
       height: appHeight,
     }"
   >
-    <div v-if="isEmptyTapestry">
+    <div v-if="isEmptyTapestry" class="vertical-center">
       <root-node-button v-if="isLoggedIn"></root-node-button>
       <div v-else class="empty-message">The requested Tapestry is empty.</div>
     </div>
@@ -946,8 +946,13 @@ export default {
     cursor: grabbing;
   }
 
-  .empty-message {
-    margin: 30vh auto;
+  .vertical-center {
+    padding-top: 50px;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
   }
 
   svg {

@@ -177,17 +177,12 @@ export default {
 
 <style lang="scss" scoped>
 #root-node-button {
-  padding-top: 40px;
-  display: flex;
-  align-items: center;
-  flex-direction: column;
   z-index: 0;
 
   .root-node-button {
     background: none;
     color: inherit;
     display: inline-block;
-    margin-top: 20vh;
     text-align: center;
     cursor: pointer;
     transition: all 0.2s;
