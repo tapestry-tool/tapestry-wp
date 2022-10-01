@@ -2,7 +2,7 @@
   <main
     id="tapestry"
     ref="app"
-    :class="{ panning: isPanning }"
+    :class="{ panning: isPanning, empty: isEmptyTapestry }"
     :style="{
       height: appHeight,
     }"
@@ -431,6 +431,9 @@ export default {
       }
     },
     handleZoom(delta, x, y) {
+      if (this.isEmptyTapestry) {
+        return
+      }
       const newScale = this.clampScale(this.scale + delta)
       const scaleChange = newScale / this.scale
 
@@ -461,6 +464,9 @@ export default {
       this.scale = newScale
     },
     handlePan(dx, dy) {
+      if (this.isEmptyTapestry) {
+        return
+      }
       if (!this.appDimensions) {
         this.fetchAppDimensions()
       }
@@ -940,10 +946,13 @@ export default {
 <style lang="scss" scoped>
 #tapestry {
   position: relative;
-  cursor: move;
 
-  &.panning {
-    cursor: grabbing;
+  &:not(.empty) {
+    cursor: move;
+
+    &.panning {
+      cursor: grabbing;
+    }
   }
 
   .vertical-center {
