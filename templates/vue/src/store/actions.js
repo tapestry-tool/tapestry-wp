@@ -92,7 +92,7 @@ export async function doUpdateUserSettings({ commit, dispatch }, userSettings) {
 
 // nodes
 export async function addNode({ dispatch }, payload) {
-  await dispatch("doAddNode", {
+  return dispatch("doAddNode", {
     ...payload,
     isCommand: true,
   })
