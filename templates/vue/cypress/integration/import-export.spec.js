@@ -59,7 +59,7 @@ describe("Export", () => {
       .should("be.visible")
       .click()
 
-    cy.wait("@export")
+    cy.wait("@export_zip")
       .its("response.body")
       .then(data => {
         expect("zipUrl" in data).to.be.true
