@@ -223,9 +223,9 @@ export default class Helpers {
   }
 
   static hasPermission(node, action, showRejected) {
-    // Check 0: node is null case - this should only apply to creating the root node.
+    // Check 0: node is null case - this should only apply to creating a standalone node
     if (node === null) {
-      return wp.canEditTapestry()
+      return action === userActions.ADD && wp.canEditTapestry()
     }
 
     // Public users never have any permissions other than read
@@ -235,29 +235,29 @@ export default class Helpers {
 
     // Checks related to draft nodes
     /**
-     * If node is a draft:
-     *  - Allow author to move submitted and rejected nodes
-     *  - Allow all actions for original author EXCEPT if the node is submitted for
-     *    review
-     *  - Allow "read" to reviewers only if the node is submitted for review
+     * If node is a draft (accepted draft nodes are PUBLISHED nodes, so they are not considered here):
+     * - If node is not submitted for review:
+     *  - Allow all actions except "add" for original author
+     *  - Allow all actions except "edit" for reviewer if node is rejected and showRejected is true
+     * - If node is submitted for review:
+     *  - Only allow "read" for original author
+     *  - Allow all actions except "edit" for reviewer
      */
     if (node.status === nodeStatus.DRAFT) {
-      if (node.author && wp.isCurrentUser(node.author.id) && action == "move") {
-        if (node.reviewStatus !== nodeStatus.ACCEPT) {
+      if (node.author && wp.isCurrentUser(node.author.id)) {
+        if (action === userActions.READ || wp.canEditTapestry()) {
           return true
         }
-      }
-      if (node.author && wp.isCurrentUser(node.author.id)) {
-        return action === userActions.READ || node.reviewStatus !== nodeStatus.SUBMIT
+        return node.reviewStatus !== nodeStatus.SUBMIT && action !== userActions.ADD
       }
       if (wp.canEditTapestry()) {
-        if (action === userActions.READ) {
-          return (
-            node.reviewStatus === nodeStatus.SUBMIT ||
-            (showRejected && node.reviewStatus === nodeStatus.REJECT)
-          )
+        if (action === userActions.EDIT) {
+          return false
         }
-        return false
+        return (
+          node.reviewStatus === nodeStatus.SUBMIT ||
+          (showRejected && node.reviewStatus === nodeStatus.REJECT)
+        )
       }
       return false
     }
@@ -436,28 +436,39 @@ export default class Helpers {
   }
 
   /**
-   * Map value from [minValue, maxValue] to [from, to]
-   * @param {Object} options
+   * Map value from [1, maxLevel] to [from, to]
+   * @param {Number} level the current level, in [1, maxLevel]
+   * @param {Number} maxLevel the maximum level
+   * @param {Number} from the minimum value
+   * @param {Number} to the maximum value
    * @return {number}
    */
-  static mapValue({ value, minValue = 1, maxValue, from, to }) {
-    if (maxValue === minValue) {
+  static mapLevel(level, maxLevel, from, to) {
+    if (maxLevel === 1) {
       return from
     }
-    return from + (to - from) * ((value - minValue) / (maxValue - minValue))
+    return from + (to - from) * ((level - 1) / (maxLevel - 1))
   }
 
   static darkenColor(color, level, maxLevel) {
     let hsl = TinyColor(color).toHsl()
-    const amount = Helpers.mapValue({
-      value: level,
-      maxValue: maxLevel,
-      from: 1,
-      to: Math.max(1 - maxLevel * 0.05, 0.7),
-    })
+    const amount = Helpers.mapLevel(
+      level,
+      maxLevel,
+      1,
+      Math.max(1 - maxLevel * 0.05, 0.7)
+    )
     hsl.s = hsl.s * amount
     hsl.l = hsl.l * amount
     return TinyColor(hsl).toHexString()
+  }
+
+  static getDropShadow(level, maxLevel, scale = 1) {
+    return {
+      offset: 4 * (maxLevel - level) * scale + 3,
+      blur: Helpers.mapLevel(level, maxLevel, 16, 5),
+      opacity: Helpers.mapLevel(level, maxLevel, 0.2, 0.5),
+    }
   }
 
   static getNodeVisibility(level, scale, depth) {

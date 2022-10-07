@@ -49,7 +49,12 @@ Cypress.Commands.add("visitTapestry", ({ skipClosingMinimap = false } = {}) => {
   cy.visit(`/tapestry/${TEST_TAPESTRY_NAME}`)
   cy.getByTestId("tapestry-loading").should("not.exist")
   if (!skipClosingMinimap) {
-    cy.getByTestId("close-minimap").click()
+    cy.get("body").then($body => {
+      const $button = $body.find(`[data-qa="close-minimap"]`)
+      if ($button.length > 0) {
+        $button.first().trigger("click")
+      }
+    })
   }
 })
 
@@ -66,17 +71,14 @@ Cypress.Commands.add("getSelectedNode", () =>
     .then(({ nodes, selectedNodeId }) => nodes[selectedNodeId])
 )
 
-Cypress.Commands.add("addNode", { prevSubject: false }, (parent, node) => {
+Cypress.Commands.add("addNode", { prevSubject: false }, (parentId, node) => {
   cy.intercept("POST", `**/nodes`).as("addNode")
   cy.store().then(store => {
-    store.dispatch("addNode", deepMerge(store.getters.createDefaultNode(), node))
-    cy.wait("@addNode")
-    cy.getNodeByTitle(node.title).then(({ id }) => {
-      store.commit("updateVisibleNodes", [...store.state.visibleNodes, id])
-      if (parent) {
-        cy.addLink(parent.id || parent, id)
-      }
+    store.dispatch("addNode", {
+      node: deepMerge(store.getters.createDefaultNode(), node),
+      parentId,
     })
+    cy.wait("@addNode")
   })
 })
 
@@ -161,6 +163,8 @@ Cypress.Commands.add("openModal", (type, id) => {
       return cy.getByTestId(`edit-node-${id}`).click()
     case "settings":
       return cy.getByTestId("settings-button").click()
+    case "user-answers":
+      return cy.getByTestId("user-answers-button").click()
     default:
       throw new Error(`Unknown modal type: ${type}`)
   }

@@ -87,9 +87,9 @@ class TapestryApi {
    *
    * @return  {Object}
    */
-  async addNode(node) {
+  async addNode(payload) {
     const url = `/tapestries/${this.postId}/nodes`
-    const response = await this.client.post(url, node)
+    const response = await this.client.post(url, payload)
     return response
   }
 
@@ -200,6 +200,12 @@ class TapestryApi {
   async completeQuestion(nodeId, questionId, answerType, answer) {
     const url = `/users/activity?post_id=${this.postId}&node_id=${nodeId}&question_id=${questionId}`
     const response = await this.client.post(url, { answerType, answer })
+    return response
+  }
+
+  async getAllUsersAnswers(nodeId) {
+    const url = `/users/answers?post_id=${this.postId}&node_id=${nodeId}`
+    const response = await this.client.get(url)
     return response
   }
 

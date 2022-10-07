@@ -136,7 +136,7 @@ export default {
       "isFavourite",
       "isMultiContent",
     ]),
-    ...mapState(["favourites", "rootId"]),
+    ...mapState(["favourites"]),
     parentNode() {
       const parentNodeId = this.getParent(this.node.id)
       return this.getNode(parentNodeId)
@@ -300,6 +300,7 @@ button[disabled] {
 }
 
 .media-container {
+  position: relative;
   height: 100%;
   width: 100%;
   max-width: 150vh;

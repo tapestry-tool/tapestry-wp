@@ -3,7 +3,7 @@
     <import-changelog :changes="changes" />
     <button class="root-node-button" data-qa="root-node-button" @click="addRootNode">
       <i class="fas fa-plus-circle fa-5x" aria-hidden="true"></i>
-      <div>Add Root Node</div>
+      <div>Add a Node</div>
     </button>
     <p>Or</p>
     <b-button class="import-button" @click="openFileBrowser">
@@ -177,17 +177,13 @@ export default {
 
 <style lang="scss" scoped>
 #root-node-button {
-  padding-top: 40px;
-  display: flex;
-  align-items: center;
-  flex-direction: column;
   z-index: 0;
 
   .root-node-button {
+    position: relative;
     background: none;
     color: inherit;
     display: inline-block;
-    margin-top: 20vh;
     text-align: center;
     cursor: pointer;
     transition: all 0.2s;
@@ -216,6 +212,7 @@ export default {
 }
 
 .import-button {
+  position: relative;
   background-color: #2c3e50;
   border: none;
   z-index: 10;
@@ -227,12 +224,11 @@ export default {
 
 .dropbox {
   width: 100%;
-  height: 85%;
+  height: calc(100% - 50px);
   border: 3px dashed black;
   position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translateX(-50%);
+  top: 50px;
+  left: 0;
   opacity: 0;
   z-index: 0;
   bottom: 0;

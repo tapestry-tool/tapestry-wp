@@ -16,12 +16,7 @@
         disabled: !isLoggedIn,
       }"
       :style="{
-        filter: `drop-shadow(${4 * (maxLevel - source.level) * scale}px ${4 *
-          (maxLevel - source.level) *
-          scale}px ${Math.max(10 - source.level, 4)}px rgba(0, 0, 0, ${Math.max(
-          0.5 - source.level * 0.05,
-          0.2
-        )}))`,
+        filter: dropShadow,
       }"
       :points="polygonPoints"
       @click="handleClick"
@@ -52,7 +47,7 @@ export default {
     },
   },
   computed: {
-    ...mapState(["visibleNodes", "rootId", "maxLevel", "currentDepth"]),
+    ...mapState(["visibleNodes", "maxLevel", "currentDepth"]),
     ...mapGetters(["getNeighbours", "isVisible"]),
     show() {
       return (
@@ -78,6 +73,14 @@ export default {
     },
     elementId() {
       return Helpers.getLinkElementId(this.source.id, this.target.id)
+    },
+    dropShadow() {
+      const { offset, blur, opacity } = Helpers.getDropShadow(
+        this.source.level,
+        this.maxLevel,
+        this.scale
+      )
+      return `drop-shadow(${offset}px ${offset}px ${blur}px rgba(0, 0, 0, ${opacity}))`
     },
   },
   methods: {

@@ -1,3 +1,5 @@
+import { roles } from "../../support/roles"
+
 describe("Activity", () => {
   it("should be able to complete drag and drop answer with items with background image and text ", () => {
     cy.fixture("one-node.json").as("oneNode")
@@ -627,6 +629,67 @@ describe("Activity", () => {
       })
       cy.getByTestId("progress-bar").should("have.css", "color", "rgb(17, 17, 17)")
       cy.lightbox().should("not.exist")
+    })
+  })
+  it("should be able to view activity answers", () => {
+    cy.fixture("one-node.json").as("oneNode")
+    cy.setup("@oneNode")
+    cy.getSelectedNode().then(node => {
+      cy.openModal("edit", node.id)
+      cy.changeMediaType("activity")
+      const question = "What's your name?"
+      const placeholder = "placeholder"
+      const answer = "Rainbow Horse"
+      cy.getByTestId("question-text-0").click()
+      cy.focused().type(question)
+      cy.getByTestId("question-answer-text-0").click({ force: true })
+      cy.getByTestId("question-answer-text-single-0").click({ force: true })
+      cy.getByTestId("question-answer-text-single-placeholder-0").type(placeholder)
+      cy.submitModal()
+
+      cy.logout()
+      cy.login("subscriber").visitTapestry()
+
+      cy.openLightbox(node.id)
+      cy.intercept("POST", "**/users/activity/**").as("submit")
+      cy.lightbox().within(() => {
+        cy.get(`[placeholder="${placeholder}"]`).should("be.visible")
+        cy.get("input").type(answer)
+        cy.contains(/submit/i).click()
+        cy.contains("You can press the button below to continue.").should(
+          "be.visible"
+        )
+        cy.contains(/done/i).click()
+      })
+      cy.lightbox().should("not.exist")
+
+      cy.logout()
+      cy.login(roles.ADMIN).visitTapestry()
+
+      cy.openModal("user-answers")
+
+      cy.getByTestId("choose-activity")
+        .find("input")
+        .click()
+      cy.getByTestId("choose-activity")
+        .contains("Root")
+        .click()
+      cy.getByTestId("choose-question")
+        .find("input")
+        .click()
+      cy.getByTestId("choose-question")
+        .contains("What's your name?")
+        .click()
+
+      cy.getByTestId("question-answers-table")
+        .scrollIntoView()
+        .should("be.visible")
+        .as("answersTable")
+
+      cy.get("@answersTable")
+        .find("tr")
+        .should("have.length.at.least", 2)
+      cy.get("@answersTable").contains(answer)
     })
   })
 })

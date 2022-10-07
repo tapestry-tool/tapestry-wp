@@ -2,14 +2,14 @@
   <main
     id="tapestry"
     ref="app"
-    :class="{ 'can-pan': canPan, panning: isPanning }"
+    :class="{ 'can-pan': canPan, panning: isPanning, empty: isEmptyTapestry }"
     :style="{
       height: appHeight,
     }"
     @mousedown="handleMousedownOnApp"
   >
-    <div v-if="empty">
-      <root-node-button v-if="canEdit" @click="addRootNode"></root-node-button>
+    <div v-if="isEmptyTapestry" class="vertical-center">
+      <root-node-button v-if="isLoggedIn"></root-node-button>
       <div v-else class="empty-message">The requested Tapestry is empty.</div>
     </div>
     <div v-else ref="dragArea">
@@ -68,30 +68,30 @@
           :viewBox="computedViewBox"
         ></locked-tooltip>
       </svg>
+      <tapestry-toolbar />
+      <tapestry-node-toolbar v-for="(node, id) in nodes" :key="id" :node="node" />
+      <tapestry-link-toolbar
+        v-for="link in links"
+        :key="`${link.source}-${link.target}`"
+        :source="nodes[link.source]"
+        :target="nodes[link.target]"
+      />
+      <tapestry-minimap
+        v-if="showMinimap"
+        ref="minimap"
+        :view-box="unscaledViewBox"
+        :scale="scale"
+        :offset="offset"
+        :isDragSelecting="isDragSelecting"
+        @pan-by="handleMinimapPanBy"
+        @pan-to="handleMinimapPanTo"
+        @close="showMinimap = false"
+      ></tapestry-minimap>
+      <tapestry-minimap-button
+        v-else
+        @click="showMinimap = true"
+      ></tapestry-minimap-button>
     </div>
-    <tapestry-toolbar />
-    <tapestry-node-toolbar v-for="(node, id) in nodes" :key="id" :node="node" />
-    <tapestry-link-toolbar
-      v-for="link in links"
-      :key="`${link.source}-${link.target}`"
-      :source="nodes[link.source]"
-      :target="nodes[link.target]"
-    />
-    <tapestry-minimap
-      v-if="showMinimap"
-      ref="minimap"
-      :view-box="unscaledViewBox"
-      :scale="scale"
-      :offset="offset"
-      :isDragSelecting="isDragSelecting"
-      @pan-by="handleMinimapPanBy"
-      @pan-to="handleMinimapPanTo"
-      @close="showMinimap = false"
-    ></tapestry-minimap>
-    <tapestry-minimap-button
-      v-else
-      @click="showMinimap = true"
-    ></tapestry-minimap-button>
   </main>
 </template>
 
@@ -158,14 +158,19 @@ export default {
       "links",
       "selection",
       "settings",
-      "rootId",
       "browserDimensions",
       "maxLevel",
       "currentDepth",
       "scaleConstants",
       "currentTool",
     ]),
-    ...mapGetters(["getNode", "getNodeNavId", "getNodeNavParent"]),
+    ...mapGetters([
+      "isEmptyTapestry",
+      "getNode",
+      "getInitialNodeId",
+      "getNodeNavId",
+      "getNodeNavParent",
+    ]),
     nodeNavLinkMode: {
       get() {
         return this.$store.state.nodeNavigation.linkMode
@@ -227,10 +232,7 @@ export default {
       return wp.canEditTapestry()
     },
     canPan() {
-      return this.currentTool === null || this.currentTool === tools.PAN
-    },
-    empty() {
-      return Object.keys(this.nodes).length === 0
+      return !this.isEmptyTapestry && (this.currentTool === null || this.currentTool === tools.PAN)
     },
     selectedId() {
       return Number(this.$route.params.nodeId)
@@ -260,7 +262,7 @@ export default {
     },
   },
   watch: {
-    empty(empty) {
+    isEmptyTapestry(empty) {
       if (!empty) {
         this.zoomPanHelper.unregister()
         this.zoomPanHelper.register()
@@ -273,16 +275,19 @@ export default {
         document.body.style.backgroundImage = background ? `url(${background})` : ""
       },
     },
+    nodes() {
+      this.updateViewBox()
+    },
     selectedId: {
       immediate: true,
       handler(nodeId) {
         if (this.$route.name === names.APP && !this.nodes.hasOwnProperty(nodeId)) {
           this.$router.replace(
-            Object.keys(this.nodes).length === 0
+            this.isEmptyTapestry
               ? { path: "/", query: this.$route.query }
               : {
                   name: names.APP,
-                  params: { nodeId: this.rootId },
+                  params: { nodeId: this.getInitialNodeId },
                   query: this.$route.query,
                 }
           )
@@ -378,7 +383,7 @@ export default {
         this.updateOffset()
         this.fetchAppDimensions()
       },
-      [this.$refs.minimap.$el],
+      () => (this.$refs.minimap ? [this.$refs.minimap.$el] : []),
       ["vue-svg"]
     )
     this.zoomPanHelper.register()
@@ -408,9 +413,6 @@ export default {
       "goToNodeSibling",
       "resetNodeNavigation",
     ]),
-    addRootNode() {
-      this.$root.$emit("add-node", null)
-    },
     updateAppHeight() {
       if (this.$refs.app) {
         const bodyHeight = document.body.getBoundingClientRect().height
@@ -477,6 +479,9 @@ export default {
       }
     },
     handleZoom(delta, x, y) {
+      if (this.isEmptyTapestry) {
+        return
+      }
       const newScale = this.clampScale(this.scale + delta)
       const scaleChange = newScale / this.scale
 
@@ -871,10 +876,13 @@ export default {
     },
     handleKey(evt) {
       // Ignore key events if focus is outside Tapestry view
-      if (!this.$refs["vue-svg"].contains(document.activeElement)) {
+      if (!this.$refs["vue-svg"]?.contains(document.activeElement)) {
         return
       }
 
+      if (this.isEmptyTapestry) {
+        return
+      }
       const { code } = evt
       const node = this.getNode(this.selectedId)
       if (code === "Enter") {
@@ -992,14 +1000,20 @@ export default {
 
   &.can-pan {
     cursor: move;
+
+    &.panning {
+      cursor: grabbing;
+    }
   }
 
-  &.panning {
-    cursor: grabbing;
-  }
-
-  .empty-message {
-    margin: 30vh auto;
+  .vertical-center {
+    position: relative;
+    padding-top: 50px;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
   }
 
   svg {

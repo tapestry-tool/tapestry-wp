@@ -25,7 +25,7 @@
         :key="level"
         href="#indicator-layer"
         x="0"
-        :y="mapValue(level)"
+        :y="getYOffset(level)"
         :fill="isVisibleLevel(level) ? '#6F8699' : '#C2C2C2'"
         :stroke="isCurrentLevel(level) ? '#49CFFF' : ''"
         :stroke-width="isCurrentLevel(level) ? 2 : 0"
@@ -82,16 +82,11 @@ export default {
       return layers
     },
   },
-  mounted() {},
-  beforeDestroy() {},
   methods: {
-    mapValue(level) {
-      return Helpers.mapValue({
-        value: level,
-        maxValue: this.maxLevel,
-        from: 0,
-        to: 100,
-      })
+    getYOffset(level) {
+      const minOffset = Math.max(0, 50 - (this.maxLevel - 1) * 10)
+      const maxOffset = Math.min(100, 50 + (this.maxLevel - 1) * 10)
+      return Helpers.mapLevel(level, this.maxLevel, minOffset, maxOffset)
     },
     isCurrentLevel(level) {
       return this.currentLevel == level

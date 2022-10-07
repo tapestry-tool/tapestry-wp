@@ -1,4 +1,17 @@
 import Helpers from "@/utils/Helpers"
+import * as wp from "../services/wp"
+
+export function isEmptyTapestry(state) {
+  return Object.keys(state.nodes).length === 0
+}
+
+export function getInitialNodeId(state) {
+  if (state.rootId) {
+    return state.rootId
+  }
+  const nodeIds = Object.keys(state.nodes)
+  return nodeIds.length === 0 ? null : parseInt(nodeIds[0])
+}
 
 export function getDirectChildren(state) {
   return id => {
@@ -86,7 +99,10 @@ export function isVisible(state, { getNode, hasMultiContentAncestor }) {
     if (!Helpers.hasPermission(node, "read", showRejected)) {
       return false
     }
-    if (!Helpers.hasPermission(node, "edit", showRejected)) {
+    if (
+      !Helpers.hasPermission(node, "edit", showRejected) &&
+      !wp.canEditTapestry()
+    ) {
       return (
         (node.unlocked || !node.hideWhenLocked) && !hasMultiContentAncestor(node.id)
       )

@@ -253,7 +253,7 @@ export default {
       if (!this.isLoggedIn) {
         return false
       }
-      if (this.node.author.id === wp.getCurrentUser().id) {
+      if (parseInt(this.node.author.id) === wp.getCurrentUser().id) {
         return this.node.status === nodeStatus.DRAFT
       }
       if (wp.canEditTapestry()) {
