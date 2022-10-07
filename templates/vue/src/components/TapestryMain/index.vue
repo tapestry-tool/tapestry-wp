@@ -232,7 +232,10 @@ export default {
       return wp.canEditTapestry()
     },
     canPan() {
-      return !this.isEmptyTapestry && (this.currentTool === null || this.currentTool === tools.PAN)
+      return (
+        !this.isEmptyTapestry &&
+        (this.currentTool === null || this.currentTool === tools.PAN)
+      )
     },
     selectedId() {
       return Number(this.$route.params.nodeId)
