@@ -75,7 +75,7 @@
 </template>
 
 <script>
-import { mapState, mapGetters, mapActions, mapMutations } from "vuex"
+import { mapState, mapGetters, mapActions } from "vuex"
 import CompletedIcon from "@/components/common/CompletedIcon"
 import LockedContent from "./common/LockedContent"
 import PageMenu from "./PageMenu"
@@ -212,8 +212,7 @@ export default {
     }
   },
   methods: {
-    ...mapMutations(["updateNode"]),
-    ...mapActions(["completeNode", "toggleFavourite"]),
+    ...mapActions(["completeNode"]),
     updateDimensions() {
       // this setTimeout is a way to run code after everything has been rendered by Vue, not just the component itself (to avoid resulting in a boundingClientRect of 0 by 0)
       setTimeout(() => {
