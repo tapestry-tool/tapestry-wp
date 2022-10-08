@@ -85,7 +85,9 @@ export default {
   },
   methods: {
     handleClick() {
-      this.$root.$emit("context-toolbar::click", this.elementId)
+      // TODO: remove after link context toolbar is implemented
+      this.openLinkModal()
+      // this.$root.$emit("context-toolbar::click", this.elementId)
     },
     openLinkModal() {
       this.$router.push({
