@@ -14,10 +14,10 @@
       <slot></slot>
     </button>
     <b-tooltip
-      :custom-class="horizontal ? 'offset-bottom' : 'offset-left'"
+      :custom-class="`button-tooltip ${tooltipPlacementValue}`"
       :target="id"
       triggers="hover"
-      :placement="horizontal ? 'top' : 'right'"
+      :placement="tooltipPlacementValue"
     >
       {{ tooltip }}
     </b-tooltip>
@@ -53,11 +53,23 @@ export default {
       required: false,
       default: false,
     },
+    tooltipPlacement: {
+      type: String,
+      required: false,
+      default: null,
+    },
   },
   computed: {
     ...mapState(["currentTool"]),
     isSelected() {
       return this.currentTool && this.tool === this.currentTool
+    },
+    tooltipPlacementValue() {
+      return this.tooltipPlacement
+        ? this.tooltipPlacement
+        : this.horizontal
+        ? "top"
+        : "right"
     },
   },
   methods: {
@@ -92,11 +104,21 @@ export default {
   }
 }
 
-.offset-left {
-  left: 24px !important;
-}
+.button-tooltip {
+  .top {
+    top: -14px !important;
+  }
 
-.offset-bottom {
-  top: -12px !important;
+  .bottom {
+    top: 14px !important;
+  }
+
+  .right {
+    left: 24px !important;
+  }
+
+  .left {
+    left: -24px !important;
+  }
 }
 </style>

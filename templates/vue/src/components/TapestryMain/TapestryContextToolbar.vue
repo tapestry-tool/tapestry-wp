@@ -4,7 +4,7 @@
     :target="target"
     :show="show"
     triggers=""
-    placement="top"
+    :placement="placement"
     custom-class="popover-root"
   >
     <div class="toolbar">
@@ -21,6 +21,11 @@ export default {
     target: {
       type: String,
       required: true,
+    },
+    placement: {
+      type: String,
+      required: false,
+      default: "top",
     },
   },
   data() {
@@ -48,6 +53,11 @@ export default {
         this.show = false
       }
     })
+  },
+  methods: {
+    toggleVisible() {
+      this.show = !this.show
+    },
   },
 }
 </script>
