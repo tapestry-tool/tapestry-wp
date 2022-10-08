@@ -46,6 +46,25 @@ export const userActions = {
 
 export const DEFAULT_DEPTH = 3
 
+export const swatches = [
+  { color: "#1FBC9C", label: "Light Sea Green" },
+  { color: "#1CA085", label: "Jungle Green" },
+  { color: "#2ECC70", label: "Emerald" },
+  { color: "#27AF60", label: "Green" },
+  { color: "#3398DB", label: "Blue" },
+  { color: "#2980B9", label: "Dark Blue" },
+  { color: "#A463BF", label: "Amethyst" },
+  { color: "#8E43AD", label: "Purple" },
+  { color: "#3D556E", label: "Dimmed Blue" },
+  { color: "#222F3D", label: "Dark Grey" },
+  { color: "#F2C511", label: "Yellow" },
+  { color: "#F39C19", label: "Orange" },
+  { color: "#E84B3C", label: "Red" },
+  { color: "#C0382B", label: "Dark Red" },
+  { color: "#DDE6E8", label: "Silver" },
+  { color: "#BDC3C8", label: "Platinum" },
+]
+
 // * DEV: this is not used; use store.state.scaleConstants temporarily
 export const scaleConstants = {
   levelMultiplier: 1.7, // higher -> deep nodes get revealed faster
