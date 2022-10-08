@@ -4,10 +4,13 @@
       :id="`delete-node-button-${node.id}`"
       horizontal
       tooltip="Delete Node"
+      @click="handleDeleteNode"
     >
       <i class="fas fa-trash-alt fa-lg"></i>
     </tapestry-toolbar-button>
+
     <div class="tapestry-toolbar-separator"></div>
+
     <tapestry-toolbar-button
       :id="`hide-title-button-${node.id}`"
       horizontal
@@ -42,12 +45,14 @@
         :id="`title-color-button-${node.id}`"
         slot="trigger"
         horizontal
-        tooltip="Change Background"
+        tooltip="Change Text Color"
       >
         <i class="fas fa-font fa-lg"></i>
       </tapestry-toolbar-button>
     </v-swatches>
+
     <div class="tapestry-toolbar-separator"></div>
+
     <tapestry-toolbar-button
       :id="`background-button-${node.id}`"
       horizontal
@@ -98,6 +103,24 @@
         ></v-swatches>
       </tapestry-toolbar-button>
     </tapestry-context-toolbar>
+
+    <div class="tapestry-toolbar-separator"></div>
+
+    <b-dropdown
+      variant="none"
+      no-caret
+      toggle-class="more-actions-button"
+      :toggle-attrs="{
+        'aria-label': 'Other Node Actions',
+      }"
+    >
+      <template #button-content>
+        <i class="fas fa-ellipsis-h"></i>
+      </template>
+      <b-dropdown-item-button>
+        Lock Node
+      </b-dropdown-item-button>
+    </b-dropdown>
   </tapestry-context-toolbar>
 </template>
 
@@ -134,7 +157,7 @@ export default {
     },
   },
   methods: {
-    ...mapActions(["updateNode"]),
+    ...mapActions(["updateNode", "deleteNode"]),
     setField(field, value) {
       this.updateNode({
         id: this.node.id,
@@ -145,6 +168,21 @@ export default {
     },
     toggleBackgroundToolbar() {
       this.$refs.backgroundToolbar.toggleVisible()
+    },
+    handleDeleteNode() {
+      this.$bvModal
+        .msgBoxConfirm(`Are you sure you want to delete ${this.node.title}?`, {
+          modalClass: "node-modal-confirmation",
+          title: "Are you sure you want to delete this node?",
+          okTitle: "Yes, Delete!",
+          okVariant: "danger",
+        })
+        .then(close => {
+          if (close) {
+            this.deleteNode(this.node.id)
+          }
+        })
+        .catch(err => console.log(err))
     },
   },
 }
@@ -174,5 +212,16 @@ export default {
   width: 1.5rem;
   height: 1.5rem;
   border-radius: 50%;
+}
+</style>
+
+<style lang="scss">
+.more-actions-button {
+  &:focus,
+  &:hover {
+    background: none;
+    outline: none;
+    box-shadow: none !important; // Remove Bootstrap focus outline
+  }
 }
 </style>
