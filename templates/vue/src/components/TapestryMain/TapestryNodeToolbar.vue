@@ -40,6 +40,7 @@
       popover-x="right"
       class="swatch"
       @input="setField('textColor', $event)"
+      @open="hidePopupToolbars"
     >
       <tapestry-toolbar-button
         :id="`title-color-button-${node.id}`"
@@ -98,6 +99,7 @@
           fallback-input-type="color"
           row-length="8"
           popover-x="right"
+          popover-y="top"
           class="swatch"
           @input="setField('backgroundColor', $event)"
         ></v-swatches>
@@ -113,6 +115,7 @@
       :toggle-attrs="{
         'aria-label': 'Other Node Actions',
       }"
+      @show="hidePopupToolbars"
     >
       <template #button-content>
         <i class="fas fa-ellipsis-h"></i>
@@ -158,7 +161,11 @@ export default {
   },
   methods: {
     ...mapActions(["updateNode", "deleteNode"]),
+    hidePopupToolbars() {
+      this.$refs.backgroundToolbar.hide()
+    },
     setField(field, value) {
+      this.hidePopupToolbars()
       this.updateNode({
         id: this.node.id,
         newNode: {
@@ -170,6 +177,7 @@ export default {
       this.$refs.backgroundToolbar.toggleVisible()
     },
     handleDeleteNode() {
+      this.hidePopupToolbars()
       this.$bvModal
         .msgBoxConfirm(`Are you sure you want to delete ${this.node.title}?`, {
           modalClass: "node-modal-confirmation",

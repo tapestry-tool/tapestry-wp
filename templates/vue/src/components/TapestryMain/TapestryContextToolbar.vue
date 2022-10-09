@@ -58,6 +58,9 @@ export default {
     toggleVisible() {
       this.show = !this.show
     },
+    hide() {
+      this.show = false
+    },
   },
 }
 </script>
