@@ -245,7 +245,6 @@ export default {
       if (!empty) {
         this.zoomPanHelper.unregister()
         this.zoomPanHelper.register()
-        this.registerKeyHandler()
       }
     },
     background: {
