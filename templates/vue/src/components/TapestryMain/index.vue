@@ -750,6 +750,10 @@ export default {
         },
         () => {
           this.updateScale()
+          this.$root.$emit(
+            "context-toolbar::click",
+            Helpers.getNodeElementId(node.id)
+          )
         },
         "easeOut"
       )

@@ -556,7 +556,6 @@ export default {
           : this.updateRootNode()
       }
       client.recordAnalyticsEvent("user", "click", "node", this.node.id)
-      this.$root.$emit("context-toolbar::click", this.elementId)
     },
     handleFocus() {
       this.isFocused = true
