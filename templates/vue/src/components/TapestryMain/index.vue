@@ -269,7 +269,6 @@ export default {
       if (!empty) {
         this.zoomPanHelper.unregister()
         this.zoomPanHelper.register()
-        this.registerKeyHandler()
       }
     },
     background: {
@@ -633,52 +632,53 @@ export default {
         const { width, height } = this.$refs.app.getBoundingClientRect()
         const { x0, y0, x, y } = this.getNodeDimensions()
 
-        const tapestryDimensions = {
+        const boundaries = {
           startX: x0 - MAX_RADIUS * 1.25,
           startY: y0 - MAX_RADIUS * 1.25,
-          width: x + MAX_RADIUS * 1.25,
-          height: y + MAX_RADIUS * 1.25,
+          endX: x + MAX_RADIUS * 1.25,
+          endY: y + MAX_RADIUS * 1.25,
         }
-        const tapestryWidth = tapestryDimensions.width - tapestryDimensions.startX
-        const tapestryHeight = tapestryDimensions.height - tapestryDimensions.startY
+        const tapestry = {
+          x: boundaries.startX,
+          y: boundaries.startY,
+          width: boundaries.endX - boundaries.startX,
+          height: boundaries.endY - boundaries.startY,
+        }
 
+        // add spaces to the sides if the tapestry is too narrow or too tall
         const appAspectRatio = width / height
-        const tapestryAspectRatio = tapestryWidth / tapestryHeight
+        const tapestryAspectRatio = tapestry.width / tapestry.height
         if (appAspectRatio > tapestryAspectRatio) {
-          const targetWidth = tapestryHeight * appAspectRatio
-          const widthDiff = targetWidth - tapestryWidth
-          tapestryDimensions.width += widthDiff / 2
-          tapestryDimensions.startX -= widthDiff / 2
+          const targetWidth = tapestry.height * appAspectRatio
+          const widthDiff = targetWidth - tapestry.width
+          tapestry.width += widthDiff
+          tapestry.x -= widthDiff / 2
         } else {
-          const targetHeight = tapestryWidth / appAspectRatio
-          const heightDiff = targetHeight - tapestryHeight
-          tapestryDimensions.height += heightDiff / 2
-          tapestryDimensions.startY -= heightDiff / 2
+          const targetHeight = tapestry.width / appAspectRatio
+          const heightDiff = targetHeight - tapestry.height
+          tapestry.height += heightDiff
+          tapestry.y -= heightDiff / 2
         }
 
-        // const windowWidth = this.browserDimensions.width
-        // Center the nodes if there is not enough of them to fill the width of the screen
-        // if (
-        //   tapestryDimensions.width - tapestryDimensions.startX - MAX_RADIUS * 1.25 <
-        //   windowWidth
-        // ) {
-        //   tapestryDimensions.startX -=
-        //     (windowWidth - tapestryDimensions.width + tapestryDimensions.startX) /
-        //       2 +
-        //     MAX_RADIUS
-        // }
-
-        const MIN_WIDTH = this.browserDimensions.width * MIN_TAPESTRY_WIDTH_FACTOR
-        const MIN_HEIGHT = this.browserDimensions.height * MIN_TAPESTRY_WIDTH_FACTOR
+        // expand the view to the min. width and height if needed, and center the tapestry
+        const MIN_WIDTH = width * MIN_TAPESTRY_WIDTH_FACTOR
+        const MIN_HEIGHT = height * MIN_TAPESTRY_WIDTH_FACTOR
+        if (tapestry.width < MIN_WIDTH) {
+          const widthDiff = MIN_WIDTH - tapestry.width
+          tapestry.width += widthDiff
+          tapestry.x -= widthDiff / 2
+        }
+        if (tapestry.height < MIN_HEIGHT) {
+          const heightDiff = MIN_HEIGHT - tapestry.height
+          tapestry.height += heightDiff
+          tapestry.y -= heightDiff / 2
+        }
 
         this.unscaledViewBox = [
-          tapestryDimensions.startX,
-          tapestryDimensions.startY,
-          Math.max(tapestryDimensions.width - tapestryDimensions.startX, MIN_WIDTH),
-          Math.max(
-            tapestryDimensions.height - tapestryDimensions.startY,
-            MIN_HEIGHT
-          ),
+          tapestry.x,
+          tapestry.y,
+          tapestry.width,
+          tapestry.height,
         ]
         this.viewBox = [
           this.unscaledViewBox[0] * this.scale,
