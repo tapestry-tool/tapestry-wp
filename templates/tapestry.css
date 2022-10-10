@@ -38,6 +38,10 @@ li p {
     margin-bottom: 0;
 }
 
+.content-area {
+    padding: 0 !important;
+}
+
 #header {
     position: fixed;
     top: 1em;
