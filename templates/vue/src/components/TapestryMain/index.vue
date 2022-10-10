@@ -20,7 +20,15 @@
         role="application"
         aria-label="Main Tapestry View"
         :viewBox="computedViewBox"
+        @mousemove="handleMousemoveOnSvg"
       >
+        <tapestry-link-placeholder
+          v-if="linkToolNode"
+          ref="linkPlaceholder"
+          :node="linkToolNode"
+          :scale="scale"
+          :coordinates="mouseCoordinates"
+        />
         <g v-for="r in renderedLevels" :key="r.level">
           <g class="node-shadows">
             <tapestry-node-shadow
@@ -111,6 +119,7 @@ import TapestryNodeToolbar from "./TapestryNodeToolbar"
 import TapestryLinkToolbar from "./TapestryLinkToolbar"
 import TapestryNodeShadow from "./TapestryNodeShadow"
 import TapestryNodePlaceholder from "./TapestryNodePlaceholder"
+import TapestryLinkPlaceholder from "./TapestryLinkPlaceholder"
 import TapestryMinimapButton from "./TapestryMinimap/TapestryMinimapButton"
 import TapestryMinimap from "./TapestryMinimap"
 import RootNodeButton from "./RootNodeButton"
@@ -132,6 +141,7 @@ export default {
     TapestryLinkToolbar,
     TapestryNodeShadow,
     TapestryNodePlaceholder,
+    TapestryLinkPlaceholder,
     TapestryMinimapButton,
     TapestryMinimap,
     RootNodeButton,
@@ -157,7 +167,8 @@ export default {
       dragEdgeDirection: { x: 0, y: 0 },
       dragOffsetDelta: { x: 0, y: 0 },
 
-      mouseCoordinates: null,
+      mouseCoordinates: { x: 0, y: 0 },
+      linkToolNode: null,
 
       showMinimap: true,
     }
@@ -338,25 +349,11 @@ export default {
         el?.focus()
       },
     },
-    currentTool(newTool, oldTool) {
+    currentTool(newTool) {
       if (this.dragSelectEnabled && newTool === tools.SELECT) {
         DragSelectModular.initializeDragSelect(this.$refs.dragArea, this, this.nodes)
       } else {
         DragSelectModular.disableDragSelect()
-      }
-
-      if (newTool === tools.ADD_NODE) {
-        this.$refs["vue-svg"].addEventListener(
-          "mousemove",
-          this.handleMousemoveOnSvg
-        )
-      }
-      if (oldTool === tools.ADD_NODE) {
-        this.$refs["vue-svg"].removeEventListener(
-          "mousemove",
-          this.handleMousemoveOnSvg
-        )
-        this.mouseCoordinates = null
       }
     },
   },
@@ -439,6 +436,7 @@ export default {
       "goToNodeParent",
       "goToNodeSibling",
       "resetNodeNavigation",
+      "addLink",
     ]),
     updateAppHeight() {
       if (this.$refs.app) {
@@ -733,6 +731,30 @@ export default {
       return box
     },
     handleNodeClick(node) {
+      if (this.currentTool === tools.ADD_LINK) {
+        if (this.linkToolNode === null) {
+          this.linkToolNode = node
+        } else if (node.id === this.linkToolNode.id) {
+          this.linkToolNode = null
+        } else {
+          const linkExists = this.links.some(
+            link =>
+              (link.source === this.linkToolNode.id && link.target === node.id) ||
+              (link.source === node.id && link.target === this.linkToolNode.id)
+          )
+          if (!linkExists) {
+            this.$refs.linkPlaceholder.freeze()
+            this.addLink({ source: this.linkToolNode.id, target: node.id }).then(
+              () => {
+                this.$refs.linkPlaceholder.unfreeze()
+                this.linkToolNode = null
+              }
+            )
+          }
+        }
+        return
+      }
+
       // zoom to the level that the node is on, and pan towards the node
       const targetScale = Helpers.getTargetScale(node.level)
       const deltaScale = targetScale - this.scale

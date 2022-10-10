@@ -1,13 +1,9 @@
 <template>
   <transition name="fade">
     <circle
-      v-show="shouldShow"
+      v-show="show"
       ref="circle"
-      :transform="
-        coordinates === null
-          ? `translate(0, 0)`
-          : `translate(${coordinates.x}, ${coordinates.y})`
-      "
+      :transform="`translate(${coordinates.x}, ${coordinates.y})`"
       :fill="fill"
       :style="{
         filter: dropShadow,
@@ -36,8 +32,7 @@ export default {
     },
     coordinates: {
       type: Object,
-      required: false,
-      default: null,
+      required: true,
     },
   },
   data() {
@@ -48,9 +43,6 @@ export default {
   },
   computed: {
     ...mapState(["maxLevel"]),
-    shouldShow() {
-      return this.show && this.coordinates !== null
-    },
     radius() {
       return Helpers.getNodeRadius(this.node.level, this.scale)
     },
