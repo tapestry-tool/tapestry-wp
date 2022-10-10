@@ -349,11 +349,15 @@ export default {
         el?.focus()
       },
     },
-    currentTool(newTool) {
+    currentTool(newTool, oldTool) {
       if (this.dragSelectEnabled && newTool === tools.SELECT) {
         DragSelectModular.initializeDragSelect(this.$refs.dragArea, this, this.nodes)
       } else {
         DragSelectModular.disableDragSelect()
+      }
+
+      if (oldTool === tools.ADD_LINK) {
+        this.linkToolNode = null
       }
     },
   },
