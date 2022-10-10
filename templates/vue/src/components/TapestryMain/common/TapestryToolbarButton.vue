@@ -1,18 +1,16 @@
 <template>
-  <div>
-    <button
-      :id="id"
-      :class="[
-        'tapestry-toolbar-button',
-        'm-2',
-        {
-          selected: isSelected,
-        },
-      ]"
-      @click="handleClick"
-    >
+  <button
+    :id="id"
+    class="tapestry-toolbar-button"
+    :class="{
+      horizontal: horizontal,
+      selected: isSelected,
+    }"
+    @click="handleClick"
+  >
+    <div class="button-content">
       <slot></slot>
-    </button>
+    </div>
     <b-tooltip
       :custom-class="`button-tooltip ${tooltipPlacementValue}`"
       :target="id"
@@ -21,7 +19,7 @@
     >
       {{ tooltip }}
     </b-tooltip>
-  </div>
+  </button>
 </template>
 
 <script>
@@ -58,11 +56,16 @@ export default {
       required: false,
       default: null,
     },
+    active: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   computed: {
     ...mapState(["currentTool"]),
     isSelected() {
-      return this.currentTool && this.tool === this.currentTool
+      return this.active || (this.currentTool && this.tool === this.currentTool)
     },
     tooltipPlacementValue() {
       return this.tooltipPlacement
@@ -93,14 +96,22 @@ export default {
 
 <style lang="scss" scoped>
 .tapestry-toolbar-button {
-  color: var(--text-color-tertiary);
+  color: #59595b;
   padding: 0;
   background: none;
   font-size: 1.2em;
   transition: all 0.2s ease;
 
   &.selected {
-    color: var(--highlight-color);
+    background: #d7d7d7;
+  }
+
+  .button-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
   }
 }
 

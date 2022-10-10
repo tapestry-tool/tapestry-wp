@@ -7,7 +7,7 @@
     :placement="placement"
     custom-class="popover-root"
   >
-    <div class="toolbar">
+    <div class="tapestry-context-toolbar">
       <slot></slot>
     </div>
   </b-popover>
@@ -39,6 +39,15 @@ export default {
       return `${this.target}-menu`
     },
   },
+  watch: {
+    show(show) {
+      if (show) {
+        this.$emit("show")
+      } else {
+        this.$emit("hide")
+      }
+    },
+  },
   mounted() {
     this.$root.$on("bv::modal::show", () => {
       this.show = false
@@ -57,6 +66,7 @@ export default {
   methods: {
     toggleVisible() {
       this.show = !this.show
+      return this.show
     },
     hide() {
       this.show = false
@@ -67,17 +77,10 @@ export default {
 
 <style lang="scss" scoped>
 .popover-root {
-  padding: 0 4px;
-  background-color: var(--bg-color-secondary);
-  border: 2px solid #fafafa;
+  background-color: #ededed;
+  border: 2px solid #f8f8f8;
   border-radius: 9px;
-
-  .toolbar {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: stretch;
-  }
+  max-width: none !important;
 
   // override BootstrapVue popover styles
   ::v-deep .arrow {
@@ -92,7 +95,22 @@ export default {
 <style lang="scss">
 .tapestry-toolbar-separator {
   width: 2px;
-  background-color: #fafafa;
-  margin: 0 4px;
+  background-color: #f8f8f8;
+}
+.tapestry-context-toolbar {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: stretch;
+
+  &:first-child > :first-child {
+    border-top-left-radius: 9px;
+    border-bottom-left-radius: 9px;
+  }
+
+  &:last-child > :last-child {
+    border-top-right-radius: 9px;
+    border-bottom-right-radius: 9px;
+  }
 }
 </style>

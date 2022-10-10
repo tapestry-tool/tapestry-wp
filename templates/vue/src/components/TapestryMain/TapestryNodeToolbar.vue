@@ -1,7 +1,8 @@
 <template>
-  <tapestry-context-toolbar :target="nodeElementId">
+  <tapestry-context-toolbar :target="nodeElementId" @hide="resetActiveButton">
     <tapestry-toolbar-button
       :id="`delete-node-button-${node.id}`"
+      class="after-separator before-separator"
       horizontal
       tooltip="Delete Node"
       @click="handleDeleteNode"
@@ -13,6 +14,7 @@
 
     <tapestry-toolbar-button
       :id="`hide-title-button-${node.id}`"
+      class="after-separator"
       horizontal
       :tooltip="node.hideTitle ? 'Show Title' : 'Hide Title'"
       @click="setField('hideTitle', !node.hideTitle)"
@@ -40,13 +42,16 @@
       popover-x="right"
       class="swatch"
       @input="setField('textColor', $event)"
-      @open="hidePopupToolbars"
+      @open="handleOpen('textColor')"
+      @close="handleClose('textColor')"
     >
       <tapestry-toolbar-button
         :id="`title-color-button-${node.id}`"
         slot="trigger"
+        class="before-separator"
         horizontal
         tooltip="Change Text Color"
+        :active="activeButton === 'textColor'"
       >
         <i class="fas fa-font fa-lg"></i>
       </tapestry-toolbar-button>
@@ -56,8 +61,10 @@
 
     <tapestry-toolbar-button
       :id="`background-button-${node.id}`"
+      class="after-separator before-separator"
       horizontal
       tooltip="Change Background"
+      :active="activeButton === 'background'"
       @click="toggleBackgroundToolbar"
     >
       <i v-if="node.imageURL" class="fas fa-image fa-lg"></i>
@@ -73,37 +80,39 @@
         horizontal
         tooltip="Change Background Image"
         tooltip-placement="bottom"
+        :active="activeBackgroundButton === 'image'"
       >
         <i class="fas fa-image fa-lg"></i>
       </tapestry-toolbar-button>
-      <tapestry-toolbar-button
-        :id="`background-color-button-${node.id}`"
-        horizontal
-        tooltip="Change Background Color"
-        tooltip-placement="bottom"
+      <v-swatches
+        :value="node.backgroundColor"
+        :swatches="swatches"
+        show-fallback
+        show-border
+        shapes="circles"
+        swatch-size="30"
+        :wrapper-style="{ zIndex: 1000 }"
+        fallback-input-type="color"
+        row-length="8"
+        popover-x="right"
+        popover-y="top"
+        class="swatch"
+        @input="setField('backgroundColor', $event)"
+        @open="activeBackgroundButton = 'color'"
+        @close="handleBackgroundClose('color')"
       >
-        <v-swatches
-          ref="swatches"
-          :value="node.backgroundColor"
-          :swatches="swatches"
-          show-fallback
-          show-border
-          shapes="circles"
-          swatch-size="30"
-          :trigger-style="{
-            width: '20px',
-            height: '20px',
-            border: 'solid 1px #aaa',
-          }"
-          :wrapper-style="{ zIndex: 1000 }"
-          fallback-input-type="color"
-          row-length="8"
-          popover-x="right"
-          popover-y="top"
-          class="swatch"
-          @input="setField('backgroundColor', $event)"
-        ></v-swatches>
-      </tapestry-toolbar-button>
+        <tapestry-toolbar-button
+          :id="`background-color-button-${node.id}`"
+          slot="trigger"
+          class="before-separator"
+          horizontal
+          tooltip="Change Background Color"
+          tooltip-placement="bottom"
+          :active="activeBackgroundButton === 'color'"
+        >
+          <div class="circle" :style="{ background: node.backgroundColor }"></div>
+        </tapestry-toolbar-button>
+      </v-swatches>
     </tapestry-context-toolbar>
 
     <div class="tapestry-toolbar-separator"></div>
@@ -111,14 +120,22 @@
     <b-dropdown
       variant="none"
       no-caret
-      toggle-class="more-actions-button"
+      toggle-class="more-actions-button after-separator before-separator"
       :toggle-attrs="{
         'aria-label': 'Other Node Actions',
       }"
-      @show="hidePopupToolbars"
+      @show="handleOpen('moreActions')"
+      @hide="handleClose('moreActions')"
     >
       <template #button-content>
-        <i class="fas fa-ellipsis-h"></i>
+        <tapestry-toolbar-button
+          :id="`more-actions-button-${node.id}`"
+          horizontal
+          tooltip="Other Node Actions"
+          :active="activeButton === 'moreActions'"
+        >
+          <i class="fas fa-ellipsis-h"></i>
+        </tapestry-toolbar-button>
       </template>
       <b-dropdown-item-button>
         Lock Node
@@ -152,6 +169,9 @@ export default {
     return {
       tools: tools,
       swatches: swatches,
+
+      activeButton: null,
+      activeBackgroundButton: null,
     }
   },
   computed: {
@@ -174,7 +194,30 @@ export default {
       })
     },
     toggleBackgroundToolbar() {
-      this.$refs.backgroundToolbar.toggleVisible()
+      const isVisible = this.$refs.backgroundToolbar.toggleVisible()
+      if (isVisible) {
+        this.activeButton = "background"
+      } else if (this.activeButton === "background") {
+        this.activeButton = null
+      }
+    },
+    resetActiveButton() {
+      this.activeButton = null
+      this.activeBackgroundButton = null
+    },
+    handleOpen(button) {
+      this.activeButton = button
+      this.hidePopupToolbars()
+    },
+    handleClose(button) {
+      if (this.activeButton === button) {
+        this.activeButton = null
+      }
+    },
+    handleBackgroundClose(button) {
+      if (this.activeBackgroundButton === button) {
+        this.activeBackgroundButton = null
+      }
     },
     handleDeleteNode() {
       this.hidePopupToolbars()
@@ -197,6 +240,14 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.before-separator {
+  padding-right: 4px;
+}
+
+.after-separator {
+  padding-left: 4px;
+}
+
 .hide-title-text {
   position: relative;
 
@@ -225,6 +276,8 @@ export default {
 
 <style lang="scss">
 .more-actions-button {
+  padding: 0 !important; // Remove Bootstrap padding
+
   &:focus,
   &:hover {
     background: none;
