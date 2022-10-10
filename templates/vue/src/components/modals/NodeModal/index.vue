@@ -740,9 +740,16 @@ export default {
       }
     },
     close(event = null) {
+      const updatedQuery = {
+        ...this.$route.query,
+        nav: undefined,
+        popup: undefined,
+        nodeX: undefined,
+        nodeY: undefined,
+      }
       if (this.show) {
         if (this.isEmptyTapestry) {
-          this.$router.push({ path: "/", query: this.$route.query })
+          this.$router.push({ path: "/", query: updatedQuery })
         } else if (this.returnRoute) {
           this.$router.push(this.returnRoute)
         } else if (this.keepOpen) {
@@ -753,7 +760,7 @@ export default {
               type: "edit",
               tab: "content",
             },
-            query: this.$route.query,
+            query: updatedQuery,
           })
           this.loading = false
         } else if (!this.nodeId || event === "delete") {
@@ -761,7 +768,7 @@ export default {
           this.$router.push({
             name: names.APP,
             params: { nodeId: this.getInitialNodeId },
-            query: this.$route.query,
+            query: updatedQuery,
           })
         } else if (
           this.isMultiContentNodeChild &&
@@ -775,13 +782,13 @@ export default {
           this.$router.push({
             name: names.MODAL,
             params: { nodeId: this.parent.id, type: "edit", tab: "content" },
-            query: this.$route.query,
+            query: updatedQuery,
           })
         } else {
           this.$router.push({
             name: names.APP,
             params: { nodeId: this.nodeId },
-            query: { ...this.$route.query, nav: undefined, popup: undefined },
+            query: updatedQuery,
           })
         }
       }
@@ -1020,8 +1027,17 @@ export default {
       }
     },
     updateNodeCoordinates() {
-      if (this.type === "add" && this.parent) {
-        this.coinToss() ? this.calculateX(false) : this.calculateY(false)
+      if (this.type === "add") {
+        if (this.parent) {
+          this.coinToss() ? this.calculateX(false) : this.calculateY(false)
+        } else if (this.$route.query.nodeX && this.$route.query.nodeY) {
+          const x = parseFloat(this.$route.query.nodeX)
+          const y = parseFloat(this.$route.query.nodeY)
+          if (!isNaN(x) && !isNaN(y)) {
+            this.update("coordinates.x", x)
+            this.update("coordinates.y", y)
+          }
+        }
       }
     },
     validateNode() {

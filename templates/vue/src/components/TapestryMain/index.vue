@@ -2,7 +2,8 @@
   <main
     id="tapestry"
     ref="app"
-    :class="{ 'can-pan': canPan, panning: isPanning, empty: isEmptyTapestry }"
+    :class="{ panning: isPanning, empty: isEmptyTapestry }"
+    :data-tool="currentTool"
     :style="{
       height: appHeight,
     }"
@@ -62,6 +63,11 @@
             ></tapestry-node>
           </g>
         </g>
+        <tapestry-node-placeholder
+          :scale="scale"
+          :show="showNodePlaceholder"
+          :coordinates="mouseCoordinates"
+        />
         <locked-tooltip
           v-if="activeNode"
           :node="nodes[activeNode]"
@@ -104,6 +110,7 @@ import TapestryToolbar from "./TapestryToolbar"
 import TapestryNodeToolbar from "./TapestryNodeToolbar"
 import TapestryLinkToolbar from "./TapestryLinkToolbar"
 import TapestryNodeShadow from "./TapestryNodeShadow"
+import TapestryNodePlaceholder from "./TapestryNodePlaceholder"
 import TapestryMinimapButton from "./TapestryMinimap/TapestryMinimapButton"
 import TapestryMinimap from "./TapestryMinimap"
 import RootNodeButton from "./RootNodeButton"
@@ -124,6 +131,7 @@ export default {
     TapestryNodeToolbar,
     TapestryLinkToolbar,
     TapestryNodeShadow,
+    TapestryNodePlaceholder,
     TapestryMinimapButton,
     TapestryMinimap,
     RootNodeButton,
@@ -148,6 +156,8 @@ export default {
       dragTimer: null,
       dragEdgeDirection: { x: 0, y: 0 },
       dragOffsetDelta: { x: 0, y: 0 },
+
+      mouseCoordinates: null,
 
       showMinimap: true,
     }
@@ -237,6 +247,9 @@ export default {
         (this.currentTool === null || this.currentTool === tools.PAN)
       )
     },
+    showNodePlaceholder() {
+      return this.currentTool === tools.ADD_NODE
+    },
     selectedId() {
       return Number(this.$route.params.nodeId)
     },
@@ -266,8 +279,10 @@ export default {
   },
   watch: {
     isEmptyTapestry(empty) {
-      if (!empty) {
+      if (empty) {
         this.zoomPanHelper.unregister()
+        this.setCurrentTool(null)
+      } else {
         this.zoomPanHelper.register()
       }
     },
@@ -323,18 +338,26 @@ export default {
         el?.focus()
       },
     },
-    currentTool: {
-      handler(newTool) {
-        if (this.dragSelectEnabled && newTool === tools.SELECT) {
-          DragSelectModular.initializeDragSelect(
-            this.$refs.dragArea,
-            this,
-            this.nodes
-          )
-        } else {
-          DragSelectModular.disableDragSelect()
-        }
-      },
+    currentTool(newTool, oldTool) {
+      if (this.dragSelectEnabled && newTool === tools.SELECT) {
+        DragSelectModular.initializeDragSelect(this.$refs.dragArea, this, this.nodes)
+      } else {
+        DragSelectModular.disableDragSelect()
+      }
+
+      if (newTool === tools.ADD_NODE) {
+        this.$refs["vue-svg"].addEventListener(
+          "mousemove",
+          this.handleMousemoveOnSvg
+        )
+      }
+      if (oldTool === tools.ADD_NODE) {
+        this.$refs["vue-svg"].removeEventListener(
+          "mousemove",
+          this.handleMousemoveOnSvg
+        )
+        this.mouseCoordinates = null
+      }
     },
   },
   created() {
@@ -388,7 +411,9 @@ export default {
       () => (this.$refs.minimap ? [this.$refs.minimap.$el] : []),
       ["vue-svg"]
     )
-    this.zoomPanHelper.register()
+    if (!this.isEmptyTapestry) {
+      this.zoomPanHelper.register()
+    }
     this.$refs.app.addEventListener("keydown", this.handleKey)
 
     this.$nextTick(() => {
@@ -997,6 +1022,20 @@ export default {
     handleMousedownOnApp() {
       this.$root.$emit("context-toolbar::dismiss")
     },
+    handleMousemoveOnSvg(evt) {
+      if (!this.appDimensions) {
+        this.fetchAppDimensions()
+      }
+      const { width, height } = this.appDimensions
+      const relativeX = (evt.offsetX / width) * this.viewBox[2]
+      const relativeY = (evt.offsetY / height) * this.viewBox[3]
+      const absoluteX = relativeX + this.viewBox[0] + this.offset.x
+      const absoluteY = relativeY + this.viewBox[1] + this.offset.y
+      this.mouseCoordinates = {
+        x: absoluteX,
+        y: absoluteY,
+      }
+    },
   },
 }
 </script>
@@ -1005,12 +1044,17 @@ export default {
 #tapestry {
   position: relative;
 
-  &.can-pan {
+  &[data-tool="pan"],
+  &:not([data-tool]) {
     cursor: move;
 
     &.panning {
       cursor: grabbing;
     }
+  }
+
+  &[data-tool="add_node"] {
+    cursor: copy;
   }
 
   .vertical-center {
