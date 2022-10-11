@@ -83,7 +83,11 @@
         ></locked-tooltip>
       </svg>
       <tapestry-toolbar />
-      <tapestry-node-toolbar v-for="(node, id) in nodes" :key="id" :node="node" />
+      <tapestry-node-toolbar
+        v-for="node in editableNodes"
+        :key="node.id"
+        :node="node"
+      />
       <tapestry-link-toolbar
         v-for="link in links"
         :key="`${link.source}-${link.target}`"
@@ -268,9 +272,7 @@ export default {
       return !this.settings.renderMap
     },
     editableNodes() {
-      return this.nodes.length
-        ? this.nodes.filter(node => this.nodeIsEditable(node))
-        : this.nodes
+      return Object.values(this.nodes).filter(node => this.nodeIsEditable(node))
     },
     maxScale() {
       // TODO: may need to update how the smallest node size is calculated
