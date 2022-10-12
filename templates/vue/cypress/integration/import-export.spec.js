@@ -61,6 +61,7 @@ describe("Export", () => {
 
     cy.wait("@export_zip")
       .its("response.body")
+      .then(JSON.parse)
       .then(data => {
         expect("zipUrl" in data).to.be.true
         expect("wpPosts" in data).to.be.true
