@@ -171,7 +171,7 @@ export default {
       dragEdgeDirection: { x: 0, y: 0 },
       dragOffsetDelta: { x: 0, y: 0 },
 
-      mouseCoordinates: { x: 0, y: 0 },
+      screenMouseCoordinates: { x: 0, y: 0 },
       linkToolNode: null,
 
       showMinimap: true,
@@ -289,6 +289,20 @@ export default {
     browserHeight() {
       return this.browserDimensions.height
     },
+    mouseCoordinates() {
+      if (!this.appDimensions) {
+        return { x: 0, y: 0 }
+      }
+      const { width, height } = this.appDimensions
+      const relativeX = (this.screenMouseCoordinates.x / width) * this.viewBox[2]
+      const relativeY = (this.screenMouseCoordinates.y / height) * this.viewBox[3]
+      const absoluteX = relativeX + this.viewBox[0] + this.offset.x
+      const absoluteY = relativeY + this.viewBox[1] + this.offset.y
+      return {
+        x: absoluteX,
+        y: absoluteY,
+      }
+    },
   },
   watch: {
     isEmptyTapestry(empty) {
@@ -398,7 +412,6 @@ export default {
       },
       () => {
         this.updateScale()
-        this.fetchAppDimensions()
       },
       (dx, dy) => {
         this.handlePan(
@@ -409,7 +422,6 @@ export default {
       () => {
         this.isPanning = false
         this.updateOffset()
-        this.fetchAppDimensions()
       },
       () => (this.$refs.minimap ? [this.$refs.minimap.$el] : []),
       ["vue-svg"]
@@ -456,6 +468,7 @@ export default {
         this.appHeight = "100vh"
       }
       this.$nextTick(() => {
+        this.fetchAppDimensions()
         this.updateViewBox()
       })
     },
@@ -503,6 +516,9 @@ export default {
       }
     },
     fetchAppDimensions() {
+      if (!this.$refs.app) {
+        return
+      }
       const { width, height } = this.$refs.app.getBoundingClientRect()
       this.appDimensions = {
         width,
@@ -517,7 +533,7 @@ export default {
       const scaleChange = newScale / this.scale
 
       if (!this.appDimensions) {
-        this.fetchAppDimensions()
+        return
       }
       const { width, height } = this.appDimensions
 
@@ -543,11 +559,8 @@ export default {
       this.scale = newScale
     },
     handlePan(dx, dy) {
-      if (!this.canPan) {
+      if (!this.canPan || !this.appDimensions) {
         return
-      }
-      if (!this.appDimensions) {
-        this.fetchAppDimensions()
       }
       if (!this.isPanning) {
         this.isPanning = true
@@ -1051,17 +1064,9 @@ export default {
       this.$root.$emit("context-toolbar::dismiss")
     },
     handleMousemoveOnSvg(evt) {
-      if (!this.appDimensions) {
-        this.fetchAppDimensions()
-      }
-      const { width, height } = this.appDimensions
-      const relativeX = (evt.offsetX / width) * this.viewBox[2]
-      const relativeY = (evt.offsetY / height) * this.viewBox[3]
-      const absoluteX = relativeX + this.viewBox[0] + this.offset.x
-      const absoluteY = relativeY + this.viewBox[1] + this.offset.y
-      this.mouseCoordinates = {
-        x: absoluteX,
-        y: absoluteY,
+      this.screenMouseCoordinates = {
+        x: evt.offsetX,
+        y: evt.offsetY,
       }
     },
   },
