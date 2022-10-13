@@ -18,9 +18,6 @@
             <user-answers-button data-qa="user-answers-button"></user-answers-button>
           </b-col>
           <b-col class="p-0">
-            <settings-modal-button></settings-modal-button>
-          </b-col>
-          <b-col class="p-0">
             <operations-button />
           </b-col>
         </template>
@@ -31,7 +28,6 @@
 
 <script>
 import { mapState } from "vuex"
-import SettingsModalButton from "./SettingsModalButton"
 import UserAnswersButton from "./UserAnswersButton"
 import UserSettingsButton from "./UserSettingsButton"
 import ReviewNotifications from "./ReviewNotifications"
@@ -41,7 +37,6 @@ import * as wp from "@/services/wp"
 
 export default {
   components: {
-    SettingsModalButton,
     ReviewNotifications,
     UserSettingsButton,
     HelpButton,

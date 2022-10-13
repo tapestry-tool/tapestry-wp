@@ -30,9 +30,7 @@
         >
           <i class="fas fa-arrows-alt-v fa-lg"></i>
         </tapestry-toolbar-button>
-        <tapestry-toolbar-button id="tapestry-settings-button" tooltip="Settings">
-          <i class="fas fa-cog fa-lg"></i>
-        </tapestry-toolbar-button>
+        <settings-modal-button></settings-modal-button>
       </div>
       <div class="separator"></div>
       <div class="tool-group">
@@ -49,11 +47,13 @@
 
 <script>
 import TapestryToolbarButton from "../common/TapestryToolbarButton"
+import SettingsModalButton from "./SettingsModalButton"
 import { tools } from "@/utils/constants"
 
 export default {
   components: {
     TapestryToolbarButton,
+    SettingsModalButton,
   },
   data() {
     return {

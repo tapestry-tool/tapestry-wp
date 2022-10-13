@@ -1,30 +1,31 @@
 <template>
-  <button
+  <tapestry-toolbar-button
+    id="tapestry-settings-button"
     aria-label="Open Tapestry Settings"
+    tooltip="Settings"
     data-qa="settings-button"
-    class="menubar-button"
     @click="open"
   >
-    <tapestry-icon icon="cog"></tapestry-icon>
+    <i class="fas fa-cog fa-lg"></i>
     <settings-modal
       :show="settingsModalOpen"
       :tab="tab"
       @close="close"
       @change:tab="changeTab"
     ></settings-modal>
-  </button>
+  </tapestry-toolbar-button>
 </template>
 
 <script>
 import SettingsModal from "@/components/modals/SettingsModal"
-import TapestryIcon from "@/components/common/TapestryIcon"
+import TapestryToolbarButton from "../common/TapestryToolbarButton"
 import { names } from "@/config/routes"
 import client from "@/services/TapestryAPI"
 
 export default {
   components: {
     SettingsModal,
-    TapestryIcon,
+    TapestryToolbarButton,
   },
   computed: {
     settingsModalOpen: {
