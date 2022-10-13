@@ -8,6 +8,7 @@
       height: appHeight,
     }"
     @mousedown="handleMousedownOnApp"
+    @keydown="handleKey"
   >
     <div v-if="isEmptyTapestry" class="vertical-center">
       <root-node-button v-if="isLoggedIn"></root-node-button>
@@ -421,7 +422,6 @@ export default {
     if (!this.isEmptyTapestry) {
       this.zoomPanHelper.register()
     }
-    this.$refs.app.addEventListener("keydown", this.handleKey)
 
     this.$nextTick(() => {
       this.updateAppHeight()
@@ -433,7 +433,6 @@ export default {
   },
   beforeDestroy() {
     this.zoomPanHelper && this.zoomPanHelper.unregister()
-    this.$refs.app.removeEventListener("keydown", this.handleKey)
   },
   methods: {
     ...mapActions(["updateNodeCoordinates"]),
