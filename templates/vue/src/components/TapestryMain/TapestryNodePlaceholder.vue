@@ -8,7 +8,6 @@
       :style="{
         filter: dropShadow,
       }"
-      @click="handleClick"
     ></circle>
   </transition>
 </template>
@@ -17,7 +16,6 @@
 import * as d3 from "d3"
 import { mapState } from "vuex"
 import Helpers from "@/utils/Helpers"
-import { names } from "@/config/routes"
 
 export default {
   name: "tapestry-node-placeholder",
@@ -79,23 +77,6 @@ export default {
   },
   mounted() {
     this.$refs.circle.setAttribute("r", this.radius)
-  },
-  methods: {
-    handleClick() {
-      this.$router.push({
-        name: names.MODAL,
-        params: {
-          nodeId: 0,
-          type: "add",
-          tab: "content",
-        },
-        query: {
-          ...this.$route.query,
-          nodeX: (this.coordinates.x / this.scale).toFixed(4),
-          nodeY: (this.coordinates.y / this.scale).toFixed(4),
-        },
-      })
-    },
   },
 }
 </script>

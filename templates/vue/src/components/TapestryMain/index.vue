@@ -21,6 +21,7 @@
         aria-label="Main Tapestry View"
         :viewBox="computedViewBox"
         @mousemove="handleMousemoveOnSvg"
+        @click="handleClickOnSvg"
       >
         <tapestry-link-placeholder
           v-if="linkToolNode"
@@ -253,10 +254,7 @@ export default {
       return wp.canEditTapestry()
     },
     canPan() {
-      return (
-        !this.isEmptyTapestry &&
-        (this.currentTool === null || this.currentTool === tools.PAN)
-      )
+      return !this.isEmptyTapestry && this.currentTool !== tools.SELECT
     },
     showNodePlaceholder() {
       return this.currentTool === tools.ADD_NODE
@@ -304,6 +302,7 @@ export default {
         this.setCurrentTool(null)
       } else {
         this.zoomPanHelper.register()
+        this.setCurrentTool(tools.PAN)
       }
     },
     background: {
@@ -428,12 +427,9 @@ export default {
       this.updateAppHeight()
     })
 
-    this.$root.$on("bv::modal::show", () => {
-      this.setCurrentTool(null)
-    })
-    this.$root.$on("bv::modal::hide", () => {
-      this.setCurrentTool(null)
-    })
+    if (!this.isEmptyTapestry) {
+      this.setCurrentTool(tools.PAN)
+    }
   },
   beforeDestroy() {
     this.zoomPanHelper && this.zoomPanHelper.unregister()
@@ -1061,6 +1057,23 @@ export default {
         y: evt.offsetY,
       }
     },
+    handleClickOnSvg() {
+      if (this.currentTool === tools.ADD_NODE && !this.isPanning) {
+        this.$router.push({
+          name: names.MODAL,
+          params: {
+            nodeId: 0,
+            type: "add",
+            tab: "content",
+          },
+          query: {
+            ...this.$route.query,
+            nodeX: (this.mouseCoordinates.x / this.scale).toFixed(4),
+            nodeY: (this.mouseCoordinates.y / this.scale).toFixed(4),
+          },
+        })
+      }
+    },
   },
 }
 </script>
@@ -1069,17 +1082,16 @@ export default {
 #tapestry {
   position: relative;
 
-  &[data-tool="pan"],
-  &:not([data-tool]) {
+  &[data-tool="pan"] {
     cursor: move;
-
-    &.panning {
-      cursor: grabbing;
-    }
   }
 
   &[data-tool="add_node"] {
     cursor: copy;
+  }
+
+  &.panning {
+    cursor: grabbing;
   }
 
   .vertical-center {

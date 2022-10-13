@@ -79,14 +79,7 @@ export default {
     ...mapMutations(["setCurrentTool"]),
     handleClick() {
       this.$emit("click")
-      if (this.tool) {
-        this.toggleTool()
-      }
-    },
-    toggleTool() {
-      if (this.tool === this.currentTool) {
-        this.setCurrentTool(null)
-      } else {
+      if (this.tool && this.tool !== this.currentTool) {
         this.setCurrentTool(this.tool)
       }
     },
