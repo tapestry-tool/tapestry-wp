@@ -550,10 +550,17 @@ export default {
       ) {
         this.selected ? this.unselect(this.node.id) : this.select(this.node.id)
       } else if (this.node.unlocked || this.hasPermission("edit")) {
-        this.$emit("click", this.node)
-        this.root && this.node.hideMedia
-          ? this.openNode(this.node.id)
-          : this.updateRootNode()
+        const shouldOpenLightbox = this.root && this.node.hideMedia
+        const shouldOpenToolbar = !shouldOpenLightbox && this.hasPermission("edit")
+        this.$emit("click", {
+          node: this.node,
+          shouldOpenToolbar,
+        })
+        if (shouldOpenLightbox) {
+          this.openNode(this.node.id)
+        } else {
+          this.updateRootNode()
+        }
       }
       client.recordAnalyticsEvent("user", "click", "node", this.node.id)
     },

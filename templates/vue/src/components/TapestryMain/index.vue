@@ -83,11 +83,7 @@
         ></locked-tooltip>
       </svg>
       <tapestry-toolbar />
-      <tapestry-node-toolbar
-        v-for="node in editableNodes"
-        :key="node.id"
-        :node="node"
-      />
+      <tapestry-node-toolbar v-for="(node, id) in nodes" :key="id" :node="node" />
       <tapestry-link-toolbar
         v-for="link in links"
         :key="`${link.source}-${link.target}`"
@@ -270,9 +266,6 @@ export default {
     },
     dragSelectEnabled() {
       return !this.settings.renderMap
-    },
-    editableNodes() {
-      return Object.values(this.nodes).filter(node => this.nodeIsEditable(node))
     },
     maxScale() {
       // TODO: may need to update how the smallest node size is calculated
@@ -660,9 +653,6 @@ export default {
     updateSelectableNodes() {
       DragSelectModular.updateSelectableNodes()
     },
-    nodeIsEditable(node) {
-      return this.isLoggedIn && this.hasPermission(node, "edit")
-    },
     hasPermission(node, action) {
       return Helpers.hasPermission(node, action, this.settings.showRejected)
     },
@@ -749,7 +739,7 @@ export default {
 
       return box
     },
-    handleNodeClick(node) {
+    handleNodeClick({ node, shouldOpenToolbar }) {
       if (this.currentTool === tools.ADD_LINK) {
         if (this.linkToolNode === null) {
           this.linkToolNode = node
@@ -816,10 +806,12 @@ export default {
         },
         () => {
           this.updateScale()
-          this.$root.$emit(
-            "context-toolbar::click",
-            Helpers.getNodeElementId(node.id)
-          )
+          if (shouldOpenToolbar) {
+            this.$root.$emit(
+              "context-toolbar::click",
+              Helpers.getNodeElementId(node.id)
+            )
+          }
         },
         "easeOut"
       )
