@@ -3,6 +3,20 @@
     <div class="toolbar">
       <div class="tool-group">
         <tapestry-toolbar-button
+          id="tapestry-pan-tool"
+          :tool="tools.PAN"
+          tooltip="Pan Tool"
+        >
+          <i class="fas fa-arrows-alt fa-lg"></i>
+        </tapestry-toolbar-button>
+        <tapestry-toolbar-button
+          id="tapestry-select-tool"
+          :tool="tools.SELECT"
+          tooltip="Select Tool"
+        >
+          <i class="fas fa-mouse-pointer fa-lg"></i>
+        </tapestry-toolbar-button>
+        <tapestry-toolbar-button
           id="tapestry-add-node-tool"
           :tool="tools.ADD_NODE"
           tooltip="Add Node"
@@ -12,23 +26,9 @@
         <tapestry-toolbar-button
           id="tapestry-add-link-tool"
           :tool="tools.ADD_LINK"
-          tooltip="Make Connection"
+          tooltip="Add Connection"
         >
           <i class="fas fa-arrows-alt-v fa-lg"></i>
-        </tapestry-toolbar-button>
-        <tapestry-toolbar-button
-          id="tapestry-select-tool"
-          :tool="tools.SELECT"
-          tooltip="Selection Tool"
-        >
-          <i class="fas fa-mouse-pointer fa-lg"></i>
-        </tapestry-toolbar-button>
-        <tapestry-toolbar-button
-          id="tapestry-pan-tool"
-          :tool="tools.PAN"
-          tooltip="Pan Tool"
-        >
-          <i class="fas fa-arrows-alt fa-lg"></i>
         </tapestry-toolbar-button>
         <tapestry-toolbar-button id="tapestry-settings-button" tooltip="Settings">
           <i class="fas fa-cog fa-lg"></i>
