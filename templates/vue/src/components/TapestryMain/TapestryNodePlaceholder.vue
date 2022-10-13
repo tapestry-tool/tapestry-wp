@@ -91,8 +91,8 @@ export default {
         },
         query: {
           ...this.$route.query,
-          nodeX: this.coordinates.x.toFixed(4),
-          nodeY: this.coordinates.y.toFixed(4),
+          nodeX: (this.coordinates.x / this.scale).toFixed(4),
+          nodeY: (this.coordinates.y / this.scale).toFixed(4),
         },
       })
     },
