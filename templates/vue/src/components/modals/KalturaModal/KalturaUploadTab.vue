@@ -106,7 +106,7 @@ export default {
   },
   data() {
     return {
-      useKalturaPlayer: false,
+      useKalturaPlayer: true,
       allVideos: [],
       selectedVideos: [],
     }

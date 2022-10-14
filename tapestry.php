@@ -41,6 +41,7 @@ error_reporting(E_ERROR | E_PARSE);
  * Register endpoints and perform other includes
  */
 require_once dirname(__FILE__).'/classes/class.tapestry-analytics.php';
+require_once dirname(__FILE__).'/classes/class.kaltura-api.php';
 require_once dirname(__FILE__).'/utilities/class.tapestry-helpers.php';
 require_once dirname(__FILE__).'/endpoints.php';
 require_once dirname(__FILE__).'/settings.php';
@@ -172,9 +173,9 @@ function tapestry_enqueue_vue_app()
         global $wp_roles;
 
         // pass Kaltura account variables to frontend; will be null if LOAD_KALTURA is false
-        $kaltura_partner_id = TapestryHelpers::getKalturaPartnerId();
-        $kaltura_service_url = TapestryHelpers::getKalturaServiceUrl();
-        $kaltura_unique_configuration = TapestryHelpers::getKalturaUniqueConfig();
+        $kaltura_partner_id = KalturaApi::getKalturaPartnerId();
+        $kaltura_service_url = KalturaApi::getKalturaServiceUrl();
+        $kaltura_unique_configuration = KalturaApi::getKalturaUniqueConfig();
 
         $currentUser = wp_get_current_user();
         $currentUser->data = (object) [
