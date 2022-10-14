@@ -77,6 +77,7 @@
           :scale="scale"
           :show="showNodePlaceholder"
           :coordinates="mouseCoordinates"
+          :level="selectedNodeLevel"
         />
         <locked-tooltip
           v-if="activeNode"
@@ -262,6 +263,9 @@ export default {
     },
     selectedId() {
       return Number(this.$route.params.nodeId)
+    },
+    selectedNodeLevel() {
+      return this.getNode(this.selectedId)?.level ?? 1
     },
     dragSelectEnabled() {
       return !this.settings.renderMap
@@ -1067,6 +1071,7 @@ export default {
           x: this.mouseCoordinates.x / this.scale,
           y: this.mouseCoordinates.y / this.scale,
         }
+        newNode.level = this.selectedNodeLevel
         newNode.title = "Insert Title"
         this.addNode({ node: newNode }).then(id => {
           this.$root.$emit("edit-node-title", id)

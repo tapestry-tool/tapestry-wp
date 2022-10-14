@@ -32,6 +32,10 @@ export default {
       type: Object,
       required: true,
     },
+    level: {
+      type: Number,
+      required: true,
+    },
   },
   data() {
     return {
@@ -42,18 +46,18 @@ export default {
   computed: {
     ...mapState(["maxLevel"]),
     radius() {
-      return Helpers.getNodeRadius(this.node.level, this.scale)
+      return Helpers.getNodeRadius(this.level, this.scale)
     },
     fill() {
       return Helpers.darkenColor(
         this.node.backgroundColor,
-        this.node.level,
+        this.level,
         this.maxLevel
       )
     },
     dropShadow() {
       const { offset, blur, opacity } = Helpers.getDropShadow(
-        this.node.level,
+        this.level,
         this.maxLevel,
         this.scale
       )
