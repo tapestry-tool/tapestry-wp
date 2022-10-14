@@ -4,6 +4,7 @@
     <tapestry-app :aria-hidden="viewingNode ? 'true' : 'false'"></tapestry-app>
     <router-view></router-view>
     <node-modal></node-modal>
+    <node-access-modal></node-access-modal>
     <link-modal></link-modal>
     <lightbox
       v-if="node"
@@ -34,6 +35,7 @@ import { names } from "@/config/routes"
 import Lightbox from "@/components/Lightbox"
 import LinkModal from "@/components/modals/LinkModal"
 import NodeModal from "@/components/modals/NodeModal"
+import NodeAccessModal from "@/components/modals/NodeAccessModal"
 import TapestryApp from "@/components/TapestryApp"
 import Sidebar from "@/components/Sidebar"
 import TapestryError from "@/components/TapestryError"
@@ -48,6 +50,7 @@ export default {
     Loading,
     Lightbox,
     NodeModal,
+    NodeAccessModal,
     LinkModal,
     TapestryApp,
     Sidebar,

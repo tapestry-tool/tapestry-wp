@@ -13,6 +13,7 @@ export const names = {
   MODAL: "modal",
   SETTINGS: "settings",
   LINKMODAL: "linkmodal",
+  NODEACCESS: "nodeAccess",
   USERANSWERS: "userAnswers",
   USERSETTINGS: "userSettings",
   HELP: "help",
@@ -45,6 +46,10 @@ export default [
       {
         path: `:type(add|edit)/:rowId(\\d+)?/:tab`,
         name: names.MODAL,
+      },
+      {
+        path: `access`,
+        name: names.NODEACCESS,
       },
       {
         path: `link/:source/:target`,

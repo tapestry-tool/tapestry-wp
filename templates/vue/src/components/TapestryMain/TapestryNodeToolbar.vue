@@ -137,7 +137,7 @@
           <i class="fas fa-ellipsis-h"></i>
         </tapestry-toolbar-button>
       </template>
-      <b-dropdown-item-button>
+      <b-dropdown-item-button @click="openNodeAccessModal">
         Lock Node
       </b-dropdown-item-button>
     </b-dropdown>
@@ -152,6 +152,7 @@ import TapestryToolbarButton from "./common/TapestryToolbarButton"
 import Helpers from "@/utils/Helpers"
 import { tools, swatches } from "@/utils/constants"
 import { mapActions } from "vuex"
+import { names } from "@/config/routes"
 
 export default {
   components: {
@@ -234,6 +235,13 @@ export default {
           }
         })
         .catch(err => console.log(err))
+    },
+    openNodeAccessModal() {
+      this.$router.push({
+        name: names.NODEACCESS,
+        params: { nodeId: this.node.id },
+        query: this.$route.query,
+      })
     },
   },
 }
