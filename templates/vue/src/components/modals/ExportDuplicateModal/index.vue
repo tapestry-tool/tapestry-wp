@@ -1,7 +1,6 @@
 <template>
   <b-modal
     id="export-duplicate-modal"
-    data-qa="export-duplicate-modal"
     :visible="show"
     size="md"
     title="Export / Duplicate Tapestry"
@@ -10,7 +9,7 @@
     hide-footer
     @hidden="$emit('close')"
   >
-    <b-container fluid class="px-0">
+    <b-container fluid class="px-0" data-qa="export-duplicate-modal">
       <b-tabs card>
         <b-tab
           title="Export"

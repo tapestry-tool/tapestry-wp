@@ -9,7 +9,9 @@ describe("Operations", () => {
 
   it(`should be able to duplicate a tapestry`, () => {
     cy.contains(/export\/duplicate tapestry/i).click()
-    cy.contains(/duplicate/i).click()
+    cy.getByTestId("export-duplicate-modal")
+      .contains(/duplicate/i)
+      .click()
 
     cy.intercept("POST", "**/tapestries").as("duplicate")
 
