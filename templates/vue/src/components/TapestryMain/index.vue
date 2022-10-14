@@ -443,6 +443,7 @@ export default {
       "goToNodeSibling",
       "resetNodeNavigation",
       "addLink",
+      "addNode",
     ]),
     updateAppHeight() {
       if (this.$refs.app) {
@@ -1061,18 +1062,14 @@ export default {
     },
     handleClickOnSvg() {
       if (this.currentTool === tools.ADD_NODE && !this.isPanning) {
-        this.$router.push({
-          name: names.MODAL,
-          params: {
-            nodeId: 0,
-            type: "add",
-            tab: "content",
-          },
-          query: {
-            ...this.$route.query,
-            nodeX: (this.mouseCoordinates.x / this.scale).toFixed(4),
-            nodeY: (this.mouseCoordinates.y / this.scale).toFixed(4),
-          },
+        const newNode = Helpers.createDefaultNode()
+        newNode.coordinates = {
+          x: this.mouseCoordinates.x / this.scale,
+          y: this.mouseCoordinates.y / this.scale,
+        }
+        newNode.title = "Insert Title"
+        this.addNode({ node: newNode }).then(id => {
+          this.$root.$emit("edit-node-title", id)
         })
       }
     },

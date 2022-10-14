@@ -479,6 +479,12 @@ export default {
           })
         })
     )
+
+    this.$root.$on("edit-node-title", id => {
+      if (id === this.node.id) {
+        this.startEditingTitle()
+      }
+    })
   },
   methods: {
     ...mapActions(["resetNodeNavigation", "updateNode"]),
@@ -559,7 +565,7 @@ export default {
     handleClick(evt) {
       const clickTime = new Date().getTime()
       if (clickTime - this.lastClickTime < 300 && this.hasPermission("edit")) {
-        this.handleDoubleClick()
+        this.startEditingTitle()
         this.lastClickTime = 0
       } else {
         if (
@@ -584,7 +590,7 @@ export default {
         this.lastClickTime = clickTime
       }
     },
-    handleDoubleClick() {
+    startEditingTitle() {
       this.isEditingTitle = true
       this.$nextTick(() => {
         this.$refs.title.focus()

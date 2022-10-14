@@ -744,8 +744,6 @@ export default {
         ...this.$route.query,
         nav: undefined,
         popup: undefined,
-        nodeX: undefined,
-        nodeY: undefined,
       }
       if (this.show) {
         if (this.isEmptyTapestry) {
@@ -1030,13 +1028,6 @@ export default {
       if (this.type === "add") {
         if (this.parent) {
           this.coinToss() ? this.calculateX(false) : this.calculateY(false)
-        } else if (this.$route.query.nodeX && this.$route.query.nodeY) {
-          const x = parseFloat(this.$route.query.nodeX)
-          const y = parseFloat(this.$route.query.nodeY)
-          if (!isNaN(x) && !isNaN(y)) {
-            this.update("coordinates.x", x)
-            this.update("coordinates.y", y)
-          }
         }
       }
     },
