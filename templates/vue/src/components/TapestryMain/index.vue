@@ -132,7 +132,7 @@ import ZoomPanHelper from "@/utils/ZoomPanHelper"
 import { names } from "@/config/routes"
 import * as wp from "@/services/wp"
 import { interpolate } from "@/utils/interpolate"
-import { tools } from "@/utils/constants"
+import { tools, toolKeyBindings } from "@/utils/constants"
 // import { scaleConstants } from "@/utils/constants"
 
 export default {
@@ -953,7 +953,12 @@ export default {
       }
       const { code } = evt
       const node = this.getNode(this.selectedId)
-      if (code === "Enter") {
+      const tool = Object.entries(toolKeyBindings).find(
+        ([, key]) => `Key${key}` === code
+      )?.[0]
+      if (tool) {
+        this.setCurrentTool(tool)
+      } else if (code === "Enter") {
         if (this.nodeNavLinkMode) {
           this.$router.push({
             name: names.LINKMODAL,

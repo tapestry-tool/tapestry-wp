@@ -17,13 +17,13 @@
       triggers="hover"
       :placement="tooltipPlacementValue"
     >
-      {{ tooltip }}
+      {{ tooltip }} {{ tooltipSuffix }}
     </b-tooltip>
   </button>
 </template>
 
 <script>
-import { tools } from "@/utils/constants"
+import { tools, toolKeyBindings } from "@/utils/constants"
 import { mapMutations, mapState } from "vuex"
 
 export default {
@@ -73,6 +73,11 @@ export default {
         : this.horizontal
         ? "top"
         : "right"
+    },
+    tooltipSuffix() {
+      return this.tool && toolKeyBindings[this.tool]
+        ? `(${toolKeyBindings[this.tool]})`
+        : ""
     },
   },
   methods: {

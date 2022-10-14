@@ -86,3 +86,10 @@ export const tools = {
   SELECT: "select",
   PAN: "pan",
 }
+
+export const toolKeyBindings = {
+  [tools.ADD_NODE]: "N",
+  [tools.ADD_LINK]: "L",
+  [tools.SELECT]: "V",
+  [tools.PAN]: "P",
+}
