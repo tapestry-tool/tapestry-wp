@@ -2,6 +2,7 @@
   <div>
     <b-dropdown
       id="operations-button"
+      data-qa="operations-button"
       right
       variant="none"
       toggle-class="operations-button"

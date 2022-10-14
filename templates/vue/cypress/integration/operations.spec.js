@@ -4,7 +4,7 @@ describe("Operations", () => {
   beforeEach(() => {
     cy.fixture("three-nodes.json").as("tapestry")
     cy.setup("@tapestry")
-    cy.get(".operations-button").click()
+    cy.getByTestId("operations-button").click()
   })
 
   it(`should be able to duplicate a tapestry`, () => {
