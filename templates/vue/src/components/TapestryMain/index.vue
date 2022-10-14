@@ -935,8 +935,11 @@ export default {
       }
     },
     handleKey(evt) {
-      // Ignore key events if focus is outside Tapestry view
-      if (!this.$refs["vue-svg"]?.contains(document.activeElement)) {
+      // Ignore key events if focus is outside Tapestry view or if is focused on a node title (for editing)
+      if (
+        !this.$refs["vue-svg"]?.contains(document.activeElement) ||
+        document.activeElement.className === "node-title"
+      ) {
         return
       }
 

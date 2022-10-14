@@ -86,7 +86,16 @@
                 v-if="!node.unlocked && node.hideWhenLocked"
                 class="fas fa-eye-slash"
               ></i>
-              <p class="title">{{ node.title }}</p>
+              <p
+                ref="title"
+                class="node-title"
+                :contenteditable="isEditingTitle ? 'true' : 'false'"
+                :tabindex="isEditingTitle ? '0' : '-1'"
+                @blur="handleTitleBlur"
+                @keydown="handleTitleKeydown"
+              >
+                {{ node.title }}
+              </p>
               <p style="font-size: 60%;">Level {{ node.level }}</p>
               <p v-if="node.mediaDuration" class="timecode">
                 {{ formatDuration() }}
@@ -198,6 +207,10 @@ export default {
       transitioning: false,
       isHovered: false,
       isFocused: false,
+
+      lastClickTime: 0,
+      isEditingTitle: false,
+      draftTitle: "",
     }
   },
   computed: {
@@ -468,7 +481,7 @@ export default {
     )
   },
   methods: {
-    ...mapActions(["resetNodeNavigation"]),
+    ...mapActions(["resetNodeNavigation", "updateNode"]),
     ...mapMutations(["select", "unselect"]),
     updateRootNode() {
       if (!this.root) {
@@ -525,7 +538,7 @@ export default {
       this.isHovered = true
 
       // Move node to end of svg document so it appears on top, but do not do this when the node is in focus since it will blur the node
-      if (!this.isFocused) {
+      if (!this.isFocused && !this.isEditingTitle) {
         const node = this.$refs.node
         node.parentNode.appendChild(node)
       }
@@ -544,25 +557,72 @@ export default {
       this.$root.$emit("context-toolbar::dismiss")
     },
     handleClick(evt) {
-      if (
-        this.hasPermission("edit") &&
-        (evt.ctrlKey || evt.metaKey || evt.shiftKey)
-      ) {
-        this.selected ? this.unselect(this.node.id) : this.select(this.node.id)
-      } else if (this.node.unlocked || this.hasPermission("edit")) {
-        const shouldOpenLightbox = this.root && this.node.hideMedia
-        const shouldOpenToolbar = !shouldOpenLightbox && this.hasPermission("edit")
-        this.$emit("click", {
-          node: this.node,
-          shouldOpenToolbar,
-        })
-        if (shouldOpenLightbox) {
-          this.openNode(this.node.id)
-        } else {
-          this.updateRootNode()
+      const clickTime = new Date().getTime()
+      if (clickTime - this.lastClickTime < 300 && this.hasPermission("edit")) {
+        this.handleDoubleClick()
+        this.lastClickTime = 0
+      } else {
+        if (
+          this.hasPermission("edit") &&
+          (evt.ctrlKey || evt.metaKey || evt.shiftKey)
+        ) {
+          this.selected ? this.unselect(this.node.id) : this.select(this.node.id)
+        } else if (this.node.unlocked || this.hasPermission("edit")) {
+          const shouldOpenLightbox = this.root && this.node.hideMedia
+          const shouldOpenToolbar = !shouldOpenLightbox && this.hasPermission("edit")
+          this.$emit("click", {
+            node: this.node,
+            shouldOpenToolbar,
+          })
+          if (shouldOpenLightbox) {
+            this.openNode(this.node.id)
+          } else {
+            this.updateRootNode()
+          }
         }
+        client.recordAnalyticsEvent("user", "click", "node", this.node.id)
+        this.lastClickTime = clickTime
       }
-      client.recordAnalyticsEvent("user", "click", "node", this.node.id)
+    },
+    handleDoubleClick() {
+      this.isEditingTitle = true
+      this.$nextTick(() => {
+        this.$refs.title.focus()
+
+        // select all text in the title <p> element
+        if (window.getSelection && document.createRange) {
+          const range = document.createRange()
+          range.selectNodeContents(this.$refs.title)
+          const sel = window.getSelection()
+          sel.removeAllRanges()
+          sel.addRange(range)
+        } else if (document.body.createTextRange) {
+          const range = document.body.createTextRange()
+          range.moveToElementText(this.$refs.title)
+          range.select()
+        }
+      })
+    },
+    handleTitleBlur() {
+      this.isEditingTitle = false
+      this.$refs.title.innerText = this.node.title
+    },
+    handleTitleKeydown(evt) {
+      if (evt.code === "Enter") {
+        evt.preventDefault()
+        const newNodeTitle = this.$refs.title.innerText
+        if (newNodeTitle.length === 0) {
+          return
+        }
+        this.updateNode({
+          id: this.node.id,
+          newNode: {
+            title: newNodeTitle,
+          },
+        }).then(() => {
+          this.$refs.title.blur()
+        })
+      }
     },
     handleFocus() {
       this.isFocused = true
@@ -640,7 +700,8 @@ export default {
   flex-direction: column;
   text-align: center;
   font-size: 30px;
-  .title {
+
+  .node-title {
     padding-left: 0;
     margin-top: 12px;
     margin-bottom: 0;
