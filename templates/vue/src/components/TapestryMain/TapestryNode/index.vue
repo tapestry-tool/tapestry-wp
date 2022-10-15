@@ -470,7 +470,16 @@ export default {
           }
         })
       } else {
-        this.$refs.title.innerText = this.node.title
+        const newNodeTitle = this.$refs.title.innerText
+        if (newNodeTitle.length === 0 || newNodeTitle === this.node.title) {
+          return
+        }
+        this.updateNode({
+          id: this.node.id,
+          newNode: {
+            title: newNodeTitle,
+          },
+        })
       }
     },
   },
@@ -611,20 +620,9 @@ export default {
       this.$emit("node-editing-title", null)
     },
     handleTitleKeydown(evt) {
-      if (evt.code === "Enter") {
+      if (evt.code === "Enter" || evt.code === "Escape") {
         evt.preventDefault()
-        const newNodeTitle = this.$refs.title.innerText
-        if (newNodeTitle.length === 0) {
-          return
-        }
-        this.updateNode({
-          id: this.node.id,
-          newNode: {
-            title: newNodeTitle,
-          },
-        }).then(() => {
-          this.$refs.title.blur()
-        })
+        this.$refs.title.blur()
       }
     },
     handleFocus() {
