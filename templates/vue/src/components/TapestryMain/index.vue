@@ -2,7 +2,11 @@
   <main
     id="tapestry"
     ref="app"
-    :class="{ panning: isPanning, empty: isEmptyTapestry }"
+    :class="{
+      panning: isPanning,
+      empty: isEmptyTapestry,
+      'node-placeholder-visible': showNodePlaceholder,
+    }"
     :data-tool="currentTool"
     :style="{
       height: appHeight,
@@ -62,6 +66,7 @@
               :class="{ selectable: true }"
               :data-id="id"
               :root="id == selectedId"
+              :is-editing-title="nodeEditingTitle == id"
               tabindex="-1"
               @dragstart="handleNodeDragStart"
               @drag="handleNodeDrag"
@@ -70,6 +75,7 @@
               @mouseleave="activeNode = null"
               @mounted="dragSelectEnabled ? updateSelectableNodes(node) : null"
               @click="handleNodeClick"
+              @node-editing-title="nodeEditingTitle = $event"
             ></tapestry-node>
           </g>
         </g>
@@ -172,6 +178,7 @@ export default {
 
       screenMouseCoordinates: { x: 0, y: 0 },
       linkToolNode: null,
+      nodeEditingTitle: null,
 
       showMinimap: true,
     }
@@ -259,7 +266,7 @@ export default {
       return !this.isEmptyTapestry && this.currentTool !== tools.SELECT
     },
     showNodePlaceholder() {
-      return this.currentTool === tools.ADD_NODE
+      return this.currentTool === tools.ADD_NODE && this.nodeEditingTitle === null
     },
     selectedId() {
       return Number(this.$route.params.nodeId)
@@ -1070,16 +1077,20 @@ export default {
       }
     },
     handleClickOnSvg() {
-      if (this.currentTool === tools.ADD_NODE && !this.isPanning) {
+      if (
+        this.currentTool === tools.ADD_NODE &&
+        !this.isPanning &&
+        this.nodeEditingTitle === null
+      ) {
         const newNode = Helpers.createDefaultNode()
         newNode.coordinates = {
           x: this.mouseCoordinates.x / this.scale,
           y: this.mouseCoordinates.y / this.scale,
         }
         newNode.level = this.selectedNodeLevel
-        newNode.title = "Insert Title"
+        newNode.title = "Untitled"
         this.addNode({ node: newNode }).then(id => {
-          this.$root.$emit("edit-node-title", id)
+          this.nodeEditingTitle = id
         })
       }
     },
@@ -1095,7 +1106,7 @@ export default {
     cursor: move;
   }
 
-  &[data-tool="add_node"] {
+  &.node-placeholder-visible {
     cursor: copy;
   }
 

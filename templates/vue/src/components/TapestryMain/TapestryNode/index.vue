@@ -93,9 +93,8 @@
                 :tabindex="isEditingTitle ? '0' : '-1'"
                 @blur="handleTitleBlur"
                 @keydown="handleTitleKeydown"
-              >
-                {{ node.title }}
-              </p>
+                v-text="node.title"
+              ></p>
               <p style="font-size: 60%;">Level {{ node.level }}</p>
               <p v-if="node.mediaDuration" class="timecode">
                 {{ formatDuration() }}
@@ -201,6 +200,10 @@ export default {
       type: Number,
       required: true,
     },
+    isEditingTitle: {
+      type: Boolean,
+      required: true,
+    },
   },
   data() {
     return {
@@ -209,8 +212,6 @@ export default {
       isFocused: false,
 
       lastClickTime: 0,
-      isEditingTitle: false,
-      draftTitle: "",
     }
   },
   computed: {
@@ -450,6 +451,28 @@ export default {
         })
         .attr("r", newRadius)
     },
+    isEditingTitle(isEditingTitle) {
+      if (isEditingTitle) {
+        this.$nextTick(() => {
+          this.$refs.title.focus()
+
+          // select all text in the title <p> element
+          if (window.getSelection && document.createRange) {
+            const range = document.createRange()
+            range.selectNodeContents(this.$refs.title)
+            const sel = window.getSelection()
+            sel.removeAllRanges()
+            sel.addRange(range)
+          } else if (document.body.createTextRange) {
+            const range = document.body.createTextRange()
+            range.moveToElementText(this.$refs.title)
+            range.select()
+          }
+        })
+      } else {
+        this.$refs.title.innerText = this.node.title
+      }
+    },
   },
   mounted() {
     this.$emit("mounted")
@@ -479,12 +502,6 @@ export default {
           })
         })
     )
-
-    this.$root.$on("edit-node-title", id => {
-      if (id === this.node.id) {
-        this.startEditingTitle()
-      }
-    })
   },
   methods: {
     ...mapActions(["resetNodeNavigation", "updateNode"]),
@@ -565,7 +582,7 @@ export default {
     handleClick(evt) {
       const clickTime = new Date().getTime()
       if (clickTime - this.lastClickTime < 300 && this.hasPermission("edit")) {
-        this.startEditingTitle()
+        this.$emit("node-editing-title", this.node.id)
         this.lastClickTime = 0
       } else {
         if (
@@ -590,28 +607,8 @@ export default {
         this.lastClickTime = clickTime
       }
     },
-    startEditingTitle() {
-      this.isEditingTitle = true
-      this.$nextTick(() => {
-        this.$refs.title.focus()
-
-        // select all text in the title <p> element
-        if (window.getSelection && document.createRange) {
-          const range = document.createRange()
-          range.selectNodeContents(this.$refs.title)
-          const sel = window.getSelection()
-          sel.removeAllRanges()
-          sel.addRange(range)
-        } else if (document.body.createTextRange) {
-          const range = document.body.createTextRange()
-          range.moveToElementText(this.$refs.title)
-          range.select()
-        }
-      })
-    },
     handleTitleBlur() {
-      this.isEditingTitle = false
-      this.$refs.title.innerText = this.node.title
+      this.$emit("node-editing-title", null)
     },
     handleTitleKeydown(evt) {
       if (evt.code === "Enter") {
