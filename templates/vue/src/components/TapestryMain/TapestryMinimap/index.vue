@@ -119,6 +119,10 @@ export default {
       elem.addEventListener("mouseup", this.handleMouseup)
       elem.addEventListener("mouseleave", this.handleMouseup)
     }
+
+    this.$root.$on("minimap::redraw", () => {
+      this.drawMinimap()
+    })
   },
   beforeDestroy() {
     const elem = this.$refs.viewbox
@@ -128,6 +132,7 @@ export default {
       elem.removeEventListener("mouseup", this.handleMouseup)
       elem.removeEventListener("mouseleave", this.handleMouseup)
     }
+    this.$root.$off("minimap::redraw")
   },
   updated() {
     this.drawMinimap()

@@ -87,7 +87,7 @@
         popover-x="right"
         popover-y="top"
         class="swatch"
-        @input="setField('backgroundColor', $event)"
+        @input="handleBackgroundColorInput"
         @open="activeBackgroundButton = 'color'"
         @close="handleBackgroundClose('color')"
       >
@@ -184,15 +184,6 @@ export default {
     hidePopupToolbars() {
       this.$refs.backgroundToolbar.hide()
     },
-    setField(field, value) {
-      this.hidePopupToolbars()
-      this.updateNode({
-        id: this.node.id,
-        newNode: {
-          [field]: value,
-        },
-      })
-    },
     toggleBackgroundToolbar() {
       const isVisible = this.$refs.backgroundToolbar.toggleVisible()
       if (isVisible) {
@@ -249,6 +240,16 @@ export default {
           textColor: textColor,
           hideTitle: textColor === "",
         },
+      })
+    },
+    handleBackgroundColorInput(backgroundColor) {
+      this.updateNode({
+        id: this.node.id,
+        newNode: {
+          backgroundColor: backgroundColor,
+        },
+      }).then(() => {
+        this.$root.$emit("minimap::redraw")
       })
     },
   },
