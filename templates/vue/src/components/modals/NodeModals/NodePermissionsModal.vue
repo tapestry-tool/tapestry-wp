@@ -1,18 +1,19 @@
 <template>
   <b-modal
     v-if="node"
-    id="node-access-modal"
+    id="node-permissions-modal"
     :visible="show"
     size="lg"
-    title="Node Access"
     scrollable
-    aria-label="Node Access Settings"
+    aria-label="Node Permission Settings"
     @hidden="closeModal"
   >
+    <template #modal-title>
+      <span>{{ node.title }}</span>
+      <i class="fas fa-chevron-right fa-xs mx-2" />
+      <span class="modal-name">Node Permissions</span>
+    </template>
     <b-container fluid>
-      <!-- <h6 class="mt-4 mb-3">Lock Node</h6> -->
-      <!-- <conditions-form /> -->
-      <h6 class="mb-3">Node Permissions</h6>
       <b-card no-body>
         <permissions-table v-model="node.permissions" />
       </b-card>
@@ -31,11 +32,11 @@
 <script>
 import { names } from "@/config/routes"
 import { mapActions, mapGetters } from "vuex"
-import PermissionsTable from "./common/PermissionsTable"
+import PermissionsTable from "../common/PermissionsTable"
 import Helpers from "@/utils/Helpers"
 
 export default {
-  name: "node-access-modal",
+  name: "node-permissions-modal",
   components: {
     PermissionsTable,
   },
@@ -47,17 +48,20 @@ export default {
   computed: {
     ...mapGetters(["getNode"]),
     show() {
-      return this.$route.name === names.NODEACCESS
+      return this.$route.name === names.NODEPERMISSIONS
     },
     nodeId() {
       return parseInt(this.$route.params.nodeId)
     },
   },
   watch: {
-    show(show) {
-      if (show) {
-        this.node = Helpers.deepCopy(this.getNode(this.nodeId))
-      }
+    show: {
+      handler(show) {
+        if (show) {
+          this.node = Helpers.deepCopy(this.getNode(this.nodeId))
+        }
+      },
+      immediate: true,
     },
   },
   methods: {
@@ -81,4 +85,8 @@ export default {
 }
 </script>
 
-<style></style>
+<style lang="scss" scoped>
+.modal-name {
+  color: var(--tapestry-med-gray);
+}
+</style>

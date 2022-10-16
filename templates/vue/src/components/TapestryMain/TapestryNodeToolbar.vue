@@ -137,7 +137,10 @@
           <i class="fas fa-ellipsis-h"></i>
         </tapestry-toolbar-button>
       </template>
-      <b-dropdown-item-button @click="openNodeAccessModal">
+      <b-dropdown-item-button @click="openModal(names.NODEPERMISSIONS)">
+        Node Permissions
+      </b-dropdown-item-button>
+      <b-dropdown-item-button @click="openModal(names.NODELOCK)">
         Lock Node
       </b-dropdown-item-button>
     </b-dropdown>
@@ -170,6 +173,7 @@ export default {
     return {
       tools: tools,
       swatches: swatches,
+      names: names,
 
       activeButton: null,
       activeBackgroundButton: null,
@@ -236,9 +240,9 @@ export default {
         })
         .catch(err => console.log(err))
     },
-    openNodeAccessModal() {
+    openModal(name) {
       this.$router.push({
-        name: names.NODEACCESS,
+        name: name,
         params: { nodeId: this.node.id },
         query: this.$route.query,
       })

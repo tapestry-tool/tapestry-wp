@@ -13,7 +13,8 @@ export const names = {
   MODAL: "modal",
   SETTINGS: "settings",
   LINKMODAL: "linkmodal",
-  NODEACCESS: "nodeAccess",
+  NODEPERMISSIONS: "nodePermissions",
+  NODELOCK: "nodeLock",
   USERANSWERS: "userAnswers",
   USERSETTINGS: "userSettings",
   HELP: "help",
@@ -48,8 +49,12 @@ export default [
         name: names.MODAL,
       },
       {
-        path: `access`,
-        name: names.NODEACCESS,
+        path: `permissions`,
+        name: names.NODEPERMISSIONS,
+      },
+      {
+        path: `lock`,
+        name: names.NODELOCK,
       },
       {
         path: `link/:source/:target`,
