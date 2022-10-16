@@ -55,13 +55,13 @@ export const swatches = [
   { color: "#2980B9", label: "Dark Blue" },
   { color: "#A463BF", label: "Amethyst" },
   { color: "#8E43AD", label: "Purple" },
-  { color: "#3D556E", label: "Dimmed Blue" },
-  { color: "#222F3D", label: "Dark Grey" },
+  { color: "#8396A1", label: "Gray" },
+  { color: "#000000", label: "Black" },
   { color: "#F2C511", label: "Yellow" },
   { color: "#F39C19", label: "Orange" },
   { color: "#E84B3C", label: "Red" },
   { color: "#C0382B", label: "Dark Red" },
-  { color: "#DDE6E8", label: "Silver" },
+  { color: "#FFFFFF", label: "White" },
   { color: "#BDC3C8", label: "Platinum" },
 ]
 
