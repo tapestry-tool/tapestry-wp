@@ -590,6 +590,8 @@ export default {
       this.updateOffset()
     },
     zoomToAndCenterNode(node) {
+      this.$root.$emit("context-toolbar::dismiss")
+
       const baseRadius = Helpers.getNodeBaseRadius(node.level, this.maxLevel)
       const targetScale = 140 / baseRadius
 
@@ -637,6 +639,12 @@ export default {
         },
         () => {
           this.updateScale()
+          if (this.hasPermission(node, "edit")) {
+            this.$root.$emit(
+              "context-toolbar::open",
+              Helpers.getNodeElementId(node.id)
+            )
+          }
         }
       )
     },
@@ -815,7 +823,7 @@ export default {
           this.updateScale()
           if (shouldOpenToolbar) {
             this.$root.$emit(
-              "context-toolbar::click",
+              "context-toolbar::open",
               Helpers.getNodeElementId(node.id)
             )
           }

@@ -55,7 +55,7 @@ export default {
     this.$root.$on("context-toolbar::dismiss", () => {
       this.show = false
     })
-    this.$root.$on("context-toolbar::click", elementId => {
+    this.$root.$on("context-toolbar::open", elementId => {
       if (elementId === this.target && !this.show) {
         this.show = true
       } else {
