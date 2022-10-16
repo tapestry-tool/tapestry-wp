@@ -53,7 +53,10 @@
         tooltip="Change Text Color"
         :active="activeButton === 'textColor'"
       >
-        <i class="fas fa-font fa-lg"></i>
+        <div class="text-color-icon-container">
+          <i class="fas fa-font"></i>
+          <div class="color-box" :style="{ background: node.textColor }"></div>
+        </div>
       </tapestry-toolbar-button>
     </v-swatches>
 
@@ -277,6 +280,18 @@ export default {
   left: 0;
   transform: rotate(-70deg) translate(-6px, -4px);
   transform-origin: 0 0;
+}
+
+.text-color-icon-container {
+  position: relative;
+  width: 20px;
+  margin-top: -5px;
+}
+
+.color-box {
+  width: 20px;
+  height: 5px;
+  position: absolute;
 }
 
 .circle {
