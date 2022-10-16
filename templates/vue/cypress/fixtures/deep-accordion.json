@@ -53,7 +53,7 @@
       "hideProgress": false,
       "hideMedia": false,
       "backgroundColor": "#8396a1",
-      "textColor": "white",
+      "textColor": "#ffffff",
       "skippable": true,
       "fullscreen": false,
       "conditions": [],
@@ -111,7 +111,7 @@
       "hideProgress": false,
       "hideMedia": false,
       "backgroundColor": "#8396a1",
-      "textColor": "white",
+      "textColor": "#ffffff",
       "skippable": true,
       "fullscreen": false,
       "coordinates": {
@@ -175,7 +175,7 @@
       "hideProgress": false,
       "hideMedia": false,
       "backgroundColor": "#8396a1",
-      "textColor": "white",
+      "textColor": "#ffffff",
       "skippable": true,
       "fullscreen": false,
       "coordinates": {

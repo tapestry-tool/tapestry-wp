@@ -88,7 +88,7 @@ class TapestryNode implements ITapestryNode
         $this->hideProgress = false;
         $this->hideMedia = false;
         $this->backgroundColor = '#8396a1';
-        $this->textColor = 'white';
+        $this->textColor = '#ffffff';
         $this->skippable = true;
         $this->fullscreen = false;
         $this->childOrdering = [];

@@ -389,7 +389,7 @@ export default class Helpers {
       hideMedia: false,
       hideWhenLocked: false,
       backgroundColor: "#8396a1",
-      textColor: "white",
+      textColor: "#ffffff",
       skippable: true,
       fullscreen: false,
       coordinates: {
