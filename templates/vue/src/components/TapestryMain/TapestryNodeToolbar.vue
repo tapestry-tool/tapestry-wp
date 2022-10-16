@@ -12,26 +12,9 @@
 
     <div class="tapestry-toolbar-separator"></div>
 
-    <tapestry-toolbar-button
-      :id="`hide-title-button-${node.id}`"
-      class="after-separator"
-      horizontal
-      :tooltip="node.hideTitle ? 'Show Title' : 'Hide Title'"
-      @click="setField('hideTitle', !node.hideTitle)"
-    >
-      <div
-        class="hide-title-text"
-        :class="{
-          'hide-title': node.hideTitle,
-        }"
-      >
-        Title
-        <div v-if="node.hideTitle" class="slash"></div>
-      </div>
-    </tapestry-toolbar-button>
     <v-swatches
       :value="node.textColor"
-      :swatches="swatches"
+      :swatches="swatchesWithTransparentColor"
       show-border
       show-fallback
       shapes="circles"
@@ -41,19 +24,23 @@
       row-length="8"
       popover-x="right"
       class="swatch"
-      @input="setField('textColor', $event)"
+      @input="handleTextColorInput"
       @open="handleOpen('textColor')"
       @close="handleClose('textColor')"
     >
       <tapestry-toolbar-button
         :id="`title-color-button-${node.id}`"
         slot="trigger"
-        class="before-separator"
+        class="after-separator before-separator"
         horizontal
         tooltip="Change Text Color"
         :active="activeButton === 'textColor'"
       >
-        <div class="text-color-icon-container">
+        <div v-if="node.hideTitle" class="text-color-hidden-container">
+          <i class="fas fa-font fa-lg"></i>
+          <div class="slash"></div>
+        </div>
+        <div v-else class="text-color-icon-container">
           <i class="fas fa-font"></i>
           <div class="color-box" :style="{ background: node.textColor }"></div>
         </div>
@@ -186,6 +173,11 @@ export default {
     nodeElementId() {
       return Helpers.getNodeElementId(this.node.id)
     },
+    swatchesWithTransparentColor() {
+      const swatches = [...this.swatches]
+      swatches.splice(swatches.length - 1, 1, { color: "", label: "Transparent" })
+      return swatches
+    },
   },
   methods: {
     ...mapActions(["updateNode", "deleteNode"]),
@@ -250,6 +242,15 @@ export default {
         query: this.$route.query,
       })
     },
+    handleTextColorInput(textColor) {
+      this.updateNode({
+        id: this.node.id,
+        newNode: {
+          textColor: textColor,
+          hideTitle: textColor === "",
+        },
+      })
+    },
   },
 }
 </script>
@@ -263,22 +264,19 @@ export default {
   padding-left: 4px;
 }
 
-.hide-title-text {
+.text-color-hidden-container {
   position: relative;
-
-  &.hide-title {
-    color: #b2b2b2;
-  }
+  color: #b2b2b2;
 }
 
 .slash {
   width: 2px;
-  height: 3rem;
+  height: 40px;
   background: #000;
   position: absolute;
   top: 0;
   left: 0;
-  transform: rotate(-70deg) translate(-6px, -4px);
+  transform: rotate(-45deg) translate(-2px, -4px);
   transform-origin: 0 0;
 }
 
