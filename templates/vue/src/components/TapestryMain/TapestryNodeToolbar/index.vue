@@ -31,7 +31,7 @@
       <tapestry-toolbar-button
         :id="`title-color-button-${node.id}`"
         slot="trigger"
-        class="after-separator before-separator"
+        class="after-separator"
         horizontal
         tooltip="Change Text Color"
         :active="activeButton === 'textColor'"
@@ -47,11 +47,9 @@
       </tapestry-toolbar-button>
     </v-swatches>
 
-    <div class="tapestry-toolbar-separator"></div>
-
     <tapestry-toolbar-button
       :id="`background-button-${node.id}`"
-      class="after-separator before-separator"
+      class="before-separator"
       horizontal
       tooltip="Change Background"
       :active="activeButton === 'background'"
@@ -107,6 +105,24 @@
 
     <div class="tapestry-toolbar-separator"></div>
 
+    <div class="position-relative">
+      <tapestry-toolbar-button
+        :id="`change-level-button-${node.id}`"
+        horizontal
+        tooltip="Change Level"
+        @click="handleToggle('level')"
+      >
+        <div class="circle level-circle">{{ node.level }}</div>
+      </tapestry-toolbar-button>
+      <node-level-select
+        v-if="activeButton === 'level'"
+        :node="node"
+        @close="handleClose('level')"
+      ></node-level-select>
+    </div>
+
+    <div class="tapestry-toolbar-separator"></div>
+
     <b-dropdown
       variant="none"
       no-caret
@@ -140,8 +156,9 @@
 <script>
 import VSwatches from "vue-swatches"
 import "vue-swatches/dist/vue-swatches.css"
-import TapestryContextToolbar from "./TapestryContextToolbar"
-import TapestryToolbarButton from "./common/TapestryToolbarButton"
+import TapestryContextToolbar from "../TapestryContextToolbar"
+import TapestryToolbarButton from "../common/TapestryToolbarButton"
+import NodeLevelSelect from "./NodeLevelSelect"
 import Helpers from "@/utils/Helpers"
 import { tools, swatches } from "@/utils/constants"
 import { mapActions } from "vuex"
@@ -151,6 +168,7 @@ export default {
   components: {
     TapestryContextToolbar,
     TapestryToolbarButton,
+    NodeLevelSelect,
     VSwatches,
   },
   props: {
@@ -192,6 +210,14 @@ export default {
         this.activeButton = null
       }
     },
+    toggleLevelToolbar() {
+      // const isVisible = this.$refs.levelToolbar.toggleVisible()
+      // if (isVisible) {
+      //   this.activeButton = "level"
+      // } else if (this.activeButton === "level") {
+      //   this.activeButton = null
+      // }
+    },
     resetActiveButton() {
       this.activeButton = null
       this.activeBackgroundButton = null
@@ -203,6 +229,14 @@ export default {
     handleClose(button) {
       if (this.activeButton === button) {
         this.activeButton = null
+      }
+    },
+    handleToggle(button) {
+      if (this.activeButton === button) {
+        this.activeButton = null
+      } else {
+        this.activeButton = button
+        this.hidePopupToolbars()
       }
     },
     handleBackgroundClose(button) {
@@ -257,13 +291,15 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+/*
 .before-separator {
-  padding-right: 4px;
+  padding-right: 2px;
 }
 
 .after-separator {
-  padding-left: 4px;
+  padding-left: 2px;
 }
+*/
 
 .text-color-hidden-container {
   position: relative;
@@ -297,6 +333,17 @@ export default {
   width: 1.5rem;
   height: 1.5rem;
   border-radius: 50%;
+}
+
+.level-circle {
+  background-color: var(--tapestry-light-blue);
+  color: #ffffff;
+  font-size: 0.8rem;
+  line-height: 1.5rem;
+}
+
+.position-relative {
+  position: relative;
 }
 </style>
 
