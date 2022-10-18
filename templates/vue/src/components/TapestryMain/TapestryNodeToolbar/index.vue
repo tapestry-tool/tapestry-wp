@@ -1,10 +1,11 @@
 <template>
-  <tapestry-context-toolbar :target="nodeElementId" @hide="resetActiveButton">
+  <tapestry-context-toolbar :target="nodeElementId" @hide="activeButton = null">
     <tapestry-toolbar-button
       :id="`delete-node-button-${node.id}`"
       class="after-separator before-separator"
       horizontal
       tooltip="Delete Node"
+      :active="activeButton === 'delete'"
       @click="handleDeleteNode"
     >
       <i class="fas fa-trash-alt fa-lg"></i>
@@ -47,61 +48,12 @@
       </tapestry-toolbar-button>
     </v-swatches>
 
-    <tapestry-toolbar-button
-      :id="`background-button-${node.id}`"
-      class="before-separator"
-      horizontal
-      tooltip="Change Background"
+    <node-background-button
+      :node="node"
       :active="activeButton === 'background'"
-      @click="toggleBackgroundToolbar"
-    >
-      <i v-if="node.imageURL" class="fas fa-image fa-lg"></i>
-      <div v-else class="circle" :style="{ background: node.backgroundColor }"></div>
-    </tapestry-toolbar-button>
-    <tapestry-context-toolbar
-      ref="backgroundToolbar"
-      :target="`background-button-${node.id}`"
-      placement="bottom"
-    >
-      <tapestry-toolbar-button
-        :id="`background-image-button-${node.id}`"
-        horizontal
-        tooltip="Change Background Image"
-        tooltip-placement="bottom"
-        :active="activeBackgroundButton === 'image'"
-      >
-        <i class="fas fa-image fa-lg"></i>
-      </tapestry-toolbar-button>
-      <v-swatches
-        :value="node.backgroundColor"
-        :swatches="swatches"
-        show-fallback
-        show-border
-        shapes="circles"
-        swatch-size="30"
-        :wrapper-style="{ zIndex: 1000 }"
-        fallback-input-type="color"
-        row-length="8"
-        popover-x="right"
-        popover-y="top"
-        class="swatch"
-        @input="handleBackgroundColorInput"
-        @open="activeBackgroundButton = 'color'"
-        @close="handleBackgroundClose('color')"
-      >
-        <tapestry-toolbar-button
-          :id="`background-color-button-${node.id}`"
-          slot="trigger"
-          class="before-separator"
-          horizontal
-          tooltip="Change Background Color"
-          tooltip-placement="bottom"
-          :active="activeBackgroundButton === 'color'"
-        >
-          <div class="circle" :style="{ background: node.backgroundColor }"></div>
-        </tapestry-toolbar-button>
-      </v-swatches>
-    </tapestry-context-toolbar>
+      @show="handleOpen('background')"
+      @hide="handleClose('background')"
+    ></node-background-button>
 
     <div class="tapestry-toolbar-separator"></div>
 
@@ -159,6 +111,7 @@ import "vue-swatches/dist/vue-swatches.css"
 import TapestryContextToolbar from "../TapestryContextToolbar"
 import TapestryToolbarButton from "../common/TapestryToolbarButton"
 import NodeLevelSelect from "./NodeLevelSelect"
+import NodeBackgroundButton from "./NodeBackgroundButton"
 import Helpers from "@/utils/Helpers"
 import { tools, swatches } from "@/utils/constants"
 import { mapActions } from "vuex"
@@ -169,6 +122,7 @@ export default {
     TapestryContextToolbar,
     TapestryToolbarButton,
     NodeLevelSelect,
+    NodeBackgroundButton,
     VSwatches,
   },
   props: {
@@ -184,7 +138,6 @@ export default {
       names: names,
 
       activeButton: null,
-      activeBackgroundButton: null,
     }
   },
   computed: {
@@ -199,32 +152,8 @@ export default {
   },
   methods: {
     ...mapActions(["updateNode", "deleteNode"]),
-    hidePopupToolbars() {
-      this.$refs.backgroundToolbar.hide()
-    },
-    toggleBackgroundToolbar() {
-      const isVisible = this.$refs.backgroundToolbar.toggleVisible()
-      if (isVisible) {
-        this.activeButton = "background"
-      } else if (this.activeButton === "background") {
-        this.activeButton = null
-      }
-    },
-    toggleLevelToolbar() {
-      // const isVisible = this.$refs.levelToolbar.toggleVisible()
-      // if (isVisible) {
-      //   this.activeButton = "level"
-      // } else if (this.activeButton === "level") {
-      //   this.activeButton = null
-      // }
-    },
-    resetActiveButton() {
-      this.activeButton = null
-      this.activeBackgroundButton = null
-    },
     handleOpen(button) {
       this.activeButton = button
-      this.hidePopupToolbars()
     },
     handleClose(button) {
       if (this.activeButton === button) {
@@ -236,16 +165,10 @@ export default {
         this.activeButton = null
       } else {
         this.activeButton = button
-        this.hidePopupToolbars()
-      }
-    },
-    handleBackgroundClose(button) {
-      if (this.activeBackgroundButton === button) {
-        this.activeBackgroundButton = null
       }
     },
     handleDeleteNode() {
-      this.hidePopupToolbars()
+      this.activeButton = "delete"
       this.$bvModal
         .msgBoxConfirm(`Are you sure you want to delete ${this.node.title}?`, {
           modalClass: "node-modal-confirmation",
@@ -259,6 +182,9 @@ export default {
           }
         })
         .catch(err => console.log(err))
+        .finally(() => {
+          this.handleClose("delete")
+        })
     },
     openModal(name) {
       this.$router.push({
@@ -274,16 +200,6 @@ export default {
           textColor: textColor,
           hideTitle: textColor === "",
         },
-      })
-    },
-    handleBackgroundColorInput(backgroundColor) {
-      this.updateNode({
-        id: this.node.id,
-        newNode: {
-          backgroundColor: backgroundColor,
-        },
-      }).then(() => {
-        this.$root.$emit("minimap::redraw")
       })
     },
   },
