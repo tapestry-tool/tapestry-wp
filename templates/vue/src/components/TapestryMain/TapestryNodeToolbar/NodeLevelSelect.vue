@@ -75,6 +75,7 @@ export default {
   color: #ffffff;
   font-size: 0.8rem;
   line-height: 1.5rem;
+  margin-top: -2px;
 }
 
 button {
