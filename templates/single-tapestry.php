@@ -11,6 +11,7 @@
 
 get_header();
 ?>
+
 <div id="primary" class="content-area col-md-12">
     <?php
     $main_classes = implode(" ", array_map(function ($role) {

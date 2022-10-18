@@ -277,7 +277,7 @@ import { sizes, nodeStatus } from "@/utils/constants"
 import { getLinkMetadata } from "@/services/LinkPreviewApi"
 import DragSelectModular from "@/utils/dragSelectModular"
 import * as wp from "@/services/wp"
-import client from "@/services/TapestryAPI"
+import KalturaAPI from "@/services/KalturaAPI"
 
 const shouldFetch = (url, selectedNode) => {
   if (!selectedNode.typeData.linkMetadata) {
@@ -1089,7 +1089,7 @@ export default {
         if (this.node.mediaFormat === "kaltura") {
           if (wp.getKalturaStatus()) {
             try {
-              const validKalturaVideo = await client.checkKalturaVideo(
+              const validKalturaVideo = await KalturaAPI.getVideoStatus(
                 this.node.typeData.kalturaId
               )
               if (!validKalturaVideo) {
@@ -1251,7 +1251,7 @@ export default {
         if (this.node.mediaFormat === "kaltura") {
           if (wp.getKalturaStatus()) {
             try {
-              data = await client.getKalturaVideoMeta(this.node.typeData.kalturaId)
+              data = await KalturaAPI.getVideoMeta(this.node.typeData.kalturaId)
             } catch (error) {
               this.addApiError(error)
               return

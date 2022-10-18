@@ -95,7 +95,7 @@
 </template>
 
 <script>
-import client from "@/services/TapestryAPI"
+import KalturaAPI from "@/services/KalturaAPI"
 import ErrorHelper from "@/utils/errorHelper"
 
 export default {
@@ -155,21 +155,18 @@ export default {
       this.selectedVideos = rows
     },
     startVideoUpload() {
-      client
-        .startKalturaUpload(
-          this.selectedVideos.map(video => video.nodeID),
-          this.useKalturaPlayer
-        )
-        .catch(error => {
-          // Kaltura availability changed unexpectedly
-          this.$emit("api-error", ErrorHelper.getErrorMessage(error))
-        })
+      KalturaAPI.uploadVideos(
+        this.selectedVideos.map(video => video.nodeID),
+        this.useKalturaPlayer
+      ).catch(error => {
+        // Kaltura availability changed unexpectedly
+        this.$emit("api-error", ErrorHelper.getErrorMessage(error))
+      })
 
       this.$emit("upload-start")
     },
     getVideosToUpload(ctx, callback) {
-      client
-        .getVideosToUpload()
+      KalturaAPI.getVideosToUpload()
         .then(data => {
           callback(data)
         })

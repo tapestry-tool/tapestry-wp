@@ -77,7 +77,7 @@
 
 <script>
 import { mapMutations, mapState } from "vuex"
-import client from "@/services/TapestryAPI"
+import KalturaAPI from "@/services/KalturaAPI"
 import ErrorHelper from "@/utils/errorHelper"
 import * as wp from "@/services/wp"
 
@@ -138,7 +138,7 @@ export default {
         this.uploadAlertText = ""
 
         try {
-          const kalturaId = await client.uploadVideoToKaltura(videoFile, this.nodeId)
+          const kalturaId = await KalturaAPI.uploadVideo(videoFile, this.nodeId)
           this.kalturaId = kalturaId
           this.uploadAlertText = `
             Upload completed successfully. Your video has Kaltura ID ${kalturaId}.

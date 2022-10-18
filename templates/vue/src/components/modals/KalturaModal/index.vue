@@ -100,6 +100,7 @@
 
 <script>
 import client from "@/services/TapestryAPI"
+import KalturaAPI from "@/services/KalturaAPI"
 import { data as wpData } from "@/services/wp"
 import { names } from "@/config/routes"
 import KalturaUploadTab from "./KalturaUploadTab"
@@ -226,7 +227,7 @@ export default {
       setTimeout(this.refresh, 1000)
     },
     refresh() {
-      Promise.all([client.getKalturaUploadStatus(), client.getNotifications()]).then(
+      Promise.all([KalturaAPI.getUploadStatus(), client.getNotifications()]).then(
         ([status, notifications]) => {
           this.isUploading = status.inProgress
           this.uploadError = status.error
@@ -257,7 +258,7 @@ export default {
       })
     },
     async requestStopVideoUpload() {
-      await client.requestStopKalturaUpload()
+      await KalturaAPI.stopUpload()
       this.hasRequestedStop = true
       setTimeout(() => {
         this.hasRequestedStop = false
@@ -265,7 +266,7 @@ export default {
     },
     async clearUploadError() {
       this.uploadError = false
-      await client.clearKalturaUploadError()
+      await KalturaAPI.clearUploadError()
     },
   },
 }

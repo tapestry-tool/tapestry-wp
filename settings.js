@@ -13,7 +13,7 @@ function openRequest(method, endpoint) {
 }
 
 function refreshUploadInProgress() {
-  const xhr = openRequest("GET", "/kaltura/upload_status");
+  const xhr = openRequest("GET", "/kaltura/videos/status");
 
   xhr.onload = () => {
     if (xhr.status >= 200 && xhr.status < 300) {
@@ -90,7 +90,7 @@ function forceResetUploadStatus() {
     return;
   }
 
-  const xhr = openRequest("POST", "/kaltura/upload_status/reset");
+  const xhr = openRequest("DELETE", "/kaltura/videos/status");
 
   const btn = document.getElementById("reset_upload_status");
   btn.toggleAttribute("disabled");

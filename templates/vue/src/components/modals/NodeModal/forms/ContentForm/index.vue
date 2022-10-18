@@ -194,7 +194,7 @@ export default {
     mediaFormats() {
       if (this.node.mediaType === "video") {
         return [
-          { value: "mp4", text: "URL" },
+          { value: "mp4", text: "File or URL" },
           { value: "youtube", text: "YouTube" },
           { value: "kaltura", text: "Kaltura", disabled: this.disableKalturaOption },
         ]

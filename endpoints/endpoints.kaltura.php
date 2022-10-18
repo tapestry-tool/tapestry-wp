@@ -43,74 +43,10 @@ class KalturaEndpoints
 
         return [
             'UPLOAD_VIDEO_TO_KALTURA' => (object) [
-                'ROUTE' => '/kaltura/upload_video',
+                'ROUTE' => '/kaltura/video',
                 'ARGUMENTS' => [
                     'methods' => $REST_API_POST_METHOD,
                     'callback' => 'KalturaEndpoints::uploadVideoToKaltura',
-                    'permission_callback' => 'KalturaEndpoints::canUploadToKaltura',
-                ],
-            ],
-            'UPLOAD_VIDEOS_TO_KALTURA' => (object) [
-                'ROUTE' => '/kaltura/upload_videos',
-                'ARGUMENTS' => [
-                    'methods' => $REST_API_POST_METHOD,
-                    'callback' => 'KalturaEndpoints::uploadVideosToKaltura',
-                    'permission_callback' => 'KalturaEndpoints::canUploadToKaltura',
-                ],
-            ],
-            'GET_VIDEOS_TO_UPLOAD_TO_KALTURA' => (object) [
-                'ROUTE' => '/kaltura/videos/to_upload',
-                'ARGUMENTS' => [
-                    'methods' => $REST_API_GET_METHOD,
-                    'callback' => 'KalturaEndpoints::getVideosToUpload',
-                    'permission_callback' => 'KalturaEndpoints::canUploadToKaltura',
-                ],
-            ],
-            'GET_KALTURA_UPLOAD_STATUS' => (object) [
-                'ROUTE' => '/kaltura/upload_status',
-                'ARGUMENTS' => [
-                    'methods' => $REST_API_GET_METHOD,
-                    'callback' => 'KalturaEndpoints::getKalturaUploadStatus',
-                    'permission_callback' => 'KalturaEndpoints::canUploadToKaltura',
-                ],
-            ],
-            'GET_KALTURA_UPLOAD_LOG' => (object) [
-                'ROUTE' => '/kaltura/upload_log',
-                'ARGUMENTS' => [
-                    'methods' => $REST_API_GET_METHOD,
-                    'callback' => 'KalturaEndpoints::getKalturaUploadLog',
-                    'permission_callback' => 'KalturaEndpoints::canUploadToKaltura',
-                ],
-            ],
-            'RESET_UPLOAD_STATUS' => (object) [
-                'ROUTE' => '/kaltura/upload_status/reset',
-                'ARGUMENTS' => [
-                    'methods' => $REST_API_POST_METHOD,
-                    'callback' => 'KalturaEndpoints::forceResetUploadStatus',
-                    'permission_callback' => 'KalturaEndpoints::canUploadToKaltura',
-                ],
-            ],
-            'CLEAR_UPLOAD_ERROR' => (object) [
-                'ROUTE' => '/kaltura/upload_status/clear_error',
-                'ARGUMENTS' => [
-                    'methods' => $REST_API_POST_METHOD,
-                    'callback' => 'KalturaEndpoints::clearUploadError',
-                    'permission_callback' => 'KalturaEndpoints::canUploadToKaltura',
-                ],
-            ],
-            'STOP_KALTURA_UPLOAD' => (object) [
-                'ROUTE' => '/kaltura/stop_upload',
-                'ARGUMENTS' => [
-                    'methods' => $REST_API_POST_METHOD,
-                    'callback' => 'KalturaEndpoints::stopKalturaUpload',
-                    'permission_callback' => 'KalturaEndpoints::canUploadToKaltura',
-                ],
-            ],
-            'UPDATE_CONVERTING_VIDEOS' => (object) [
-                'ROUTE' => '/kaltura/videos/converting',
-                'ARGUMENTS' => [
-                    'methods' => $REST_API_POST_METHOD,
-                    'callback' => 'KalturaEndpoints::updateConvertingVideos',
                     'permission_callback' => 'KalturaEndpoints::canUploadToKaltura',
                 ],
             ],
@@ -126,6 +62,70 @@ class KalturaEndpoints
                 'ARGUMENTS' => [
                     'methods' => $REST_API_GET_METHOD,
                     'callback' => 'KalturaEndpoints::getKalturaVideoMeta',
+                ],
+            ],
+            'UPLOAD_VIDEOS_TO_KALTURA' => (object) [
+                'ROUTE' => '/kaltura/videos',
+                'ARGUMENTS' => [
+                    'methods' => $REST_API_POST_METHOD,
+                    'callback' => 'KalturaEndpoints::uploadVideosToKaltura',
+                    'permission_callback' => 'KalturaEndpoints::canUploadToKaltura',
+                ],
+            ],
+            'UPDATE_CONVERTING_VIDEOS' => (object) [
+                'ROUTE' => '/kaltura/videos/converting',
+                'ARGUMENTS' => [
+                    'methods' => $REST_API_POST_METHOD,
+                    'callback' => 'KalturaEndpoints::updateConvertingVideos',
+                    'permission_callback' => 'KalturaEndpoints::canUploadToKaltura',
+                ],
+            ],
+            'GET_KALTURA_UPLOAD_LOG' => (object) [
+                'ROUTE' => '/kaltura/videos/log',
+                'ARGUMENTS' => [
+                    'methods' => $REST_API_GET_METHOD,
+                    'callback' => 'KalturaEndpoints::getKalturaUploadLog',
+                    'permission_callback' => 'KalturaEndpoints::canUploadToKaltura',
+                ],
+            ],
+            'GET_KALTURA_UPLOAD_STATUS' => (object) [
+                'ROUTE' => '/kaltura/videos/status',
+                'ARGUMENTS' => [
+                    'methods' => $REST_API_GET_METHOD,
+                    'callback' => 'KalturaEndpoints::getKalturaUploadStatus',
+                    'permission_callback' => 'KalturaEndpoints::canUploadToKaltura',
+                ],
+            ],
+            'RESET_UPLOAD_STATUS' => (object) [
+                'ROUTE' => '/kaltura/videos/status',
+                'ARGUMENTS' => [
+                    'methods' => $REST_API_DELETE_METHOD,
+                    'callback' => 'KalturaEndpoints::forceResetUploadStatus',
+                    'permission_callback' => 'KalturaEndpoints::canUploadToKaltura',
+                ],
+            ],
+            'CLEAR_UPLOAD_ERROR' => (object) [
+                'ROUTE' => '/kaltura/videos/status/error',
+                'ARGUMENTS' => [
+                    'methods' => $REST_API_DELETE_METHOD,
+                    'callback' => 'KalturaEndpoints::clearUploadError',
+                    'permission_callback' => 'KalturaEndpoints::canUploadToKaltura',
+                ],
+            ],
+            'STOP_KALTURA_UPLOAD' => (object) [
+                'ROUTE' => '/kaltura/videos/stop',
+                'ARGUMENTS' => [
+                    'methods' => $REST_API_POST_METHOD,
+                    'callback' => 'KalturaEndpoints::stopKalturaUpload',
+                    'permission_callback' => 'KalturaEndpoints::canUploadToKaltura',
+                ],
+            ],
+            'GET_VIDEOS_TO_UPLOAD_TO_KALTURA' => (object) [
+                'ROUTE' => '/kaltura/videos_to_upload',
+                'ARGUMENTS' => [
+                    'methods' => $REST_API_GET_METHOD,
+                    'callback' => 'KalturaEndpoints::getVideosToUpload',
+                    'permission_callback' => 'KalturaEndpoints::canUploadToKaltura',
                 ],
             ],
         ];
