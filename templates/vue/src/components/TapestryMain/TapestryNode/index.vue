@@ -10,8 +10,6 @@
       :transform="`translate(${coordinates.x}, ${coordinates.y})`"
       :class="{
         opaque: !visibleNodes.includes(node.id),
-        'has-thumbnail': node.thumbnailURL,
-        'has-title': !node.hideTitle,
       }"
       :style="{
         cursor:
