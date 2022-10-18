@@ -65,7 +65,13 @@
         <transition name="fade">
           <foreignObject
             v-if="!node.hideTitle"
-            v-show="!isHovered || !thumbnailURL || selected || !node.unlocked"
+            v-show="
+              !isHovered ||
+                !thumbnailURL ||
+                selected ||
+                !node.unlocked ||
+                hasPermission('edit')
+            "
             :data-qa="`node-title-${node.id}`"
             class="metaWrapper"
             :width="(radius * 2 * 5) / 6"
