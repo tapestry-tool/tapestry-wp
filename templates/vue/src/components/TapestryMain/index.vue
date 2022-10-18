@@ -441,9 +441,12 @@ export default {
     if (!this.isEmptyTapestry) {
       this.setCurrentTool(tools.PAN)
     }
+
+    document.body.addEventListener("keydown", this.handleGenericKey)
   },
   beforeDestroy() {
     this.zoomPanHelper && this.zoomPanHelper.unregister()
+    document.body.removeEventListener("keydown", this.handleGenericKey)
   },
   methods: {
     ...mapActions(["updateNodeCoordinates"]),
@@ -954,26 +957,48 @@ export default {
         this.activeNode = id
       }
     },
-    handleKey(evt) {
-      // Ignore key events if focus is outside Tapestry view or if is focused on a node title (for editing)
-      if (
-        !this.$refs["vue-svg"]?.contains(document.activeElement) ||
-        document.activeElement.className === "node-title"
-      ) {
-        return
+    handleGenericKey(evt, isEventHandler = true) {
+      // Used to capture generic key for global actions on keydown events from the document body or from a focusable element within the main view
+      if (this.isEmptyTapestry) {
+        return false
       }
 
-      if (this.isEmptyTapestry) {
-        return
+      if (isEventHandler && document.activeElement !== document.body) {
+        return false
       }
+
       const { code } = evt
-      const node = this.getNode(this.selectedId)
       const tool = Object.entries(toolKeyBindings).find(
         ([, key]) => `Key${key}` === code
       )?.[0]
       if (tool) {
         this.setCurrentTool(tool)
-      } else if (code === "Enter") {
+        return true
+      }
+      return false
+    },
+    handleKey(evt) {
+      if (this.isEmptyTapestry) {
+        return
+      }
+
+      // Ignore key events if focused on a node title for in-place editing
+      if (document.activeElement.className === "node-title") {
+        return
+      }
+
+      if (this.handleGenericKey(evt, false)) {
+        return
+      }
+
+      // Ignore key events if focus is outside Tapestry view
+      if (!this.$refs["vue-svg"]?.contains(document.activeElement)) {
+        return
+      }
+
+      const { code } = evt
+      const node = this.getNode(this.selectedId)
+      if (code === "Enter") {
         if (this.nodeNavLinkMode) {
           this.$router.push({
             name: names.LINKMODAL,
