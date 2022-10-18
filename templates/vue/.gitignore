@@ -7,6 +7,7 @@ config.js
 cypress.json
 cypress/screenshots/
 cypress/videos/
+cypress/downloads/
 .env
 
 # Editor directories and files

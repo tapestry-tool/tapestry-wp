@@ -3,9 +3,5 @@
 .DS_Store
 *.icloud
 
-cypress/videos
-cypress/screenshots
-cypress.json
-
 data/
 bin/config.sh
