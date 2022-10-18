@@ -42,7 +42,6 @@ error_reporting(E_ERROR | E_PARSE);
  */
 require_once dirname(__FILE__).'/classes/class.tapestry-analytics.php';
 require_once dirname(__FILE__).'/classes/class.kaltura-api.php';
-require_once dirname(__FILE__).'/utilities/class.tapestry-helpers.php';
 require_once dirname(__FILE__).'/endpoints.php';
 require_once dirname(__FILE__).'/settings.php';
 require_once dirname(__FILE__).'/plugin-updates.php';
