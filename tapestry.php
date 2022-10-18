@@ -45,6 +45,7 @@ require_once dirname(__FILE__).'/classes/class.kaltura-api.php';
 require_once dirname(__FILE__).'/endpoints.php';
 require_once dirname(__FILE__).'/settings.php';
 require_once dirname(__FILE__).'/plugin-updates.php';
+require_once dirname(__FILE__).'/utilities/class.tapestry-import-export.php';
 
 /**
  * Register Tapestry type on initialization.
@@ -360,4 +361,23 @@ function tapestry_tool_log_event()
     $analytics->log($_POST);
 
     wp_die();
+}
+
+// Cleanup
+
+add_action('tapestry_clean_export_files', 'clean_export_files');
+function clean_export_files() {
+    TapestryImportExport::clearExportedZips();
+}
+
+register_activation_hook(__FILE__, 'schedule_tapestry_export_file_cleanup');
+function schedule_tapestry_export_file_cleanup() {
+    if ( ! wp_next_scheduled('tapestry_clean_export_files') ) {
+        wp_schedule_event( time(), 'daily', 'tapestry_clean_export_files' );
+    }
+}
+
+register_deactivation_hook(__FILE__, 'unschedule_tapestry_export_file_cleanup');
+function unschedule_tapestry_export_file_cleanup() {
+    wp_clear_scheduled_hook('tapestry_clean_export_files');
 }

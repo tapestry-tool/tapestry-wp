@@ -23,4 +23,25 @@ class TapestryH5P implements ITapestryH5P
 
         return $content;
     }
+
+    /**
+     * Gets the id and slug of an H5P content, by id.
+     *
+     * @param string|int    H5P id
+     *
+     * @return object|null an object containing the id and slug of the H5P content,
+     *                     or null if not found
+     */
+    public function getH5P($id)
+    {
+        global $wpdb;
+
+        $sql = $wpdb->prepare('SELECT content.id as id, content.slug as slug
+                                FROM '.$wpdb->prefix.'h5p_contents content
+                                WHERE content.id = %d;', (int) $id);
+
+        $h5p_content = $wpdb->get_row($sql);
+
+        return $h5p_content;
+    }
 }
