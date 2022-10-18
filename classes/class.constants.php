@@ -21,13 +21,3 @@ class CommentTypes
     public const COMMENT = 'Comment';
     public const STATUS_CHANGE = 'StatusChange';
 }
-
-class UploadStatus
-{
-    public const NOT_STARTED = 'Not started';
-    public const UPLOADING = 'Uploading';
-    public const CONVERTING = 'Converting';
-    public const COMPLETE = 'Complete';
-    public const CANCELED = 'Canceled';
-    public const ERROR = 'Error';
-}

@@ -9,7 +9,8 @@
       <div>Upload Videos to Kaltura</div>
       <b-form-text>
         Select videos in this Tapestry that you would like to upload to Kaltura. Only
-        videos added as file uploads can be uploaded.
+        videos added as file uploads can be uploaded. Once a video is successfully
+        uploaded to Kaltura, it will be deleted locally to save server space.
       </b-form-text>
       <b-table
         ref="videoTable"
@@ -55,7 +56,11 @@
           </b-tooltip>
         </template>
       </b-table>
-      <b-form-group>
+      <b-form-group
+        description="Your videos can keep using a basic HTML5 video player if you
+          uncheck this, but the basic player does not provide features such as
+          captions, quality, and bandwidth adjustments."
+      >
         <b-form-checkbox v-model="useKalturaPlayer" :disabled="isUploading">
           Switch uploaded videos to use Kaltura media player
         </b-form-checkbox>

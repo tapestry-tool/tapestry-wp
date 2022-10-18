@@ -22,6 +22,16 @@ class KalturaConstants
     public const UPLOAD_BATCH_SIZE = 10;
 }
 
+class KalturaUploadStatus
+{
+    public const NOT_STARTED = 'Not started';
+    public const UPLOADING = 'Uploading';
+    public const CONVERTING = 'Converting';
+    public const COMPLETE = 'Complete';
+    public const CANCELED = 'Canceled';
+    public const ERROR = 'Error';
+}
+
 class KalturaEndpoints
 {
     public static function getRoutes()
@@ -446,7 +456,7 @@ class KalturaEndpoints
                     && is_array($kalturaData)
                     && array_key_exists('id', $kalturaData)
                     && array_key_exists('uploadStatus', $kalturaData)
-                    && $kalturaData['uploadStatus'] === UploadStatus::CONVERTING) {
+                    && $kalturaData['uploadStatus'] === KalturaUploadStatus::CONVERTING) {
                     $kalturaID = $kalturaData['id'];
                     $response = $kalturaApi->getVideo($kalturaID);
 
@@ -455,21 +465,21 @@ class KalturaEndpoints
                         'nodeID' => $nodeID,
                         'nodeTitle' => $node->getTitle(),
                         'kalturaID' => $kalturaID,
-                        'previousStatus' => UploadStatus::CONVERTING,
-                        'currentStatus' => UploadStatus::CONVERTING,
+                        'previousStatus' => KalturaUploadStatus::CONVERTING,
+                        'currentStatus' => KalturaUploadStatus::CONVERTING,
                         'additionalInfo' => '',
                     ];
 
                     if ($response->status === EntryStatus::READY) {
-                        self::_saveVideoUploadStatusInNode($node, UploadStatus::COMPLETE, $response);
+                        self::_saveVideoUploadStatusInNode($node, KalturaUploadStatus::COMPLETE, $response);
 
                         $file_path = TapestryHelpers::getPathToNodeMedia($node)->file_path;
                         KalturaApi::saveAndDeleteLocalVideo($node, $response, $useKalturaPlayer, $file_path);
 
-                        $video->currentStatus = UploadStatus::COMPLETE;
+                        $video->currentStatus = KalturaUploadStatus::COMPLETE;
                     } elseif ($response->status !== EntryStatus::PRECONVERT) {
-                        self::_saveVideoUploadStatusInNode($node, UploadStatus::ERROR, $response);
-                        $video->currentStatus = UploadStatus::ERROR;
+                        self::_saveVideoUploadStatusInNode($node, KalturaUploadStatus::ERROR, $response);
+                        $video->currentStatus = KalturaUploadStatus::ERROR;
                         if ($response->status === EntryStatus::ERROR_CONVERTING) {
                             $video->additionalInfo = 'An error occurred: Could not convert the video.';
                         } else {
@@ -695,7 +705,7 @@ class KalturaEndpoints
             $batch = array_slice($videosToUpload, $batchStart, KalturaConstants::UPLOAD_BATCH_SIZE);
 
             foreach ($batch as $video) {
-                self::saveVideoUploadStatus($video, $videosToUpload, UploadStatus::UPLOADING);
+                self::saveVideoUploadStatus($video, $videosToUpload, KalturaUploadStatus::UPLOADING);
 
                 $kalturaData = null;
                 try {
@@ -706,18 +716,18 @@ class KalturaEndpoints
                     error_log($error_msg."\nStack trace: \n".$e->getTraceAsString());
 
                     $video->additionalInfo = $error_msg;
-                    self::saveVideoUploadStatus($video, $videosToUpload, UploadStatus::ERROR);
+                    self::saveVideoUploadStatus($video, $videosToUpload, KalturaUploadStatus::ERROR);
                     $numUploadedWithError++;
                     continue;
                 }
 
                 $video->kalturaID = $kalturaData->id;
-                self::saveVideoUploadStatus($video, $videosToUpload, UploadStatus::CONVERTING, $kalturaData);
+                self::saveVideoUploadStatus($video, $videosToUpload, KalturaUploadStatus::CONVERTING, $kalturaData);
             }
 
             // Filter out videos that did not successfully upload so we don't get an infinite loop
             $remainingVideos = array_filter($batch, function ($vid) {
-                return $vid->uploadStatus === UploadStatus::CONVERTING;
+                return $vid->uploadStatus === KalturaUploadStatus::CONVERTING;
             });
 
             while (count($remainingVideos) > 0) {
@@ -733,16 +743,16 @@ class KalturaEndpoints
                     }
 
                     if ($response->status === EntryStatus::READY) {
-                        $node = self::saveVideoUploadStatus($video, $videosToUpload, UploadStatus::COMPLETE);
+                        $node = self::saveVideoUploadStatus($video, $videosToUpload, KalturaUploadStatus::COMPLETE);
                         KalturaApi::saveAndDeleteLocalVideo($node, $response, $useKalturaPlayer, $video->file->file_path);
                         $numSuccessfullyUploaded++;
                     } elseif ($response->status === EntryStatus::ERROR_CONVERTING) {
                         $video->additionalInfo = 'An error occurred: Could not convert the video.';
-                        self::saveVideoUploadStatus($video, $videosToUpload, UploadStatus::ERROR);
+                        self::saveVideoUploadStatus($video, $videosToUpload, KalturaUploadStatus::ERROR);
                         $numUploadedWithError++;
                     } else {
                         $video->additionalInfo = 'An error occurred: Expected the video to be converting, but it was not.';
-                        self::saveVideoUploadStatus($video, $videosToUpload, UploadStatus::ERROR);
+                        self::saveVideoUploadStatus($video, $videosToUpload, KalturaUploadStatus::ERROR);
                         $numUploadedWithError++;
                     }
 
@@ -763,7 +773,7 @@ class KalturaEndpoints
 
         // Mark remaining videos as canceled, if any
         for ($i = $batchStart; $i < count($videosToUpload); $i++) {
-            self::saveVideoUploadStatus($videosToUpload[$i], $videosToUpload, UploadStatus::CANCELED);
+            self::saveVideoUploadStatus($videosToUpload[$i], $videosToUpload, KalturaUploadStatus::CANCELED);
         }
 
         return (object) [
@@ -789,14 +799,14 @@ class KalturaEndpoints
                     'tapestryID' => $tapestryPostId,
                     'nodeID' => $nodeId,
                     'nodeTitle' => $node->getTitle(),
-                    'uploadStatus' => UploadStatus::NOT_STARTED,
+                    'uploadStatus' => KalturaUploadStatus::NOT_STARTED,
                     'file' => TapestryHelpers::getPathToNodeMedia($node),
                     'kalturaID' => '',
                     'additionalInfo' => '',
                     'timestamp' => $timestamp,
                 ]);
 
-                $node->getTypeData()->kalturaData = array('uploadStatus' => UploadStatus::NOT_STARTED);
+                $node->getTypeData()->kalturaData = array('uploadStatus' => KalturaUploadStatus::NOT_STARTED);
                 $node->save();
             }
         }
