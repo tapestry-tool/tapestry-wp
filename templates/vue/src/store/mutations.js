@@ -205,3 +205,7 @@ export function setCurrentEditingNodeProperty(state, { property, value }) {
     }
   }
 }
+
+export function setNotifications(state, notifications) {
+  state.notifications = notifications
+}

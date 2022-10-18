@@ -4,7 +4,7 @@
       <b-form-checkbox
         v-model="includeMedia"
         data-qa="include-media"
-        class="mb-2"
+        class="mt-2"
         switch
       >
         {{ includeMedia ? "Include media" : "Exclude media" }}

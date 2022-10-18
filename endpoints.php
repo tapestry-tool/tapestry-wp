@@ -3,7 +3,6 @@
 /**
  * Tapestry Endpoints.
  */
-require_once __DIR__.'/utilities/class.tapestry-permissions.php';
 require_once __DIR__.'/classes/class.tapestry.php';
 require_once __DIR__.'/classes/class.tapestry-node.php';
 require_once __DIR__.'/classes/class.tapestry-group.php';
@@ -11,10 +10,12 @@ require_once __DIR__.'/classes/class.tapestry-user-progress.php';
 require_once __DIR__.'/classes/class.tapestry-audio.php';
 require_once __DIR__.'/classes/class.tapestry-h5p.php';
 require_once __DIR__.'/classes/class.constants.php';
+require_once __DIR__.'/utilities/class.tapestry-permissions.php';
 require_once __DIR__.'/utilities/class.tapestry-user.php';
 require_once __DIR__.'/utilities/class.tapestry-import-export.php';
 require_once __DIR__.'/utilities/class.tapestry-errors.php';
 require_once __DIR__.'/utilities/class.tapestry-helpers.php';
+require_once __DIR__.'/endpoints/endpoints.kaltura.php';
 
 $REST_API_NAMESPACE = 'tapestry-tool/v1';
 
@@ -72,6 +73,22 @@ $REST_API_ENDPOINTS = [
         'ARGUMENTS' => [
             'methods' => $REST_API_PUT_METHOD,
             'callback' => 'updateTapestrySettings',
+            'permission_callback' => 'TapestryPermissions::putTapestrySettings',
+        ],
+    ],
+    'GET_TAPESTRY_NOTIFICATIONS' => (object) [
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/notifications',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => 'getTapestryNotifications',
+            'permission_callback' => 'TapestryPermissions::putTapestrySettings',
+        ],
+    ],
+    'PUT_TAPESTRY_NOTIFICATIONS' => (object) [
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/notifications',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_PUT_METHOD,
+            'callback' => 'updateTapestryNotifications',
             'permission_callback' => 'TapestryPermissions::putTapestrySettings',
         ],
     ],
@@ -342,6 +359,8 @@ $REST_API_ENDPOINTS = [
         ],
     ],
 ];
+
+$REST_API_ENDPOINTS = array_merge($REST_API_ENDPOINTS, KalturaEndpoints::getRoutes());
 
 /*
  * REGISTER API ENDPOINTS
@@ -926,6 +945,53 @@ function updateTapestrySettings($request)
         $tapestry->set((object) ['settings' => $settings]);
 
         return $tapestry->save();
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+/**
+ * Get Tapestry notifications.
+ *
+ * @param object $request HTTP request
+ *
+ * @return object $response   HTTP response
+ */
+function getTapestryNotifications($request)
+{
+    $postId = $request['tapestryPostId'];
+    try {
+        if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+        $tapestry = new Tapestry($postId);
+        return $tapestry->getNotifications();
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+/**
+ * Update Tapestry notifications.
+ *
+ * @param object $request HTTP request
+ *
+ * @return object $response   HTTP response
+ */
+function updateTapestryNotifications($request)
+{
+    $postId = $request['tapestryPostId'];
+    $notifications = json_decode($request->get_body());
+    // TODO: JSON validations should happen here
+    try {
+        if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+        $tapestry = new Tapestry($postId);
+        $tapestry->set((object) ['notifications' => $notifications]);
+
+        $tapestry->save();
+        return true;
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }

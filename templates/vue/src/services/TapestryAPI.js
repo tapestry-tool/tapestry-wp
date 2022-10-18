@@ -1,5 +1,4 @@
 import axios from "axios"
-import Helpers from "../utils/Helpers"
 import { data } from "./wp"
 
 const { apiUrl, nonce, postId, adminAjaxUrl } = data
@@ -78,7 +77,7 @@ class TapestryApi {
 
   async getNode(id) {
     const data = await this.getTapestry()
-    return data.nodes[Helpers.findNodeIndex(id, data)]
+    return data.nodes[id]
   }
 
   async getNodeProgress(id) {
@@ -180,6 +179,18 @@ class TapestryApi {
   async updateSettings(settings) {
     const url = `/tapestries/${this.postId}/settings`
     const response = await this.client.put(url, settings)
+    return response
+  }
+
+  async getNotifications() {
+    const url = `/tapestries/${this.postId}/notifications`
+    const response = await this.client.get(url)
+    return response.data
+  }
+
+  async updateNotifications(notifications) {
+    const url = `/tapestries/${this.postId}/notifications`
+    const response = await this.client.put(url, notifications)
     return response
   }
 
