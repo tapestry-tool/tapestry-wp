@@ -1,5 +1,7 @@
 # tapestry-wp
 
+[![tapestry-wp](https://img.shields.io/endpoint?url=https://dashboard.cypress.io/badge/simple/h3nrkv/master&style=flat&logo=cypress)](https://dashboard.cypress.io/projects/h3nrkv/runs)
+
 This is a plugin for Wordpress that allows creating non-linear, collaborative, and interactive content. This plugin adds a new post type to Wordpress called "Tapestry" and allows presentation and authoring in the frontend using Vue JS.
 
 Visit [tapestry-tool.com](https://www.tapestry-tool.com) for more info.
@@ -19,10 +21,11 @@ The Vue application requires node v16 (or higher). Before running any of the com
 ### Local Development
 
 To get started with developing locally:
+
 - Clone this repo into a directory called `tapestry` under your Wordpress directory in the plugins folder (`wp-content/plugins`)
 - Setup your local dev environment. You have 2 options for your local development:
-  1. *Using LAMP/MAMP/WAMP:* Follow the detailed instruction for [Mac, Windows](https://github.com/tapestry-tool/tapestry-wp/wiki/Local-Dev-with-MAMP-or-WAMP), or [Linux](https://github.com/tapestry-tool/tapestry-wp/wiki/Local-Dev-with-LAMP-setup).
-  2. *Using Docker:* Follow the detailed [Docker Installation & Usage](https://github.com/tapestry-tool/tapestry-wp/wiki/Docker-Installation-&-Usage) wiki page.
+  1. _Using LAMP/MAMP/WAMP:_ Follow the detailed instruction for [Mac, Windows](https://github.com/tapestry-tool/tapestry-wp/wiki/Local-Dev-with-MAMP-or-WAMP), or [Linux](https://github.com/tapestry-tool/tapestry-wp/wiki/Local-Dev-with-LAMP-setup).
+  2. _Using Docker:_ Follow the detailed [Docker Installation & Usage](https://github.com/tapestry-tool/tapestry-wp/wiki/Docker-Installation-&-Usage) wiki page.
 - Edit your Wordpress `wp-config.php` file and add the following line right above the comment "That's all, stop editing!":
   ```
   define('TAPESTRY_USE_DEV_MODE', true);
@@ -33,6 +36,7 @@ To get started with developing locally:
 ### Build & Deployment
 
 To build a new plugin zip file with your local edits:
+
 - CD into the `templates/vue` directory and run: `npm install && npm run build`
 - Edit your Wordpress `wp-config.php` file and set `TAPESTRY_USE_DEV_MODE` to false if it exists (no action needed if that setting doesn't exist)
 - You can safely delete:
@@ -47,10 +51,10 @@ It's strongly recommended you complete this to get link previews working for the
 1. Navigate to [linkpreview.net](https://www.linkpreview.net/) and sign up to get an API Key
 2. Once logged in, press "Generate new access key" on the top right corner and copy the key
 3. In the `templates/vue` directory, create a `.env` file containing the following line:
-    ```
-    LINK_PREVIEW_API_KEY=<key>
-    ```
-    where `<key>` is the key you generated.
+   ```
+   LINK_PREVIEW_API_KEY=<key>
+   ```
+   where `<key>` is the key you generated.
 
 If you complete these steps before running `npm run build`, you will have link previews working.
 
@@ -61,28 +65,25 @@ Do you have access to Kaltura and want to offload your videos to be saved there 
 1. Run `composer install` in the tapestry plugin root folder. If successful, you will be able to see a `vendor` folder containing `kaltura`.
 
 2. Edit your Wordpress `wp-config.php` file and add the following lines right above the comment "That's all, stop editing! Happy publishing":
-    ```
-    define('KALTURA_ADMIN_SECRET', '');
-    define('KALTURA_PARTNER_ID', '');
-    define('KALTURA_SERVICE_URL', '');
-    define('KALTURA_UNIQUE_CONFIG', '');
-    ```
-The Kaltura Admininstrator Secret and Partner ID can be found by going to your Kaltura Settings > Integration tab in the Kaltura admin. The service URL is simply the main domain where your Kaltura videos are hosted on. The Kaltura Unique Configuration sets the media player design. It can be found in the Studio tab. 
+   ` define('KALTURA_ADMIN_SECRET', ''); define('KALTURA_PARTNER_ID', ''); define('KALTURA_SERVICE_URL', ''); define('KALTURA_UNIQUE_CONFIG', ''); `
+   The Kaltura Admininstrator Secret and Partner ID can be found by going to your Kaltura Settings > Integration tab in the Kaltura admin. The service URL is simply the main domain where your Kaltura videos are hosted on. The Kaltura Unique Configuration sets the media player design. It can be found in the Studio tab.
 
 3. Note the following PHP configurations affect file uploading and HTTP request execution time limits on the server. This might be relevant for Kaltura and regular file upload as well. We recommend you find your active `php.ini` file and edit the following configurations:
-    ```
-    post_max_size = 
-    upload_max_filesize =
-    max_execution_time =
-    ```
-  In case of an HTTPS/SSL error troubleshoot with the following ([source](https://stackoverflow.com/questions/28858351/php-ssl-certificate-error-unable-to-get-local-issuer-certificate)):
-  ```
-  // Download the cacert.pem file from here: https://curl.se/docs/caextract.html and move it into C:/MAMP
-  // make sure this is uncommented
-  extension=php_openssl.dll
-  // Add these configuration lines
-  [SSL]
-  curl.cainfo="route/to/mamp/cacert.pem"
-  openssl.cafile="route/to/mamp/cacert.pem"
-  ```
+   ```
+   post_max_size =
+   upload_max_filesize =
+   max_execution_time =
+   ```
+   In case of an HTTPS/SSL error troubleshoot with the following ([source](https://stackoverflow.com/questions/28858351/php-ssl-certificate-error-unable-to-get-local-issuer-certificate)):
+
+```
+// Download the cacert.pem file from here: https://curl.se/docs/caextract.html and move it into C:/MAMP
+// make sure this is uncommented
+extension=php_openssl.dll
+// Add these configuration lines
+[SSL]
+curl.cainfo="route/to/mamp/cacert.pem"
+openssl.cafile="route/to/mamp/cacert.pem"
+```
+
 You should now be able to upload videos onto Kaltura.
