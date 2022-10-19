@@ -86,7 +86,7 @@ import YoutubeForm from "./YoutubeForm"
 import KalturaForm from "./KalturaForm"
 import { mapState, mapMutations } from "vuex"
 import ISO6391 from "iso-639-1"
-import client from "@/services/TapestryAPI"
+import KalturaAPI from "@/services/KalturaAPI"
 import * as wp from "@/services/wp"
 import Helpers from "@/utils/Helpers"
 import CaptionRow from "./CaptionRow"
@@ -184,7 +184,7 @@ export default {
     async getKalturaAvailableLanguages() {
       if (this.kalturaAvailable) {
         try {
-          return await client.getKalturaAvailableLanguages()
+          return await KalturaAPI.getLanguages()
         } catch (error) {
           // Kaltura availability changed unexpectedly
         }

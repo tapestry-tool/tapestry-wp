@@ -126,6 +126,22 @@ class TapestryError extends Error
             'MESSAGE' => 'An unexpected error occurred on Kaltura',
             'STATUS' => ['status' => 500],
         ],
+        'INVALID_TAPESTRY_DATA' => [
+            'MESSAGE' => 'Tapestry data is invalid',
+            'STATUS' => ['status' => 400],
+        ],
+        'INVALID_ZIP' => [
+            'MESSAGE' => 'Zip file is invalid',
+            'STATUS' => ['status' => 400],
+        ],
+        'FAILED_TO_IMPORT' => [
+            'MESSAGE' => 'Unable to import Tapestry',
+            'STATUS' => ['status' => 500],
+        ],
+        'FAILED_TO_EXPORT' => [
+            'MESSAGE' => 'Unable to export Tapestry',
+            'STATUS' => ['status' => 500],
+        ],
     ];
 
     /**

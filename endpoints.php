@@ -3,7 +3,6 @@
 /**
  * Tapestry Endpoints.
  */
-require_once __DIR__.'/utilities/class.tapestry-permissions.php';
 require_once __DIR__.'/classes/class.tapestry.php';
 require_once __DIR__.'/classes/class.tapestry-node.php';
 require_once __DIR__.'/classes/class.tapestry-group.php';
@@ -11,10 +10,12 @@ require_once __DIR__.'/classes/class.tapestry-user-progress.php';
 require_once __DIR__.'/classes/class.tapestry-audio.php';
 require_once __DIR__.'/classes/class.tapestry-h5p.php';
 require_once __DIR__.'/classes/class.constants.php';
-require_once __DIR__.'/classes/class.kaltura-api.php';
+require_once __DIR__.'/utilities/class.tapestry-permissions.php';
 require_once __DIR__.'/utilities/class.tapestry-user.php';
-
-use Kaltura\Client\Enum\EntryStatus;
+require_once __DIR__.'/utilities/class.tapestry-import-export.php';
+require_once __DIR__.'/utilities/class.tapestry-errors.php';
+require_once __DIR__.'/utilities/class.tapestry-helpers.php';
+require_once __DIR__.'/endpoints/endpoints.kaltura.php';
 
 $REST_API_NAMESPACE = 'tapestry-tool/v1';
 
@@ -72,6 +73,22 @@ $REST_API_ENDPOINTS = [
         'ARGUMENTS' => [
             'methods' => $REST_API_PUT_METHOD,
             'callback' => 'updateTapestrySettings',
+            'permission_callback' => 'TapestryPermissions::putTapestrySettings',
+        ],
+    ],
+    'GET_TAPESTRY_NOTIFICATIONS' => (object) [
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/notifications',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => 'getTapestryNotifications',
+            'permission_callback' => 'TapestryPermissions::putTapestrySettings',
+        ],
+    ],
+    'PUT_TAPESTRY_NOTIFICATIONS' => (object) [
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/notifications',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_PUT_METHOD,
+            'callback' => 'updateTapestryNotifications',
             'permission_callback' => 'TapestryPermissions::putTapestrySettings',
         ],
     ],
@@ -209,6 +226,13 @@ $REST_API_ENDPOINTS = [
             'callback' => 'completeQuestionById',
         ],
     ],
+    'GET_TAPESTRY_USER_ALL_ANSWERS' => (object) [
+        'ROUTE' => 'users/answers',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => 'getAllUsersAnswers',
+        ],
+    ],
     'GET_TAPESTRY_USER_H5P_SETTING' => (object) [
         'ROUTE' => 'users/h5psettings/(?P<tapestryPostId>[\d]+)',
         'ARGUMENTS' => [
@@ -302,18 +326,27 @@ $REST_API_ENDPOINTS = [
             'callback' => 'getTapestryContributors',
         ],
     ],
-    'GET_ALL_ROLES' => (object) [
-        'ROUTE' => '/roles',
-        'ARGUMENTS' => [
-            'methods' => $REST_API_GET_METHOD,
-            'callback' => 'get_all_user_roles',
-        ],
-    ],
     'GET_TAPESTRY_EXPORT' => (object) [
         'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/export',
         'ARGUMENTS' => [
             'methods' => $REST_API_GET_METHOD,
-            'callback' => 'exportTapestry',
+            'callback' => 'exportTapestryAsJson',
+            'permission_callback' => 'TapestryPermissions::putTapestrySettings',
+        ],
+    ],
+    'GET_TAPESTRY_EXPORT_ZIP' => (object) [
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/export_zip',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => 'exportTapestryAsZip',
+            'permission_callback' => 'TapestryPermissions::putTapestrySettings',
+        ],
+    ],
+    'IMPORT_ZIP' => (object) [
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/import_zip',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_POST_METHOD,     // Ideally PUT, but can only access the uploaded file in POST
+            'callback' => 'importTapestryFromZip',
             'permission_callback' => 'TapestryPermissions::putTapestrySettings',
         ],
     ],
@@ -325,113 +358,9 @@ $REST_API_ENDPOINTS = [
             'permission_callback' => 'TapestryPermissions::putTapestrySettings',
         ],
     ],
-    'UPLOAD_VIDEO_TO_KALTURA' => (object) [
-        'ROUTE' => '/kaltura/upload_video',
-        'ARGUMENTS' => [
-            'methods' => $REST_API_POST_METHOD,
-            'callback' => 'uploadVideoToKaltura',
-        ],
-    ],
-    'UPLOAD_VIDEOS_TO_KALTURA' => (object) [
-        'ROUTE' => '/kaltura/upload_videos',
-        'ARGUMENTS' => [
-            'methods' => $REST_API_POST_METHOD,
-            'callback' => 'uploadVideosToKaltura',
-            'permission_callback' => 'TapestryPermissions::kalturaUpload',
-        ],
-    ],
-    'GET_VIDEOS_TO_UPLOAD' => (object) [
-        'ROUTE' => '/kaltura/videos/to_upload',
-        'ARGUMENTS' => [
-            'methods' => $REST_API_GET_METHOD,
-            'callback' => 'getVideosToUpload',
-            'permission_callback' => 'TapestryPermissions::kalturaUpload',
-        ],
-    ],
-    'GET_KALTURA_UPLOAD_STATUS' => (object) [
-        'ROUTE' => '/kaltura/upload_status',
-        'ARGUMENTS' => [
-            'methods' => $REST_API_GET_METHOD,
-            'callback' => 'getKalturaUploadStatus',
-            'permission_callback' => 'TapestryPermissions::kalturaUpload',
-        ],
-    ],
-    'GET_KALTURA_UPLOAD_LOG' => (object) [
-        'ROUTE' => '/kaltura/upload_log',
-        'ARGUMENTS' => [
-            'methods' => $REST_API_GET_METHOD,
-            'callback' => 'getKalturaUploadLog',
-            'permission_callback' => 'TapestryPermissions::kalturaUpload',
-        ],
-    ],
-    'RESET_UPLOAD_STATUS' => (object) [
-        'ROUTE' => '/kaltura/upload_status/reset',
-        'ARGUMENTS' => [
-            'methods' => $REST_API_POST_METHOD,
-            'callback' => 'forceResetUploadStatus',
-            'permission_callback' => 'TapestryPermissions::kalturaUpload',
-        ],
-    ],
-    'CLEAR_UPLOAD_ERROR' => (object) [
-        'ROUTE' => '/kaltura/upload_status/clear_error',
-        'ARGUMENTS' => [
-            'methods' => $REST_API_POST_METHOD,
-            'callback' => 'clearUploadError',
-            'permission_callback' => 'TapestryPermissions::kalturaUpload',
-        ],
-    ],
-    'STOP_KALTURA_UPLOAD' => (object) [
-        'ROUTE' => '/kaltura/stop_upload',
-        'ARGUMENTS' => [
-            'methods' => $REST_API_POST_METHOD,
-            'callback' => 'stopKalturaUpload',
-            'permission_callback' => 'TapestryPermissions::kalturaUpload',
-        ],
-    ],
-    'UPDATE_CONVERTING_VIDEOS' => (object) [
-        'ROUTE' => '/kaltura/videos/converting',
-        'ARGUMENTS' => [
-            'methods' => $REST_API_POST_METHOD,
-            'callback' => 'updateConvertingVideos',
-            'permission_callback' => 'TapestryPermissions::kalturaUpload',
-        ],
-    ],
-    'GET_KALTURA_VIDEO_STATUS' => (object) [
-        'ROUTE' => '/kaltura/video/status',
-        'ARGUMENTS' => [
-            'methods' => $REST_API_GET_METHOD,
-            'callback' => 'checkKalturaVideo',
-        ],
-    ],
-    'GET_KALTURA_VIDEO_META' => (object) [
-        'ROUTE' => '/kaltura/video/meta',
-        'ARGUMENTS' => [
-            'methods' => $REST_API_GET_METHOD,
-            'callback' => 'getKalturaVideoMeta',
-        ],
-    ],
-    'GET_KALTURA_AVAILABLE_LANGUAGES' => (object) [
-        'ROUTE' => '/kaltura/languages',
-        'ARGUMENTS' => [
-            'methods' => $REST_API_GET_METHOD,
-            'callback' => 'getKalturaAvailableLanguages',
-        ],
-    ],
-    'GET_KALTURA_VIDEO_CAPTIONS' => (object) [
-        'ROUTE' => '/kaltura/video/captions',
-        'ARGUMENTS' => [
-            'methods' => $REST_API_GET_METHOD,
-            'callback' => 'getKalturaVideoCaptions',
-        ],
-    ],
-    'PUT_KALTURA_VIDEO_CAPTIONS' => (object) [
-        'ROUTE' => '/kaltura/video/captions',
-        'ARGUMENTS' => [
-            'methods' => $REST_API_PUT_METHOD,
-            'callback' => 'updateKalturaVideoCaptions',
-        ],
-    ],
 ];
+
+$REST_API_ENDPOINTS = array_merge($REST_API_ENDPOINTS, KalturaEndpoints::getRoutes());
 
 /*
  * REGISTER API ENDPOINTS
@@ -449,29 +378,141 @@ foreach ($REST_API_ENDPOINTS as $ENDPOINT) {
     );
 }
 
-function exportTapestry($request)
+/**
+ * Export a Tapestry to JSON.
+ * Returns:
+ *  - A string ID identifying this export run
+ *  - The JSON data of the Tapestry
+ *  - The XML data of WordPress posts in the Tapestry, if any exist
+ */
+function exportTapestryAsJson($request)
 {
     $postId = $request['tapestryPostId'];
     try {
         if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
             throw new TapestryError('INVALID_POST_ID');
         }
+        // Create an ID to identify this export run
+        $export_id = TapestryImportExport::getExportId();
+
         $tapestry = new Tapestry($postId);
-        return $tapestry->export();
+        $tapestry_data = $tapestry->export();
+        
+        $result = ['json' => $tapestry_data, 'exportId' => $export_id];
+
+        return $result;
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
 }
 
-function get_all_user_roles($request)
+/**
+ * Export a Tapestry to a zip file.
+ * Returns:
+ *  - A string ID identifying this export run
+ *  - The URL of the zip file on the server
+ *  - A list of warnings generated during the zip export
+ *  - The XML data of WordPress posts in the Tapestry, if any exist
+ *
+ * @param object $request   HTTP request
+ */
+function exportTapestryAsZip($request)
 {
-    global $wp_roles;
+    $postId = $request['tapestryPostId'];
 
-    $roles = $wp_roles->roles;
+    try {
+        if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
 
-    return $roles;
+        // Create an ID to identify this export run
+        $export_id = TapestryImportExport::getExportId();
+
+        // Export Tapestry to an object
+        $tapestry = new Tapestry($postId);
+        $tapestry_data = $tapestry->export();
+
+        // If the Tapestry contains WordPress posts, separately export them too
+        $wp_posts = TapestryImportExport::exportWpPostsInTapestry($tapestry_data, $export_id);
+
+        // Create zip file containing the Tapestry data as a JSON file,
+        // and all media referenced by the Tapestry data
+        $result = TapestryImportExport::exportExternalMedia($tapestry_data);
+        $result['exportId'] = $export_id;
+
+        if ($wp_posts) {
+            $result['wpPosts'] = $wp_posts;
+        }
+        return $result;
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
 }
 
+/**
+ * Imports a Tapestry from an uploaded zip file.
+ *
+ * @param object $request   HTTP request (contains the zip file)
+ */
+function importTapestryFromZip($request)
+{
+    $postId = $request['tapestryPostId'];
+    $file_params = $request->get_file_params();
+
+    try {
+        if (!array_key_exists('file', $file_params)) {
+            throw new TapestryError('INVALID_ZIP', 'Could not find zip file');
+        }
+        $zip_path = $file_params['file']['tmp_name'];
+
+        $zip = new ZipArchive();
+        if ($zip->open($zip_path, ZipArchive::RDONLY) !== true) {
+            throw new TapestryError('FAILED_TO_IMPORT');
+        }
+
+        // Validate import file
+        $contents = $zip->getFromName('tapestry.json');
+        if ($contents === false) {
+            throw new TapestryError('INVALID_ZIP', 'Could not find tapestry.json in zip');
+        }
+        $tapestry_data = json_decode($contents);
+        TapestryImportExport::validateTapestryData($tapestry_data);
+        TapestryImportExport::validateTapestryZipStructure($zip);
+
+        $changes = TapestryImportExport::prepareImport($tapestry_data);
+
+        // Extract zip file to a temporary directory
+        $temp_dir = TapestryImportExport::createTempDirectory($parent_dir);
+        if (!$temp_dir) {
+            throw new TapestryError('FAILED_TO_IMPORT');
+        }
+        $zip->extractTo($temp_dir['path']);
+
+        // Re-create all media referenced by the Tapestry data on this site,
+        // and update references to new URLs
+        $importResult = TapestryImportExport::importExternalMedia($tapestry_data, $temp_dir['path'], $temp_dir['url']);
+
+        $importedTapestry = importTapestry($postId, $tapestry_data);
+
+        return [
+            'changes' => $changes,
+            'warnings' => $importResult['warnings'],
+            'rebuildH5PCache' => $importResult['rebuildH5PCache'],  // Whether the H5P cache needs rebuilding
+            'exportWarnings' => !empty($tapestry_data->warnings),   // Whether the provided file was exported with warnings
+            'tapestry' => $importedTapestry,                        // Data of imported Tapestry
+        ];
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    } finally {
+        // Clean up resources
+        if ($zip) {
+            $zip->close();
+        }
+        if ($temp_dir) {
+            TapestryImportExport::deleteTempDirectory($temp_dir['path']);
+        }
+    }
+}
 
 function login($request)
 {
@@ -575,7 +616,16 @@ function putTapestry($request)
     $postId = $request['tapestryPostId'];
     $tapestryData = json_decode($request->get_body());
     try {
-        return importTapestry($postId, $tapestryData);
+        TapestryImportExport::validateTapestryData($tapestryData);
+
+        $changes = TapestryImportExport::prepareImport($tapestryData);
+
+        $importedTapestry = importTapestry($postId, $tapestryData);
+
+        return [
+            'changes' => $changes,
+            'tapestry' => $importedTapestry,
+        ];
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
@@ -624,6 +674,14 @@ function importTapestry($postId, $tapestryData)
                 }
             }
 
+            if ($node->mediaType === 'answer') {
+                $oldActivityNodeId = $oldNode->typeData->activityId;
+                $node->typeData->activityId = $idMap->$oldActivityNodeId;
+            } elseif ($node->mediaType === 'wp-post') {
+                // We are requiring the user to import WordPress posts independently
+                // The post may have a different ID after import, so try to get the new post ID
+                TapestryImportExport::tryUpdateWpPostId($tapestryData->{'site-url'}, $node->typeData->mediaURL);
+            }
 
             $tapestryNode->set($node);
             $tapestryNode->save();
@@ -887,6 +945,53 @@ function updateTapestrySettings($request)
         $tapestry->set((object) ['settings' => $settings]);
 
         return $tapestry->save();
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+/**
+ * Get Tapestry notifications.
+ *
+ * @param object $request HTTP request
+ *
+ * @return object $response   HTTP response
+ */
+function getTapestryNotifications($request)
+{
+    $postId = $request['tapestryPostId'];
+    try {
+        if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+        $tapestry = new Tapestry($postId);
+        return $tapestry->getNotifications();
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+/**
+ * Update Tapestry notifications.
+ *
+ * @param object $request HTTP request
+ *
+ * @return object $response   HTTP response
+ */
+function updateTapestryNotifications($request)
+{
+    $postId = $request['tapestryPostId'];
+    $notifications = json_decode($request->get_body());
+    // TODO: JSON validations should happen here
+    try {
+        if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+        $tapestry = new Tapestry($postId);
+        $tapestry->set((object) ['notifications' => $notifications]);
+
+        $tapestry->save();
+        return true;
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
@@ -1391,6 +1496,29 @@ function completeQuestionById($request)
 }
 
 /**
+ * Get all answers from all users for a question
+ * Example: /wp-json/tapestry-tool/v1/users/answers?post_id=44&node_id=3&question_id=abcd.
+ *
+ * @param object $request HTTP request
+ *
+ * @return object $response HTTP response
+ */
+function getAllUsersAnswers($request)
+{
+    $postId = $request['post_id'];
+    $nodeMetaId = $request['node_id'];
+
+    try {
+        $userProgress = new TapestryUserProgress($postId, $nodeMetaId);
+        return $userProgress->getAllUsersAnswers();
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+
+
+/**
  * Get user h5p video setting on a tapestry page by post id. Will need to pass these as query parameters
  * Example: /wp-json/tapestry-tool/v1/users/h5psettings/42.
  *
@@ -1632,701 +1760,6 @@ function getQuestionHasAnswers($request)
         }
 
         return TapestryUserProgress::questionsHasAnyAnswer($postId, $nodeMetaId, $questionId, $answerType);
-    } catch (TapestryError $e) {
-        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
-    }
-}
-
-/**
- * Upload video to Kaltura and return Kaltura ID.
- *
- * If nodeMetaId specified, requires permission to edit that node.
- * Otherwise, requires same permissions as adding nodes.
- */
-function uploadVideoToKaltura($request)
-{
-    $tapestryPostId = $request['tapestryPostId'];
-    $nodeMetaId = $request['nodeMetaId'];
-
-    try {
-        if (!TapestryHelpers::isValidTapestry($tapestryPostId)) {
-            throw new TapestryError('INVALID_POST_ID');
-        }
-
-        if (!LOAD_KALTURA) {
-            throw new TapestryError('KALTURA_NOT_AVAILABLE');
-        }
-
-        if (empty($nodeMetaId)) {
-            $tapestry = new Tapestry($tapestryPostId);
-            if ($tapestry->isEmpty()) {
-                $user = new TapestryUser();
-                if (!$user->canEdit($tapestryPostId)) {
-                    throw new TapestryError('ADD_NODE_PERMISSION_DENIED');
-                }
-            }
-        } elseif (!TapestryHelpers::userIsAllowed('EDIT', $nodeMetaId, $tapestryPostId)) {
-            throw new TapestryError('EDIT_NODE_PERMISSION_DENIED');
-        }
-
-        $file_params = $request->get_file_params();
-        $file_path = $file_params['file']['tmp_name'];
-
-        $file_obj = (object) [
-            'file_path' => $file_path,
-            'name' => $file_params['file']['name'],
-        ];
-
-        $category = TapestryHelpers::getKalturaCategoryName($tapestryPostId);
-        $kaltura_api = new KalturaApi();
-        $response = $kaltura_api->uploadVideo($file_obj, $category);
-
-        while ($response->status === EntryStatus::PRECONVERT && $response->duration === 0) {
-            // Wait for the video's duration to load (or conversion to error out/complete)
-            sleep(5);
-            $response = $kaltura_api->getVideo($response->id);
-        }
-
-        return $response->id;
-    } catch (TapestryError $e) {
-        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
-    }
-}
-
-/**
- * Starts uploading a list of videos from local server to Kaltura.
- * Does nothing if an upload is already in progress.
- *
- * @param object $request   HTTP request
- *                          Request body should specify the list of videos to upload and
- *                          whether to switch uploaded videos to the Kaltura media player.
- *
- * Example request body:
- * {
- *  tapestryID: 7746,
- *  nodeIDs: [13004, 13005],
- *  useKalturaPlayer: false
- * }
- */
-function uploadVideosToKaltura($request)
-{
-    $upload_request = json_decode($request->get_body());
-    if (!is_object($upload_request)) {
-        return;
-    }
-
-    $tapestry_id = (int) $upload_request->tapestryID;
-    $node_ids = $upload_request->nodeIDs;
-    $use_kaltura_player = $upload_request->useKalturaPlayer;
-    if (empty($tapestry_id) || empty($node_ids) || !isset($use_kaltura_player)) {
-        return;
-    }
-
-    try {
-        if (!TapestryHelpers::isValidTapestry($tapestry_id)) {
-            throw new TapestryError('INVALID_POST_ID');
-        }
-
-        if (!LOAD_KALTURA) {
-            throw new TapestryError('KALTURA_NOT_AVAILABLE');
-        }
-
-        $is_upload_in_progress = get_option(KalturaUpload::IN_PROGRESS_OPTION);
-
-        if ($is_upload_in_progress === false) {
-            // False return value means option does not exist in database yet
-            add_option(KalturaUpload::IN_PROGRESS_OPTION, KalturaUpload::NO_VALUE);
-        } elseif ($is_upload_in_progress !== KalturaUpload::NO_VALUE) {
-            return;
-        }
-
-        update_option(KalturaUpload::IN_PROGRESS_OPTION, KalturaUpload::YES_VALUE);
-        update_option(KalturaUpload::LATEST_TAPESTRY_OPTION, $tapestry_id);
-        update_option(KalturaUpload::STOP_UPLOAD_OPTION, KalturaUpload::NO_VALUE, false);
-        update_option(KalturaUpload::UPLOAD_ERROR_OPTION, '');
-
-        add_action('shutdown', 'cleanUpKalturaUpload');
-
-        try {
-            perform_batched_upload_to_kaltura($tapestry_id, $node_ids, $use_kaltura_player);
-        } catch (Throwable $e) {
-            error_log($e->getMessage());
-            update_option(KalturaUpload::UPLOAD_ERROR_OPTION, $e->getMessage());
-        } finally {
-            update_option(KalturaUpload::IN_PROGRESS_OPTION, KalturaUpload::NO_VALUE);
-            update_option(KalturaUpload::STOP_UPLOAD_OPTION, KalturaUpload::NO_VALUE, false);
-        }
-    } catch (TapestryError $e) {
-        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
-    }
-}
-
-function cleanUpKalturaUpload()
-{
-    update_option(KalturaUpload::IN_PROGRESS_OPTION, KalturaUpload::NO_VALUE);
-
-    $error = error_get_last();
-    if ($error['type'] === E_ERROR) {
-        // If interrupted by a fatal error, save the error to notify the user
-        update_option(KalturaUpload::UPLOAD_ERROR_OPTION, $error['message']);
-    }
-}
-
-/**
- * Uploads videos to Kaltura.
- *
- * Video files are transferred up to UPLOAD_BATCH_SIZE at a time.
- * At the end of each batch, waits synchronously for all videos in the batch to finish converting (or error),
- * before uploading the next batch.
- *
- * @param string $tapestry_id        ID of the Tapestry for which the upload request is being made.
- * @param array $node_ids            IDs of the nodes to upload.
- *                                   Nodes are checked to be videos and to be local Wordpress uploads before being uploaded to Kaltura.
- * @param bool $use_kaltura_player   Whether to switch uploaded videos to use the Kaltura media player.
- *
- * @return int The number of videos that were successfully uploaded.
- */
-function perform_batched_upload_to_kaltura($tapestry_id, $node_ids, $use_kaltura_player)
-{
-    $category = TapestryHelpers::getKalturaCategoryName($tapestry_id);
-
-    $videos_to_upload = create_upload_log($tapestry_id, $node_ids);
-    add_to_upload_log($videos_to_upload);
-
-    $kalturaApi = new KalturaApi();
-
-    $num_successfully_uploaded = 0;
-    $batch_start = 0;
-
-    for ($batch_start; $batch_start < count($videos_to_upload); $batch_start += KalturaUpload::UPLOAD_BATCH_SIZE) {
-        // Retrieve fresh value without caching, since we expect the option value to change underneath
-        $GLOBALS['wp_object_cache']->delete(KalturaUpload::STOP_UPLOAD_OPTION, 'options');
-        $stop_requested = get_option(KalturaUpload::STOP_UPLOAD_OPTION);
-        if ($stop_requested === KalturaUpload::YES_VALUE) {
-            break;
-        }
-
-        $batch = array_slice($videos_to_upload, $batch_start, KalturaUpload::UPLOAD_BATCH_SIZE);
-
-        foreach ($batch as $video) {
-            save_video_upload_status($video, $videos_to_upload, UploadStatus::UPLOADING);
-
-            $kaltura_data = null;
-            try {
-                $kaltura_data = $kalturaApi->uploadVideo($video->file, $category);
-            } catch (Throwable $e) {
-                $error_msg = "Unable to upload video '".$video->file->name."' to Kaltura due to: ".$e->getMessage();
-
-                error_log($error_msg."\nStack trace: \n".$e->getTraceAsString());
-
-                $video->additionalInfo = $error_msg;
-                save_video_upload_status($video, $videos_to_upload, UploadStatus::ERROR);
-                continue;
-            }
-
-            $video->kalturaID = $kaltura_data->id;
-            save_video_upload_status($video, $videos_to_upload, UploadStatus::CONVERTING, $kaltura_data);
-        }
-
-        // Filter out videos that did not successfully upload so we don't get an infinite loop
-        $remaining_videos = array_filter($batch, function ($vid) {
-            return $vid->uploadStatus === UploadStatus::CONVERTING;
-        });
-
-        while (count($remaining_videos) > 0) {
-            sleep(5);
-            $videos_to_remove = array();
-
-            foreach ($remaining_videos as $video) {
-                $response = $kalturaApi->getVideo($video->kalturaID);
-
-                if ($response->status === EntryStatus::PRECONVERT) {
-                    // Still converting
-                    continue;
-                }
-
-                if ($response->status === EntryStatus::READY) {
-                    $node = save_video_upload_status($video, $videos_to_upload, UploadStatus::COMPLETE);
-                    TapestryHelpers::saveAndDeleteLocalVideo($node, $response, $use_kaltura_player, $video->file->file_path);
-                    $num_successfully_uploaded++;
-
-                    $failed_captions = TapestryHelpers::uploadVideoCaptions($node, $kalturaApi, $response);
-                    if ($failed_captions > 0) {
-                        $plural = $failed_captions !== 1 ? 's' : '';
-                        $video->additionalInfo = $failed_captions . ' caption' . $plural . ' failed to upload. Please edit the node to check.';
-                        save_video_upload_status($video, $videos_to_upload, UploadStatus::COMPLETE, null, false);
-                    }
-                } elseif ($response->status === EntryStatus::ERROR_CONVERTING) {
-                    $video->additionalInfo = 'An error occurred: Could not convert the video.';
-                    save_video_upload_status($video, $videos_to_upload, UploadStatus::ERROR);
-                } else {
-                    $video->additionalInfo = 'An error occurred: Expected the video to be converting, but it was not.';
-                    save_video_upload_status($video, $videos_to_upload, UploadStatus::ERROR);
-                }
-
-                array_push($videos_to_remove, $video);
-            }
-
-            $remaining_videos = array_udiff($remaining_videos, $videos_to_remove, function ($video1, $video2) {
-                if ($video1->tapestryID > $video2->tapestryID) {
-                    return 1;
-                } elseif ($video1->tapestryID < $video2->tapestryID) {
-                    return -1;
-                } else {
-                    return $video1->nodeID - $video2->nodeID;
-                }
-            });
-        }
-    }
-
-    // Mark remaining videos as canceled, if any
-    for ($i = $batch_start; $i < count($videos_to_upload); $i++) {
-        save_video_upload_status($videos_to_upload[$i], $videos_to_upload, UploadStatus::CANCELED);
-    }
-
-    return $num_successfully_uploaded;
-}
-
-/**
- * Initializes the list of videos to upload.
- * Silently excludes provided videos that are not suitable for upload.
- */
-function create_upload_log($tapestry_id, $node_ids)
-{
-    $upload_log = array();
-    $timestamp = time(); // Videos in the same upload should be identifiable by the upload time
-
-    foreach ($node_ids as $node_id) {
-        $node = new TapestryNode($tapestry_id, $node_id);
-        if (TapestryHelpers::videoCanBeUploaded($node) && TapestryHelpers::checkVideoFileSize($node)) {
-            $video_info = (object) [
-                'tapestryID' => $tapestry_id,
-                'nodeID' => $node_id,
-                'nodeTitle' => $node->getTitle(),
-                'uploadStatus' => UploadStatus::NOT_STARTED,
-                'file' => TapestryHelpers::getPathToMedia($node->getTypeData()->mediaURL),
-                'kalturaID' => '',
-                'additionalInfo' => '',
-                'timestamp' => $timestamp,
-            ];
-            array_push($upload_log, $video_info);
-
-            $node->getTypeData()->kalturaData = array('uploadStatus' => UploadStatus::NOT_STARTED);
-            $node->save();
-        }
-    }
-
-    return $upload_log;
-}
-
-function save_video_upload_status($video, $videos_to_upload, $new_status, $kaltura_data = null, $save_node = true)
-{
-    $video->uploadStatus = $new_status;
-    update_upload_log($videos_to_upload);
-
-    if ($save_node) {
-        $node = new TapestryNode($video->tapestryID, $video->nodeID);
-        TapestryHelpers::saveVideoUploadStatusInNode($node, $new_status, $kaltura_data);
-        return $node;
-    }
-}
-
-// Filter the logged videos so that certain information (e.g. the file path of the videos) is not returned
-function filter_logged_videos($videos)
-{
-    return array_map(function ($video) {
-        return (object) [
-            'tapestryID' => $video->tapestryID,
-            'nodeID' => $video->nodeID,
-            'nodeTitle' => $video->nodeTitle,
-            'uploadStatus' => $video->uploadStatus,
-            'kalturaID' => $video->kalturaID,
-            'additionalInfo' => $video->additionalInfo,
-            'timestamp' => $video->timestamp,
-        ];
-    }, $videos);
-}
-
-function add_to_upload_log($videos)
-{
-    $upload_log = get_option(KalturaUpload::UPLOAD_LOG_OPTION);
-    if (!is_array($upload_log)) {
-        $upload_log = [];
-    }
-
-    array_push($upload_log, ...filter_logged_videos($videos));
-    update_option(KalturaUpload::UPLOAD_LOG_OPTION, $upload_log);
-}
-
-function update_upload_log($videos)
-{
-    $upload_log = get_option(KalturaUpload::UPLOAD_LOG_OPTION);
-    if (!is_array($upload_log)) {
-        $upload_log = [];
-    }
-
-    // Replace the same videos at the end of the list
-    array_splice($upload_log, -count($videos), count($upload_log), filter_logged_videos($videos));
-    update_option(KalturaUpload::UPLOAD_LOG_OPTION, $upload_log);
-}
-
-/**
- * Gets status of Kaltura upload.
- */
-function getKalturaUploadStatus($request)
-{
-    $inProgress = get_option(KalturaUpload::IN_PROGRESS_OPTION) === KalturaUpload::YES_VALUE;
-    $latest_tapestry_id = get_option(KalturaUpload::LATEST_TAPESTRY_OPTION, '');
-    $error = get_option(KalturaUpload::UPLOAD_ERROR_OPTION, '');
-    return (object) [
-        'inProgress' => $inProgress,
-        'latestTapestryID' => $latest_tapestry_id,
-        'error' => !empty($error),
-    ];
-}
-
-/**
- * Gets Kaltura upload log for a particular Tapestry.
- *
- * Query parameters (pagination):
- * - page = which page to return
- * - count = number of entries per page; if count = 0, returns all entries
- *
- * @param object $request   HTTP request
- *
- * @return object
- *
- * Example response body:
- * {
- *  videos: [
- *   {
- *     tapestryID: 7746,
- *     nodeID: 13004,
- *     nodeTitle: "Video",
- *     uploadStatus: "Converting",
- *     kalturaID: "0_c7syr9zv",
- *     additionalInfo: ""
- *     timestamp: "2022-08-22 13:39:23"
- *   }
- *  ],
- *  totalCount: 10,
- * }
- */
-function getKalturaUploadLog($request)
-{
-    $tapestryPostId = $request['tapestryPostId'];
-
-    // Pagination
-    $page = (int) $request['page'];
-    $perPage = (int) $request['count'];
-
-    try {
-        if (empty($tapestryPostId) || !TapestryHelpers::isValidTapestry($tapestryPostId)) {
-            throw new TapestryError('INVALID_POST_ID');
-        }
-
-        $videos = get_option(KalturaUpload::UPLOAD_LOG_OPTION, []);
-        if (!is_array($videos)) {
-            $videos = [];
-        }
-
-        $videos = array_filter($videos, function ($video) use ($tapestryPostId) {
-            return $video->tapestryID == $tapestryPostId;
-        });
-        $videos = array_reverse($videos); // Return entries in reverse chronological order
-        $totalCount = count($videos);
-
-        if ($perPage > 0) {
-            $videos = array_slice($videos, ($page - 1) * $perPage, $perPage);
-        }
-
-        $datetime = new DateTime("now", wp_timezone());
-        foreach ($videos as $video) {
-            // Convert Unix timestamp to human-readable string, following Wordpress site timezone
-            $datetime->setTimestamp($video->timestamp);
-            $video->uploadTime = $datetime->format('Y-m-d G:i:s');
-            unset($video->timestamp);
-        }
-
-        return (object) [
-            'videos' => $videos,
-            'totalCount' => $totalCount,    // Number of videos in all pages
-        ];
-    } catch (TapestryError $e) {
-        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
-    }
-}
-
-/**
- * Forcefully sets the upload to "not in progress".
- * Should only be used as a last resort to fix upload issues.
- */
-function forceResetUploadStatus($request)
-{
-    update_option(KalturaUpload::IN_PROGRESS_OPTION, KalturaUpload::NO_VALUE);
-    return (object) [
-        'success' => get_option(KalturaUpload::IN_PROGRESS_OPTION) === KalturaUpload::NO_VALUE,
-    ];
-}
-
-/**
- * Clear the upload error.
- */
-function clearUploadError($request)
-{
-    update_option(KalturaUpload::UPLOAD_ERROR_OPTION, '');
-    return (object) [
-        'success' => get_option(KalturaUpload::UPLOAD_ERROR_OPTION) === '',
-    ];
-}
-
-/**
- * Gets all videos in a Tapestry that can be uploaded to Kaltura.
- * If tapestryPostId query parameter is not set, gets uploadable videos in all Tapestries.
- *
- * @param object $request   HTTP request
- * @return array
- *
- * Example response body:
- * [
- *  { tapestryID: 7746, nodeID: 13004, nodeTitle: "Video", withinSizeLimit: true }
- * ]
- */
-function getVideosToUpload($request)
-{
-    try {
-        $tapestryPostId = $request['tapestryPostId'];
-        return TapestryHelpers::getVideosToUpload($tapestryPostId);
-    } catch (TapestryError $e) {
-        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
-    }
-}
-
-function updateConvertingVideos($request)
-{
-    $body = json_decode($request->get_body());
-    $use_kaltura_player = $body->useKalturaPlayer;
-
-    $kaltura_api = new KalturaApi();
-
-    $tapestries = get_posts(['post_type' => 'tapestry', 'numberposts' => -1]);
-    $videos = array();
-
-    foreach ($tapestries as $post) {
-        $tapestry = new Tapestry($post->ID);
-
-        foreach ($tapestry->getNodeIds() as $nodeID) {
-            $node = $tapestry->getNode($nodeID);
-            $kalturaData = $node->getTypeData()->kalturaData;
-
-            if (isset($kalturaData)
-                && is_array($kalturaData)
-                && array_key_exists('id', $kalturaData)
-                && array_key_exists('uploadStatus', $kalturaData)
-                && $kalturaData['uploadStatus'] === UploadStatus::CONVERTING) {
-                $kalturaID = $kalturaData['id'];
-
-                try {
-                    $response = $kaltura_api->getVideo($kalturaID);
-
-                    $video = (object) [
-                        'tapestryID' => $post->ID,
-                        'nodeID' => $nodeID,
-                        'nodeTitle' => $node->getTitle(),
-                        'kalturaID' => $kalturaID,
-                        'previousStatus' => UploadStatus::CONVERTING,
-                        'currentStatus' => UploadStatus::CONVERTING,
-                        'additionalInfo' => '',
-                    ];
-
-                    if ($response->status === EntryStatus::READY) {
-                        TapestryHelpers::saveVideoUploadStatusInNode($node, UploadStatus::COMPLETE, $response);
-
-                        $file_path = TapestryHelpers::getPathToMedia($node->getTypeData()->mediaURL)->file_path;
-                        TapestryHelpers::saveAndDeleteLocalVideo($node, $response, $use_kaltura_player, $file_path);
-
-                        $video->currentStatus = UploadStatus::COMPLETE;
-
-                        $failed_captions = TapestryHelpers::uploadVideoCaptions($node, $kaltura_api, $response);
-                        if ($failed_captions > 0) {
-                            $video->additionalInfo = $failed_captions . ' captions could not be uploaded. Please edit the node to check them.';
-                        }
-                    } elseif ($response->status !== EntryStatus::PRECONVERT) {
-                        TapestryHelpers::saveVideoUploadStatusInNode($node, UploadStatus::ERROR, $response);
-                        $video->currentStatus = UploadStatus::ERROR;
-                        if ($response->status === EntryStatus::ERROR_CONVERTING) {
-                            $video->additionalInfo = 'An error occurred: Could not convert the video.';
-                        } else {
-                            $video->additionalInfo = 'An error occurred: Expected the video to be converting, but it was not.';
-                        }
-                    }
-
-                    array_push($videos, $video);
-                } catch (TapestryError $e) {
-                    continue;
-                }
-            }
-        }
-    }
-
-    // Update the upload log so the user sees the latest statuses
-    amend_upload_log($videos);
-
-    // Clear the upload error
-    update_option(KalturaUpload::UPLOAD_ERROR_OPTION, '');
-
-    return (object) [
-        'processedVideos' => $videos,
-    ];
-}
-
-function amend_upload_log($updated_videos)
-{
-    $node_map = (object) [];
-
-    foreach ($updated_videos as $video) {
-        $node_key = $video->tapestryID.'-'.$video->nodeID;
-        $node_map->{$node_key} = $video;
-    }
-
-    $upload_log = get_option(KalturaUpload::UPLOAD_LOG_OPTION, []);
-
-    // Update the most recent entry in the upload log for each video
-    for (end($upload_log); key($upload_log) !== null && !empty($node_map); prev($upload_log)) {
-        $video = current($upload_log);
-
-        $node_key = $video->tapestryID.'-'.$video->nodeID;
-        $updated_node = $node_map->{$node_key};
-
-        if ($updated_node) {
-            $video->uploadStatus = $updated_node->currentStatus;
-            $video->additionalInfo = $updated_node->additionalInfo;
-
-            unset($node_map->{$node_key});
-        }
-    }
-    update_option(KalturaUpload::UPLOAD_LOG_OPTION, $upload_log);
-}
-
-/**
- * Sends a signal to stop an ongoing Kaltura upload.
- */
-function stopKalturaUpload($request)
-{
-    // This will create the option if it doesn't exist
-    update_option(KalturaUpload::STOP_UPLOAD_OPTION, KalturaUpload::YES_VALUE, false);
-}
-
-/**
- * Checks whether a Kaltura video with given entry id exists.
- *
- * @return bool Response: true if the video exists, and false otherwise.
- */
-function checkKalturaVideo($request)
-{
-    try {
-        if (!LOAD_KALTURA) {
-            throw new TapestryError('KALTURA_NOT_AVAILABLE');
-        }
-
-        $entryId = $request['entry_id'];
-
-        $kaltura_api = new KalturaApi();
-        $result = $kaltura_api->getVideo($entryId);
-
-        if ($result != null) {
-            return true;
-        }
-        return false;
-    } catch (TapestryError $e) {
-        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
-    }
-}
-
-/**
- * If a Kaltura video with given entry id exists, returns the video metadata.
- *
- * Example response body:
- * {
- *  "image": "https://streaming.video.ubc.ca/p/186/sp/18600/thumbnail/entry_id/0_p5er0usa/version/100002",
- *  "duration": 126
- * }
- *
- * @return - HTTP response: a video metadata object if the entry id is valid, and false otherwise.
- */
-function getKalturaVideoMeta($request)
-{
-    try {
-        if (!LOAD_KALTURA) {
-            throw new TapestryError('KALTURA_NOT_AVAILABLE');
-        }
-
-        $entryId = $request['entry_id'];
-
-        $kaltura_api = new KalturaApi();
-        $result = $kaltura_api->getVideo($entryId);
-
-        if ($result != null) {
-            return array("image" => $result->thumbnailUrl, "duration" => $result->duration);
-        }
-        return false;
-    } catch (TapestryError $e) {
-        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
-    }
-}
-
-function getKalturaAvailableLanguages($request)
-{
-    try {
-        if (!LOAD_KALTURA) {
-            throw new TapestryError('KALTURA_NOT_AVAILABLE');
-        }
-
-        $kaltura_api = new KalturaApi();
-        return $kaltura_api->getAvailableLanguages();
-    } catch (TapestryError $e) {
-        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
-    }
-}
-
-function getKalturaVideoCaptions($request)
-{
-    try {
-        if (!LOAD_KALTURA) {
-            throw new TapestryError('KALTURA_NOT_AVAILABLE');
-        }
-
-        $video_entry_id = $request['entry_id'];
-
-        $kaltura_api = new KalturaApi();
-        return $kaltura_api->getCaptionsAndDefaultCaption($video_entry_id);
-    } catch (TapestryError $e) {
-        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
-    }
-}
-
-function updateKalturaVideoCaptions($request)
-{
-    try {
-        if (!LOAD_KALTURA) {
-            throw new TapestryError('KALTURA_NOT_AVAILABLE');
-        }
-
-        $video_entry_id = $request['entry_id'];
-        $body = json_decode($request->get_body());
-        $captions = $body->captions;
-        $default_caption_id = $body->defaultCaptionId;
-
-        if (!isset($captions) || !is_array($captions)) {
-            return null;
-        }
-
-        try {
-            $kaltura_api = new KalturaApi();
-            return $kaltura_api->setCaptionsAndDefaultCaption($video_entry_id, $captions, $default_caption_id, true);
-        } catch (TapestryError $e) {
-            return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
-        }
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }

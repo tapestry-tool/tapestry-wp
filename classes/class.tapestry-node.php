@@ -47,6 +47,7 @@ class TapestryNode implements ITapestryNode
     private $references;
     private $mapCoordinates;
     private $popup;
+    private $hideWhenLocked;
 
     /**
      * Constructor.
@@ -99,6 +100,7 @@ class TapestryNode implements ITapestryNode
             'lng' => '',
         ];
         $this->popup = null;
+        $this->hideWhenLocked = false;
 
         if (TapestryHelpers::isValidTapestryNode($this->nodeMetaId)) {
             $node = $this->_loadFromDatabase();
@@ -246,6 +248,9 @@ class TapestryNode implements ITapestryNode
         if (property_exists($node, 'popup')) {
             $this->popup = $node->popup;
         }
+        if (isset($node->hideWhenLocked) && is_bool($node->hideWhenLocked)) {
+            $this->hideWhenLocked = $node->hideWhenLocked;
+        }
     }
 
     /**
@@ -370,20 +375,6 @@ class TapestryNode implements ITapestryNode
         return $node;
     }
 
-    public function getTypeData()
-    {
-        $node = $this->get();
-
-        return $node->typeData;
-    }
-
-    public function getTitle()
-    {
-        $node = $this->get();
-
-        return $node->title;
-    }
-
     public function isAvailableToUser($userId = 0)
     {
         $nodeMeta = $this->getMeta();
@@ -434,6 +425,26 @@ class TapestryNode implements ITapestryNode
             'reviewStatus' => $this->reviewStatus,
             'reviewComments' => $this->reviewComments,
         ];
+    }
+
+    public function getMediaType()
+    {
+        return $this->mediaType;
+    }
+
+    public function getNodeId()
+    {
+        return $this->nodeMetaId;
+    }
+
+    public function getTypeData()
+    {
+        return $this->typeData;
+    }
+
+    public function getTitle()
+    {
+        return $this->title;
     }
 
     private function _validateComment($review)
@@ -596,6 +607,7 @@ class TapestryNode implements ITapestryNode
             'references' => $this->references,
             'mapCoordinates' => $this->mapCoordinates,
             'popup' => $this->popup,
+            'hideWhenLocked' => $this->hideWhenLocked,
         ];
     }
 

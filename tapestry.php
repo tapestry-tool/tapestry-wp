@@ -41,10 +41,11 @@ error_reporting(E_ERROR | E_PARSE);
  * Register endpoints and perform other includes
  */
 require_once dirname(__FILE__).'/classes/class.tapestry-analytics.php';
-require_once dirname(__FILE__).'/utilities/class.tapestry-helpers.php';
+require_once dirname(__FILE__).'/classes/class.kaltura-api.php';
 require_once dirname(__FILE__).'/endpoints.php';
 require_once dirname(__FILE__).'/settings.php';
 require_once dirname(__FILE__).'/plugin-updates.php';
+require_once dirname(__FILE__).'/utilities/class.tapestry-import-export.php';
 
 /**
  * Register Tapestry type on initialization.
@@ -172,9 +173,9 @@ function tapestry_enqueue_vue_app()
         global $wp_roles;
 
         // pass Kaltura account variables to frontend; will be null if LOAD_KALTURA is false
-        $kaltura_partner_id = TapestryHelpers::getKalturaPartnerId();
-        $kaltura_service_url = TapestryHelpers::getKalturaServiceUrl();
-        $kaltura_unique_configuration = TapestryHelpers::getKalturaUniqueConfig();
+        $kaltura_partner_id = KalturaApi::getKalturaPartnerId();
+        $kaltura_service_url = KalturaApi::getKalturaServiceUrl();
+        $kaltura_unique_configuration = KalturaApi::getKalturaUniqueConfig();
 
         $currentUser = wp_get_current_user();
         $currentUser->data = (object) [
@@ -360,4 +361,23 @@ function tapestry_tool_log_event()
     $analytics->log($_POST);
 
     wp_die();
+}
+
+// Cleanup
+
+add_action('tapestry_clean_export_files', 'clean_export_files');
+function clean_export_files() {
+    TapestryImportExport::clearExportedZips();
+}
+
+register_activation_hook(__FILE__, 'schedule_tapestry_export_file_cleanup');
+function schedule_tapestry_export_file_cleanup() {
+    if ( ! wp_next_scheduled('tapestry_clean_export_files') ) {
+        wp_schedule_event( time(), 'daily', 'tapestry_clean_export_files' );
+    }
+}
+
+register_deactivation_hook(__FILE__, 'unschedule_tapestry_export_file_cleanup');
+function unschedule_tapestry_export_file_cleanup() {
+    wp_clear_scheduled_hook('tapestry_clean_export_files');
 }

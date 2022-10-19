@@ -13,7 +13,7 @@ function openRequest(method, endpoint) {
 }
 
 function refreshUploadInProgress() {
-  const xhr = openRequest("GET", "/kaltura/upload_status");
+  const xhr = openRequest("GET", "/kaltura/videos/status");
 
   xhr.onload = () => {
     if (xhr.status >= 200 && xhr.status < 300) {
@@ -33,6 +33,10 @@ function refreshUploadInProgress() {
 
 function cleanUploadedVideos() {
   const xhr = openRequest("POST", "/kaltura/videos/converting");
+  
+  const btn = document.getElementById("refresh_uploaded_videos");
+  btn.toggleAttribute("disabled");
+  btn.innerText = "Cleaning...";
 
   xhr.onload = () => {
     if (xhr.status >= 200 && xhr.status < 300) {
@@ -66,6 +70,8 @@ function cleanUploadedVideos() {
       table.replaceChild(tbody, old_tbody);
       document.getElementById("cleaned_videos_table").style.display = "table";
     }
+    btn.removeAttribute("disabled");
+    btn.innerText = "Clean Uploaded Videos";
   };
 
   const useKalturaPlayer =
@@ -84,7 +90,11 @@ function forceResetUploadStatus() {
     return;
   }
 
-  const xhr = openRequest("POST", "/kaltura/upload_status/reset");
+  const xhr = openRequest("DELETE", "/kaltura/videos/status");
+
+  const btn = document.getElementById("reset_upload_status");
+  btn.toggleAttribute("disabled");
+  btn.innerText = "Resetting...";
 
   xhr.onload = () => {
     if (xhr.status >= 200 && xhr.status < 300) {
@@ -108,8 +118,12 @@ function forceResetUploadStatus() {
       }
 
       noticeElement.style.display = "block";
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
+
+  btn.removeAttribute("disabled");
+  btn.innerText = "Reset Upload Status";
 
   xhr.send();
 }

@@ -98,9 +98,9 @@
 
 <script>
 import { mapMutations, mapState, mapActions } from "vuex"
-import client from "@/services/TapestryAPI"
 import ErrorHelper from "@/utils/errorHelper"
 import * as wp from "@/services/wp"
+import KalturaAPI from "@/services/KalturaAPI"
 
 export default {
   props: {
@@ -162,7 +162,7 @@ export default {
       if (this.kalturaAvailable) {
         try {
           const validKalturaVideo =
-            skipCheck || (await client.checkKalturaVideo(kalturaId))
+            skipCheck || (await KalturaAPI.getVideoStatus(kalturaId))
 
           if (validKalturaVideo) {
             this.update("typeData.kalturaId", kalturaId)
@@ -181,7 +181,7 @@ export default {
     },
     async getKalturaCaptions(kalturaId) {
       // Loads captions, assuming Kaltura is available on the server
-      const result = await client.getKalturaVideoCaptions(kalturaId)
+      const result = await KalturaAPI.getVideoCaptions(kalturaId)
 
       this.update("typeData.defaultCaptionId", result.defaultCaptionId)
       this.update("typeData.captions", result.captions)
@@ -196,9 +196,10 @@ export default {
         this.editingKalturaId = false
         this.isUploading = true
         this.$root.$emit("node-modal::uploading", true)
+        this.uploadAlertText = ""
 
         try {
-          const kalturaId = await client.uploadVideoToKaltura(videoFile, this.nodeId)
+          const kalturaId = await KalturaAPI.uploadVideo(videoFile, this.nodeId)
           this.kalturaId = kalturaId
           this.uploadAlertText = `
             Upload completed successfully. Your video has Kaltura ID ${kalturaId}.

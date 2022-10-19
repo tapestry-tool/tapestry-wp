@@ -2,6 +2,7 @@
   <div>
     <b-dropdown
       id="operations-button"
+      data-qa="operations-button"
       right
       variant="none"
       toggle-class="operations-button"
@@ -12,6 +13,14 @@
     >
       <template #button-content>
         <i class="fas fa-ellipsis-h"></i>
+        <b-badge
+          v-if="showKalturaOption && notifications.kaltura.total !== 0"
+          class="notification-badge"
+          pill
+          variant="danger"
+        >
+          {{ notifications.kaltura.total }}
+        </b-badge>
       </template>
       <b-dropdown-item-button @click="open(names.EXPORTDUPLICATE)">
         Export/Duplicate Tapestry
@@ -20,7 +29,13 @@
         v-if="showKalturaOption"
         @click="open(names.KALTURAMODAL)"
       >
-        Kaltura Sync
+        <div v-if="notifications.kaltura.total !== 0" class="kaltura-button">
+          <div>Upload to Kaltura</div>
+          <b-badge pill variant="danger">{{ notifications.kaltura.total }}</b-badge>
+        </div>
+        <template v-else>
+          Upload to Kaltura
+        </template>
       </b-dropdown-item-button>
       <b-dropdown-item-button @click="open(names.OTHEROPERATIONS)">
         Other Operations
@@ -50,6 +65,7 @@ import OtherOperationsModal from "@/components/modals/OtherOperationsModal"
 import { names } from "@/config/routes"
 import * as wp from "@/services/wp"
 import Helpers from "@/utils/Helpers"
+import { mapState } from "vuex"
 
 const operationModalNames = [
   names.EXPORTDUPLICATE,
@@ -77,6 +93,7 @@ export default {
     }
   },
   computed: {
+    ...mapState(["notifications"]),
     openOperation: {
       get() {
         return operationModalNames.includes(this.$route.name)
@@ -153,5 +170,18 @@ export default {
 
 .operations-button:only-child {
   margin-right: 12px;
+}
+
+.kaltura-button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.notification-badge {
+  position: absolute !important;
+  top: -2px !important;
+  right: -3px !important;
+  font-size: 0.7rem !important;
 }
 </style>

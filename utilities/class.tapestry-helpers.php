@@ -165,8 +165,6 @@ class TapestryHelpers
         }
 
         // not an image in our gallery. let's upload it.
-        include_once(ABSPATH . 'wp-admin/includes/image.php');
-
         $imagetype = end(explode('/', getimagesize($imageURL)['mime']));
         $uniq_name = date('dmY').''.(int) microtime(true);
         $filename = $uniq_name.'.'.$imagetype;
@@ -178,7 +176,21 @@ class TapestryHelpers
         fwrite($savefile, $contents);
         fclose($savefile);
 
-        $wp_filetype = wp_check_filetype(basename($filename), null);
+        return self::createAttachment($uploadfile, true);
+    }
+
+    /**
+     * Add a media item (image, video) as a WordPress attachment.
+     *
+     * @param string $filepath          Filepath of the file to add.
+     * @param bool $generate_metadata   If true, also generates metadata and image sub-sizes.
+     */
+    public static function createAttachment($filepath, $generate_metadata = false)
+    {
+        include_once(ABSPATH . 'wp-admin/includes/image.php');
+
+        $filename = basename($filepath);
+        $wp_filetype = wp_check_filetype($filename, null);
         $attachment = array(
             'post_mime_type' => $wp_filetype['type'],
             'post_title' => $filename,
@@ -186,11 +198,14 @@ class TapestryHelpers
             'post_status' => 'inherit'
         );
 
-        $attachment_id = wp_insert_attachment($attachment, $uploadfile);
-        $imagenew = get_post($attachment_id);
-        $fullsizepath = get_attached_file($imagenew->ID);
-        $attach_data = wp_generate_attachment_metadata($attachment_id, $fullsizepath);
-        wp_update_attachment_metadata($attachment_id, $attach_data);
+        $attachment_id = wp_insert_attachment($attachment, $filepath);
+
+        if ($generate_metadata) {
+            $imagenew = get_post($attachment_id);
+            $fullsizepath = get_attached_file($imagenew->ID);
+            $attach_data = wp_generate_attachment_metadata($attachment_id, $fullsizepath);
+            wp_update_attachment_metadata($attachment_id, $attach_data);
+        }
 
         return $attachment_id;
     }
@@ -309,117 +324,8 @@ class TapestryHelpers
     }
 
     /**
-     * Getters for Kaltura configuration variables.
-     * Return null if LOAD_KALTURA is false.
-     */
-    public static function getKalturaAdminSecret()
-    {
-        return KALTURA_OVERRIDE_CONFIG ? get_option('kaltura_admin_secret') : (KALTURA_DEFAULT_CONFIG ? KALTURA_ADMIN_SECRET : null);
-    }
-
-    public static function getKalturaPartnerId()
-    {
-        return KALTURA_OVERRIDE_CONFIG ? get_option('kaltura_partner_id') : (KALTURA_DEFAULT_CONFIG ? KALTURA_PARTNER_ID : null);
-    }
-
-    public static function getKalturaServiceUrl()
-    {
-        return KALTURA_OVERRIDE_CONFIG ? get_option('kaltura_service_url') : (KALTURA_DEFAULT_CONFIG ? KALTURA_SERVICE_URL : null);
-    }
-
-    public static function getKalturaUniqueConfig()
-    {
-        return KALTURA_OVERRIDE_CONFIG ? get_option('kaltura_unique_config') : (KALTURA_DEFAULT_CONFIG ? KALTURA_UNIQUE_CONFIG : null);
-    }
-
-    /**
-     * Return the name of the Kaltura category a video should be sorted under.
-     */
-    public static function getKalturaCategoryName($tapestryPostId) {
-        if (get_option('kaltura_category_structure') === 'tapestry_name') {
-            $tapestry = new Tapestry($tapestryPostId);
-            return $tapestry->getSettings()->title;
-        } else {
-            // Categorize by date by default
-            return date('Y/m/d');
-        }
-    }
-
-    /**
-     * Update the Kaltura upload status of a video node.
-     *
-     * @param TapestryNode      $node           Video node to update
-     * @param string            $newStatus      Upload status
-     * @param MediaEntry|null   $kalturaData    (optional) Response from Kaltura API
-     */
-    public static function saveVideoUploadStatusInNode($node, $newStatus, $kalturaData = null)
-    {
-        $typeData = $node->getTypeData();
-        $typeData->kalturaData['uploadStatus'] = $newStatus;
-
-        if ($kalturaData) {
-            $typeData->kalturaData['id'] = $kalturaData->id;
-        }
-
-        $node->save();
-    }
-
-    /**
-     * Update video node data and delete the local video after it has been uploaded to Kaltura.
-     *
-     * @param TapestryNode  $node               Video node to update
-     * @param MediaEntry    $kalturaData        Response from Kaltura API
-     * @param boolean       $useKalturaPlayer   If true, also switch the video to use Kaltura player
-     * @param string        $videoPath          Path to the video file.
-     */
-    public static function saveAndDeleteLocalVideo($node, $kalturaData, $useKalturaPlayer, $videoPath)
-    {
-        $node->set((object) ['mediaFormat' => 'kaltura']);
-        $typeData = $node->getTypeData();
-        $typeData->mediaURL = $kalturaData->dataUrl.'?.mp4';
-        $typeData->kalturaId = $kalturaData->id;
-
-        // Save Kaltura account info so we can still show Kaltura player, even if LOAD_KALTURA is currently false
-        if (!isset($typeData->kalturaData)) {
-            $typeData->kalturaData = [];
-        }
-        $typeData->kalturaData['partnerId'] = self::getKalturaPartnerId();
-        $typeData->kalturaData['serviceUrl'] = self::getKalturaServiceUrl();
-        $typeData->kalturaData['uniqueConfiguration'] = self::getKalturaUniqueConfig();
-
-        $typeData->videoPlayer = $useKalturaPlayer ? 'kaltura' : 'regular';
-
-        $node->save();
-
-        wp_delete_file($videoPath);
-    }
-
-    public static function uploadVideoCaptions($node, $kalturaApi, $kalturaData)
-    {
-        $typeData = $node->getTypeData();
-        $captions = $typeData->captions;
-        if (!isset($captions) || !is_array($captions)) {
-            return 0;
-        }
-
-        try {
-            $captionData = $kalturaApi->setCaptionsAndDefaultCaption($kalturaData->id, $captions, $typeData->defaultCaptionId, false);            
-
-            $typeData->captions = $captionData->captions;
-            $typeData->pendingCaptions = $captionData->pendingCaptions;
-            $typeData->defaultCaptionId = $captionData->defaultCaptionId;    
-        } catch (TapestryError $e) {
-            $typeData->pendingCaptions = $captions;
-        }
-
-        $node->save();
-
-        return count($typeData->pendingCaptions);
-    }
-
-    /**
      * Get the file path of a local WordPress upload by its URL.
-     * 
+     *
      * @param string $url
      * @return object|null     Returns null if the URL is not a local upload.
      */
@@ -438,31 +344,6 @@ class TapestryHelpers
         $file_obj->extension = pathinfo($url, PATHINFO_EXTENSION);
 
         return $file_obj;
-    }
-
-    /**
-     * Return all videos that can be uploaded to Kaltura.
-     * If Tapestry ID provided, returns only videos in that Tapestry.
-     * Otherwise, returns uploadable videos in all Tapestries.
-     *
-     * @param int|string $tapestryPostId    Tapestry ID
-     *
-     * @return array
-     */
-    public static function getVideosToUpload($tapestryPostId)
-    {
-        if (empty($tapestryPostId)) {
-            $tapestries = get_posts(['post_type' => 'tapestry', 'numberposts' => -1]);
-            $videos_to_upload = array();
-
-            foreach ($tapestries as $tapestry) {
-                $videos_to_upload = array_merge($videos_to_upload, self::_getVideosToUploadInTapestry($tapestry->ID));
-            }
-
-            return $videos_to_upload;
-        } else {
-            return self::_getVideosToUploadInTapestry($tapestryPostId);
-        }
     }
 
     /**
@@ -489,44 +370,9 @@ class TapestryHelpers
         return substr($url, 0, strlen($upload_dir_url)) === $upload_dir_url;
     }
 
-    /**
-     * Checks if the user has defined a maximum video upload size for Kaltura that is smaller than the WordPress max upload size,
-     * and if so, whether a video is too large to be uploaded.
-     *
-     * Assumes that the input video can be uploaded to Kaltura (check before calling).
-     *
-     * @param TapestryNode  $node
-     * @return boolean  True if the user has defined no maximum video upload size, or it is not smaller than the WordPress max upload size.
-     *                  Otherwise, returns true if the video is within the user-defined limit.
-     */
-    public static function checkVideoFileSize($node)
-    {
-        // Overridden value in WordPress settings
-        $max_file_size_setting = get_option('tapestry_kaltura_upload_max_file_size');
-
-        // Value defined in wp-config.php
-        $max_file_size_constant = defined('TAPESTRY_KALTURA_UPLOAD_MAX_FILE_SIZE') ? TAPESTRY_KALTURA_UPLOAD_MAX_FILE_SIZE : null;
-
-        $user_defined_size_string = !empty($max_file_size_setting) ? $max_file_size_setting : $max_file_size_constant;
-        if (empty($user_defined_size_string)) {
-            return true;
-        }
-
-        $user_defined_max_upload_size = wp_convert_hr_to_bytes($user_defined_size_string);
-
-        if ($user_defined_max_upload_size >= wp_max_upload_size()) {
-            return true;
-        }
-
-        $file = self::getPathToMedia($node->getTypeData()->mediaURL);
-        $filesize = self::_realFileSize($file->file_path);
-
-        return $filesize <= $user_defined_max_upload_size;
-    }
-
     // Get the actual file size for large files.
     // https://www.php.net/manual/en/function.filesize.php#113457
-    private static function _realFileSize($path)
+    public static function getRealFileSize($path)
     {
         $fp = fopen($path, 'r');
 
@@ -552,26 +398,5 @@ class TapestryHelpers
         fclose($fp);
 
         return $pos;
-    }
-
-    private static function _getVideosToUploadInTapestry($tapestryPostId)
-    {
-        $videos_to_upload = array();
-        $tapestry = new Tapestry($tapestryPostId);
-
-        foreach ($tapestry->getNodeIds() as $nodeID) {
-            $node = new TapestryNode($tapestryPostId, $nodeID);
-            if (self::videoCanBeUploaded($node)) {
-                $video = (object) [
-                    'tapestryID' => (int) $tapestryPostId,
-                    'nodeID' => $nodeID,
-                    'nodeTitle' => $node->getTitle(),
-                    'withinSizeLimit' => self::checkVideoFileSize($node),
-                ];
-                array_push($videos_to_upload, $video);
-            }
-        }
-
-        return $videos_to_upload;
     }
 }
