@@ -34,10 +34,18 @@
       </div>
       <div class="separator"></div>
       <div class="tool-group">
-        <tapestry-toolbar-button id="tapestry-undo-button" tooltip="Undo">
+        <tapestry-toolbar-button
+          id="tapestry-undo-button"
+          tooltip="Undo"
+          @click="undo"
+        >
           <i class="fas fa-undo fa-lg"></i>
         </tapestry-toolbar-button>
-        <tapestry-toolbar-button id="tapestry-redo-button" tooltip="Redo">
+        <tapestry-toolbar-button
+          id="tapestry-redo-button"
+          tooltip="Redo"
+          @click="redo"
+        >
           <i class="fas fa-redo fa-lg"></i>
         </tapestry-toolbar-button>
       </div>
@@ -49,6 +57,7 @@
 import TapestryToolbarButton from "../common/TapestryToolbarButton"
 import SettingsModalButton from "./SettingsModalButton"
 import { tools } from "@/utils/constants"
+import { mapActions } from "vuex"
 
 export default {
   components: {
@@ -59,6 +68,9 @@ export default {
     return {
       tools: tools,
     }
+  },
+  methods: {
+    ...mapActions(["undo", "redo"]),
   },
 }
 </script>
