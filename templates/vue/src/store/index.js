@@ -26,6 +26,13 @@ export const store = {
     userAnswers: {},
     returnRoute: null,
     currentEditingNode: null,
+    notifications: {
+      kaltura: {
+        total: 0,
+        success: 0,
+        error: 0,
+      },
+    },
   },
   getters,
   mutations,

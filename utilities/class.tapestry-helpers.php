@@ -2,13 +2,15 @@
 
 require_once dirname(__FILE__).'/class.tapestry-node-permissions.php';
 
-define(
-    'H5P_DEFINED',
-    file_exists(__DIR__.'/../../h5p/public/class-h5p-plugin.php')
-);
+if (!defined('H5P_DEFINED')) {
+    define(
+        'H5P_DEFINED',
+        file_exists(__DIR__.'/../../h5p/public/class-h5p-plugin.php')
+    );
 
-if (H5P_DEFINED) {
-    include_once __DIR__.'/../../h5p/public/class-h5p-plugin.php';
+    if (H5P_DEFINED) {
+        include_once __DIR__.'/../../h5p/public/class-h5p-plugin.php';
+    }
 }
 
 /**
@@ -174,8 +176,6 @@ class TapestryHelpers
         }
 
         // not an image in our gallery. let's upload it.
-        include_once(ABSPATH . 'wp-admin/includes/image.php');
-
         $imagetype = end(explode('/', getimagesize($imageURL)['mime']));
         $uniq_name = date('dmY').''.(int) microtime(true);
         $filename = $uniq_name.'.'.$imagetype;
@@ -187,7 +187,21 @@ class TapestryHelpers
         fwrite($savefile, $contents);
         fclose($savefile);
 
-        $wp_filetype = wp_check_filetype(basename($filename), null);
+        return self::createAttachment($uploadfile, true);
+    }
+
+    /**
+     * Add a media item (image, video) as a WordPress attachment.
+     *
+     * @param string $filepath          Filepath of the file to add.
+     * @param bool $generate_metadata   If true, also generates metadata and image sub-sizes.
+     */
+    public static function createAttachment($filepath, $generate_metadata = false)
+    {
+        include_once(ABSPATH . 'wp-admin/includes/image.php');
+
+        $filename = basename($filepath);
+        $wp_filetype = wp_check_filetype($filename, null);
         $attachment = array(
             'post_mime_type' => $wp_filetype['type'],
             'post_title' => $filename,
@@ -195,11 +209,14 @@ class TapestryHelpers
             'post_status' => 'inherit'
         );
 
-        $attachment_id = wp_insert_attachment($attachment, $uploadfile);
-        $imagenew = get_post($attachment_id);
-        $fullsizepath = get_attached_file($imagenew->ID);
-        $attach_data = wp_generate_attachment_metadata($attachment_id, $fullsizepath);
-        wp_update_attachment_metadata($attachment_id, $attach_data);
+        $attachment_id = wp_insert_attachment($attachment, $filepath);
+
+        if ($generate_metadata) {
+            $imagenew = get_post($attachment_id);
+            $fullsizepath = get_attached_file($imagenew->ID);
+            $attach_data = wp_generate_attachment_metadata($attachment_id, $fullsizepath);
+            wp_update_attachment_metadata($attachment_id, $attach_data);
+        }
 
         return $attachment_id;
     }
@@ -318,95 +335,26 @@ class TapestryHelpers
     }
 
     /**
-     * Getters for Kaltura configuration variables.
-     * Return null if LOAD_KALTURA is false.
-     */
-    public static function getKalturaAdminSecret()
-    {
-        return KALTURA_OVERRIDE_CONFIG ? get_option('kaltura_admin_secret') : (KALTURA_DEFAULT_CONFIG ? KALTURA_ADMIN_SECRET : null);
-    }
-
-    public static function getKalturaPartnerId()
-    {
-        return KALTURA_OVERRIDE_CONFIG ? get_option('kaltura_partner_id') : (KALTURA_DEFAULT_CONFIG ? KALTURA_PARTNER_ID : null);
-    }
-
-    public static function getKalturaServiceUrl()
-    {
-        return KALTURA_OVERRIDE_CONFIG ? get_option('kaltura_service_url') : (KALTURA_DEFAULT_CONFIG ? KALTURA_SERVICE_URL : null);
-    }
-
-    public static function getKalturaUniqueConfig()
-    {
-        return KALTURA_OVERRIDE_CONFIG ? get_option('kaltura_unique_config') : (KALTURA_DEFAULT_CONFIG ? KALTURA_UNIQUE_CONFIG : null);
-    }
-
-    /**
-     * Return the name of the Kaltura category a video should be sorted under.
-     */
-    public static function getKalturaCategoryName($tapestryPostId)
-    {
-        if (get_option('kaltura_category_structure') === 'tapestry_name') {
-            $tapestry = new Tapestry($tapestryPostId);
-            return $tapestry->getSettings()->title;
-        } else {
-            // Categorize by date by default
-            return date('Y/m/d');
-        }
-    }
-
-    /**
-     * Update the Kaltura upload status of a video node.
+     * Get the file path of a local WordPress upload by its URL.
      *
-     * @param TapestryNode      $node           Video node to update
-     * @param string            $newStatus      Upload status
-     * @param MediaEntry|null   $kalturaData    (optional) Response from Kaltura API
+     * @param string $url
+     * @return object|null     Returns null if the URL is not a local upload.
      */
-    public static function saveVideoUploadStatusInNode($node, $newStatus, $kalturaData = null)
+    public static function getPathToMedia($url)
     {
-        $typeData = $node->getTypeData();
-        $typeData->kalturaData['uploadStatus'] = $newStatus;
-
-        if ($kalturaData) {
-            $typeData->kalturaData['id'] = $kalturaData->id;
+        if (!self::isLocalUpload($url)) {
+            return null;
         }
 
-        $node->save();
-    }
+        $upload_folder = wp_upload_dir()['basedir'];
+        $upload_folder_url = wp_upload_dir()['baseurl'];
 
-    /**
-     * Update video node data and delete the local video after it has been uploaded to Kaltura.
-     *
-     * @param TapestryNode  $node               Node to update (video or H5P)
-     * @param MediaEntry    $kalturaData        Response from Kaltura API
-     * @param boolean       $useKalturaPlayer   If true, switch node to use Kaltura player. Video nodes only.
-     * @param string        $videoPath          Path to the video file.
-     */
-    public static function saveAndDeleteLocalVideo($node, $kalturaData, $useKalturaPlayer, $videoPath)
-    {
-        $nodeMeta = $node->getMeta();
-        if ($nodeMeta->mediaType === 'video') {
-            $node->set((object) ['mediaFormat' => 'kaltura']);
-            $typeData = $node->getTypeData();
-            $typeData->mediaURL = $kalturaData->dataUrl.'?.mp4';
-            $typeData->kalturaId = $kalturaData->id;
+        $file_obj = new stdClass();
+        $file_obj->file_path = substr_replace($url, $upload_folder, 0, strlen($upload_folder_url));
+        $file_obj->name = pathinfo($url, PATHINFO_BASENAME);
+        $file_obj->extension = pathinfo($url, PATHINFO_EXTENSION);
 
-            // Save Kaltura account info so we can still show Kaltura player, even if LOAD_KALTURA is currently false
-            if (!isset($typeData->kalturaData)) {
-                $typeData->kalturaData = [];
-            }
-            $typeData->kalturaData['partnerId'] = self::getKalturaPartnerId();
-            $typeData->kalturaData['serviceUrl'] = self::getKalturaServiceUrl();
-            $typeData->kalturaData['uniqueConfiguration'] = self::getKalturaUniqueConfig();
-
-            $typeData->videoPlayer = $useKalturaPlayer ? 'kaltura' : 'regular';
-        } elseif ($nodeMeta->mediaType === 'h5p') {
-            self::_updateH5PVideoURL($node, $kalturaData->dataUrl);
-        }
-
-        $node->save();
-
-        wp_delete_file($videoPath);
+        return $file_obj;
     }
 
     /**
@@ -423,75 +371,6 @@ class TapestryHelpers
             return self::getPathToH5PVideo($node);
         }
         return null;
-    }
-
-    /**
-     * Get the file path of a local WordPress upload by its URL.
-     *
-     * @param string $url
-     */
-    public static function getPathToMedia($url)
-    {
-        $upload_folder = wp_upload_dir()['basedir'];
-        $upload_folder_url = wp_upload_dir()['baseurl'];
-
-        $file_obj = new stdClass();
-        $file_obj->file_path = substr_replace($url, $upload_folder, 0, strlen($upload_folder_url));
-        $file_obj->name = pathinfo($url)['basename'];
-
-        return $file_obj;
-    }
-
-    /**
-     * Return all videos that can be uploaded to Kaltura.
-     * If Tapestry ID provided, returns only videos in that Tapestry.
-     * Otherwise, returns uploadable videos in all Tapestries.
-     *
-     * @param int|string $tapestryPostId    Tapestry ID
-     *
-     * @return array
-     */
-    public static function getVideosToUpload($tapestryPostId)
-    {
-        if (empty($tapestryPostId)) {
-            $tapestries = get_posts(['post_type' => 'tapestry', 'numberposts' => -1]);
-            $videos_to_upload = array();
-
-            foreach ($tapestries as $tapestry) {
-                $videos_to_upload = array_merge($videos_to_upload, self::_getVideosToUploadInTapestry($tapestry->ID));
-            }
-
-            return $videos_to_upload;
-        } else {
-            return self::_getVideosToUploadInTapestry($tapestryPostId);
-        }
-    }
-
-    /**
-     * Checks if a node with video content can be uploaded to Kaltura.
-     * Only H5P or Video nodes whose videos are local uploads can be transferred to Kaltura.
-     *
-     * @param TapestryNode  $node
-     * @return bool
-     */
-    public static function videoCanBeUploaded($node)
-    {
-        $nodeMeta = $node->getMeta();
-
-        if ($nodeMeta->mediaType === 'video') {
-            // URL videos can be uploaded if mediaURL is a local upload on this site
-            $upload_dir_url = wp_upload_dir()['baseurl'];
-            return substr($node->getTypeData()->mediaURL, 0, strlen($upload_dir_url)) === $upload_dir_url;
-        } elseif (H5P_DEFINED && $nodeMeta->mediaType === 'h5p') {
-            // H5P videos can be uploaded if the video 'path' attribute is a relative path
-            $h5pId = self::getH5PIdFromMediaURL($node->getTypeData()->mediaURL);
-            $videoPathOrUrl = self::_getH5PVideoURL($h5pId);
-            if ($videoPathOrUrl) {
-                return !filter_var($videoPathOrUrl, FILTER_VALIDATE_URL);
-            }
-        }
-
-        return false;
     }
 
     /**
@@ -523,104 +402,44 @@ class TapestryHelpers
     }
 
     /**
-     * Gets the H5P id from the mediaURL of an H5P node
-     * Example: extracts '3' from 'http://localhost/wordpress/wp-admin/admin-ajax.php?action=h5p_embed&id=3'
-     *
-     * @param string $mediaURL
-     * @return string
-     */
-    public static function getH5PIdFromMediaURL($mediaURL)
-    {
-        $urlParts = explode('&id=', $mediaURL);
-        return count($urlParts) >= 2 ? $urlParts[1] : null;
-    }
-
-    /**
-     * Gets the video source (URL or path) from an H5P content, by the H5P ID
-     *
-     * @param string|int $h5pId
-     * @return string|null          Returns null if the H5P ID is invalid or the H5P is not an interactive video
-     */
-    private static function _getH5PVideoURL($h5pId)
-    {
-        $controller = new TapestryH5P();
-        $content = json_decode($controller->getMetadata($h5pId)->parameters);
-
-        if (isset($content->interactiveVideo)) {
-            return $content->interactiveVideo->video->files[0]->path;
-        }
-        return null;
-    }
-
-    /**
-     * Updates the video source of an H5P content
-     *
-     * @param TapestryNode $node    H5P node
-     * @param string $newVideoUrl   New video source
-     */
-    private static function _updateH5PVideoURL($node, $newVideoUrl)
-    {
-        if (H5P_DEFINED) {
-            $controller = new TapestryH5P();
-            $h5pId = self::getH5PIdFromMediaURL($node->getTypeData()->mediaURL);
-            $metadata = $controller->getMetadata($h5pId);
-            $params = json_decode($metadata->parameters);
-            $params->interactiveVideo->video->files[0]->path = $newVideoUrl;
-
-            $h5pInterface = H5P_Plugin::get_instance()->get_h5p_instance('interface');
-            $h5pInterface->updateContent([
-                'id' => $h5pId,
-                'metadata' => $metadata,
-                'params' => json_encode($params),
-                'disable' => $metadata->disable,
-                'library' => [
-                    'libraryId' => $metadata->library_id,
-                    'machineName' => $metadata->library_name,
-                    'majorVersion' => $metadata->major_version,
-                    'minorVersion' => $metadata->minor_version,
-                ],
-            ]);
-        }
-    }
-
-    /**
-     * Checks if the user has defined a maximum video upload size for Kaltura that is smaller than the WordPress max upload size,
-     * and if so, whether a video is too large to be uploaded.
-     *
-     * Assumes that the input video can be uploaded to Kaltura (check before calling).
+     * Checks if a node with video content can be uploaded to Kaltura.
+     * Only H5P or Video nodes whose videos are local uploads can be transferred to Kaltura.
      *
      * @param TapestryNode  $node
-     * @return boolean  True if the user has defined no maximum video upload size, or it is not smaller than the WordPress max upload size.
-     *                  Otherwise, returns true if the video is within the user-defined limit.
+     * @return bool
      */
-    public static function checkVideoFileSize($node)
+    public static function videoCanBeUploaded($node)
     {
-        // Overridden value in WordPress settings
-        $max_file_size_setting = get_option('tapestry_kaltura_upload_max_file_size');
+        $nodeMeta = $node->getMeta();
 
-        // Value defined in wp-config.php
-        $max_file_size_constant = defined('TAPESTRY_KALTURA_UPLOAD_MAX_FILE_SIZE') ? TAPESTRY_KALTURA_UPLOAD_MAX_FILE_SIZE : null;
-
-        $user_defined_size_string = !empty($max_file_size_setting) ? $max_file_size_setting : $max_file_size_constant;
-        if (empty($user_defined_size_string)) {
-            return true;
+        if ($nodeMeta->mediaType === 'video') {
+            // URL videos can be uploaded if mediaURL is a local upload on this site
+            return self::isLocalUpload($node->getTypeData()->mediaURL);
+        } elseif (H5P_DEFINED && $nodeMeta->mediaType === 'h5p') {
+            // H5P videos can be uploaded if the video 'path' attribute is a relative path
+            $h5pId = self::getH5PIdFromMediaURL($node->getTypeData()->mediaURL);
+            $videoPathOrUrl = self::_getH5PVideoURL($h5pId);
+            if ($videoPathOrUrl) {
+                return !filter_var($videoPathOrUrl, FILTER_VALIDATE_URL);
+            }
         }
 
-        $user_defined_max_upload_size = wp_convert_hr_to_bytes($user_defined_size_string);
+        return false;
+    }
 
-        if ($user_defined_max_upload_size >= wp_max_upload_size()) {
-            return true;
-        }
-
-        $file_obj = self::getVideoPath($node);
-        $filesize = self::_realFileSize($file_obj->file_path);
-
-        return $filesize <= $user_defined_max_upload_size;
+    /**
+     * Checks if a URL represents a local upload (a file in the WordPress upload directory).
+     * Only checks the URL form, not that the file actually exists.
+     */
+    public static function isLocalUpload($url)
+    {
+        $upload_dir_url = wp_upload_dir()['baseurl'];
+        return substr($url, 0, strlen($upload_dir_url)) === $upload_dir_url;
     }
 
     // Get the actual file size for large files.
     // https://www.php.net/manual/en/function.filesize.php#113457
-    private static function _realFileSize($path)
+    public static function getRealFileSize($path)
     {
         $fp = fopen($path, 'r');
 
@@ -646,27 +465,5 @@ class TapestryHelpers
         fclose($fp);
 
         return $pos;
-    }
-
-    private static function _getVideosToUploadInTapestry($tapestryPostId)
-    {
-        $videos_to_upload = array();
-        $tapestry = new Tapestry($tapestryPostId);
-
-        foreach ($tapestry->getNodeIds() as $nodeID) {
-            $node = new TapestryNode($tapestryPostId, $nodeID);
-            if (self::videoCanBeUploaded($node)) {
-                $video = (object) [
-                    'tapestryID' => (int) $tapestryPostId,
-                    'nodeID' => $nodeID,
-                    'nodeTitle' => $node->getTitle(),
-                    'nodeType' => $node->getMeta()->mediaType === 'video' ? 'Video' : 'H5P',
-                    'withinSizeLimit' => self::checkVideoFileSize($node),
-                ];
-                array_push($videos_to_upload, $video);
-            }
-        }
-
-        return $videos_to_upload;
     }
 }

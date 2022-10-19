@@ -1,5 +1,38 @@
 <template>
-  <b-container fluid class="upload-container px-0">
+  <span v-if="compactMode && !isImage" class="d-flex">
+    <b-form-input
+      :placeholder="placeholder"
+      :value="value"
+      :data-qa="inputTestId"
+      :disabled="disabled || isUploading"
+      required
+      @input="$emit('input', $event)"
+    />
+    <b-form-file
+      :id="fileUploadId"
+      ref="file"
+      plain
+      hidden
+      name="async-upload"
+      :accept="fileTypes"
+      :disabled="disabled || isUploading"
+      required
+      data-qa="import-file-input"
+      @dragover.prevent
+      @drop.prevent="uploadFile"
+      @change="uploadFile"
+    ></b-form-file>
+    <b-button
+      variant="outline-secondary"
+      tag="label"
+      :for="fileUploadId"
+      class="mb-0 rounded-0"
+      :disabled="disabled"
+    >
+      {{ value ? "Change" : "Upload" }}
+    </b-button>
+  </span>
+  <b-container v-else fluid class="upload-container px-0">
     <template v-if="isUploading && !compactMode">
       <b-row>
         <b-col cols="auto" class="upload-label mr-auto text-muted">
@@ -79,13 +112,14 @@
           </b-button-group>
           <b-form-file
             v-if="!value || (changeImage && !isUploading)"
+            :id="fileUploadId"
             ref="file"
             name="async-upload"
             class="image-file"
             placeholder="Click to choose a file or drop file here to upload"
             drop-placeholder="Drop file here..."
             :accept="fileTypes"
-            :disabled="isUploading"
+            :disabled="disabled || isUploading"
             required
             data-qa="import-file-input"
             @dragover.prevent
@@ -127,13 +161,14 @@
           <b-row v-if="!showImagePreviewValue || !value || changeImage">
             <b-col :class="{ 'pr-0': showUrlUpload }">
               <b-form-file
+                :id="fileUploadId"
                 ref="file"
                 name="async-upload"
                 class="image-file"
                 placeholder="Choose a file or drop it here..."
                 drop-placeholder="Drop file here..."
                 :accept="fileTypes"
-                :disabled="isUploading"
+                :disabled="disabled || isUploading"
                 required
                 data-qa="import-file-input"
                 @dragover.prevent
@@ -152,7 +187,7 @@
                   :value="value"
                   :data-qa="inputTestId"
                   :data-testid="inputTestId"
-                  :disabled="isUploading"
+                  :disabled="disabled || isUploading"
                   required
                   @input="$emit('input', $event)"
                 />
@@ -196,6 +231,11 @@ export default {
       required: false,
       default: "",
     },
+    disabled: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
     inputTestId: {
       type: String,
       required: false,
@@ -212,6 +252,11 @@ export default {
       required: false,
       default: null,
     },
+    fileUploadId: {
+      type: String,
+      required: false,
+      default: "file-upload-input",
+    },
     showImagePreview: {
       type: Boolean,
       required: false,
@@ -226,6 +271,11 @@ export default {
       type: Boolean,
       required: false,
       default: false,
+    },
+    isImage: {
+      type: Boolean,
+      required: false,
+      default: true,
     },
   },
   data() {

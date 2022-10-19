@@ -1,7 +1,7 @@
 <template>
   <b-row>
     <b-col>
-      <b-form-group label="Video URL" class="mb-2">
+      <b-form-group label="Video File or URL" class="mb-2">
         <file-upload
           id="node-video-mp4-url"
           v-model="mediaURL"

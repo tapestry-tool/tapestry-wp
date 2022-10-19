@@ -71,7 +71,7 @@
   </div>
 </template>
 <script>
-import client from "@/services/TapestryAPI"
+import KalturaAPI from "@/services/KalturaAPI"
 
 export default {
   data() {
@@ -83,8 +83,7 @@ export default {
   },
   methods: {
     getUploadLog(ctx, callback) {
-      client
-        .getKalturaUploadLog(ctx.currentPage, ctx.perPage)
+      KalturaAPI.getUploadLog(ctx.currentPage, ctx.perPage)
         .then(data => {
           callback(data.videos)
           this.uploadLogLength = data.totalCount

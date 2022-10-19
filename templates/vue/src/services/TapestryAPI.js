@@ -39,20 +39,6 @@ class TapestryApi {
     return response.data
   }
 
-  async getAllRoles() {
-    const usersRequest = await this.client.get(`/roles`)
-    const users = usersRequest.data
-    let wp_roles = new Set()
-    //defaults
-    wp_roles.add("public")
-    wp_roles.add("authenticated")
-    for (let role of Object.keys(users)) {
-      wp_roles.add(role)
-    }
-    wp_roles.delete("administrator")
-    return wp_roles
-  }
-
   async importTapestry(data) {
     const url = `/tapestries/${this.postId}`
     try {
@@ -63,8 +49,28 @@ class TapestryApi {
     }
   }
 
+  async importTapestryFromZip(zipFile) {
+    const url = `/tapestries/${this.postId}/import_zip`
+
+    const formData = new FormData()
+    formData.append("file", zipFile)
+    const response = await this.client.post(url, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    })
+
+    return response.data
+  }
+
   async getTapestryExport() {
     const url = `/tapestries/${this.postId}/export`
+    const response = await this.client.get(url)
+    return response.data
+  }
+
+  async getTapestryExportAsZip() {
+    const url = `/tapestries/${this.postId}/export_zip`
     const response = await this.client.get(url)
     return response.data
   }
@@ -176,6 +182,18 @@ class TapestryApi {
     return response
   }
 
+  async getNotifications() {
+    const url = `/tapestries/${this.postId}/notifications`
+    const response = await this.client.get(url)
+    return response.data
+  }
+
+  async updateNotifications(notifications) {
+    const url = `/tapestries/${this.postId}/notifications`
+    const response = await this.client.put(url, notifications)
+    return response
+  }
+
   /**
    * Upload audio to server
    *
@@ -199,6 +217,12 @@ class TapestryApi {
   async completeQuestion(nodeId, questionId, answerType, answer) {
     const url = `/users/activity?post_id=${this.postId}&node_id=${nodeId}&question_id=${questionId}`
     const response = await this.client.post(url, { answerType, answer })
+    return response
+  }
+
+  async getAllUsersAnswers(nodeId) {
+    const url = `/users/answers?post_id=${this.postId}&node_id=${nodeId}`
+    const response = await this.client.get(url)
     return response
   }
 
@@ -307,71 +331,6 @@ class TapestryApi {
     const url = `/tapestries/${this.postId}/nodes/${nodeId}/question/hasAnswers?question_id=${questionId}&answer_type=${answerType}`
     const response = await this.client.get(url)
     return response
-  }
-
-  async uploadVideoToKaltura(videoFile, nodeId) {
-    const url =
-      `/kaltura/upload_video?tapestryPostId=${this.postId}` +
-      (nodeId ? `&nodeMetaId=${nodeId}` : "")
-
-    const formData = new FormData()
-    formData.append("file", videoFile)
-    const response = await this.client.post(url, formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    })
-    return response.data
-  }
-
-  async checkKalturaVideo(entryId) {
-    const url = `/kaltura/video/status?entry_id=${entryId}`
-    const response = await this.client.get(url)
-    return response.data
-  }
-
-  async getKalturaVideoMeta(entryId) {
-    const url = `/kaltura/video/meta?entry_id=${entryId}`
-    const response = await this.client.get(url)
-    return response.data
-  }
-
-  async getVideosToUpload() {
-    const url = `/kaltura/videos/to_upload?tapestryPostId=${this.postId}`
-    const response = await this.client.get(url)
-    return response.data
-  }
-
-  async startKalturaUpload(nodeIds, useKalturaPlayer) {
-    const url = `/kaltura/upload_videos`
-    const response = await this.client.post(url, {
-      tapestryID: this.postId,
-      nodeIDs: nodeIds,
-      useKalturaPlayer: useKalturaPlayer,
-    })
-    return response
-  }
-
-  async getKalturaUploadStatus() {
-    const url = `/kaltura/upload_status`
-    const response = await this.client.get(url)
-    return response.data
-  }
-
-  async getKalturaUploadLog(page, perPage) {
-    const url = `/kaltura/upload_log?tapestryPostId=${this.postId}&page=${page}&count=${perPage}`
-    const response = await this.client.get(url)
-    return response.data
-  }
-
-  async requestStopKalturaUpload() {
-    const url = `/kaltura/stop_upload`
-    await this.client.post(url)
-  }
-
-  async clearKalturaUploadError() {
-    const url = `/kaltura/upload_status/clear_error`
-    await this.client.post(url)
   }
 }
 

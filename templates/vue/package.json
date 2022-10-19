@@ -31,6 +31,7 @@
     "core-js": "^3.22.7",
     "d3": "^5.16.0",
     "dragselect": "^1.13.1",
+    "iso-639-1": "^2.1.15",
     "leaflet": "^1.7.1",
     "match-sorter": "^5.0.0",
     "moment": "^2.29.4",
@@ -46,7 +47,8 @@
     "vue-swatches": "^2.1.1",
     "vue-youtube-embed": "^2.2.2",
     "vue2-leaflet": "^2.5.2",
-    "vuex": "^3.1.1"
+    "vuex": "^3.1.1",
+    "xlsx": "^0.17.1"
   },
   "browserslist": [
     "> 1%",

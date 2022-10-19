@@ -277,7 +277,7 @@ import { sizes, nodeStatus } from "@/utils/constants"
 import { getLinkMetadata } from "@/services/LinkPreviewApi"
 import DragSelectModular from "@/utils/dragSelectModular"
 import * as wp from "@/services/wp"
-import client from "@/services/TapestryAPI"
+import KalturaAPI from "@/services/KalturaAPI"
 
 const shouldFetch = (url, selectedNode) => {
   if (!selectedNode.typeData.linkMetadata) {
@@ -441,7 +441,24 @@ export default {
     },
     hasUnsavedChanges() {
       const oldNode = this.getNode(this.nodeId)
-      return this.type === "add" || !Helpers.nodeEqual(oldNode, this.node)
+      return (
+        this.type === "add" ||
+        !Helpers.nodeEqual(oldNode, this.node, {
+          captionUrl: (oldUrl, newUrl) => {
+            // Caption URLs fetched from Kaltura include a string that identifies the current Kaltura session, which changes every time -
+            // so we use a custom comparison that only compares the caption asset ID
+            if (oldUrl !== newUrl) {
+              const oldUrlParams = new URLSearchParams(oldUrl)
+              const newUrlParams = new URLSearchParams(newUrl)
+              return (
+                oldUrlParams.get("captionAssetId") ===
+                newUrlParams.get("captionAssetId")
+              )
+            }
+            return true
+          },
+        })
+      )
     },
     isMultiContentNodeChild() {
       return this.parent && this.parent.mediaType == "multi-content"
@@ -537,7 +554,7 @@ export default {
       },
     },
     hasSubmissionApiError() {
-      if (this.apiError) {
+      if (this.apiError && !this.errors.includes(this.apiError.error)) {
         this.errors.push(this.apiError.error)
       }
     },
@@ -586,6 +603,7 @@ export default {
       "updateNode",
       "updateLockedStatus",
       "setTapestryErrorReporting",
+      "addApiError",
     ]),
     update(property, value) {
       this.setCurrentEditingNodeProperty({ property, value })
@@ -713,25 +731,46 @@ export default {
     },
     handleClose(event) {
       if (
-        this.hasUnsavedChanges &&
-        (event.trigger == "backdrop" ||
-          event.trigger == "headerclose" ||
-          event.trigger == "esc" ||
-          event instanceof MouseEvent) // cancel triggered
+        event.trigger == "backdrop" ||
+        event.trigger == "headerclose" ||
+        event.trigger == "esc" ||
+        event instanceof MouseEvent
       ) {
-        event.preventDefault()
-        this.$bvModal
-          .msgBoxConfirm("All unsaved changes will be lost.", {
-            modalClass: "node-modal-confirmation",
-            title: "Are you sure you want to continue?",
-            okTitle: "Close",
-          })
-          .then(close => {
-            if (close) {
-              this.close()
-            }
-          })
-          .catch(err => console.log(err))
+        if (this.hasUnsavedChanges) {
+          event.preventDefault()
+          this.$bvModal
+            .msgBoxConfirm("All unsaved changes will be lost.", {
+              modalClass: "node-modal-confirmation",
+              title: "Are you sure you want to continue?",
+              okTitle: "Close",
+            })
+            .then(close => {
+              if (close) {
+                this.close()
+              }
+            })
+            .catch(err => console.log(err))
+        } else if (this.fileUploading) {
+          event.preventDefault()
+          this.$bvModal
+            .msgBoxConfirm(
+              "An upload is in progress. If you close the modal now, the upload will still continue, but the uploaded file will not be applied to this node.",
+              {
+                modalClass: "node-modal-confirmation",
+                title: "Are you sure you want to continue?",
+                okTitle: "Close",
+              }
+            )
+            .then(close => {
+              if (close) {
+                this.fileUploading = false
+                this.close()
+              }
+            })
+            .catch(err => console.log(err))
+        } else {
+          this.close(event)
+        }
       } else {
         this.close(event)
       }
@@ -799,6 +838,26 @@ export default {
             }
           })
           .catch(err => console.log(err))
+      } else if (this.fileUploading) {
+        this.$bvModal
+          .msgBoxConfirm(
+            "An upload is in progress. If you close the modal now, the upload will still continue, but the uploaded file will not be applied to this node.",
+            {
+              modalClass: "node-modal-confirmation",
+              title: "Are you sure you want to continue?",
+              okTitle: "Close",
+            }
+          )
+          .then(close => {
+            if (close) {
+              this.fileUploading = false
+              this.$router.push({
+                name: names.MODAL,
+                params: { nodeId, type: "edit", tab: "content" },
+              })
+            }
+          })
+          .catch(err => console.log(err))
       } else {
         this.$router.push({
           name: names.MODAL,
@@ -827,7 +886,14 @@ export default {
           ])
         }
 
-        if (this.node.mediaFormat === "kaltura") {
+        if (this.node.mediaFormat === "kaltura" && wp.getKalturaStatus()) {
+          try {
+            await this.updateKalturaVideoCaptions()
+          } catch (error) {
+            this.addApiError(error)
+            return
+          }
+
           if (!this.node.typeData.kalturaData) {
             this.update("typeData.kalturaData", {
               id: this.node.typeData.kalturaId,
@@ -1045,10 +1111,34 @@ export default {
       if (!this.node.mediaType) {
         errMsgs.push("Please select a Content Type")
       } else if (this.node.mediaType === "video") {
+        const captions = this.node.typeData.captions
+        if (
+          this.node.mediaFormat === "kaltura" &&
+          this.node.typeData.videoPlayer === "kaltura"
+        ) {
+          if (
+            captions &&
+            captions.some(
+              caption =>
+                !caption.captionUrl?.endsWith(".vtt") &&
+                !caption.captionUrl?.endsWith(".srt")
+            )
+          ) {
+            errMsgs.push("Please upload a WebVTT or SRT file for each caption")
+          }
+        } else if (this.node.mediaFormat !== "youtube") {
+          if (
+            captions &&
+            captions.some(caption => !caption.captionUrl?.endsWith(".vtt"))
+          ) {
+            errMsgs.push("Please upload a WebVTT file for each caption")
+          }
+        }
+
         if (this.node.mediaFormat === "kaltura") {
           if (wp.getKalturaStatus()) {
             try {
-              const validKalturaVideo = await client.checkKalturaVideo(
+              const validKalturaVideo = await KalturaAPI.getVideoStatus(
                 this.node.typeData.kalturaId
               )
               if (!validKalturaVideo) {
@@ -1061,6 +1151,9 @@ export default {
         } else {
           if (!this.isValidVideo(this.node.typeData)) {
             errMsgs.push("Please enter a valid Video URL")
+          }
+          if (this.node.mediaFormat === "youtube" && !this.node.typeData.youtubeID) {
+            this.update("mediaFormat", "mp4")
           }
           if (!Helpers.onlyContainsDigits(this.node.mediaDuration)) {
             this.update("mediaDuration", 0)
@@ -1189,7 +1282,7 @@ export default {
     isValidVideo(typeData) {
       return (
         typeData.mediaURL !== "" &&
-        (typeData.youtubeID !== undefined || typeData.mediaURL.endsWith(".mp4"))
+        (typeData.youtubeID || typeData.mediaURL.endsWith(".mp4"))
       )
     },
     updateOrderingArray(arr) {
@@ -1207,7 +1300,7 @@ export default {
         if (this.node.mediaFormat === "kaltura") {
           if (wp.getKalturaStatus()) {
             try {
-              data = await client.getKalturaVideoMeta(this.node.typeData.kalturaId)
+              data = await KalturaAPI.getVideoMeta(this.node.typeData.kalturaId)
             } catch (error) {
               this.addApiError(error)
               return
@@ -1313,6 +1406,29 @@ export default {
       const serviceUrl = wp.data.kaltura.serviceUrl
       const mediaURL = `${serviceUrl}/p/${partnerId}/sp/${partnerId}00/playManifest/entryId/${this.node.typeData.kalturaId}/format/url/protocol/https?.mp4`
       this.update("typeData.mediaURL", mediaURL)
+    },
+    async updateKalturaVideoCaptions() {
+      if (this.node.typeData.captions) {
+        // "Push" changes made to Kaltura captions to Kaltura, then save results in node
+        const result = await KalturaAPI.updateVideoCaptions(
+          this.node.typeData.kalturaId,
+          this.node.typeData.captions,
+          this.node.typeData.defaultCaptionId
+        )
+
+        // Merge old pending captions and new pending captions by caption ID
+        const currentPendingCaptions = this.node.typeData.pendingCaptions ?? []
+        const newPendingCaptions = result.pendingCaptions
+        for (let caption of currentPendingCaptions) {
+          if (newPendingCaptions.every(c => c.id !== caption.id)) {
+            newPendingCaptions.push(caption)
+          }
+        }
+
+        this.update("typeData.captions", result.captions)
+        this.update("typeData.pendingCaptions", newPendingCaptions)
+        this.update("typeData.defaultCaptionId", result.defaultCaptionId)
+      }
     },
   },
 }
@@ -1462,5 +1578,33 @@ button:disabled {
 
 .buttons-container > * {
   margin: 0.25rem !important;
+}
+</style>
+
+<style lang="scss">
+.topright-checkbox {
+  position: absolute;
+  right: 20px;
+  top: 13px;
+  .custom-switch {
+    .custom-control-label {
+      margin-right: 35px;
+      text-align: right;
+
+      &::before {
+        right: -2.25rem !important;
+        left: unset;
+      }
+
+      &::after {
+        right: calc(-2.25rem + 2px) !important;
+        left: unset;
+      }
+    }
+    .custom-control-input:checked ~ .custom-control-label::after {
+      -webkit-transform: translateX(-0.75rem);
+      transform: translateX(-0.75rem);
+    }
+  }
 }
 </style>

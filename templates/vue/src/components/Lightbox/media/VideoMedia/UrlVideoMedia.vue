@@ -3,6 +3,7 @@
     <video
       ref="video"
       controls
+      crossorigin="anonymous"
       :autoplay="autoplay"
       :src="node.typeData.mediaURL"
       :style="videoStyles"
@@ -14,12 +15,23 @@
       @seeking="$emit('seeking')"
       @timeupdate="updateVideoProgress"
       @error="handleError"
-    ></video>
+    >
+      <track
+        v-for="caption in visibleCaptions"
+        :key="caption.id"
+        :default="caption.id === defaultCaptionId"
+        kind="captions"
+        :label="caption.label || caption.language"
+        :src="caption.captionUrl"
+        :srclang="getLanguageCode(caption.language)"
+      />
+    </video>
     <play-screen v-if="!videoPlaying" class="screen" @play="playVideo" />
   </div>
 </template>
 
 <script>
+import ISO6391 from "iso-639-1"
 import { mapMutations } from "vuex"
 import client from "@/services/TapestryAPI"
 import { SEEK_THRESHOLD } from "./video.config"
@@ -58,6 +70,13 @@ export default {
     }
   },
   computed: {
+    visibleCaptions() {
+      const captions = this.node.typeData.captions ?? []
+      return captions.filter(c => c.displayOnPlayer)
+    },
+    defaultCaptionId() {
+      return this.node.typeData.defaultCaptionId
+    },
     videoStyles() {
       if (!this.videoDimensions) {
         return { width: "100%" }
@@ -98,6 +117,9 @@ export default {
   },
   methods: {
     ...mapMutations(["updateNode"]),
+    getLanguageCode(language) {
+      return ISO6391.getCode(language)
+    },
     playVideo() {
       const video = this.$refs.video
       if (video) {

@@ -239,7 +239,7 @@ describe("Node Authoring", () => {
         cy.contains(videoErrorMsg, { timeout: 10000 }).should("exist")
 
         cy.getByTestId(`node-video-mp4-url`)
-          .clear()
+          .clear({ force: true })
           .type(existVideoURL)
         cy.submitModal()
       })

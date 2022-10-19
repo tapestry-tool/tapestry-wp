@@ -147,14 +147,16 @@ Cypress.Commands.add("openModal", (type, id) => {
       return cy.getByTestId(`edit-node-${id}`).click()
     case "settings":
       return cy.getByTestId("settings-button").click()
+    case "user-answers":
+      return cy.getByTestId("user-answers-button").click()
     default:
       throw new Error(`Unknown modal type: ${type}`)
   }
 })
 
-Cypress.Commands.add("submitModal", () => {
+Cypress.Commands.add("submitModal", timeout => {
   cy.getByTestId("submit-node-modal").click()
-  cy.getByTestId("node-modal", { timeout: 10000 }).should("not.exist")
+  cy.getByTestId("node-modal", { timeout: timeout ?? 10000 }).should("not.exist")
 })
 
 Cypress.Commands.add("submitSettingsModal", () => {
