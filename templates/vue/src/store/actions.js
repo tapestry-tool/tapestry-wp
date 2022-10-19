@@ -8,7 +8,7 @@ const LOCAL_PROGRESS_ID = "tapestry-progress"
 // undo / redo
 export async function command({ state }, command) {
   // do not call this action directly; instead call buildCommand
-  await state.commandHistory.doCommand(command)
+  return state.commandHistory.doCommand(command)
 }
 
 export async function undo({ state }) {
@@ -31,7 +31,7 @@ export async function buildCommand({ dispatch }, options) {
     replace = null,
   } = options
   // NOTE: undoAction and undoPayload are optional; they default to their execute counterparts
-  await dispatch("command", {
+  return dispatch("command", {
     name,
     execute: async () => {
       const result = await dispatch(executeAction, executePayload)
@@ -42,6 +42,7 @@ export async function buildCommand({ dispatch }, options) {
           replace: "previous",
         })
       }
+      return result
     },
     undo: async () => {
       const result = await dispatch(

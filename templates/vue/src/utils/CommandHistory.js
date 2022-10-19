@@ -25,7 +25,7 @@ export default class CommandHistory {
       this.history.push(command)
       this.position++
 
-      await command.execute()
+      return command.execute()
     }
   }
 
