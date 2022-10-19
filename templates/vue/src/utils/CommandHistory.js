@@ -9,18 +9,22 @@ export default class CommandHistory {
   }
 
   async doCommand(command) {
-    if (this.position < this.history.length - 1) {
-      this.history.splice(this.position + 1)
-    }
-    if (this.position === CommandHistory.maxLength - 1) {
-      this.history.shift()
-      this.position--
-    }
+    if (command.replace === "next") {
+      this.history.splice(this.position + 1, 1, command)
+    } else if (command.replace === "previous") {
+      this.history.splice(this.position, 1, command)
+    } else {
+      if (this.position < this.history.length - 1) {
+        this.history.splice(this.position + 1)
+      }
+      if (this.position === CommandHistory.maxLength - 1) {
+        this.history.shift()
+        this.position--
+      }
 
-    this.history.push(command)
-    this.position++
+      this.history.push(command)
+      this.position++
 
-    if (!command.skipExecute) {
       await command.execute()
     }
   }

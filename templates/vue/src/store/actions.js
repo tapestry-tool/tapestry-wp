@@ -19,27 +19,44 @@ export async function redo({ state }) {
   return state.commandHistory.redo()
 }
 
-export async function buildCommand(
-  { dispatch },
-  {
+export async function buildCommand({ dispatch }, options) {
+  const {
     name,
     executeAction,
-    undoAction,
     executePayload,
+    executeCallback,
+    undoAction,
     undoPayload,
-    skipExecute = false,
-  }
-) {
+    undoCallback,
+    replace = null,
+  } = options
   // NOTE: undoAction and undoPayload are optional; they default to their execute counterparts
   await dispatch("command", {
     name,
     execute: async () => {
-      await dispatch(executeAction, executePayload)
+      const result = await dispatch(executeAction, executePayload)
+      if (executeCallback) {
+        await dispatch("buildCommand", {
+          ...options,
+          ...executeCallback(result),
+          replace: "previous",
+        })
+      }
     },
     undo: async () => {
-      await dispatch(undoAction ?? executeAction, undoPayload ?? executePayload)
+      const result = await dispatch(
+        undoAction ?? executeAction,
+        undoPayload ?? executePayload
+      )
+      if (undoCallback) {
+        await dispatch("buildCommand", {
+          ...options,
+          ...undoCallback(result),
+          replace: "next",
+        })
+      }
     },
-    skipExecute,
+    replace,
   })
 }
 
@@ -92,15 +109,21 @@ export async function doUpdateUserSettings({ commit, dispatch }, userSettings) {
 
 // nodes
 export async function addNode({ dispatch }, payload) {
-  return dispatch("doAddNode", {
-    ...payload,
-    isCommand: true,
+  await dispatch("buildCommand", {
+    name: "add node",
+    executeAction: "doAddNode",
+    executePayload: payload, // ! payload.parentId may become invalid if the parent is deleted before this command and then redone (parentId will become a new id)
+    executeCallback: addedNodeId => ({
+      undoPayload: addedNodeId,
+    }),
+    undoAction: "doDeleteNode",
+    undoPayload: null,
   })
 }
 
 export async function doAddNode(
   { commit, dispatch, getters, state },
-  { node, parentId, isCommand = false }
+  { node, parentId }
 ) {
   try {
     const response = await client.addNode({ node, parentId })
@@ -136,17 +159,6 @@ export async function doAddNode(
 
     if (link) {
       commit("addLink", link)
-    }
-
-    if (isCommand) {
-      await dispatch("buildCommand", {
-        name: "add node",
-        executeAction: "doAddNode",
-        executePayload: { node, parentId },
-        skipExecute: true,
-        undoAction: "doDeleteNode",
-        undoPayload: id,
-      })
     }
 
     return id
@@ -333,6 +345,9 @@ export async function deleteNode({ dispatch, getters }, id) {
     executePayload: id,
     undoAction: "doAddNode", // may customize the undo action to recreate the links associated with the node
     undoPayload: { node: { ...getters.getNode(id) }, parentId: null },
+    undoCallback: addedNodeId => ({
+      executePayload: addedNodeId,
+    }),
   })
 }
 
