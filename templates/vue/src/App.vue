@@ -29,7 +29,7 @@
 </template>
 
 <script>
-import { mapMutations, mapGetters } from "vuex"
+import { mapMutations, mapGetters, mapActions } from "vuex"
 import { names } from "@/config/routes"
 import Lightbox from "@/components/Lightbox"
 import LinkModal from "@/components/modals/LinkModal"
@@ -72,12 +72,18 @@ export default {
         this.$route.name === names.LIGHTBOX || this.$route.query.from === "lightbox"
       )
     },
+    viewingApp() {
+      return this.$route.name === names.APP
+    },
   },
   watch: {
     loggedIn(isStillLoggedIn) {
       if (!isStillLoggedIn) {
         this.$bvModal.show("loggedOutModal")
       }
+    },
+    getTheme() {
+      this.applyTheme()
     },
   },
   mounted() {
@@ -93,6 +99,7 @@ export default {
     }
 
     window.addEventListener("click", this.recordAnalytics)
+    window.addEventListener("keydown", this.handleKeydown)
     window.addEventListener("resize", this.updateBrowserDimensions)
     this.updateBrowserDimensions()
 
@@ -103,25 +110,7 @@ export default {
     ]
     Promise.all(data).then(([tapestryData, selectedNode, theme]) => {
       this.changeTheme(theme.data)
-      if (this.getTheme == "system") {
-        const isDarkMode =
-          window.matchMedia &&
-          window.matchMedia("(prefers-color-scheme: dark)").matches
-        document.documentElement.setAttribute(
-          "data-theme",
-          isDarkMode ? "dark" : "light"
-        )
-        window
-          .matchMedia("(prefers-color-scheme: dark)")
-          .addEventListener("change", e => {
-            document.documentElement.setAttribute(
-              "data-theme",
-              e.matches ? "dark" : "light"
-            )
-          })
-      } else {
-        document.documentElement.setAttribute("data-theme", this.getTheme)
-      }
+      this.applyTheme()
 
       this.init(tapestryData)
       this.loading = false
@@ -142,9 +131,11 @@ export default {
   },
   beforeDestroy() {
     window.removeEventListener("click", this.recordAnalytics)
+    window.removeEventListener("keydown", this.handleKeydown)
     window.removeEventListener("resize", this.updateBrowserDimensions)
   },
   methods: {
+    ...mapActions(["undo", "redo"]),
     ...mapMutations(["init", "changeTheme", "updateBrowserDimensions"]),
     refresh() {
       this.$router.go()
@@ -159,6 +150,46 @@ export default {
         x: x,
         y: y,
       })
+    },
+    applyTheme() {
+      if (this.getTheme == "system") {
+        const isDarkMode =
+          window.matchMedia &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches
+        document.documentElement.setAttribute(
+          "data-theme",
+          isDarkMode ? "dark" : "light"
+        )
+        window
+          .matchMedia("(prefers-color-scheme: dark)")
+          .addEventListener("change", e => {
+            document.documentElement.setAttribute(
+              "data-theme",
+              e.matches ? "dark" : "light"
+            )
+          })
+      } else {
+        document.documentElement.setAttribute("data-theme", this.getTheme)
+      }
+    },
+    handleKeydown(evt) {
+      if (this.viewingApp) {
+        if (evt.code === "KeyZ" && (evt.metaKey || evt.ctrlKey)) {
+          const action = evt.shiftKey ? this.redo : this.undo
+          action().then(message => {
+            if (message) {
+              this.$bvToast.toast(message, {
+                noCloseButton: true,
+                autoHideDelay: 3000,
+                variant: "secondary",
+                solid: true,
+                toaster: "b-toaster-bottom-center",
+                bodyClass: "tapestry-toast-body",
+              })
+            }
+          })
+        }
+      }
     },
   },
 }
@@ -210,6 +241,11 @@ html {
         }
       }
     }
+  }
+
+  .tapestry-toast-body {
+    text-align: center;
+    font-weight: bold;
   }
 }
 </style>

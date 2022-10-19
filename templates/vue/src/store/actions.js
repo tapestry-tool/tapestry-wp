@@ -5,7 +5,73 @@ import ErrorHelper from "../utils/errorHelper"
 
 const LOCAL_PROGRESS_ID = "tapestry-progress"
 
-export async function updateSettings({ commit, dispatch }, newSettings) {
+// undo / redo
+export async function command({ state }, command) {
+  // do not call this action directly; instead call buildCommand
+  return state.commandHistory.doCommand(command)
+}
+
+export async function undo({ state }) {
+  return state.commandHistory.undo()
+}
+
+export async function redo({ state }) {
+  return state.commandHistory.redo()
+}
+
+export async function buildCommand({ dispatch }, options) {
+  const {
+    name,
+    executeAction,
+    executePayload,
+    executeCallback,
+    undoAction,
+    undoPayload,
+    undoCallback,
+    replace = null,
+  } = options
+  // NOTE: undoAction and undoPayload are optional; they default to their execute counterparts
+  return dispatch("command", {
+    name,
+    execute: async () => {
+      const result = await dispatch(executeAction, executePayload)
+      if (executeCallback) {
+        await dispatch("buildCommand", {
+          ...options,
+          ...executeCallback(result),
+          replace: "previous",
+        })
+      }
+      return result
+    },
+    undo: async () => {
+      const result = await dispatch(
+        undoAction ?? executeAction,
+        undoPayload ?? executePayload
+      )
+      if (undoCallback) {
+        await dispatch("buildCommand", {
+          ...options,
+          ...undoCallback(result),
+          replace: "next",
+        })
+      }
+    },
+    replace,
+  })
+}
+
+// settings
+export async function updateSettings({ state, dispatch }, newSettings) {
+  await dispatch("buildCommand", {
+    name: "update settings",
+    executeAction: "doUpdateSettings",
+    executePayload: newSettings,
+    undoPayload: state.settings,
+  })
+}
+
+export async function doUpdateSettings({ commit, dispatch }, newSettings) {
   try {
     await client.updateSettings(JSON.stringify(newSettings))
     commit("updateSettings", newSettings)
@@ -24,8 +90,16 @@ export async function updateH5pSettings({ commit, dispatch }, newSettings) {
 }
 
 // userSettings
+export async function updateUserSettings({ state, dispatch }, userSettings) {
+  await dispatch("buildCommand", {
+    name: "update user settings",
+    executeAction: "doUpdateUserSettings",
+    executePayload: userSettings,
+    undoPayload: { theme: state.theme },
+  })
+}
 
-export async function updateUserSettings({ commit, dispatch }, userSettings) {
+export async function doUpdateUserSettings({ commit, dispatch }, userSettings) {
   try {
     await client.updateUserSettings(JSON.stringify(userSettings))
     commit("changeTheme", userSettings.theme)
@@ -35,7 +109,20 @@ export async function updateUserSettings({ commit, dispatch }, userSettings) {
 }
 
 // nodes
-export async function addNode(
+export async function addNode({ dispatch }, payload) {
+  return dispatch("buildCommand", {
+    name: "add node",
+    executeAction: "doAddNode",
+    executePayload: payload, // ! payload.parentId may become invalid if the parent is deleted before this command and then redone (parentId will become a new id)
+    executeCallback: addedNodeId => ({
+      undoPayload: addedNodeId,
+    }),
+    undoAction: "doDeleteNode",
+    undoPayload: null,
+  })
+}
+
+export async function doAddNode(
   { commit, dispatch, getters, state },
   { node, parentId }
 ) {
@@ -252,7 +339,20 @@ async function unlockNodes({ commit, getters, dispatch }) {
   }
 }
 
-export async function deleteNode({ commit, dispatch, state, getters }, id) {
+export async function deleteNode({ dispatch, getters }, id) {
+  await dispatch("buildCommand", {
+    name: "delete node",
+    executeAction: "doDeleteNode",
+    executePayload: id,
+    undoAction: "doAddNode", // may customize the undo action to recreate the links associated with the node
+    undoPayload: { node: { ...getters.getNode(id) }, parentId: null },
+    undoCallback: addedNodeId => ({
+      executePayload: addedNodeId,
+    }),
+  })
+}
+
+export async function doDeleteNode({ commit, dispatch, state, getters }, id) {
   try {
     const level = getters.getNode(id).level
 
@@ -344,7 +444,16 @@ export async function reviewNode({ commit, dispatch }, { id, comments }) {
 }
 
 // links
-export async function addLink({ commit, dispatch, getters }, newLink) {
+export async function addLink({ dispatch }, payload) {
+  await dispatch("buildCommand", {
+    name: "add link",
+    executeAction: "doAddLink",
+    undoAction: "doDeleteLink",
+    executePayload: payload,
+  })
+}
+
+export async function doAddLink({ commit, dispatch, getters }, newLink) {
   try {
     await client.addLink(JSON.stringify(newLink))
     commit("addLink", newLink)
@@ -361,7 +470,19 @@ export async function addLink({ commit, dispatch, getters }, newLink) {
   }
 }
 
-export async function reverseLink({ commit, dispatch, getters }, link) {
+export async function reverseLink({ dispatch }, payload) {
+  await dispatch("buildCommand", {
+    name: "reverse link",
+    executeAction: "doReverseLink",
+    executePayload: payload,
+    undoPayload: {
+      source: payload.target,
+      target: payload.source,
+    },
+  })
+}
+
+export async function doReverseLink({ commit, dispatch, getters }, link) {
   try {
     const parent = getters.getNode(link.source)
     await commit("updateNode", {
@@ -387,6 +508,23 @@ export async function reverseLink({ commit, dispatch, getters }, link) {
 }
 
 export async function deleteLink(
+  { dispatch },
+  { source, target, useClient = true }
+) {
+  if (useClient) {
+    await dispatch("buildCommand", {
+      name: "delete link",
+      executeAction: "doDeleteLink",
+      executePayload: { source, target, useClient },
+      undoAction: "doAddLink",
+      undoPayload: { source, target },
+    })
+  } else {
+    await dispatch("doDeleteLink", { source, target, useClient })
+  }
+}
+
+export async function doDeleteLink(
   { commit, dispatch },
   { source, target, useClient = true }
 ) {
@@ -399,7 +537,15 @@ export async function deleteLink(
 }
 
 // favourites
-export function toggleFavourite({ dispatch, getters }, id) {
+export async function toggleFavourite({ dispatch }, payload) {
+  await dispatch("buildCommand", {
+    name: "toggle favourite",
+    executeAction: "doToggleFavourite",
+    executePayload: payload,
+  })
+}
+
+export function doToggleFavourite({ dispatch, getters }, id) {
   const favourites = getters.favourites
   const newFavourites = getters.isFavourite(id)
     ? favourites.filter(fid => fid != id)
