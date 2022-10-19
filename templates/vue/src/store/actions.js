@@ -109,7 +109,7 @@ export async function doUpdateUserSettings({ commit, dispatch }, userSettings) {
 
 // nodes
 export async function addNode({ dispatch }, payload) {
-  await dispatch("buildCommand", {
+  return dispatch("buildCommand", {
     name: "add node",
     executeAction: "doAddNode",
     executePayload: payload, // ! payload.parentId may become invalid if the parent is deleted before this command and then redone (parentId will become a new id)
