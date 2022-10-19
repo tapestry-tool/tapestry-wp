@@ -26,22 +26,10 @@
         href="#indicator-layer"
         x="0"
         :y="getYOffset(level)"
-        :fill="isVisibleLevel(level) ? '#6F8699' : '#C2C2C2'"
+        :fill="getFillColor(level)"
         :stroke="isCurrentLevel(level) ? '#49CFFF' : ''"
         :stroke-width="isCurrentLevel(level) ? 2 : 0"
       />
-      <!--
-      <use href="#indicator-layer" x="0" y="40" fill="#C2C2C2" />
-      <use href="#indicator-layer" x="0" y="20" fill="#6F8699" />
-      <use
-        href="#indicator-layer"
-        x="0"
-        y="0"
-        fill="#6F8699"
-        stroke="#49CFFF"
-        stroke-width="2"
-      />
-      -->
     </svg>
     <depth-slider v-show="!showMap && hasDepth"></depth-slider>
   </div>
@@ -87,6 +75,15 @@ export default {
       const minOffset = Math.max(0, 50 - (this.maxLevel - 1) * 10)
       const maxOffset = Math.min(100, 50 + (this.maxLevel - 1) * 10)
       return Helpers.mapLevel(level, this.maxLevel, minOffset, maxOffset)
+    },
+    getFillColor(level) {
+      if (this.isCurrentLevel(level)) {
+        return "var(--highlight-color)"
+      }
+      if (this.isVisibleLevel(level)) {
+        return "#6F8699"
+      }
+      return "#C2C2C2"
     },
     isCurrentLevel(level) {
       return this.currentLevel == level

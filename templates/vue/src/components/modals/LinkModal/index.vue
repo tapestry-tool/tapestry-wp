@@ -77,6 +77,13 @@ export default {
       return this.nodes[this.$route.params.target]
     },
   },
+  watch: {
+    show(show) {
+      if (show) {
+        this.reverse = false
+      }
+    },
+  },
   methods: {
     ...mapActions(["deleteLink", "reverseLink"]),
     ...mapGetters(["isMultiContent"]),

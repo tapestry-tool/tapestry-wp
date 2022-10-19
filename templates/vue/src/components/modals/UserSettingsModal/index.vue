@@ -86,7 +86,6 @@ export default {
     saveSettings() {
       const theme = this.$refs.themeForm.getTheme()
       this.$refs.developerForm.applyChanges()
-      this.$refs.themeForm.applyTheme()
       this.updateUserSettings({ theme })
       this.$root.$emit("bv::hide::modal", "user-settings-modal")
     },

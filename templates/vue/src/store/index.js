@@ -4,6 +4,7 @@ import Vuex from "vuex"
 import * as actions from "./actions"
 import * as mutations from "./mutations"
 import * as getters from "./getters"
+import CommandHistory from "@/utils/CommandHistory"
 
 Vue.use(Vuex)
 
@@ -32,6 +33,7 @@ export const store = {
       height: 0,
     },
     currentEditingNode: null,
+    commandHistory: new CommandHistory(),
     nodeNavigation: {
       stack: [],
       siblings: [],
