@@ -42,6 +42,7 @@ import TapestryError from "@/components/TapestryError"
 import Loading from "@/components/common/Loading"
 import client from "@/services/TapestryAPI"
 import { isLoggedIn } from "./services/wp"
+import { toolKeyBindings } from "@/utils/constants"
 import "@/assets/styles/themes.css"
 
 export default {
@@ -139,7 +140,12 @@ export default {
   },
   methods: {
     ...mapActions(["undo", "redo"]),
-    ...mapMutations(["init", "changeTheme", "updateBrowserDimensions"]),
+    ...mapMutations([
+      "init",
+      "changeTheme",
+      "updateBrowserDimensions",
+      "setCurrentTool",
+    ]),
     refresh() {
       this.$router.go()
     },
@@ -176,7 +182,14 @@ export default {
       }
     },
     handleKeydown(evt) {
-      if (this.viewingApp) {
+      // make sure no inputs are in focus (this.viewingApp already prevents capturing inputs in modals, but have to make sure the main app's inputs are not in focus)
+      const activeElement = document.activeElement
+      if (
+        this.viewingApp &&
+        activeElement.tagName !== "INPUT" &&
+        activeElement.tagName !== "TEXTAREA" &&
+        activeElement.className !== "node-title"
+      ) {
         if (evt.code === "KeyZ" && (evt.metaKey || evt.ctrlKey)) {
           const action = evt.shiftKey ? this.redo : this.undo
           action().then(message => {
@@ -191,6 +204,13 @@ export default {
               })
             }
           })
+        } else {
+          const tool = Object.entries(toolKeyBindings).find(
+            ([, key]) => `Key${key}` === evt.code
+          )?.[0]
+          if (tool) {
+            this.setCurrentTool(tool)
+          }
         }
       }
     },

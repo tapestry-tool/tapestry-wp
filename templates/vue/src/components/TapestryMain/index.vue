@@ -138,7 +138,7 @@ import ZoomPanHelper from "@/utils/ZoomPanHelper"
 import { names } from "@/config/routes"
 import * as wp from "@/services/wp"
 import { interpolate } from "@/utils/interpolate"
-import { tools, toolKeyBindings } from "@/utils/constants"
+import { tools } from "@/utils/constants"
 // import { scaleConstants } from "@/utils/constants"
 
 export default {
@@ -441,12 +441,9 @@ export default {
     if (!this.isEmptyTapestry) {
       this.setCurrentTool(tools.PAN)
     }
-
-    document.body.addEventListener("keydown", this.handleGenericKey)
   },
   beforeDestroy() {
     this.zoomPanHelper && this.zoomPanHelper.unregister()
-    document.body.removeEventListener("keydown", this.handleGenericKey)
   },
   methods: {
     ...mapActions(["updateNodeCoordinates"]),
@@ -957,26 +954,6 @@ export default {
         this.activeNode = id
       }
     },
-    handleGenericKey(evt, isEventHandler = true) {
-      // Used to capture generic key for global actions on keydown events from the document body or from a focusable element within the main view
-      if (this.isEmptyTapestry) {
-        return false
-      }
-
-      if (isEventHandler && document.activeElement !== document.body) {
-        return false
-      }
-
-      const { code } = evt
-      const tool = Object.entries(toolKeyBindings).find(
-        ([, key]) => `Key${key}` === code
-      )?.[0]
-      if (tool) {
-        this.setCurrentTool(tool)
-        return true
-      }
-      return false
-    },
     handleKey(evt) {
       if (this.isEmptyTapestry) {
         return
@@ -984,10 +961,6 @@ export default {
 
       // Ignore key events if focused on a node title for in-place editing
       if (document.activeElement.className === "node-title") {
-        return
-      }
-
-      if (this.handleGenericKey(evt, false)) {
         return
       }
 
