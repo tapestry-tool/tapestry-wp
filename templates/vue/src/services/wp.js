@@ -28,3 +28,5 @@ export const isLoggedIn = () =>
   wpData.iframe_mode !== "1" && Boolean(wpData.currentUser.ID)
 
 export const canEditTapestry = () => wpData.wpCanEditTapestry === "1"
+
+export const getKalturaStatus = () => wpData.kaltura.kalturaStatus

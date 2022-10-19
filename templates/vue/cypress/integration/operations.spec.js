@@ -4,11 +4,14 @@ describe("Operations", () => {
   beforeEach(() => {
     cy.fixture("three-nodes.json").as("tapestry")
     cy.setup("@tapestry")
-    cy.get(".operations-button").click()
+    cy.getByTestId("operations-button").click()
   })
 
   it(`should be able to duplicate a tapestry`, () => {
     cy.contains(/export\/duplicate tapestry/i).click()
+    cy.getByTestId("export-duplicate-modal")
+      .contains(/duplicate/i)
+      .click()
 
     cy.intercept("POST", "**/tapestries").as("duplicate")
 

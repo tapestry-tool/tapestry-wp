@@ -44,22 +44,6 @@ export default class Helpers {
     return "ontouchstart" in window || navigator.maxTouchPoints > 0
   }
 
-  /**
-   * Finds the node index with node ID
-   *
-   * @param  {Number} id          nodeMetaId
-   * @param  {Object} tapestry    tapestry
-   *
-   * @return {Number}
-   */
-  static findNodeIndex(id, tapestry) {
-    function helper(obj) {
-      return obj.id == id
-    }
-
-    return tapestry.nodes.findIndex(helper)
-  }
-
   static getAspectRatio() {
     const browserHeight = this.getBrowserHeight()
     const browserWidth = this.getBrowserWidth()
@@ -302,6 +286,13 @@ export default class Helpers {
     return false
   }
 
+  static hasKalturaUploadPermission() {
+    const { roles } = wp.getCurrentUser()
+    const allowedRole = "administrator"
+
+    return roles.includes(allowedRole)
+  }
+
   /**
    * Given an array of objects, return an array of unique objects
    * determined by the given label.
@@ -379,6 +370,7 @@ export default class Helpers {
       hideTitle: false,
       hideProgress: false,
       hideMedia: false,
+      hideWhenLocked: false,
       backgroundColor: "#8396a1",
       textColor: "white",
       skippable: true,

@@ -147,6 +147,8 @@ Cypress.Commands.add("openModal", (type, id) => {
       return cy.getByTestId(`edit-node-${id}`).click()
     case "settings":
       return cy.getByTestId("settings-button").click()
+    case "user-answers":
+      return cy.getByTestId("user-answers-button").click()
     default:
       throw new Error(`Unknown modal type: ${type}`)
   }
@@ -168,6 +170,10 @@ Cypress.Commands.add("submitSettingsModal", () => {
 
 Cypress.Commands.add("changeMediaType", type =>
   cy.getByTestId(`node-media-type`).select(type)
+)
+
+Cypress.Commands.add("changeMediaFormat", format =>
+  cy.getByTestId(`node-media-format`).select(format)
 )
 
 // -- Utils --
