@@ -36,15 +36,15 @@
       <div class="tool-group">
         <tapestry-toolbar-button
           id="tapestry-undo-button"
-          tooltip="Undo"
-          @click="undo"
+          :tooltip="undoTooltip"
+          @click="performUndo"
         >
           <i class="fas fa-undo fa-lg"></i>
         </tapestry-toolbar-button>
         <tapestry-toolbar-button
           id="tapestry-redo-button"
-          tooltip="Redo"
-          @click="redo"
+          :tooltip="redoTooltip"
+          @click="performRedo"
         >
           <i class="fas fa-redo fa-lg"></i>
         </tapestry-toolbar-button>
@@ -69,8 +69,39 @@ export default {
       tools: tools,
     }
   },
+  computed: {
+    platform() {
+      return window.navigator.platform?.toLowerCase().indexOf("mac") !== -1
+        ? "mac"
+        : "windows"
+    },
+    undoTooltip() {
+      return `Undo (${this.platform === "mac" ? "Cmd" : "Ctrl"} + Z)`
+    },
+    redoTooltip() {
+      return `Redo (Shift + ${this.platform === "mac" ? "Cmd" : "Ctrl"} + Z)`
+    },
+  },
   methods: {
     ...mapActions(["undo", "redo"]),
+    performUndo() {
+      this.undo().then(this.showToast)
+    },
+    performRedo() {
+      this.redo().then(this.showToast)
+    },
+    showToast(message) {
+      if (message) {
+        this.$bvToast.toast(message, {
+          noCloseButton: true,
+          autoHideDelay: 3000,
+          variant: "secondary",
+          solid: true,
+          toaster: "b-toaster-bottom-center",
+          bodyClass: "tapestry-toast-body",
+        })
+      }
+    },
   },
 }
 </script>
