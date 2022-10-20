@@ -494,7 +494,7 @@ class KalturaEndpoints
                     if ($response->status === EntryStatus::READY) {
                         self::_saveVideoUploadStatusInNode($node, KalturaUploadStatus::COMPLETE, $response);
 
-                        $file_path = TapestryHelpers::getPathToNodeMedia($node)->file_path;
+                        $file_path = TapestryHelpers::getPathToMedia($node->getTypeData()->mediaURL)->file_path;
                         KalturaApi::saveAndDeleteLocalVideo($node, $response, $useKalturaPlayer, $file_path);
 
                         $video->currentStatus = KalturaUploadStatus::COMPLETE;
@@ -826,7 +826,7 @@ class KalturaEndpoints
                         KalturaApi::saveAndDeleteLocalVideo($node, $response, $useKalturaPlayer, $video->file->file_path);
                         $numSuccessfullyUploaded++;
 
-                        $failedCaptions = TapestryHelpers::uploadVideoCaptions($node, $kalturaApi, $response);
+                        $failedCaptions = self::_uploadVideoCaptions($node, $kalturaApi, $response);
                         if ($failedCaptions > 0) {
                             $plural = $failedCaptions !== 1 ? 's' : '';
                             $video->additionalInfo = $failedCaptions . ' caption' . $plural . ' failed to upload. Please edit the node to check.';
@@ -886,7 +886,7 @@ class KalturaEndpoints
                     'nodeID' => $nodeId,
                     'nodeTitle' => $node->getTitle(),
                     'uploadStatus' => KalturaUploadStatus::NOT_STARTED,
-                    'file' => TapestryHelpers::getPathToNodeMedia($node),
+                    'file' => TapestryHelpers::getPathToMedia($node->getTypeData()->mediaURL),
                     'kalturaID' => '',
                     'additionalInfo' => '',
                     'timestamp' => $timestamp,
@@ -939,7 +939,7 @@ class KalturaEndpoints
         update_option(KalturaConstants::UPLOAD_LOG_OPTION, $uploadLog);
     }
 
-    private static function uploadVideoCaptions($node, $kalturaApi, $kalturaData)
+    private static function _uploadVideoCaptions($node, $kalturaApi, $kalturaData)
     {
         $typeData = $node->getTypeData();
         $captions = $typeData->captions;
