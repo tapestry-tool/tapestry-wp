@@ -504,26 +504,22 @@ export default {
     nodeId: {
       immediate: true,
       handler() {
-        if (this.show) {
-          if (this.isValid()) {
-            this.initialize()
-          }
+        if (this.show && this.isValid()) {
+          this.initialize()
         }
       },
     },
     show: {
       immediate: true,
       handler(show) {
-        if (show) {
-          if (this.isValid()) {
-            this.loading = false
-            this.initialize()
-          }
+        if (show && this.isValid()) {
+          this.loading = false
+          this.initialize()
         }
       },
     },
     type(type) {
-      if (type) {
+      if (this.show && type) {
         this.initialize()
       }
     },
@@ -570,7 +566,9 @@ export default {
         this.update("lockedThumbnailFileId", "")
       }
     })
-    this.initialize()
+    if (this.show) {
+      this.initialize()
+    }
   },
   beforeDestroy() {
     for (const event of [
