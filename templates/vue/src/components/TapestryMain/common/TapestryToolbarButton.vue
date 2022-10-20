@@ -4,6 +4,7 @@
     class="tapestry-toolbar-button"
     :class="{
       horizontal: horizontal,
+      'not-available': disabled,
       selected: isSelected,
     }"
     @click="handleClick"
@@ -56,6 +57,11 @@ export default {
       required: false,
       default: null,
     },
+    disabled: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
     active: {
       type: Boolean,
       required: false,
@@ -99,6 +105,11 @@ export default {
   background: none;
   font-size: 1.2em;
   transition: all 0.2s ease;
+
+  &.not-available {
+    color: #c4c4c4;
+    cursor: default;
+  }
 
   &.selected {
     background: #d7d7d7;

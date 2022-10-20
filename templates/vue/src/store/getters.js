@@ -236,3 +236,11 @@ export function getNodeNavParent(state) {
 export function getNodeNavIsLinkMode(state) {
   return state.nodeNavigation.linkMode
 }
+
+export function canUndo(state) {
+  return state.commandHistory.position >= 0
+}
+
+export function canRedo(state) {
+  return state.commandHistory.position < state.commandHistory.history.length - 1
+}

@@ -37,6 +37,7 @@
         <tapestry-toolbar-button
           id="tapestry-undo-button"
           :tooltip="undoTooltip"
+          :disabled="!canUndo"
           @click="performUndo"
         >
           <i class="fas fa-undo fa-lg"></i>
@@ -44,6 +45,7 @@
         <tapestry-toolbar-button
           id="tapestry-redo-button"
           :tooltip="redoTooltip"
+          :disabled="!canRedo"
           @click="performRedo"
         >
           <i class="fas fa-redo fa-lg"></i>
@@ -57,7 +59,7 @@
 import TapestryToolbarButton from "../common/TapestryToolbarButton"
 import SettingsModalButton from "./SettingsModalButton"
 import { tools } from "@/utils/constants"
-import { mapActions } from "vuex"
+import { mapActions, mapGetters } from "vuex"
 
 export default {
   components: {
@@ -70,6 +72,7 @@ export default {
     }
   },
   computed: {
+    ...mapGetters(["canUndo", "canRedo"]),
     platform() {
       return window.navigator.platform?.toLowerCase().indexOf("mac") !== -1
         ? "mac"
