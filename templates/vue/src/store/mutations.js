@@ -237,3 +237,7 @@ export function setScaleConstants(state, scaleConstants) {
 export function setCurrentTool(state, tool) {
   state.currentTool = tool
 }
+
+export function setFullscreenDropzone(state, fullscreenDropzone) {
+  state.fullscreenDropzone = fullscreenDropzone
+}

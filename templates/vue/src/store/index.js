@@ -40,6 +40,10 @@ export const store = {
       siblingPosition: -1,
       linkMode: false,
     },
+    fullscreenDropzone: {
+      active: false,
+      file: null,
+    },
     // * DEV: temporarily allow editing constants.js/scaleConstants
     scaleConstants: {
       levelMultiplier: 1.7, // higher -> deep nodes get revealed faster

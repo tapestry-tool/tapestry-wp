@@ -32,7 +32,11 @@
       <tapestry-toolbar-button
         :id="`background-image-button-${node.id}`"
         horizontal
-        :tooltip="node.imageURL ? 'Change Background Image' : 'Add Background Image'"
+        :tooltip="
+          node.imageURL
+            ? 'Change Background Image By Clicking / Drag & Drop'
+            : 'Add Background Image By Clicking / Drag & Drop'
+        "
         tooltip-placement="bottom"
         :active="activeButton === 'image'"
         @click="openFileBrowser"
@@ -71,14 +75,14 @@
           <div class="circle" :style="{ background: node.backgroundColor }"></div>
         </tapestry-toolbar-button>
       </v-swatches>
-      <input
-        ref="imageUpload"
-        type="file"
-        accept="image/*"
-        style="display: none;"
-        @change="handleImageUpload"
-      />
     </tapestry-context-toolbar>
+    <input
+      ref="imageUpload"
+      type="file"
+      accept="image/*"
+      style="display: none;"
+      @change="handleImageUpload"
+    />
   </div>
 </template>
 
@@ -89,7 +93,7 @@ import TapestryContextToolbar from "../TapestryContextToolbar"
 import TapestryToolbarButton from "../common/TapestryToolbarButton"
 import NodeThumbnailPreview from "./NodeThumbnailPreview"
 import { swatches } from "@/utils/constants"
-import { mapActions, mapMutations } from "vuex"
+import { mapActions, mapMutations, mapState } from "vuex"
 import { data as wpData } from "@/services/wp"
 
 export default {
@@ -118,16 +122,38 @@ export default {
       isImageUploading: false,
     }
   },
+  computed: {
+    ...mapState(["fullscreenDropzone"]),
+    dropzoneFile() {
+      return this.fullscreenDropzone.file
+    },
+  },
   watch: {
-    active(active) {
-      if (!active) {
-        this.$refs.backgroundToolbar.hide()
-        this.activeButton = null
+    active: {
+      handler(active) {
+        if (active) {
+          window.addEventListener("dragenter", this.handleDragEnter)
+        } else {
+          this.$refs.backgroundToolbar?.hide()
+          this.activeButton = null
+
+          window.removeEventListener("dragenter", this.handleDragEnter)
+        }
+      },
+      immediate: true,
+    },
+    dropzoneFile(file) {
+      if (this.active && file) {
+        if (file.type?.startsWith("image/")) {
+          this.uploadImage(file)
+        } else {
+          this.addApiError({ error: "Unable to upload file: File is not an image." })
+        }
       }
     },
   },
   methods: {
-    ...mapMutations(["addApiError"]),
+    ...mapMutations(["setFullscreenDropzone", "addApiError"]),
     ...mapActions(["updateNode"]),
     toggleToolbar() {
       const isVisible = this.$refs.backgroundToolbar.toggleVisible()
@@ -162,7 +188,26 @@ export default {
     },
     handleImageUpload() {
       const file = this.$refs.imageUpload.files[0]
-
+      this.uploadImage(file)
+    },
+    handleUploadError(error) {
+      const errMsg = error.message || error.data.message
+      this.addApiError({ error: `Unable to upload file: ${errMsg}` })
+    },
+    openFileBrowser() {
+      if (this.isImageUploading) {
+        return
+      }
+      this.activeButton = "image"
+      this.$refs.imageUpload.click()
+    },
+    handleDragEnter(evt) {
+      evt.preventDefault()
+      if (!this.fullscreenDropzone.active) {
+        this.setFullscreenDropzone({ active: true, file: null })
+      }
+    },
+    uploadImage(file) {
       const formData = new FormData()
       formData.append("action", "upload-attachment")
       formData.append("async-upload", file)
@@ -198,17 +243,6 @@ export default {
           this.isImageUploading = false
           this.activeButton = null
         })
-    },
-    handleUploadError(error) {
-      const errMsg = error.message || error.data.message
-      this.addApiError({ error: `Unable to upload file: ${errMsg}` })
-    },
-    openFileBrowser() {
-      if (this.isImageUploading) {
-        return
-      }
-      this.activeButton = "image"
-      this.$refs.imageUpload.click()
     },
   },
 }
