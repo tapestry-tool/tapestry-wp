@@ -1,6 +1,7 @@
 <?php
 
 require_once dirname(__FILE__).'/class.tapestry-node-permissions.php';
+require_once dirname(__FILE__).'/../classes/class.tapestry-h5p.php';
 
 if (!defined('H5P_DEFINED')) {
     define(
@@ -368,37 +369,9 @@ class TapestryHelpers
         if ($nodeMeta->mediaType === 'video') {
             return self::getPathToMedia($node->getTypeData()->mediaURL);
         } elseif ($nodeMeta->mediaType === 'h5p') {
-            return self::getPathToH5PVideo($node);
+            return TapestryH5P::getPathToH5PVideo($node);
         }
         return null;
-    }
-
-    /**
-     * Gets the file path of the video file in an H5P video.
-     * Assumes that the video is a local upload.
-     *
-     * @param TapestryNode $node    H5P node.
-     */
-    public static function getPathToH5PVideo($node)
-    {
-        if (!H5P_DEFINED) {
-            return null;
-        }
-
-        $h5pPlugin = H5P_Plugin::get_instance();
-        $h5pId = self::getH5PIdFromMediaURL($node->getTypeData()->mediaURL);
-        $videoRelativePath = self::_getH5PVideoURL($h5pId);
-        if (substr($videoRelativePath, -4) === '#tmp') {
-            // Trim the #tmp suffix on the field
-            $videoRelativePath = substr($videoRelativePath, 0, strlen($videoRelativePath) - 4);
-        }
-
-        $videoPath = $h5pPlugin->get_h5p_path() . '/content/' . $h5pId . '/' . $videoRelativePath;
-
-        return (object) [
-            'file_path' => $videoPath,
-            'name' => pathinfo($videoPath)['basename'],
-        ];
     }
 
     /**
@@ -417,11 +390,7 @@ class TapestryHelpers
             return self::isLocalUpload($node->getTypeData()->mediaURL);
         } elseif (H5P_DEFINED && $nodeMeta->mediaType === 'h5p') {
             // H5P videos can be uploaded if the video 'path' attribute is a relative path
-            $h5pId = self::getH5PIdFromMediaURL($node->getTypeData()->mediaURL);
-            $videoPathOrUrl = self::_getH5PVideoURL($h5pId);
-            if ($videoPathOrUrl) {
-                return !filter_var($videoPathOrUrl, FILTER_VALIDATE_URL);
-            }
+            return TapestryH5P::hasRelativeVideoUrl($node);
         }
 
         return false;

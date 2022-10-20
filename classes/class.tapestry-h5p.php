@@ -120,6 +120,51 @@ class TapestryH5P implements ITapestryH5P
     }
 
     /**
+     * Gets the file path of the video file in an H5P video.
+     * Assumes that the video is a local upload.
+     *
+     * @param TapestryNode $node H5P node
+     */
+    public static function getPathToH5PVideo($node)
+    {
+        if (!H5P_DEFINED) {
+            return null;
+        }
+
+        $h5pPlugin = H5P_Plugin::get_instance();
+        $h5pId = self::getH5PIdFromMediaURL($node->getTypeData()->mediaURL);
+        $videoRelativePath = self::_getH5PVideoURL($h5pId);
+        if ('#tmp' === substr($videoRelativePath, -4)) {
+            // Trim the #tmp suffix on the field
+            $videoRelativePath = substr($videoRelativePath, 0, strlen($videoRelativePath) - 4);
+        }
+
+        $videoPath = $h5pPlugin->get_h5p_path().'/content/'.$h5pId.'/'.$videoRelativePath;
+
+        return (object) [
+            'file_path' => $videoPath,
+            'name' => pathinfo($videoPath)['basename'],
+        ];
+    }
+
+    /**
+     * Gets the file path of the video file in an H5P video.
+     * Assumes that the video is a local upload.
+     *
+     * @param TapestryNode $node H5P node
+     */
+    public static function hasRelativeVideoUrl($node)
+    {
+        $h5pId = self::getH5PIdFromMediaURL($node->getTypeData()->mediaURL);
+        $videoPathOrUrl = self::_getH5PVideoURL($h5pId);
+        if ($videoPathOrUrl) {
+            return !filter_var($videoPathOrUrl, FILTER_VALIDATE_URL);
+        }
+
+        return false;
+    }
+
+    /**
      * Gets the video source (URL or path) from an H5P content, by the H5P ID.
      *
      * @param string|int $h5pId

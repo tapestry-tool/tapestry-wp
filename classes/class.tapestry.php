@@ -726,7 +726,7 @@ class Tapestry implements ITapestry
         $allH5Ps = $controller->get();
         foreach ($nodes as $i => $node) {
             if ('h5p' == $node->mediaType && $node->typeData->mediaURL) {
-                $H5PId = TapestryHelpers::getH5PIdFromMediaURL($node->typeData->mediaURL);
+                $H5PId = TapestryH5P::getH5PIdFromMediaURL($node->typeData->mediaURL);
                 if ($H5PId) {
                     $H5PIndex = array_search($H5PId, array_column($allH5Ps, 'id'));
                     if ($H5PIndex || 0 == $H5PIndex) {
