@@ -66,6 +66,15 @@
         @change="handleTypeChange"
       ></b-form-select>
     </b-form-group>
+    <b-form-group v-if="node.mediaType === 'video'" label="Video Source">
+      <b-form-select
+        id="node-media-format"
+        data-qa="node-media-format"
+        :value="node.mediaFormat"
+        :options="mediaFormats"
+        @change="handleFormatChange"
+      ></b-form-select>
+    </b-form-group>
     <b-form-group label="Content Details">
       <b-card
         bg-variant="light"
@@ -104,6 +113,7 @@ import VideoForm from "./VideoForm"
 import WpPostForm from "./WpPostForm"
 import AnswerForm from "./AnswerForm"
 import SubItemTable from "./common/SubItemTable"
+import * as wp from "@/services/wp"
 
 export default {
   components: {
@@ -139,6 +149,7 @@ export default {
     return {
       addDesc: false,
       addMenuTitle: false,
+      disableKalturaOption: false,
     }
   },
 
@@ -179,6 +190,16 @@ export default {
           },
         ]
       }
+    },
+    mediaFormats() {
+      if (this.node.mediaType === "video") {
+        return [
+          { value: "mp4", text: "File or URL" },
+          { value: "youtube", text: "YouTube" },
+          { value: "kaltura", text: "Kaltura", disabled: this.disableKalturaOption },
+        ]
+      }
+      return []
     },
     isUnitChild() {
       return (
@@ -223,6 +244,8 @@ export default {
   },
   created() {
     this.selectUnitChild()
+    this.disableKalturaOption =
+      !wp.getKalturaStatus() && this.node.mediaFormat !== "kaltura"
   },
   methods: {
     ...mapMutations(["setCurrentEditingNodeProperty"]),
@@ -240,6 +263,11 @@ export default {
         evt === "video" ? "mp4" : evt === "h5p" ? "h5p" : ""
       )
       this.$emit("type-changed", evt)
+    },
+    handleFormatChange(evt) {
+      this.update("mediaFormat", evt)
+      this.update("typeData.mediaURL", "")
+      this.update("typeData.youtubeID", undefined)
     },
     selectUnitChild() {
       if (this.isUnitChild) {
