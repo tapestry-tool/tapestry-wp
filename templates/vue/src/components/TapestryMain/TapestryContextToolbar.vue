@@ -6,6 +6,8 @@
     triggers=""
     :placement="placement"
     custom-class="popover-root"
+    @hide="handleHide"
+    @hidden="handleHidden"
   >
     <div class="tapestry-context-toolbar">
       <slot></slot>
@@ -32,6 +34,7 @@ export default {
     return {
       tools: tools,
       show: false,
+      keepOpen: false,
     }
   },
   computed: {
@@ -64,6 +67,19 @@ export default {
     })
   },
   methods: {
+    handleHide() {
+      if (!this.keepOpen) {
+        this.keepOpen = this.show
+      }
+      this.show = false
+    },
+    handleHidden() {
+      if (this.keepOpen) {
+        this.show = true
+      }
+      this.keepOpen = false
+    },
+    // the following 2 methods are for other components to call
     toggleVisible() {
       this.show = !this.show
       return this.show
