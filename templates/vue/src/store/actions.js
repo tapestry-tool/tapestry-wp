@@ -162,18 +162,24 @@ export async function doAddNode(
       commit("addLink", link)
     }
 
+    if (node.level > state.maxLevel) {
+      commit("setMaxLevel", node.level)
+    }
+
     return id
   } catch (error) {
     dispatch("addApiError", error)
   }
 }
 
-export async function updateNode({ commit, dispatch, getters }, payload) {
+export async function updateNode({ commit, dispatch, getters, state }, payload) {
   try {
     const response = await client.updateNode(
       payload.id,
       JSON.stringify(payload.newNode)
     )
+
+    const oldNode = getters.getNode(payload.id)
 
     const newNode = { ...payload.newNode }
     newNode.id = response.data.id
@@ -191,6 +197,15 @@ export async function updateNode({ commit, dispatch, getters }, payload) {
         },
       })
     }
+
+    if (newNode.level) {
+      if (newNode.level > state.maxLevel) {
+        commit("setMaxLevel", newNode.level)
+      } else if (oldNode.level === state.maxLevel) {
+        commit("updateMaxLevel")
+      }
+    }
+
     return id
   } catch (error) {
     dispatch("addApiError", error)
@@ -383,11 +398,7 @@ export async function doDeleteNode({ commit, dispatch, state, getters }, id) {
     }
 
     if (level === state.maxLevel) {
-      const remainingLevels = Object.values(state.nodes).map(node => node.level ?? 1)
-      const remainingMaxLevel = remainingLevels.length
-        ? Math.max(...remainingLevels)
-        : 1
-      commit("setMaxLevel", remainingMaxLevel)
+      commit("updateMaxLevel")
     }
   } catch (error) {
     dispatch("addApiError", error)

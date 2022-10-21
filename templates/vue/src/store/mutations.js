@@ -222,6 +222,16 @@ export function setNodeNavigation(state, nav) {
   }
 }
 
+export function updateMaxLevel(state) {
+  const newMaxLevel = Object.values(state.nodes).reduce(
+    (acc, node) => Math.max(acc, node.level),
+    1
+  )
+  if (state.maxLevel !== newMaxLevel) {
+    state.maxLevel = newMaxLevel
+  }
+}
+
 export function setMaxLevel(state, maxLevel) {
   state.maxLevel = maxLevel
 }
