@@ -2,6 +2,7 @@ import axios from "axios"
 import { data } from "./wp"
 
 const API_URL = `${data.rest_url}/wp/v2`
+const ADMIN_AJAX_URL = data.adminAjaxUrl
 
 let wp_posts_cache = []
 
@@ -43,7 +44,20 @@ async function getPostById(id) {
     .then(parsePost)
 }
 
-export default { loadCachedPosts, getPosts, getPostById }
+/**
+ * Rebuild caches for all H5P content that need their caches rebuilt.
+ */
+async function rebuildAllH5PCache() {
+  let needsRebuilding = 1
+  do {
+    // Each call to h5p_rebuild_cache rebuilds as many as possible within 5 seconds
+    // And returns the number of contents that still need rebuilding
+    const response = await axios.post(`${ADMIN_AJAX_URL}?action=h5p_rebuild_cache`)
+    needsRebuilding = parseInt(response.data)
+  } while (needsRebuilding > 0)
+}
+
+export default { loadCachedPosts, getPosts, getPostById, rebuildAllH5PCache }
 
 const parsePost = post => ({
   ...post,

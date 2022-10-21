@@ -7,6 +7,7 @@
       {
         'media-wrapper-no-scroll':
           (node.mediaFormat === 'mp4' ||
+            node.mediaFormat === 'kaltura' ||
             node.mediaFormat === 'h5p' ||
             node.mediaFormat === 'youtube') &&
           !(context == 'lightbox' && node.fullscreen && !node.fitWindow),
@@ -135,7 +136,7 @@ export default {
           return true
         }
       }
-      return ["mp4", "youtube"].includes(this.node.mediaFormat)
+      return ["mp4", "youtube", "kaltura"].includes(this.node.mediaFormat)
     },
   },
   beforeDestroy() {
