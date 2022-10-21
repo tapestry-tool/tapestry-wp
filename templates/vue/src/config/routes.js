@@ -17,6 +17,7 @@ export const names = {
   USERSETTINGS: "userSettings",
   HELP: "help",
   EXPORTDUPLICATE: "exportDuplicate",
+  KALTURAMODAL: "kalturaModal",
   OTHEROPERATIONS: "otherOperations",
 }
 
@@ -87,6 +88,16 @@ export default [
       {
         path: `export-duplicate`,
         name: names.EXPORTDUPLICATE,
+      },
+      {
+        path: `kalturamodal`,
+        redirect: `${ROOT_PATH}/kalturamodal/upload`,
+        children: [
+          {
+            path: `:tab`,
+            name: names.KALTURAMODAL,
+          },
+        ],
       },
       {
         path: `other-operations`,

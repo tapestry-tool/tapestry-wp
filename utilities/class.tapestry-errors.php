@@ -106,6 +106,34 @@ class TapestryError extends Error
             'MESSAGE' => 'The Tapestry is not empty',
             'STATUS' => ['status' => 400],
         ],
+        'KALTURA_NOT_AVAILABLE' => [
+            'MESSAGE' => 'Kaltura is not enabled on the server.',
+            'STATUS' => ['status' => 400],
+        ],
+        'FAILED_TO_ESTABLISH_KALTURA_SESSION' => [
+            'MESSAGE' => 'Unable to establish Kaltura session',
+            'STATUS' => ['status' => 401],
+        ],
+        'UPLOAD_FILE_NOT_FOUND' => [
+            'MESSAGE' => 'File was not found on the server',
+            'STATUS' => ['status' => 500],
+        ],
+        'INVALID_TAPESTRY_DATA' => [
+            'MESSAGE' => 'Tapestry data is invalid',
+            'STATUS' => ['status' => 400],
+        ],
+        'INVALID_ZIP' => [
+            'MESSAGE' => 'Zip file is invalid',
+            'STATUS' => ['status' => 400],
+        ],
+        'FAILED_TO_IMPORT' => [
+            'MESSAGE' => 'Unable to import Tapestry',
+            'STATUS' => ['status' => 500],
+        ],
+        'FAILED_TO_EXPORT' => [
+            'MESSAGE' => 'Unable to export Tapestry',
+            'STATUS' => ['status' => 500],
+        ],
     ];
 
     /**

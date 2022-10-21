@@ -235,15 +235,15 @@ class TapestryUserProgress implements ITapestryUserProgress
         $activityNodes = [];
         foreach ($nodeIds as $nodeId) {
             $node = $tapestry->getNode($nodeId);
-            if ('activity' === $tapestryNode->getMediaType($node)) {
+            if ('activity' === $node->getMediaType()) {
                 array_push($activityNodes, $node);
             }
         }
         $allUsersAnswers = (object) [];
         $users = get_users(['fields' => ['ID', 'display_name']]);
         foreach ($activityNodes as $activity) {
-            $activityId = $tapestryNode->getNodeId($activity);
-            $typeData = $tapestryNode->getTypeData($activity);
+            $activityId = $activity->getNodeId();
+            $typeData = $activity->getTypeData();
             $activityQuestions = $typeData->activity->questions;
             $activityAnswers = (object) [];
             foreach ($activityQuestions as $question) {

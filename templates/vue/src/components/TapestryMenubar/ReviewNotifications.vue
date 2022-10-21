@@ -9,7 +9,9 @@
     >
       <span>
         <tapestry-icon icon="comment-dots" />
-        <span v-show="!isEmpty" class="count">{{ nodesPendingReview.length }}</span>
+        <b-badge v-show="!isEmpty" class="notification-badge" pill variant="danger">
+          {{ nodesPendingReview.length }}
+        </b-badge>
       </span>
     </button>
     <div v-show="showMenu" class="menu">
@@ -151,15 +153,11 @@ ul {
   }
 }
 
-.count {
-  position: absolute;
-  top: 2px;
-  font-size: 0.5em;
-  color: white;
-  background: red;
-  padding: 0 4px;
-  border-radius: 4px;
-  transform: translateX(-8px);
+.notification-badge {
+  position: absolute !important;
+  top: 0 !important;
+  right: -3px !important;
+  font-size: 0.7rem !important;
 }
 
 h1 {
