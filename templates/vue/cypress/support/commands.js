@@ -170,6 +170,10 @@ Cypress.Commands.add("changeMediaType", type =>
   cy.getByTestId(`node-media-type`).select(type)
 )
 
+Cypress.Commands.add("changeMediaFormat", format =>
+  cy.getByTestId(`node-media-format`).select(format)
+)
+
 // -- Utils --
 
 Cypress.Commands.add("sidebar", () => cy.getByTestId("sidebar"))
