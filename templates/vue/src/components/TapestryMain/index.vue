@@ -170,6 +170,7 @@ export default {
       appDimensions: null,
       zoomPanHelper: null,
       isPanning: false,
+      isTransitioning: false,
 
       dragCoordinates: {},
       dragTimer: null,
@@ -614,6 +615,7 @@ export default {
       }
       targetOffset = this.clampOffsetValue(targetOffset, targetScale)
 
+      this.isTransitioning = true
       interpolate(
         {
           scale: this.scale,
@@ -638,6 +640,7 @@ export default {
           this.viewBox[1] = viewBoxY
         },
         () => {
+          this.isTransitioning = false
           this.updateScale()
           if (this.hasPermission(node, "edit")) {
             this.$root.$emit(
@@ -796,6 +799,7 @@ export default {
       }
       targetOffset = this.clampOffsetValue(targetOffset, targetScale)
 
+      this.isTransitioning = true
       interpolate(
         {
           scale: this.scale,
@@ -820,6 +824,7 @@ export default {
           this.viewBox[1] = viewBoxY
         },
         () => {
+          this.isTransitioning = false
           this.updateScale()
           if (shouldOpenToolbar) {
             this.$root.$emit(
@@ -832,6 +837,9 @@ export default {
       )
     },
     handleNodeDragStart(node) {
+      if (this.isTransitioning) {
+        return
+      }
       this.dragOffsetDelta = { x: 0, y: 0 }
 
       // save initial coordinates of nodes
@@ -914,6 +922,9 @@ export default {
       }
     },
     handleNodeDragEnd({ dx, dy }) {
+      if (this.isTransitioning) {
+        return
+      }
       clearInterval(this.dragTimer)
       this.dragTimer = null
 
