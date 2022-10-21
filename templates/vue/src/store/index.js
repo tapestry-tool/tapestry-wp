@@ -43,6 +43,13 @@ export const store = {
       minTapestrySizeToScreen: 0.6, // min. allowed value of: tapestryWidth / viewWidth
       disableOffsetClamp: false,
     },
+    notifications: {
+      kaltura: {
+        total: 0,
+        success: 0,
+        error: 0,
+      },
+    },
   },
   getters,
   mutations,

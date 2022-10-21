@@ -53,3 +53,5 @@ export const isLoggedIn = jest.fn().mockReturnValue(true)
 export const canEditTapestry = jest.fn().mockReturnValue(true)
 
 export const canReview = jest.fn().mockReturnValue(true)
+
+export const getKalturaStatus = jest.fn().mockReturnValue(true)
