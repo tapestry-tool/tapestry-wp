@@ -220,3 +220,7 @@ export function setCurrentDepth(state, depth) {
 export function setScaleConstants(state, scaleConstants) {
   state.scaleConstants = scaleConstants
 }
+
+export function setNotifications(state, notifications) {
+  state.notifications = notifications
+}
