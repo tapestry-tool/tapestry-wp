@@ -31,6 +31,9 @@ export default {
   methods: {
     ...mapActions(["updateNode"]),
     changeLevel(diff) {
+      if (this.node.level + diff < 1) {
+        return
+      }
       this.updateNode({
         id: this.node.id,
         newNode: {
