@@ -251,3 +251,7 @@ export function setCurrentTool(state, tool) {
 export function setFullscreenDropzone(state, fullscreenDropzone) {
   state.fullscreenDropzone = fullscreenDropzone
 }
+
+export function setNotifications(state, notifications) {
+  state.notifications = notifications
+}

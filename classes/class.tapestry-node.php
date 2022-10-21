@@ -432,19 +432,24 @@ class TapestryNode implements ITapestryNode
         ];
     }
 
-    public function getMediaType($node)
+    public function getMediaType()
     {
-        return $node->mediaType;
+        return $this->mediaType;
     }
 
-    public function getTypeData($node)
+    public function getNodeId()
     {
-        return $node->typeData;
+        return $this->nodeMetaId;
     }
 
-    public function getNodeId($node)
+    public function getTypeData()
     {
-        return $node->nodeMetaId;
+        return $this->typeData;
+    }
+
+    public function getTitle()
+    {
+        return $this->title;
     }
 
     private function _validateComment($review)
