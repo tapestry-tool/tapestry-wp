@@ -175,7 +175,7 @@ describe("Node Authoring", () => {
         cy.getByTestId(`node-title`).type(nodeName)
 
         cy.changeMediaType("video")
-        cy.getByTestId(`node-video-url`).type(nexistVideoURL)
+        cy.getByTestId(`node-video-mp4-url`).type(nexistVideoURL)
 
         cy.getByTestId("submit-node-modal").click()
         cy.contains(videoErrorMsg, { timeout: 10000 }).should("exist")
@@ -193,7 +193,7 @@ describe("Node Authoring", () => {
         cy.openModal("add", parent.id)
         cy.changeMediaType("video")
         cy.getByTestId(`node-title`).type(nodeName)
-        cy.getByTestId(`node-video-url`).type(validYouTubeURL)
+        cy.getByTestId(`node-video-mp4-url`).type(validYouTubeURL)
         cy.getByTestId("modal-submit-error").should("not.exist")
       })
     })
@@ -209,12 +209,12 @@ describe("Node Authoring", () => {
         cy.getByTestId(`node-title`).type(nodeName)
 
         cy.changeMediaType("video")
-        cy.getByTestId(`node-video-url`).type(nexistVideoURL)
+        cy.getByTestId(`node-video-mp4-url`).type(nexistVideoURL)
 
         cy.getByTestId("submit-node-modal").click()
         cy.contains(videoErrorMsg, { timeout: 10000 }).should("exist")
 
-        cy.getByTestId(`node-video-url`)
+        cy.getByTestId(`node-video-mp4-url`)
           .clear()
           .type(existVideoURL)
         cy.submitModal()

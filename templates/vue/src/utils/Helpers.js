@@ -61,22 +61,6 @@ export default class Helpers {
     return "ontouchstart" in window || navigator.maxTouchPoints > 0
   }
 
-  /**
-   * Finds the node index with node ID
-   *
-   * @param  {Number} id          nodeMetaId
-   * @param  {Object} tapestry    tapestry
-   *
-   * @return {Number}
-   */
-  static findNodeIndex(id, tapestry) {
-    function helper(obj) {
-      return obj.id == id
-    }
-
-    return tapestry.nodes.findIndex(helper)
-  }
-
   static normalizeUrl(url) {
     return url.startsWith("http:") || url.startsWith("https:") ? url : `https:${url}`
   }
@@ -308,6 +292,13 @@ export default class Helpers {
     }
 
     return false
+  }
+
+  static hasKalturaUploadPermission() {
+    const { roles } = wp.getCurrentUser()
+    const allowedRole = "administrator"
+
+    return roles.includes(allowedRole)
   }
 
   /**
