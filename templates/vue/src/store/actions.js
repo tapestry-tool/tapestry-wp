@@ -168,7 +168,37 @@ export async function doAddNode(
   }
 }
 
-export async function updateNode({ commit, dispatch, getters }, payload) {
+export async function updateNode({ dispatch, getters }, payload) {
+  const node = getters.getNode(payload.id)
+  let undoPayload = {
+    id: payload.id,
+    newNode: { ...payload.newNode },
+  }
+  for (const key in undoPayload.newNode) {
+    undoPayload.newNode[key] = node[key]
+  }
+  return dispatch("buildCommand", {
+    name: "update node",
+    executeAction: "doUpdateNode",
+    executePayload: payload,
+    executeCallback: nodeId => ({
+      undoPayload: {
+        ...undoPayload,
+        id: nodeId,
+      },
+    }),
+    undoAction: "doUpdateNode",
+    undoPayload: undoPayload,
+    undoCallback: nodeId => ({
+      executePayload: {
+        ...payload,
+        id: nodeId,
+      },
+    }),
+  })
+}
+
+export async function doUpdateNode({ commit, dispatch, getters }, payload) {
   try {
     const response = await client.updateNode(
       payload.id,
