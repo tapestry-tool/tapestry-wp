@@ -215,7 +215,7 @@ describe("Import", () => {
     const invalidImportFile = "no-tapestry-json.zip"
     cy.getByTestId("import-file-input").attachFile(invalidImportFile)
     cy.wait("@import_zip")
-    cy.contains(/Zip file is invalid/i).should("be.visible")
+    cy.contains(/Could not find tapestry\.json in zip/i).should("be.visible")
   })
 
   it("should not be able to import a zip where tapestry.json is not valid JSON", () => {
