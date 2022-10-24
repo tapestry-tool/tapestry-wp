@@ -192,11 +192,10 @@ export default {
   background: var(--bg-color-primary);
   width: 100px;
   height: 10px;
-  opacity: 0.8;
-  transition: opacity 0.2s;
   position: relative;
   align-items: center;
   margin: 0 30px;
+  border: solid 2px #c2c2c2;
 
   &:before,
   &:after {
@@ -210,14 +209,14 @@ export default {
     background-repeat: no-repeat;
     border: 1px solid var(--bg-color-primary);
     border-radius: 50%;
-    left: -30px;
+    left: -20px;
     bottom: -9px;
   }
 
   &:after {
     background-image: var(--zoomOutBg);
     left: initial;
-    right: -30px;
+    right: -20px;
   }
 
   /* webkit support */
@@ -249,12 +248,8 @@ export default {
     background: var(--highlight-color);
   }
 
-  &:hover {
-    opacity: 1;
-  }
-
   &:focus {
-    border-color: transparent !important;
+    border-color: #c2c2c2 !important;
   }
 }
 </style>
