@@ -1,5 +1,5 @@
 <template>
-  <div v-if="maxDepth > 1" class="depth-slider" @mousedown="pauseDragSelect">
+  <div v-if="maxDepth > 1" class="depth-slider">
     <div>
       <input
         v-model="currentDepth"
@@ -11,9 +11,6 @@
         :style="{ '--zoomInBg': zoomInBg, '--zoomOutBg': zoomOutBg }"
       />
     </div>
-    <p v-if="false && currentDepth < maxDepth" class="warning-text alert p-2 small">
-      Some nodes might be hidden because you're not at maximum depth.
-    </p>
   </div>
 </template>
 
@@ -21,7 +18,6 @@
 import { mapState, mapGetters, mapMutations } from "vuex"
 import ZoomIn from "@/assets/zoom-in.png"
 import ZoomOut from "@/assets/zoom-out.png"
-// import DragSelectModular from "@/utils/dragSelectModular"
 import Helpers from "@/utils/Helpers"
 import client from "@/services/TapestryAPI"
 
@@ -156,9 +152,6 @@ export default {
       this.$emit("change")
       */
     },
-    pauseDragSelect() {
-      // DragSelectModular.pauseDragSelect()
-    },
   },
 }
 </script>
@@ -263,19 +256,5 @@ export default {
   &:focus {
     border-color: transparent !important;
   }
-}
-
-.warning-text {
-  position: absolute;
-  z-index: 8;
-  user-select: none;
-  width: 100%;
-  top: calc(100% - 1px);
-  right: 0;
-  color: var(--text-color-primary);
-  box-shadow: 0 7px 7px 0 var(--bg-color-primary);
-  border-top-right-radius: 0;
-  border-top-left-radius: 0;
-  background-color: var(--bg-color-secondary);
 }
 </style>
