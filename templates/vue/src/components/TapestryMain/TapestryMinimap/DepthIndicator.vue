@@ -27,8 +27,8 @@
         x="0"
         :y="getYOffset(level)"
         :fill="getFillColor(level)"
-        :stroke="isCurrentLevel(level) ? '#49CFFF' : ''"
-        :stroke-width="isCurrentLevel(level) ? 2 : 0"
+        :stroke="isCurrentLevel(level) ? '#49CFFF' : '#9CACBB'"
+        stroke-width="2"
       />
     </svg>
     <depth-slider v-show="!showMap && hasDepth"></depth-slider>

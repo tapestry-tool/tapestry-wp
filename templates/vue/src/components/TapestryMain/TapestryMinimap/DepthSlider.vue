@@ -1,5 +1,5 @@
 <template>
-  <div v-if="maxDepth > 1" class="depth-slider" @mousedown="pauseDragSelect">
+  <div v-if="maxDepth > 1" class="depth-slider">
     <div>
       <input
         v-model="currentDepth"
@@ -11,9 +11,6 @@
         :style="{ '--zoomInBg': zoomInBg, '--zoomOutBg': zoomOutBg }"
       />
     </div>
-    <p v-if="false && currentDepth < maxDepth" class="warning-text alert p-2 small">
-      Some nodes might be hidden because you're not at maximum depth.
-    </p>
   </div>
 </template>
 
@@ -21,7 +18,6 @@
 import { mapState, mapGetters, mapMutations } from "vuex"
 import ZoomIn from "@/assets/zoom-in.png"
 import ZoomOut from "@/assets/zoom-out.png"
-// import DragSelectModular from "@/utils/dragSelectModular"
 import Helpers from "@/utils/Helpers"
 import client from "@/services/TapestryAPI"
 
@@ -156,9 +152,6 @@ export default {
       this.$emit("change")
       */
     },
-    pauseDragSelect() {
-      // DragSelectModular.pauseDragSelect()
-    },
   },
 }
 </script>
@@ -199,11 +192,10 @@ export default {
   background: var(--bg-color-primary);
   width: 100px;
   height: 10px;
-  opacity: 0.8;
-  transition: opacity 0.2s;
   position: relative;
   align-items: center;
   margin: 0 30px;
+  border: solid 2px #c2c2c2;
 
   &:before,
   &:after {
@@ -217,14 +209,14 @@ export default {
     background-repeat: no-repeat;
     border: 1px solid var(--bg-color-primary);
     border-radius: 50%;
-    left: -30px;
+    left: -20px;
     bottom: -9px;
   }
 
   &:after {
     background-image: var(--zoomOutBg);
     left: initial;
-    right: -30px;
+    right: -20px;
   }
 
   /* webkit support */
@@ -256,26 +248,8 @@ export default {
     background: var(--highlight-color);
   }
 
-  &:hover {
-    opacity: 1;
-  }
-
   &:focus {
-    border-color: transparent !important;
+    border-color: #c2c2c2 !important;
   }
-}
-
-.warning-text {
-  position: absolute;
-  z-index: 8;
-  user-select: none;
-  width: 100%;
-  top: calc(100% - 1px);
-  right: 0;
-  color: var(--text-color-primary);
-  box-shadow: 0 7px 7px 0 var(--bg-color-primary);
-  border-top-right-radius: 0;
-  border-top-left-radius: 0;
-  background-color: var(--bg-color-secondary);
 }
 </style>

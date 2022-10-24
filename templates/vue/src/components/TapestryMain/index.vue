@@ -257,6 +257,9 @@ export default {
     background() {
       return this.settings.backgroundUrl
     },
+    isSidebarOpen() {
+      return !!this.$route.query.sidebar
+    },
     isLoggedIn() {
       return wp.isLoggedIn()
     },
@@ -326,6 +329,11 @@ export default {
     },
     nodes() {
       this.updateViewBox()
+    },
+    isSidebarOpen() {
+      setTimeout(() => {
+        this.updateViewBox()
+      }, 300)
     },
     selectedId: {
       immediate: true,
