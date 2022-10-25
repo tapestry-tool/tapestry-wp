@@ -228,17 +228,35 @@ export async function doUpdateNode({ commit, dispatch, getters, state }, payload
       })
     }
 
-    if (newNode.level) {
+    if (newNode.level && newNode.level !== oldNode.level) {
       if (newNode.level > state.maxLevel) {
         commit("setMaxLevel", newNode.level)
       } else if (oldNode.level === state.maxLevel) {
         commit("updateMaxLevel")
       }
+      await dispatch("updateLinkDirections", id)
     }
 
     return id
   } catch (error) {
     dispatch("addApiError", error)
+  }
+}
+
+export async function updateLinkDirections({ dispatch, getters, state }, id) {
+  const level = getters.getNode(id).level
+  for (const link of state.links) {
+    if (link.source === id) {
+      const otherLevel = getters.getNode(link.target).level
+      if (level > otherLevel) {
+        await dispatch("doReverseLink", { source: link.source, target: link.target })
+      }
+    } else if (link.target === id) {
+      const otherLevel = getters.getNode(link.source).level
+      if (level < otherLevel) {
+        await dispatch("doReverseLink", { source: link.source, target: link.target })
+      }
+    }
   }
 }
 
@@ -504,6 +522,12 @@ export async function addLink({ dispatch }, payload) {
 
 export async function doAddLink({ commit, dispatch, getters }, newLink) {
   try {
+    const sourceLevel = getters.getNode(newLink.source).level
+    const targetLevel = getters.getNode(newLink.target).level
+    if (sourceLevel > targetLevel) {
+      newLink = { ...newLink, source: newLink.target, target: newLink.source }
+    }
+
     await client.addLink(JSON.stringify(newLink))
     commit("addLink", newLink)
 
