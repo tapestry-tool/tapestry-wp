@@ -9,18 +9,20 @@
       <i class="fas fa-trash-alt fa-lg"></i>
     </tapestry-toolbar-button>
 
-    <div class="tapestry-toolbar-separator"></div>
+    <template v-if="isSameLevelLink">
+      <div class="tapestry-toolbar-separator"></div>
 
-    <div class="vertex-title left">{{ source.title }}</div>
-    <tapestry-toolbar-button
-      :id="`reverse-link-button-${source.id}-${target.id}`"
-      horizontal
-      tooltip="Reverse Link"
-      @click="handleReverseLink"
-    >
-      <i class="fas fa-exchange-alt fa-lg"></i>
-    </tapestry-toolbar-button>
-    <div class="vertex-title right">{{ target.title }}</div>
+      <div class="vertex-title left">{{ source.title }}</div>
+      <tapestry-toolbar-button
+        :id="`reverse-link-button-${source.id}-${target.id}`"
+        horizontal
+        tooltip="Reverse Link"
+        @click="handleReverseLink"
+      >
+        <i class="fas fa-exchange-alt fa-lg"></i>
+      </tapestry-toolbar-button>
+      <div class="vertex-title right">{{ target.title }}</div>
+    </template>
   </tapestry-context-toolbar>
 </template>
 
@@ -54,6 +56,9 @@ export default {
   computed: {
     linkElementId() {
       return Helpers.getLinkElementId(this.source.id, this.target.id)
+    },
+    isSameLevelLink() {
+      return this.source.level === this.target.level
     },
   },
   methods: {
