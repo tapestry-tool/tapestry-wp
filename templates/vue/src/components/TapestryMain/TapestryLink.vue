@@ -26,7 +26,6 @@
 
 <script>
 import { mapGetters, mapState } from "vuex"
-import { names } from "@/config/routes"
 import * as wp from "@/services/wp"
 import Helpers from "@/utils/Helpers"
 
@@ -91,16 +90,6 @@ export default {
       ) {
         this.$root.$emit("context-toolbar::open", this.elementId)
       }
-    },
-    openLinkModal() {
-      this.$router.push({
-        name: names.LINKMODAL,
-        params: {
-          source: this.source.id,
-          target: this.target.id,
-        },
-        query: this.$route.query,
-      })
     },
   },
 }

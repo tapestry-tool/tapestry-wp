@@ -598,11 +598,20 @@ export async function deleteLink(
 }
 
 export async function doDeleteLink(
-  { commit, dispatch },
+  { commit, dispatch, getters },
   { source, target, useClient = true }
 ) {
   try {
     if (useClient) await client.deleteLink({ source: source, target: target })
+
+    const parent = getters.getNode(source)
+    commit("updateNode", {
+      id: source,
+      newNode: {
+        childOrdering: parent.childOrdering.filter(id => id !== target),
+      },
+    })
+
     commit("deleteLink", { source, target })
   } catch (error) {
     dispatch("addApiError", error)

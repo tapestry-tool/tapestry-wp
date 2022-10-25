@@ -991,20 +991,10 @@ export default {
       const { code } = evt
       const node = this.getNode(this.selectedId)
       if (code === "Enter") {
-        if (this.nodeNavLinkMode) {
-          this.$router.push({
-            name: names.LINKMODAL,
-            params: {
-              source: this.getNodeNavParent,
-              target: this.selectedId,
-            },
-            query: this.$route.query,
-          })
-        } else if (
-          node.accessible ||
-          Helpers.hasPermission(node, "edit", this.settings.showRejected)
-        ) {
-          this.$root.$emit("open-node", node.id)
+        if (!this.nodeNavLinkMode) {
+          if (node.accessible || this.hasPermission(node, "edit")) {
+            this.$root.$emit("open-node", node.id)
+          }
         }
       } else if (code === "KeyS") {
         // focus the sidebar
@@ -1018,10 +1008,10 @@ export default {
           document.querySelector(".sidebar")?.focus()
         })
       } else if (code === "KeyE") {
-        if (this.nodeNavLinkMode) {
-          this.openSelectedLinkModal()
-        } else if (Helpers.hasPermission(node, "edit", this.settings.showRejected)) {
-          this.$root.$emit("edit-node", node.id)
+        if (!this.nodeNavLinkMode) {
+          if (this.hasPermission(node, "edit")) {
+            this.$root.$emit("edit-node", node.id)
+          }
         }
       } else if (code === "KeyQ" || code === "Escape") {
         // focus the next element after the main
@@ -1081,16 +1071,6 @@ export default {
           ? `.node[data-id='${focused.id}']`
           : `#link-${focused.source}-${focused.target}`
       )
-    },
-    openSelectedLinkModal() {
-      this.$router.push({
-        name: names.LINKMODAL,
-        params: {
-          source: this.getNodeNavParent,
-          target: this.selectedId,
-        },
-        query: this.$route.query,
-      })
     },
     handleMousedownOnApp() {
       this.$root.$emit("context-toolbar::dismiss")

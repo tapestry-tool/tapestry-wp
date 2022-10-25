@@ -12,7 +12,6 @@ export const names = {
   LIGHTBOX: "lightbox",
   MODAL: "modal",
   SETTINGS: "settings",
-  LINKMODAL: "linkmodal",
   NODEPERMISSIONS: "nodePermissions",
   NODELOCK: "nodeLock",
   USERANSWERS: "userAnswers",
@@ -56,10 +55,6 @@ export default [
       {
         path: `lock`,
         name: names.NODELOCK,
-      },
-      {
-        path: `link/:source/:target`,
-        name: names.LINKMODAL,
       },
       {
         path: `settings`,

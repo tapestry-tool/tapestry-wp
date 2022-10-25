@@ -5,7 +5,6 @@
     <router-view></router-view>
     <node-modal></node-modal>
     <node-modals></node-modals>
-    <link-modal></link-modal>
     <lightbox
       v-if="node"
       :visible="viewingNode"
@@ -40,7 +39,6 @@
 import { mapMutations, mapGetters, mapActions, mapState } from "vuex"
 import { names } from "@/config/routes"
 import Lightbox from "@/components/Lightbox"
-import LinkModal from "@/components/modals/LinkModal"
 import NodeModal from "@/components/modals/NodeModal"
 import NodeModals from "@/components/modals/NodeModals"
 import TapestryApp from "@/components/TapestryApp"
@@ -59,7 +57,6 @@ export default {
     Lightbox,
     NodeModal,
     NodeModals,
-    LinkModal,
     TapestryApp,
     Sidebar,
     TapestryError,
