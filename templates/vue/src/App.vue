@@ -13,13 +13,7 @@
     ></lightbox>
     <sidebar v-if="!isEmptyTapestry"></sidebar>
     <tapestry-error></tapestry-error>
-    <div
-      v-show="fullscreenDropzone.active"
-      class="fullscreen-dropzone"
-      @dragleave="hideFullscreenDropzone"
-      @dragover="handleDragover"
-      @drop="handleDrop"
-    ></div>
+    <fullscreen-dropzone></fullscreen-dropzone>
     <b-modal
       id="loggedOutModal"
       :visible="!loggedIn"
@@ -36,7 +30,7 @@
 </template>
 
 <script>
-import { mapMutations, mapGetters, mapActions, mapState } from "vuex"
+import { mapMutations, mapGetters, mapActions } from "vuex"
 import { names } from "@/config/routes"
 import Lightbox from "@/components/Lightbox"
 import NodeModal from "@/components/modals/NodeModal"
@@ -45,6 +39,7 @@ import TapestryApp from "@/components/TapestryApp"
 import Sidebar from "@/components/Sidebar"
 import TapestryError from "@/components/TapestryError"
 import Loading from "@/components/common/Loading"
+import FullscreenDropzone from "@/components/FullscreenDropzone"
 import client from "@/services/TapestryAPI"
 import { isLoggedIn } from "./services/wp"
 import { toolKeyBindings } from "@/utils/constants"
@@ -60,6 +55,7 @@ export default {
     TapestryApp,
     Sidebar,
     TapestryError,
+    FullscreenDropzone,
   },
   data() {
     return {
@@ -68,7 +64,6 @@ export default {
     }
   },
   computed: {
-    ...mapState(["fullscreenDropzone"]),
     ...mapGetters(["getNode", "isEmptyTapestry", "getTheme", "getInitialNodeId"]),
     nodeId() {
       return this.$route.params.nodeId
@@ -150,7 +145,6 @@ export default {
       "changeTheme",
       "updateBrowserDimensions",
       "setCurrentTool",
-      "setFullscreenDropzone",
     ]),
     refresh() {
       this.$router.go()
@@ -220,34 +214,9 @@ export default {
         }
       }
     },
-    handleDragover(evt) {
-      evt.preventDefault()
-    },
-    hideFullscreenDropzone() {
-      this.setFullscreenDropzone({ active: false, file: null })
-    },
-    handleDrop(evt) {
-      evt.preventDefault()
-      evt.stopPropagation()
-      this.setFullscreenDropzone({ active: false, file: evt.dataTransfer.files[0] })
-    },
   },
 }
 </script>
-
-<style lang="scss" scoped>
-.fullscreen-dropzone {
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.2);
-  z-index: 9999;
-}
-</style>
 
 <style lang="scss">
 html {

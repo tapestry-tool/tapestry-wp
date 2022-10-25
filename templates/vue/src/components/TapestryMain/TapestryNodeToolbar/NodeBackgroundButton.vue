@@ -152,6 +152,9 @@ export default {
       }
     },
   },
+  beforeDestroy() {
+    window.removeEventListener("dragenter", this.handleDragEnter)
+  },
   methods: {
     ...mapMutations(["setFullscreenDropzone", "addApiError"]),
     ...mapActions(["updateNode"]),
