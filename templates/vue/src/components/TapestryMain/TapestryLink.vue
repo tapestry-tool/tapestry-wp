@@ -47,7 +47,7 @@ export default {
     },
   },
   computed: {
-    ...mapState(["visibleNodes", "maxLevel", "currentDepth"]),
+    ...mapState(["visibleNodes", "maxLevel", "currentDepth", "settings"]),
     ...mapGetters(["getNeighbours", "isVisible"]),
     show() {
       return (
@@ -85,7 +85,12 @@ export default {
   },
   methods: {
     handleClick() {
-      this.$root.$emit("context-toolbar::open", this.elementId)
+      if (
+        Helpers.hasPermission(this.source, "add", this.settings.showRejected) &&
+        Helpers.hasPermission(this.source, "add", this.settings.showRejected)
+      ) {
+        this.$root.$emit("context-toolbar::open", this.elementId)
+      }
     },
     openLinkModal() {
       this.$router.push({
