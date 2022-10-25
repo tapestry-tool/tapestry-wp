@@ -26,7 +26,6 @@
         aria-label="Main Tapestry View"
         :viewBox="computedViewBox"
         @mousemove="handleMousemoveOnSvg"
-        @click="handleClickOnSvg"
       >
         <tapestry-link-placeholder
           v-if="linkToolNode"
@@ -84,6 +83,7 @@
           :show="showNodePlaceholder"
           :coordinates="mouseCoordinates"
           :level="selectedNodeLevel"
+          @click="handleNodePlaceholderClick"
         />
         <locked-tooltip
           v-if="activeNode"
@@ -1101,12 +1101,8 @@ export default {
         y: evt.offsetY,
       }
     },
-    handleClickOnSvg() {
-      if (
-        this.currentTool === tools.ADD_NODE &&
-        !this.isPanning &&
-        this.nodeEditingTitle === null
-      ) {
+    handleNodePlaceholderClick() {
+      if (!this.isPanning && this.nodeEditingTitle === null) {
         const newNode = Helpers.createDefaultNode()
         newNode.coordinates = {
           x: this.mouseCoordinates.x / this.scale,

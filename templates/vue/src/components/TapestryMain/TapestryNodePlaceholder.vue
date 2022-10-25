@@ -8,6 +8,7 @@
       :style="{
         filter: dropShadow,
       }"
+      @click="$emit('click')"
     ></circle>
   </transition>
 </template>
