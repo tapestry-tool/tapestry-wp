@@ -1,7 +1,7 @@
 <template>
   <tapestry-context-toolbar :target="linkElementId">
     <tapestry-toolbar-button
-      :id="`delete-link-button-${source.id}-${target.id}`"
+      id="delete-link-btn"
       horizontal
       tooltip="Delete Link"
       @click="handleDeleteLink"
@@ -73,7 +73,6 @@ export default {
       )
       this.reverseLink({ source: this.source.id, target: this.target.id }).then(
         () => {
-          console.log("reverse")
           this.$root.$emit("context-toolbar::open", reversedElementId)
         }
       )
