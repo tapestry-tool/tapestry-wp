@@ -87,7 +87,7 @@ export default {
     handleClick() {
       if (
         Helpers.hasPermission(this.source, "add", this.settings.showRejected) &&
-        Helpers.hasPermission(this.source, "add", this.settings.showRejected)
+        Helpers.hasPermission(this.target, "add", this.settings.showRejected)
       ) {
         this.$root.$emit("context-toolbar::open", this.elementId)
       }
