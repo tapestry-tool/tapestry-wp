@@ -344,6 +344,19 @@ function prefix_title_entity_decode($response)
     return $response;
 }
 
+// Set the extension and mime type for .vtt files so Wordpress allows their upload
+
+add_filter('wp_check_filetype_and_ext', 'wpse_file_and_ext', 10, 4);
+function wpse_file_and_ext($types, $file, $filename, $mimes)
+{
+    if (false !== strpos($filename, '.vtt')) {
+        $types['ext'] = 'vtt';
+        $types['type'] = 'text/vtt';
+    }
+
+    return $types;
+}
+
 // Analytics
 
 register_activation_hook(__FILE__, 'create_tapestry_analytics_schema');
@@ -366,18 +379,21 @@ function tapestry_tool_log_event()
 // Cleanup
 
 add_action('tapestry_clean_export_files', 'clean_export_files');
-function clean_export_files() {
+function clean_export_files()
+{
     TapestryImportExport::clearExportedZips();
 }
 
 register_activation_hook(__FILE__, 'schedule_tapestry_export_file_cleanup');
-function schedule_tapestry_export_file_cleanup() {
-    if ( ! wp_next_scheduled('tapestry_clean_export_files') ) {
-        wp_schedule_event( time(), 'daily', 'tapestry_clean_export_files' );
+function schedule_tapestry_export_file_cleanup()
+{
+    if (! wp_next_scheduled('tapestry_clean_export_files')) {
+        wp_schedule_event(time(), 'daily', 'tapestry_clean_export_files');
     }
 }
 
 register_deactivation_hook(__FILE__, 'unschedule_tapestry_export_file_cleanup');
-function unschedule_tapestry_export_file_cleanup() {
+function unschedule_tapestry_export_file_cleanup()
+{
     wp_clear_scheduled_hook('tapestry_clean_export_files');
 }
