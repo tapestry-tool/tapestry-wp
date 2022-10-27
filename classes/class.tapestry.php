@@ -27,6 +27,7 @@ class Tapestry implements ITapestry
     private $settings;
     private $rootId;
     private $nodes;
+    private $notifications;
 
     private $nodeObjects; // Used only in the set up so we don't have to retrieve the nodes from the db multiple times
     private $visitedNodeIds; // Used in _recursivelySetAccessible function
@@ -50,6 +51,7 @@ class Tapestry implements ITapestry
         // $this->groups = [];
         $this->rootId = 0;
         $this->settings = $this->_getDefaultSettings();
+        $this->notifications = $this->_getDefaultNotifications();
 
         if (TapestryHelpers::isValidTapestry($this->postId)) {
             $tapestry = $this->_loadFromDatabase();
@@ -111,6 +113,21 @@ class Tapestry implements ITapestry
                 $this->settings->draftNodesEnabled = true;
                 $this->settings->submitNodesEnabled = true;
             }
+            if (!isset($this->settings->permalink)) {
+                $this->settings->permalink = get_permalink($this->postId);
+            }
+            if (!isset($this->settings->tapestrySlug)) {
+                $this->settings->tapestrySlug = get_post($this->postId)->post_name;
+            }
+            if (!isset($this->settings->title)) {
+                $this->settings->title = get_the_title($this->postId);
+            }
+            if (!isset($this->settings->status)) {
+                $this->settings->status = get_post_status($this->postId);
+            }
+        }
+        if (isset($tapestry->notifications) && is_object($tapestry->notifications)) {
+            $this->notifications = $tapestry->notifications;
         }
     }
 
@@ -154,6 +171,34 @@ class Tapestry implements ITapestry
         }
 
         return $this->links;
+    }
+
+    /**
+     * Get settings.
+     *
+     * @return object $settings
+     */
+    public function getSettings()
+    {
+        if (!$this->postId) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+
+        return $this->settings;
+    }
+
+    /**
+     * Get notifications.
+     *
+     * @return object $notifications
+     */
+    public function getNotifications()
+    {
+        if (!$this->postId) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+
+        return $this->notifications;
     }
 
     /**
@@ -446,7 +491,6 @@ class Tapestry implements ITapestry
         // foreach ($this->groups as $group) {
         //     $groups[] = (new TapestryGroup($this->postId, $$group))->get();
         // }
-        $parsedUrl = parse_url($this->settings->permalink);
         unset($this->settings->permalink);
         unset($this->settings->tapestrySlug);
         unset($this->settings->title);
@@ -457,7 +501,7 @@ class Tapestry implements ITapestry
             // 'groups' => $groups,
             'links' => $this->links,
             'settings' => $this->settings,
-            'site-url' => $parsedUrl['scheme'].'://'.$parsedUrl['host'],
+            'site-url' => get_bloginfo('url'),
         ];
     }
 
@@ -572,6 +616,17 @@ class Tapestry implements ITapestry
         return $settings;
     }
 
+    private function _getDefaultNotifications()
+    {
+        return (object) [
+            'kaltura' => (object) [
+                'total' => 0,
+                'success' => 0,
+                'error' => 0,
+            ],
+        ];
+    }
+
     private function _getAuthor()
     {
         if ($this->postId) {
@@ -589,6 +644,7 @@ class Tapestry implements ITapestry
             'links' => $this->links,
             'settings' => $this->settings,
             'rootId' => $this->rootId,
+            'notifications' => $this->notifications,
         ];
     }
 

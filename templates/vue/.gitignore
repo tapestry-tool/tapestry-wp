@@ -5,6 +5,7 @@ npm-debug.log
 yarn-error.log
 config.js
 cypress.json
+cypress/downloads/
 cypress/screenshots/
 cypress/videos/
 .env
