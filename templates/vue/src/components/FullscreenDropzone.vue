@@ -44,7 +44,7 @@ export default {
   right: 0;
   width: 100%;
   height: 100%;
-  background-color: #1eade199;
+  background-color: #1eade1cc;
   z-index: 99999;
   display: flex;
   justify-content: center;
