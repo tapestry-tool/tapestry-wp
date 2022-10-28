@@ -1,110 +1,112 @@
 <template>
-  <b-popover
-    :id="menuElementId"
-    :target="target"
-    :show="show"
-    triggers=""
-    :placement="placement"
-    custom-class="popover-root"
-    @hide="handleHide"
-    @hidden="handleHidden"
-  >
-    <div class="tapestry-context-toolbar">
-      <slot></slot>
+  <transition name="fade">
+    <div v-show="show" ref="popper" class="context-toolbar-container">
+      <div class="tapestry-context-toolbar">
+        <slot></slot>
+      </div>
     </div>
-  </b-popover>
+  </transition>
 </template>
 
 <script>
-import { tools } from "@/utils/constants"
+import { createPopper } from "@popperjs/core"
 
 export default {
+  model: {
+    prop: "show",
+    event: "set-show",
+  },
   props: {
+    show: {
+      type: Boolean,
+      required: true,
+    },
+    // should provide one of position (for virtual element) or target (element ID of actual element):
+    position: {
+      type: Object,
+      required: false,
+      default: () => ({ left: 0, top: 0, right: 0, bottom: 0, width: 0, height: 0 }),
+    },
     target: {
       type: String,
-      required: true,
+      required: false,
+      default: null,
     },
     placement: {
       type: String,
       required: false,
       default: "top",
     },
+    offset: {
+      type: Number,
+      required: false,
+      default: 0,
+    },
   },
   data() {
     return {
-      tools: tools,
-      show: false,
-      keepOpen: false,
+      popper: null,
     }
   },
   computed: {
-    menuElementId() {
-      return `${this.target}-menu`
+    virtualTarget() {
+      return {
+        getBoundingClientRect: () => this.position,
+      }
     },
   },
   watch: {
     show(show) {
       if (show) {
-        this.$emit("show")
-      } else {
-        this.$emit("hide")
+        this.popper?.update()
       }
+    },
+    position: {
+      handler() {
+        this.popper?.update()
+      },
+      deep: true,
     },
   },
   mounted() {
     this.$root.$on("bv::modal::show", () => {
-      this.show = false
+      this.$emit("set-show", false)
     })
-    this.$root.$on("context-toolbar::dismiss", () => {
-      this.show = false
-    })
-    this.$root.$on("context-toolbar::open", elementId => {
-      if (elementId === this.target && !this.show) {
-        this.show = true
-      } else {
-        this.show = false
+    this.popper = createPopper(
+      this.target ? document.getElementById(this.target) : this.virtualTarget,
+      this.$refs.popper,
+      {
+        placement: this.placement,
+        modifiers: [
+          {
+            name: "offset",
+            options: {
+              offset: [0, this.offset],
+            },
+          },
+        ],
       }
-    })
-  },
-  methods: {
-    handleHide() {
-      if (!this.keepOpen) {
-        this.keepOpen = this.show
-      }
-      this.show = false
-    },
-    handleHidden() {
-      if (this.keepOpen) {
-        this.show = true
-      }
-      this.keepOpen = false
-    },
-    // the following 2 methods are for other components to call
-    toggleVisible() {
-      this.show = !this.show
-      return this.show
-    },
-    hide() {
-      this.show = false
-    },
+    )
   },
 }
 </script>
 
 <style lang="scss" scoped>
-.popover-root {
+.context-toolbar-container {
   background-color: #ededed;
   border: 2px solid #f8f8f8;
   border-radius: 9px;
-  max-width: none !important;
+  z-index: 100;
+  display: block;
+}
 
-  // override BootstrapVue popover styles
-  ::v-deep .arrow {
-    display: none;
-  }
-  ::v-deep .popover-body {
-    padding: 0;
-  }
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>
 

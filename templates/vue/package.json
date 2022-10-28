@@ -24,6 +24,7 @@
     "start": "npm run dev"
   },
   "dependencies": {
+    "@popperjs/core": "^2.11.6",
     "audio-recorder-polyfill": "^0.3.4",
     "axios": "^0.21.1",
     "bootstrap": "^4.3.1",

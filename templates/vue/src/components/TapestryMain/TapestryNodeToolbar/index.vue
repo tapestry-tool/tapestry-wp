@@ -1,107 +1,114 @@
 <template>
-  <tapestry-context-toolbar :target="nodeElementId" @hide="activeButton = null">
-    <tapestry-toolbar-button
-      :id="`delete-node-button-${node.id}`"
-      class="after-separator before-separator"
-      horizontal
-      tooltip="Delete Node"
-      :active="activeButton === 'delete'"
-      @click="handleDeleteNode"
-    >
-      <i class="fas fa-trash-alt fa-lg"></i>
-    </tapestry-toolbar-button>
-
-    <div class="tapestry-toolbar-separator"></div>
-
-    <v-swatches
-      :value="node.textColor"
-      :swatches="swatchesWithTransparentColor"
-      show-border
-      show-fallback
-      shapes="circles"
-      swatch-size="30"
-      :wrapper-style="{ zIndex: 1000 }"
-      fallback-input-type="color"
-      row-length="8"
-      popover-x="right"
-      class="swatch"
-      @input="handleTextColorInput"
-      @open="handleOpen('textColor')"
-      @close="handleClose('textColor')"
-    >
+  <tapestry-context-toolbar
+    :show="show && hasEditPermission"
+    :position="position"
+    :offset="20"
+    @set-show="handleShowHide"
+  >
+    <template v-if="node">
       <tapestry-toolbar-button
-        :id="`title-color-button-${node.id}`"
-        slot="trigger"
-        class="after-separator"
+        :id="`delete-node-button-${node.id}`"
+        class="after-separator before-separator"
         horizontal
-        tooltip="Change Text Color"
-        :active="activeButton === 'textColor'"
+        tooltip="Delete Node"
+        :active="activeButton === 'delete'"
+        @click="handleDeleteNode"
       >
-        <div v-if="node.hideTitle" class="text-color-hidden-container">
-          <i class="fas fa-font fa-lg"></i>
-          <div class="slash"></div>
-        </div>
-        <div v-else class="text-color-icon-container">
-          <i class="fas fa-font"></i>
-          <div class="color-box" :style="{ background: node.textColor }"></div>
-        </div>
+        <i class="fas fa-trash-alt fa-lg"></i>
       </tapestry-toolbar-button>
-    </v-swatches>
 
-    <node-background-button
-      :node="node"
-      :active="activeButton === 'background'"
-      @show="handleOpen('background')"
-      @hide="handleClose('background')"
-    ></node-background-button>
+      <div class="tapestry-toolbar-separator"></div>
 
-    <div class="tapestry-toolbar-separator"></div>
-
-    <div class="position-relative">
-      <tapestry-toolbar-button
-        :id="`change-level-button-${node.id}`"
-        horizontal
-        tooltip="Change Level"
-        @click="handleToggle('level')"
+      <v-swatches
+        :value="node.textColor"
+        :swatches="swatchesWithTransparentColor"
+        show-border
+        show-fallback
+        shapes="circles"
+        swatch-size="30"
+        :wrapper-style="{ zIndex: 1000 }"
+        fallback-input-type="color"
+        row-length="8"
+        popover-x="right"
+        class="swatch"
+        @input="handleTextColorInput"
+        @open="handleOpen('textColor')"
+        @close="handleClose('textColor')"
       >
-        <div class="circle level-circle">{{ node.level }}</div>
-      </tapestry-toolbar-button>
-      <node-level-select
-        v-if="activeButton === 'level'"
-        :node="node"
-        @close="handleClose('level')"
-      ></node-level-select>
-    </div>
-
-    <div class="tapestry-toolbar-separator"></div>
-
-    <b-dropdown
-      variant="none"
-      no-caret
-      toggle-class="more-actions-button after-separator before-separator"
-      :toggle-attrs="{
-        'aria-label': 'Other Node Actions',
-      }"
-      @show="handleOpen('moreActions')"
-      @hide="handleClose('moreActions')"
-    >
-      <template #button-content>
         <tapestry-toolbar-button
-          :id="`more-actions-button-${node.id}`"
+          :id="`title-color-button-${node.id}`"
+          slot="trigger"
+          class="after-separator"
           horizontal
-          tooltip="Other Node Actions"
-          :active="activeButton === 'moreActions'"
+          tooltip="Change Text Color"
+          :active="activeButton === 'textColor'"
         >
-          <i class="fas fa-ellipsis-h"></i>
+          <div v-if="node.hideTitle" class="text-color-hidden-container">
+            <i class="fas fa-font fa-lg"></i>
+            <div class="slash"></div>
+          </div>
+          <div v-else class="text-color-icon-container">
+            <i class="fas fa-font"></i>
+            <div class="color-box" :style="{ background: node.textColor }"></div>
+          </div>
         </tapestry-toolbar-button>
-      </template>
-      <b-dropdown-item-button @click="openModal(names.NODEPERMISSIONS)">
-        Node Permissions
-      </b-dropdown-item-button>
-      <b-dropdown-item-button @click="openModal(names.NODELOCK)">
-        Lock Node
-      </b-dropdown-item-button>
-    </b-dropdown>
+      </v-swatches>
+
+      <node-background-button
+        :node="node"
+        :active="activeButton === 'background'"
+        @show="handleOpen('background')"
+        @hide="handleClose('background')"
+      ></node-background-button>
+
+      <div class="tapestry-toolbar-separator"></div>
+
+      <div class="position-relative">
+        <tapestry-toolbar-button
+          :id="`change-level-button-${node.id}`"
+          horizontal
+          tooltip="Change Level"
+          @click="handleToggle('level')"
+        >
+          <div class="circle level-circle">{{ node.level }}</div>
+        </tapestry-toolbar-button>
+        <node-level-select
+          v-if="activeButton === 'level'"
+          :node="node"
+          @close="handleClose('level')"
+        ></node-level-select>
+      </div>
+
+      <div class="tapestry-toolbar-separator"></div>
+
+      <b-dropdown
+        variant="none"
+        no-caret
+        toggle-class="more-actions-button after-separator before-separator"
+        :toggle-attrs="{
+          'aria-label': 'Other Node Actions',
+        }"
+        @show="handleOpen('moreActions')"
+        @hide="handleClose('moreActions')"
+      >
+        <template #button-content>
+          <tapestry-toolbar-button
+            :id="`more-actions-button-${node.id}`"
+            horizontal
+            tooltip="Other Node Actions"
+            :active="activeButton === 'moreActions'"
+          >
+            <i class="fas fa-ellipsis-h"></i>
+          </tapestry-toolbar-button>
+        </template>
+        <b-dropdown-item-button @click="openModal(names.NODEPERMISSIONS)">
+          Node Permissions
+        </b-dropdown-item-button>
+        <b-dropdown-item-button @click="openModal(names.NODELOCK)">
+          Lock Node
+        </b-dropdown-item-button>
+      </b-dropdown>
+    </template>
   </tapestry-context-toolbar>
 </template>
 
@@ -114,7 +121,7 @@ import NodeLevelSelect from "./NodeLevelSelect"
 import NodeBackgroundButton from "./NodeBackgroundButton"
 import Helpers from "@/utils/Helpers"
 import { tools, swatches } from "@/utils/constants"
-import { mapActions } from "vuex"
+import { mapActions, mapState } from "vuex"
 import { names } from "@/config/routes"
 
 export default {
@@ -125,8 +132,21 @@ export default {
     NodeBackgroundButton,
     VSwatches,
   },
+  model: {
+    prop: "show",
+    event: "set-show",
+  },
   props: {
+    show: {
+      type: Boolean,
+      required: true,
+    },
     node: {
+      type: Object,
+      required: false,
+      default: null,
+    },
+    position: {
       type: Object,
       required: true,
     },
@@ -141,17 +161,36 @@ export default {
     }
   },
   computed: {
-    nodeElementId() {
-      return Helpers.getNodeElementId(this.node.id)
+    ...mapState(["settings"]),
+    hasEditPermission() {
+      return this.node
+        ? Helpers.hasPermission(this.node, "edit", this.settings.showRejected)
+        : false
     },
     swatchesWithTransparentColor() {
       const swatches = [...this.swatches]
       swatches.splice(swatches.length - 1, 1, { color: "", label: "Transparent" })
       return swatches
     },
+    nodeId() {
+      return this.node?.id
+    },
+  },
+  watch: {
+    nodeId() {
+      this.activeButton = null
+    },
   },
   methods: {
     ...mapActions(["updateNode", "deleteNode"]),
+    handleShowHide(show) {
+      if (show !== this.show) {
+        this.$emit("set-show", show)
+        if (!show) {
+          this.activeButton = null
+        }
+      }
+    },
     handleOpen(button) {
       this.activeButton = button
     },

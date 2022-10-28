@@ -11,7 +11,6 @@
     :style="{
       height: appHeight,
     }"
-    @mousedown="handleMousedownOnApp"
     @keydown="handleKey"
   >
     <div v-if="isEmptyTapestry" class="vertical-center">
@@ -25,6 +24,7 @@
         role="application"
         aria-label="Main Tapestry View"
         :viewBox="computedViewBox"
+        @click="handleClickOnSvg"
         @mousemove="handleMousemoveOnSvg"
       >
         <tapestry-link-placeholder
@@ -53,6 +53,7 @@
               :target="nodes[link.target]"
               :scale="scale"
               tabindex="-1"
+              @click="handleLinkClick(link)"
             ></tapestry-link>
           </g>
           <g class="nodes">
@@ -92,12 +93,17 @@
         ></locked-tooltip>
       </svg>
       <tapestry-toolbar />
-      <tapestry-node-toolbar v-for="(node, id) in nodes" :key="id" :node="node" />
+      <tapestry-node-toolbar
+        :show="showContextToolbar == 'node'"
+        :node="selectedNode"
+        :position="nodeToolbarPosition"
+        @set-show="setShowContextToolbar('node', $event)"
+      ></tapestry-node-toolbar>
       <tapestry-link-toolbar
-        v-for="link in links"
-        :key="`${link.source}-${link.target}`"
-        :source="nodes[link.source]"
-        :target="nodes[link.target]"
+        :show="showContextToolbar == 'link'"
+        :link="activeLink"
+        :position="linkToolbarPosition"
+        @set-show="setShowContextToolbar('link', $event)"
       />
       <tapestry-minimap
         v-if="showMinimap"
@@ -182,6 +188,8 @@ export default {
       nodeEditingTitle: null,
 
       showMinimap: true,
+      showContextToolbar: false, // one of false, "node", "link"
+      activeLink: null, // for link context toolbar
     }
   },
   computed: {
@@ -275,6 +283,9 @@ export default {
     selectedId() {
       return Number(this.$route.params.nodeId)
     },
+    selectedNode() {
+      return this.getNode(this.selectedId)
+    },
     selectedNodeLevel() {
       return this.getNode(this.selectedId)?.level ?? 1
     },
@@ -308,6 +319,50 @@ export default {
       return {
         x: absoluteX,
         y: absoluteY,
+      }
+    },
+    nodeToolbarPosition() {
+      if (!this.selectedNode || !this.appDimensions) {
+        return { left: 0, top: 0, right: 0, bottom: 0, width: 0, height: 0 }
+      }
+
+      const { x, y } = this.svgToScreen(this.selectedNode.coordinates)
+      const r =
+        (Helpers.getNodeRadius(this.selectedNode.level, this.scale) /
+          this.viewBox[2]) *
+        this.appDimensions.width *
+        1.2 // times 1.2 to account for rings around the node
+
+      return {
+        left: x - r,
+        top: y - r,
+        right: x + r,
+        bottom: y + r,
+        width: r * 2,
+        height: r * 2,
+      }
+    },
+    linkToolbarPosition() {
+      if (!this.activeLink || !this.appDimensions) {
+        return { left: 0, top: 0, right: 0, bottom: 0, width: 0, height: 0 }
+      }
+
+      const source = this.getNode(this.activeLink.source)
+      const target = this.getNode(this.activeLink.target)
+      const center = {
+        x: (source.coordinates.x + target.coordinates.x) / 2,
+        y: (source.coordinates.y + target.coordinates.y) / 2,
+      }
+      const { x, y } = this.svgToScreen(center)
+      // may want to adjust the behaviour so that the link toolbar position is the cursor position when clicking on the link instead of the middle of the link (for better experience when the link is very long)
+
+      return {
+        left: x,
+        top: y,
+        right: x,
+        bottom: y,
+        width: 0,
+        height: 0,
       }
     },
   },
@@ -354,6 +409,11 @@ export default {
         }
         this.updateViewBox()
       },
+    },
+    showContextToolbar(newVal, oldVal) {
+      if (oldVal === "link") {
+        this.activeLink = null
+      }
     },
     browserDimensions: {
       deep: true,
@@ -421,7 +481,6 @@ export default {
       "tapestry",
       (delta, x, y) => {
         this.handleZoom(delta * this.scaleConstants.zoomSensitivity, x, y)
-        this.$root.$emit("context-toolbar::dismiss")
       },
       () => {
         this.updateScale()
@@ -528,10 +587,12 @@ export default {
       if (!this.$refs.app) {
         return
       }
-      const { width, height } = this.$refs.app.getBoundingClientRect()
+      const { width, height, x, y } = this.$refs.app.getBoundingClientRect()
       this.appDimensions = {
         width,
         height,
+        x,
+        y,
       }
     },
     handleZoom(delta, x, y) {
@@ -599,8 +660,6 @@ export default {
       this.updateOffset()
     },
     zoomToAndCenterNode(node) {
-      this.$root.$emit("context-toolbar::dismiss")
-
       const baseRadius = Helpers.getNodeBaseRadius(node.level, this.maxLevel)
       const targetScale = 140 / baseRadius
 
@@ -650,12 +709,7 @@ export default {
         () => {
           this.isTransitioning = false
           this.updateScale()
-          if (this.hasPermission(node, "edit")) {
-            this.$root.$emit(
-              "context-toolbar::open",
-              Helpers.getNodeElementId(node.id)
-            )
-          }
+          this.showContextToolbar = "node"
         }
       )
     },
@@ -835,10 +889,7 @@ export default {
           this.isTransitioning = false
           this.updateScale()
           if (shouldOpenToolbar) {
-            this.$root.$emit(
-              "context-toolbar::open",
-              Helpers.getNodeElementId(node.id)
-            )
+            this.showContextToolbar = "node"
           }
         },
         "easeOut"
@@ -963,6 +1014,10 @@ export default {
       this.updateViewBox()
       this.clampOffset()
     },
+    handleLinkClick(link) {
+      this.activeLink = link
+      this.showContextToolbar = "link"
+    },
     handleMouseover(id) {
       const node = this.nodes[id]
       if (
@@ -1072,8 +1127,10 @@ export default {
           : `#link-${focused.source}-${focused.target}`
       )
     },
-    handleMousedownOnApp() {
-      this.$root.$emit("context-toolbar::dismiss")
+    handleClickOnSvg() {
+      if (!this.isPanning) {
+        this.showContextToolbar = false
+      }
     },
     handleMousemoveOnSvg(evt) {
       this.screenMouseCoordinates = {
@@ -1093,6 +1150,25 @@ export default {
         this.addNode({ node: newNode }).then(id => {
           this.nodeEditingTitle = id
         })
+      }
+    },
+    setShowContextToolbar(type, show) {
+      if (show) {
+        this.showContextToolbar = type
+      } else if (this.showContextToolbar === type) {
+        this.showContextToolbar = false
+      }
+    },
+    svgToScreen({ x, y }) {
+      return {
+        x:
+          ((x * this.scale - this.viewBox[0] - this.offset.x) / this.viewBox[2]) *
+            this.appDimensions.width +
+          this.appDimensions.x,
+        y:
+          ((y * this.scale - this.viewBox[1] - this.offset.y) / this.viewBox[3]) *
+            this.appDimensions.height +
+          this.appDimensions.y,
       }
     },
   },

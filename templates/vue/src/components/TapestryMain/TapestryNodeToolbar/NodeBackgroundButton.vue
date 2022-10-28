@@ -14,7 +14,7 @@
       <div v-else class="circle" :style="{ background: node.backgroundColor }"></div>
     </tapestry-toolbar-button>
     <tapestry-context-toolbar
-      ref="backgroundToolbar"
+      v-model="showBackgroundToolbar"
       :target="`background-button-${node.id}`"
       placement="bottom"
     >
@@ -120,6 +120,7 @@ export default {
 
       activeButton: null,
       isImageUploading: false,
+      showBackgroundToolbar: false,
     }
   },
   computed: {
@@ -134,7 +135,7 @@ export default {
         if (active) {
           window.addEventListener("dragenter", this.handleDragEnter)
         } else {
-          this.$refs.backgroundToolbar?.hide()
+          this.showBackgroundToolbar = false
           this.activeButton = null
 
           window.removeEventListener("dragenter", this.handleDragEnter)
@@ -159,8 +160,8 @@ export default {
     ...mapMutations(["setFullscreenDropzone", "addApiError"]),
     ...mapActions(["updateNode"]),
     toggleToolbar() {
-      const isVisible = this.$refs.backgroundToolbar.toggleVisible()
-      this.$emit(isVisible ? "show" : "hide")
+      this.showBackgroundToolbar = !this.showBackgroundToolbar
+      this.$emit(this.showBackgroundToolbar ? "show" : "hide")
     },
     handleColorInput(backgroundColor) {
       this.updateNode({

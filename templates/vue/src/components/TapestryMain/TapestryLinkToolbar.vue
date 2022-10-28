@@ -1,5 +1,10 @@
 <template>
-  <tapestry-context-toolbar :target="linkElementId">
+  <tapestry-context-toolbar
+    :show="show && hasEditPermission"
+    :position="position"
+    :offset="10"
+    @set-show="$emit('set-show', $event)"
+  >
     <tapestry-toolbar-button
       id="delete-link-btn"
       horizontal
@@ -30,52 +35,63 @@
 import TapestryContextToolbar from "./TapestryContextToolbar"
 import TapestryToolbarButton from "./common/TapestryToolbarButton"
 import Helpers from "@/utils/Helpers"
-import { tools } from "@/utils/constants"
-import { mapActions } from "vuex"
+import { mapActions, mapGetters, mapState } from "vuex"
 
 export default {
   components: {
     TapestryContextToolbar,
     TapestryToolbarButton,
   },
-  props: {
-    source: {
-      type: Object,
-      required: true,
-    },
-    target: {
-      type: Object,
-      required: true,
-    },
+  model: {
+    prop: "show",
+    event: "set-show",
   },
-  data() {
-    return {
-      tools: tools,
-    }
+  props: {
+    show: {
+      type: Boolean,
+      required: true,
+    },
+    link: {
+      type: Object,
+      required: false,
+      default: null,
+    },
+    position: {
+      type: Object,
+      required: true,
+    },
   },
   computed: {
-    linkElementId() {
-      return Helpers.getLinkElementId(this.source.id, this.target.id)
+    ...mapState(["settings"]),
+    ...mapGetters(["getNode"]),
+    source() {
+      return this.link ? this.getNode(this.link.source) : null
+    },
+    target() {
+      return this.link ? this.getNode(this.link.target) : null
     },
     isSameLevelLink() {
-      return this.source.level === this.target.level
+      return this.link ? this.source.level === this.target.level : false
+    },
+    hasEditPermission() {
+      return this.link
+        ? Helpers.hasPermission(this.source, "add", this.settings.showRejected) &&
+            Helpers.hasPermission(this.target, "add", this.settings.showRejected)
+        : false
     },
   },
   methods: {
     ...mapActions(["deleteLink", "reverseLink"]),
     handleDeleteLink() {
-      this.deleteLink({ source: this.source.id, target: this.target.id })
-    },
-    handleReverseLink() {
-      const reversedElementId = Helpers.getLinkElementId(
-        this.target.id,
-        this.source.id
-      )
-      this.reverseLink({ source: this.source.id, target: this.target.id }).then(
+      this.deleteLink({ source: this.source.id, target: this.target.id }).then(
         () => {
-          this.$root.$emit("context-toolbar::open", reversedElementId)
+          this.$emit("set-show", false)
         }
       )
+    },
+    handleReverseLink() {
+      this.reverseLink({ source: this.source.id, target: this.target.id })
+      // the link prop is a reference to the link object in the store, so we don't need to emit an event to update it
     },
   },
 }

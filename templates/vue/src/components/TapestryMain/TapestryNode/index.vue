@@ -588,11 +588,10 @@ export default {
     },
     handleMousedown() {
       this.isMouseDown = true
-
-      // Dismiss toolbar when drag starts
-      this.$root.$emit("context-toolbar::dismiss")
     },
     handleClick(evt) {
+      evt.stopPropagation()
+
       const clickTime = new Date().getTime()
       if (clickTime - this.lastClickTime < 300 && this.hasPermission("edit")) {
         this.$emit("node-editing-title", this.node.id)
