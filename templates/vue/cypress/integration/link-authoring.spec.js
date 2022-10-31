@@ -28,7 +28,7 @@ describe("Link Authoring", () => {
         cy.logout().visitTapestry()
 
         cy.link(child1.id, child2.id).click()
-        cy.get("#delete-link-btn").should("not.exist")
+        cy.get("#delete-link-btn").should("be.hidden")
       })
   })
 
