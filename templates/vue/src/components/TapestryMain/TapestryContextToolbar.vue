@@ -62,7 +62,6 @@ export default {
       return this.show && (this.target !== null || this.position !== null)
     },
     virtualTarget() {
-      console.log("virtualTarget change")
       return {
         getBoundingClientRect: () => this.position ?? defaultPosition,
       }
