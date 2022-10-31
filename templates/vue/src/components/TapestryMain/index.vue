@@ -54,6 +54,7 @@
               :scale="scale"
               tabindex="-1"
               @click="handleLinkClick(link)"
+              @focus="handleLinkClick(link)"
             ></tapestry-link>
           </g>
           <g class="nodes">
@@ -75,6 +76,7 @@
               @mouseleave="activeNode = null"
               @mounted="dragSelectEnabled ? updateSelectableNodes(node) : null"
               @click="handleNodeClick"
+              @focus="handleNodeFocus(id)"
               @node-editing-title="nodeEditingTitle = $event"
             ></tapestry-node>
           </g>
@@ -323,7 +325,7 @@ export default {
     },
     nodeToolbarPosition() {
       if (!this.selectedNode || !this.appDimensions) {
-        return { left: 0, top: 0, right: 0, bottom: 0, width: 0, height: 0 }
+        return null
       }
 
       const { x, y } = this.svgToScreen(this.selectedNode.coordinates)
@@ -344,7 +346,7 @@ export default {
     },
     linkToolbarPosition() {
       if (!this.activeLink || !this.appDimensions) {
-        return { left: 0, top: 0, right: 0, bottom: 0, width: 0, height: 0 }
+        return null
       }
 
       const source = this.getNode(this.activeLink.source)
@@ -709,7 +711,9 @@ export default {
         () => {
           this.isTransitioning = false
           this.updateScale()
-          this.showContextToolbar = "node"
+          if (!this.nodeNavLinkMode) {
+            this.showContextToolbar = "node"
+          }
         }
       )
     },
@@ -818,6 +822,11 @@ export default {
       }
 
       return box
+    },
+    handleNodeFocus(nodeId) {
+      if (nodeId == this.selectedId) {
+        this.showContextToolbar = "node"
+      }
     },
     handleNodeClick({ node, shouldOpenToolbar }) {
       if (this.currentTool === tools.ADD_LINK) {

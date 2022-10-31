@@ -630,6 +630,7 @@ export default {
     },
     handleFocus() {
       this.isFocused = true
+      this.$emit("focus")
       // TODO: technically the next 3 lines are not needed, since the only way a node will be focused is through the keyboard node navigation which is managed by TapestryMain; nodes other than the focused node is not focusable (tabindex="-1")
       if (this.getNodeNavId !== this.node.id) {
         this.resetNodeNavigation(this.node.id)

@@ -1,6 +1,6 @@
 <template>
   <tapestry-context-toolbar
-    :show="show && hasEditPermission"
+    :show="show && hasEditPermission && !justChanged"
     :position="position"
     :offset="10"
     @set-show="$emit('set-show', $event)"
@@ -58,8 +58,14 @@ export default {
     },
     position: {
       type: Object,
-      required: true,
+      required: false,
+      default: null,
     },
+  },
+  data() {
+    return {
+      justChanged: false,
+    }
   },
   computed: {
     ...mapState(["settings"]),
@@ -78,6 +84,16 @@ export default {
         ? Helpers.hasPermission(this.source, "add", this.settings.showRejected) &&
             Helpers.hasPermission(this.target, "add", this.settings.showRejected)
         : false
+    },
+  },
+  watch: {
+    link(newLink, oldLink) {
+      if (oldLink !== null && newLink !== null) {
+        this.justChanged = true
+        setTimeout(() => {
+          this.justChanged = false
+        }, 300) // allow time for toolbar hide transition to finish
+      }
     },
   },
   methods: {

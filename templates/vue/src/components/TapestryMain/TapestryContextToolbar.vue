@@ -1,6 +1,6 @@
 <template>
   <transition name="fade">
-    <div v-show="show" ref="popper" class="context-toolbar-container">
+    <div v-show="shouldShow" ref="popper" class="context-toolbar-container">
       <div class="tapestry-context-toolbar">
         <slot></slot>
       </div>
@@ -10,6 +10,15 @@
 
 <script>
 import { createPopper } from "@popperjs/core"
+
+const defaultPosition = {
+  width: 0,
+  height: 0,
+  top: 0,
+  left: 0,
+  bottom: 0,
+  right: 0,
+}
 
 export default {
   model: {
@@ -25,7 +34,7 @@ export default {
     position: {
       type: Object,
       required: false,
-      default: () => ({ left: 0, top: 0, right: 0, bottom: 0, width: 0, height: 0 }),
+      default: null,
     },
     target: {
       type: String,
@@ -49,21 +58,27 @@ export default {
     }
   },
   computed: {
+    shouldShow() {
+      return this.show && (this.target !== null || this.position !== null)
+    },
     virtualTarget() {
+      console.log("virtualTarget change")
       return {
-        getBoundingClientRect: () => this.position,
+        getBoundingClientRect: () => this.position ?? defaultPosition,
       }
     },
   },
   watch: {
-    show(show) {
+    shouldShow(show) {
       if (show) {
         this.popper?.update()
       }
     },
     position: {
-      handler() {
-        this.popper?.update()
+      handler(position) {
+        if (position !== null && this.shouldShow) {
+          this.popper?.update()
+        }
       },
       deep: true,
     },

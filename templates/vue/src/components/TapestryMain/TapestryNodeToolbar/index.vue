@@ -1,6 +1,6 @@
 <template>
   <tapestry-context-toolbar
-    :show="show && hasEditPermission"
+    :show="show && hasEditPermission && !justChanged"
     :position="position"
     :offset="20"
     @set-show="handleShowHide"
@@ -148,7 +148,8 @@ export default {
     },
     position: {
       type: Object,
-      required: true,
+      required: false,
+      default: null,
     },
   },
   data() {
@@ -158,6 +159,7 @@ export default {
       names: names,
 
       activeButton: null,
+      justChanged: false,
     }
   },
   computed: {
@@ -172,13 +174,16 @@ export default {
       swatches.splice(swatches.length - 1, 1, { color: "", label: "Transparent" })
       return swatches
     },
-    nodeId() {
-      return this.node?.id
-    },
   },
   watch: {
-    nodeId() {
-      this.activeButton = null
+    node(newNode, oldNode) {
+      if (oldNode !== null && newNode?.id !== oldNode.id) {
+        this.activeButton = null
+        this.justChanged = true
+        setTimeout(() => {
+          this.justChanged = false
+        }, 300) // allow time for toolbar hide transition to finish
+      }
     },
   },
   methods: {

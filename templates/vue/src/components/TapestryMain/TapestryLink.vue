@@ -20,6 +20,7 @@
       }"
       :points="polygonPoints"
       @click="handleClick"
+      @focus="handleFocus"
     ></polygon>
   </transition>
 </template>
@@ -86,6 +87,9 @@ export default {
     handleClick(evt) {
       evt.stopPropagation()
       this.$emit("click")
+    },
+    handleFocus() {
+      this.$emit("focus")
     },
   },
 }
