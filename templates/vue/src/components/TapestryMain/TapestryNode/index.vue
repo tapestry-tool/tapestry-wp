@@ -105,6 +105,7 @@
         <g v-show="radius >= 80">
           <node-button
             v-if="!node.hideMedia"
+            v-show="isHovered || canEdit"
             :x="0"
             :y="-radius"
             :fill="buttonBackgroundColor"
@@ -128,7 +129,7 @@
               :y="radius"
               :fill="buttonBackgroundColor"
               :data-qa="`edit-node-${node.id}`"
-              @click="editNode(node.id)"
+              @click="editNode"
             >
               <tapestry-icon icon="pen" svg></tapestry-icon>
             </node-button>
@@ -528,13 +529,13 @@ export default {
         })
       }
     },
-    openNode(id) {
-      this.$root.$emit("open-node", id)
-      client.recordAnalyticsEvent("app", "open", "lightbox", id)
+    openNode() {
+      this.$root.$emit("open-node", this.node.id)
+      client.recordAnalyticsEvent("app", "open", "lightbox", this.node.id)
     },
-    editNode(id) {
-      this.$root.$emit("edit-node", id)
-      client.recordAnalyticsEvent("user", "click", "edit-node-button", id)
+    editNode() {
+      this.$root.$emit("edit-node", this.node.id)
+      client.recordAnalyticsEvent("user", "click", "edit-node-button", this.node.id)
     },
     reviewNode() {
       this.$router.push({
@@ -565,7 +566,7 @@ export default {
     },
     handleRequestOpen() {
       if (this.node.unlocked || this.canEdit) {
-        this.openNode(this.node.id)
+        this.openNode()
       }
       client.recordAnalyticsEvent("user", "click", "open-node-button", this.node.id)
     },
@@ -592,8 +593,12 @@ export default {
       evt.stopPropagation()
 
       const clickTime = new Date().getTime()
-      if (clickTime - this.lastClickTime < 300 && this.canEdit) {
-        this.$emit("node-editing-title", this.node.id)
+      if (clickTime - this.lastClickTime < 300) {
+        if (this.canEdit) {
+          this.$emit("node-editing-title", this.node.id)
+        } else if (this.node.unlocked) {
+          this.openNode()
+        }
         this.lastClickTime = 0
       } else {
         if (this.canEdit && (evt.ctrlKey || evt.metaKey || evt.shiftKey)) {
@@ -606,7 +611,7 @@ export default {
             shouldOpenToolbar,
           })
           if (shouldOpenLightbox) {
-            this.openNode(this.node.id)
+            this.openNode()
           } else {
             this.updateRootNode()
           }
