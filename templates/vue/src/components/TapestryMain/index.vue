@@ -301,6 +301,10 @@ export default {
     )
     this.zoomPanHelper.register()
 
+    if (this.selectedId) {
+      this.zoomToAndCenterNode(this.getNode(this.selectedId))
+    }
+
     this.$refs.app.addEventListener("keydown", this.handleKey)
   },
   beforeDestroy() {
