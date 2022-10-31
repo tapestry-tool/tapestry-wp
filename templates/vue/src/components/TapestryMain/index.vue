@@ -111,6 +111,7 @@ export default {
       unscaledViewBox: [2200, 2700, 1600, 1100],
       viewBox: [2200, 2700, 1600, 1100],
       scale: 1,
+      manualScale: 1,
       offset: { x: 0, y: 0 },
       appDimensions: null,
       zoomPanHelper: null,
@@ -269,19 +270,6 @@ export default {
       },
     },
   },
-  created() {
-    const { scale, x, y } = this.$route.query
-    if (scale && !isNaN(scale)) {
-      this.scale = this.clampScale(Number(scale))
-    }
-    if (x && !isNaN(x)) {
-      this.offset.x = Number(x)
-    }
-    if (y && !isNaN(y)) {
-      this.offset.y = Number(y)
-    }
-    this.clampOffset()
-  },
   mounted() {
     if (this.dragSelectEnabled) {
       // ! disabled drag select in favor of panning
@@ -296,7 +284,6 @@ export default {
         this.handleZoom(delta * this.scaleConstants.zoomSensitivity, x, y)
       },
       () => {
-        this.updateScale()
         this.fetchAppDimensions()
       },
       (dx, dy) => {
@@ -307,7 +294,6 @@ export default {
       },
       () => {
         this.isPanning = false
-        this.updateOffset()
         this.fetchAppDimensions()
       },
       [this.$refs.minimap.$el],
@@ -387,6 +373,11 @@ export default {
       const newScale = this.clampScale(this.scale + delta)
       const scaleChange = newScale / this.scale
 
+      this.manualScale = Math.max(
+        1,
+        Math.min(this.maxScale / 2, this.manualScale + newScale - this.scale)
+      )
+
       if (!this.appDimensions) {
         this.fetchAppDimensions()
       }
@@ -442,7 +433,6 @@ export default {
       this.offset.x = scaledX - this.viewBox[2] / 2
       this.offset.y = scaledY - this.viewBox[3] / 2
       this.clampOffset()
-      this.updateOffset()
     },
     zoomToAndCenterNode(node) {
       const baseRadius = Helpers.getNodeBaseRadius(node.level, this.maxLevel)
@@ -489,28 +479,8 @@ export default {
           this.offset.y = offsetY
           this.viewBox[0] = viewBoxX
           this.viewBox[1] = viewBoxY
-        },
-        () => {
-          this.updateScale()
         }
       )
-    },
-    updateScale() {
-      this.$router.push({
-        ...this.$route,
-        query: { ...this.$route.query, scale: this.scale.toFixed(2) },
-      })
-      this.updateOffset()
-    },
-    updateOffset() {
-      this.$router.push({
-        ...this.$route,
-        query: {
-          ...this.$route.query,
-          x: this.offset.x.toFixed(4),
-          y: this.offset.y.toFixed(4),
-        },
-      })
     },
     updateSelectableNodes() {
       DragSelectModular.updateSelectableNodes()
@@ -596,7 +566,7 @@ export default {
     },
     handleNodeClick(node) {
       // zoom to the level that the node is on, and pan towards the node
-      const targetScale = Helpers.getTargetScale(node.level)
+      const targetScale = Helpers.getTargetScale(node.level) * this.manualScale
       const deltaScale = targetScale - this.scale
 
       const targetViewBoxX = this.unscaledViewBox[0] * targetScale
@@ -635,9 +605,7 @@ export default {
           this.viewBox[0] = viewBoxX
           this.viewBox[1] = viewBoxY
         },
-        () => {
-          this.updateScale()
-        },
+        () => {},
         "easeOut"
       )
     },
