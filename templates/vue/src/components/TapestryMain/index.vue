@@ -102,6 +102,7 @@ export default {
       unscaledViewBox: [2200, 2700, 1600, 1100],
       viewBox: [2200, 2700, 1600, 1100],
       scale: 1,
+      manualScale: 1,
       offset: { x: 0, y: 0 },
       appDimensions: null,
       zoomPanHelper: null,
@@ -323,6 +324,11 @@ export default {
       const newScale = this.clampScale(this.scale + delta)
       const scaleChange = newScale / this.scale
 
+      this.manualScale = Math.max(
+        1,
+        Math.min(this.maxScale / 2, this.manualScale + newScale - this.scale)
+      )
+
       if (!this.appDimensions) {
         this.fetchAppDimensions()
       }
@@ -481,7 +487,7 @@ export default {
     },
     handleNodeClick(node) {
       // zoom to the level that the node is on, and pan towards the node
-      const targetScale = Helpers.getTargetScale(node.level)
+      const targetScale = Helpers.getTargetScale(node.level) * this.manualScale
       const deltaScale = targetScale - this.scale
 
       const targetViewBoxX = this.unscaledViewBox[0] * targetScale
