@@ -215,19 +215,6 @@ export default {
       },
     },
   },
-  created() {
-    const { scale, x, y } = this.$route.query
-    if (scale && !isNaN(scale)) {
-      this.scale = this.clampScale(Number(scale))
-    }
-    if (x && !isNaN(x)) {
-      this.offset.x = Number(x)
-    }
-    if (y && !isNaN(y)) {
-      this.offset.y = Number(y)
-    }
-    this.clampOffset()
-  },
   mounted() {
     if (this.dragSelectEnabled) {
       // ! disabled drag select in favor of panning
@@ -242,7 +229,6 @@ export default {
         this.handleZoom(delta * this.scaleConstants.zoomSensitivity, x, y)
       },
       () => {
-        this.updateScale()
         this.fetchAppDimensions()
       },
       (dx, dy) => {
@@ -253,7 +239,6 @@ export default {
       },
       () => {
         this.isPanning = false
-        this.updateOffset()
         this.fetchAppDimensions()
       },
       [this.$refs.minimap.$el],
@@ -384,24 +369,6 @@ export default {
       this.offset.x = scaledX - this.viewBox[2] / 2
       this.offset.y = scaledY - this.viewBox[3] / 2
       this.clampOffset()
-      this.updateOffset()
-    },
-    updateScale() {
-      this.$router.push({
-        ...this.$route,
-        query: { ...this.$route.query, scale: this.scale.toFixed(2) },
-      })
-      this.updateOffset()
-    },
-    updateOffset() {
-      this.$router.push({
-        ...this.$route,
-        query: {
-          ...this.$route.query,
-          x: this.offset.x.toFixed(4),
-          y: this.offset.y.toFixed(4),
-        },
-      })
     },
     updateSelectableNodes() {
       DragSelectModular.updateSelectableNodes()
@@ -526,9 +493,7 @@ export default {
           this.viewBox[0] = viewBoxX
           this.viewBox[1] = viewBoxY
         },
-        () => {
-          this.updateScale()
-        },
+        () => {},
         "easeOut"
       )
     },
