@@ -13,7 +13,7 @@
       }"
       :style="{
         cursor:
-          node.unlocked || hasPermission('edit') || hasPermission('move')
+          node.unlocked || canEdit || hasPermission('move')
             ? 'pointer'
             : 'not-allowed',
       }"
@@ -66,11 +66,7 @@
           <foreignObject
             v-if="!node.hideTitle"
             v-show="
-              !isHovered ||
-                !thumbnailURL ||
-                selected ||
-                !node.unlocked ||
-                hasPermission('edit')
+              !isHovered || !thumbnailURL || selected || !node.unlocked || canEdit
             "
             :data-qa="`node-title-${node.id}`"
             class="metaWrapper"
@@ -113,7 +109,7 @@
             :y="-radius"
             :fill="buttonBackgroundColor"
             :data-qa="`open-node-${node.id}`"
-            :disabled="!node.unlocked && !hasPermission('edit')"
+            :disabled="!node.unlocked && !canEdit"
             @click="handleRequestOpen"
           >
             <tapestry-icon :icon="icon" svg></tapestry-icon>
@@ -123,11 +119,11 @@
               v-if="canAddChild"
               :node="node"
               :fill="buttonBackgroundColor"
-              :x="canReview || hasPermission('edit') ? -35 : 0"
+              :x="canReview || canEdit ? -35 : 0"
               :y="radius"
             ></add-child-button>
             <node-button
-              v-if="hasPermission('edit')"
+              v-if="canEdit"
               :x="hasTooManyLevels && node.mediaType !== 'multi-content' ? 0 : 35"
               :y="radius"
               :fill="buttonBackgroundColor"
@@ -254,7 +250,7 @@ export default {
         label +=
           "You are not on the node navigation route. To view this node, press Enter. "
       }
-      if (this.hasPermission("edit")) {
+      if (this.canEdit) {
         label += "To edit this node, press E. "
       }
       label +=
@@ -440,6 +436,9 @@ export default {
         this.settings.showAcceptedHighlight
       )
     },
+    canEdit() {
+      return this.hasPermission("edit")
+    },
   },
   watch: {
     radius(newRadius) {
@@ -565,7 +564,7 @@ export default {
       return hours + ":" + minutes + ":" + sec
     },
     handleRequestOpen() {
-      if (this.node.unlocked || this.hasPermission("edit")) {
+      if (this.node.unlocked || this.canEdit) {
         this.openNode(this.node.id)
       }
       client.recordAnalyticsEvent("user", "click", "open-node-button", this.node.id)
@@ -593,18 +592,15 @@ export default {
       evt.stopPropagation()
 
       const clickTime = new Date().getTime()
-      if (clickTime - this.lastClickTime < 300 && this.hasPermission("edit")) {
+      if (clickTime - this.lastClickTime < 300 && this.canEdit) {
         this.$emit("node-editing-title", this.node.id)
         this.lastClickTime = 0
       } else {
-        if (
-          this.hasPermission("edit") &&
-          (evt.ctrlKey || evt.metaKey || evt.shiftKey)
-        ) {
+        if (this.canEdit && (evt.ctrlKey || evt.metaKey || evt.shiftKey)) {
           this.selected ? this.unselect(this.node.id) : this.select(this.node.id)
-        } else if (this.node.unlocked || this.hasPermission("edit")) {
+        } else if (this.node.unlocked || this.canEdit) {
           const shouldOpenLightbox = this.root && this.node.hideMedia
-          const shouldOpenToolbar = !shouldOpenLightbox && this.hasPermission("edit")
+          const shouldOpenToolbar = !shouldOpenLightbox && this.canEdit
           this.$emit("click", {
             node: this.node,
             shouldOpenToolbar,
