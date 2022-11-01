@@ -9,6 +9,9 @@
         #wpadminbar {
             display: none !important;
         }
+        #tapestry-app > .toolbar {
+            display: none !important;
+        }
         <?php if (array_key_exists('no-sidebar', $_GET)): ?>
         .sidebar-container {
             display: none !important;

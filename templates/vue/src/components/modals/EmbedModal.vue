@@ -9,11 +9,11 @@
   >
     <b-container fluid class="pt-3">
       <b-form-group>
-        <b-form-checkbox v-model="expandWidth" data-qa="expand-width-toggle">
-          Automatically determine width and height
+        <b-form-checkbox v-model="autoResize" data-qa="auto-resize-toggle">
+          Automatically set width and height
         </b-form-checkbox>
       </b-form-group>
-      <b-form-row v-show="!expandWidth">
+      <b-form-row v-show="!autoResize">
         <b-col>
           <b-form-group label="Width">
             <b-form-input v-model="width" type="number"></b-form-input>
@@ -25,16 +25,6 @@
           </b-form-group>
         </b-col>
       </b-form-row>
-      <b-form-group class="mt-1">
-        <b-form-checkbox v-model="hideSidebar" data-qa="hide-sidebar-toggle">
-          Hide sidebar
-        </b-form-checkbox>
-      </b-form-group>
-      <b-form-group>
-        <b-form-checkbox v-model="showInfo" data-qa="show-info-toggle">
-          Show Tapestry information below the iFrame
-        </b-form-checkbox>
-      </b-form-group>
       <b-form-group label="iFrame Code">
         <b-form-textarea
           ref="code"
@@ -82,40 +72,50 @@ export default {
   },
   data() {
     return {
-      width: 800,
-      height: 600,
-      showInfo: true,
-      expandWidth: true,
-      hideSidebar: true,
+      autoResize: true,
       copied: false,
     }
   },
   computed: {
     ...mapState(["settings"]),
     ...mapGetters(["getNodeDimensions"]),
+    width() {
+      return 800
+    },
+    height() {
+      return 600
+    },
     embed() {
       return `<iframe id="${this.iframeId}" width="${this.width}" height="${
         this.height
-      }" style="border: none;" src="${this.settings.permalink}?iframe${
-        this.hideSidebar ? "&no-sidebar" : ""
-      }"></iframe>${this.showInfo ? this.info : ""}${
-        this.expandWidth ? this.expandScript : ""
+      }" style="border:solid 1px #93bbcf;border-radius:12px;" src="${
+        this.settings.permalink
+      }?iframe&no-sidebar"></iframe>${this.info}${
+        this.autoResize ? this.autoResizeScript : ""
       }`
     },
     info() {
-      return `<div style="margin-top:10px;display:flex;align-items:center;gap:10px;"><img width="40" height="40" src="${data.image_uri}/TapestryLogo.png" /><b>${this.settings.title}</b> <a href="${this.settings.permalink}" target="_blank">Open this Tapestry</a></div>`
+      return (
+        `<div style="margin:-77px 0 0 -20px;">` +
+        `<a title="Open this tapestry in a new window" ` +
+        `href="${this.settings.permalink}" target="_blank">` +
+        `<img width="40" height="40" src="${data.image_uri}/TapestryLogo.png" />` +
+        `</a>` +
+        `</div>`
+      )
     },
     iframeId() {
       let randomId = ""
       for (let i = 0; i < 6; i++) {
         randomId += idChars[Math.floor(Math.random() * idChars.length)]
       }
-      return `tapestry-iframe-${randomId}`
+      return `tpstry-${randomId}`
     },
-    expandScript() {
+    autoResizeScript() {
       const { x0, y0, x, y } = this.getNodeDimensions
+      const nodeDiameter = 140
       // eslint-disable-next-line
-      return `<script>(function(){var aspectRatio=${(y - y0) / (x - x0)},element=document.getElementById("${this.iframeId}");if(element){var parentDimensions=element.parentElement.getBoundingClientRect(),width=parentDimensions.width,height=width*aspectRatio;element.setAttribute("width",width);element.setAttribute("height",height);}})();<\/script>`
+      return `<script>(()=>{const r=${(y + nodeDiameter - y0) / (x + nodeDiameter - x0)},e=document.getElementById("${this.iframeId}");if(e){var parentDimensions=e.parentElement.getBoundingClientRect(),w=parentDimensions.width,h=w*r;e.setAttribute("width",w);e.setAttribute("height",h);}})();<\/script>`
     },
   },
   methods: {

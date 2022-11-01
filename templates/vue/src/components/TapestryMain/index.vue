@@ -151,7 +151,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-#app-container {
+#tapestry-app {
   position: relative;
   transform: scale(1);
   transform-origin: top left;
@@ -186,7 +186,7 @@ export default {
 #app {
   background-size: cover;
 }
-#app-container .btn-link {
+#tapestry-app .btn-link {
   background: transparent;
 }
 </style>
