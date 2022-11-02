@@ -119,16 +119,11 @@ class ZoomPanHelper {
   }
 
   wheelHandler(e) {
-    if (e.ctrlKey || e.metaKey) {
-      e.preventDefault()
-      // panning has higher priority than trackpad pinch zoom
-      if (!this.isPanning) {
-        this.onZoom(-0.01 * e.deltaY, e.offsetX, e.offsetY)
-        this.onZoomEnd()
-      }
-    } else {
-      // posX -= e.deltaX * 2
-      // posY -= e.deltaY * 2
+    e.preventDefault()
+    // panning has higher priority than trackpad pinch zoom
+    if (!this.isPanning) {
+      this.onZoom(-0.01 * e.deltaY, e.offsetX, e.offsetY)
+      this.onZoomEnd()
     }
   }
 
