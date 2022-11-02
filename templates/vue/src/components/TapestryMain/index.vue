@@ -582,8 +582,8 @@ export default {
         y,
       }
     },
-    handleZoom(delta, x, y) {
-      if (this.isEmptyTapestry) {
+    handleZoom(delta, clientX, clientY) {
+      if (this.isEmptyTapestry || !this.appDimensions) {
         return
       }
       const newScale = this.clampScale(this.scale + delta)
@@ -594,13 +594,11 @@ export default {
         Math.min(this.maxScale / 2, this.manualScale + newScale - this.scale)
       )
 
-      if (!this.appDimensions) {
-        return
-      }
-      const { width, height } = this.appDimensions
+      const x = clientX - this.appDimensions.x
+      const y = clientY - this.appDimensions.y
 
-      const relativeX = (x / width) * this.viewBox[2]
-      const relativeY = (y / height) * this.viewBox[3]
+      const relativeX = (x / this.appDimensions.width) * this.viewBox[2]
+      const relativeY = (y / this.appDimensions.height) * this.viewBox[3]
       const absoluteX = relativeX + this.viewBox[0] + this.offset.x
       const absoluteY = relativeY + this.viewBox[1] + this.offset.y
 
