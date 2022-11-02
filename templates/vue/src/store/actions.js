@@ -113,12 +113,16 @@ export async function addNode({ dispatch }, payload) {
   return dispatch("buildCommand", {
     name: "add node",
     executeAction: "doAddNode",
-    executePayload: payload, // ! payload.parentId may become invalid if the parent is deleted before this command and then redone (parentId will become a new id)
+    executePayload: payload,
     executeCallback: addedNodeId => ({
       undoPayload: addedNodeId,
     }),
     undoAction: "doDeleteNode",
     undoPayload: null,
+    undoCallback: deletedNodeId => ({
+      executeAction: "doRestoreNode",
+      executePayload: deletedNodeId,
+    }),
   })
 }
 
@@ -369,16 +373,12 @@ async function unlockNodes({ commit, getters, dispatch }) {
   }
 }
 
-export async function deleteNode({ dispatch, getters }, id) {
+export async function deleteNode({ dispatch }, id) {
   await dispatch("buildCommand", {
     name: "delete node",
     executeAction: "doDeleteNode",
     executePayload: id,
-    undoAction: "doAddNode", // may customize the undo action to recreate the links associated with the node
-    undoPayload: { node: { ...getters.getNode(id) }, parentId: null },
-    undoCallback: addedNodeId => ({
-      executePayload: addedNodeId,
-    }),
+    undoAction: "doRestoreNode", // may customize the undo action to recreate the links associated with the node
   })
 }
 
@@ -418,6 +418,19 @@ export async function doDeleteNode({ commit, dispatch, state, getters }, id) {
         ? Math.max(...remainingLevels)
         : 1
       commit("setMaxLevel", remainingMaxLevel)
+    }
+
+    return id
+  } catch (error) {
+    dispatch("addApiError", error)
+  }
+}
+
+export async function doRestoreNode({ commit, dispatch, getters }, id) {
+  try {
+    const node = (await client.restoreNode(id)).data
+    if (node) {
+      commit("addNode", Helpers.deepMerge(getters.createDefaultNode(), node))
     }
   } catch (error) {
     dispatch("addApiError", error)

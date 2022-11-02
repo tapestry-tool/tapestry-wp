@@ -116,6 +116,13 @@ $REST_API_ENDPOINTS = [
             'callback' => 'deleteTapestryNode',
         ],
     ],
+    'RESTORE_TAPESTRY_NODE' => (object) [
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/restore',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_POST_METHOD,
+            'callback' => 'restoreTapestryNode',
+        ],
+    ],
     'PUT_TAPESTRY_NODE_SIZE' => (object) [
         'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/size',
         'ARGUMENTS' => [
@@ -1102,6 +1109,39 @@ function deleteTapestryNode($request)
         $tapestry = new Tapestry($postId);
 
         return $tapestry->deleteNodeFromTapestry($nodeMetaId);
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+function restoreTapestryNode($request)
+{
+    $postId = $request['tapestryPostId'];
+    $nodeMetaId = $request['nodeMetaId'];
+
+    try {
+        if (empty($postId) || !TapestryHelpers::isValidTapestry($postId)) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+        if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
+            throw new TapestryError('INVALID_NODE_META_ID', 'Node not found. It may already be permanently deleted.');
+        }
+        if (!TapestryHelpers::userIsAllowed(UserActions::EDIT, $nodeMetaId, $postId)) {
+            throw new TapestryError('EDIT_NODE_PERMISSION_DENIED');
+        }
+        // Check if nodeId is already in tapestry nodes array
+        if (TapestryHelpers::isChildNodeOfTapestry($nodeMetaId, $postId)) {
+            throw new TapestryError('ALREADY_RESTORED', 'Node has already been restored', 400);
+        }
+        // Check if node originally belongs to tapestry
+        $nodeTapestryPostId = get_metadata_by_mid('post', $nodeMetaId)->post_id;
+        if ($nodeTapestryPostId !== $postId) {
+            throw new TapestryError('INVALID_NODE_TAPESTRY', 'Node does not belong to this tapestry', 400);
+        }
+
+        $tapestry = new Tapestry($postId);
+
+        return $tapestry->restoreNode($nodeMetaId);
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }

@@ -103,6 +103,11 @@ class TapestryApi {
     return await this.client.delete(url)
   }
 
+  async restoreNode(id) {
+    const url = `/tapestries/${this.postId}/nodes/${id}/restore`
+    return await this.client.post(url)
+  }
+
   /**
    * Add link
    *
