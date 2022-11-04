@@ -591,8 +591,6 @@ class TapestryNode implements ITapestryNode
             return;
         }
         $nodePostId = $nodeMetadata->meta_value->post_id;
-        // error_log(EMPTY_TRASH_DAYS);
-        // TODO: handle case when EMPTY_TRASH_DAYS is 0 (i.e. trash is not enabled)
         wp_trash_post($nodePostId);
     }
 
