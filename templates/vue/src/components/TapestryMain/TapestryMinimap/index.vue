@@ -20,8 +20,8 @@
         height: height + 'px',
       }"
     ></canvas>
-    <div data-qa="close-minimap" class="minimap-button" title="Close minimap">
-      <button @click="$emit('close')">
+    <div class="minimap-button" title="Close minimap">
+      <button data-qa="close-minimap" @click="$emit('close')">
         <i class="fas fa-times"></i>
       </button>
     </div>
