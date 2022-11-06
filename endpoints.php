@@ -1118,6 +1118,7 @@ function restoreTapestryNode($request)
 {
     $postId = $request['tapestryPostId'];
     $nodeMetaId = $request['nodeMetaId'];
+    $nodeData = json_decode($request->get_body());
 
     try {
         if (empty($postId) || !TapestryHelpers::isValidTapestry($postId)) {
@@ -1140,8 +1141,43 @@ function restoreTapestryNode($request)
         }
 
         $tapestry = new Tapestry($postId);
+        $tapestryNodeIds = $tapestry->getNodeIds();
 
-        return $tapestry->restoreNode($nodeMetaId);
+        // Restore tapestry node
+        $node = $tapestry->restoreNode($nodeMetaId);
+        $nodeId = $node->id;
+        array_push($tapestryNodeIds, $nodeId); // for checks when recreating links below
+
+        // Recreate links associated with node
+        $nodeData = json_decode($request->get_body());
+        $links = [];
+        if ($nodeData->links && is_array($nodeData->links)) {
+            foreach ($nodeData->links as $link) {
+                // TODO: check if link already exists in tapestry
+                if (
+                    $link->source && $link->target &&
+                    in_array($link->source, $tapestryNodeIds) &&
+                    in_array($link->target, $tapestryNodeIds) &&
+                    ($link->source === $nodeId || $link->target === $nodeId) &&
+                    (
+                        TapestryHelpers::nodeIsDraft($link->source, $postId) ||
+                        TapestryHelpers::nodeIsDraft($link->target, $postId) ||
+                        (
+                            TapestryHelpers::userIsAllowed(UserActions::ADD, $link->source, $postId) &&
+                            TapestryHelpers::userIsAllowed(UserActions::ADD, $link->source, $postId)
+                        )
+                    )
+                ) {
+                    $tapestry->addLink($link);
+                    array_push($links, $link);
+                }
+            }
+        }
+
+        return (object) [
+            'node' => $node,
+            'links' => $links,
+        ];
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }

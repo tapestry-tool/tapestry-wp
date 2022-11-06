@@ -119,9 +119,10 @@ export async function addNode({ dispatch }, payload) {
     }),
     undoAction: "doDeleteNode",
     undoPayload: null,
-    undoCallback: deletedNodeId => ({
+    undoCallback: nodeIdAndLinks => ({
       executeAction: "doRestoreNode",
-      executePayload: deletedNodeId,
+      executePayload: nodeIdAndLinks,
+      executeCallback: null,
     }),
   })
 }
@@ -378,7 +379,11 @@ export async function deleteNode({ dispatch }, id) {
     name: "delete node",
     executeAction: "doDeleteNode",
     executePayload: id,
+    executeCallback: nodeIdAndLinks => ({
+      undoPayload: nodeIdAndLinks,
+    }),
     undoAction: "doRestoreNode", // may customize the undo action to recreate the links associated with the node
+    undoPayload: { id },
   })
 }
 
@@ -420,17 +425,35 @@ export async function doDeleteNode({ commit, dispatch, state, getters }, id) {
       commit("setMaxLevel", remainingMaxLevel)
     }
 
-    return id
+    return {
+      id,
+      links: neighbouringLinks,
+    }
   } catch (error) {
     dispatch("addApiError", error)
   }
 }
 
-export async function doRestoreNode({ commit, dispatch, getters }, id) {
+export async function doRestoreNode({ commit, dispatch, getters }, payload) {
   try {
-    const node = (await client.restoreNode(id)).data
+    const { node, links } = (
+      await client.restoreNode(payload.id, payload.links)
+    ).data
     if (node) {
       commit("addNode", Helpers.deepMerge(getters.createDefaultNode(), node))
+      if (links) {
+        for (const link of links) {
+          commit("addLink", link)
+
+          const parent = getters.getNode(link.source)
+          commit("updateNode", {
+            id: link.source,
+            newNode: {
+              childOrdering: [...parent.childOrdering, link.target],
+            },
+          })
+        }
+      }
     }
   } catch (error) {
     dispatch("addApiError", error)
