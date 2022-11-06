@@ -42,6 +42,16 @@
           @clicked="toggleFavourite(node.id)"
         />
         <modal-button
+          icon="info-circle"
+          icon-size="sm"
+          :title="showInformation ? 'Hide information' : 'Show information'"
+          :icon-color="showInformation ? 'var(--highlight-color)' : ''"
+          :bg-color="showInformation ? '#fff' : ''"
+          :bg-hover-color="showInformation ? '#fff' : 'var(--highlight-color)'"
+          tabindex="0"
+          @clicked="showInformation = !showInformation"
+        />
+        <modal-button
           v-if="canEditNode"
           aria-label="Edit this node."
           icon="pencil-alt"
@@ -52,6 +62,23 @@
         />
       </div>
       <div data-qa="lightbox-content" class="content" :style="contentStyles">
+        <div
+          class="information-sheet"
+          :class="{
+            show: showInformation,
+          }"
+        >
+          <h1 class="information-header">{{ node.title }}</h1>
+          <section v-if="node.description">
+            <h2 class="content-header">About</h2>
+            <div class="content-body" v-html="node.description"></div>
+          </section>
+          <node-license :node="node"></node-license>
+          <section v-if="node.references">
+            <h2 class="content-header">References</h2>
+            <div class="content-body" v-html="node.references"></div>
+          </section>
+        </div>
         <multi-content-media
           v-if="node.mediaType === 'multi-content'"
           id="multicontent-container"
@@ -82,6 +109,7 @@ import client from "@/services/TapestryAPI"
 import MultiContentMedia from "./media/MultiContentMedia"
 import TapestryMedia from "./media/TapestryMedia"
 import PageMenu from "./media/MultiContentMedia/PageMenu"
+import NodeLicense from "@/components/common/NodeLicense"
 import ModalButton from "./ModalButton"
 import { names } from "@/config/routes"
 import Helpers from "@/utils/Helpers"
@@ -93,6 +121,7 @@ export default {
     TapestryMedia,
     PageMenu,
     ModalButton,
+    NodeLicense,
   },
   props: {
     visible: {
@@ -113,6 +142,7 @@ export default {
     return {
       dimensions: {},
       isUsingCustomDimensions: false,
+      showInformation: false,
     }
   },
   computed: {
@@ -262,6 +292,8 @@ export default {
       }
     },
     handleShow() {
+      this.showInformation = false
+
       // if opening a multi-content unit node, instead go to its first visible child
       if (
         this.node.mediaType === "multi-content" &&
@@ -382,6 +414,58 @@ body.tapestry-lightbox-open {
     position: relative;
     height: 100%;
     overflow: hidden;
+    border-radius: 15px;
+  }
+
+  .information-sheet {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    max-height: 100%;
+    z-index: 100;
+    overflow: auto;
+    padding: 20px;
+    box-sizing: border-box;
+    background-color: #5d656c;
+    color: #becddc;
+    text-align: left;
+    box-shadow: 0 0 20px #000;
+    transition: margin-top 0.3s ease-in-out;
+    margin-top: -100%;
+
+    &.show {
+      margin-top: 0;
+    }
+
+    .content-header {
+      color: #fff;
+      margin: 1em -1em 0.2em;
+      border-bottom: solid 2px #6b747d;
+      padding: 0.2em 1em;
+      font-size: 1.75em;
+    }
+
+    .content-body {
+      display: block;
+      text-align: left;
+      color: #becddc;
+
+      a {
+        color: #becddc;
+        text-decoration: underline;
+        &:hover {
+          color: #fff;
+        }
+      }
+    }
+
+    .information-header {
+      color: #fff;
+      font-size: 1.75rem;
+      font-weight: 500;
+      margin-bottom: 1em;
+    }
   }
 
   .full-height-media {
