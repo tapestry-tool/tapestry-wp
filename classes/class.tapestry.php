@@ -275,6 +275,30 @@ class Tapestry implements ITapestry
     }
 
     /**
+     * Restore a node from trash.
+     *
+     * @param object $nodeId Tapestry node id
+     *
+     * @return object $Array   Tapestry nodes
+     */
+    public function restoreNode($nodeId)
+    {
+        $tapestryNode = new TapestryNode($this->postId, $nodeId);
+
+        $node = $tapestryNode->restore();
+
+        if ($this->isEmpty()) {
+            $this->rootId = $node->id;
+        }
+
+        array_push($this->nodes, $node->id);
+
+        $this->_saveToDatabase();
+
+        return $node;
+    }
+
+    /**
      * Add a new link.
      *
      * @param object $link Tapestry link
