@@ -489,6 +489,10 @@ export default {
       this.zoomPanHelper.register()
     }
 
+    if (this.selectedId) {
+      this.zoomToAndCenterNode(this.getNode(this.selectedId))
+    }
+
     this.$nextTick(() => {
       this.updateAppHeight()
     })
