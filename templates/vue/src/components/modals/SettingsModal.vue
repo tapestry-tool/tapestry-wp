@@ -98,6 +98,14 @@
             </b-form-checkbox>
           </b-form-group>
           <b-form-group
+            label="Allow moving all nodes"
+            description="When enabled, users can move all nodes even if they don't have permission to move them. Note that this only allows them to move the nodes locally; the movement will not be saved unless the user has move permission for that node."
+          >
+            <b-form-checkbox v-model="allowMovingAllNodes" switch>
+              {{ allowMovingAllNodes ? "Enabled" : "Disabled" }}
+            </b-form-checkbox>
+          </b-form-group>
+          <b-form-group
             label="Geography map"
             :description="
               'Replace Tapestry with a map of Earth with placeholders for each node.' +
@@ -320,6 +328,7 @@ export default {
       analyticsEnabled: false,
       draftNodesEnabled: true,
       submitNodesEnabled: true,
+      allowMovingAllNodes: false,
       renderMap: false,
       mapBounds: { neLat: 90, neLng: 180, swLat: -90, swLng: -180 },
     }
@@ -398,6 +407,7 @@ export default {
         analyticsEnabled = false,
         draftNodesEnabled = true,
         submitNodesEnabled = true,
+        allowMovingAllNodes = false,
         mapBounds = { neLat: 90, neLng: 180, swLat: -90, swLng: -180 },
       } = this.settings
       this.backgroundUrl = backgroundUrl
@@ -413,6 +423,7 @@ export default {
       this.analyticsEnabled = analyticsEnabled
       this.draftNodesEnabled = draftNodesEnabled
       this.submitNodesEnabled = submitNodesEnabled
+      this.allowMovingAllNodes = allowMovingAllNodes
       this.mapBounds = mapBounds
     },
     async updateSettings() {
@@ -430,6 +441,7 @@ export default {
         analyticsEnabled: this.analyticsEnabled,
         draftNodesEnabled: this.draftNodesEnabled,
         submitNodesEnabled: this.submitNodesEnabled,
+        allowMovingAllNodes: this.allowMovingAllNodes,
         mapBounds: this.mapBounds,
       })
       await this.$store.dispatch("updateSettings", settings)

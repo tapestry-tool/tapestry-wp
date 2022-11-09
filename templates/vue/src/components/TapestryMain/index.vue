@@ -650,9 +650,10 @@ export default {
       // save initial coordinates of nodes
       this.dragCoordinates = {}
       if (this.selection.length) {
-        const movableNodes = this.selection
-          .map(nodeId => this.getNode(nodeId))
-          .filter(node => this.hasPermission(node, "move"))
+        const selectedNodes = this.selection.map(nodeId => this.getNode(nodeId))
+        const movableNodes = this.settings.allowMovingAllNodes
+          ? selectedNodes
+          : selectedNodes.filter(node => this.hasPermission(node, "move"))
         if (movableNodes.length === 0) {
           return
         }
@@ -664,7 +665,10 @@ export default {
           return coordinates
         }, {})
       } else {
-        if (!this.hasPermission(node, "move")) {
+        if (
+          !this.settings.allowMovingAllNodes &&
+          !this.hasPermission(node, "move")
+        ) {
           return
         }
         this.dragCoordinates[node.id] = {
