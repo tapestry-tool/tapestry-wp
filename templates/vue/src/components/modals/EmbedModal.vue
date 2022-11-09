@@ -58,9 +58,6 @@
 
 <script>
 import { mapGetters, mapState } from "vuex"
-import { data } from "@/services/wp"
-
-const idChars = "0123456789abcdefghijklmnopqrstuvwxyz"
 
 export default {
   name: "embed-modal",
@@ -88,34 +85,27 @@ export default {
     embed() {
       return `<iframe id="${this.iframeId}" width="${this.width}" height="${
         this.height
-      }" style="border:solid 1px #93bbcf;border-radius:12px;" src="${
+      }" style="border:solid 1px #a8aaad;border-radius:12px;max-width:100% !important" src="${
         this.settings.permalink
-      }?iframe&no-sidebar"></iframe>${this.info}${
+      }?iframe" onLoad="setTimeout(f${this.iframeId}, 1000);"></iframe>${
         this.autoResize ? this.autoResizeScript : ""
       }`
     },
-    info() {
-      return (
-        `<div style="margin:-77px 0 0 -20px;">` +
-        `<a title="Open this tapestry in a new window" ` +
-        `href="${this.settings.permalink}" target="_blank">` +
-        `<img width="40" height="40" src="${data.image_uri}/TapestryLogo.png" />` +
-        `</a>` +
-        `</div>`
-      )
-    },
     iframeId() {
       let randomId = ""
+      const idChars = "0123456789abcdefghijklmnopqrstuvwxyz"
       for (let i = 0; i < 6; i++) {
         randomId += idChars[Math.floor(Math.random() * idChars.length)]
       }
-      return `tpstry-${randomId}`
+      return `tpstry${randomId}`
     },
     autoResizeScript() {
-      const { x0, y0, x, y } = this.getNodeDimensions
-      const nodeDiameter = 140
+      const nodeDiameter = 350
+      // Shortened vars:
+      // - r: Ratio of tapestry height to width
+      // - e: The iframe element
       // eslint-disable-next-line
-      return `<script>(()=>{const r=${(y + nodeDiameter - y0) / (x + nodeDiameter - x0)},e=document.getElementById("${this.iframeId}");if(e){var parentDimensions=e.parentElement.getBoundingClientRect(),w=parentDimensions.width,h=w*r;e.setAttribute("width",w);e.setAttribute("height",h);}})();<\/script>`
+      return `<script>f${this.iframeId}=()=>{const e=document.getElementById("${this.iframeId}"),r=(e.contentWindow.document.body.offsetHeight+${nodeDiameter}*2)/(e.contentWindow.document.body.offsetWidth+${nodeDiameter}*2);if(e){e.setAttribute("width","100%");var w=e.getBoundingClientRect().width;e.setAttribute("height",w*r)}};window.addEventListener("resize",f${this.iframeId});<\/script>`
     },
   },
   methods: {

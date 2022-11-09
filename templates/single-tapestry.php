@@ -14,9 +14,8 @@
 $iframe_mode = array_key_exists('iframe', $_GET);
 
 if ($iframe_mode) {
-    load_template(__DIR__ . '/header-frameless.php');
-}
-else {
+    load_template(__DIR__ . '/header-iframe.php');
+} else {
     get_header();
 }
 ?>
@@ -83,9 +82,8 @@ else {
 
 <?php
 if ($iframe_mode) {
-    load_template(__DIR__ . '/footer-frameless.php');
-}
-else {
+    load_template(__DIR__ . '/footer-iframe.php');
+} else {
     get_footer();
 }
 ?>

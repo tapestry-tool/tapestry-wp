@@ -161,22 +161,14 @@ export default {
       }
     }
   }
-  #tapestry {
-    .empty-message {
-      margin: 30vh auto;
-    }
-    svg {
-      position: relative;
-    }
-  }
 }
 </style>
 
 <style lang="scss">
 #app {
   background-size: cover;
-}
-#tapestry-app .btn-link {
-  background: transparent;
+  #tapestry-app .btn-link {
+    background: transparent;
+  }
 }
 </style>

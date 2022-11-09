@@ -6,17 +6,11 @@
 	<link rel="profile" href="https://gmpg.org/xfn/11" />
 	<?php wp_head(); ?>
     <style>
-        #wpadminbar {
+        #wpadminbar,
+        #tapestry-app > .toolbar,
+        #tapestry-sidebar-container {
             display: none !important;
         }
-        #tapestry-app > .toolbar {
-            display: none !important;
-        }
-        <?php if (array_key_exists('no-sidebar', $_GET)): ?>
-        .sidebar-container {
-            display: none !important;
-        }
-        <?php endif; ?>
     </style>
 </head>
 <body <?php body_class(); ?>>
