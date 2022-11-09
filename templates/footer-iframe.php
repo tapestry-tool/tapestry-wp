@@ -8,10 +8,12 @@
         </a>
         <div style="font-size:12px;margin: 20px 0 0 4px;white-space: nowrap;">Powered by Tapestry</div>
     </div>
+    <?php if(isset($_GET['show-open-link'])): ?>
     <a href="<?php echo strtok($_SERVER["REQUEST_URI"], '?'); ?>" target="_blank" style="color:#000;font-size:12px;margin: 20px 20px 0 4px;white-space: nowrap;">
         Open this tapestry in a new window 
         <i class="fas fa-external-link-alt" style="color:#186d95"></i>
     </a>
+    <?php endif; ?>
 </div>
 <?php wp_footer(); ?>
 </body>
