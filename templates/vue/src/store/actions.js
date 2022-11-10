@@ -268,6 +268,14 @@ export async function getTapestryExport({ dispatch }) {
   }
 }
 
+export async function getTapestryExportAsZip({ dispatch }) {
+  try {
+    return await client.getTapestryExportAsZip()
+  } catch (error) {
+    dispatch("addApiError", error)
+  }
+}
+
 export async function completeQuestion(
   { commit, dispatch },
   { nodeId, questionId, answerType, answer }
@@ -493,4 +501,13 @@ export function goToNextLink({ commit, state }, offset) {
     currentLinked: nextLinked,
   })
   return nextLinked
+}
+
+export async function updateNotifications({ commit, dispatch }, notifications) {
+  try {
+    await client.updateNotifications(notifications)
+    commit("setNotifications", notifications)
+  } catch (error) {
+    dispatch("addApiError", error)
+  }
 }

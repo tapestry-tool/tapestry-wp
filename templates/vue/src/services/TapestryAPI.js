@@ -1,5 +1,4 @@
 import axios from "axios"
-import Helpers from "../utils/Helpers"
 import { data } from "./wp"
 
 const { apiUrl, nonce, postId, adminAjaxUrl } = data
@@ -40,20 +39,6 @@ class TapestryApi {
     return response.data
   }
 
-  async getAllRoles() {
-    const usersRequest = await this.client.get(`/roles`)
-    const users = usersRequest.data
-    let wp_roles = new Set()
-    //defaults
-    wp_roles.add("public")
-    wp_roles.add("authenticated")
-    for (let role of Object.keys(users)) {
-      wp_roles.add(role)
-    }
-    wp_roles.delete("administrator")
-    return wp_roles
-  }
-
   async importTapestry(data) {
     const url = `/tapestries/${this.postId}`
     try {
@@ -64,15 +49,35 @@ class TapestryApi {
     }
   }
 
+  async importTapestryFromZip(zipFile) {
+    const url = `/tapestries/${this.postId}/import_zip`
+
+    const formData = new FormData()
+    formData.append("file", zipFile)
+    const response = await this.client.post(url, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    })
+
+    return response.data
+  }
+
   async getTapestryExport() {
     const url = `/tapestries/${this.postId}/export`
     const response = await this.client.get(url)
     return response.data
   }
 
+  async getTapestryExportAsZip() {
+    const url = `/tapestries/${this.postId}/export_zip`
+    const response = await this.client.get(url)
+    return response.data
+  }
+
   async getNode(id) {
     const data = await this.getTapestry()
-    return data.nodes[Helpers.findNodeIndex(id, data)]
+    return data.nodes[id]
   }
 
   async getNodeProgress(id) {
@@ -174,6 +179,18 @@ class TapestryApi {
   async updateSettings(settings) {
     const url = `/tapestries/${this.postId}/settings`
     const response = await this.client.put(url, settings)
+    return response
+  }
+
+  async getNotifications() {
+    const url = `/tapestries/${this.postId}/notifications`
+    const response = await this.client.get(url)
+    return response.data
+  }
+
+  async updateNotifications(notifications) {
+    const url = `/tapestries/${this.postId}/notifications`
+    const response = await this.client.put(url, notifications)
     return response
   }
 
