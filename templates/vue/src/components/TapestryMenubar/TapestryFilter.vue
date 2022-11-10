@@ -21,6 +21,7 @@
       <v-select
         v-if="type !== types.STATUS"
         v-model="filterValue"
+        class="vue-select"
         data-qa="search-input"
         :filter="getVisibleMatches"
         :options="filterOptions"
@@ -256,6 +257,9 @@ export default {
             this.resetSearch()
             this.addApiError({ error: `You're not allowed to search by author.` })
           }
+          this.$nextTick(() => {
+            document.querySelector(".vue-select input")?.focus()
+          })
         }
       },
     },
