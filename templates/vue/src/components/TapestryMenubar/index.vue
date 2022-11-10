@@ -1,8 +1,12 @@
 <template>
   <div class="tapestry-menubar" aria-label="Tapestry Menubar">
-    <tapestry-filter v-if="!settings.renderMap" style="z-index: 10" />
+    <tapestry-filter
+      v-if="!settings.renderMap"
+      class="menubar-group"
+      style="z-index: 10"
+    />
     <b-container v-if="isLoggedIn">
-      <b-row align-v="center">
+      <b-row align-v="center" class="menubar-group">
         <b-col class="p-0">
           <user-settings-button
             data-qa="user-settings-button"
@@ -63,11 +67,10 @@ export default {
   position: absolute;
   top: 1%;
   right: 5%;
-  padding: 5px 10px;
+  height: 56px;
   transition: all 0.2s ease-out;
   display: flex;
   flex-wrap: nowrap;
-  align-items: center;
 
   button.menubar-button {
     color: var(--text-color-tertiary);
@@ -82,6 +85,16 @@ export default {
       color: var(--highlight-color);
       transform: scale(1.1);
     }
+  }
+
+  .menubar-group {
+    height: 56px;
+    background-color: var(--bg-color-secondary);
+    border-radius: 8px;
+    padding: 0 0.5rem;
+    margin-left: 0.5rem;
+    display: flex;
+    align-items: center;
   }
 }
 </style>
