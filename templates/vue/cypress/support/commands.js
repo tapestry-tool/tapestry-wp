@@ -4,23 +4,19 @@ import roles from "./roles"
 import { deepMerge } from "./utils"
 import { API_URL, TEST_TAPESTRY_NAME } from "./constants"
 
-Cypress.Commands.add(
-  "setup",
-  { prevSubject: false },
-  (fixture, { role = "admin", skipClosingMinimap = false } = {}) => {
-    if (fixture) {
-      cy.get(fixture).then(tapestry => {
-        cy.addTapestry(tapestry)
-      })
-    } else {
-      cy.addTapestry()
-    }
-    if (role !== "public") {
-      cy.login(role)
-    }
-    cy.visitTapestry({ skipClosingMinimap })
+Cypress.Commands.add("setup", { prevSubject: false }, (fixture, role = "admin") => {
+  if (fixture) {
+    cy.get(fixture).then(tapestry => {
+      cy.addTapestry(tapestry)
+    })
+  } else {
+    cy.addTapestry()
   }
-)
+  if (role !== "public") {
+    cy.login(role)
+  }
+  cy.visitTapestry()
+})
 
 Cypress.Commands.add("login", role => {
   const { username, password } = roles[role]
@@ -45,7 +41,7 @@ Cypress.Commands.add("deleteTapestry", (title = TEST_TAPESTRY_NAME) => {
   })
 })
 
-Cypress.Commands.add("visitTapestry", ({ skipClosingMinimap = false } = {}) => {
+Cypress.Commands.add("visitTapestry", () => {
   cy.visit(`/tapestry/${TEST_TAPESTRY_NAME}`)
   cy.getByTestId("tapestry-loading").should("not.exist")
   // Close the minimap if the minimap is visible
