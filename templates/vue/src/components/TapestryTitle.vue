@@ -1,44 +1,30 @@
 <template>
-  <div class="tapestry-title">
-    <h1 class="title">{{ title }}</h1>
-    <tapestry-filter v-if="!showMap" style="z-index: 10" />
-  </div>
+  <h1 class="tapestry-title">{{ title }}</h1>
 </template>
 
 <script>
 import { mapState } from "vuex"
-import TapestryFilter from "./TapestryMenubar/TapestryFilter"
 
 export default {
-  components: {
-    TapestryFilter,
-  },
   computed: {
     ...mapState(["settings"]),
     title() {
       return this.settings.title
     },
-    showMap() {
-      return this.settings.renderMap
-    },
   },
-  methods: {},
 }
 </script>
 
 <style lang="scss" scoped>
 .tapestry-title {
   position: absolute;
-  top: 0;
-  left: 0;
-  padding: calc(1vh + 8px) 0 0 5vw;
-  height: 36px;
-  line-height: 36px;
+  top: 1%;
+  left: 5%;
+  height: 56px;
+  line-height: 56px;
   display: flex;
-
-  .title {
-    font-size: 1.5rem;
-    font-weight: normal;
-  }
+  font-size: 1.5rem;
+  font-weight: normal;
+  margin: 0;
 }
 </style>

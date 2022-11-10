@@ -1,6 +1,7 @@
 <template>
-  <div v-if="isLoggedIn" class="tapestry-menubar" aria-label="Tapestry Menubar">
-    <b-container class="can-edit">
+  <div class="tapestry-menubar" aria-label="Tapestry Menubar">
+    <tapestry-filter v-if="!settings.renderMap" style="z-index: 10" />
+    <b-container v-if="isLoggedIn">
       <b-row align-v="center">
         <b-col class="p-0">
           <user-settings-button
@@ -33,6 +34,7 @@ import UserSettingsButton from "./UserSettingsButton"
 import ReviewNotifications from "./ReviewNotifications"
 import HelpButton from "./HelpButton"
 import OperationsButton from "./OperationsButton"
+import TapestryFilter from "./TapestryFilter"
 import * as wp from "@/services/wp"
 
 export default {
@@ -42,6 +44,7 @@ export default {
     UserSettingsButton,
     HelpButton,
     OperationsButton,
+    TapestryFilter,
   },
   computed: {
     ...mapState(["settings"]),
@@ -58,11 +61,13 @@ export default {
 <style lang="scss">
 .tapestry-menubar {
   position: absolute;
-  top: 0;
-  right: 0;
-  padding-top: 1vh;
-  padding-right: 5vw;
+  top: 1%;
+  right: 5%;
+  padding: 5px 10px;
   transition: all 0.2s ease-out;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
 
   button.menubar-button {
     color: var(--text-color-tertiary);

@@ -2,6 +2,7 @@
   <div data-qa="tapestry-filter" class="filter">
     <button
       v-if="!settings.renderMap"
+      class="menubar-button"
       aria-label="search"
       :style="isActive && 'margin-right: 12px;'"
       @click="toggleFilter"
@@ -365,18 +366,9 @@ export default {
   border-radius: 8px;
 
   button {
-    color: var(--text-color-tertiary);
-    padding: 0;
-    background: none;
-    width: 36px;
-    font-size: 0.8em;
     display: flex;
     align-items: center;
     justify-content: center;
-
-    &:hover {
-      color: var(--highlight-color);
-    }
   }
 
   .filter-combobox {
