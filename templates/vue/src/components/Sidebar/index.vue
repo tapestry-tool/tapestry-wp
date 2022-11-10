@@ -49,7 +49,7 @@
       tabindex="0"
       :class="['sidebar', { closed: closed }]"
     >
-      <header ref="info" class="sidebar-header">
+      <header ref="info" class="sidebar-header" data-name="info">
         <h1 class="content-title">{{ node.title }}</h1>
         <div class="button-container">
           <b-button
@@ -71,14 +71,14 @@
           <h2 class="content-header">About</h2>
           <div class="content-body" v-html="node.description"></div>
         </section>
-        <section ref="copyright">
+        <section ref="copyright" data-name="copyright">
           <node-license :node="node"></node-license>
           <section v-if="node.references">
             <h2 class="content-header">References</h2>
             <div class="content-body" v-html="node.references"></div>
           </section>
         </section>
-        <section v-if="isReviewParticipant" ref="review">
+        <section v-if="isReviewParticipant" ref="review" data-name="review">
           <h2 class="content-header">Review</h2>
           <node-review :node="node"></node-review>
         </section>
