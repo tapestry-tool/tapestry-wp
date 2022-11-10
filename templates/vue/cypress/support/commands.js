@@ -48,14 +48,13 @@ Cypress.Commands.add("deleteTapestry", (title = TEST_TAPESTRY_NAME) => {
 Cypress.Commands.add("visitTapestry", ({ skipClosingMinimap = false } = {}) => {
   cy.visit(`/tapestry/${TEST_TAPESTRY_NAME}`)
   cy.getByTestId("tapestry-loading").should("not.exist")
-  if (!skipClosingMinimap) {
-    cy.get("body").then($body => {
-      const $button = $body.find(`[data-qa="close-minimap"]`)
-      if ($button.length > 0) {
-        $button.first().trigger("click")
-      }
-    })
-  }
+  // Close the minimap if the minimap is visible
+  cy.get("body").then($body => {
+    const $button = $body.find(`[data-qa="close-minimap"]`)
+    if ($button.length > 0) {
+      $button.first().trigger("click")
+    }
+  })
 })
 
 // -- Nodes --
