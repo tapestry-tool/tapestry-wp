@@ -11,9 +11,6 @@ describe("Embed Modal", () => {
     cy.getByTestId("embed-code").should($textarea => {
       const val = $textarea.val()
       expect(val).to.include("</iframe>")
-      expect(val).to.include("</div>")
     })
-
-    cy.contains(/done/i).click({ force: true })
   })
 })
