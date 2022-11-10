@@ -16,7 +16,7 @@
         <b-tab
           title="Answers"
           :active="tab === 'answers'"
-          @click="$emit('change:tab', 'answers')"
+          @click="changeTab('answers')"
         >
           <div class="px-3 mt-n2">
             <b-overlay variant="white">
@@ -112,7 +112,7 @@
         <b-tab
           title="Export"
           :active="tab === 'export'"
-          @click="$emit('change:tab', 'export')"
+          @click="changeTab('export')"
         >
           <b-form-group
             label="Export All User Answers"
@@ -135,6 +135,7 @@ import client from "@/services/TapestryAPI"
 import Combobox from "@/components/modals/common/Combobox"
 import CompletedActivityMedia from "@/components/Lightbox/media/common/CompletedActivityMedia"
 import DragSelectModular from "@/utils/dragSelectModular"
+import { names } from "@/config/routes"
 
 export default {
   name: "user-answers-modal",
@@ -146,11 +147,6 @@ export default {
     show: {
       type: Boolean,
       required: true,
-    },
-    tab: {
-      type: String,
-      required: false,
-      default: "answers",
     },
   },
   data() {
@@ -193,10 +189,28 @@ export default {
         row => row.text || row.audio || row.multipleChoice || row.dragDrop
       )
     },
+    tab() {
+      return this.$route.params.tab
+    },
   },
   watch: {
     activityId() {
       this.questionId = null
+    },
+    tab: {
+      immediate: true,
+      handler(requestedTab) {
+        if (this.show) {
+          const acceptedTabs = ["answers", "export"]
+          if (!acceptedTabs.includes(requestedTab)) {
+            this.$router.replace({
+              name: names.USERANSWERS,
+              params: { nodeId: this.$route.params.nodeId, tab: "answers" },
+              query: this.$route.query,
+            })
+          }
+        }
+      },
     },
   },
   mounted() {
@@ -218,6 +232,13 @@ export default {
   methods: {
     closeModal() {
       this.$emit("close")
+    },
+    changeTab(tab) {
+      this.$router.push({
+        name: names.USERANSWERS,
+        params: { nodeId: this.$route.params.nodeId, tab },
+        query: this.$route.query,
+      })
     },
     exportAnswers() {
       let newWorkBook = XLSX.utils.book_new()

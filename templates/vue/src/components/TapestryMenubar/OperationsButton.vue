@@ -25,6 +25,9 @@
       <b-dropdown-item-button @click="open(names.EXPORTDUPLICATE)">
         Export/Duplicate Tapestry
       </b-dropdown-item-button>
+      <b-dropdown-item-button v-if="isAdmin" @click="open(names.USERANSWERS)">
+        View User Answers
+      </b-dropdown-item-button>
       <b-dropdown-item-button
         v-if="showKalturaOption"
         @click="open(names.KALTURAMODAL)"
@@ -45,6 +48,11 @@
       :show="openOperation === names.EXPORTDUPLICATE"
       @close="close(names.EXPORTDUPLICATE)"
     ></export-duplicate-modal>
+    <user-answers-modal
+      v-if="isAdmin"
+      :show="openOperation === names.USERANSWERS"
+      @close="close(names.USERANSWERS)"
+    ></user-answers-modal>
     <kaltura-modal
       v-if="showKalturaOption"
       :show="openOperation === names.KALTURAMODAL"
@@ -60,6 +68,7 @@
 <script>
 import client from "@/services/TapestryAPI"
 import ExportDuplicateModal from "@/components/modals/ExportDuplicateModal"
+import UserAnswersModal from "@/components/modals/UserAnswersModal"
 import KalturaModal from "@/components/modals/KalturaModal"
 import OtherOperationsModal from "@/components/modals/OtherOperationsModal"
 import { names } from "@/config/routes"
@@ -69,21 +78,25 @@ import { mapState } from "vuex"
 
 const operationModalNames = [
   names.EXPORTDUPLICATE,
+  names.USERANSWERS,
   names.OTHEROPERATIONS,
   names.KALTURAMODAL,
 ]
 const operationAnalyticsNames = {
   [names.EXPORTDUPLICATE]: "export-duplicate",
+  [names.USERANSWERS]: "user-answers",
   [names.KALTURAMODAL]: "kaltura-modal",
   [names.OTHEROPERATIONS]: "other-operations",
 }
 const defaultTabs = {
+  [names.USERANSWERS]: "answers",
   [names.KALTURAMODAL]: "upload",
 }
 
 export default {
   components: {
     ExportDuplicateModal,
+    UserAnswersModal,
     KalturaModal,
     OtherOperationsModal,
   },
@@ -110,6 +123,10 @@ export default {
     },
     showKalturaOption() {
       return Helpers.hasKalturaUploadPermission() && wp.getKalturaStatus()
+    },
+    isAdmin() {
+      const currentUser = wp.getCurrentUser()
+      return currentUser.roles && currentUser.roles.includes("administrator")
     },
   },
   methods: {

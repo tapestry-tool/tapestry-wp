@@ -14,9 +14,6 @@
           <b-col v-if="settings.submitNodesEnabled" class="p-0">
             <review-notifications />
           </b-col>
-          <b-col v-if="isAdmin" class="p-0">
-            <user-answers-button data-qa="user-answers-button"></user-answers-button>
-          </b-col>
           <b-col class="p-0">
             <settings-modal-button></settings-modal-button>
           </b-col>
@@ -32,7 +29,6 @@
 <script>
 import { mapState } from "vuex"
 import SettingsModalButton from "./SettingsModalButton"
-import UserAnswersButton from "./UserAnswersButton"
 import UserSettingsButton from "./UserSettingsButton"
 import ReviewNotifications from "./ReviewNotifications"
 import HelpButton from "./HelpButton"
@@ -46,7 +42,6 @@ export default {
     UserSettingsButton,
     HelpButton,
     OperationsButton,
-    UserAnswersButton,
   },
   computed: {
     ...mapState(["settings"]),
@@ -55,10 +50,6 @@ export default {
     },
     isLoggedIn() {
       return wp.isLoggedIn()
-    },
-    isAdmin() {
-      const currentUser = wp.getCurrentUser()
-      return currentUser.roles && currentUser.roles.includes("administrator")
     },
   },
 }
