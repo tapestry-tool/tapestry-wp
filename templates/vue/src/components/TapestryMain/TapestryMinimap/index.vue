@@ -11,6 +11,7 @@
       }"
     ></canvas>
     <canvas
+      id="tapestry-minimap"
       ref="viewbox"
       :width="viewBox[2]"
       :height="viewBox[3]"
@@ -268,6 +269,13 @@ export default {
       this.mouseDown = false
       this.mouseMoved = false
       this.mousePos = null
+    },
+    getMinimapDimensions() {
+      // method for TapestryMain to receive minimap dimensions
+      return {
+        width: this.width,
+        height: this.height,
+      }
     },
   },
 }

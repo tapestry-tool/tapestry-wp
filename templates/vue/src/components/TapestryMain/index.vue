@@ -319,8 +319,8 @@ export default {
 
     this.zoomPanHelper = new ZoomPanHelper(
       "tapestry",
-      (delta, x, y) => {
-        this.handleZoom(delta * this.scaleConstants.zoomSensitivity, x, y)
+      (delta, x, y, target) => {
+        this.handleZoom(delta * this.scaleConstants.zoomSensitivity, x, y, target)
       },
       () => {
         this.fetchAppDimensions()
@@ -428,7 +428,7 @@ export default {
         height,
       }
     },
-    handleZoom(delta, x, y) {
+    handleZoom(delta, x, y, target) {
       if (this.isEmptyTapestry) {
         return
       }
@@ -440,10 +440,14 @@ export default {
         Math.min(this.maxScale / 2, this.manualScale + newScale - this.scale)
       )
 
+      const isMinimapZoom =
+        target && target.id === "tapestry-minimap" && this.$refs.minimap
       if (!this.appDimensions) {
         this.fetchAppDimensions()
       }
-      const { width, height } = this.appDimensions
+      const { width, height } = isMinimapZoom
+        ? this.$refs.minimap.getMinimapDimensions()
+        : this.appDimensions
 
       const relativeX = (x / width) * this.viewBox[2]
       const relativeY = (y / height) * this.viewBox[3]
