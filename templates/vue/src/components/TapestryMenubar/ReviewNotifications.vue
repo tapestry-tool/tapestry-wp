@@ -1,5 +1,5 @@
 <template>
-  <div id="review-notifications">
+  <div v-if="nodesPendingReview.length !== 0" id="review-notifications">
     <button
       ref="toggle"
       aria-label="toggle pending nodes"
