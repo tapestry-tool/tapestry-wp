@@ -13,7 +13,7 @@
 import client from "@/services/TapestryAPI"
 
 export default {
-  name: "kaltura-video-media",
+  name: "kaltura-media",
   props: {
     node: {
       type: Object,
@@ -25,6 +25,11 @@ export default {
       validator: val => {
         return ["width", "height"].every(prop => val.hasOwnProperty(prop))
       },
+    },
+    context: {
+      type: String,
+      required: false,
+      default: "lightbox",
     },
     playing: {
       type: Boolean,
@@ -45,6 +50,9 @@ export default {
   computed: {
     kalturaId() {
       return this.node.typeData.kalturaId
+    },
+    hasMultiContentContext() {
+      return this.context === "multi-content"
     },
   },
   watch: {
@@ -98,6 +106,11 @@ export default {
         kWidget.addReadyCallback(playerId => {
           this.playerId = playerId
           const kalturaVideo = document.getElementById(playerId)
+
+          if (this.context === "multi-content") {
+            this.setFrameDimensions()
+            window.addEventListener("resize", this.setFrameDimensions)
+          }
 
           kalturaVideo.kBind("playerUpdatePlayhead", currentTime => {
             const videoDuration = kalturaVideo.evaluate("{duration}")
@@ -158,6 +171,7 @@ export default {
     document.head.appendChild(kalturaScript)
   },
   beforeDestroy() {
+    window.removeEventListener("resize", this.setFrameDimensions)
     const kalturaScript = document.getElementById("kaltura-script")
     document.head.removeChild(kalturaScript)
   },
@@ -166,6 +180,33 @@ export default {
       this.amountViewed = currentTime / duration
       this.$emit("timeupdate", { amountViewed: this.amountViewed, currentTime })
       this.lastTime = currentTime
+    },
+    setFrameDimensions() {
+      const kalturaPlayerBarHeight = 36
+
+      const kalturaVideo = document.getElementById(this.playerId)
+
+      const fitHeight = window.innerHeight
+      const playerWidth = kalturaVideo.evaluate("{video.player.width}")
+      const entry = kalturaVideo.evaluate("{mediaProxy.entry}")
+
+      if (entry) {
+        // Proportionally make the frame smaller
+        let scaleFactor = fitHeight / entry.height
+        this.frameHeight = entry.height * scaleFactor + kalturaPlayerBarHeight
+        this.frameWidth = entry.width * scaleFactor
+        // if the width is bigger than the available space, we need to scale based on the width
+        if (this.frameWidth > playerWidth) {
+          scaleFactor = playerWidth / entry.width
+          this.frameHeight = entry.height * scaleFactor + kalturaPlayerBarHeight
+          this.frameWidth = entry.width * scaleFactor
+        }
+
+        this.$emit("change:dimensions", {
+          width: this.frameWidth,
+          height: this.frameHeight,
+        })
+      }
     },
     playVideo() {
       if (this.playerId) {
@@ -181,10 +222,12 @@ export default {
     },
     reset() {
       this.onLoad = false
-      const kalturaVideo = document.getElementById(this.playerId)
-      this.updateVideoProgress(0, kalturaVideo.evaluate("{duration}"))
-      kalturaVideo.sendNotification("doSeek", 0)
-      this.$emit("timeupdate", { amountViewed: this.amountViewed, currentTime: 0 })
+      if (this.playerId) {
+        const kalturaVideo = document.getElementById(this.playerId)
+        this.updateVideoProgress(0, kalturaVideo.evaluate("{duration}"))
+        kalturaVideo.sendNotification("doSeek", 0)
+        this.$emit("timeupdate", { amountViewed: this.amountViewed, currentTime: 0 })
+      }
     },
   },
 }

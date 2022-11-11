@@ -888,7 +888,7 @@ export default {
 
         if (this.node.mediaFormat === "kaltura" && wp.getKalturaStatus()) {
           try {
-            await this.updateKalturaVideoCaptions()
+            await this.updateKalturaCaptions()
           } catch (error) {
             this.addApiError(error)
             return
@@ -913,7 +913,7 @@ export default {
               wp.data.kaltura.uniqueConfiguration
             )
           }
-          this.updateKalturaVideoMediaURL()
+          this.updateKalturaMediaURL()
         }
 
         if (
@@ -1400,14 +1400,14 @@ export default {
       )
       this.loadDuration = false
     },
-    updateKalturaVideoMediaURL() {
+    updateKalturaMediaURL() {
       // For Kaltura videos, the Kaltura ID determines the mediaURL, so let's ensure they are in sync
       const partnerId = wp.data.kaltura.partnerId
       const serviceUrl = wp.data.kaltura.serviceUrl
       const mediaURL = `${serviceUrl}/p/${partnerId}/sp/${partnerId}00/playManifest/entryId/${this.node.typeData.kalturaId}/format/url/protocol/https?.mp4`
       this.update("typeData.mediaURL", mediaURL)
     },
-    async updateKalturaVideoCaptions() {
+    async updateKalturaCaptions() {
       if (this.node.typeData.captions) {
         // "Push" changes made to Kaltura captions to Kaltura, then save results in node
         const result = await KalturaAPI.updateVideoCaptions(
