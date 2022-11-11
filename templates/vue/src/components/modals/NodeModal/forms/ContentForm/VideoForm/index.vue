@@ -37,7 +37,6 @@
                   :disabled="disableFields || loadingCaptions"
                   :is-kaltura="isKaltura"
                   :allow-srt="allowSrt"
-                  :is-removable="captions.length >= 2"
                   :is-default="caption.id === defaultCaptionId"
                   :languages="languages"
                   @input="captions.splice(index, 1, $event)"
@@ -209,13 +208,17 @@ export default {
       this.captions = []
     },
     addCaption() {
+      const newCaptionId = Helpers.createUUID()
       this.captions = [
         ...this.captions,
         {
           ...Helpers.deepCopy(defaultCaption),
-          id: Helpers.createUUID(),
+          id: newCaptionId,
         },
       ]
+      if (this.captions.length == 1) {
+        this.defaultCaptionId = newCaptionId
+      }
       this.focusCaption(this.captions.length - 1)
     },
     removeCaption(index, caption) {
