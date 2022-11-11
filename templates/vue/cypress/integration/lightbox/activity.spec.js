@@ -666,7 +666,8 @@ describe("Activity", () => {
       cy.logout()
       cy.login(roles.ADMIN).visitTapestry()
 
-      cy.openModal("user-answers")
+      cy.get(".operations-button").click()
+      cy.contains(/view user answers/i).click()
 
       cy.getByTestId("choose-activity")
         .find("input")

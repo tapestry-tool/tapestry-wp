@@ -158,8 +158,6 @@ Cypress.Commands.add("openModal", (type, id) => {
       return cy.getByTestId(`edit-node-${id}`).click()
     case "settings":
       return cy.getByTestId("settings-button").click()
-    case "user-answers":
-      return cy.getByTestId("user-answers-button").click()
     default:
       throw new Error(`Unknown modal type: ${type}`)
   }
