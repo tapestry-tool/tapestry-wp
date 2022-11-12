@@ -125,6 +125,9 @@ class Tapestry implements ITapestry
             if (!isset($this->settings->status)) {
                 $this->settings->status = get_post_status($this->postId);
             }
+            if (!isset($this->settings->showChildrenOfMulticontent)) {
+                $this->settings->showChildrenOfMulticontent = false;
+            }
         }
         if (isset($tapestry->notifications) && is_object($tapestry->notifications)) {
             $this->notifications = $tapestry->notifications;
@@ -606,6 +609,7 @@ class Tapestry implements ITapestry
         $settings->showAccess = true;
         $settings->showRejected = false;
         $settings->showAcceptedHighlight = true;
+        $settings->showChildrenOfMulticontent = false;
         $settings->defaultPermissions = TapestryNodePermissions::getDefaultNodePermissions($this->postId);
         $settings->superuserOverridePermissions = true;
         $settings->analyticsEnabled = false;
