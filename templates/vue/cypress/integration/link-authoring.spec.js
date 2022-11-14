@@ -4,6 +4,21 @@ describe("Link Authoring", () => {
     cy.setup("@threeNodes")
   })
 
+  it("should be able to add a link using the link tool", () => {
+    cy.get("#tapestry-add-link-tool").click()
+
+    cy.store()
+      .its("state.nodes")
+      .then(nodes => {
+        const [, child1, child2] = Object.values(nodes)
+
+        cy.link(child1.id, child2.id).should("not.exist")
+        cy.getNodeById(child1.id).click()
+        cy.getNodeById(child2.id).click()
+        cy.link(child1.id, child2.id).should("be.visible")
+      })
+  })
+
   it("should be able to delete a link between two leaf nodes", () => {
     cy.store()
       .its("state.nodes")

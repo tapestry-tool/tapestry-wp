@@ -93,6 +93,7 @@
               <p
                 ref="title"
                 class="node-title"
+                :data-qa="`node-title-text-${node.id}`"
                 :contenteditable="isEditingTitle ? 'true' : 'false'"
                 :tabindex="isEditingTitle ? '0' : '-1'"
                 @blur="handleTitleBlur"
