@@ -83,9 +83,6 @@ export default {
     },
   },
   mounted() {
-    this.$root.$on("bv::modal::show", () => {
-      this.$emit("set-show", false)
-    })
     this.popper = createPopper(
       this.target ? document.getElementById(this.target) : this.virtualTarget,
       this.$refs.popper,
