@@ -42,7 +42,6 @@ export default {
   },
   data() {
     return {
-      onLoad: true,
       playerId: "",
       amountViewed: 0,
     }
@@ -53,26 +52,6 @@ export default {
     },
     hasMultiContentContext() {
       return this.context === "multi-content"
-    },
-  },
-  watch: {
-    playing() {
-      if (this.playing && this.playerId) {
-        const kalturaVideo = document.getElementById(this.playerId)
-        if (this.onLoad) {
-          const videoDuration = kalturaVideo.evaluate("{duration}")
-          const currentTime = this.node.progress * videoDuration
-
-          this.$emit("timeupdate", {
-            amountViewed: this.node.progress,
-            currentTime,
-          })
-
-          kalturaVideo.sendNotification("doSeek", currentTime)
-          this.lastTime = currentTime
-          this.onLoad = false
-        }
-      }
     },
   },
   created() {
@@ -150,7 +129,7 @@ export default {
             )
           })
 
-          kalturaVideo.kBind("seeked", seekedTime => {
+          kalturaVideo.kBind("userInitiatedSeek", seekedTime => {
             this.$emit("seeked", { currentTime: seekedTime })
           })
 
@@ -163,6 +142,9 @@ export default {
           const nodeProgress = this.node.progress
           const videoDuration = kalturaVideo.evaluate("{duration}")
           const currentTime = nodeProgress * videoDuration
+
+          kalturaVideo.sendNotification("doSeek", currentTime)
+
           this.$emit("load", { currentTime, type: "kaltura-video" })
         })
       }
@@ -221,7 +203,6 @@ export default {
       }
     },
     reset() {
-      this.onLoad = false
       if (this.playerId) {
         const kalturaVideo = document.getElementById(this.playerId)
         this.updateVideoProgress(0, kalturaVideo.evaluate("{duration}"))
