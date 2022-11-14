@@ -63,6 +63,12 @@ class TapestryApi {
     return response.data
   }
 
+  async getImportStatus() {
+    const url = `/tapestries/${this.postId}/import_status`
+    const response = await this.client.get(url)
+    return response.data
+  }
+
   async getTapestryExport() {
     const url = `/tapestries/${this.postId}/export`
     const response = await this.client.get(url)

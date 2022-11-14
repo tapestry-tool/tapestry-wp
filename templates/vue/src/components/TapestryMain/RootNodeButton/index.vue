@@ -21,6 +21,9 @@
       <br />
       Please try with another file.
     </div>
+    <div v-if="isImporting" style="margin-top: 16px;">
+      {{ importStatusMessage }}
+    </div>
     <input
       ref="fileInput"
       data-qa="import-file-input"
@@ -45,6 +48,7 @@ import { names } from "@/config/routes"
 import client from "@/services/TapestryAPI"
 import WordpressApi from "@/services/WordpressApi"
 import ImportChangelog from "./ImportChangelog"
+import { mapMutations } from "vuex"
 
 export default {
   name: "root-node-button",
@@ -56,6 +60,8 @@ export default {
       error: null,
       isDragover: false,
       isImporting: false,
+      importStatusMessage: "",
+      importStatusRefresh: null,
       changes: {
         noChange: true,
         permissions: new Set(),
@@ -65,6 +71,7 @@ export default {
     }
   },
   methods: {
+    ...mapMutations(["addApiError"]),
     addRootNode() {
       this.$router.push({
         name: names.MODAL,
@@ -123,6 +130,7 @@ export default {
         this.error = ""
 
         this.isImporting = true
+        this.importStatusMessage = ""
         const upload = e.target.result
         client
           .importTapestry(upload)
@@ -145,9 +153,27 @@ export default {
     importTapestryFromZip(zipFile) {
       this.error = ""
       this.isImporting = true
+      this.importStatusMessage = "Uploading file..."
+      this.importStatusRefresh = setInterval(() => {
+        client
+          .getImportStatus()
+          .then(status => {
+            if (status.message) {
+              this.importStatusMessage = status.message + "..."
+            }
+            if (!status.inProgress) {
+              this.importStatusMessage = "Import is not in progress"
+            }
+          })
+          .catch(err => {
+            this.addApiError(err)
+          })
+      }, 10000)
+
       client
         .importTapestryFromZip(zipFile)
         .then(response => {
+          clearInterval(this.importStatusRefresh)
           if (response) {
             this.changes.permissions = new Set(response.changes.permissions)
             this.changes.noChange = response.changes.noChange
@@ -160,12 +186,15 @@ export default {
           }
         })
         .catch(err => {
+          clearInterval(this.importStatusRefresh)
           this.error = err.response.data
         })
         .then(shouldRebuild => {
           if (shouldRebuild) {
             // The h5pMeta.details field is not generated for imported H5Ps
             // If any H5Ps were added during import, we need to rebuild the H5P cache
+            this.importStatusMessage =
+              "Rebuilding H5P cache... Please do not close this tab."
             return WordpressApi.rebuildAllH5PCache()
           }
         })
@@ -178,6 +207,7 @@ export default {
           }
         })
         .finally(() => {
+          this.importStatusMessage = ""
           this.isImporting = false
         })
     },
