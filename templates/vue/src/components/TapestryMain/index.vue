@@ -94,7 +94,6 @@
           :viewBox="computedViewBox"
         ></locked-tooltip>
       </svg>
-      <tapestry-toolbar />
       <tapestry-node-toolbar
         :show="showContextToolbar == 'node'"
         :node="selectedNode"
@@ -107,6 +106,7 @@
         :position="linkToolbarPosition"
         @set-show="setShowContextToolbar('link', $event)"
       />
+      <tapestry-toolbar />
       <tapestry-minimap
         v-if="showMinimap"
         ref="minimap"
