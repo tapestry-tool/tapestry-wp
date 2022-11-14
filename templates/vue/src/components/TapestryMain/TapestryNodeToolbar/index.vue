@@ -66,6 +66,7 @@
       <div class="position-relative">
         <tapestry-toolbar-button
           :id="`change-level-button-${node.id}`"
+          :tabindex="activeButton === 'level' ? -1 : 0"
           horizontal
           tooltip="Change Level"
           @click="handleToggle('level')"
@@ -87,6 +88,7 @@
         toggle-class="more-actions-button after-separator before-separator"
         :toggle-attrs="{
           'aria-label': 'Other Node Actions',
+          tabindex: -1,
         }"
         @show="handleOpen('moreActions')"
         @hide="handleClose('moreActions')"
