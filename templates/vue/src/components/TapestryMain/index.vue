@@ -391,6 +391,7 @@ export default {
     isSidebarOpen() {
       setTimeout(() => {
         this.updateViewBox()
+        this.fetchAppDimensions()
       }, 300)
     },
     selectedId: {
