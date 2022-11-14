@@ -27,6 +27,7 @@ class Tapestry implements ITapestry
     private $settings;
     private $rootId;
     private $nodes;
+    private $notifications;
 
     private $nodeObjects; // Used only in the set up so we don't have to retrieve the nodes from the db multiple times
     private $visitedNodeIds; // Used in _recursivelySetAccessible function
@@ -50,6 +51,7 @@ class Tapestry implements ITapestry
         // $this->groups = [];
         $this->rootId = 0;
         $this->settings = $this->_getDefaultSettings();
+        $this->notifications = $this->_getDefaultNotifications();
 
         if (TapestryHelpers::isValidTapestry($this->postId)) {
             $tapestry = $this->_loadFromDatabase();
@@ -111,6 +113,21 @@ class Tapestry implements ITapestry
                 $this->settings->draftNodesEnabled = true;
                 $this->settings->submitNodesEnabled = true;
             }
+            if (!isset($this->settings->permalink)) {
+                $this->settings->permalink = get_permalink($this->postId);
+            }
+            if (!isset($this->settings->tapestrySlug)) {
+                $this->settings->tapestrySlug = get_post($this->postId)->post_name;
+            }
+            if (!isset($this->settings->title)) {
+                $this->settings->title = get_the_title($this->postId);
+            }
+            if (!isset($this->settings->status)) {
+                $this->settings->status = get_post_status($this->postId);
+            }
+        }
+        if (isset($tapestry->notifications) && is_object($tapestry->notifications)) {
+            $this->notifications = $tapestry->notifications;
         }
     }
 
@@ -157,6 +174,34 @@ class Tapestry implements ITapestry
     }
 
     /**
+     * Get settings.
+     *
+     * @return object $settings
+     */
+    public function getSettings()
+    {
+        if (!$this->postId) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+
+        return $this->settings;
+    }
+
+    /**
+     * Get notifications.
+     *
+     * @return object $notifications
+     */
+    public function getNotifications()
+    {
+        if (!$this->postId) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+
+        return $this->notifications;
+    }
+
+    /**
      * Add a new node.
      *
      * @param object $node Tapestry node
@@ -175,7 +220,7 @@ class Tapestry implements ITapestry
         }
 
         $tapestryNode->set($node);
-        $node = $tapestryNode->save($node);
+        $node = $tapestryNode->save();
 
         array_push($this->nodes, $node->id);
 
@@ -375,7 +420,10 @@ class Tapestry implements ITapestry
             $traversedNodeIds = [];
             foreach ($nodesData as $node) {
                 if ($node->unlocked && !in_array($node->id, $traversedNodeIds)) {
-                    $this->_traverseNodesAndApplyFunction($nodesData, $node, false,
+                    $this->_traverseNodesAndApplyFunction(
+                        $nodesData,
+                        $node,
+                        false,
                         function ($n) {
                             $n->accessible = $n->unlocked;
                         },
@@ -462,7 +510,6 @@ class Tapestry implements ITapestry
         // foreach ($this->groups as $group) {
         //     $groups[] = (new TapestryGroup($this->postId, $$group))->get();
         // }
-        $parsedUrl = parse_url($this->settings->permalink);
         unset($this->settings->permalink);
         unset($this->settings->tapestrySlug);
         unset($this->settings->title);
@@ -473,7 +520,7 @@ class Tapestry implements ITapestry
             // 'groups' => $groups,
             'links' => $this->links,
             'settings' => $this->settings,
-            'site-url' => $parsedUrl['scheme'].'://'.$parsedUrl['host'],
+            'site-url' => get_bloginfo('url'),
         ];
     }
 
@@ -588,6 +635,17 @@ class Tapestry implements ITapestry
         return $settings;
     }
 
+    private function _getDefaultNotifications()
+    {
+        return (object) [
+            'kaltura' => (object) [
+                'total' => 0,
+                'success' => 0,
+                'error' => 0,
+            ],
+        ];
+    }
+
     private function _getAuthor()
     {
         if ($this->postId) {
@@ -605,6 +663,7 @@ class Tapestry implements ITapestry
             'links' => $this->links,
             'settings' => $this->settings,
             'rootId' => $this->rootId,
+            'notifications' => $this->notifications,
         ];
     }
 
@@ -659,7 +718,7 @@ class Tapestry implements ITapestry
 
     private function _filterTapestry($tapestry, $filterUserId)
     {
-        $tapestry->nodes = $this->_filterNodesMetaIdsByAccess();
+        $tapestry->nodes = $this->_filterNodesMetaIdsByAccess($filterUserId);
         $tapestry->links = $this->_filterLinksByNodeMetaIds($tapestry->links, $tapestry->nodes);
 
         return $tapestry;
@@ -700,7 +759,7 @@ class Tapestry implements ITapestry
         return $nodes;
     }
 
-    private function _filterNodesMetaIdsByAccess()
+    private function _filterNodesMetaIdsByAccess($filterUserId)
     {
         $currentUser = new TapestryUser();
         $currentUserId = $currentUser->getID();
@@ -744,14 +803,24 @@ class Tapestry implements ITapestry
                 $nodesPermitted[$nodeId]->permitted = false;
             }
 
-            $this->_traverseNodesAndApplyFunction($nodesPermitted, $nodesPermitted[$this->rootId], false,
-                function ($n) use ($superuserOverridePermissions, $currentUserId, $filterUserId) {
-                    $n->permitted = $this->_userIsAllowed($n->id, $superuserOverridePermissions, $currentUserId) ||
-                    (-1 !== $filterUserId && $this->_userIsAllowed($n->id, $superuserOverridePermissions, $filterUserId));
-                }, function ($n) {
-                    return true;
+            $traversedNodeIds = [];
+            foreach ($nodesPermitted as $node) {
+                if (!in_array($node->id, $traversedNodeIds)) {
+                    $this->_traverseNodesAndApplyFunction(
+                        $nodesPermitted,
+                        $nodesPermitted[$node->id],
+                        false,
+                        function ($n) use ($superuserOverridePermissions, $currentUserId, $filterUserId) {
+                            $n->permitted = $this->_userIsAllowed($n->id, $superuserOverridePermissions, $currentUserId) ||
+                            (-1 !== $filterUserId && $this->_userIsAllowed($n->id, $superuserOverridePermissions, $filterUserId));
+                        },
+                        function ($n) {
+                            return true;
+                        }
+                    );
+                    $traversedNodeIds = array_merge($traversedNodeIds, $this->visitedNodeIds);
                 }
-            );
+            }
 
             $nodes = array_filter($nodes, function ($nodeId) use ($nodesPermitted) {
                 return $nodesPermitted[$nodeId]->permitted;

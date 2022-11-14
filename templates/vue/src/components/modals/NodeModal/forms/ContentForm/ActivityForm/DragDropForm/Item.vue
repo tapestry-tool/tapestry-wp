@@ -2,28 +2,36 @@
   <div class="item-container" :style="itemStyle">
     <b-form-group v-if="useImages">
       <file-upload
-        v-model="item.imageUrl"
+        :value="item.imageUrl"
         input-test-id="node-bucketitem-thumbnail-url"
         :show-url-upload="false"
         :show-image-preview="true"
         :compact-mode="true"
         file-types="image/*"
+        @input="
+          $emit('update-item', { id: item.id, property: 'imageUrl', value: $event })
+        "
         @isUploading="handleUploadChange"
       />
     </b-form-group>
     <b-input-group>
       <b-form-input
         ref="input"
-        v-model="item.text"
+        :value="item.text"
         placeholder="Enter item name"
         class="item-text"
+        @update="
+          $emit('update-item', { id: item.id, property: 'text', value: $event })
+        "
       ></b-form-input>
       <b-input-group-append>
         <b-input-group-text v-if="!useImages">
           <color-picker
             class="m-n1 mr-n3 item-background-color"
             :currentColor="item.color"
-            @change="item.color = $event"
+            @change="
+              $emit('update-item', { id: item.id, property: 'color', value: $event })
+            "
           />
         </b-input-group-text>
         <b-button

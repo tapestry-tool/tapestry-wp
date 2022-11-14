@@ -1,14 +1,17 @@
 <template>
   <div id="root-node-button">
-    <import-changelog :changes="changes" />
+    <import-changelog
+      :changes="changes"
+      :warnings="warnings"
+      :exportWarnings="exportWarnings"
+    />
     <div data-qa="root-node-button" @click="addRootNode">
       <i class="fas fa-plus-circle fa-5x"></i>
       <div>Add Root Node</div>
     </div>
     <p>Or</p>
-    <b-button class="import-button" @click="openFileBrowser">
+    <b-button class="import-button mx-1" @click="openFileBrowser">
       <b-spinner v-if="isImporting"></b-spinner>
-
       <div v-else>
         Import a Tapestry
       </div>
@@ -40,8 +43,8 @@
 <script>
 import { names } from "@/config/routes"
 import client from "@/services/TapestryAPI"
+import WordpressApi from "@/services/WordpressApi"
 import ImportChangelog from "./ImportChangelog"
-import { data as wpData } from "@/services/wp"
 
 export default {
   name: "root-node-button",
@@ -57,6 +60,8 @@ export default {
         noChange: true,
         permissions: new Set(),
       },
+      warnings: {},
+      exportWarnings: false,
     }
   },
   methods: {
@@ -88,17 +93,29 @@ export default {
       evt.preventDefault()
       evt.stopPropagation()
       const file = evt.dataTransfer.files[0]
-      if (!file.name.endsWith("json")) {
-        this.error = {
-          message: "Please upload a JSON file.",
-        }
-      } else {
-        this.importTapestry(file)
-      }
+      this.importTapestryFromFile(file)
     },
     handleFileChange() {
       const file = this.$refs.fileInput.files[0]
-      this.importTapestry(file)
+      this.importTapestryFromFile(file)
+    },
+    importTapestryFromFile(file) {
+      if (!file) return
+
+      switch (this.getFileExtension(file.name)) {
+        case "json":
+          this.error = null
+          this.importTapestry(file)
+          break
+        case "zip":
+          this.error = null
+          this.importTapestryFromZip(file)
+          break
+        default:
+          this.error = {
+            message: "Please upload a JSON file or a ZIP file.",
+          }
+      }
     },
     importTapestry(file) {
       const reader = new FileReader()
@@ -106,70 +123,68 @@ export default {
         this.error = ""
 
         this.isImporting = true
-        let upload
-        try {
-          upload = JSON.parse(e.target.result)
-          this.validateTapestryJSON(upload)
-        } catch (err) {
-          this.error = err
-          this.isImporting = false
-          return
-        }
-        if (!(upload["site-url"] == wpData.wpUrl)) {
-          await this.prepareImport(upload)
-        }
+        const upload = e.target.result
         client
           .importTapestry(upload)
-          .then(() => {
-            this.isImporting = false
-            this.$bvModal.show("import-changelog")
+          .then(response => {
+            if (response) {
+              this.changes.permissions = new Set(response.changes.permissions)
+              this.changes.noChange = response.changes.noChange
+              this.$bvModal.show("import-changelog")
+            }
           }) // TODO: Change this so a refresh isn't required
           .catch(err => {
             this.error = err
           })
+          .finally(() => {
+            this.isImporting = false
+          })
       }
       reader.readAsText(file)
     },
-    filterImportedPerms(permissions, wp_roles) {
-      let filteredPerms = permissions
-      filteredPerms = Object.keys(permissions)
-        // only keep roles that exist in the current site
-        .filter(key => wp_roles.has(key))
-        // create new permissiones object with filtered roles
-        .reduce((obj, key) => {
-          return {
-            ...obj,
-            [key]: permissions[key],
+    importTapestryFromZip(zipFile) {
+      this.error = ""
+      this.isImporting = true
+      client
+        .importTapestryFromZip(zipFile)
+        .then(response => {
+          if (response) {
+            this.changes.permissions = new Set(response.changes.permissions)
+            this.changes.noChange = response.changes.noChange
+            this.warnings = response.warnings
+            this.exportWarnings = response.exportWarnings
+
+            return response.rebuildH5PCache
+          } else {
+            return false
           }
-        }, {})
-      // if permissions modified, add the role to changes
-      for (let key in permissions) {
-        if (!Object.keys(filteredPerms).includes(key)) {
-          this.changes.permissions.add(key)
-          this.changes.noChange = false
-        }
-      }
-      return filteredPerms
+        })
+        .catch(err => {
+          this.error = err.response.data
+        })
+        .then(shouldRebuild => {
+          if (shouldRebuild) {
+            // The h5pMeta.details field is not generated for imported H5Ps
+            // If any H5Ps were added during import, we need to rebuild the H5P cache
+            return WordpressApi.rebuildAllH5PCache()
+          }
+        })
+        .catch(err => {
+          this.error = err
+        })
+        .then(() => {
+          if (!this.error) {
+            this.$bvModal.show("import-changelog")
+          }
+        })
+        .finally(() => {
+          this.isImporting = false
+        })
     },
-    async prepareImport(data) {
-      let wp_roles = await client.getAllRoles()
-      for (let node of data.nodes) {
-        node.permissions = this.filterImportedPerms(node.permissions, wp_roles)
-      }
-      if (data.settings) {
-        data.settings.defaultPermissions = this.filterImportedPerms(
-          data.settings.defaultPermissions,
-          wp_roles
-        )
-      }
-    },
-    validateTapestryJSON(upload) {
-      const properties = ["nodes", "links", "groups", "site-url"]
-      properties.forEach(property => {
-        if (!upload.hasOwnProperty(property)) {
-          throw new Error(`Invalid Tapestry JSON: Missing property ${property}`)
-        }
-      })
+    getFileExtension(fileName) {
+      // Get extension from file name
+      // See https://stackoverflow.com/a/12900504
+      return fileName.slice(((fileName.lastIndexOf(".") - 1) >>> 0) + 2)
     },
   },
 }

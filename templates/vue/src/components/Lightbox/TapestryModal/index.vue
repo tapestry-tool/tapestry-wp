@@ -28,7 +28,9 @@
             @clicked="editNode"
           />
         </div>
-        <slot></slot>
+        <div class="content-cutoff">
+          <slot></slot>
+        </div>
       </div>
     </transition>
   </div>
@@ -156,6 +158,12 @@ export default {
     box-shadow: 0 0 100px -40px #000;
     border-radius: 15px;
     height: 100%;
+
+    .content-cutoff {
+      position: relative;
+      height: 100%;
+      overflow: hidden;
+    }
 
     .buttons-container {
       position: absolute;

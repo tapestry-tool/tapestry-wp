@@ -3,7 +3,6 @@
 /**
  * Tapestry Endpoints.
  */
-require_once __DIR__.'/utilities/class.tapestry-permissions.php';
 require_once __DIR__.'/classes/class.tapestry.php';
 require_once __DIR__.'/classes/class.tapestry-node.php';
 require_once __DIR__.'/classes/class.tapestry-group.php';
@@ -11,8 +10,13 @@ require_once __DIR__.'/classes/class.tapestry-user-progress.php';
 require_once __DIR__.'/classes/class.tapestry-audio.php';
 require_once __DIR__.'/classes/class.tapestry-h5p.php';
 require_once __DIR__.'/classes/class.constants.php';
-require_once __DIR__ . '/endpoints/endpoints.circle-of-support.php';
+require_once __DIR__.'/utilities/class.tapestry-permissions.php';
 require_once __DIR__.'/utilities/class.tapestry-user.php';
+require_once __DIR__.'/utilities/class.tapestry-import-export.php';
+require_once __DIR__.'/utilities/class.tapestry-errors.php';
+require_once __DIR__.'/utilities/class.tapestry-helpers.php';
+require_once __DIR__.'/endpoints/endpoints.kaltura.php';
+require_once __DIR__.'/endpoints/endpoints.circle-of-support.php';
 
 $REST_API_NAMESPACE = 'tapestry-tool/v1';
 
@@ -70,6 +74,22 @@ $REST_API_ENDPOINTS = [
         'ARGUMENTS' => [
             'methods' => $REST_API_PUT_METHOD,
             'callback' => 'updateTapestrySettings',
+            'permission_callback' => 'TapestryPermissions::putTapestrySettings',
+        ],
+    ],
+    'GET_TAPESTRY_NOTIFICATIONS' => (object) [
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/notifications',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => 'getTapestryNotifications',
+            'permission_callback' => 'TapestryPermissions::putTapestrySettings',
+        ],
+    ],
+    'PUT_TAPESTRY_NOTIFICATIONS' => (object) [
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/notifications',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_PUT_METHOD,
+            'callback' => 'updateTapestryNotifications',
             'permission_callback' => 'TapestryPermissions::putTapestrySettings',
         ],
     ],
@@ -207,6 +227,13 @@ $REST_API_ENDPOINTS = [
             'callback' => 'completeQuestionById',
         ],
     ],
+    'GET_TAPESTRY_USER_ALL_ANSWERS' => (object) [
+        'ROUTE' => 'users/answers',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => 'getAllUsersAnswers',
+        ],
+    ],
     'GET_TAPESTRY_USER_H5P_SETTING' => (object) [
         'ROUTE' => 'users/h5psettings/(?P<tapestryPostId>[\d]+)',
         'ARGUMENTS' => [
@@ -307,18 +334,27 @@ $REST_API_ENDPOINTS = [
             'callback' => 'getTapestryContributors',
         ],
     ],
-    'GET_ALL_ROLES' => (object) [
-        'ROUTE' => '/roles',
-        'ARGUMENTS' => [
-            'methods' => $REST_API_GET_METHOD,
-            'callback' => 'get_all_user_roles',
-        ],
-    ],
     'GET_TAPESTRY_EXPORT' => (object) [
         'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/export',
         'ARGUMENTS' => [
             'methods' => $REST_API_GET_METHOD,
-            'callback' => 'exportTapestry',
+            'callback' => 'exportTapestryAsJson',
+            'permission_callback' => 'TapestryPermissions::putTapestrySettings',
+        ],
+    ],
+    'GET_TAPESTRY_EXPORT_ZIP' => (object) [
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/export_zip',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => 'exportTapestryAsZip',
+            'permission_callback' => 'TapestryPermissions::putTapestrySettings',
+        ],
+    ],
+    'IMPORT_ZIP' => (object) [
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/import_zip',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_POST_METHOD,     // Ideally PUT, but can only access the uploaded file in POST
+            'callback' => 'importTapestryFromZip',
             'permission_callback' => 'TapestryPermissions::putTapestrySettings',
         ],
     ],
@@ -332,6 +368,7 @@ $REST_API_ENDPOINTS = [
     ],
 ];
 
+$REST_API_ENDPOINTS = array_merge($REST_API_ENDPOINTS, KalturaEndpoints::getRoutes());
 $REST_API_ENDPOINTS = array_merge($REST_API_ENDPOINTS, CircleOfSupportEndpoints::getRoutes());
 
 /*
@@ -344,35 +381,147 @@ foreach ($REST_API_ENDPOINTS as $ENDPOINT) {
             register_rest_route(
                 $REST_API_NAMESPACE,
                 $ENDPOINT->ROUTE,
-                array_merge(array('permission_callback' => '__return_true') ,$ENDPOINT->ARGUMENTS)
+                array_merge(array('permission_callback' => '__return_true'), $ENDPOINT->ARGUMENTS)
             );
         }
     );
 }
 
-function exportTapestry($request)
+/**
+ * Export a Tapestry to JSON.
+ * Returns:
+ *  - A string ID identifying this export run
+ *  - The JSON data of the Tapestry
+ *  - The XML data of WordPress posts in the Tapestry, if any exist
+ */
+function exportTapestryAsJson($request)
 {
     $postId = $request['tapestryPostId'];
     try {
         if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
             throw new TapestryError('INVALID_POST_ID');
         }
+        // Create an ID to identify this export run
+        $export_id = TapestryImportExport::getExportId();
+
         $tapestry = new Tapestry($postId);
-        return $tapestry->export();
+        $tapestry_data = $tapestry->export();
+        
+        $result = ['json' => $tapestry_data, 'exportId' => $export_id];
+
+        return $result;
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
 }
 
-function get_all_user_roles($request)
+/**
+ * Export a Tapestry to a zip file.
+ * Returns:
+ *  - A string ID identifying this export run
+ *  - The URL of the zip file on the server
+ *  - A list of warnings generated during the zip export
+ *  - The XML data of WordPress posts in the Tapestry, if any exist
+ *
+ * @param object $request   HTTP request
+ */
+function exportTapestryAsZip($request)
 {
-    global $wp_roles;
-    
-    $roles = $wp_roles->roles;
-    
-    return $roles;
+    $postId = $request['tapestryPostId'];
+
+    try {
+        if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+
+        // Create an ID to identify this export run
+        $export_id = TapestryImportExport::getExportId();
+
+        // Export Tapestry to an object
+        $tapestry = new Tapestry($postId);
+        $tapestry_data = $tapestry->export();
+
+        // If the Tapestry contains WordPress posts, separately export them too
+        $wp_posts = TapestryImportExport::exportWpPostsInTapestry($tapestry_data, $export_id);
+
+        // Create zip file containing the Tapestry data as a JSON file,
+        // and all media referenced by the Tapestry data
+        $result = TapestryImportExport::exportExternalMedia($tapestry_data);
+        $result['exportId'] = $export_id;
+
+        if ($wp_posts) {
+            $result['wpPosts'] = $wp_posts;
+        }
+        return $result;
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
 }
-  
+
+/**
+ * Imports a Tapestry from an uploaded zip file.
+ *
+ * @param object $request   HTTP request (contains the zip file)
+ */
+function importTapestryFromZip($request)
+{
+    $postId = $request['tapestryPostId'];
+    $file_params = $request->get_file_params();
+
+    try {
+        if (!array_key_exists('file', $file_params)) {
+            throw new TapestryError('INVALID_ZIP', 'Could not find zip file');
+        }
+        $zip_path = $file_params['file']['tmp_name'];
+
+        $zip = new ZipArchive();
+        if ($zip->open($zip_path, ZipArchive::RDONLY) !== true) {
+            throw new TapestryError('FAILED_TO_IMPORT');
+        }
+
+        // Validate import file
+        $contents = $zip->getFromName('tapestry.json');
+        if ($contents === false) {
+            throw new TapestryError('INVALID_ZIP', 'Could not find tapestry.json in zip');
+        }
+        $tapestry_data = json_decode($contents);
+        TapestryImportExport::validateTapestryData($tapestry_data);
+        TapestryImportExport::validateTapestryZipStructure($zip);
+
+        $changes = TapestryImportExport::prepareImport($tapestry_data);
+
+        // Extract zip file to a temporary directory
+        $temp_dir = TapestryImportExport::createTempDirectory($parent_dir);
+        if (!$temp_dir) {
+            throw new TapestryError('FAILED_TO_IMPORT');
+        }
+        $zip->extractTo($temp_dir['path']);
+
+        // Re-create all media referenced by the Tapestry data on this site,
+        // and update references to new URLs
+        $importResult = TapestryImportExport::importExternalMedia($tapestry_data, $temp_dir['path'], $temp_dir['url']);
+
+        $importedTapestry = importTapestry($postId, $tapestry_data);
+
+        return [
+            'changes' => $changes,
+            'warnings' => $importResult['warnings'],
+            'rebuildH5PCache' => $importResult['rebuildH5PCache'],  // Whether the H5P cache needs rebuilding
+            'exportWarnings' => !empty($tapestry_data->warnings),   // Whether the provided file was exported with warnings
+            'tapestry' => $importedTapestry,                        // Data of imported Tapestry
+        ];
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    } finally {
+        // Clean up resources
+        if ($zip) {
+            $zip->close();
+        }
+        if ($temp_dir) {
+            TapestryImportExport::deleteTempDirectory($temp_dir['path']);
+        }
+    }
+}
 
 function login($request)
 {
@@ -476,7 +625,16 @@ function putTapestry($request)
     $postId = $request['tapestryPostId'];
     $tapestryData = json_decode($request->get_body());
     try {
-        return importTapestry($postId, $tapestryData);
+        TapestryImportExport::validateTapestryData($tapestryData);
+
+        $changes = TapestryImportExport::prepareImport($tapestryData);
+
+        $importedTapestry = importTapestry($postId, $tapestryData);
+
+        return [
+            'changes' => $changes,
+            'tapestry' => $importedTapestry,
+        ];
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
@@ -525,6 +683,14 @@ function importTapestry($postId, $tapestryData)
                 }
             }
 
+            if ($node->mediaType === 'answer') {
+                $oldActivityNodeId = $oldNode->typeData->activityId;
+                $node->typeData->activityId = $idMap->$oldActivityNodeId;
+            } elseif ($node->mediaType === 'wp-post') {
+                // We are requiring the user to import WordPress posts independently
+                // The post may have a different ID after import, so try to get the new post ID
+                TapestryImportExport::tryUpdateWpPostId($tapestryData->{'site-url'}, $node->typeData->mediaURL);
+            }
 
             $tapestryNode->set($node);
             $tapestryNode->save();
@@ -726,7 +892,7 @@ function reverseTapestryLink($request)
         if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
             throw new TapestryError('INVALID_POST_ID');
         }
-        if (!TapestryHelpers::userIsAllowed('ADD', $newLink->source, $postId) 
+        if (!TapestryHelpers::userIsAllowed('ADD', $newLink->source, $postId)
             || !TapestryHelpers::userIsAllowed('ADD', $newLink->target, $postId)) {
             throw new TapestryError('ADD_LINK_PERMISSION_DENIED');
         }
@@ -788,6 +954,53 @@ function updateTapestrySettings($request)
         $tapestry->set((object) ['settings' => $settings]);
 
         return $tapestry->save();
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+/**
+ * Get Tapestry notifications.
+ *
+ * @param object $request HTTP request
+ *
+ * @return object $response   HTTP response
+ */
+function getTapestryNotifications($request)
+{
+    $postId = $request['tapestryPostId'];
+    try {
+        if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+        $tapestry = new Tapestry($postId);
+        return $tapestry->getNotifications();
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+/**
+ * Update Tapestry notifications.
+ *
+ * @param object $request HTTP request
+ *
+ * @return object $response   HTTP response
+ */
+function updateTapestryNotifications($request)
+{
+    $postId = $request['tapestryPostId'];
+    $notifications = json_decode($request->get_body());
+    // TODO: JSON validations should happen here
+    try {
+        if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+        $tapestry = new Tapestry($postId);
+        $tapestry->set((object) ['notifications' => $notifications]);
+
+        $tapestry->save();
+        return true;
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
@@ -1084,7 +1297,7 @@ function optimizeTapestryNodeThumbnails($request)
             $node = $tapestry->getNode($nodeMetaId);
             $nodeData = $node->get();
             $protocol = is_ssl() ? "https:" : "http:";
-    
+
             if ($nodeData->imageURL) {
                 $urlPrepend = substr($nodeData->imageURL, 0, 4) === "http" ? "" : $protocol;
                 $attachmentId = TapestryHelpers::attachImageByURL($urlPrepend . $nodeData->imageURL);
@@ -1290,6 +1503,29 @@ function completeQuestionById($request)
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
 }
+
+/**
+ * Get all answers from all users for a question
+ * Example: /wp-json/tapestry-tool/v1/users/answers?post_id=44&node_id=3&question_id=abcd.
+ *
+ * @param object $request HTTP request
+ *
+ * @return object $response HTTP response
+ */
+function getAllUsersAnswers($request)
+{
+    $postId = $request['post_id'];
+    $nodeMetaId = $request['node_id'];
+
+    try {
+        $userProgress = new TapestryUserProgress($postId, $nodeMetaId);
+        return $userProgress->getAllUsersAnswers();
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+
 
 /**
  * Get user h5p video setting on a tapestry page by post id. Will need to pass these as query parameters
@@ -1529,7 +1765,7 @@ function getQuestionHasAnswers($request)
     $nodeMetaId = $request['nodeMetaId'];
     $questionId = $request['question_id'];
     $answerType = $request['answer_type'];
-    
+
     try {
         if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
             throw new TapestryError('INVALID_POST_ID');
@@ -1545,5 +1781,4 @@ function getQuestionHasAnswers($request)
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
-    
 }

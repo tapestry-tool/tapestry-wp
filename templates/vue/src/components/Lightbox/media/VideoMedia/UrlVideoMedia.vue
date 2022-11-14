@@ -3,7 +3,8 @@
     <video
       ref="video"
       controls
-      :src="node.typeData.mediaURL"
+      crossorigin="anonymous"
+      :autoplay="autoplay"
       :style="videoStyles"
       preload="metadata"
       @loadeddata="handleLoad"
@@ -12,12 +13,26 @@
       @seeked="handleSeek"
       @seeking="$emit('seeking')"
       @timeupdate="updateVideoProgress"
-    ></video>
+      @error="handleError"
+    >
+      <source type="video/mp4" :src="node.typeData.mediaURL" />
+      <track
+        v-for="caption in visibleCaptions"
+        :key="caption.id"
+        :default="caption.id === defaultCaptionId"
+        kind="captions"
+        :label="caption.label || caption.language"
+        :src="caption.captionUrl"
+        :srclang="getLanguageCode(caption.language)"
+      />
+    </video>
     <play-screen v-if="!videoPlaying" class="screen" @play="playVideo" />
   </div>
 </template>
 
 <script>
+import ISO6391 from "iso-639-1"
+import { mapMutations } from "vuex"
 import client from "@/services/TapestryAPI"
 import { SEEK_THRESHOLD } from "./video.config"
 import PlayScreen from "./PlayScreen"
@@ -55,6 +70,13 @@ export default {
     }
   },
   computed: {
+    visibleCaptions() {
+      const captions = this.node.typeData.captions ?? []
+      return captions.filter(c => c.displayOnPlayer)
+    },
+    defaultCaptionId() {
+      return this.node.typeData.defaultCaptionId
+    },
     videoStyles() {
       if (!this.videoDimensions) {
         return { width: "100%" }
@@ -94,6 +116,10 @@ export default {
     this.updateVideoProgress()
   },
   methods: {
+    ...mapMutations(["updateNode"]),
+    getLanguageCode(language) {
+      return ISO6391.getCode(language)
+    },
     playVideo() {
       const video = this.$refs.video
       if (video) {
@@ -147,6 +173,23 @@ export default {
         currentTime,
       })
     },
+    async handleError() {
+      // If an error occurs loading the video, first try to re-fetch the video URL from the backend
+      // Only alert user if this is unsuccessful
+      const fetchedNode = await client.getNode(this.node.id)
+      if (fetchedNode.typeData.mediaURL !== this.node.typeData.mediaURL) {
+        this.updateNode({
+          id: this.node.id,
+          newNode: fetchedNode,
+        })
+      } else if (
+        confirm(
+          "It seems this video cannot be loaded, would you like to refresh the page?"
+        )
+      ) {
+        location.reload()
+      }
+    },
     updateVideoProgress($event) {
       const video = $event?.srcElement || this.$refs.video
       if (video) {
@@ -158,14 +201,6 @@ export default {
           this.$emit("timeupdate", { amountViewed, currentTime })
         }
         this.lastTime = currentTime
-      }
-    },
-    mounted() {
-      const video = this.$refs.video
-      if (this.autoplay) {
-        video.play()
-      } else {
-        video.pause()
       }
     },
   },

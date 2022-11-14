@@ -48,16 +48,12 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex"
+import { mapGetters, mapState } from "vuex"
 import { names } from "@/config/routes"
 
 export default {
   name: "sub-item-table",
   props: {
-    node: {
-      type: Object,
-      required: true,
-    },
     actionType: {
       type: String,
       required: true,
@@ -69,11 +65,14 @@ export default {
     },
   },
   computed: {
+    ...mapState({
+      node: "currentEditingNode",
+    }),
     ...mapGetters(["getNode", "getDirectChildren"]),
     requiresSaving() {
-      // Require saving if node is changing from non-multi-content to multi-content
+      // Require saving if node is changing from non-multi-content / non-video to multi-content / video
       const node = this.getNode(this.node.id)
-      return this.actionType === "add" || node.mediaType !== "multi-content"
+      return this.actionType === "add" || node.mediaType !== this.node.mediaType
     },
     buttonContainerStyle() {
       return this.subItemNodes.length > 0 ? "margin-top: 20px" : ""
@@ -86,10 +85,14 @@ export default {
   },
   methods: {
     addSubitem() {
+      let newQuery = { ...this.$route.query, nav: "modal" }
+      if (this.isPopups) {
+        newQuery.popup = 1
+      }
       this.$router.push({
         name: names.MODAL,
         params: { nodeId: this.node.id, type: "add", tab: "content" },
-        query: { ...this.$route.query, nav: "modal" },
+        query: newQuery,
       })
     },
     handleEdit(nodeId) {

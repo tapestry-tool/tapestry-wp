@@ -7,7 +7,7 @@ require_once dirname(__FILE__).'/class.tapestry-node-permissions.php';
  */
 class TapestryHelpers
 {
-    const POST_TYPES = [
+    public const POST_TYPES = [
         'TAPESTRY' => 'tapestry',
         'TAPESTRY_NODE' => 'tapestry_node',
     ];
@@ -165,8 +165,6 @@ class TapestryHelpers
         }
 
         // not an image in our gallery. let's upload it.
-        include_once(ABSPATH . 'wp-admin/includes/image.php');
-
         $imagetype = end(explode('/', getimagesize($imageURL)['mime']));
         $uniq_name = date('dmY').''.(int) microtime(true);
         $filename = $uniq_name.'.'.$imagetype;
@@ -178,7 +176,21 @@ class TapestryHelpers
         fwrite($savefile, $contents);
         fclose($savefile);
 
-        $wp_filetype = wp_check_filetype(basename($filename), null);
+        return self::createAttachment($uploadfile, true);
+    }
+
+    /**
+     * Add a media item (image, video) as a WordPress attachment.
+     *
+     * @param string $filepath          Filepath of the file to add.
+     * @param bool $generate_metadata   If true, also generates metadata and image sub-sizes.
+     */
+    public static function createAttachment($filepath, $generate_metadata = false)
+    {
+        include_once(ABSPATH . 'wp-admin/includes/image.php');
+
+        $filename = basename($filepath);
+        $wp_filetype = wp_check_filetype($filename, null);
         $attachment = array(
             'post_mime_type' => $wp_filetype['type'],
             'post_title' => $filename,
@@ -186,11 +198,14 @@ class TapestryHelpers
             'post_status' => 'inherit'
         );
 
-        $attachment_id = wp_insert_attachment($attachment, $uploadfile);
-        $imagenew = get_post($attachment_id);
-        $fullsizepath = get_attached_file($imagenew->ID);
-        $attach_data = wp_generate_attachment_metadata($attachment_id, $fullsizepath);
-        wp_update_attachment_metadata($attachment_id, $attach_data);
+        $attachment_id = wp_insert_attachment($attachment, $filepath);
+
+        if ($generate_metadata) {
+            $imagenew = get_post($attachment_id);
+            $fullsizepath = get_attached_file($imagenew->ID);
+            $attach_data = wp_generate_attachment_metadata($attachment_id, $fullsizepath);
+            wp_update_attachment_metadata($attachment_id, $attach_data);
+        }
 
         return $attachment_id;
     }
@@ -208,7 +223,7 @@ class TapestryHelpers
     {
         $options = TapestryNodePermissions::getNodePermissions();
         $nodePostId = get_metadata_by_mid('post', $nodeMetaId)->meta_value->post_id;
-       
+
         $tapestry = new Tapestry($tapestryPostId);
         $node = $tapestry->getNode($nodeMetaId);
 
@@ -306,5 +321,82 @@ class TapestryHelpers
             }
         }
         return false;
+    }
+
+    /**
+     * Get the file path of a local WordPress upload by its URL.
+     *
+     * @param string $url
+     * @return object|null     Returns null if the URL is not a local upload.
+     */
+    public static function getPathToMedia($url)
+    {
+        if (!self::isLocalUpload($url)) {
+            return null;
+        }
+
+        $upload_folder = wp_upload_dir()['basedir'];
+        $upload_folder_url = wp_upload_dir()['baseurl'];
+
+        $file_obj = new stdClass();
+        $file_obj->file_path = substr_replace($url, $upload_folder, 0, strlen($upload_folder_url));
+        $file_obj->name = pathinfo($url, PATHINFO_BASENAME);
+        $file_obj->extension = pathinfo($url, PATHINFO_EXTENSION);
+
+        return $file_obj;
+    }
+
+    /**
+     * Checks if a video can be uploaded to Kaltura.
+     * Only videos added via upload to WordPress can be transferred to Kaltura.
+     *
+     * @param TapestryNode  $node
+     * @return bool
+     */
+    public static function videoCanBeUploaded($node)
+    {
+        $nodeMeta = $node->getMeta();
+        $nodeTypeData = $node->getTypeData();
+        return $nodeMeta->mediaType == "video" && self::isLocalUpload($node->getTypeData()->mediaURL);
+    }
+
+    /**
+     * Checks if a URL represents a local upload (a file in the WordPress upload directory).
+     * Only checks the URL form, not that the file actually exists.
+     */
+    public static function isLocalUpload($url)
+    {
+        $upload_dir_url = wp_upload_dir()['baseurl'];
+        return substr($url, 0, strlen($upload_dir_url)) === $upload_dir_url;
+    }
+
+    // Get the actual file size for large files.
+    // https://www.php.net/manual/en/function.filesize.php#113457
+    public static function getRealFileSize($path)
+    {
+        $fp = fopen($path, 'r');
+
+        $pos = 0;
+        $size = 1073741824;
+        fseek($fp, 0, SEEK_SET);
+        while ($size > 1) {
+            fseek($fp, $size, SEEK_CUR);
+
+            if (fgetc($fp) === false) {
+                fseek($fp, -$size, SEEK_CUR);
+                $size = (int)($size / 2);
+            } else {
+                fseek($fp, -1, SEEK_CUR);
+                $pos += $size;
+            }
+        }
+
+        while (fgetc($fp) !== false) {
+            $pos++;
+        }
+
+        fclose($fp);
+
+        return $pos;
     }
 }

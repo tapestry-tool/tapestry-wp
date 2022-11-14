@@ -1,20 +1,39 @@
 <?php
 
-require_once __DIR__.'/classes/class.tapestry-analytics.php';
-
 /**
  * Plugin Name: Tapestry
  * Plugin URI: https://www.tapestry-tool.com
  * Description: Custom post type - Tapestry
- * Version: 2.54.0-beta
- * Author: Tapestry Team, University of British Coloumbia.
+ * Version: 2.56.0-beta
+ * Author: Tapestry Team, University of British Columbia.
  */
 
-// Used to force-refresh assets
-$TAPESTRY_VERSION_NUMBER = '2.54.0-beta';
+// Used to force-refresh assets and run updates
+$TAPESTRY_VERSION_NUMBER = '2.56.0-beta';
 
-// Set this to false if you want to use the Vue build instead of npm dev
-$TAPESTRY_USE_DEV_MODE = true;
+// Record whether user has specified site-specific Kaltura configuration variables
+define(
+    'KALTURA_OVERRIDE_CONFIG',
+    !empty(get_option('kaltura_admin_secret')) &&
+    !empty(get_option('kaltura_partner_id')) &&
+    !empty(get_option('kaltura_service_url')) &&
+    !empty(get_option('kaltura_unique_config'))
+);
+
+// Record whether Kaltura configuration variables are defined in wp-config.php
+define(
+    'KALTURA_DEFAULT_CONFIG',
+    (defined('KALTURA_ADMIN_SECRET') && !empty(KALTURA_ADMIN_SECRET)) &&
+    (defined('KALTURA_PARTNER_ID') && !empty(KALTURA_PARTNER_ID)) &&
+    (defined('KALTURA_SERVICE_URL') && !empty(KALTURA_SERVICE_URL)) &&
+    (defined('KALTURA_UNIQUE_CONFIG') && !empty(KALTURA_UNIQUE_CONFIG))
+);
+
+define(
+    'LOAD_KALTURA',
+    file_exists(plugin_dir_path(__FILE__) . 'vendor/autoload.php') &&
+    (KALTURA_OVERRIDE_CONFIG || KALTURA_DEFAULT_CONFIG)
+);
 
 // TYDE settings
 $TYDE_YOUTH_ROLES = [
@@ -31,11 +50,14 @@ $TYDE_DYAD_ROLES = [
 error_reporting(E_ERROR | E_PARSE);
 
 /**
- * Register endpoints.
+ * Register endpoints and perform other includes
  */
+require_once dirname(__FILE__).'/classes/class.tapestry-analytics.php';
+require_once dirname(__FILE__).'/classes/class.kaltura-api.php';
 require_once dirname(__FILE__).'/endpoints.php';
 require_once dirname(__FILE__).'/settings.php';
 require_once dirname(__FILE__).'/plugin-updates.php';
+require_once dirname(__FILE__).'/utilities/class.tapestry-import-export.php';
 
 /**
  * Register Tapestry type on initialization.
@@ -144,7 +166,6 @@ function tapestry_enqueue_vue_app()
     global $post;
     if ('tapestry' == get_post_type($post) && !post_password_required($post)) {
         global $TAPESTRY_VERSION_NUMBER;
-        global $TAPESTRY_USE_DEV_MODE;
 
         global $TYDE_DYAD_ROLES;
         $isDyad = wp_get_current_user() && array_intersect(wp_get_current_user()->roles, array_keys($TYDE_DYAD_ROLES));
@@ -156,7 +177,7 @@ function tapestry_enqueue_vue_app()
             }
         }
 
-        $use_dev = $TAPESTRY_USE_DEV_MODE || isset($_GET['debug']);
+        $use_dev = (defined('TAPESTRY_USE_DEV_MODE') && !empty(TAPESTRY_USE_DEV_MODE)) || isset($_GET['debug']);
 
         // register the Vue build script.
         $vueUrl = $use_dev ? 'http://localhost:8080/dist' : plugin_dir_url(__FILE__).'templates/vue/dist';
@@ -172,6 +193,11 @@ function tapestry_enqueue_vue_app()
         // make custom data available to the Vue app with wp_localize_script.
         global $post;
         global $wp_roles;
+
+        // pass Kaltura account variables to frontend; will be null if LOAD_KALTURA is false
+        $kaltura_partner_id = KalturaApi::getKalturaPartnerId();
+        $kaltura_service_url = KalturaApi::getKalturaServiceUrl();
+        $kaltura_unique_configuration = KalturaApi::getKalturaUniqueConfig();
 
         $currentUser = wp_get_current_user();
         $currentUser->data = (object) [
@@ -206,6 +232,12 @@ function tapestry_enqueue_vue_app()
                 'wpCanEditTapestry' => current_user_can('edit_post', get_the_ID()),
                 'currentUser' => $currentUser,
                 'uploadDirArray' => wp_upload_dir(),
+                'kaltura' => array(
+                    'kalturaStatus' => LOAD_KALTURA,
+                    'partnerId' => $kaltura_partner_id,
+                    'serviceUrl' => $kaltura_service_url,
+                    'uniqueConfiguration' => $kaltura_unique_configuration,
+                ),
             ]
         );
 
@@ -335,6 +367,19 @@ function prefix_title_entity_decode($response)
     return $response;
 }
 
+// Set the extension and mime type for .vtt files so Wordpress allows their upload
+
+add_filter('wp_check_filetype_and_ext', 'wpse_file_and_ext', 10, 4);
+function wpse_file_and_ext($types, $file, $filename, $mimes)
+{
+    if (false !== strpos($filename, '.vtt')) {
+        $types['ext'] = 'vtt';
+        $types['type'] = 'text/vtt';
+    }
+
+    return $types;
+}
+
 // Analytics
 
 register_activation_hook(__FILE__, 'create_tapestry_analytics_schema');
@@ -352,6 +397,28 @@ function tapestry_tool_log_event()
     $analytics->log($_POST);
 
     wp_die();
+}
+
+// Cleanup
+
+add_action('tapestry_clean_export_files', 'clean_export_files');
+function clean_export_files()
+{
+    TapestryImportExport::clearExportedZips();
+}
+
+register_activation_hook(__FILE__, 'schedule_tapestry_export_file_cleanup');
+function schedule_tapestry_export_file_cleanup()
+{
+    if (! wp_next_scheduled('tapestry_clean_export_files')) {
+        wp_schedule_event(time(), 'daily', 'tapestry_clean_export_files');
+    }
+}
+
+register_deactivation_hook(__FILE__, 'unschedule_tapestry_export_file_cleanup');
+function unschedule_tapestry_export_file_cleanup()
+{
+    wp_clear_scheduled_hook('tapestry_clean_export_files');
 }
 
 // TYDE Roles

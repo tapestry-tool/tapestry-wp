@@ -8,54 +8,11 @@ describe("User Settings", () => {
     cy.getByTestId("user-settings-button").click({ force: true })
 
     cy.contains(/light mode/i).click({ force: true })
-    cy.contains(/save theme/i).click({ force: true })
+    cy.contains(/save/i).click({ force: true })
 
     cy.getByTestId("user-settings-button").click({ force: true })
 
     cy.contains(/dark mode/i).click({ force: true })
-    cy.contains(/save theme/i).click({ force: true })
-  })
-
-  // TODO: Fix this test
-  it.skip(`should be able to save and edit an Avatar`, () => {
-    cy.store()
-      .its("state.avatar")
-      .then(avatar => {
-        if (Object.keys(avatar).length === 0) {
-          cy.get(`[aria-label="Close"]`).click()
-        }
-        cy.getByTestId("user-settings-button").click({ force: true })
-        cy.get(`[class="modal-body p-0"]`).as("scrollbar")
-        cy.get("@scrollbar").scrollTo("bottom")
-        cy.getByTestId("avatar-background-select").should("be.visible")
-        cy.getByTestId("avatar-background-select").select("Transparent")
-        cy.contains(/face/i).click()
-        cy.get("@scrollbar").scrollTo("bottom")
-        cy.getByTestId("avatar-eyebrow-select").should("be.visible")
-        cy.getByTestId("avatar-eyebrow-select").select("UpDown")
-        cy.contains(/hair/i).click()
-        cy.get("@scrollbar").scrollTo(0, 500)
-        cy.getByTestId("avatar-hair-select").should("be.visible")
-        cy.getByTestId("avatar-hair-select").select("LongHairBigHair")
-        cy.contains(/clothing/i).click()
-        cy.get("@scrollbar").scrollTo("bottom")
-        cy.getByTestId("avatar-glasses-select").should("be.visible")
-        cy.getByTestId("avatar-glasses-select").select("Wayfarers")
-        cy.get("@scrollbar").scrollTo("bottom")
-        cy.contains(/save avatar/i).click()
-
-        cy.getByTestId("user-settings-button").click({ force: true })
-        cy.get("@scrollbar").scrollTo("bottom")
-        cy.contains("Transparent").should("be.visible")
-        cy.contains(/face/i).click()
-        cy.get("@scrollbar").scrollTo("bottom")
-        cy.contains("UpDown").should("be.visible")
-        cy.contains(/hair/i).click()
-        cy.contains("LongHairBigHair").should("be.visible")
-        cy.contains(/clothing/i).click()
-        cy.get("@scrollbar").scrollTo("bottom")
-        cy.contains("Wayfarers").should("be.visible")
-        cy.get(`[aria-label="Close"]`).click()
-      })
+    cy.contains(/save/i).click({ force: true })
   })
 })

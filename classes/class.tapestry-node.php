@@ -48,6 +48,7 @@ class TapestryNode implements ITapestryNode
     private $mapCoordinates;
     private $isDyad;
     private $popup;
+    private $hideWhenLocked;
 
     /**
      * Constructor.
@@ -101,6 +102,7 @@ class TapestryNode implements ITapestryNode
         ];
         $this->isDyad = false;
         $this->popup = null;
+        $this->hideWhenLocked = false;
 
         if (TapestryHelpers::isValidTapestryNode($this->nodeMetaId)) {
             $node = $this->_loadFromDatabase();
@@ -157,7 +159,6 @@ class TapestryNode implements ITapestryNode
         }
         if (isset($node->thumbnailFileId) && (is_numeric($node->thumbnailFileId) || is_string($node->thumbnailFileId))) {
             if (is_string($node->thumbnailFileId) && '' == $node->thumbnailFileId) {
-                $this->imageURL = '';
                 $this->thumbnailFileId = '';
             } else {
                 $this->thumbnailFileId = $node->thumbnailFileId;
@@ -173,7 +174,6 @@ class TapestryNode implements ITapestryNode
         }
         if (isset($node->lockedThumbnailFileId) && (is_numeric($node->lockedThumbnailFileId) || is_string($node->lockedThumbnailFileId))) {
             if (is_string($node->lockedThumbnailFileId) && '' == $node->lockedThumbnailFileId) {
-                $this->lockedImageURL = '';
                 $this->lockedThumbnailFileId = '';
             } else {
                 $this->lockedThumbnailFileId = $node->lockedThumbnailFileId;
@@ -252,6 +252,9 @@ class TapestryNode implements ITapestryNode
         }
         if (property_exists($node, 'popup')) {
             $this->popup = $node->popup;
+        }
+        if (isset($node->hideWhenLocked) && is_bool($node->hideWhenLocked)) {
+            $this->hideWhenLocked = $node->hideWhenLocked;
         }
     }
 
@@ -442,6 +445,26 @@ class TapestryNode implements ITapestryNode
         ];
     }
 
+    public function getMediaType()
+    {
+        return $this->mediaType;
+    }
+
+    public function getNodeId()
+    {
+        return $this->nodeMetaId;
+    }
+
+    public function getTypeData()
+    {
+        return $this->typeData;
+    }
+
+    public function getTitle()
+    {
+        return $this->title;
+    }
+
     private function _validateComment($review)
     {
         $canEditTapestry = current_user_can('edit_post', $this->tapestryPostId);
@@ -603,6 +626,7 @@ class TapestryNode implements ITapestryNode
             'mapCoordinates' => $this->mapCoordinates,
             'isDyad' => $this->isDyad,
             'popup' => $this->popup,
+            'hideWhenLocked' => $this->hideWhenLocked,
         ];
     }
 
@@ -658,14 +682,16 @@ class TapestryNode implements ITapestryNode
             $id = 1;
         }
         $user = get_user_by('id', $id);
-        if ($user) {
-            return (object) [
-                'id' => $id,
-                'name' => $user->display_name,
-                'email' => $user->user_email,
-                'original_author_name' => '',
-                'original_author_email' => '',
-            ];
+        if (!$user) {
+            $user = get_user_by('id', 1);
         }
+
+        return (object) [
+            'id' => $id,
+            'name' => $user->display_name,
+            'email' => $user->user_email,
+            'original_author_name' => '',
+            'original_author_email' => '',
+        ];
     }
 }

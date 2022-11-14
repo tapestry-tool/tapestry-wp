@@ -36,19 +36,12 @@ export default class Helpers {
   }
 
   /**
-   * Finds the node index with node ID
+   * Check if user is on a touch enabled device
    *
-   * @param  {Number} id          nodeMetaId
-   * @param  {Object} tapestry    tapestry
-   *
-   * @return {Number}
+   * @returns {Boolean}
    */
-  static findNodeIndex(id, tapestry) {
-    function helper(obj) {
-      return obj.id == id
-    }
-
-    return tapestry.nodes.findIndex(helper)
+  static isTouchEnabledDevice() {
+    return "ontouchstart" in window || navigator.maxTouchPoints > 0
   }
 
   static getAspectRatio() {
@@ -144,16 +137,18 @@ export default class Helpers {
    * Reference: https://stackoverflow.com/questions/25456013/javascript-deepequal-comparison/25456134
    * @param {Object} src
    * @param {Object} other
+   * @param {Object} customCompareProps
    * @param {Array} ignoreProps
    */
-  static nodeEqual(src, other, ignoreProps = []) {
+  static nodeEqual(src, other, customCompareProps = {}, ignoreProps = []) {
     if (src === other) {
       return true
     } else if (Array.isArray(src) && Array.isArray(other)) {
       if (src.length !== other.length) return false
 
       for (let i = 0; i < src.length; i++) {
-        if (!Helpers.nodeEqual(src[i], other[i])) return false
+        if (!Helpers.nodeEqual(src[i], other[i], customCompareProps, ignoreProps))
+          return false
       }
     } else if (
       typeof src == "object" &&
@@ -164,7 +159,18 @@ export default class Helpers {
       for (let prop in src) {
         if (ignoreProps.includes(prop)) continue
         if (other.hasOwnProperty(prop)) {
-          if (!Helpers.nodeEqual(src[prop], other[prop])) {
+          if (prop in customCompareProps) {
+            if (!customCompareProps[prop](src[prop], other[prop])) {
+              return false
+            }
+          } else if (
+            !Helpers.nodeEqual(
+              src[prop],
+              other[prop],
+              customCompareProps,
+              ignoreProps
+            )
+          ) {
             return false
           }
         } else {
@@ -230,7 +236,7 @@ export default class Helpers {
           return true
         }
       }
-      if (wp.isCurrentUser(node.author.id)) {
+      if (node.author && wp.isCurrentUser(node.author.id)) {
         return action === userActions.READ || node.reviewStatus !== nodeStatus.SUBMIT
       }
       if (wp.canEditTapestry()) {
@@ -291,6 +297,13 @@ export default class Helpers {
     }
 
     return false
+  }
+
+  static hasKalturaUploadPermission() {
+    const { roles } = wp.getCurrentUser()
+    const allowedRole = "administrator"
+
+    return roles.includes(allowedRole)
   }
 
   /**
@@ -374,6 +387,7 @@ export default class Helpers {
       hideTitle: false,
       hideProgress: false,
       hideMedia: false,
+      hideWhenLocked: false,
       backgroundColor: "#8396a1",
       textColor: "white",
       skippable: true,
@@ -383,7 +397,6 @@ export default class Helpers {
         y: 3000,
       },
       childOrdering: [],
-      license: "",
       references: "",
       unlocked: true,
       accessible: true,

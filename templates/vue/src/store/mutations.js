@@ -180,6 +180,7 @@ export function setReturnRoute(state, route) {
   state.returnRoute = route
 }
 
+<<<<<<< HEAD
 // TYDE
 
 export function addAvatar(state, newAvatar) {
@@ -188,4 +189,37 @@ export function addAvatar(state, newAvatar) {
 
 export function addCos(state, cos) {
   state.cos = cos
+=======
+export function setCurrentEditingNode(state, node) {
+  state.currentEditingNode = node
+}
+
+export function setCurrentEditingNodeProperty(state, { property, value }) {
+  if (state.currentEditingNode) {
+    const deep = property.includes(".")
+    if (deep) {
+      let anchor = state.currentEditingNode
+      const path = property.split(".")
+      const lastKey = path.pop()
+      for (const key of path) {
+        anchor = anchor[key]
+      }
+      if (!anchor.hasOwnProperty(lastKey)) {
+        Vue.set(anchor, lastKey, value) // for triggering view re-renders
+      } else {
+        anchor[lastKey] = value
+      }
+    } else {
+      if (!state.currentEditingNode.hasOwnProperty(property)) {
+        Vue.set(state.currentEditingNode, property, value) // for triggering view re-renders
+      } else {
+        state.currentEditingNode[property] = value
+      }
+    }
+  }
+}
+
+export function setNotifications(state, notifications) {
+  state.notifications = notifications
+>>>>>>> 1277-kaltura-fixes
 }

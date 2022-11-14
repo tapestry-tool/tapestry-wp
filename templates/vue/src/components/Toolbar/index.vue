@@ -19,8 +19,16 @@
             <b-col v-if="canEdit && settings.submitNodesEnabled" class="p-0">
               <review-notifications />
             </b-col>
+            <b-col v-if="isAdmin" class="p-0">
+              <user-answers-button
+                data-qa="user-answers-button"
+              ></user-answers-button>
+            </b-col>
             <b-col v-if="canEdit" class="p-0">
               <settings-modal-button :max-depth="maxDepth"></settings-modal-button>
+            </b-col>
+            <b-col v-if="canEdit" class="p-0">
+              <operations-button />
             </b-col>
           </template>
           <tapestry-depth-slider
@@ -39,11 +47,13 @@
 import { mapMutations, mapState } from "vuex"
 import TapestryDepthSlider from "./TapestryDepthSlider"
 import SettingsModalButton from "./SettingsModalButton"
+import UserAnswersButton from "./UserAnswersButton"
 import UserSettingsButton from "./UserSettingsButton"
 import TapestryFilter from "./TapestryFilter"
 import ReviewNotifications from "./ReviewNotifications"
 import HelpButton from "./HelpButton"
-import { isLoggedIn, canEditTapestry } from "@/services/wp"
+import { isLoggedIn, canEditTapestry, getCurrentUser } from "@/services/wp"
+import OperationsButton from "./OperationsButton"
 
 export default {
   components: {
@@ -53,6 +63,8 @@ export default {
     ReviewNotifications,
     UserSettingsButton,
     HelpButton,
+    OperationsButton,
+    UserAnswersButton,
   },
   data() {
     return {
@@ -63,6 +75,10 @@ export default {
     ...mapState(["nodes", "links", "selection", "settings", "rootId"]),
     canEdit() {
       return canEditTapestry()
+    },
+    isAdmin() {
+      const currentUser = getCurrentUser()
+      return currentUser.roles && currentUser.roles.includes("administrator")
     },
     hasDepth() {
       return this.maxDepth > 1 && this.settings.defaultDepth > 0

@@ -1,52 +1,85 @@
 <template>
-  <div
-    ref="container"
-    class="media-container"
-    :style="navBarStyle"
-    data-qa="multi-content"
-  >
-    <header>
-      <h1
-        v-if="showTitle"
-        :class="{
-          title: true,
-          'nested-media-title': context === 'multi-content',
-        }"
-      >
-        {{ node.title }}
-        <completed-icon :node="node" class="mx-2" />
-      </h1>
-    </header>
-    <multi-content-rows
-      v-if="node.presentationStyle"
-      :dimensions="dimensions"
-      :node="node"
-      :rowId="rowId"
-      :context="context"
-      :level="level"
-      @load="$emit('load')"
-      @change-row="changeRow"
-      @complete="complete"
-    />
-    <tapestry-modal
-      v-if="showCompletion"
-      :node-id="node.id"
-      :allow-close="false"
-      @close="handleCancel"
+  <div class="multicontent-media-container">
+    <div
+      ref="container"
+      class="media-container"
+      :style="navBarStyle"
+      data-qa="multi-content"
     >
-      <h1>{{ node.typeData.confirmationTitleText }}</h1>
-      <p>{{ node.typeData.confirmationBodyText }}</p>
-      <div class="button-container">
-        <button class="button-completion" @click="handleClose">
-          <i class="far fa-arrow-alt-circle-right fa-4x"></i>
-          <p>{{ node.typeData.continueButtonText }}</p>
-        </button>
-        <button class="button-completion" @click="handleCancel">
-          <i class="far fa-times-circle fa-4x"></i>
-          <p>{{ node.typeData.cancelLinkText }}</p>
-        </button>
-      </div>
-    </tapestry-modal>
+      <header>
+        <h1
+          v-if="showTitle"
+          :class="{
+            title: true,
+            'nested-media-title': context === 'multi-content',
+          }"
+        >
+          {{ node.title }}
+          <completed-icon :node="node" class="mx-2" />
+        </h1>
+      </header>
+      <template v-if="node.presentationStyle">
+        <div v-if="node.presentationStyle === 'unit'">
+          There's currently no content here.
+        </div>
+        <template v-else>
+          <div v-if="!node.accessible">
+            <locked-content :node="node"></locked-content>
+          </div>
+          <multi-content-rows
+            v-else
+            :dimensions="dimensions"
+            :node="node"
+            :rowId="rowId"
+            :context="context"
+            :level="level"
+            @load="$emit('load')"
+            @change-row="changeRow"
+            @complete="complete"
+          />
+          <div v-if="isUnitChild && pageIndex !== -1" class="unit-navigation">
+            <button :disabled="pageIndex === 0" @click="prevPage">
+              <i class="fas fa-chevron-left" />
+              <div>Previous</div>
+            </button>
+            <button
+              :disabled="pageIndex === filteredPages.length - 1"
+              @click="nextPage"
+            >
+              <div>Next</div>
+              <i class="fas fa-chevron-right" />
+            </button>
+          </div>
+        </template>
+      </template>
+      <tapestry-modal
+        v-if="showCompletion"
+        :node-id="node.id"
+        :allow-close="false"
+        @close="handleCancel"
+      >
+        <h1>{{ node.typeData.confirmationTitleText }}</h1>
+        <p>{{ node.typeData.confirmationBodyText }}</p>
+        <div class="button-container">
+          <button class="button-completion" @click="handleClose">
+            <i class="far fa-arrow-alt-circle-right fa-4x"></i>
+            <p>{{ node.typeData.continueButtonText }}</p>
+          </button>
+          <button class="button-completion" @click="handleCancel">
+            <i class="far fa-times-circle fa-4x"></i>
+            <p>{{ node.typeData.cancelLinkText }}</p>
+          </button>
+        </div>
+      </tapestry-modal>
+    </div>
+    <page-menu
+      v-if="showPageMenu"
+      :node="node"
+      :dimensions="menuDimensions"
+      :pages="filteredPages"
+      :active-page-index="pageIndex"
+      @change-page="changePage"
+    ></page-menu>
   </div>
 </template>
 
@@ -54,6 +87,8 @@
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex"
 import client from "@/services/TapestryAPI"
 import CompletedIcon from "@/components/common/CompletedIcon"
+import LockedContent from "./common/LockedContent"
+import PageMenu from "./PageMenu"
 import TapestryModal from "../../TapestryModal"
 import MultiContentRows from "./MultiContentRows"
 import { names } from "@/config/routes"
@@ -62,6 +97,8 @@ export default {
   name: "multi-content-media",
   components: {
     CompletedIcon,
+    LockedContent,
+    PageMenu,
     TapestryModal,
     MultiContentRows,
   },
@@ -90,6 +127,11 @@ export default {
       required: false,
       default: false,
     },
+    menuDimensions: {
+      type: Object,
+      required: false,
+      default: null,
+    },
   },
   data() {
     return {
@@ -97,6 +139,7 @@ export default {
       showCompletion: false,
       isMounted: false,
       navBarStyle: {},
+      pages: false,
     }
   },
   computed: {
@@ -108,6 +151,20 @@ export default {
       "isMultiContent",
     ]),
     ...mapState(["favourites", "rootId"]),
+    parentNode() {
+      const parentNodeId = this.getParent(this.node.id)
+      return this.getNode(parentNodeId)
+    },
+    filteredPages() {
+      return this.pages
+        ? this.pages.filter(page => page.unlocked || !page.hideWhenLocked)
+        : false
+    },
+    pageIndex() {
+      return this.filteredPages
+        ? this.filteredPages.findIndex(page => page.id === this.node.id)
+        : -1
+    },
     rows() {
       return this.node.childOrdering.map(id => {
         const node = this.getNode(id)
@@ -140,10 +197,37 @@ export default {
         (this.level == 0 || this.node.typeData.showTitle !== false)
       )
     },
+    isUnitChild() {
+      return (
+        this.parentNode &&
+        this.parentNode.mediaType === "multi-content" &&
+        this.parentNode.presentationStyle === "unit"
+      )
+    },
+    showPageMenu() {
+      if (this.context !== "lightbox") {
+        return false
+      }
+      if (
+        this.node.mediaType === "multi-content" &&
+        this.node.presentationStyle === "page" &&
+        this.node.typeData.showNavBar
+      ) {
+        return true
+      }
+      return this.isUnitChild && this.parentNode.childOrdering.length > 1
+    },
+  },
+  watch: {
+    parentNode() {
+      this.updatePages()
+    },
   },
   mounted() {
     this.isMounted = true
     this.activeIndex = this.node.presentationStyle === "page" ? -1 : 0
+
+    this.updatePages()
 
     // if all children are completed, mark this as completed too
     // this is just in case it hasn't done this properly before
@@ -173,6 +257,23 @@ export default {
         }
       )
       this.showCompletion = false
+    },
+    updatePages() {
+      this.pages = this.isUnitChild
+        ? this.parentNode.childOrdering.map(this.getNode)
+        : false
+    },
+    changePage(pageNodeId) {
+      this.$root.$emit("open-node", pageNodeId)
+    },
+    prevPage() {
+      this.pageIndex > 0 &&
+        this.changePage(this.filteredPages[this.pageIndex - 1].id)
+    },
+    nextPage() {
+      this.pageIndex >= 0 &&
+        this.pageIndex < this.filteredPages.length - 1 &&
+        this.changePage(this.filteredPages[this.pageIndex + 1].id)
     },
     disableRow(index) {
       return this.lockRows && this.disabledFrom >= 0 && index > this.disabledFrom
@@ -229,7 +330,16 @@ button[disabled] {
   text-align: left;
 }
 
+.multicontent-media-container {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: row-reverse;
+  padding: 24px;
+}
+
 .media-container {
+  position: relative;
   height: 100%;
   width: 100%;
   max-width: 150vh;
@@ -280,5 +390,28 @@ button[disabled] {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.unit-navigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+
+  button {
+    background: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    column-gap: 10px;
+    height: 1rem;
+    line-height: 1rem;
+    color: #0073aa;
+
+    &:not(:disabled):hover {
+      color: var(--highlight-color);
+    }
+  }
 }
 </style>

@@ -1,5 +1,38 @@
 <template>
-  <b-container fluid class="upload-container px-0">
+  <span v-if="compactMode && !isImage" class="d-flex">
+    <b-form-input
+      :placeholder="placeholder"
+      :value="value"
+      :data-qa="inputTestId"
+      :disabled="disabled || isUploading"
+      required
+      @input="$emit('input', $event)"
+    />
+    <b-form-file
+      :id="fileUploadId"
+      ref="file"
+      plain
+      hidden
+      name="async-upload"
+      :accept="fileTypes"
+      :disabled="disabled || isUploading"
+      required
+      data-qa="import-file-input"
+      @dragover.prevent
+      @drop.prevent="uploadFile"
+      @change="uploadFile"
+    ></b-form-file>
+    <b-button
+      variant="outline-secondary"
+      tag="label"
+      :for="fileUploadId"
+      class="mb-0 rounded-0"
+      :disabled="disabled"
+    >
+      {{ value ? "Change" : "Upload" }}
+    </b-button>
+  </span>
+  <b-container v-else fluid class="upload-container px-0">
     <template v-if="isUploading && !compactMode">
       <b-row>
         <b-col cols="auto" class="upload-label mr-auto text-muted">
@@ -23,7 +56,7 @@
       </b-row>
     </template>
     <b-row v-if="!isUploading || compactMode">
-      <b-col v-if="showImagePreview" class="thumbnail-col">
+      <b-col v-if="showImagePreviewValue" class="thumbnail-col">
         <svg
           width="130"
           height="130"
@@ -79,13 +112,14 @@
           </b-button-group>
           <b-form-file
             v-if="!value || (changeImage && !isUploading)"
+            :id="fileUploadId"
             ref="file"
             name="async-upload"
             class="image-file"
             placeholder="Click to choose a file or drop file here to upload"
             drop-placeholder="Drop file here..."
             :accept="fileTypes"
-            :disabled="isUploading"
+            :disabled="disabled || isUploading"
             required
             data-qa="import-file-input"
             @dragover.prevent
@@ -103,7 +137,7 @@
       </b-col>
       <b-col>
         <div v-if="!compactMode">
-          <div v-if="showImagePreview && value">
+          <div v-if="showImagePreviewValue && value">
             <h6>Operations:</h6>
             <b-button
               class="mb-2"
@@ -124,16 +158,17 @@
             </b-button>
             <h6 v-else>Change image:</h6>
           </div>
-          <b-row v-if="!showImagePreview || !value || changeImage">
+          <b-row v-if="!showImagePreviewValue || !value || changeImage">
             <b-col :class="{ 'pr-0': showUrlUpload }">
               <b-form-file
+                :id="fileUploadId"
                 ref="file"
                 name="async-upload"
                 class="image-file"
                 placeholder="Choose a file or drop it here..."
                 drop-placeholder="Drop file here..."
                 :accept="fileTypes"
-                :disabled="isUploading"
+                :disabled="disabled || isUploading"
                 required
                 data-qa="import-file-input"
                 @dragover.prevent
@@ -145,14 +180,14 @@
               <b-col cols="1" class="divider">
                 <h6 class="text-muted">OR</h6>
               </b-col>
-              <b-col :class="{ 'pl-0': !showImagePreview }">
+              <b-col :class="{ 'pl-0': !showImagePreviewValue }">
                 <b-form-input
                   name="text-input"
                   :placeholder="placeholder"
                   :value="value"
                   :data-qa="inputTestId"
                   :data-testid="inputTestId"
-                  :disabled="isUploading"
+                  :disabled="disabled || isUploading"
                   required
                   @input="$emit('input', $event)"
                 />
@@ -196,6 +231,11 @@ export default {
       required: false,
       default: "",
     },
+    disabled: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
     inputTestId: {
       type: String,
       required: false,
@@ -212,6 +252,11 @@ export default {
       required: false,
       default: null,
     },
+    fileUploadId: {
+      type: String,
+      required: false,
+      default: "file-upload-input",
+    },
     showImagePreview: {
       type: Boolean,
       required: false,
@@ -227,6 +272,11 @@ export default {
       required: false,
       default: false,
     },
+    isImage: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
   },
   data() {
     return {
@@ -236,23 +286,22 @@ export default {
       isUploading: false,
       confirmedUpload: true,
       changeImage: false,
-      imagePatternId: "",
       error: null,
     }
   },
-  created() {
-    // NOTE: compactMode cannot work without showing the image preview
-    if (this.compactMode) {
-      this.showImagePreview = true
-    }
-
-    if (this.showImagePreview) {
-      this.imagePatternId =
-        "thumbnail-preview-" +
-        Math.random()
-          .toString(36)
-          .substring(9)
-    }
+  computed: {
+    showImagePreviewValue() {
+      // NOTE: compactMode cannot work without showing the image preview
+      return this.compactMode || this.showImagePreview
+    },
+    imagePatternId() {
+      return this.showImagePreviewValue
+        ? "thumbnail-preview-" +
+            Math.random()
+              .toString(36)
+              .substring(9)
+        : ""
+    },
   },
   methods: {
     ...mapMutations(["addApiError"]),

@@ -54,7 +54,7 @@
             :node="node"
             :question="question"
             :answer="answer || ''"
-            @skipQuestion="$emit('skipQuestion')"
+            @skip-question="$emit('skip-question')"
             @submit="handleSubmit"
           ></component>
         </div>
@@ -138,7 +138,7 @@ export default {
               this.question.followUp.questionId
             ]
           ) {
-            // eslint-disable-next-line vue/no-side-effects-in-computed-properties
+            // eslint-disable-next-line vue/no-side-effects-in-computed-properties, vue/no-mutating-props
             this.question.followUp.nodeId = tempNodeId
             // eslint-disable-next-line vue/no-side-effects-in-computed-properties
             this.prevQuestionId = this.question.followUp.questionId
@@ -221,6 +221,8 @@ export default {
       if (!this.isLoggedIn) {
         return this.$emit("submit")
       }
+
+      this.$emit("before-submit")
 
       let submittedAnswer = null
 
