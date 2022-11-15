@@ -180,7 +180,6 @@ export function setReturnRoute(state, route) {
   state.returnRoute = route
 }
 
-<<<<<<< HEAD
 // TYDE
 
 export function addAvatar(state, newAvatar) {
@@ -189,7 +188,8 @@ export function addAvatar(state, newAvatar) {
 
 export function addCos(state, cos) {
   state.cos = cos
-=======
+}
+
 export function setCurrentEditingNode(state, node) {
   state.currentEditingNode = node
 }
@@ -221,5 +221,4 @@ export function setCurrentEditingNodeProperty(state, { property, value }) {
 
 export function setNotifications(state, notifications) {
   state.notifications = notifications
->>>>>>> 1277-kaltura-fixes
 }

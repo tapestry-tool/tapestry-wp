@@ -76,6 +76,7 @@
       v-if="showPageMenu"
       :node="node"
       :dimensions="menuDimensions"
+      :full-screen="settings.tydeModeEnabled"
       :pages="filteredPages"
       :active-page-index="pageIndex"
       @change-page="changePage"
@@ -150,7 +151,7 @@ export default {
       "isFavourite",
       "isMultiContent",
     ]),
-    ...mapState(["favourites", "rootId"]),
+    ...mapState(["favourites", "rootId", "settings"]),
     parentNode() {
       const parentNodeId = this.getParent(this.node.id)
       return this.getNode(parentNodeId)

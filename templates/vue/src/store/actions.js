@@ -118,11 +118,7 @@ export async function updateLockedStatus({ commit, getters, dispatch }) {
 }
 
 export async function updateNodeProgress(
-<<<<<<< HEAD
   { commit, state, getters, dispatch },
-=======
-  { commit, state, dispatch, getters },
->>>>>>> 1277-kaltura-fixes
   payload
 ) {
   // Tapestry editors and admins don't need this feature. We disable this to
@@ -134,7 +130,10 @@ export async function updateNodeProgress(
     const { id, progress } = payload
 
     const node = getters.getNode(id)
-<<<<<<< HEAD
+
+    if (node.completed || node.progress === progress) {
+      return
+    }
 
     if (!Helpers.nodeAndUserAreDyad(node)) {
       if (!wp.isLoggedIn()) {
@@ -149,22 +148,6 @@ export async function updateNodeProgress(
         await client.updateUserProgress(id, progress)
       }
       commit("updateNodeProgress", { id, progress })
-=======
-    if (node.completed || node.progress === progress) {
-      return
-    }
-
-    if (!wp.isLoggedIn()) {
-      const progressObj = JSON.parse(localStorage.getItem(LOCAL_PROGRESS_ID))
-      const nodeProgress = progressObj[id] || {}
-      nodeProgress.progress = progress
-      localStorage.setItem(LOCAL_PROGRESS_ID, JSON.stringify(progressObj))
-    } else if (
-      !state.userProgress[id] ||
-      state.userProgress[id].progress !== progress
-    ) {
-      await client.updateUserProgress(id, progress)
->>>>>>> 1277-kaltura-fixes
     }
   } catch (error) {
     dispatch("addApiError", error)
@@ -194,8 +177,12 @@ export async function completeNode(context, nodeId) {
     return
   }
   const { commit, dispatch, getters } = context
-<<<<<<< HEAD
   const node = getters.getNode(nodeId)
+
+  if (node.completed) {
+    return
+  }
+
   if (!Helpers.nodeAndUserAreDyad(node)) {
     try {
       if (!wp.isLoggedIn()) {
@@ -207,29 +194,6 @@ export async function completeNode(context, nodeId) {
         await client.completeNode(nodeId)
       }
       commit("updateNode", {
-=======
-  try {
-    const node = getters.getNode(nodeId)
-    if (node.completed) {
-      return
-    }
-
-    if (!wp.isLoggedIn()) {
-      const progressObj = JSON.parse(localStorage.getItem(LOCAL_PROGRESS_ID))
-      const nodeProgress = progressObj[nodeId] || {}
-      nodeProgress.completed = true
-      localStorage.setItem(LOCAL_PROGRESS_ID, JSON.stringify(progressObj))
-    } else {
-      await client.completeNode(nodeId)
-    }
-    commit("updateNode", {
-      id: nodeId,
-      newNode: { completed: true },
-    })
-
-    if (node.mediaType !== "video") {
-      await dispatch("updateNodeProgress", {
->>>>>>> 1277-kaltura-fixes
         id: nodeId,
         newNode: { completed: true },
       })

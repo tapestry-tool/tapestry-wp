@@ -1,20 +1,4 @@
 <template>
-<<<<<<< HEAD
-  <div ref="wrapper" class="page-nav-wrapper">
-    <aside
-      ref="container"
-      data-qa="page-nav-container"
-      :class="[
-        'page-nav',
-        {
-          lightbox: !isFullScreen,
-          fullscreen: isFullScreen,
-          closed: !opened,
-          'is-unit-child': unitsMenuVisible,
-        },
-      ]"
-      :style="{ height: isFullScreen ? '100vh' : dimensions.height + 'px' }"
-=======
   <div>
     <transition
       name="slide-fade"
@@ -23,7 +7,6 @@
       @enter-cancelled="animate = false"
       @after-leave="animate = false"
       @leave-cancelled="animate = false"
->>>>>>> 1277-kaltura-fixes
     >
       <aside
         v-show="menuVisible"
@@ -31,13 +14,10 @@
         :class="[
           'page-nav-wrapper',
           {
-<<<<<<< HEAD
+            lightbox: !isFullScreen,
             fullscreen: isFullScreen,
-=======
-            lightbox: !node.fullscreen,
-            fullscreen: node.fullscreen,
-            'unit-child': unitsMenuVisible,
->>>>>>> 1277-kaltura-fixes
+            closed: !opened,
+            'is-unit-child': unitsMenuVisible,
           },
         ]"
       >
@@ -45,7 +25,7 @@
           ref="container"
           data-qa="page-nav-container"
           class="page-nav"
-          :style="{ height: node.fullscreen ? '100vh' : dimensions.height + 'px' }"
+          :style="{ height: isFullScreen ? '100vh' : dimensions.height + 'px' }"
         >
           <div v-if="unitsMenuVisible">
             <b-dropdown
@@ -88,39 +68,8 @@
             v-if="isLoggedIn"
             :href="logoutUrl"
             class="logout-link mt-auto ml-3 pt-4"
+            style="color: var(--text-color-primary);"
           >
-<<<<<<< HEAD
-            {{ page.title }}
-          </b-dropdown-item>
-        </b-dropdown>
-        <h5 class="pl-2 py-1 mb-4">{{ node.title }}</h5>
-      </div>
-      <div
-        :class="[
-          'page-nav-content',
-          'mb-auto',
-          {
-            fullscreen: isFullScreen,
-            closed: !opened,
-          },
-        ]"
-      >
-        <ul class="page-menu-items fa-ul">
-          <page-menu-item
-            v-for="row in rows"
-            :key="row.node.id"
-            :node="row.node"
-            :lockRows="lockRows"
-            :disabled="disabledRow(row.node)"
-            @scroll-to="scrollToRef"
-          />
-        </ul>
-      </div>
-      <a
-        v-if="isLoggedIn"
-        :href="logoutUrl"
-        class="mt-auto ml-3 pt-4"
-=======
             Logout
           </a>
         </div>
@@ -130,7 +79,7 @@
       :class="[
         'page-nav-toggle',
         {
-          fullscreen: node.fullscreen,
+          fullscreen: isFullScreen,
         },
       ]"
       data-qa="page-nav-toggle"
@@ -139,7 +88,6 @@
       <i
         v-if="!opened"
         class="fas fa-bars fa-lg"
->>>>>>> 1277-kaltura-fixes
         style="color: var(--text-color-primary);"
       ></i>
       <i v-else class="fas fa-times fa-lg"></i>
@@ -168,12 +116,11 @@ export default {
       required: false,
       default: null,
     },
-<<<<<<< HEAD
     fullScreen: {
       type: Boolean,
       required: false,
       default: false,
-=======
+    },
     pages: {
       type: [Array, Boolean],
       required: true,
@@ -181,7 +128,6 @@ export default {
     activePageIndex: {
       type: Number,
       required: true,
->>>>>>> 1277-kaltura-fixes
     },
   },
   data() {
@@ -228,7 +174,7 @@ export default {
       return this.fullScreen || this.node.fullscreen
     },
     menuVisible() {
-      return this.opened || (this.node.fullscreen && this.browserWidth > 800)
+      return this.opened || (this.isFullScreen && this.browserWidth > 800)
     },
     unitsMenuVisible() {
       return this.pages && this.parentNode.childOrdering.length > 1
@@ -284,16 +230,9 @@ export default {
     },
     scrollToRef(nodeId) {
       this.$nextTick(() => {
-<<<<<<< HEAD
         const container = document.getElementById(`multicontent-container`)
         const navbar = document.getElementById(`tapestry-navbar`)
         const yOffset = (navbar ? -navbar.getBoundingClientRect().bottom : 0) + 10
-=======
-        const container = document.querySelector(
-          `#multicontent-container .media-container`
-        )
-        const yOffset = -50
->>>>>>> 1277-kaltura-fixes
         const element = document.getElementById(`row-${nodeId}`)
         const y =
           element.getBoundingClientRect().top -
@@ -307,35 +246,6 @@ export default {
 }
 </script>
 
-<<<<<<< HEAD
-<style lang="scss">
-.has-navbar ~ .page-nav-wrapper > .page-nav {
-  padding-top: 8rem !important;
-}
-
-.page-nav-wrapper {
-  .page-nav {
-    position: relative;
-    color: white;
-    background: #5d656c;
-    padding: 2.2rem 1.5rem;
-    transform: translateY(0);
-    transition: all 0.2s ease-in-out;
-    font-size: 14px;
-    text-align: left;
-    z-index: 0;
-    overflow-y: auto;
-    min-width: 200px;
-    display: flex;
-    flex-direction: column;
-
-    &.lightbox {
-      position: absolute;
-      left: 0;
-      top: 0;
-      z-index: 11;
-      border-radius: 15px 0 0 15px;
-=======
 <style lang="scss" scoped>
 .page-nav-toggle {
   background-color: transparent;
@@ -344,7 +254,6 @@ export default {
   left: 20px;
   top: 20px;
   z-index: 11;
->>>>>>> 1277-kaltura-fixes
 
   &.fullscreen {
     top: 40px;
@@ -452,6 +361,10 @@ $slide-fade-speed: 0.3s;
 </style>
 
 <style lang="scss">
+.has-navbar ~ .page-nav-wrapper > .page-nav {
+  padding-top: 8rem !important;
+}
+
 .unit-switch-dropdown {
   margin: 1.2rem -24px !important;
   button {
