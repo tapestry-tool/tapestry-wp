@@ -194,7 +194,7 @@
                     'pendingCaptions' => $result->pendingCaptions,
                     'defaultCaptionId' => $newDefaultCaptionId,
                 ];
-            } catch (ClientException|ApiException $e) {
+            } catch (ClientException | ApiException $e) {
                 throw new TapestryError('KALTURA_ERROR');
             }
         }

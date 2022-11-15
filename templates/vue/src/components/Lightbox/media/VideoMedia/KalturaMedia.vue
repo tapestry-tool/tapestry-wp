@@ -50,9 +50,6 @@ export default {
     kalturaId() {
       return this.node.typeData.kalturaId
     },
-    hasMultiContentContext() {
-      return this.context === "multi-content"
-    },
   },
   created() {
     const kalturaScript = document.createElement("script")

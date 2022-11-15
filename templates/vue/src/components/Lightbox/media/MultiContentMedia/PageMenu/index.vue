@@ -17,7 +17,7 @@
             lightbox: !isFullScreen,
             fullscreen: isFullScreen,
             closed: !opened,
-            'is-unit-child': unitsMenuVisible,
+            'unit-child': unitsMenuVisible,
           },
         ]"
       >

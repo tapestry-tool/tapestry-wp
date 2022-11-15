@@ -54,6 +54,7 @@ import ReviewNotifications from "./ReviewNotifications"
 import HelpButton from "./HelpButton"
 import { isLoggedIn, canEditTapestry, getCurrentUser } from "@/services/wp"
 import OperationsButton from "./OperationsButton"
+import * as wp from "@/services/wp"
 
 export default {
   components: {
@@ -78,6 +79,10 @@ export default {
     },
     isAdmin() {
       const currentUser = getCurrentUser()
+      return currentUser.roles && currentUser.roles.includes("administrator")
+    },
+    isAdmin() {
+      const currentUser = wp.getCurrentUser()
       return currentUser.roles && currentUser.roles.includes("administrator")
     },
     hasDepth() {
