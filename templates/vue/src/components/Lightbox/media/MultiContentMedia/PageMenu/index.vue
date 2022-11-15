@@ -68,7 +68,6 @@
             v-if="isLoggedIn"
             :href="logoutUrl"
             class="logout-link mt-auto ml-3 pt-4"
-            style="color: var(--text-color-primary);"
           >
             Logout
           </a>

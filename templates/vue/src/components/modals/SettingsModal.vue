@@ -323,7 +323,7 @@ import FileUpload from "./common/FileUpload"
 import PermissionsTable from "./common/PermissionsTable"
 import DragSelectModular from "@/utils/dragSelectModular"
 import { data as wpData } from "@/services/wp"
-import Combobox from "../common/Combobox.vue"
+import Combobox from "./common/Combobox.vue"
 
 const editorRoles = ["editor", "administrator", "author"]
 const defaultPermissions = Object.fromEntries(

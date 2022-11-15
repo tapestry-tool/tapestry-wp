@@ -28,7 +28,7 @@ module.exports = {
           {
             loader: "sass-loader",
             options: {
-              data: "@import 'src/assets/styles/onbording-colors.scss';",
+              additionalData: "@import 'src/assets/styles/onbording-colors.scss';",
             },
           },
         ],
