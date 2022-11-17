@@ -140,7 +140,17 @@ export default {
           const videoDuration = kalturaVideo.evaluate("{duration}")
           const currentTime = nodeProgress * videoDuration
 
-          kalturaVideo.sendNotification("doSeek", currentTime)
+          try {
+            kalturaVideo.sendNotification("doSeek", currentTime)
+          } catch (e) {
+            try {
+              kalturaVideo.kBind("mediaReady", function() {
+                kalturaVideo.sendNotification("doSeek", currentTime)
+              })
+            } catch (e) {
+              console.log("Kaltura player could not seek")
+            }
+          }
 
           this.$emit("load", { currentTime, type: "kaltura-video" })
         })
