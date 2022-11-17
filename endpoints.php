@@ -519,6 +519,17 @@ function importTapestryFromZip($request)
         ]);
         $importedTapestry = importTapestry($postId, $tapestry_data);
 
+        if ($importResult['rebuildH5PCache']) {
+            // Delete h5p cachedassets if h5p nodes were imported
+            $cachedAssetsDir = wp_upload_dir()['basedir'] . DIRECTORY_SEPARATOR . 'h5p' . DIRECTORY_SEPARATOR . 'cachedassets';
+            if (is_dir($cachedAssetsDir)) {
+                $files_to_delete = glob($cachedAssetsDir . DIRECTORY_SEPARATOR . "*");
+                if ($files_to_delete !== false) {
+                    array_map('unlink', $files_to_delete);
+                }
+            }
+        }
+
         return [
             'changes' => $changes,
             'warnings' => $importResult['warnings'],
