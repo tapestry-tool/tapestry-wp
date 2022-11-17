@@ -168,7 +168,7 @@ export default {
           .catch(err => {
             this.addApiError(err)
           })
-      }, 10000)
+      }, 5000)
 
       client
         .importTapestryFromZip(zipFile)
