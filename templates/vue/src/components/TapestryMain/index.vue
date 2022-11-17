@@ -100,6 +100,11 @@
         :position="nodeToolbarPosition"
         @set-show="setShowContextToolbar('node', $event)"
       ></tapestry-node-toolbar>
+      <tapestry-multi-node-toolbar
+        :show="showContextToolbar == 'multi-node'"
+        :position="multiNodeToolbarPosition"
+        @set-show="setShowContextToolbar('multi-node', $event)"
+      ></tapestry-multi-node-toolbar>
       <tapestry-link-toolbar
         :show="showContextToolbar == 'link'"
         :link="activeLink"
@@ -113,7 +118,7 @@
         :view-box="unscaledViewBox"
         :scale="scale"
         :offset="offset"
-        :isDragSelecting="isDragSelecting"
+        :is-drag-selecting="isDragSelecting"
         @pan-by="handleMinimapPanBy"
         @pan-to="handleMinimapPanTo"
         @close="showMinimap = false"
@@ -133,6 +138,7 @@ import TapestryNode from "./TapestryNode"
 import TapestryLink from "./TapestryLink"
 import TapestryToolbar from "./TapestryToolbar"
 import TapestryNodeToolbar from "./TapestryNodeToolbar"
+import TapestryMultiNodeToolbar from "./TapestryMultiNodeToolbar"
 import TapestryLinkToolbar from "./TapestryLinkToolbar"
 import TapestryNodeShadow from "./TapestryNodeShadow"
 import TapestryNodePlaceholder from "./TapestryNodePlaceholder"
@@ -155,6 +161,7 @@ export default {
     TapestryLink,
     TapestryToolbar,
     TapestryNodeToolbar,
+    TapestryMultiNodeToolbar,
     TapestryLinkToolbar,
     TapestryNodeShadow,
     TapestryNodePlaceholder,
@@ -191,7 +198,7 @@ export default {
       nodeEditingTitle: null,
 
       showMinimap: true,
-      showContextToolbar: false, // one of false, "node", "link"
+      showContextToolbar: false, // one of false, "node", "multi-node", "link"
       activeLink: null, // for link context toolbar
     }
   },
@@ -345,6 +352,30 @@ export default {
         height: r * 2,
       }
     },
+    multiNodeToolbarPosition() {
+      if (this.selection.length === 0 || !this.appDimensions) {
+        return null
+      }
+
+      let x = 0,
+        y = 0
+      for (const id of this.selection) {
+        const coords = this.svgToScreen(this.getNode(id).coordinates)
+        x += coords.x
+        y += coords.y
+      }
+      x /= this.selection.length
+      y /= this.selection.length
+
+      return {
+        left: x,
+        top: y,
+        right: x,
+        bottom: y,
+        width: 0,
+        height: 0,
+      }
+    },
     linkToolbarPosition() {
       if (!this.activeLink || !this.appDimensions) {
         return null
@@ -413,6 +444,9 @@ export default {
         }
         this.updateViewBox()
       },
+    },
+    selection(selection) {
+      this.setShowContextToolbar("multi-node", selection.length !== 0)
     },
     showContextToolbar(newVal, oldVal) {
       if (oldVal === "link") {
