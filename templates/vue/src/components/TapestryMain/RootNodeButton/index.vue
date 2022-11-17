@@ -5,13 +5,22 @@
       :warnings="warnings"
       :exportWarnings="exportWarnings"
     />
-    <div data-qa="root-node-button" @click="addRootNode">
-      <i class="fas fa-plus-circle fa-5x"></i>
-      <div>Add Root Node</div>
-    </div>
-    <p>Or</p>
-    <b-button class="import-button mx-1" @click="openFileBrowser">
-      <b-spinner v-if="isImporting"></b-spinner>
+    <template v-if="!isImporting">
+      <div data-qa="root-node-button" @click="addRootNode">
+        <i class="fas fa-plus-circle fa-5x"></i>
+        <div>Add Root Node</div>
+      </div>
+      <p>Or</p>
+    </template>
+    <b-button
+      class="import-button mx-1"
+      :disabled="isImporting"
+      @click="openFileBrowser"
+    >
+      <template v-if="isImporting">
+        <b-spinner></b-spinner>
+        Importing
+      </template>
       <div v-else>
         Import a Tapestry
       </div>
@@ -159,7 +168,8 @@ export default {
           .getImportStatus()
           .then(status => {
             if (status.message) {
-              this.importStatusMessage = status.message + "..."
+              this.importStatusMessage =
+                status.message + "... Please do not close this tab."
             }
             if (!status.inProgress) {
               this.importStatusMessage = "Import is not in progress"
@@ -261,6 +271,10 @@ export default {
   background-color: #2c3e50;
   border: none;
   z-index: 10;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  column-gap: 10px;
 
   &:hover {
     background-color: var(--highlight-color);
