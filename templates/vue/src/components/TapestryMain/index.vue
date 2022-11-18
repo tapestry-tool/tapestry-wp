@@ -174,6 +174,7 @@ export default {
   data() {
     return {
       isDragSelecting: false,
+      didDragSelect: false,
       activeNode: null,
 
       appHeight: "100vh",
@@ -446,7 +447,9 @@ export default {
       },
     },
     selection(selection) {
-      this.setShowContextToolbar("multi-node", selection.length !== 0)
+      if (!this.isDragSelecting) {
+        this.setShowContextToolbar("multi-node", selection.length !== 0)
+      }
     },
     showContextToolbar(newVal, oldVal) {
       if (oldVal === "link") {
@@ -493,9 +496,12 @@ export default {
       DragSelectModular.initialize(
         () => {
           this.isDragSelecting = true
+          this.didDragSelect = false
+          this.setShowContextToolbar("multi-node", false)
         },
         () => {
           this.isDragSelecting = false
+          this.didDragSelect = true
         }
       )
     }
@@ -1145,7 +1151,12 @@ export default {
     },
     handleClickOnSvg() {
       if (!this.isPanning) {
-        this.showContextToolbar = false
+        if (this.didDragSelect) {
+          this.setShowContextToolbar("multi-node", this.selection.length !== 0)
+          this.didDragSelect = false
+        } else {
+          this.showContextToolbar = false
+        }
       }
     },
     handleMousemoveOnSvg(evt) {
