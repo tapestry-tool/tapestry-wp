@@ -80,8 +80,11 @@ export default {
 
       kalturaIframe.onload = () => {
         kWidget.addReadyCallback(playerId => {
-          this.playerId = playerId
           const kalturaVideo = document.getElementById(playerId)
+          if (!kalturaVideo.contains(kalturaIframe)) {
+            return
+          }
+          this.playerId = playerId
 
           if (this.context === "multi-content") {
             this.setFrameDimensions()
