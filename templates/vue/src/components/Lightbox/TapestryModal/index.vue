@@ -104,7 +104,10 @@ export default {
     if (this.node.mediaType === "multi-content") {
       setTimeout(() => {
         const rowId = this.$route.params.rowId
-        const container = document.getElementById(`multicontent-container`)
+        const container = document.querySelector(`#multicontent-container .media-container`)
+        if (!container) {
+          return
+        }
         const navbar = document.getElementById(`tapestry-navbar`)
         let y = navbar ? -navbar.getBoundingClientRect().bottom : 0
         if (rowId) {

@@ -220,7 +220,7 @@ export default {
     activeQuestionId() {
       if (this.node.id) {
         this.$nextTick(() => {
-          const container = document.getElementById(`multicontent-container`)
+          const container = document.querySelector(`#multicontent-container .media-container`)
           const element = document.getElementById(`row-${this.node.id}`)
           if (element) {
             // We add spacing to scroll past the navbar
