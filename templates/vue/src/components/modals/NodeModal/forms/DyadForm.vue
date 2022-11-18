@@ -4,7 +4,7 @@
       Dyad Node
     </h6>
     <b-form-group>
-      <b-form-checkbox v-model="node.isDyad">
+      <b-form-checkbox v-model="isDyad">
         This is a dyad node
       </b-form-checkbox>
     </b-form-group>
@@ -22,10 +22,17 @@
 <script>
 export default {
   name: "dyad-form",
-  props: {
-    node: {
-      type: Object,
-      required: true,
+  computed: {
+    isDyad: {
+      get() {
+        return this.$store.state.currentEditingNode.isDyad
+      },
+      set(value) {
+        this.$store.commit("setCurrentEditingNodeProperty", {
+          property: "isDyad",
+          value,
+        })
+      },
     },
   },
 }

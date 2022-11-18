@@ -193,7 +193,7 @@ export default {
       return Twemoji.parse(div).innerHTML
     },
     handleEmojiSelect(emoji) {
-      this.community.icon = emoji
+      this.handleChange("icon", emoji)
     },
     handleChange(prop, value) {
       this.$emit("change", { ...this.community, [prop]: value })

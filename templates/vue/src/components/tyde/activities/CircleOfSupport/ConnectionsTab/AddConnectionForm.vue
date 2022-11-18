@@ -10,10 +10,11 @@
       <div class="connection" style="flex: 1">
         <div class="connection-name">
           <input
-            v-model="connection.name"
+            :value="connection.name"
             name="connection name"
             type="text"
             placeholder="connection"
+            @input="handleChange('name', $event.target.value)"
             @blur="isInputTouched = true"
           />
           <p :style="{ '--color': countColor }">{{ characterCount }}</p>
@@ -218,15 +219,22 @@ export default {
     },
     toggleCommunity(communityId) {
       if (this.connection.communities.includes(communityId)) {
-        this.connection.communities = this.connection.communities.filter(
-          id => id !== communityId
+        this.handleChange(
+          "communities",
+          this.connection.communities.filter(id => id !== communityId)
         )
       } else {
-        this.connection.communities.push(communityId)
+        this.handleChange("communities", [
+          ...this.connection.communities,
+          communityId,
+        ])
       }
     },
     handleEmojiSelect(emoji) {
-      this.connection.avatar = emoji
+      this.handleChange("avatar", emoji)
+    },
+    handleChange(prop, value) {
+      this.$emit("change", { ...this.connection, [prop]: value })
     },
     submitConnection() {
       this.isInputTouched = true

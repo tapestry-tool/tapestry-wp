@@ -229,7 +229,9 @@ export default {
     },
     scrollToRef(nodeId) {
       this.$nextTick(() => {
-        const container = document.querySelector(`#multicontent-container .media-container`)
+        const container = document.querySelector(
+          `#multicontent-container .media-container`
+        )
         const navbar = document.getElementById(`tapestry-navbar`)
         const yOffset = (navbar ? -navbar.getBoundingClientRect().bottom : 0) + 10
         const element = document.getElementById(`row-${nodeId}`)

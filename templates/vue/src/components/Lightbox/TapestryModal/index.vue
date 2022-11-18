@@ -104,7 +104,9 @@ export default {
     if (this.node.mediaType === "multi-content") {
       setTimeout(() => {
         const rowId = this.$route.params.rowId
-        const container = document.querySelector(`#multicontent-container .media-container`)
+        const container = document.querySelector(
+          `#multicontent-container .media-container`
+        )
         if (!container) {
           return
         }

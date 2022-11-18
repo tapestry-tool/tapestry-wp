@@ -94,7 +94,7 @@
             </b-card>
             <h6 class="mt-4 mb-3">Lock Node</h6>
             <conditions-form />
-            <dyad-form :node="node" />
+            <dyad-form />
           </b-tab>
           <b-tab
             v-if="node.mediaType === 'h5p' || node.mediaType === 'video'"
