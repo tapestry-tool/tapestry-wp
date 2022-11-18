@@ -122,7 +122,7 @@ class ZoomPanHelper {
     e.preventDefault()
     // panning has higher priority than trackpad pinch zoom
     if (!this.isPanning) {
-      this.onZoom(-0.01 * e.deltaY, e.clientX, e.clientY)
+      this.onZoom(-0.01 * e.deltaY, e.clientX, e.clientY, e.target)
       this.onZoomEnd()
     }
   }
@@ -161,7 +161,7 @@ class ZoomPanHelper {
       if (distance !== null && this.lastDistance !== null) {
         const delta = distance - this.lastDistance
         const scaleDelta = delta * 0.01
-        this.onZoom(scaleDelta, this.pinchPoint.x, this.pinchPoint.y)
+        this.onZoom(scaleDelta, this.pinchPoint.x, this.pinchPoint.y, e.target)
         this.onZoomEnd()
       }
       this.lastDistance = distance
@@ -198,7 +198,7 @@ class ZoomPanHelper {
         scaleDelta,
         600,
         delta => {
-          this.onZoom(delta, clientX, clientY)
+          this.onZoom(delta, clientX, clientY, e.target)
           this.lastClickTime = null
         },
         () => {

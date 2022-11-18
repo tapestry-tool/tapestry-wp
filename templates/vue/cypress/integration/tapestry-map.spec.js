@@ -1,7 +1,7 @@
 describe("Map Tapestry", () => {
   beforeEach(() => {
     cy.fixture("two-nodes.json").as("twoNodes")
-    cy.setup("@twoNodes", { skipClosingMinimap: true })
+    cy.setup("@twoNodes")
 
     cy.getByTestId("settings-button").click()
     cy.contains(/advanced/i).click()
@@ -52,7 +52,7 @@ describe("Map Tapestry", () => {
   })
 
   it("if logged out, should see map without the list of nodes", () => {
-    cy.logout().visitTapestry({ skipClosingMinimap: true })
+    cy.logout().visitTapestry()
     cy.get(".nodes-list").should("not.exist")
     cy.get(".vue2leaflet-map").should("be.visible")
   })
@@ -71,7 +71,7 @@ describe("Map Tapestry", () => {
       .type("-150")
     cy.submitModal()
 
-    cy.logout().visitTapestry({ skipClosingMinimap: true })
+    cy.logout().visitTapestry()
 
     cy.get(".leaflet-marker-icon").should("be.visible")
     cy.get(".leaflet-marker-icon").click({ force: true })
