@@ -51,6 +51,7 @@ export function addNode(state, node) {
 }
 
 export function deleteNode(state, id) {
+  state.selection = state.selection.filter(nodeId => nodeId !== parseInt(id))
   Vue.delete(state.nodes, id)
 }
 

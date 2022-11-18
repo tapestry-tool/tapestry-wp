@@ -30,7 +30,7 @@ export default {
   },
   methods: {
     changeLevels(diff) {
-      this.$emit("changeLevels", diff)
+      this.$emit("change-levels", diff)
     },
   },
 }
