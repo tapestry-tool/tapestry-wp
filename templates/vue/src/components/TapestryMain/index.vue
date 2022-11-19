@@ -282,6 +282,9 @@ export default {
     isLoggedIn() {
       return wp.isLoggedIn()
     },
+    isFilteringTapestry() {
+      return !!this.$route.query.search
+    },
     canEdit() {
       return wp.canEditTapestry()
     },
@@ -426,6 +429,19 @@ export default {
         this.fetchAppDimensions()
       }, 300)
     },
+    isFilteringTapestry: {
+      immediate: true,
+      handler(isFilteringTapestry) {
+        if (isFilteringTapestry) {
+          this.scale = 1
+          this.offset.x = 0
+          this.offset.y = 0
+          this.viewBox[0] = this.unscaledViewBox[0]
+          this.viewBox[1] = this.unscaledViewBox[1]
+          this.showContextToolbar = false
+        }
+      },
+    },
     selectedId: {
       immediate: true,
       handler(nodeId) {
@@ -530,7 +546,7 @@ export default {
       this.zoomPanHelper.register()
     }
 
-    if (this.selectedId) {
+    if (this.selectedId && !this.isFilteringTapestry) {
       this.zoomToAndCenterNode(this.getNode(this.selectedId))
     }
 
