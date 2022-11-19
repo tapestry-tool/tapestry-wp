@@ -184,6 +184,7 @@ export default {
       scale: 1,
       manualScale: 1,
       offset: { x: 0, y: 0 },
+      savedZoomParams: null,
       appDimensions: null,
       zoomPanHelper: null,
       isPanning: false,
@@ -433,12 +434,23 @@ export default {
       immediate: true,
       handler(isFilteringTapestry) {
         if (isFilteringTapestry) {
+          this.savedZoomParams = {
+            scale: this.scale,
+            offset: { ...this.offset },
+          }
           this.scale = 1
           this.offset.x = 0
           this.offset.y = 0
           this.viewBox[0] = this.unscaledViewBox[0]
           this.viewBox[1] = this.unscaledViewBox[1]
           this.showContextToolbar = false
+        } else if (this.savedZoomParams) {
+          this.scale = this.savedZoomParams.scale
+          this.offset.x = this.savedZoomParams.offset.x
+          this.offset.y = this.savedZoomParams.offset.y
+          this.viewBox[0] = this.unscaledViewBox[0] * this.scale
+          this.viewBox[1] = this.unscaledViewBox[1] * this.scale
+          this.savedZoomParams = null
         }
       },
     },
