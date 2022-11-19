@@ -4,9 +4,6 @@
       v-show="show"
       ref="circle"
       :transform="`translate(${coordinates.x}, ${coordinates.y})`"
-      :class="{
-        opaque: !visibleNodes.includes(node.id),
-      }"
       :fill="fill"
       :style="{
         filter: dropShadow,
@@ -42,13 +39,7 @@ export default {
     }
   },
   computed: {
-    ...mapState([
-      "selection",
-      "settings",
-      "visibleNodes",
-      "maxLevel",
-      "currentDepth",
-    ]),
+    ...mapState(["selection", "settings", "maxLevel", "currentDepth"]),
     ...mapGetters(["isVisible"]),
     show() {
       return this.isVisible(this.node.id) && this.visibility >= 0
@@ -139,10 +130,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.opaque {
-  opacity: 0.2;
-}
-
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.2s;

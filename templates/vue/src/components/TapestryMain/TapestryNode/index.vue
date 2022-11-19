@@ -150,6 +150,13 @@
           </template>
         </g>
       </g>
+      <circle
+        v-if="showSearchHighlight"
+        :data-qa="`node-search-highlight-${node.id}`"
+        :r="radius + 40"
+        fill="var(--highlight-color)"
+        class="search-highlight"
+      ></circle>
       <defs>
         <pattern :id="`node-image-${node.id}`" width="1" height="1">
           <image
@@ -441,6 +448,12 @@ export default {
         this.settings.showAcceptedHighlight
       )
     },
+    isFilteringTapestry() {
+      return !!this.$route.query.search
+    },
+    showSearchHighlight() {
+      return this.isFilteringTapestry && this.visibleNodes.includes(this.node.id)
+    },
   },
   watch: {
     radius(newRadius) {
@@ -648,10 +661,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.opaque {
-  opacity: 0.2;
-}
-
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.2s;
@@ -713,5 +722,9 @@ export default {
     margin-bottom: 0;
     font-weight: bold;
   }
+}
+
+.search-highlight {
+  opacity: 0.4;
 }
 </style>
