@@ -517,6 +517,50 @@ class Tapestry implements ITapestry
     }
 
     /**
+     * Infers and sets levels of all nodes in tapestry based on the connections,
+     *   assuming tapestry is flat (all nodes have level 1) and does not contain standalone nodes.
+     *
+     * @param Number $startingNodeId the id of the node to start with
+     *
+     * @return bool $success
+     */
+    public function inferNodeLevels($startingNodeId)
+    {
+        $levels = [
+            $startingNodeId => 1,
+        ];
+        $nodesToVisit = [$startingNodeId];
+
+        // Perform depth-first search, storing unvisited nodes in $nodesToVisit
+        while (!empty($nodesToVisit)) {
+            $nodeId = array_pop($nodesToVisit);
+            $nodeLevel = $levels[$nodeId];
+
+            $nodeObject = new TapestryNode($this->postId, $nodeId);
+            $nodeObject->set((object) [
+                'level' => $nodeLevel,
+            ]);
+            $nodeObject->save();
+
+            foreach ($this->links as $link) {
+                if ($link->source === $nodeId) {
+                    if (!isset($levels[$link->target])) {
+                        $levels[$link->target] = $nodeLevel + 1;
+                        array_push($nodesToVisit, $link->target);
+                    }
+                } elseif ($link->target === $nodeId) {
+                    if (!isset($levels[$link->source])) {
+                        $levels[$link->source] = max(1, $nodeLevel - 1);
+                        array_push($nodesToVisit, $link->source);
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Traverses through the nodes in one direction or bi-directioanlly and applies
      * the given function to each node. Notes:
      * - Nodes needs to be an array of objects, each object representing a node (at least with an id)

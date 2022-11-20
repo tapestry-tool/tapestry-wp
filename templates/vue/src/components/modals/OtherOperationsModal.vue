@@ -18,6 +18,7 @@
           <b-col lg="6">
             <b-button
               id="optimize-thumbnails-button"
+              class="perform-operation-button"
               block
               variant="primary"
               :class="isOptimizing ? 'disabled' : ''"
@@ -35,12 +36,53 @@
       <b-alert :show="hasOptimized" variant="success" style="margin-top: 1em;">
         Thumbnails have been successfully optimized!
       </b-alert>
+      <b-card>
+        <b-card-title>Transform Tapestry</b-card-title>
+        <b-card-text>
+          Transform the tapestry into a zoomable structure where the levels of nodes
+          are automatically determined by the connections between nodes.
+        </b-card-text>
+        <b-card-text class="text-muted">
+          Currently, the algorithm does not work well when there are loops within the
+          tapestry. You can always make adjustments to the levels of nodes in the
+          node toolbar after transforming.
+        </b-card-text>
+        <b-row>
+          <b-col lg="6">
+            <b-form-group
+              label="Root Node"
+              description="Select which node to use as the root node."
+            >
+              <b-form-select
+                id="transform-starting-node"
+                v-model="transformStartingNode"
+                :options="nodeOptions"
+              ></b-form-select>
+            </b-form-group>
+            <b-button
+              id="transform-tapestry-zoomable"
+              class="perform-operation-button"
+              block
+              variant="primary"
+              :class="isTransforming ? 'disabled' : ''"
+              :disabled="isTransforming"
+              @click="transformTapestry"
+            >
+              <b-spinner v-if="isTransforming" small></b-spinner>
+              <div :style="isTransforming ? 'opacity: 50%;' : ''">
+                Transform Tapestry
+              </div>
+            </b-button>
+          </b-col>
+        </b-row>
+      </b-card>
     </b-container>
   </b-modal>
 </template>
 
 <script>
 import client from "@/services/TapestryAPI"
+import { mapState } from "vuex"
 
 export default {
   props: {
@@ -53,7 +95,25 @@ export default {
     return {
       isOptimizing: false,
       hasOptimized: false,
+      isTransforming: false,
+      transformStartingNode: null,
     }
+  },
+  computed: {
+    ...mapState(["nodes", "rootId"]),
+    nodeOptions() {
+      return Object.values(this.nodes)
+        .filter(node => node.id !== this.nodeId)
+        .map(node => ({
+          value: node.id,
+          text: node.title,
+        }))
+    },
+  },
+  created() {
+    this.transformStartingNode = this.rootId
+      ? this.rootId
+      : this.nodeOptions[0]?.value
   },
   methods: {
     closeModal() {
@@ -81,12 +141,45 @@ export default {
           )
         })
     },
+    async transformTapestry() {
+      this.isTransforming = true
+      client
+        .transformTapestry(this.transformStartingNode)
+        .then(response => {
+          const success = !!response.data
+          if (success) {
+            this.$bvModal
+              .msgBoxOk(
+                "The tapestry has been transformed into a zoomable structure! Refresh the page to see the updated tapestry.",
+                {
+                  modalClass: "node-modal-confirmation",
+                  title: "Transformation Complete",
+                  okTitle: "Refresh",
+                }
+              )
+              .then(() => {
+                location.hash = "" // so the operations modal will not be opened after refresh
+                location.reload()
+              })
+          }
+        })
+        .catch(err => {
+          console.log(err)
+          this.$bvToast.toast("An error occured while transforming the tapestry.", {
+            title: "Transformation did not complete",
+            variant: "danger",
+          })
+        })
+        .finally(() => {
+          this.isTransforming = false
+        })
+    },
   },
 }
 </script>
 
 <style lang="scss" scoped>
-#optimize-thumbnails-button {
+.perform-operation-button {
   position: relative;
   > span {
     position: absolute;

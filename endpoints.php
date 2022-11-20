@@ -367,6 +367,14 @@ $REST_API_ENDPOINTS = [
             'permission_callback' => 'TapestryPermissions::putTapestrySettings',
         ],
     ],
+    'TRANSFORM_TAPESTRY' => (object) [
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/transform_tapestry',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_POST_METHOD,
+            'callback' => 'transformTapestryToZoomableStructure',
+            'permission_callback' => 'TapestryPermissions::putTapestrySettings',
+        ],
+    ],
 ];
 
 $REST_API_ENDPOINTS = array_merge($REST_API_ENDPOINTS, KalturaEndpoints::getRoutes());
@@ -1410,6 +1418,35 @@ function optimizeTapestryNodeThumbnails($request)
             }
         }
         return true;
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+function transformTapestryToZoomableStructure($request)
+{
+    $postId = $request['tapestryPostId'];
+    $startingNodeId = json_decode($request->get_body())->startingNodeId;
+
+    try {
+        if (empty($postId) || !TapestryHelpers::isValidTapestry($postId)) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+        if (!isset($startingNodeId) || empty($startingNodeId)) {
+            throw new TapestryError('INVALID_STARTING_NODE', 'Starting node is not set.', 400);
+        }
+        if (!TapestryHelpers::isValidTapestryNode($startingNodeId)) {
+            throw new TapestryError('INVALID_NODE_META_ID');
+        }
+        if (!TapestryHelpers::isChildNodeOfTapestry($startingNodeId, $postId)) {
+            throw new TapestryError('INVALID_CHILD_NODE');
+        }
+
+        $tapestry = new Tapestry($postId);
+
+        $success = $tapestry->inferNodeLevels($startingNodeId);
+
+        return $success;
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }

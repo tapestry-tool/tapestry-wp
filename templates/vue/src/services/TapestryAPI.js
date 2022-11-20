@@ -160,6 +160,11 @@ class TapestryApi {
     return await this.client.post(url)
   }
 
+  async transformTapestry(startingNodeId) {
+    const url = `${apiUrl}/tapestries/${this.postId}/transform_tapestry`
+    return await this.client.post(url, { startingNodeId })
+  }
+
   async getUserProgress() {
     const url = `/users/progress?post_id=${this.postId}`
     const response = await this.client.get(url)
