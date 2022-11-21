@@ -445,11 +445,13 @@ export default {
           this.viewBox[1] = this.unscaledViewBox[1]
           this.showContextToolbar = false
         } else if (this.savedZoomParams) {
-          this.scale = this.savedZoomParams.scale
-          this.offset.x = this.savedZoomParams.offset.x
-          this.offset.y = this.savedZoomParams.offset.y
-          this.viewBox[0] = this.unscaledViewBox[0] * this.scale
-          this.viewBox[1] = this.unscaledViewBox[1] * this.scale
+          if (this.scale === 1 && this.offset.x === 0 && this.offset.y === 0) {
+            this.scale = this.savedZoomParams.scale
+            this.offset.x = this.savedZoomParams.offset.x
+            this.offset.y = this.savedZoomParams.offset.y
+            this.viewBox[0] = this.unscaledViewBox[0] * this.scale
+            this.viewBox[1] = this.unscaledViewBox[1] * this.scale
+          }
           this.savedZoomParams = null
         }
       },
