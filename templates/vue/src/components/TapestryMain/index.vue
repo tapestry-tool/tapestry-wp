@@ -910,7 +910,7 @@ export default {
           viewBoxX: targetViewBoxX,
           viewBoxY: targetViewBoxY,
         },
-        Math.abs(deltaScale * 600),
+        300 + Math.abs(deltaScale) * 50,
         ({ scale, offsetX, offsetY, viewBoxX, viewBoxY }) => {
           this.scale = scale
           this.offset.x = offsetX
