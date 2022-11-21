@@ -166,6 +166,10 @@ export function updateVisibleNodes(state, nodes) {
   state.visibleNodes = nodes
 }
 
+export function updateVisibleNodeParents(state, parentsObj) {
+  state.visibleNodeParents = parentsObj
+}
+
 export function addApiError(state, error) {
   state.apiError = error
 }

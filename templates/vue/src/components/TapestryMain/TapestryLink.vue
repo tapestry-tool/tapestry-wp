@@ -11,8 +11,7 @@
         'half-opaque':
           (!source.accessible && source.hideWhenLocked) ||
           (!target.accessible && target.hideWhenLocked),
-        opaque:
-          !visibleNodes.includes(source.id) || !visibleNodes.includes(target.id),
+        opaque: isOpaque,
         disabled: !isLoggedIn,
       }"
       :style="{
@@ -47,7 +46,7 @@ export default {
     },
   },
   computed: {
-    ...mapState(["visibleNodes", "maxLevel", "currentDepth"]),
+    ...mapState(["visibleNodeParents", "maxLevel", "currentDepth"]),
     ...mapGetters(["getNeighbours", "isVisible"]),
     show() {
       return (
@@ -81,6 +80,17 @@ export default {
         this.scale
       )
       return `drop-shadow(${offset}px ${offset}px ${blur}px rgba(0, 0, 0, ${opacity}))`
+    },
+    isFilteringTapestry() {
+      return !!this.$route.query.search
+    },
+    isOpaque() {
+      return (
+        this.isFilteringTapestry &&
+        !this.visibleNodeParents.links.some(
+          link => link.source === this.source.id && link.target === this.target.id
+        )
+      )
     },
   },
   methods: {
