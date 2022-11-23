@@ -54,15 +54,6 @@
             style="overflow: hidden;"
             @click="changeTab('content')"
           >
-            <b-form-group label="Debug: Set Node Level">
-              <b-form-input
-                :value="node.level"
-                data-qa="node-level-input"
-                type="number"
-                number
-                @update="update('level', $event)"
-              />
-            </b-form-group>
             <content-form
               :parent="parent"
               :actionType="type"

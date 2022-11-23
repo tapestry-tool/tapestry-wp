@@ -88,7 +88,7 @@
             >
               <i
                 v-if="!node.unlocked && node.hideWhenLocked"
-                class="fas fa-eye-slash"
+                class="fas fa-eye-slash icon-hide"
               ></i>
               <p
                 ref="title"
@@ -100,7 +100,6 @@
                 @keydown="handleTitleKeydown"
                 v-text="node.title"
               ></p>
-              <p style="font-size: 60%;">Level {{ node.level }}</p>
               <p v-if="node.mediaDuration" class="timecode">
                 {{ formatDuration() }}
               </p>
@@ -726,9 +725,13 @@ export default {
   text-align: center;
   font-size: 30px;
 
+  .icon-hide {
+    margin-bottom: 12px;
+  }
+
   .node-title {
     padding-left: 0;
-    margin-top: 12px;
+    margin-top: 0;
     margin-bottom: 0;
     font-weight: bold;
   }
