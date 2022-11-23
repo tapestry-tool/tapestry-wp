@@ -11,6 +11,7 @@
 
 <script>
 import Helpers from "@/utils/Helpers"
+import { scaleConstants } from "@/utils/constants"
 
 export default {
   props: {
@@ -37,7 +38,7 @@ export default {
     strokeWidth() {
       return (
         Helpers.getNodeRadius(this.node.level, this.scale) *
-        this.$store.state.scaleConstants.lineWidthRatio
+        scaleConstants.lineWidthRatio
       )
     },
   },

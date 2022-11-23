@@ -40,7 +40,7 @@ export default {
       immediate: true,
       handler(requestedTab) {
         if (this.settingsModalOpen) {
-          const acceptedTabs = ["theme", "developer"]
+          const acceptedTabs = ["theme"]
           if (!acceptedTabs.includes(requestedTab)) {
             this.$router.replace({
               name: names.USERSETTINGS,

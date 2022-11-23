@@ -153,7 +153,7 @@ import { names } from "@/config/routes"
 import * as wp from "@/services/wp"
 import { interpolate } from "@/utils/interpolate"
 import { tools } from "@/utils/constants"
-// import { scaleConstants } from "@/utils/constants"
+import { scaleConstants } from "@/utils/constants"
 
 export default {
   components: {
@@ -213,7 +213,6 @@ export default {
       "browserDimensions",
       "maxLevel",
       "currentDepth",
-      "scaleConstants",
       "currentTool",
     ]),
     ...mapGetters([
@@ -310,7 +309,7 @@ export default {
     maxScale() {
       // TODO: may need to update how the smallest node size is calculated
       return Math.max(
-        (this.scaleConstants.maxNodeSizeToScreen *
+        (scaleConstants.maxNodeSizeToScreen *
           Math.min(this.viewBox[2], this.viewBox[3])) /
           Helpers.getNodeBaseRadius(this.maxLevel),
         140 / Helpers.getNodeBaseRadius(this.maxLevel)
@@ -541,13 +540,13 @@ export default {
     this.zoomPanHelper = new ZoomPanHelper(
       "tapestry",
       (delta, x, y, target) => {
-        this.handleZoom(delta * this.scaleConstants.zoomSensitivity, x, y, target)
+        this.handleZoom(delta * scaleConstants.zoomSensitivity, x, y, target)
       },
       () => {},
       (dx, dy) => {
         this.handlePan(
-          dx * this.scaleConstants.panSensitivity,
-          dy * this.scaleConstants.panSensitivity
+          dx * scaleConstants.panSensitivity,
+          dy * scaleConstants.panSensitivity
         )
       },
       () => {
@@ -605,7 +604,7 @@ export default {
     clampScale(scale) {
       return Math.max(
         Math.min(scale, this.maxScale),
-        this.scaleConstants.minTapestrySizeToScreen
+        scaleConstants.minTapestrySizeToScreen
       )
     },
     clampOffset() {
@@ -614,9 +613,6 @@ export default {
       this.offset.y = y
     },
     clampOffsetValue(offset, scale) {
-      if (this.scaleConstants.disableOffsetClamp) {
-        return offset
-      }
       if (!scale) {
         scale = this.scale
       }
@@ -715,8 +711,8 @@ export default {
     },
     handleMinimapPanBy({ dx, dy }) {
       // dx, dy passed here is in viewBox dimensions, not screen pixels; we apply the changes to the offset directly, bypassing the calculations in handlePan
-      this.offset.x -= dx * this.scaleConstants.panSensitivity * this.scale
-      this.offset.y -= dy * this.scaleConstants.panSensitivity * this.scale
+      this.offset.x -= dx * scaleConstants.panSensitivity * this.scale
+      this.offset.y -= dy * scaleConstants.panSensitivity * this.scale
       this.clampOffset()
       this.zoomPanHelper.onPanEnd()
     },

@@ -1,7 +1,6 @@
 import * as wp from "@/services/wp"
 import TinyColor from "tinycolor2"
-import { nodeStatus, userActions } from "./constants"
-import store from "../store"
+import { nodeStatus, scaleConstants, userActions } from "./constants"
 
 /**
  * Helper Functions
@@ -473,11 +472,11 @@ export default class Helpers {
   }
 
   static getTargetScale(level) {
-    return Math.max(1, level / store.state.scaleConstants.levelMultiplier)
+    return Math.max(1, level / scaleConstants.levelMultiplier)
   }
 
   static getCurrentLevel(scale) {
-    return Math.floor(scale * store.state.scaleConstants.levelMultiplier)
+    return Math.floor(scale * scaleConstants.levelMultiplier)
   }
 
   static getNodeBaseRadius(level) {
@@ -489,11 +488,10 @@ export default class Helpers {
     const currentLevel = Helpers.getCurrentLevel(scale)
     if (level < currentLevel) {
       // growth rate should be slow for nodes higher than current level
-      const baseScale = (level + 1) / store.state.scaleConstants.levelMultiplier
+      const baseScale = (level + 1) / scaleConstants.levelMultiplier
       return (
         baseRadius *
-        (baseScale +
-          (scale - baseScale) / store.state.scaleConstants.largeNodeGrowthSupressor)
+        (baseScale + (scale - baseScale) / scaleConstants.largeNodeGrowthSupressor)
       )
     } else {
       return baseRadius * scale
@@ -506,18 +504,16 @@ export default class Helpers {
       x2 = target.coordinates.x,
       y2 = target.coordinates.y
     let width1 =
-        Helpers.getNodeBaseRadius(source.level) *
-        store.state.scaleConstants.lineWidthRatio,
+        Helpers.getNodeBaseRadius(source.level) * scaleConstants.lineWidthRatio,
       width2 =
-        Helpers.getNodeBaseRadius(target.level) *
-        store.state.scaleConstants.lineWidthRatio
+        Helpers.getNodeBaseRadius(target.level) * scaleConstants.lineWidthRatio
     // make width differences more dramatic for better visual aid
     if (source.level < target.level) {
-      width1 *= store.state.scaleConstants.widthDifferenceEnhancer.grow
-      width2 *= store.state.scaleConstants.widthDifferenceEnhancer.shrink
+      width1 *= scaleConstants.widthDifferenceEnhancer.grow
+      width2 *= scaleConstants.widthDifferenceEnhancer.shrink
     } else if (source.level > target.level) {
-      width2 *= store.state.scaleConstants.widthDifferenceEnhancer.grow
-      width1 *= store.state.scaleConstants.widthDifferenceEnhancer.shrink
+      width2 *= scaleConstants.widthDifferenceEnhancer.grow
+      width1 *= scaleConstants.widthDifferenceEnhancer.shrink
     }
     const angle = Math.atan((y2 - y1) / (x2 - x1))
     const dx1 = -1 * width1 * Math.sin(angle),
@@ -538,18 +534,16 @@ export default class Helpers {
       x2 = target.coordinates.x * scale,
       y2 = target.coordinates.y * scale
     let width1 =
-        Helpers.getNodeRadius(source.level, scale) *
-        store.state.scaleConstants.lineWidthRatio,
+        Helpers.getNodeRadius(source.level, scale) * scaleConstants.lineWidthRatio,
       width2 =
-        Helpers.getNodeRadius(target.level, scale) *
-        store.state.scaleConstants.lineWidthRatio
+        Helpers.getNodeRadius(target.level, scale) * scaleConstants.lineWidthRatio
     // make width differences more dramatic for better visual aid
     if (source.level < target.level) {
-      width1 *= store.state.scaleConstants.widthDifferenceEnhancer.grow
-      width2 *= store.state.scaleConstants.widthDifferenceEnhancer.shrink
+      width1 *= scaleConstants.widthDifferenceEnhancer.grow
+      width2 *= scaleConstants.widthDifferenceEnhancer.shrink
     } else if (source.level > target.level) {
-      width2 *= store.state.scaleConstants.widthDifferenceEnhancer.grow
-      width1 *= store.state.scaleConstants.widthDifferenceEnhancer.shrink
+      width2 *= scaleConstants.widthDifferenceEnhancer.grow
+      width1 *= scaleConstants.widthDifferenceEnhancer.shrink
     }
     const angle = Math.atan((y2 - y1) / (x2 - x1))
     const dx1 = -1 * width1 * Math.sin(angle),
