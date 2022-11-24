@@ -136,7 +136,7 @@ export default {
             .join(", ")}?`,
           {
             modalClass: "node-modal-confirmation",
-            title: "Are you sure you want to delete these nodes?",
+            title: `Are you sure you want to delete ${this.nodes.length} nodes?`,
             okTitle: "Yes, Delete!",
             okVariant: "danger",
           }
