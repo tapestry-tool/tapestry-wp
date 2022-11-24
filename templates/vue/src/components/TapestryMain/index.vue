@@ -17,7 +17,7 @@
       <root-node-button v-if="isLoggedIn"></root-node-button>
       <div v-else class="empty-message">The requested Tapestry is empty.</div>
     </div>
-    <div v-else ref="dragArea">
+    <div v-else>
       <svg
         id="vue-svg"
         ref="vue-svg"
@@ -511,7 +511,11 @@ export default {
     },
     currentTool(newTool, oldTool) {
       if (this.dragSelectEnabled && newTool === tools.SELECT) {
-        DragSelectModular.initializeDragSelect(this.$refs.dragArea, this, this.nodes)
+        DragSelectModular.initializeDragSelect(
+          this.$refs["vue-svg"],
+          this,
+          this.nodes
+        )
       } else {
         DragSelectModular.disableDragSelect()
       }
@@ -936,7 +940,7 @@ export default {
           viewBoxX: targetViewBoxX,
           viewBoxY: targetViewBoxY,
         },
-        Math.abs(deltaScale * 600),
+        300 + Math.abs(deltaScale) * 50,
         ({ scale, offsetX, offsetY, viewBoxX, viewBoxY }) => {
           this.scale = scale
           this.offset.x = offsetX
