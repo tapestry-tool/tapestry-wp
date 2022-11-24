@@ -102,9 +102,6 @@ export function isVisible(state, { getNode, hasMultiContentAncestor }) {
   const { showRejected } = state.settings
   return id => {
     const node = getNode(id)
-    if (node.nodeType === "") {
-      return false
-    }
     if (!Helpers.hasPermission(node, "read", showRejected)) {
       return false
     }

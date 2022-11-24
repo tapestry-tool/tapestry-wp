@@ -41,7 +41,7 @@
         ></circle>
       </transition>
       <progress-bar
-        v-if="!isGrandChild && node.nodeType !== '' && !node.hideProgress"
+        v-if="!isGrandChild && !node.hideProgress"
         :x="coordinates.x"
         :y="coordinates.y"
         :radius="radius"
@@ -51,7 +51,7 @@
         :locked="!node.unlocked"
       ></progress-bar>
       <status-bar
-        v-if="!isGrandChild && node.nodeType !== '' && !node.hideProgress"
+        v-if="!isGrandChild && !node.hideProgress"
         :x="coordinates.x"
         :y="coordinates.y"
         :radius="radius"
@@ -61,7 +61,7 @@
         :enableHighlight="highlightNode"
         :data-qa="`node-status-${node.id}`"
       ></status-bar>
-      <g v-show="!isGrandChild && node.nodeType !== ''">
+      <g v-show="!isGrandChild">
         <transition name="fade">
           <foreignObject
             v-if="!node.hideTitle"
@@ -350,7 +350,6 @@ export default {
       }
     },
     isGrandChild() {
-      // return this.node.nodeType === "grandchild"
       // make it grandchild when not visible too, to prevent buttons showing up while transitioning to hidden
       return this.visibility <= 0
     },

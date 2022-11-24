@@ -858,13 +858,11 @@ export default {
         y: 0,
       }
       for (const node of Object.values(this.nodes)) {
-        if (node.nodeType !== "") {
-          const { x, y } = node.coordinates
-          box.x0 = Math.min(x, box.x0)
-          box.y0 = Math.min(y, box.y0)
-          box.x = Math.max(x, box.x)
-          box.y = Math.max(y, box.y)
-        }
+        const { x, y } = node.coordinates
+        box.x0 = Math.min(x, box.x0)
+        box.y0 = Math.min(y, box.y0)
+        box.x = Math.max(x, box.x)
+        box.y = Math.max(y, box.y)
       }
 
       return box
@@ -1076,8 +1074,7 @@ export default {
       const node = this.nodes[id]
       if (
         !node.accessible &&
-        node.nodeType !== "grandchild" &&
-        node.nodeType !== ""
+        Helpers.getNodeVisibility(node.level, this.scale, this.currentDepth) > 0
       ) {
         this.activeNode = id
       }

@@ -353,7 +353,6 @@ export default class Helpers {
       conditions: [],
       behaviour: "new-window",
       status: "publish",
-      nodeType: "child",
       title: "",
       imageURL: "",
       lockedImageURL: "",

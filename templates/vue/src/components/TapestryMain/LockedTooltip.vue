@@ -28,14 +28,8 @@ export default {
   },
   computed: {
     radius() {
-      if (this.node.nodeType === "") {
-        return 0
-      }
       if (this.node.id === this.selectedNodeId) {
         return 210
-      }
-      if (this.node.nodeType === "grandchild") {
-        return 40
       }
       return 140
     },

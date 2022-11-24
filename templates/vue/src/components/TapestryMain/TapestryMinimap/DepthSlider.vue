@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import { mapState, mapGetters, mapMutations } from "vuex"
+import { mapState, mapMutations } from "vuex"
 import ZoomIn from "@/assets/zoom-in.png"
 import ZoomOut from "@/assets/zoom-out.png"
 import Helpers from "@/utils/Helpers"
@@ -32,8 +32,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(["nodes", "settings", "maxLevel"]),
-    ...mapGetters(["getNeighbours", "getNode"]),
+    ...mapState(["maxLevel"]),
     currentDepth: {
       get() {
         return this.$store.state.currentDepth
@@ -52,9 +51,6 @@ export default {
           })
         }
       },
-    },
-    selectedNodeId() {
-      return Number(this.$route.params.nodeId)
     },
     maxDepth() {
       return this.maxLevel - 1
@@ -77,12 +73,6 @@ export default {
           to: depth,
         })
       }
-    },
-    levels: {
-      immediate: true,
-      handler: function() {
-        this.updateNodeTypes()
-      },
     },
     isFilteringTapestry: {
       immediate: true,
@@ -107,78 +97,7 @@ export default {
     }
   },
   methods: {
-    ...mapMutations(["updateNode", "setCurrentDepth"]),
-    updateNodeTypes() {
-      // TODO: remove code elsewhere that is related to nodeType check, and safely delete the code below.
-      /*
-      const depth = parseInt(this.currentDepth)
-
-      if (depth === 0) {
-        const nodesToUpdate = Object.values(this.nodes).filter(
-          node => node.nodeType !== "child"
-        )
-        nodesToUpdate.forEach(node => {
-          this.updateNode({
-            id: node.id,
-            newNode: {
-              nodeType: "child",
-            },
-          })
-        })
-        this.$emit("change")
-        return
-      }
-
-      const updated = new Set()
-      const nodesAtCurrentDepth = this.levels[depth]
-      if (nodesAtCurrentDepth) {
-        const nodesToUpdate = nodesAtCurrentDepth.filter(nodeId => {
-          updated.add(parseInt(nodeId))
-          const node = this.getNode(nodeId)
-          return node.nodeType !== "grandchild"
-        })
-        nodesToUpdate.forEach(nodeId => {
-          this.updateNode({
-            id: nodeId,
-            newNode: {
-              nodeType: "grandchild",
-            },
-          })
-        })
-      }
-      const children = this.levels
-        .slice(0, depth)
-        .flatMap(nodes => nodes)
-        .filter(nodeId => {
-          updated.add(parseInt(nodeId))
-          const node = this.getNode(nodeId)
-          return node.nodeType !== "child"
-        })
-      children.forEach(nodeId => {
-        this.updateNode({
-          id: nodeId,
-          newNode: {
-            nodeType: "child",
-          },
-        })
-      })
-      const hidden = Object.values(this.nodes).filter(
-        node =>
-          !updated.has(node.id) &&
-          node.id !== this.selectedNodeId &&
-          node.nodeType !== ""
-      )
-      hidden.forEach(node => {
-        this.updateNode({
-          id: node.id,
-          newNode: {
-            nodeType: "",
-          },
-        })
-      })
-      this.$emit("change")
-      */
-    },
+    ...mapMutations(["setCurrentDepth"]),
   },
 }
 </script>
