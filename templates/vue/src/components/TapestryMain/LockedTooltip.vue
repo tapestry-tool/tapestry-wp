@@ -1,5 +1,9 @@
 <template>
-  <g :transform="`translate(${node.coordinates.x}, ${node.coordinates.y})`">
+  <g
+    :transform="
+      `translate(${node.coordinates.x * scale}, ${node.coordinates.y * scale})`
+    "
+  >
     <foreignObject :width="width" :height="height" :x="x" :y="y">
       <div class="tapestry-tooltip" :style="flexPosition">
         <locked-text class="tapestry-tooltip-content" :node="node" />
@@ -23,6 +27,10 @@ export default {
     },
     viewBox: {
       type: String,
+      required: true,
+    },
+    scale: {
+      type: Number,
       required: true,
     },
   },

@@ -92,6 +92,7 @@
           v-if="activeNode"
           :node="nodes[activeNode]"
           :viewBox="computedViewBox"
+          :scale="scale"
         ></locked-tooltip>
       </svg>
       <tapestry-node-toolbar
@@ -1073,7 +1074,7 @@ export default {
     handleMouseover(id) {
       const node = this.nodes[id]
       if (
-        !node.accessible &&
+        !node.unlocked &&
         Helpers.getNodeVisibility(node.level, this.scale, this.currentDepth) > 0
       ) {
         this.activeNode = id
