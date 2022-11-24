@@ -9,8 +9,8 @@
       :data-qa="elementId"
       :class="{
         'half-opaque':
-          (!source.accessible && source.hideWhenLocked) ||
-          (!target.accessible && target.hideWhenLocked),
+          (!source.unlocked && source.hideWhenLocked) ||
+          (!target.unlocked && target.hideWhenLocked),
         opaque: isOpaque,
         disabled: !isLoggedIn,
       }"
