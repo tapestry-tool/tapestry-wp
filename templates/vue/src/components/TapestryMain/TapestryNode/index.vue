@@ -604,7 +604,8 @@ export default {
         ) {
           this.selected ? this.unselect(this.node.id) : this.select(this.node.id)
         } else if (this.node.unlocked || this.hasPermission("edit")) {
-          const shouldOpenLightbox = this.root && this.node.hideMedia
+          const shouldOpenLightbox =
+            this.root && this.node.hideMedia && !this.hasPermission("edit")
           const shouldOpenToolbar = !shouldOpenLightbox && this.hasPermission("edit")
           this.$emit("click", {
             node: this.node,

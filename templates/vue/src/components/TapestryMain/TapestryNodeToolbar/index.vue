@@ -19,6 +19,20 @@
 
       <div class="tapestry-toolbar-separator"></div>
 
+      <template v-if="node.hideMedia">
+        <tapestry-toolbar-button
+          :id="`view-node-button-${node.id}`"
+          class="after-separator before-separator"
+          horizontal
+          tooltip="View Node"
+          @click="openModal(names.LIGHTBOX)"
+        >
+          <img class="icon" :src="icons.media_button" />
+        </tapestry-toolbar-button>
+
+        <div class="tapestry-toolbar-separator"></div>
+      </template>
+
       <v-swatches
         :value="node.textColor"
         :swatches="swatchesWithTransparentColor"
@@ -121,6 +135,7 @@ import TapestryContextToolbar from "../TapestryContextToolbar"
 import TapestryToolbarButton from "../common/TapestryToolbarButton"
 import NodeLevelSelect from "./NodeLevelSelect"
 import NodeBackgroundButton from "./NodeBackgroundButton"
+import media_button from "@/assets/icons/media_button.svg"
 import Helpers from "@/utils/Helpers"
 import { tools, swatches } from "@/utils/constants"
 import { mapActions, mapState } from "vuex"
@@ -159,6 +174,9 @@ export default {
       tools: tools,
       swatches: swatches,
       names: names,
+      icons: {
+        media_button,
+      },
 
       activeButton: null,
       justChanged: false,
@@ -306,6 +324,11 @@ export default {
 
 .position-relative {
   position: relative;
+}
+
+.icon {
+  max-width: 60%;
+  max-height: 60%;
 }
 </style>
 
