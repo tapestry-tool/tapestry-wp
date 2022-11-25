@@ -185,10 +185,13 @@ function tapestry_enqueue_vue_app()
             'display_name'=> $currentUser->data->display_name
         ];
 
+        $iframe_mode = array_key_exists('iframe', $_GET) ? 1 : 0;
+
         wp_localize_script(
             'tapestry_d3_vue', // vue script handle defined in wp_register_script.
             'wpData', // javascript object that will made availabe to Vue.
             [ // wordpress data to be made available to the Vue app in 'wpData'
+                'iframe_mode' => $iframe_mode,
                 'directory_uri' => plugin_dir_url(__FILE__).'templates/vue/dist', // child theme directory path.
                 'vue_uri' => $vueUrl, // path to vue
                 'rest_url' => untrailingslashit(esc_url_raw(rest_url())), // URL to the REST endpoint.
@@ -366,18 +369,21 @@ function tapestry_tool_log_event()
 // Cleanup
 
 add_action('tapestry_clean_export_files', 'clean_export_files');
-function clean_export_files() {
+function clean_export_files()
+{
     TapestryImportExport::clearExportedZips();
 }
 
 register_activation_hook(__FILE__, 'schedule_tapestry_export_file_cleanup');
-function schedule_tapestry_export_file_cleanup() {
-    if ( ! wp_next_scheduled('tapestry_clean_export_files') ) {
-        wp_schedule_event( time(), 'daily', 'tapestry_clean_export_files' );
+function schedule_tapestry_export_file_cleanup()
+{
+    if (! wp_next_scheduled('tapestry_clean_export_files')) {
+        wp_schedule_event(time(), 'daily', 'tapestry_clean_export_files');
     }
 }
 
 register_deactivation_hook(__FILE__, 'unschedule_tapestry_export_file_cleanup');
-function unschedule_tapestry_export_file_cleanup() {
+function unschedule_tapestry_export_file_cleanup()
+{
     wp_clear_scheduled_hook('tapestry_clean_export_files');
 }
