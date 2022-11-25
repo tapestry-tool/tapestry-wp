@@ -1,5 +1,5 @@
 <template>
-  <div id="app-container" :class="{ 'sidebar-open': isSidebarOpen }">
+  <div id="tapestry-app" :class="{ 'sidebar-open': isSidebarOpen }">
     <toolbar />
     <tapestry-map
       v-if="settings.renderMap"
@@ -26,7 +26,7 @@ import client from "../services/TapestryAPI"
 import { names } from "@/config/routes"
 import Toolbar from "./Toolbar"
 import TapestryMain from "./TapestryMain"
-import { mapMutations, mapState } from "vuex"
+import { mapGetters, mapMutations, mapState } from "vuex"
 import TapestryMap from "./TapestryMap"
 import Helpers from "@/utils/Helpers"
 import { getCurrentUser, canEditTapestry } from "@/services/wp"
@@ -44,6 +44,7 @@ export default {
   },
   computed: {
     ...mapState(["nodes", "links", "selection", "settings", "rootId", "avatar"]),
+    ...mapGetters(["getNodeDimensions"]),
     isSidebarOpen() {
       return Boolean(this.$route.query.sidebar)
     },
@@ -118,7 +119,7 @@ export default {
             width,
             height,
           } = this.$refs.graph.$refs.app.getBoundingClientRect()
-          const { x0, y0, x, y } = this.getNodeDimensions()
+          const { x0, y0, x, y } = this.getNodeDimensions
 
           const tapestryDimensions = {
             startX: 0,
@@ -163,25 +164,6 @@ export default {
         }
       }
     },
-    getNodeDimensions() {
-      const box = {
-        x0: 30000,
-        y0: 30000,
-        x: 0,
-        y: 0,
-      }
-      for (const node of Object.values(this.nodes)) {
-        if (node.nodeType !== "") {
-          const { x, y } = node.coordinates
-          box.x0 = Math.min(x, box.x0)
-          box.y0 = Math.min(y, box.y0)
-          box.x = Math.max(x, box.x)
-          box.y = Math.max(y, box.y)
-        }
-      }
-
-      return box
-    },
     openNode(id) {
       this.$router.push({
         name: names.LIGHTBOX,
@@ -225,7 +207,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-#app-container {
+#tapestry-app {
   position: relative;
   transform: scale(1);
   transform-origin: top left;
@@ -245,22 +227,14 @@ export default {
       }
     }
   }
-  #tapestry {
-    .empty-message {
-      margin: 30vh auto;
-    }
-    svg {
-      position: relative;
-    }
-  }
 }
 </style>
 
 <style lang="scss">
 #app {
   background-size: cover;
-}
-#app-container .btn-link {
-  background: transparent;
+  #tapestry-app .btn-link {
+    background: transparent;
+  }
 }
 </style>

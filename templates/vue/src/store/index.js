@@ -35,6 +35,7 @@ export const store = {
         error: 0,
       },
     },
+    kalturaScriptsLoaded: [],
   },
   getters,
   mutations,
