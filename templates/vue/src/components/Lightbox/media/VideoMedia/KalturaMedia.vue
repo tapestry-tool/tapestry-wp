@@ -11,6 +11,7 @@
 /*global kWidget*/
 
 import client from "@/services/TapestryAPI"
+import { mapState, mapMutations } from "vuex"
 
 export default {
   name: "kaltura-media",
@@ -47,20 +48,44 @@ export default {
     }
   },
   computed: {
+    ...mapState(["kalturaScriptsLoaded"]),
     kalturaId() {
       return this.node.typeData.kalturaId
     },
   },
-  created() {
-    const kalturaScript = document.createElement("script")
+  mounted() {
     const partnerId = this.node.typeData.kalturaData.partnerId
     const serviceUrl = this.node.typeData.kalturaData.serviceUrl
     const uniqueConfiguration = this.node.typeData.kalturaData.uniqueConfiguration
-    kalturaScript.src = `${serviceUrl}/p/${partnerId}/sp/${partnerId}00/embedIframeJs/uiconf_id/${uniqueConfiguration}/partner_id/${partnerId}`
 
-    kalturaScript.id = "kaltura-script"
+    const kalturaScriptId = `tapestry-kaltura-script-${serviceUrl}-${partnerId}-${uniqueConfiguration}`
 
-    kalturaScript.addEventListener("load", () => {
+    let kalturaScript = document.getElementById(kalturaScriptId)
+
+    if (this.kalturaScriptsLoaded.includes(kalturaScriptId)) {
+      this.handleScriptLoaded(partnerId, uniqueConfiguration)
+    } else if (kalturaScript) {
+      kalturaScript.addEventListener("load", () => {
+        this.addKalturaScriptLoaded(kalturaScriptId)
+        this.handleScriptLoaded(partnerId, uniqueConfiguration)
+      })
+    } else {
+      kalturaScript = document.createElement("script")
+      kalturaScript.src = `${serviceUrl}/p/${partnerId}/sp/${partnerId}00/embedIframeJs/uiconf_id/${uniqueConfiguration}/partner_id/${partnerId}`
+      kalturaScript.id = kalturaScriptId
+      kalturaScript.addEventListener("load", () => {
+        this.addKalturaScriptLoaded(kalturaScriptId)
+        this.handleScriptLoaded(partnerId, uniqueConfiguration)
+      })
+      document.head.appendChild(kalturaScript)
+    }
+  },
+  beforeDestroy() {
+    window.removeEventListener("resize", this.setFrameDimensions)
+  },
+  methods: {
+    ...mapMutations(["addKalturaScriptLoaded"]),
+    handleScriptLoaded(partnerId, uniqueConfiguration) {
       kWidget.embed({
         targetId: `kaltura-container-${this.node.id}`,
         wid: `_${partnerId}`,
@@ -80,8 +105,11 @@ export default {
 
       kalturaIframe.onload = () => {
         kWidget.addReadyCallback(playerId => {
-          this.playerId = playerId
           const kalturaVideo = document.getElementById(playerId)
+          if (!kalturaVideo.contains(kalturaIframe)) {
+            return
+          }
+          this.playerId = playerId
 
           if (this.context === "multi-content") {
             this.setFrameDimensions()
@@ -140,21 +168,22 @@ export default {
           const videoDuration = kalturaVideo.evaluate("{duration}")
           const currentTime = nodeProgress * videoDuration
 
-          kalturaVideo.sendNotification("doSeek", currentTime)
+          try {
+            kalturaVideo.sendNotification("doSeek", currentTime)
+          } catch (e) {
+            try {
+              kalturaVideo.kBind("mediaReady", function() {
+                kalturaVideo.sendNotification("doSeek", currentTime)
+              })
+            } catch (e) {
+              console.error("Kaltura player could not seek to its saved position", e)
+            }
+          }
 
           this.$emit("load", { currentTime, type: "kaltura-video" })
         })
       }
-    })
-
-    document.head.appendChild(kalturaScript)
-  },
-  beforeDestroy() {
-    window.removeEventListener("resize", this.setFrameDimensions)
-    const kalturaScript = document.getElementById("kaltura-script")
-    document.head.removeChild(kalturaScript)
-  },
-  methods: {
+    },
     updateVideoProgress(currentTime, duration) {
       this.amountViewed = currentTime / duration
       this.$emit("timeupdate", { amountViewed: this.amountViewed, currentTime })
