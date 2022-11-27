@@ -137,7 +137,12 @@ export default {
       "currentDepth",
       "scaleConstants",
     ]),
-    ...mapGetters(["getNode", "getNodeDimensions", "getNodeNavId", "getNodeNavParent"]),
+    ...mapGetters([
+      "getNode",
+      "getNodeDimensions",
+      "getNodeNavId",
+      "getNodeNavParent",
+    ]),
     nodeNavLinkMode: {
       get() {
         return this.$store.state.nodeNavigation.linkMode
