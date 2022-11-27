@@ -45,7 +45,7 @@
           v-if="isImageUploading"
           style="width: 24px; height: 24px;"
         ></b-spinner>
-        <i v-else class="fas fa-image fa-lg"></i>
+        <img v-else class="icon" :src="icons.add_node_background_image" />
       </tapestry-toolbar-button>
       <v-swatches
         :value="node.backgroundColor"
@@ -92,6 +92,7 @@ import VSwatches from "vue-swatches"
 import TapestryContextToolbar from "../TapestryContextToolbar"
 import TapestryToolbarButton from "../common/TapestryToolbarButton"
 import NodeThumbnailPreview from "./NodeThumbnailPreview"
+import add_node_background_image from "@/assets/icons/add_node_background_image.svg"
 import { swatches } from "@/utils/constants"
 import { mapActions, mapMutations, mapState } from "vuex"
 import { data as wpData } from "@/services/wp"
@@ -117,6 +118,9 @@ export default {
   data() {
     return {
       swatches: swatches,
+      icons: {
+        add_node_background_image,
+      },
 
       activeButton: null,
       isImageUploading: false,
@@ -257,5 +261,9 @@ export default {
   width: 1.5rem;
   height: 1.5rem;
   border-radius: 50%;
+}
+.icon {
+  max-width: 70%;
+  max-height: 70%;
 }
 </style>

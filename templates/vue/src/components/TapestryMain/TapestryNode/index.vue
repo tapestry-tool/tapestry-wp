@@ -33,6 +33,15 @@
       ></circle>
       <transition name="fade">
         <circle
+          v-show="root && !isGrandChild"
+          ref="halo"
+          fill="none"
+          :stroke-width="selectHaloWidth"
+          :stroke="selectHaloColor"
+        ></circle>
+      </transition>
+      <transition name="fade">
+        <circle
           v-show="(!node.hideTitle && !isHovered) || !node.unlocked || selected"
           :r="radius"
           :fill="overlayFill"
@@ -54,7 +63,7 @@
         v-if="!isGrandChild && !node.hideProgress"
         :x="coordinates.x"
         :y="coordinates.y"
-        :radius="radius"
+        :radius="root ? radius + selectHaloWidth : radius"
         :locked="!node.unlocked"
         :status="node.status"
         :reviewStatus="node.reviewStatus"
@@ -357,8 +366,7 @@ export default {
       if (!this.show) {
         return 0
       }
-      const radius =
-        Helpers.getNodeRadius(this.node.level, this.scale) * (this.root ? 1.2 : 1)
+      const radius = Helpers.getNodeRadius(this.node.level, this.scale)
       return this.isGrandChild ? Math.min(40, radius) : radius
     },
     fill() {
@@ -462,6 +470,12 @@ export default {
         this.visibleNodeParents.nodes.includes(this.node.id)
       )
     },
+    selectHaloWidth() {
+      return this.radius * 0.1
+    },
+    selectHaloColor() {
+      return "#49cfff"
+    },
   },
   watch: {
     radius(newRadius) {
@@ -476,6 +490,12 @@ export default {
           this.transitioning = false
         })
         .attr("r", newRadius)
+
+      d3.select(this.$refs.halo)
+        .transition()
+        .duration(350)
+        .ease(d3.easePolyOut)
+        .attr("r", newRadius + this.selectHaloWidth / 2)
     },
     isEditingTitle(isEditingTitle) {
       if (isEditingTitle) {
@@ -512,6 +532,7 @@ export default {
   mounted() {
     this.$emit("mounted")
     this.$refs.circle.setAttribute("r", this.radius)
+    this.$refs.halo.setAttribute("r", this.radius + this.selectHaloWidth / 2)
     const nodeRef = this.$refs.node
     if (this.root) {
       nodeRef.setAttribute("tabindex", "0")
@@ -625,7 +646,8 @@ export default {
         ) {
           this.selected ? this.unselect(this.node.id) : this.select(this.node.id)
         } else if (this.node.unlocked || this.hasPermission("edit")) {
-          const shouldOpenLightbox = this.root && this.node.hideMedia
+          const shouldOpenLightbox =
+            this.root && this.node.hideMedia && !this.hasPermission("edit")
           const shouldOpenToolbar = !shouldOpenLightbox && this.hasPermission("edit")
           this.$emit("click", {
             node: this.node,
