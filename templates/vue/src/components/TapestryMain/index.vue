@@ -140,6 +140,7 @@ export default {
     ...mapGetters([
       "isEmptyTapestry",
       "getNode",
+      "getNodeDimensions",
       "getInitialNodeId",
       "getNodeNavId",
       "getNodeNavParent",
@@ -504,7 +505,7 @@ export default {
       if (this.$refs.app) {
         // check if <main> in TapestryMain has rendered
         const { width, height } = this.$refs.app.getBoundingClientRect()
-        const { x0, y0, x, y } = this.getNodeDimensions()
+        const { x0, y0, x, y } = this.getNodeDimensions
 
         const tapestryDimensions = {
           startX: 0,
@@ -551,25 +552,6 @@ export default {
           this.unscaledViewBox[3],
         ]
       }
-    },
-    getNodeDimensions() {
-      const box = {
-        x0: 30000,
-        y0: 30000,
-        x: 0,
-        y: 0,
-      }
-      for (const node of Object.values(this.nodes)) {
-        if (node.nodeType !== "") {
-          const { x, y } = node.coordinates
-          box.x0 = Math.min(x, box.x0)
-          box.y0 = Math.min(y, box.y0)
-          box.x = Math.max(x, box.x)
-          box.y = Math.max(y, box.y)
-        }
-      }
-
-      return box
     },
     handleNodeClick(node) {
       // zoom to the level that the node is on, and pan towards the node
@@ -853,51 +835,19 @@ export default {
 
 <style lang="scss" scoped>
 #tapestry {
+  position: relative;
   cursor: move;
 
   &.panning {
     cursor: grabbing;
   }
-}
 
-#app-container {
-  position: relative;
-  transform: scale(1);
-  transform-origin: top left;
-  transition: all 0.2s ease-out;
-  width: 100%;
-  z-index: 0;
-
-  @media screen and (min-width: 500px) {
-    width: calc(100% - 2.5em);
-
-    &.sidebar-open {
-      width: calc(100% - min(400px, max(300px, 25vw)) - 2.5em);
-      padding-right: 0;
-
-      .toolbar {
-        padding-right: 1.5vw;
-      }
-    }
+  .empty-message {
+    margin: 30vh auto;
   }
-  #tapestry {
+
+  svg {
     position: relative;
-
-    .empty-message {
-      margin: 30vh auto;
-    }
-    svg {
-      position: relative;
-    }
   }
-}
-</style>
-
-<style lang="scss">
-#app {
-  background-size: cover;
-}
-#app-container .btn-link {
-  background: transparent;
 }
 </style>
