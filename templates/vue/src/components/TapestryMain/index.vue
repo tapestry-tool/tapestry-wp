@@ -102,6 +102,7 @@ export default {
       unscaledViewBox: [2200, 2700, 1600, 1100],
       viewBox: [2200, 2700, 1600, 1100],
       scale: 1,
+      manualScale: 1,
       offset: { x: 0, y: 0 },
       appDimensions: null,
       zoomPanHelper: null,
@@ -126,7 +127,7 @@ export default {
       "currentDepth",
       "scaleConstants",
     ]),
-    ...mapGetters(["getNode"]),
+    ...mapGetters(["getNode", "getNodeDimensions"]),
     renderedLevels() {
       const levels = []
       for (let i = 1; i <= this.maxLevel; i++) {
@@ -214,19 +215,6 @@ export default {
       },
     },
   },
-  created() {
-    const { scale, x, y } = this.$route.query
-    if (scale && !isNaN(scale)) {
-      this.scale = this.clampScale(Number(scale))
-    }
-    if (x && !isNaN(x)) {
-      this.offset.x = Number(x)
-    }
-    if (y && !isNaN(y)) {
-      this.offset.y = Number(y)
-    }
-    this.clampOffset()
-  },
   mounted() {
     if (this.dragSelectEnabled) {
       // ! disabled drag select in favor of panning
@@ -241,7 +229,6 @@ export default {
         this.handleZoom(delta * this.scaleConstants.zoomSensitivity, x, y)
       },
       () => {
-        this.updateScale()
         this.fetchAppDimensions()
       },
       (dx, dy) => {
@@ -252,7 +239,6 @@ export default {
       },
       () => {
         this.isPanning = false
-        this.updateOffset()
         this.fetchAppDimensions()
       },
       [this.$refs.minimap.$el],
@@ -323,6 +309,11 @@ export default {
       const newScale = this.clampScale(this.scale + delta)
       const scaleChange = newScale / this.scale
 
+      this.manualScale = Math.max(
+        1,
+        Math.min(this.maxScale / 2, this.manualScale + newScale - this.scale)
+      )
+
       if (!this.appDimensions) {
         this.fetchAppDimensions()
       }
@@ -378,24 +369,6 @@ export default {
       this.offset.x = scaledX - this.viewBox[2] / 2
       this.offset.y = scaledY - this.viewBox[3] / 2
       this.clampOffset()
-      this.updateOffset()
-    },
-    updateScale() {
-      this.$router.push({
-        ...this.$route,
-        query: { ...this.$route.query, scale: this.scale.toFixed(2) },
-      })
-      this.updateOffset()
-    },
-    updateOffset() {
-      this.$router.push({
-        ...this.$route,
-        query: {
-          ...this.$route.query,
-          x: this.offset.x.toFixed(4),
-          y: this.offset.y.toFixed(4),
-        },
-      })
     },
     updateSelectableNodes() {
       DragSelectModular.updateSelectableNodes()
@@ -412,7 +385,7 @@ export default {
       if (this.$refs.app) {
         // check if <main> in TapestryMain has rendered
         const { width, height } = this.$refs.app.getBoundingClientRect()
-        const { x0, y0, x, y } = this.getNodeDimensions()
+        const { x0, y0, x, y } = this.getNodeDimensions
 
         const tapestryDimensions = {
           startX: 0,
@@ -460,28 +433,9 @@ export default {
         ]
       }
     },
-    getNodeDimensions() {
-      const box = {
-        x0: 30000,
-        y0: 30000,
-        x: 0,
-        y: 0,
-      }
-      for (const node of Object.values(this.nodes)) {
-        if (node.nodeType !== "") {
-          const { x, y } = node.coordinates
-          box.x0 = Math.min(x, box.x0)
-          box.y0 = Math.min(y, box.y0)
-          box.x = Math.max(x, box.x)
-          box.y = Math.max(y, box.y)
-        }
-      }
-
-      return box
-    },
     handleNodeClick(node) {
       // zoom to the level that the node is on, and pan towards the node
-      const targetScale = Helpers.getTargetScale(node.level)
+      const targetScale = Helpers.getTargetScale(node.level) * this.manualScale
       const deltaScale = targetScale - this.scale
 
       const targetViewBoxX = this.unscaledViewBox[0] * targetScale
@@ -520,9 +474,7 @@ export default {
           this.viewBox[0] = viewBoxX
           this.viewBox[1] = viewBoxY
         },
-        () => {
-          this.updateScale()
-        },
+        () => {},
         "easeOut"
       )
     },
@@ -655,51 +607,19 @@ export default {
 
 <style lang="scss" scoped>
 #tapestry {
+  position: relative;
   cursor: move;
 
   &.panning {
     cursor: grabbing;
   }
-}
 
-#app-container {
-  position: relative;
-  transform: scale(1);
-  transform-origin: top left;
-  transition: all 0.2s ease-out;
-  width: 100%;
-  z-index: 0;
-
-  @media screen and (min-width: 500px) {
-    width: calc(100% - 2.5em);
-
-    &.sidebar-open {
-      width: calc(100% - min(400px, max(300px, 25vw)) - 2.5em);
-      padding-right: 0;
-
-      .toolbar {
-        padding-right: 1.5vw;
-      }
-    }
+  .empty-message {
+    margin: 30vh auto;
   }
-  #tapestry {
+
+  svg {
     position: relative;
-
-    .empty-message {
-      margin: 30vh auto;
-    }
-    svg {
-      position: relative;
-    }
   }
-}
-</style>
-
-<style lang="scss">
-#app {
-  background-size: cover;
-}
-#app-container .btn-link {
-  background: transparent;
 }
 </style>
