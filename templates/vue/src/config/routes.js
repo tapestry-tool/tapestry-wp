@@ -17,6 +17,7 @@ export const names = {
   USERANSWERS: "userAnswers",
   USERSETTINGS: "userSettings",
   HELP: "help",
+  EMBED: "embed",
   EXPORTDUPLICATE: "exportDuplicate",
   KALTURAMODAL: "kalturaModal",
   OTHEROPERATIONS: "otherOperations",
@@ -89,6 +90,10 @@ export default [
       {
         path: `help`,
         name: names.HELP,
+      },
+      {
+        path: `embed`,
+        name: names.EMBED,
       },
       {
         path: `export-duplicate`,

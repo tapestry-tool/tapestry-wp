@@ -218,6 +218,7 @@ export default {
     ...mapGetters([
       "isEmptyTapestry",
       "getNode",
+      "getNodeDimensions",
       "getInitialNodeId",
       "getNodeNavId",
       "getNodeNavParent",
@@ -770,7 +771,7 @@ export default {
       if (this.$refs.app) {
         // check if <main> in TapestryMain has rendered
         const { width, height } = this.$refs.app.getBoundingClientRect()
-        const { x0, y0, x, y } = this.getNodeDimensions()
+        const { x0, y0, x, y } = this.getNodeDimensions
 
         const boundaries = {
           startX: x0 - MAX_RADIUS * 1.25,
@@ -827,25 +828,6 @@ export default {
           this.unscaledViewBox[3],
         ]
       }
-    },
-    getNodeDimensions() {
-      const box = {
-        x0: 30000,
-        y0: 30000,
-        x: 0,
-        y: 0,
-      }
-      for (const node of Object.values(this.nodes)) {
-        if (node.nodeType !== "") {
-          const { x, y } = node.coordinates
-          box.x0 = Math.min(x, box.x0)
-          box.y0 = Math.min(y, box.y0)
-          box.x = Math.max(x, box.x)
-          box.y = Math.max(y, box.y)
-        }
-      }
-
-      return box
     },
     handleNodeFocus(nodeId) {
       if (nodeId == this.selectedId) {
@@ -936,15 +918,27 @@ export default {
       // save initial coordinates of nodes
       this.dragCoordinates = {}
       if (this.selection.length) {
-        this.dragCoordinates = this.selection.reduce((coordinates, nodeId) => {
-          const node = this.getNode(nodeId)
-          coordinates[nodeId] = {
+        const selectedNodes = this.selection.map(nodeId => this.getNode(nodeId))
+        const movableNodes = this.settings.allowMovingAllNodes
+          ? selectedNodes
+          : selectedNodes.filter(node => this.hasPermission(node, "move"))
+        if (movableNodes.length === 0) {
+          return
+        }
+        this.dragCoordinates = movableNodes.reduce((coordinates, node) => {
+          coordinates[node.id] = {
             x: node.coordinates.x,
             y: node.coordinates.y,
           }
           return coordinates
         }, {})
       } else {
+        if (
+          !this.settings.allowMovingAllNodes &&
+          !this.hasPermission(node, "move")
+        ) {
+          return
+        }
         this.dragCoordinates[node.id] = {
           x: node.coordinates.x,
           y: node.coordinates.y,
