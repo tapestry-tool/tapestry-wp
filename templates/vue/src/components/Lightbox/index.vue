@@ -63,7 +63,7 @@
       </div>
       <div data-qa="lightbox-content" class="content" :style="contentStyles">
         <transition name="slide-down">
-          <div v-show="showInformation" class="information-sheet">
+          <div v-if="showInformation" class="information-sheet">
             <h1 class="information-header">{{ node.title }}</h1>
             <section v-if="node.description">
               <h2 class="content-header">About</h2>
