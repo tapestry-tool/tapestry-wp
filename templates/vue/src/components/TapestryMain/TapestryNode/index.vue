@@ -29,6 +29,15 @@
       ></circle>
       <transition name="fade">
         <circle
+          v-show="root && !isGrandChild"
+          ref="halo"
+          fill="none"
+          :stroke-width="selectHaloWidth"
+          :stroke="selectHaloColor"
+        ></circle>
+      </transition>
+      <transition name="fade">
+        <circle
           v-show="(!node.hideTitle && !isHovered) || !node.unlocked || selected"
           :r="radius"
           :fill="overlayFill"
@@ -50,7 +59,7 @@
         v-if="!isGrandChild && node.nodeType !== '' && !node.hideProgress"
         :x="coordinates.x"
         :y="coordinates.y"
-        :radius="radius"
+        :radius="root ? radius + selectHaloWidth : radius"
         :locked="!node.unlocked"
         :status="node.status"
         :reviewStatus="node.reviewStatus"
@@ -285,8 +294,7 @@ export default {
       if (!this.show) {
         return 0
       }
-      const radius =
-        Helpers.getNodeRadius(this.node.level, this.scale) * (this.root ? 1.2 : 1)
+      const radius = Helpers.getNodeRadius(this.node.level, this.scale)
       return this.isGrandChild ? Math.min(40, radius) : radius
     },
     fill() {
@@ -378,6 +386,12 @@ export default {
         this.settings.showAcceptedHighlight
       )
     },
+    selectHaloWidth() {
+      return 15
+    },
+    selectHaloColor() {
+      return "#49cfff"
+    },
   },
   watch: {
     radius(newRadius) {
@@ -392,11 +406,18 @@ export default {
           this.transitioning = false
         })
         .attr("r", newRadius)
+
+      d3.select(this.$refs.halo)
+        .transition()
+        .duration(350)
+        .ease(d3.easePolyOut)
+        .attr("r", newRadius + this.selectHaloWidth / 2)
     },
   },
   mounted() {
     this.$emit("mounted")
     this.$refs.circle.setAttribute("r", this.radius)
+    this.$refs.halo.setAttribute("r", this.radius + this.selectHaloWidth / 2)
     const nodeRef = this.$refs.node
     d3.select(nodeRef).call(
       d3
