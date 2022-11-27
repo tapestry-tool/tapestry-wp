@@ -175,7 +175,7 @@ export default {
 .media-wrapper {
   overflow: auto;
   height: 100%;
-  widows: 100%;
+  width: 100%;
   padding: 0;
 
   &:not(.context-multi-content) {
