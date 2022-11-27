@@ -572,7 +572,6 @@ class TapestryNode implements ITapestryNode
     {
         $nodeMetadata = get_metadata_by_mid('post', $this->nodeMetaId);
         $nodePostId = $nodeMetadata->meta_value->post_id;
-        $nodeData = get_post_meta($nodePostId, 'tapestry_node_data', true);
         if ('trash' !== get_post_status($nodePostId)) {
             throw new TapestryError('NODE_NOT_IN_TRASH', 'The node is not in the trash.', 400);
         }

@@ -1,6 +1,7 @@
 <template>
   <div
     v-if="node"
+    id="tapestry-sidebar-container"
     ref="wrapper"
     data-qa="sidebar"
     :class="['sidebar-container', { closed: closed }]"
@@ -72,34 +73,7 @@
           <div class="content-body" v-html="node.description"></div>
         </section>
         <section ref="copyright" data-name="copyright">
-          <section v-if="node.license">
-            <h2 class="content-header">
-              License
-            </h2>
-            <p class="content-body" style="margin-bottom: 0.5em;">
-              <a
-                v-if="license.type === licenseTypes.CUSTOM && license.link"
-                :href="license.link"
-                target="_blank"
-              >
-                <span style="margin-right: 4px;" class="license-link">
-                  {{ license.name }}
-                </span>
-                <tapestry-icon icon="external-link-alt" />
-              </a>
-              <span v-else class="license-link">
-                <span v-if="node.license.type !== licenseTypes.CUSTOM">
-                  <i v-for="icon in license.icons" :key="icon" :class="icon"></i>
-                </span>
-                {{ license.name }}
-              </span>
-            </p>
-            <div
-              v-if="license.type === licenseTypes.CUSTOM && license.description"
-              class="content-body"
-              v-html="license.description"
-            ></div>
-          </section>
+          <node-license :node="node"></node-license>
           <section v-if="node.references">
             <h2 class="content-header">References</h2>
             <div class="content-body" v-html="node.references"></div>
@@ -119,8 +93,8 @@ import { mapGetters } from "vuex"
 import { names } from "@/config/routes"
 import Helpers from "@/utils/Helpers"
 import { nodeStatus } from "@/utils/constants"
-import { licenseTypes, licenses } from "@/utils/constants"
 import * as wp from "@/services/wp"
+import NodeLicense from "@/components/common/NodeLicense"
 import TapestryIcon from "@/components/common/TapestryIcon"
 import NodeReview from "./NodeReview"
 
@@ -132,6 +106,7 @@ export default {
   components: {
     NodeReview,
     TapestryIcon,
+    NodeLicense,
   },
   computed: {
     ...mapGetters(["getNode"]),
@@ -159,15 +134,6 @@ export default {
     },
     canEdit() {
       return Helpers.hasPermission(this.node, "edit")
-    },
-    licenseTypes() {
-      return licenseTypes
-    },
-    license() {
-      return {
-        ...this.node.license,
-        ...licenses[this.node.license.type],
-      }
     },
     isReviewParticipant() {
       if (wp.canEditTapestry()) {
@@ -484,15 +450,6 @@ export default {
             text-decoration: underline;
             &:hover {
               color: #fff;
-            }
-          }
-
-          .license-link {
-            color: white;
-            text-transform: capitalize;
-            font-weight: 600;
-            i {
-              margin-right: 4px;
             }
           }
         }
