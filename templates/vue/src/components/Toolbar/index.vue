@@ -12,6 +12,9 @@
               data-qa="user-settings-button"
             ></user-settings-button>
           </b-col>
+          <b-col class="p-0">
+            <embed-button data-qa="embed-modal-button"></embed-button>
+          </b-col>
           <template v-if="canEdit || (!showMap && hasDepth)">
             <b-col v-if="canEdit" class="p-0">
               <help-button />
@@ -51,6 +54,7 @@ import UserSettingsButton from "./UserSettingsButton"
 import TapestryFilter from "./TapestryFilter"
 import ReviewNotifications from "./ReviewNotifications"
 import HelpButton from "./HelpButton"
+import EmbedButton from "./EmbedButton"
 import OperationsButton from "./OperationsButton"
 import * as wp from "@/services/wp"
 
@@ -62,6 +66,7 @@ export default {
     ReviewNotifications,
     UserSettingsButton,
     HelpButton,
+    EmbedButton,
     OperationsButton,
     UserAnswersButton,
   },
@@ -106,6 +111,7 @@ export default {
 
 <style lang="scss">
 .toolbar {
+  margin-top: 20px;
   display: flex;
   justify-content: space-between;
   padding: 0 5vw;
