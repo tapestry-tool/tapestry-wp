@@ -12,6 +12,9 @@
             data-qa="user-settings-button"
           ></user-settings-button>
         </b-col>
+        <b-col class="p-0">
+          <embed-button data-qa="embed-modal-button"></embed-button>
+        </b-col>
         <template v-if="canEdit">
           <b-col class="p-0">
             <help-button />
@@ -37,6 +40,7 @@ import SettingsModalButton from "./SettingsModalButton"
 import UserSettingsButton from "./UserSettingsButton"
 import ReviewNotifications from "./ReviewNotifications"
 import HelpButton from "./HelpButton"
+import EmbedButton from "./EmbedButton"
 import OperationsButton from "./OperationsButton"
 import TapestryFilter from "./TapestryFilter"
 import * as wp from "@/services/wp"
@@ -47,6 +51,7 @@ export default {
     ReviewNotifications,
     UserSettingsButton,
     HelpButton,
+    EmbedButton,
     OperationsButton,
     TapestryFilter,
   },
