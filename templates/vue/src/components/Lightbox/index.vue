@@ -62,23 +62,20 @@
         />
       </div>
       <div data-qa="lightbox-content" class="content" :style="contentStyles">
-        <div
-          class="information-sheet"
-          :class="{
-            show: showInformation,
-          }"
-        >
-          <h1 class="information-header">{{ node.title }}</h1>
-          <section v-if="node.description">
-            <h2 class="content-header">About</h2>
-            <div class="content-body" v-html="node.description"></div>
-          </section>
-          <node-license :node="node"></node-license>
-          <section v-if="node.references">
-            <h2 class="content-header">References</h2>
-            <div class="content-body" v-html="node.references"></div>
-          </section>
-        </div>
+        <transition name="slide-down">
+          <div v-if="showInformation" class="information-sheet">
+            <h1 class="information-header">{{ node.title }}</h1>
+            <section v-if="node.description">
+              <h2 class="content-header">About</h2>
+              <div class="content-body" v-html="node.description"></div>
+            </section>
+            <node-license :node="node"></node-license>
+            <section v-if="node.references">
+              <h2 class="content-header">References</h2>
+              <div class="content-body" v-html="node.references"></div>
+            </section>
+          </div>
+        </transition>
         <multi-content-media
           v-if="node.mediaType === 'multi-content'"
           id="multicontent-container"
@@ -437,11 +434,14 @@ body.tapestry-lightbox-open {
     color: #becddc;
     text-align: left;
     box-shadow: 0 0 20px #000;
-    transition: margin-top 0.3s ease-in-out;
-    margin-top: -100%;
 
-    &.show {
-      margin-top: 0;
+    &.slide-down-enter-active,
+    &.slide-down-leave-active {
+      transition: margin-top 0.3s ease-in-out;
+    }
+    &.slide-down-enter,
+    &.slide-down-leave-to {
+      margin-top: -100%;
     }
 
     .content-header {
