@@ -1,5 +1,5 @@
 <template>
-  <div id="app-container" :class="{ 'sidebar-open': isSidebarOpen }">
+  <div id="tapestry-app" :class="{ 'sidebar-open': isSidebarOpen }">
     <toolbar />
     <tapestry-map
       v-if="settings.renderMap"
@@ -69,9 +69,6 @@ export default {
     updateViewBox() {
       this.$refs.graph && this.$refs.graph.updateViewBox()
     },
-    getNodeDimensions() {
-      this.$refs.graph && this.$refs.graph.getNodeDimensions()
-    },
     openNode(id) {
       this.$router.push({
         name: names.LIGHTBOX,
@@ -91,7 +88,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-#app-container {
+#tapestry-app {
   position: relative;
   transform: scale(1);
   transform-origin: top left;
@@ -111,22 +108,14 @@ export default {
       }
     }
   }
-  #tapestry {
-    .empty-message {
-      margin: 30vh auto;
-    }
-    svg {
-      position: relative;
-    }
-  }
 }
 </style>
 
 <style lang="scss">
 #app {
   background-size: cover;
-}
-#app-container .btn-link {
-  background: transparent;
+  #tapestry-app .btn-link {
+    background: transparent;
+  }
 }
 </style>

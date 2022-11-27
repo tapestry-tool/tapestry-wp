@@ -1,6 +1,7 @@
 <template>
   <div
     v-if="node"
+    id="tapestry-sidebar-container"
     ref="wrapper"
     data-qa="sidebar"
     :class="['sidebar-container', { closed: closed }]"
