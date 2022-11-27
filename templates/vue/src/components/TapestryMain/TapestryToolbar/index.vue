@@ -16,41 +16,45 @@
         >
           <i class="fas fa-mouse-pointer fa-lg"></i>
         </tapestry-toolbar-button>
-        <tapestry-toolbar-button
-          id="tapestry-add-node-tool"
-          :tool="tools.ADD_NODE"
-          tooltip="Add Node"
-        >
-          <i class="fas fa-plus-circle fa-lg"></i>
-        </tapestry-toolbar-button>
-        <tapestry-toolbar-button
-          id="tapestry-add-link-tool"
-          :tool="tools.ADD_LINK"
-          tooltip="Add Connection"
-        >
-          <i class="fas fa-arrows-alt-v fa-lg"></i>
-        </tapestry-toolbar-button>
-        <settings-modal-button></settings-modal-button>
+        <template v-if="isLoggedIn">
+          <tapestry-toolbar-button
+            id="tapestry-add-node-tool"
+            :tool="tools.ADD_NODE"
+            tooltip="Add Node"
+          >
+            <i class="fas fa-plus-circle fa-lg"></i>
+          </tapestry-toolbar-button>
+          <tapestry-toolbar-button
+            id="tapestry-add-link-tool"
+            :tool="tools.ADD_LINK"
+            tooltip="Add Connection"
+          >
+            <i class="fas fa-arrows-alt-v fa-lg"></i>
+          </tapestry-toolbar-button>
+          <settings-modal-button v-if="canEdit"></settings-modal-button>
+        </template>
       </div>
-      <div class="separator"></div>
-      <div class="tool-group">
-        <tapestry-toolbar-button
-          id="tapestry-undo-button"
-          :tooltip="undoTooltip"
-          :disabled="!canUndo"
-          @click="performUndo"
-        >
-          <i class="fas fa-undo fa-lg"></i>
-        </tapestry-toolbar-button>
-        <tapestry-toolbar-button
-          id="tapestry-redo-button"
-          :tooltip="redoTooltip"
-          :disabled="!canRedo"
-          @click="performRedo"
-        >
-          <i class="fas fa-redo fa-lg"></i>
-        </tapestry-toolbar-button>
-      </div>
+      <template v-if="isLoggedIn">
+        <div class="separator"></div>
+        <div class="tool-group">
+          <tapestry-toolbar-button
+            id="tapestry-undo-button"
+            :tooltip="undoTooltip"
+            :disabled="!canUndo"
+            @click="performUndo"
+          >
+            <i class="fas fa-undo fa-lg"></i>
+          </tapestry-toolbar-button>
+          <tapestry-toolbar-button
+            id="tapestry-redo-button"
+            :tooltip="redoTooltip"
+            :disabled="!canRedo"
+            @click="performRedo"
+          >
+            <i class="fas fa-redo fa-lg"></i>
+          </tapestry-toolbar-button>
+        </div>
+      </template>
     </div>
   </div>
 </template>
@@ -60,6 +64,7 @@ import TapestryToolbarButton from "../common/TapestryToolbarButton"
 import SettingsModalButton from "./SettingsModalButton"
 import { tools } from "@/utils/constants"
 import { mapActions, mapGetters } from "vuex"
+import * as wp from "@/services/wp"
 
 export default {
   components: {
@@ -77,6 +82,12 @@ export default {
       return window.navigator.platform?.toLowerCase().indexOf("mac") !== -1
         ? "mac"
         : "windows"
+    },
+    canEdit() {
+      return wp.canEditTapestry()
+    },
+    isLoggedIn() {
+      return wp.isLoggedIn()
     },
     undoTooltip() {
       return `Undo (${this.platform === "mac" ? "Cmd" : "Ctrl"} + Z)`

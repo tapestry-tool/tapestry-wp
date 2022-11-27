@@ -30,6 +30,10 @@ describe("Node Operations", () => {
       cy.editNode(node.id, {
         hideMedia: true,
       })
+    })
+    cy.logout().visitTapestry()
+
+    cy.getSelectedNode().then(node => {
       cy.getNodeById(node.id).click()
       cy.lightbox().should("be.visible")
     })

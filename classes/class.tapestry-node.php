@@ -287,6 +287,20 @@ class TapestryNode implements ITapestryNode
     }
 
     /**
+     * Restore a node from trash.
+     *
+     * @return null
+     */
+    public function restore()
+    {
+        if (!$this->nodeMetaId) {
+            throw new TapestryError('INVALID_NODE_META_ID');
+        }
+
+        return $this->_restoreFromDatabase();
+    }
+
+    /**
      * Update node conditions by removing conditions by nodeId.
      *
      * @param string $nodeId nodeId
@@ -554,6 +568,21 @@ class TapestryNode implements ITapestryNode
         return $this->_formNodeData($nodeData, $nodeMetadata);
     }
 
+    private function _restoreFromDatabase()
+    {
+        $nodeMetadata = get_metadata_by_mid('post', $this->nodeMetaId);
+        $nodePostId = $nodeMetadata->meta_value->post_id;
+        if ('trash' !== get_post_status($nodePostId)) {
+            throw new TapestryError('NODE_NOT_IN_TRASH', 'The node is not in the trash.', 400);
+        }
+        $result = wp_untrash_post($nodePostId);
+        if (false === $result || null === $result) {
+            throw new TapestryError('UNTRASH_FAILED', 'Failed to restore node.', 500);
+        }
+
+        return $this->_saveToDatabase();
+    }
+
     private function _deleteNodeFromDatabase()
     {
         $nodeMetadata = get_metadata_by_mid('post', $this->nodeMetaId);
@@ -561,8 +590,7 @@ class TapestryNode implements ITapestryNode
             return;
         }
         $nodePostId = $nodeMetadata->meta_value->post_id;
-        delete_post_meta($nodePostId, 'tapestry_node_data');
-        delete_metadata_by_mid('post', $this->nodeMetaId);
+        wp_trash_post($nodePostId);
     }
 
     private function _formNode()

@@ -2,6 +2,7 @@
   <div data-qa="tapestry-filter" class="filter">
     <button
       v-if="!settings.renderMap"
+      class="menubar-button"
       aria-label="search"
       :style="isActive && 'margin-right: 12px;'"
       @click="toggleFilter"
@@ -20,6 +21,7 @@
       <v-select
         v-if="type !== types.STATUS"
         v-model="filterValue"
+        class="vue-select"
         data-qa="search-input"
         :filter="getVisibleMatches"
         :options="filterOptions"
@@ -255,6 +257,9 @@ export default {
             this.resetSearch()
             this.addApiError({ error: `You're not allowed to search by author.` })
           }
+          this.$nextTick(() => {
+            document.querySelector(".vue-select input")?.focus()
+          })
         }
       },
     },
@@ -365,18 +370,9 @@ export default {
   border-radius: 8px;
 
   button {
-    color: var(--text-color-tertiary);
-    padding: 0;
-    background: none;
-    width: 36px;
-    font-size: 0.8em;
     display: flex;
     align-items: center;
     justify-content: center;
-
-    &:hover {
-      color: var(--highlight-color);
-    }
   }
 
   .filter-combobox {

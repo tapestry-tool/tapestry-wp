@@ -119,16 +119,11 @@ class ZoomPanHelper {
   }
 
   wheelHandler(e) {
-    if (e.ctrlKey || e.metaKey) {
-      e.preventDefault()
-      // panning has higher priority than trackpad pinch zoom
-      if (!this.isPanning) {
-        this.onZoom(-0.01 * e.deltaY, e.offsetX, e.offsetY)
-        this.onZoomEnd()
-      }
-    } else {
-      // posX -= e.deltaX * 2
-      // posY -= e.deltaY * 2
+    e.preventDefault()
+    // panning has higher priority than trackpad pinch zoom
+    if (!this.isPanning) {
+      this.onZoom(-0.01 * e.deltaY, e.clientX, e.clientY, e.target)
+      this.onZoomEnd()
     }
   }
 
@@ -137,11 +132,10 @@ class ZoomPanHelper {
     if (e.targetTouches.length === 2) {
       this.cache = {}
       let pinchPoint = { x: 0, y: 0 }
-      const { left, top } = e.target.getBoundingClientRect()
       for (const touch of e.targetTouches) {
         this.cache[touch.identifier] = { x: touch.clientX, y: touch.clientY }
-        pinchPoint.x += touch.pageX - left
-        pinchPoint.y += touch.pageY - top
+        pinchPoint.x += touch.clientX
+        pinchPoint.y += touch.clientY
       }
       pinchPoint.x /= 2
       pinchPoint.y /= 2
@@ -167,7 +161,7 @@ class ZoomPanHelper {
       if (distance !== null && this.lastDistance !== null) {
         const delta = distance - this.lastDistance
         const scaleDelta = delta * 0.01
-        this.onZoom(scaleDelta, this.pinchPoint.x, this.pinchPoint.y)
+        this.onZoom(scaleDelta, this.pinchPoint.x, this.pinchPoint.y, e.target)
         this.onZoomEnd()
       }
       this.lastDistance = distance
@@ -198,13 +192,13 @@ class ZoomPanHelper {
     if (this.lastClickTime && time - this.lastClickTime <= 300) {
       // the second click of double click
       const scaleDelta = 1
-      const { offsetX, offsetY } = e
+      const { clientX, clientY } = e
       interpolateDelta(
         0,
         scaleDelta,
         600,
         delta => {
-          this.onZoom(delta, offsetX, offsetY)
+          this.onZoom(delta, clientX, clientY, e.target)
           this.lastClickTime = null
         },
         () => {

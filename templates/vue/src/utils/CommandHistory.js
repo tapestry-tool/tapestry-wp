@@ -1,7 +1,7 @@
 export default class CommandHistory {
   history
   position
-  static maxLength = 6
+  static maxLength = 50
 
   constructor() {
     this.history = []

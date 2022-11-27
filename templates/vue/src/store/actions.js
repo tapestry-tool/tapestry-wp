@@ -113,12 +113,17 @@ export async function addNode({ dispatch }, payload) {
   return dispatch("buildCommand", {
     name: "add node",
     executeAction: "doAddNode",
-    executePayload: payload, // ! payload.parentId may become invalid if the parent is deleted before this command and then redone (parentId will become a new id)
+    executePayload: payload,
     executeCallback: addedNodeId => ({
       undoPayload: addedNodeId,
     }),
     undoAction: "doDeleteNode",
     undoPayload: null,
+    undoCallback: nodeIdAndLinks => ({
+      executeAction: "doRestoreNode",
+      executePayload: nodeIdAndLinks,
+      executeCallback: null,
+    }),
   })
 }
 
@@ -402,16 +407,16 @@ async function unlockNodes({ commit, getters, dispatch }) {
   }
 }
 
-export async function deleteNode({ dispatch, getters }, id) {
+export async function deleteNode({ dispatch }, id) {
   await dispatch("buildCommand", {
     name: "delete node",
     executeAction: "doDeleteNode",
     executePayload: id,
-    undoAction: "doAddNode", // may customize the undo action to recreate the links associated with the node
-    undoPayload: { node: { ...getters.getNode(id) }, parentId: null },
-    undoCallback: addedNodeId => ({
-      executePayload: addedNodeId,
+    executeCallback: nodeIdAndLinks => ({
+      undoPayload: nodeIdAndLinks,
     }),
+    undoAction: "doRestoreNode", // may customize the undo action to recreate the links associated with the node
+    undoPayload: { id },
   })
 }
 
@@ -447,6 +452,37 @@ export async function doDeleteNode({ commit, dispatch, state, getters }, id) {
 
     if (level === state.maxLevel) {
       commit("updateMaxLevel")
+    }
+
+    return {
+      id,
+      links: neighbouringLinks,
+    }
+  } catch (error) {
+    dispatch("addApiError", error)
+  }
+}
+
+export async function doRestoreNode({ commit, dispatch, getters }, payload) {
+  try {
+    const { node, links } = (
+      await client.restoreNode(payload.id, payload.links)
+    ).data
+    if (node) {
+      commit("addNode", Helpers.deepMerge(getters.createDefaultNode(), node))
+      if (links) {
+        for (const link of links) {
+          commit("addLink", link)
+
+          const parent = getters.getNode(link.source)
+          commit("updateNode", {
+            id: link.source,
+            newNode: {
+              childOrdering: [...parent.childOrdering, link.target],
+            },
+          })
+        }
+      }
     }
   } catch (error) {
     dispatch("addApiError", error)

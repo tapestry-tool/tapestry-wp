@@ -144,6 +144,24 @@ describe("Node Authoring", () => {
       })
     })
 
+    it("should be able to edit a node's title in-place by double clicking", () => {
+      cy.getSelectedNode().then(node => {
+        const oldTitle = node.title
+        cy.contains(oldTitle).should("exist")
+
+        cy.getByTestId(`node-title-${node.id}`).dblclick()
+        cy.getByTestId(`node-title-text-${node.id}`)
+          .clear()
+          .type("new title")
+          .blur()
+
+        cy.getNodeById(node.id).within(() => {
+          cy.contains(oldTitle).should("not.exist")
+          cy.contains("new title").should("exist")
+        })
+      })
+    })
+
     it("should be able to edit a node's title using the node modal", () => {
       cy.getSelectedNode().then(node => {
         const oldTitle = node.title
@@ -253,7 +271,7 @@ describe("Node Authoring", () => {
 
   describe("As subscriber:", () => {
     beforeEach(() => {
-      cy.setup("@subscriberNode", { role: roles.SUBSCRIBER })
+      cy.setup("@subscriberNode", roles.SUBSCRIBER)
     })
 
     it("should be able to add a child node using the node modal and edit as subscriber", () => {

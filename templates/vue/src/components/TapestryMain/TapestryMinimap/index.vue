@@ -11,6 +11,7 @@
       }"
     ></canvas>
     <canvas
+      id="tapestry-minimap"
       ref="viewbox"
       :width="viewBox[2]"
       :height="viewBox[3]"
@@ -20,8 +21,8 @@
         height: height + 'px',
       }"
     ></canvas>
-    <div data-qa="close-minimap" class="minimap-button" title="Close minimap">
-      <button @click="$emit('close')">
+    <div class="minimap-button" title="Close minimap">
+      <button data-qa="close-minimap" @click="$emit('close')">
         <i class="fas fa-times"></i>
       </button>
     </div>
@@ -277,6 +278,16 @@ export default {
       this.mouseDown = false
       this.mouseMoved = false
       this.mousePos = null
+    },
+    getMinimapDimensions() {
+      // method for TapestryMain to receive minimap dimensions
+      const { width, height, x, y } = this.$refs.minimap.getBoundingClientRect()
+      return {
+        width,
+        height,
+        x,
+        y,
+      }
     },
   },
 }

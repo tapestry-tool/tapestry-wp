@@ -17,7 +17,7 @@
       <root-node-button v-if="isLoggedIn"></root-node-button>
       <div v-else class="empty-message">The requested Tapestry is empty.</div>
     </div>
-    <div v-else ref="dragArea">
+    <div v-else>
       <svg
         id="vue-svg"
         ref="vue-svg"
@@ -94,26 +94,31 @@
           :viewBox="computedViewBox"
         ></locked-tooltip>
       </svg>
-      <tapestry-toolbar />
       <tapestry-node-toolbar
         :show="showContextToolbar == 'node'"
         :node="selectedNode"
         :position="nodeToolbarPosition"
         @set-show="setShowContextToolbar('node', $event)"
       ></tapestry-node-toolbar>
+      <tapestry-multi-node-toolbar
+        :show="showContextToolbar == 'multi-node'"
+        :position="multiNodeToolbarPosition"
+        @set-show="setShowContextToolbar('multi-node', $event)"
+      ></tapestry-multi-node-toolbar>
       <tapestry-link-toolbar
         :show="showContextToolbar == 'link'"
         :link="activeLink"
         :position="linkToolbarPosition"
         @set-show="setShowContextToolbar('link', $event)"
       />
+      <tapestry-toolbar />
       <tapestry-minimap
         v-if="showMinimap"
         ref="minimap"
         :view-box="unscaledViewBox"
         :scale="scale"
         :offset="offset"
-        :isDragSelecting="isDragSelecting"
+        :is-drag-selecting="isDragSelecting"
         @pan-by="handleMinimapPanBy"
         @pan-to="handleMinimapPanTo"
         @close="showMinimap = false"
@@ -133,6 +138,7 @@ import TapestryNode from "./TapestryNode"
 import TapestryLink from "./TapestryLink"
 import TapestryToolbar from "./TapestryToolbar"
 import TapestryNodeToolbar from "./TapestryNodeToolbar"
+import TapestryMultiNodeToolbar from "./TapestryMultiNodeToolbar"
 import TapestryLinkToolbar from "./TapestryLinkToolbar"
 import TapestryNodeShadow from "./TapestryNodeShadow"
 import TapestryNodePlaceholder from "./TapestryNodePlaceholder"
@@ -155,6 +161,7 @@ export default {
     TapestryLink,
     TapestryToolbar,
     TapestryNodeToolbar,
+    TapestryMultiNodeToolbar,
     TapestryLinkToolbar,
     TapestryNodeShadow,
     TapestryNodePlaceholder,
@@ -167,6 +174,7 @@ export default {
   data() {
     return {
       isDragSelecting: false,
+      didDragSelect: false,
       activeNode: null,
 
       appHeight: "100vh",
@@ -174,6 +182,7 @@ export default {
       unscaledViewBox: [2200, 2700, 1600, 1100],
       viewBox: [2200, 2700, 1600, 1100],
       scale: 1,
+      manualScale: 1,
       offset: { x: 0, y: 0 },
       appDimensions: null,
       zoomPanHelper: null,
@@ -190,7 +199,7 @@ export default {
       nodeEditingTitle: null,
 
       showMinimap: true,
-      showContextToolbar: false, // one of false, "node", "link"
+      showContextToolbar: false, // one of false, "node", "multi-node", "link"
       activeLink: null, // for link context toolbar
     }
   },
@@ -209,6 +218,7 @@ export default {
     ...mapGetters([
       "isEmptyTapestry",
       "getNode",
+      "getNodeDimensions",
       "getInitialNodeId",
       "getNodeNavId",
       "getNodeNavParent",
@@ -344,6 +354,30 @@ export default {
         height: r * 2,
       }
     },
+    multiNodeToolbarPosition() {
+      if (this.selection.length === 0 || !this.appDimensions) {
+        return null
+      }
+
+      let x = 0,
+        y = 0
+      for (const id of this.selection) {
+        const coords = this.svgToScreen(this.getNode(id).coordinates)
+        x += coords.x
+        y += coords.y
+      }
+      x /= this.selection.length
+      y /= this.selection.length
+
+      return {
+        left: x,
+        top: y,
+        right: x,
+        bottom: y,
+        width: 0,
+        height: 0,
+      }
+    },
     linkToolbarPosition() {
       if (!this.activeLink || !this.appDimensions) {
         return null
@@ -390,6 +424,7 @@ export default {
     isSidebarOpen() {
       setTimeout(() => {
         this.updateViewBox()
+        this.fetchAppDimensions()
       }, 300)
     },
     selectedId: {
@@ -411,6 +446,11 @@ export default {
         }
         this.updateViewBox()
       },
+    },
+    selection(selection) {
+      if (!this.isDragSelecting) {
+        this.setShowContextToolbar("multi-node", selection.length !== 0)
+      }
     },
     showContextToolbar(newVal, oldVal) {
       if (oldVal === "link") {
@@ -442,7 +482,11 @@ export default {
     },
     currentTool(newTool, oldTool) {
       if (this.dragSelectEnabled && newTool === tools.SELECT) {
-        DragSelectModular.initializeDragSelect(this.$refs.dragArea, this, this.nodes)
+        DragSelectModular.initializeDragSelect(
+          this.$refs["vue-svg"],
+          this,
+          this.nodes
+        )
       } else {
         DragSelectModular.disableDragSelect()
       }
@@ -452,27 +496,17 @@ export default {
       }
     },
   },
-  created() {
-    const { scale, x, y } = this.$route.query
-    if (scale && !isNaN(scale)) {
-      this.scale = this.clampScale(Number(scale))
-    }
-    if (x && !isNaN(x)) {
-      this.offset.x = Number(x)
-    }
-    if (y && !isNaN(y)) {
-      this.offset.y = Number(y)
-    }
-    this.clampOffset()
-  },
   mounted() {
     if (this.dragSelectEnabled) {
       DragSelectModular.initialize(
         () => {
           this.isDragSelecting = true
+          this.didDragSelect = false
+          this.setShowContextToolbar("multi-node", false)
         },
         () => {
           this.isDragSelecting = false
+          this.didDragSelect = true
         }
       )
     }
@@ -481,12 +515,10 @@ export default {
 
     this.zoomPanHelper = new ZoomPanHelper(
       "tapestry",
-      (delta, x, y) => {
-        this.handleZoom(delta * this.scaleConstants.zoomSensitivity, x, y)
+      (delta, x, y, target) => {
+        this.handleZoom(delta * this.scaleConstants.zoomSensitivity, x, y, target)
       },
-      () => {
-        this.updateScale()
-      },
+      () => {},
       (dx, dy) => {
         this.handlePan(
           dx * this.scaleConstants.panSensitivity,
@@ -495,13 +527,16 @@ export default {
       },
       () => {
         this.isPanning = false
-        this.updateOffset()
       },
       () => (this.$refs.minimap ? [this.$refs.minimap.$el] : []),
       ["vue-svg"]
     )
     if (!this.isEmptyTapestry) {
       this.zoomPanHelper.register()
+    }
+
+    if (this.selectedId) {
+      this.zoomToAndCenterNode(this.getNode(this.selectedId))
     }
 
     this.$nextTick(() => {
@@ -597,20 +632,29 @@ export default {
         y,
       }
     },
-    handleZoom(delta, x, y) {
-      if (this.isEmptyTapestry) {
+    handleZoom(delta, clientX, clientY, target) {
+      if (this.isEmptyTapestry || !this.appDimensions) {
         return
       }
       const newScale = this.clampScale(this.scale + delta)
       const scaleChange = newScale / this.scale
 
-      if (!this.appDimensions) {
-        return
-      }
-      const { width, height } = this.appDimensions
+      this.manualScale = Math.max(
+        1,
+        Math.min(this.maxScale / 2, this.manualScale + newScale - this.scale)
+      )
 
-      const relativeX = (x / width) * this.viewBox[2]
-      const relativeY = (y / height) * this.viewBox[3]
+      const isMinimapZoom =
+        target && target.id === "tapestry-minimap" && this.$refs.minimap
+      const dimensions = isMinimapZoom
+        ? this.$refs.minimap.getMinimapDimensions()
+        : this.appDimensions
+
+      const x = clientX - dimensions.x
+      const y = clientY - dimensions.y
+
+      const relativeX = (x / dimensions.width) * this.viewBox[2]
+      const relativeY = (y / dimensions.height) * this.viewBox[3]
       const absoluteX = relativeX + this.viewBox[0] + this.offset.x
       const absoluteY = relativeY + this.viewBox[1] + this.offset.y
 
@@ -659,7 +703,6 @@ export default {
       this.offset.x = scaledX - this.viewBox[2] / 2
       this.offset.y = scaledY - this.viewBox[3] / 2
       this.clampOffset()
-      this.updateOffset()
     },
     zoomToAndCenterNode(node) {
       const baseRadius = Helpers.getNodeBaseRadius(node.level, this.maxLevel)
@@ -710,29 +753,11 @@ export default {
         },
         () => {
           this.isTransitioning = false
-          this.updateScale()
           if (!this.nodeNavLinkMode) {
             this.showContextToolbar = "node"
           }
         }
       )
-    },
-    updateScale() {
-      this.$router.push({
-        ...this.$route,
-        query: { ...this.$route.query, scale: this.scale.toFixed(2) },
-      })
-      this.updateOffset()
-    },
-    updateOffset() {
-      this.$router.push({
-        ...this.$route,
-        query: {
-          ...this.$route.query,
-          x: this.offset.x.toFixed(4),
-          y: this.offset.y.toFixed(4),
-        },
-      })
     },
     updateSelectableNodes() {
       DragSelectModular.updateSelectableNodes()
@@ -746,7 +771,7 @@ export default {
       if (this.$refs.app) {
         // check if <main> in TapestryMain has rendered
         const { width, height } = this.$refs.app.getBoundingClientRect()
-        const { x0, y0, x, y } = this.getNodeDimensions()
+        const { x0, y0, x, y } = this.getNodeDimensions
 
         const boundaries = {
           startX: x0 - MAX_RADIUS * 1.25,
@@ -804,25 +829,6 @@ export default {
         ]
       }
     },
-    getNodeDimensions() {
-      const box = {
-        x0: 30000,
-        y0: 30000,
-        x: 0,
-        y: 0,
-      }
-      for (const node of Object.values(this.nodes)) {
-        if (node.nodeType !== "") {
-          const { x, y } = node.coordinates
-          box.x0 = Math.min(x, box.x0)
-          box.y0 = Math.min(y, box.y0)
-          box.x = Math.max(x, box.x)
-          box.y = Math.max(y, box.y)
-        }
-      }
-
-      return box
-    },
     handleNodeFocus(nodeId) {
       if (nodeId == this.selectedId) {
         this.showContextToolbar = "node"
@@ -854,7 +860,7 @@ export default {
       }
 
       // zoom to the level that the node is on, and pan towards the node
-      const targetScale = Helpers.getTargetScale(node.level)
+      const targetScale = Helpers.getTargetScale(node.level) * this.manualScale
       const deltaScale = targetScale - this.scale
 
       const targetViewBoxX = this.unscaledViewBox[0] * targetScale
@@ -886,7 +892,7 @@ export default {
           viewBoxX: targetViewBoxX,
           viewBoxY: targetViewBoxY,
         },
-        Math.abs(deltaScale * 600),
+        300 + Math.abs(deltaScale) * 50,
         ({ scale, offsetX, offsetY, viewBoxX, viewBoxY }) => {
           this.scale = scale
           this.offset.x = offsetX
@@ -896,7 +902,6 @@ export default {
         },
         () => {
           this.isTransitioning = false
-          this.updateScale()
           if (shouldOpenToolbar) {
             this.showContextToolbar = "node"
           }
@@ -913,15 +918,27 @@ export default {
       // save initial coordinates of nodes
       this.dragCoordinates = {}
       if (this.selection.length) {
-        this.dragCoordinates = this.selection.reduce((coordinates, nodeId) => {
-          const node = this.getNode(nodeId)
-          coordinates[nodeId] = {
+        const selectedNodes = this.selection.map(nodeId => this.getNode(nodeId))
+        const movableNodes = this.settings.allowMovingAllNodes
+          ? selectedNodes
+          : selectedNodes.filter(node => this.hasPermission(node, "move"))
+        if (movableNodes.length === 0) {
+          return
+        }
+        this.dragCoordinates = movableNodes.reduce((coordinates, node) => {
+          coordinates[node.id] = {
             x: node.coordinates.x,
             y: node.coordinates.y,
           }
           return coordinates
         }, {})
       } else {
+        if (
+          !this.settings.allowMovingAllNodes &&
+          !this.hasPermission(node, "move")
+        ) {
+          return
+        }
         this.dragCoordinates[node.id] = {
           x: node.coordinates.x,
           y: node.coordinates.y,
@@ -1138,7 +1155,12 @@ export default {
     },
     handleClickOnSvg() {
       if (!this.isPanning) {
-        this.showContextToolbar = false
+        if (this.didDragSelect) {
+          this.setShowContextToolbar("multi-node", this.selection.length !== 0)
+          this.didDragSelect = false
+        } else {
+          this.showContextToolbar = false
+        }
       }
     },
     handleMousemoveOnSvg(evt) {

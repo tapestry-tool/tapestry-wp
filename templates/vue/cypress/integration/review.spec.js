@@ -7,7 +7,7 @@ describe("Review Nodes", () => {
   })
 
   it("should be able to submit a node and have it be accepted", () => {
-    cy.setup("@oneNode", { role: roles.SUBSCRIBER })
+    cy.setup("@oneNode", roles.SUBSCRIBER)
     const node = {
       title: "For Review",
       mediaType: "text",
@@ -55,7 +55,7 @@ describe("Review Nodes", () => {
   })
 
   it("should be able to reject a node with a comment", () => {
-    cy.setup("@oneNode", { role: roles.SUBSCRIBER })
+    cy.setup("@oneNode", roles.SUBSCRIBER)
     const node = {
       title: "For Review",
       mediaType: "text",
@@ -101,7 +101,7 @@ describe("Review Nodes", () => {
   })
 
   it("should be able to leave comments as the submitter", () => {
-    cy.setup("@oneNode", { role: roles.SUBSCRIBER })
+    cy.setup("@oneNode", roles.SUBSCRIBER)
     const node = {
       title: "For Review",
       mediaType: "text",

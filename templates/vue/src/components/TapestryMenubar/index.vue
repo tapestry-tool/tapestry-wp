@@ -1,11 +1,19 @@
 <template>
-  <div v-if="isLoggedIn" class="tapestry-menubar" aria-label="Tapestry Menubar">
-    <b-container class="can-edit">
-      <b-row align-v="center">
+  <div class="tapestry-menubar" aria-label="Tapestry Menubar">
+    <tapestry-filter
+      v-if="!settings.renderMap"
+      class="menubar-group"
+      style="z-index: 10"
+    />
+    <b-container v-if="isLoggedIn">
+      <b-row align-v="center" class="menubar-group">
         <b-col class="p-0">
           <user-settings-button
             data-qa="user-settings-button"
           ></user-settings-button>
+        </b-col>
+        <b-col class="p-0">
+          <embed-button data-qa="embed-modal-button"></embed-button>
         </b-col>
         <template v-if="canEdit">
           <b-col class="p-0">
@@ -13,9 +21,6 @@
           </b-col>
           <b-col v-if="settings.submitNodesEnabled" class="p-0">
             <review-notifications />
-          </b-col>
-          <b-col v-if="isAdmin" class="p-0">
-            <user-answers-button data-qa="user-answers-button"></user-answers-button>
           </b-col>
           <b-col class="p-0">
             <operations-button />
@@ -28,11 +33,12 @@
 
 <script>
 import { mapState } from "vuex"
-import UserAnswersButton from "./UserAnswersButton"
 import UserSettingsButton from "./UserSettingsButton"
 import ReviewNotifications from "./ReviewNotifications"
 import HelpButton from "./HelpButton"
+import EmbedButton from "./EmbedButton"
 import OperationsButton from "./OperationsButton"
+import TapestryFilter from "./TapestryFilter"
 import * as wp from "@/services/wp"
 
 export default {
@@ -40,8 +46,9 @@ export default {
     ReviewNotifications,
     UserSettingsButton,
     HelpButton,
+    EmbedButton,
     OperationsButton,
-    UserAnswersButton,
+    TapestryFilter,
   },
   computed: {
     ...mapState(["settings"]),
@@ -51,10 +58,6 @@ export default {
     isLoggedIn() {
       return wp.isLoggedIn()
     },
-    isAdmin() {
-      const currentUser = wp.getCurrentUser()
-      return currentUser.roles && currentUser.roles.includes("administrator")
-    },
   },
 }
 </script>
@@ -62,11 +65,12 @@ export default {
 <style lang="scss">
 .tapestry-menubar {
   position: absolute;
-  top: 0;
-  right: 0;
-  padding-top: 1vh;
-  padding-right: 5vw;
+  top: 1%;
+  right: 5%;
+  height: 56px;
   transition: all 0.2s ease-out;
+  display: flex;
+  flex-wrap: nowrap;
 
   button.menubar-button {
     color: var(--text-color-tertiary);
@@ -81,6 +85,16 @@ export default {
       color: var(--highlight-color);
       transform: scale(1.1);
     }
+  }
+
+  .menubar-group {
+    height: 56px;
+    background-color: var(--bg-color-secondary);
+    border-radius: 8px;
+    padding: 0 0.5rem;
+    margin-left: 0.5rem;
+    display: flex;
+    align-items: center;
   }
 }
 </style>

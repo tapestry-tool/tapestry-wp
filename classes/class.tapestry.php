@@ -108,6 +108,9 @@ class Tapestry implements ITapestry
             if (!isset($this->settings->analyticsEnabled)) {
                 $this->settings->analyticsEnabled = false;
             }
+            if (!isset($this->settings->allowMovingAllNodes)) {
+                $this->settings->allowMovingAllNodes = false;
+            }
             if (!isset($this->settings->draftNodesEnabled)) {
                 $this->settings->draftNodesEnabled = true;
                 $this->settings->submitNodesEnabled = true;
@@ -272,6 +275,30 @@ class Tapestry implements ITapestry
         update_post_meta($this->postId, 'tapestry', $tapestry);
 
         return $this->nodes;
+    }
+
+    /**
+     * Restore a node from trash.
+     *
+     * @param object $nodeId Tapestry node id
+     *
+     * @return object $Array   Tapestry nodes
+     */
+    public function restoreNode($nodeId)
+    {
+        $tapestryNode = new TapestryNode($this->postId, $nodeId);
+
+        $node = $tapestryNode->restore();
+
+        if ($this->isEmpty()) {
+            $this->rootId = $node->id;
+        }
+
+        array_push($this->nodes, $node->id);
+
+        $this->_saveToDatabase();
+
+        return $node;
     }
 
     /**
@@ -598,6 +625,7 @@ class Tapestry implements ITapestry
         $settings->analyticsEnabled = false;
         $settings->draftNodesEnabled = true;
         $settings->submitNodesEnabled = true;
+        $settings->allowMovingAllNodes = false;
         $settings->permalink = get_permalink($this->postId);
 
         return $settings;

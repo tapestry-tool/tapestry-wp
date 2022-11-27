@@ -71,7 +71,7 @@ export const scaleConstants = {
   largeNodeGrowthSupressor: 1.3, // [>=1] higher -> larger nodes grow slower
   lineWidthRatio: 0.05, // higher -> links are thicker
   widthDifferenceEnhancer: {
-    grow: 1.8, // [>=1] higher -> links are thicker at parent end
+    grow: 2, // [>=1] higher -> links are thicker at parent end
     shrink: 0.4, // [<=1] lower -> links are thinner at child end
   },
   zoomSensitivity: 0.8, // higher -> zooms in/out faster
