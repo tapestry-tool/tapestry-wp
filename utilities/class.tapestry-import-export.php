@@ -520,10 +520,10 @@ class TapestryImportExport
                 self::_importActivityNode($node, $temp_dir, $node_warnings, $imported_media);
             }
 
-            if (!empty($node->thumbnailFileId)) {
+            if (!empty($node->imageURL)) {
                 self::_importMedia($node->imageURL, $temp_dir, $node_warnings, $imported_media, true, $node->thumbnailFileId);
             }
-            if (!empty($node->lockedThumbnailFileId)) {
+            if (!empty($node->lockedImageURL)) {
                 self::_importMedia($node->lockedImageURL, $temp_dir, $node_warnings, $imported_media, true, $node->lockedThumbnailFileId);
             }
 
