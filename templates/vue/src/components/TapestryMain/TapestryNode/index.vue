@@ -387,7 +387,7 @@ export default {
       )
     },
     selectHaloWidth() {
-      return 15
+      return this.radius * 0.1
     },
     selectHaloColor() {
       return "#49cfff"
