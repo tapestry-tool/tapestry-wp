@@ -299,7 +299,14 @@ export default {
       return this.getNode(this.selectedId)
     },
     selectedNodeLevel() {
-      return this.getNode(this.selectedId)?.level ?? 1
+      return this.selectedNode?.level ?? 1
+    },
+    selectedNodeVisibility() {
+      return Helpers.getNodeVisibility(
+        this.selectedNodeLevel,
+        this.scale,
+        this.currentDepth
+      )
     },
     dragSelectEnabled() {
       return !this.settings.renderMap
@@ -401,6 +408,18 @@ export default {
         height: 0,
       }
     },
+    activeLinkVisibility() {
+      if (!this.activeLink) {
+        return 1
+      }
+
+      const source = this.getNode(this.activeLink.source)
+      const target = this.getNode(this.activeLink.target)
+      return Math.min(
+        Helpers.getNodeVisibility(source.level, this.scale, this.currentDepth),
+        Helpers.getNodeVisibility(target.level, this.scale, this.currentDepth)
+      )
+    },
   },
   watch: {
     isEmptyTapestry(empty) {
@@ -455,6 +474,17 @@ export default {
     showContextToolbar(newVal, oldVal) {
       if (oldVal === "link") {
         this.activeLink = null
+      }
+    },
+    selectedNodeVisibility(visibility) {
+      if (this.showContextToolbar === "node" && visibility <= 0) {
+        this.setShowContextToolbar("node", false)
+      }
+    },
+    activeLinkVisibility(visibility) {
+      if (this.showContextToolbar === "link" && visibility < 0) {
+        // still show link toolbar when visibility == 0 so as not to confuse the user when they click on a link connecting node to grandchild node
+        this.setShowContextToolbar("link", false)
       }
     },
     browserDimensions: {
