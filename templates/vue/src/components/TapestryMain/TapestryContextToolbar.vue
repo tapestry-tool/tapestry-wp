@@ -104,8 +104,8 @@ export default {
 
 <style lang="scss" scoped>
 .context-toolbar-container {
-  background-color: #ededed;
-  border: 2px solid #f8f8f8;
+  background-color: var(--bg-color-secondary);
+  border: 2px solid var(--bg-color-layered);
   border-radius: 9px;
   z-index: 100;
   display: block;
@@ -124,7 +124,7 @@ export default {
 <style lang="scss">
 .tapestry-toolbar-separator {
   width: 2px;
-  background-color: #f8f8f8;
+  background-color: var(--bg-color-layered);
 }
 .tapestry-context-toolbar {
   display: flex;

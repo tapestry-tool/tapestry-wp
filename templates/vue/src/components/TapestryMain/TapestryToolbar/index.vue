@@ -135,8 +135,8 @@ export default {
     justify-content: center;
     align-items: stretch;
 
-    background-color: #ededed;
-    border: 2px solid #f8f8f8;
+    background-color: var(--bg-color-secondary);
+    border: 2px solid var(--bg-color-layered);
     border-radius: 9px;
 
     .tool-group {
@@ -166,7 +166,7 @@ export default {
 
     .separator {
       height: 2px;
-      background-color: #f8f8f8;
+      background-color: var(--bg-color-layered);
     }
   }
 }

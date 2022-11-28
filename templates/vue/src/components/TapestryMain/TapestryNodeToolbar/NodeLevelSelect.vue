@@ -54,7 +54,7 @@ export default {
   top: calc(-1 * (var(--level-btn-height) + 2px));
   left: -2px;
   width: 56px;
-  background-color: #ededed;
+  background-color: var(--bg-color-secondary);
   border-radius: var(--radius);
 }
 
@@ -85,9 +85,9 @@ button {
   padding: 0;
   background: none;
   font-size: 1.2em;
-  color: #59595b;
+  color: var(--text-color-primary);
   transition: all 0.2s ease;
-  border: 2px solid #f8f8f8;
+  border: 2px solid var(--text-color-tertiary);
 }
 
 .circle-btn {
@@ -103,11 +103,11 @@ button {
   width: 100%;
 
   &:not(.disabled):hover {
-    background: #d7d7d7;
+    background: var(--bg-color-primary);
   }
 
   &.disabled {
-    color: #d7d7d7;
+    color: var(--text-color-tertiary);
     cursor: pointer;
   }
 }
