@@ -529,12 +529,18 @@ class Tapestry implements ITapestry
      */
     public function inferNodeLevels($startingNodeId)
     {
+        // First mark nodes that are in a cycle
+        $isCycle = [];
+        $path = [];
+        $visited = [];
+        $this->_markNodesInCycles($startingNodeId, $isCycle, $path, $visited);
+
+        // Then perform depth-first search to set level of each node, storing unvisited nodes in $nodesToVisit and the levels of visited nodes in $levels
         $levels = [
             $startingNodeId => 1,
         ];
         $nodesToVisit = [$startingNodeId];
 
-        // Perform depth-first search, storing unvisited nodes in $nodesToVisit
         while (!empty($nodesToVisit)) {
             $nodeId = array_pop($nodesToVisit);
             $nodeLevel = $levels[$nodeId];
@@ -548,12 +554,20 @@ class Tapestry implements ITapestry
             foreach ($this->links as $link) {
                 if ($link->source === $nodeId) {
                     if (!isset($levels[$link->target])) {
-                        $levels[$link->target] = $nodeLevel + 1;
+                        if (array_key_exists($link->source, $isCycle) && array_key_exists($link->target, $isCycle)) {
+                            $levels[$link->target] = $nodeLevel;
+                        } else {
+                            $levels[$link->target] = $nodeLevel + 1;
+                        }
                         array_push($nodesToVisit, $link->target);
                     }
                 } elseif ($link->target === $nodeId) {
                     if (!isset($levels[$link->source])) {
-                        $levels[$link->source] = max(1, $nodeLevel - 1);
+                        if (array_key_exists($link->source, $isCycle) && array_key_exists($link->target, $isCycle)) {
+                            $levels[$link->source] = $nodeLevel;
+                        } else {
+                            $levels[$link->source] = max(1, $nodeLevel - 1);
+                        }
                         array_push($nodesToVisit, $link->source);
                     }
                 }
@@ -561,6 +575,53 @@ class Tapestry implements ITapestry
         }
 
         return true;
+    }
+
+    /**
+     * Marks nodes that are part of any cycle and stores them in the $flags associative array, where if the nodeId is a key in $flags, then that node is part of a cycle.
+     * Uses a modified DFS traversal that recognizes cycles in the traversal path and sets the flag when backtracking.
+     * For the $path and $visited arguments, simply create two empty array objects and pass it to this function. For the first argument $node, pass in the starting node ID.
+     * This will only traverse nodes that are reachable from the given starting node.
+     */
+    private function _markNodesInCycles($node, &$flags, &$path, &$visited)
+    {
+        $lastNode = empty($path) ? null : $path[count($path) - 1];
+
+        array_push($visited, $node);
+        array_push($path, $node);
+
+        $cycleNodes = [];
+
+        $neighbours = [];
+        foreach ($this->links as $link) {
+            if ($link->source === $node || $link->target === $node) {
+                array_push(
+                    $neighbours,
+                    $link->source === $node ? $link->target : $link->source
+                );
+            }
+        }
+
+        foreach ($neighbours as $neighbour) {
+            if ($neighbour === $node || $neighbour === $lastNode) {
+                continue;
+            }
+            if (in_array($neighbour, $path, true)) {
+                array_push($cycleNodes, $neighbour);
+            } elseif (!in_array($neighbour, $visited, true)) {
+                $cycleNodes = array_merge($cycleNodes, $this->_markNodesInCycles($neighbour, $flags, $path, $visited));
+            }
+        }
+        array_pop($path);
+        $cycleNodes = array_unique($cycleNodes);
+        if (!empty($cycleNodes)) {
+            $flags[$node] = true;
+        }
+        if (in_array($node, $cycleNodes)) {
+            array_splice($cycleNodes, array_search($node, $cycleNodes, true), 1);
+        }
+
+        return $cycleNodes;
     }
 
     /**
