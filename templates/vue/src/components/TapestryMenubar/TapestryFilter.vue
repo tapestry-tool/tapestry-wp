@@ -60,7 +60,7 @@
 
 <script>
 import "vue-select/dist/vue-select.css"
-import { mapActions, mapGetters, mapMutations, mapState } from "vuex"
+import { mapActions, mapMutations, mapState } from "vuex"
 import { matchSorter } from "match-sorter"
 import client from "@/services/TapestryAPI"
 import * as wp from "@/services/wp"
@@ -94,7 +94,6 @@ export default {
   },
   computed: {
     ...mapState(["nodes", "settings"]),
-    ...mapGetters(["getBiologicalParent"]),
     type: {
       get() {
         const search = this.$route.query.search
@@ -242,14 +241,6 @@ export default {
       immediate: true,
       handler(nodes) {
         this.updateVisibleNodes(nodes)
-        if (this.isActive) {
-          this.computeVisibleNodeParents(nodes)
-        } else {
-          this.updateVisibleNodeParents({
-            nodes: [],
-            links: [],
-          })
-        }
       },
     },
     type: {
@@ -279,11 +270,7 @@ export default {
     }
   },
   methods: {
-    ...mapMutations([
-      "updateVisibleNodes",
-      "updateVisibleNodeParents",
-      "addApiError",
-    ]),
+    ...mapMutations(["updateVisibleNodes", "addApiError"]),
     ...mapActions(["refetchTapestryData"]),
     toggleFilter() {
       if (this.isActive) {
@@ -371,30 +358,6 @@ export default {
           },
         })
         .catch(() => {})
-    },
-    computeVisibleNodeParents(nodes) {
-      const parents = []
-      const links = []
-      for (const startingNodeId of nodes) {
-        if (parents.includes(startingNodeId)) {
-          continue
-        }
-        let nodeId = startingNodeId
-        let parentId = this.getBiologicalParent(nodeId)
-        while (parentId) {
-          links.push({ source: parentId, target: nodeId })
-          if (parents.includes(parentId)) {
-            break
-          }
-          parents.push(parentId)
-          nodeId = parentId
-          parentId = this.getBiologicalParent(nodeId)
-        }
-      }
-      this.updateVisibleNodeParents({
-        nodes: parents,
-        links: links,
-      })
     },
   },
 }

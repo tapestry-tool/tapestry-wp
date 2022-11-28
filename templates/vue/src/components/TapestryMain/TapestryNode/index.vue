@@ -160,14 +160,11 @@
         </g>
       </g>
       <circle
-        v-if="showSearchHighlight || showSearchParentHighlight"
+        v-if="showSearchHighlight"
         :data-qa="`node-search-highlight-${node.id}`"
         :r="radius + 40"
         fill="var(--highlight-color)"
         class="search-highlight"
-        :class="{
-          'is-parent': showSearchParentHighlight && !showSearchHighlight,
-        }"
       ></circle>
       <defs>
         <pattern :id="`node-image-${node.id}`" width="1" height="1">
@@ -243,7 +240,6 @@ export default {
       "selection",
       "settings",
       "visibleNodes",
-      "visibleNodeParents",
       "maxLevel",
       "currentDepth",
       "nodeNavigation",
@@ -465,12 +461,6 @@ export default {
     },
     showSearchHighlight() {
       return this.isFilteringTapestry && this.visibleNodes.includes(this.node.id)
-    },
-    showSearchParentHighlight() {
-      return (
-        this.isFilteringTapestry &&
-        this.visibleNodeParents.nodes.includes(this.node.id)
-      )
     },
     selectHaloWidth() {
       return this.radius * 0.1
@@ -758,10 +748,5 @@ export default {
 
 .search-highlight {
   opacity: 0.4;
-
-  &.is-parent {
-    opacity: 0.1;
-    fill: #fd7e14;
-  }
 }
 </style>
