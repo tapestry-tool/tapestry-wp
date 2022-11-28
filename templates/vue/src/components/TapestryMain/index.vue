@@ -893,9 +893,26 @@ export default {
       const targetScale = Helpers.getTargetScale(node.level) * this.manualScale
       const deltaScale = targetScale - this.scale
 
+      const targetRadius = Helpers.getNodeRadius(
+        node.level,
+        this.maxLevel,
+        targetScale
+      )
       const targetViewBoxX = this.unscaledViewBox[0] * targetScale
       const targetViewBoxY = this.unscaledViewBox[1] * targetScale
 
+      // The offset if the node is in the center of view
+      let centerOffset = {
+        x:
+          node.coordinates.x * targetScale -
+          targetViewBoxX -
+          (this.viewBox[2] - targetRadius) / 2,
+        y:
+          node.coordinates.y * targetScale -
+          targetViewBoxY -
+          (this.viewBox[3] - targetRadius) / 2,
+      }
+      // The offset according to mouse position
       let targetOffset = {
         x:
           this.offset.x +
@@ -904,6 +921,9 @@ export default {
           this.offset.y +
           (node.coordinates.y - this.unscaledViewBox[1]) * deltaScale,
       }
+      // Move towards the center offset position a bit
+      targetOffset.x -= (targetOffset.x - centerOffset.x) * 0.5
+      targetOffset.y -= (targetOffset.y - centerOffset.y) * 0.5
       targetOffset = this.clampOffsetValue(targetOffset, targetScale)
 
       this.isTransitioning = true
