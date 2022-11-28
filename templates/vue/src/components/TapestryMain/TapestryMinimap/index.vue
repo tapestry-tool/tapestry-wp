@@ -77,14 +77,7 @@ export default {
     }
   },
   computed: {
-    ...mapState([
-      "nodes",
-      "links",
-      "maxLevel",
-      "browserDimensions",
-      "visibleNodes",
-      "visibleNodeParents",
-    ]),
+    ...mapState(["nodes", "links", "maxLevel", "browserDimensions", "visibleNodes"]),
     ...mapGetters(["isVisible"]),
     aspectRatio() {
       return this.viewBox[2] / this.viewBox[3]
@@ -203,7 +196,6 @@ export default {
             this.nodes[link.source],
             this.nodes[link.target]
           ).map(this.transformCoordinates)
-          c.save()
           c.beginPath()
           c.moveTo(initialPoint.x, initialPoint.y)
           for (const point of points) {
@@ -211,16 +203,7 @@ export default {
           }
           c.closePath()
           c.fillStyle = "#999999"
-          if (
-            this.isFilteringTapestry &&
-            !this.visibleNodeParents.links.some(
-              l => l.source === link.source && l.target === link.target
-            )
-          ) {
-            c.globalAlpha = 0.2
-          }
           c.fill()
-          c.restore()
         }
 
         // 3. draw nodes
@@ -246,25 +229,14 @@ export default {
           c.shadowOffsetY = shadow.offset
           c.fill()
 
-          // Search highlights
-          if (this.isFilteringTapestry) {
-            if (this.visibleNodes.includes(node.id)) {
-              c.save()
-              c.beginPath()
-              c.arc(x, y, radius + 40, 0, Math.PI * 2)
-              c.fillStyle = highlightColor
-              c.globalAlpha = 0.4
-              c.fill()
-              c.restore()
-            } else if (this.visibleNodeParents.nodes.includes(node.id)) {
-              c.save()
-              c.beginPath()
-              c.arc(x, y, radius + 40, 0, Math.PI * 2)
-              c.fillStyle = "#fd7e14"
-              c.globalAlpha = 0.1
-              c.fill()
-              c.restore()
-            }
+          if (this.isFilteringTapestry && this.visibleNodes.includes(node.id)) {
+            c.save()
+            c.beginPath()
+            c.arc(x, y, radius + 40, 0, Math.PI * 2)
+            c.fillStyle = highlightColor
+            c.globalAlpha = 0.4
+            c.fill()
+            c.restore()
           }
         }
         c.shadowColor = "rgba(0, 0, 0, 0)"
