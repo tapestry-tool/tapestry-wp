@@ -454,6 +454,12 @@ export default class Helpers {
     return TinyColor(hsl).toHexString()
   }
 
+  static saturateColor(color, ratio) {
+    let hsl = TinyColor(color).toHsl()
+    hsl.s = Math.max(0, Math.min(1, hsl.s * ratio))
+    return TinyColor(hsl).toHexString()
+  }
+
   static getDropShadow(level, maxLevel, scale = 1) {
     return {
       offset: 4 * (maxLevel - level) * scale + 3,
