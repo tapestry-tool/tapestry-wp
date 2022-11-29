@@ -1,5 +1,5 @@
 const path = require("path")
-const { VueLoaderPlugin } = require('vue-loader');
+const { VueLoaderPlugin } = require("vue-loader")
 
 module.exports = {
   entry: path.resolve(__dirname, "../src/main.js"),
@@ -21,17 +21,7 @@ module.exports = {
       },
       {
         test: /\.scss$/,
-        use: [
-          "vue-style-loader",
-          "css-loader",
-          "sass-loader",
-          {
-            loader: "sass-loader",
-            options: {
-              additionalData: "@import 'src/assets/styles/onbording-colors.scss';",
-            },
-          },
-        ],
+        use: ["vue-style-loader", "css-loader", "sass-loader"],
       },
       {
         test: /\.js$/,

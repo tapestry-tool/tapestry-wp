@@ -11,6 +11,8 @@ import vSelect from "vue-select"
 import "bootstrap/dist/css/bootstrap.css"
 import "bootstrap-vue/dist/bootstrap-vue.css"
 
+import "./assets/styles/onboarding-colors.css"
+
 Vue.use(VueYouTubeEmbed)
 Vue.use(BootstrapVue)
 Vue.component("v-select", vSelect)

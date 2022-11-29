@@ -1,7 +1,8 @@
-$onbording-title-color: black;
-$onbording-secondary-color: #7f88af;
-$onbording-border-color: #d8d8d8;
-
+body {
+  --onbording-title-color: black;
+  --onbording-secondary-color: #7f88af;
+  --onbording-border-color: #d8d8d8;
+}
 .center {
   position: relative;
   top: 50%;
@@ -10,21 +11,19 @@ $onbording-border-color: #d8d8d8;
 }
 
 .ob-title {
-  color: $onbording-title-color;
+  color: var(--onboarding-title-color);
 }
 
 .ob-secondary {
-  color: $onbording-secondary-color;
+  color: var(--onboarding-secondary-color);
 }
 
 .ob-border {
-  color: $onbording-border-color;
+  color: var(--onboarding-border-color);
 }
 
-.ob-font {
-  * {
-    font-family: "Avenir", Helvetica, Arial, sans-serif;
-  }
+.ob-font * {
+  font-family: "Avenir", Helvetica, Arial, sans-serif;
 }
 
 .ob-connection {
