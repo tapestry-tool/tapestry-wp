@@ -5,7 +5,7 @@
     --text-color-primary: #eee;
     --text-color-secondary: #ccc;
     --text-color-tertiary: #a9a9a9;
-    --button-color: #ddd;
+    --border-color: #707070;
 }
 
 [data-theme="light"] {
@@ -15,7 +15,7 @@
     --text-color-primary: #111;
     --text-color-secondary: #262626;
     --text-color-tertiary: #5f747f;
-    --button-color: #222;
+    --border-color: #bababa;
 }
 
 [data-theme] {

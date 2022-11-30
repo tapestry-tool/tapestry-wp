@@ -136,7 +136,7 @@ export default {
     align-items: stretch;
 
     background-color: var(--bg-color-secondary);
-    border: 2px solid var(--bg-color-layered);
+    border: 2px solid var(--border-color);
     border-radius: 9px;
 
     .tool-group {
@@ -166,7 +166,7 @@ export default {
 
     .separator {
       height: 2px;
-      background-color: var(--bg-color-layered);
+      background-color: var(--border-color);
     }
   }
 }
