@@ -24,9 +24,10 @@
 </template>
 
 <script>
+import videoMediaMixins from "./_mixins.js"
 import { mapGetters, mapActions, mapState } from "vuex"
 import client from "@/services/TapestryAPI"
-import { SEEK_THRESHOLD } from "./video.config"
+import { SEEK_THRESHOLD } from "./_config"
 import Helpers from "@/utils/Helpers"
 
 // How often to update the H5P settings (in seconds)
@@ -34,6 +35,7 @@ const updateSettingsInterval = 10
 
 export default {
   name: "h5p-video-media",
+  mixins: [videoMediaMixins],
   props: {
     node: {
       type: Object,
@@ -140,33 +142,28 @@ export default {
     setFrameDimensions() {
       const h5pDimensions = this.instance.parent.$container[0].getBoundingClientRect()
       // default
-      this.frameHeight = h5pDimensions.height
       this.frameWidth = 0
+      this.frameHeight = h5pDimensions.height
       if (this.node.fitWindow || this.hasMultiContentContext) {
         // Video should fit within the smaller of the viewport or the container it's in
-        let fitHeight = window.innerHeight
+        let containerDimensions = {
+          height: window.innerHeight,
+        }
         if (this.hasMultiContentContext) {
           // Count for the header
-          // TODO: Find a better way of doing this without hardcoding the heigh value
-          fitHeight -= 100
+          // TODO: Find a better way of doing this without hardcoding the height value
+          containerDimensions.height -= 100
         }
-        // Proportionally make the frame smaller
-        let scaleFactor = fitHeight / h5pDimensions.height
-        this.frameHeight = h5pDimensions.height * scaleFactor
-        this.frameWidth = h5pDimensions.width * scaleFactor
-        // if the width is bigger than the available space, we need to scale based on the width
-        let fitWidth = this.$refs.h5pIframeContainer.clientWidth
-        if (this.frameWidth > fitWidth) {
-          scaleFactor = fitWidth / h5pDimensions.width
-          this.frameWidth = h5pDimensions.width * scaleFactor
-          this.frameHeight = h5pDimensions.height * scaleFactor
-        }
+        ;[this.frameWidth, this.frameHeight] = this.fitMediaInContainer(
+          h5pDimensions,
+          containerDimensions
+        )
       }
       // Fix for unknown issue where H5P height is just a bit short
       if (this.frameHeight) {
         this.frameHeight += 2
       }
-      let updatedDimensions = { height: this.frameHeight }
+      const updatedDimensions = { height: this.frameHeight }
       if (this.frameWidth) {
         updatedDimensions.width = this.frameWidth
       }
@@ -302,23 +299,14 @@ export default {
     handleLoad() {
       const h5pObj = this.$refs.h5p.contentWindow.H5P
       const h5pInstance = h5pObj.instances[0]
-      const loadedH5PId = h5pInstance.contentId
-      this.library = h5pInstance.libraryInfo.machineName
-
-      this.frameHeight = this.dimensions.height
-      // Check to see whether this is an H5P recorder
-      // If it is, we can emit an event to load the recorded audio (if exists)
-      // and terminate
-      if (h5pInstance.recorder && loadedH5PId) {
-        this.loadedH5PRecorderId = loadedH5PId
-        this.h5pRecorderSaverIsLoaded()
-        return
-      }
       const mediaProgress = this.node.progress
+
       this.frameHeight = this.$refs.h5p.contentWindow.document.activeElement.children[0].clientHeight
       this.$emit("change:dimensions", { height: this.frameHeight })
+
       const h5pVideo = h5pInstance.video
       const h5pIframeComponent = this
+
       const handleH5pAfterLoad = () => {
         h5pIframeComponent.instance = h5pVideo
         window.addEventListener("resize", h5pIframeComponent.setFrameDimensions)
