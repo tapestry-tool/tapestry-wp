@@ -59,7 +59,7 @@ import KalturaMedia from "./KalturaMedia.vue"
 import Popup from "./Popup"
 import EndScreen from "./EndScreen"
 import CompletedIcon from "@/components/common/CompletedIcon"
-import { COMPLETION_THRESHOLD } from "./video.config"
+import { COMPLETION_THRESHOLD } from "./_config"
 import Loading from "@/components/common/Loading"
 import client from "@/services/TapestryAPI"
 
