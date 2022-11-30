@@ -144,6 +144,12 @@ class TapestryApi {
     return response
   }
 
+  async batchUpdateNodes(nodesData) {
+    const url = `/tapestries/${this.postId}/nodes`
+    const response = await this.client.put(url, nodesData)
+    return response
+  }
+
   async updateNodeCoordinates(id, coordinates) {
     const url = `/tapestries/${this.postId}/nodes/${id}/coordinates`
     return await this.client.put(url, coordinates)

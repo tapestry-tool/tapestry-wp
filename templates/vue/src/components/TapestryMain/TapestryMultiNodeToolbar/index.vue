@@ -103,7 +103,7 @@ export default {
     },
   },
   methods: {
-    ...mapActions(["updateNode", "deleteNode"]),
+    ...mapActions(["batchUpdateNodes", "deleteNode"]),
     handleShowHide(show) {
       if (show !== this.show) {
         this.$emit("set-show", show)
@@ -155,17 +155,19 @@ export default {
         })
     },
     handleChangeLevels(diff) {
+      const updates = []
       for (const node of this.nodes) {
         if (node.level + diff < 1) {
           continue
         }
-        this.updateNode({
+        updates.push({
           id: node.id,
           newNode: {
             level: node.level + diff,
           },
         })
       }
+      this.batchUpdateNodes(updates)
     },
   },
 }

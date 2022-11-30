@@ -109,6 +109,13 @@ $REST_API_ENDPOINTS = [
             'callback' => 'updateTapestryNode',
         ],
     ],
+    'BATCH_PUT_TAPESTRY_NODES' => (object) [
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_PUT_METHOD,
+            'callback' => 'batchUpdateNodes',
+        ],
+    ],
     'DELETE_TAPESTRY_NODE' => (object) [
         'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)',
         'ARGUMENTS' => [
@@ -1076,6 +1083,68 @@ function updateTapestryNode($request)
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
+}
+
+/**
+ * Update multiple Tapestry Nodes in one request.
+ *
+ * @param object $request HTTP request
+ *
+ * @return object $response   HTTP response
+ */
+function batchUpdateNodes($request)
+{
+    $postId = $request['tapestryPostId'];
+    $nodesData = json_decode($request->get_body());
+    
+    try {
+        if (empty($postId) || !TapestryHelpers::isValidTapestry($postId)) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+        if (!is_array($nodesData)) {
+            throw new TapestryError('INVALID_DATA', 'The provided data of nodes is not an array.', 400);
+        }
+        
+        $tapestry = new Tapestry($postId);
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+
+    $successNodeIds = [];
+
+    foreach ($nodesData as $nodeData) {
+        try {
+            if (!isset($nodeData->id) || !is_numeric($nodeData->id)) {
+                throw new TapestryError('INVALID_NODE_META_ID');
+            }
+            if (!isset($nodeData->newNode)) {
+                throw new TapestryError('INVALID_NODE_DATA', 'The node data is invalid.', 400);
+            }
+            $nodeMetaId = $nodeData->id;
+            if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
+                throw new TapestryError('INVALID_NODE_META_ID');
+            }
+            if (!TapestryHelpers::userIsAllowed(UserActions::EDIT, $nodeMetaId, $postId)) {
+                throw new TapestryError('EDIT_NODE_PERMISSION_DENIED');
+            }
+            if (!TapestryHelpers::isChildNodeOfTapestry($nodeMetaId, $postId)) {
+                throw new TapestryError('INVALID_CHILD_NODE');
+            }
+
+            $node = $tapestry->getNode($nodeMetaId);
+
+            $node->set((object) $nodeData->newNode);
+
+            $node->save();
+
+            array_push($successNodeIds, $nodeMetaId);
+        } catch (TapestryError $e) {
+            // Do not care about details of errors while batch editing nodes
+            // Whether or not error(s) occurred can be determined from the length of the response $successNodeIds
+        }
+    }
+
+    return $successNodeIds;
 }
 
 /**

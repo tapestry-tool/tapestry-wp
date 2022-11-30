@@ -177,6 +177,88 @@ export async function doAddNode(
   }
 }
 
+export async function batchUpdateNodes({ dispatch, getters }, payloads) {
+  let undoPayloads = []
+  for (const payload of payloads) {
+    const node = getters.getNode(payload.id)
+    const newNode = { ...payload.newNode }
+    for (const key in newNode) {
+      newNode[key] = node[key]
+    }
+    undoPayloads.push({
+      id: payload.id,
+      newNode,
+    })
+  }
+  return dispatch("buildCommand", {
+    name: "update multiple nodes",
+    executeAction: "doBatchUpdateNodes",
+    executePayload: payloads,
+    undoAction: "doBatchUpdateNodes",
+    undoPayload: undoPayloads,
+  })
+}
+
+export async function doBatchUpdateNodes(
+  { commit, dispatch, getters, state },
+  payloads
+) {
+  try {
+    const successNodeIds = (await client.batchUpdateNodes(JSON.stringify(payloads)))
+      .data
+
+    const linkDirectionUpdates = []
+    let failedCount = 0
+
+    for (const payload of payloads) {
+      const id = payload.id
+      if (!successNodeIds.includes(id)) {
+        failedCount++
+        continue
+      }
+      const oldNode = getters.getNode(id)
+      const newNode = { ...payload.newNode }
+      commit("updateNode", {
+        id,
+        newNode: newNode,
+      })
+
+      if (newNode.coordinates) {
+        commit("updateNodeCoordinates", {
+          id,
+          coordinates: {
+            [getters.xOrFx]: newNode.coordinates.x,
+            [getters.yOrFy]: newNode.coordinates.y,
+          },
+        })
+      }
+
+      if (newNode.level && newNode.level !== oldNode.level) {
+        if (newNode.level > state.maxLevel) {
+          commit("setMaxLevel", newNode.level)
+        } else if (oldNode.level === state.maxLevel) {
+          commit("updateMaxLevel")
+        }
+        linkDirectionUpdates.push(id)
+      }
+    }
+
+    for (const nodeId of linkDirectionUpdates) {
+      dispatch("updateLinkDirections", nodeId)
+    }
+
+    if (failedCount !== 0) {
+      commit("addApiError", {
+        error: `Failed to update ${failedCount} of the nodes.`,
+      })
+    }
+
+    return failedCount === 0
+  } catch (error) {
+    dispatch("addApiError", error)
+  }
+}
+
 export async function updateNode({ dispatch, getters }, payload) {
   const node = getters.getNode(payload.id)
   let undoPayload = {
@@ -190,20 +272,8 @@ export async function updateNode({ dispatch, getters }, payload) {
     name: "update node",
     executeAction: "doUpdateNode",
     executePayload: payload,
-    executeCallback: nodeId => ({
-      undoPayload: {
-        ...undoPayload,
-        id: nodeId,
-      },
-    }),
     undoAction: "doUpdateNode",
     undoPayload: undoPayload,
-    undoCallback: nodeId => ({
-      executePayload: {
-        ...payload,
-        id: nodeId,
-      },
-    }),
   })
 }
 
