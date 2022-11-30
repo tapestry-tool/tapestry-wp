@@ -37,15 +37,6 @@ export function getParent(state) {
   }
 }
 
-export function getBiologicalParent(state, { getNode }) {
-  // Similar to getParent, except only considers cross-level parent-child relationships; useful for avoiding infinite loops when continuously fetching the parent
-  return id => {
-    const level = getNode(id).level
-    return state.links.find(l => l.target == id && getNode(l.source).level < level)
-      ?.source
-  }
-}
-
 export function isMultiContent(_, { getNode, isNestedMultiContent }) {
   return id => {
     const node = getNode(id)

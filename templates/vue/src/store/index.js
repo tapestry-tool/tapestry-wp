@@ -23,10 +23,6 @@ export const store = {
     selectedNodeId: null,
     favourites: [],
     visibleNodes: [],
-    visibleNodeParents: {
-      nodes: [],
-      links: [],
-    },
     apiError: null,
     displayErrors: true,
     theme: "",

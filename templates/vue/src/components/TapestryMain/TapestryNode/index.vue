@@ -9,7 +9,7 @@
       :data-locked="!node.unlocked"
       :transform="`translate(${coordinates.x}, ${coordinates.y})`"
       :class="{
-        opaque: !visibleNodes.includes(node.id),
+        desaturated: !isFilterMatched,
       }"
       :style="{
         cursor:
@@ -90,6 +90,9 @@
           >
             <div
               class="meta"
+              :class="{
+                opaque: !isFilterMatched,
+              }"
               :style="{
                 color: node.textColor,
                 fontSize: radius * 0.2 + 'px',
@@ -158,16 +161,6 @@
           </template>
         </g>
       </g>
-      <circle
-        v-if="showSearchHighlight || showSearchParentHighlight"
-        :data-qa="`node-search-highlight-${node.id}`"
-        :r="radius + 40"
-        fill="var(--highlight-color)"
-        class="search-highlight"
-        :class="{
-          'is-parent': showSearchParentHighlight && !showSearchHighlight,
-        }"
-      ></circle>
       <defs>
         <pattern :id="`node-image-${node.id}`" width="1" height="1">
           <image
@@ -242,7 +235,6 @@ export default {
       "selection",
       "settings",
       "visibleNodes",
-      "visibleNodeParents",
       "maxLevel",
       "currentDepth",
       "nodeNavigation",
@@ -380,12 +372,10 @@ export default {
         this.maxLevel
       )
 
-      if (!this.isGrandChild) {
-        if (showImages && this.thumbnailURL) {
-          return `url(#node-image-${this.node.id})`
-        } else {
-          return backgroundColor
-        }
+      if (!this.isGrandChild && showImages && this.thumbnailURL) {
+        return `url(#node-image-${this.node.id})`
+      } else if (!this.isFilterMatched) {
+        return this.desaturatedBackgroundColor
       } else if (this.selected) {
         return "var(--highlight-color)"
       } else {
@@ -433,6 +423,9 @@ export default {
         .desaturate()
         .toString()
     },
+    desaturatedBackgroundColor() {
+      return Helpers.saturateColor(this.node.backgroundColor, 0.7)
+    },
     thumbnailURL() {
       return !this.node.unlocked && this.node.lockedImageURL
         ? this.node.lockedImageURL
@@ -458,17 +451,8 @@ export default {
         this.settings.showAcceptedHighlight
       )
     },
-    isFilteringTapestry() {
-      return !!this.$route.query.search
-    },
-    showSearchHighlight() {
-      return this.isFilteringTapestry && this.visibleNodes.includes(this.node.id)
-    },
-    showSearchParentHighlight() {
-      return (
-        this.isFilteringTapestry &&
-        this.visibleNodeParents.nodes.includes(this.node.id)
-      )
+    isFilterMatched() {
+      return this.visibleNodes.includes(this.node.id)
     },
     selectHaloWidth() {
       return this.radius * 0.1
@@ -703,6 +687,14 @@ export default {
 </style>
 
 <style lang="scss">
+.desaturated {
+  filter: saturate(25%);
+}
+
+.opaque {
+  opacity: 0.3;
+}
+
 .node-button {
   height: 55px;
   width: 55px;
@@ -755,15 +747,6 @@ export default {
     margin-top: 0;
     margin-bottom: 0;
     font-weight: bold;
-  }
-}
-
-.search-highlight {
-  opacity: 0.4;
-
-  &.is-parent {
-    opacity: 0.1;
-    fill: #fd7e14;
   }
 }
 </style>
