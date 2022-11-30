@@ -205,3 +205,23 @@ export function getNeighbouringLinks(state) {
 export function getTheme(state) {
   return state.theme ? state.theme : "light"
 }
+
+export function getNodeDimensions(state, { isVisible }) {
+  const box = {
+    x0: 30000,
+    y0: 30000,
+    x: 0,
+    y: 0,
+  }
+  for (const node of Object.values(state.nodes)) {
+    if (node.nodeType !== "" && isVisible(node.id)) {
+      const { x, y } = node.coordinates
+      box.x0 = Math.min(x, box.x0)
+      box.y0 = Math.min(y, box.y0)
+      box.x = Math.max(x, box.x)
+      box.y = Math.max(y, box.y)
+    }
+  }
+
+  return box
+}
