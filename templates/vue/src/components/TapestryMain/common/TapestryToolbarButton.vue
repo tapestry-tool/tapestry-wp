@@ -121,6 +121,15 @@ export default {
     justify-content: center;
     width: 46px;
     height: 46px;
+    transition: all 0.2s ease;
+  }
+
+  &.selected,
+  &:not(.not-available):hover {
+    .button-content {
+      color: var(--highlight-color);
+      transform: scale(1.1);
+    }
   }
 }
 

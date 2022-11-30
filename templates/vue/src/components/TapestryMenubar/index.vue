@@ -73,7 +73,7 @@ export default {
   flex-wrap: nowrap;
 
   button.menubar-button {
-    color: var(--text-color-tertiary);
+    color: var(--text-color-primary);
     padding: 0;
     background: none;
     font-size: 1.2em;
