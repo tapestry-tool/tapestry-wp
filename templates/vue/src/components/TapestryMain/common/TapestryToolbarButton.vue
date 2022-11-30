@@ -107,7 +107,7 @@ export default {
   transition: all 0.2s ease;
 
   &.not-available {
-    color: var(--text-color-tertiary);
+    color: var(--border-color);
     cursor: default;
   }
 

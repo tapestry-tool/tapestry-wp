@@ -87,7 +87,7 @@ button {
   font-size: 1.2em;
   color: var(--text-color-primary);
   transition: all 0.2s ease;
-  border: 2px solid var(--text-color-tertiary);
+  border: 2px solid var(--border-color);
 }
 
 .circle-btn {
@@ -107,8 +107,8 @@ button {
   }
 
   &.disabled {
-    color: var(--text-color-tertiary);
-    cursor: pointer;
+    color: var(--border-color);
+    cursor: default;
   }
 }
 </style>
