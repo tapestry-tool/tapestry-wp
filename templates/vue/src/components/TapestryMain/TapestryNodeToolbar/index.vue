@@ -14,7 +14,7 @@
         :active="activeButton === 'delete'"
         @click="handleDeleteNode"
       >
-        <i class="fas fa-trash-alt fa-lg"></i>
+        <i class="fas fa-trash-alt"></i>
       </tapestry-toolbar-button>
 
       <div class="tapestry-toolbar-separator"></div>
@@ -58,11 +58,11 @@
           :active="activeButton === 'textColor'"
         >
           <div v-if="node.hideTitle" class="text-color-hidden-container">
-            <i class="fas fa-font fa-lg"></i>
+            <i class="fas fa-font"></i>
             <div class="slash"></div>
           </div>
           <div v-else class="text-color-icon-container">
-            <i class="fas fa-font"></i>
+            <i class="fas fa-font fa-sm"></i>
             <div class="color-box" :style="{ background: node.textColor }"></div>
           </div>
         </tapestry-toolbar-button>
@@ -286,12 +286,12 @@ export default {
 
 .slash {
   width: 2px;
-  height: 40px;
+  height: 35px;
   background: #000;
   position: absolute;
   top: 0;
   left: 0;
-  transform: rotate(-45deg) translate(-2px, -4px);
+  transform: rotate(-45deg) translate(-5px, 1x);
   transform-origin: 0 0;
 }
 
@@ -305,6 +305,7 @@ export default {
   width: 20px;
   height: 5px;
   position: absolute;
+  margin-top: -3px;
 }
 
 .circle {

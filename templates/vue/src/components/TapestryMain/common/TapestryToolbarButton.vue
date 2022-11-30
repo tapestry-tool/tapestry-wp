@@ -103,7 +103,7 @@ export default {
   color: var(--text-color-primary);
   padding: 0;
   background: none;
-  font-size: 1.2em;
+  font-size: 1.4em; // 2em larger than menubar buttons
   transition: all 0.2s ease;
 
   &.not-available {
@@ -119,8 +119,8 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 52px;
-    height: 52px;
+    width: 46px;
+    height: 46px;
   }
 }
 

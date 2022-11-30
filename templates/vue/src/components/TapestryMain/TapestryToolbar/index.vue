@@ -7,14 +7,14 @@
           :tool="tools.PAN"
           tooltip="Pan Tool"
         >
-          <i class="fas fa-arrows-alt fa-lg"></i>
+          <i class="fas fa-arrows-alt"></i>
         </tapestry-toolbar-button>
         <tapestry-toolbar-button
           id="tapestry-select-tool"
           :tool="tools.SELECT"
           tooltip="Select Tool"
         >
-          <i class="fas fa-mouse-pointer fa-lg"></i>
+          <i class="fas fa-mouse-pointer"></i>
         </tapestry-toolbar-button>
         <template v-if="isLoggedIn">
           <tapestry-toolbar-button
@@ -22,14 +22,14 @@
             :tool="tools.ADD_NODE"
             tooltip="Add Node"
           >
-            <i class="fas fa-plus-circle fa-lg"></i>
+            <i class="fas fa-plus-circle"></i>
           </tapestry-toolbar-button>
           <tapestry-toolbar-button
             id="tapestry-add-link-tool"
             :tool="tools.ADD_LINK"
             tooltip="Add Connection"
           >
-            <i class="fas fa-arrows-alt-v fa-lg"></i>
+            <i class="fas fa-arrows-alt-v"></i>
           </tapestry-toolbar-button>
           <settings-modal-button v-if="canEdit"></settings-modal-button>
         </template>
@@ -43,7 +43,7 @@
             :disabled="!canUndo"
             @click="performUndo"
           >
-            <i class="fas fa-undo fa-lg"></i>
+            <i class="fas fa-undo"></i>
           </tapestry-toolbar-button>
           <tapestry-toolbar-button
             id="tapestry-redo-button"
@@ -51,7 +51,7 @@
             :disabled="!canRedo"
             @click="performRedo"
           >
-            <i class="fas fa-redo fa-lg"></i>
+            <i class="fas fa-redo"></i>
           </tapestry-toolbar-button>
         </div>
       </template>

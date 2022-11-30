@@ -53,7 +53,7 @@ export default {
   position: absolute;
   top: calc(-1 * (var(--level-btn-height) + 2px));
   left: -2px;
-  width: 56px;
+  width: 50px;
   background-color: var(--bg-color-secondary);
   border-radius: var(--radius);
 }
@@ -84,14 +84,14 @@ export default {
 button {
   padding: 0;
   background: none;
-  font-size: 1.2em;
+  font-size: 1.3em;
   color: var(--text-color-primary);
   transition: all 0.2s ease;
   border: 2px solid var(--border-color);
 }
 
 .circle-btn {
-  height: 58px;
+  height: 52px;
   width: 100%;
   display: flex;
   justify-content: center;
