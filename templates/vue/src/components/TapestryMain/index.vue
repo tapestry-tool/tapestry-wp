@@ -921,9 +921,14 @@ export default {
           this.offset.y +
           (node.coordinates.y - this.unscaledViewBox[1]) * deltaScale,
       }
-      // Move towards the center offset position a bit
-      targetOffset.x -= (targetOffset.x - centerOffset.x) * 0.5
-      targetOffset.y -= (targetOffset.y - centerOffset.y) * 0.5
+      if (
+        (Math.abs(targetOffset.x - centerOffset.x) / this.viewBox[2]) * 2 > 0.6 ||
+        (Math.abs(targetOffset.y - centerOffset.y) / this.viewBox[3]) * 2 > 0.6
+      ) {
+        // Move towards the center offset position a bit
+        targetOffset.x -= (targetOffset.x - centerOffset.x) * 0.4
+        targetOffset.y -= (targetOffset.y - centerOffset.y) * 0.4
+      }
       targetOffset = this.clampOffsetValue(targetOffset, targetScale)
 
       this.isTransitioning = true
