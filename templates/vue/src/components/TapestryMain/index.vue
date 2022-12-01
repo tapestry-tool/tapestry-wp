@@ -303,7 +303,14 @@ export default {
       return this.getNode(this.selectedId)
     },
     selectedNodeLevel() {
-      return this.getNode(this.selectedId)?.level ?? 1
+      return this.selectedNode?.level ?? 1
+    },
+    selectedNodeVisibility() {
+      return Helpers.getNodeVisibility(
+        this.selectedNodeLevel,
+        this.scale,
+        this.currentDepth
+      )
     },
     dragSelectEnabled() {
       return !this.settings.renderMap
@@ -405,6 +412,18 @@ export default {
         height: 0,
       }
     },
+    activeLinkVisibility() {
+      if (!this.activeLink) {
+        return 1
+      }
+
+      const source = this.getNode(this.activeLink.source)
+      const target = this.getNode(this.activeLink.target)
+      return Math.min(
+        Helpers.getNodeVisibility(source.level, this.scale, this.currentDepth),
+        Helpers.getNodeVisibility(target.level, this.scale, this.currentDepth)
+      )
+    },
   },
   watch: {
     isEmptyTapestry(empty) {
@@ -485,6 +504,17 @@ export default {
     showContextToolbar(newVal, oldVal) {
       if (oldVal === "link") {
         this.activeLink = null
+      }
+    },
+    selectedNodeVisibility(visibility) {
+      if (this.showContextToolbar === "node" && visibility <= 0) {
+        this.setShowContextToolbar("node", false)
+      }
+    },
+    activeLinkVisibility(visibility) {
+      if (this.showContextToolbar === "link" && visibility < 0) {
+        // still show link toolbar when visibility == 0 so as not to confuse the user when they click on a link connecting node to grandchild node
+        this.setShowContextToolbar("link", false)
       }
     },
     browserDimensions: {
@@ -893,9 +923,26 @@ export default {
       const targetScale = Helpers.getTargetScale(node.level) * this.manualScale
       const deltaScale = targetScale - this.scale
 
+      const targetRadius = Helpers.getNodeRadius(
+        node.level,
+        this.maxLevel,
+        targetScale
+      )
       const targetViewBoxX = this.unscaledViewBox[0] * targetScale
       const targetViewBoxY = this.unscaledViewBox[1] * targetScale
 
+      // The offset if the node is in the center of view
+      let centerOffset = {
+        x:
+          node.coordinates.x * targetScale -
+          targetViewBoxX -
+          (this.viewBox[2] - targetRadius) / 2,
+        y:
+          node.coordinates.y * targetScale -
+          targetViewBoxY -
+          (this.viewBox[3] - targetRadius) / 2,
+      }
+      // The offset according to mouse position
       let targetOffset = {
         x:
           this.offset.x +
@@ -903,6 +950,14 @@ export default {
         y:
           this.offset.y +
           (node.coordinates.y - this.unscaledViewBox[1]) * deltaScale,
+      }
+      if (
+        (Math.abs(targetOffset.x - centerOffset.x) / this.viewBox[2]) * 2 > 0.6 ||
+        (Math.abs(targetOffset.y - centerOffset.y) / this.viewBox[3]) * 2 > 0.6
+      ) {
+        // Move towards the center offset position a bit
+        targetOffset.x -= (targetOffset.x - centerOffset.x) * 0.4
+        targetOffset.y -= (targetOffset.y - centerOffset.y) * 0.4
       }
       targetOffset = this.clampOffsetValue(targetOffset, targetScale)
 

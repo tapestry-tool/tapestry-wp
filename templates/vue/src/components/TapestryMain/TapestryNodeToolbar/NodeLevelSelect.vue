@@ -53,8 +53,8 @@ export default {
   position: absolute;
   top: calc(-1 * (var(--level-btn-height) + 2px));
   left: -2px;
-  width: 56px;
-  background-color: #ededed;
+  width: 50px;
+  background-color: var(--bg-color-secondary);
   border-radius: var(--radius);
 }
 
@@ -79,23 +79,25 @@ export default {
   font-size: 0.8rem;
   line-height: 1.5rem;
   margin-top: -2px;
+  transform: scale(1.1);
 }
 
 button {
   padding: 0;
   background: none;
-  font-size: 1.2em;
-  color: #59595b;
+  font-size: 1.3em;
+  color: var(--text-color-primary);
   transition: all 0.2s ease;
-  border: 2px solid #f8f8f8;
+  border: 2px solid var(--border-color);
 }
 
 .circle-btn {
-  height: 58px;
+  height: 52px;
   width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
+  background: var(--bg-color-primary);
 }
 
 .level-btn {
@@ -103,12 +105,12 @@ button {
   width: 100%;
 
   &:not(.disabled):hover {
-    background: #d7d7d7;
+    background: var(--bg-color-primary);
   }
 
   &.disabled {
-    color: #d7d7d7;
-    cursor: pointer;
+    color: var(--border-color);
+    cursor: default;
   }
 }
 </style>
