@@ -11,6 +11,7 @@
       horizontal
       tooltip="Delete Nodes"
       :active="activeButton === 'delete'"
+      danger
       @click="handleDeleteNodes"
     >
       <i class="fas fa-trash-alt"></i>
