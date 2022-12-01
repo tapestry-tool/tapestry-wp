@@ -485,7 +485,7 @@ export async function deleteNode({ dispatch }, id) {
     executeCallback: nodeIdAndLinks => ({
       undoPayload: nodeIdAndLinks,
     }),
-    undoAction: "doRestoreNode", // may customize the undo action to recreate the links associated with the node
+    undoAction: "doRestoreNode",
     undoPayload: { id },
   })
 }
@@ -553,6 +553,106 @@ export async function doRestoreNode({ commit, dispatch, getters }, payload) {
           })
         }
       }
+    }
+  } catch (error) {
+    dispatch("addApiError", error)
+  }
+}
+
+export async function batchDeleteNodes({ dispatch }, ids) {
+  await dispatch("buildCommand", {
+    name: "delete multiple node",
+    executeAction: "doBatchDeleteNodes",
+    executePayload: ids,
+    executeCallback: nodeIdsAndLinks => ({
+      undoPayload: nodeIdsAndLinks,
+    }),
+    undoAction: "doBatchRestoreNodes",
+    undoPayload: { ids },
+  })
+}
+
+export async function doBatchDeleteNodes({ commit, dispatch, state, getters }, ids) {
+  try {
+    const hasMaxLevelNode = ids.some(
+      id => getters.getNode(id).level === state.maxLevel
+    )
+
+    const deletedNodeIds = (await client.batchDeleteNodes(ids)).data
+    const deletedLinks = []
+
+    for (const id of deletedNodeIds) {
+      // delete all links connected to the node, and remove node from childOrdering of neighbours
+      const neighbouringLinks = getters.getNeighbouringLinks(id)
+      for (const link of neighbouringLinks) {
+        const neighbour = getters.getNode(
+          link.source === id ? link.target : link.source
+        )
+        await dispatch("deleteLink", {
+          source: link.source,
+          target: link.target,
+          useClient: false,
+        })
+        commit("updateNode", {
+          id: neighbour.id,
+          newNode: {
+            childOrdering: neighbour.childOrdering.filter(childId => childId !== id),
+          },
+        })
+        deletedLinks.push(link)
+      }
+
+      commit("deleteNode", id)
+      if (id === state.rootId) {
+        commit("updateRootNode", null)
+      }
+    }
+
+    if (hasMaxLevelNode) {
+      commit("updateMaxLevel")
+    }
+
+    return {
+      ids: deletedNodeIds,
+      links: deletedLinks,
+    }
+  } catch (error) {
+    dispatch("addApiError", error)
+  }
+}
+
+export async function doBatchRestoreNodes({ commit, dispatch, getters }, payload) {
+  try {
+    const { nodes, links } = (
+      await client.batchRestoreNodes(payload.ids, payload.links)
+    ).data
+
+    for (const node of nodes) {
+      commit("addNode", Helpers.deepMerge(getters.createDefaultNode(), node))
+    }
+
+    for (const link of links) {
+      commit("addLink", link)
+
+      const parent = getters.getNode(link.source)
+      commit("updateNode", {
+        id: link.source,
+        newNode: {
+          childOrdering: [...parent.childOrdering, link.target],
+        },
+      })
+    }
+
+    if (nodes.length !== payload.ids.length) {
+      commit("addApiError", {
+        error: `Failed to restore ${payload.ids.length -
+          nodes.length} of the nodes.`,
+      })
+    } else if (links.length !== payload.links.length) {
+      commit("addApiError", {
+        error: `Failed to restore ${payload.links.length -
+          links.length} of the links attached to the nodes.`,
+      })
     }
   } catch (error) {
     dispatch("addApiError", error)

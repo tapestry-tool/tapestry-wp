@@ -103,9 +103,19 @@ class TapestryApi {
     return await this.client.delete(url)
   }
 
+  async batchDeleteNodes(ids) {
+    const url = `/tapestries/${this.postId}/nodes`
+    return await this.client.delete(url, { data: ids })
+  }
+
   async restoreNode(id, links) {
     const url = `/tapestries/${this.postId}/nodes/${id}/restore`
     return await this.client.post(url, { links: links })
+  }
+
+  async batchRestoreNodes(ids, links) {
+    const url = `/tapestries/${this.postId}/nodes/restore`
+    return await this.client.post(url, { ids: ids, links: links })
   }
 
   /**

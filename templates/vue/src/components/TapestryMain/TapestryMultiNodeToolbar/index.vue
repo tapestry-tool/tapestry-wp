@@ -103,7 +103,7 @@ export default {
     },
   },
   methods: {
-    ...mapActions(["batchUpdateNodes", "deleteNode"]),
+    ...mapActions(["batchUpdateNodes", "batchDeleteNodes"]),
     handleShowHide(show) {
       if (show !== this.show) {
         this.$emit("set-show", show)
@@ -143,10 +143,7 @@ export default {
         )
         .then(async close => {
           if (close) {
-            // TODO: delete all nodes in one request (and allow restoring them all at once via Undo)
-            for (const node of this.nodes) {
-              await this.deleteNode(node.id)
-            }
+            await this.batchDeleteNodes(this.selection)
           }
         })
         .catch(err => console.log(err))
