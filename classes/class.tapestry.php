@@ -496,6 +496,8 @@ class Tapestry implements ITapestry
         unset($this->settings->title);
         unset($this->settings->status);
 
+        $nodes = $this->_addH5PMeta($nodes);
+
         return (object) [
             'nodes' => $nodes,
             // 'groups' => $groups,
