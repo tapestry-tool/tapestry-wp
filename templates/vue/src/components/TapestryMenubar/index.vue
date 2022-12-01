@@ -73,11 +73,16 @@ export default {
   flex-wrap: nowrap;
 
   button.menubar-button {
-    color: var(--text-color-tertiary);
-    padding: 0.5rem;
+    color: var(--text-color-primary);
+    padding: 0;
     background: none;
     font-size: 1.2em;
     transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 46px;
+    height: 46px;
 
     &.active,
     &:hover {
@@ -91,10 +96,11 @@ export default {
     height: 56px;
     background-color: var(--bg-color-secondary);
     border-radius: 8px;
-    padding: 0 0.5rem;
+    padding: 0 5px;
     margin-left: 0.5rem;
     display: flex;
     align-items: center;
+    border: 2px solid var(--border-color);
   }
 }
 </style>

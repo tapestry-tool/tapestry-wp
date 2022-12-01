@@ -6,7 +6,7 @@
     data-qa="settings-button"
     @click="open"
   >
-    <i class="fas fa-cog fa-lg"></i>
+    <i class="fas fa-cog"></i>
     <settings-modal
       :show="settingsModalOpen"
       :tab="tab"
