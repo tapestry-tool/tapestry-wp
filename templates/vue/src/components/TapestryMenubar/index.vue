@@ -100,6 +100,7 @@ export default {
     margin-left: 0.5rem;
     display: flex;
     align-items: center;
+    border: 2px solid var(--border-color);
   }
 }
 </style>
