@@ -13,6 +13,5 @@ echo "  the the --no-verify flag"
 echo "*******************************************************\n"
 
 php-cs-fixer fix ./classes --rules=@Symfony
-/usr/local/bin/php-cs-fixer fix ./classes --rules=@Symfony
 
 cd templates/vue && node lint.js
