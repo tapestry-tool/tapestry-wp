@@ -485,6 +485,9 @@ function importTapestryFromZip($request)
             throw new TapestryError('INVALID_ZIP', 'Could not find zip file');
         }
         $zip_path = $file_params['file']['tmp_name'];
+        if (!isset($zip_path) || empty($zip_path)) {
+            throw new TapestryError('INVALID_ZIP', 'Could not find zip file');
+        }
 
         $zip = new ZipArchive();
         if ($zip->open($zip_path, ZipArchive::RDONLY) !== true) {
@@ -540,11 +543,6 @@ function importTapestryFromZip($request)
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     } finally {
-        if (isset($tapestry)) {
-            TapestryImportExport::setImportStatus($postId, (object) [
-                'inProgress' => false,
-            ]);
-        }
         // Clean up resources
         if ($zip) {
             $zip->close();
@@ -552,6 +550,10 @@ function importTapestryFromZip($request)
         if ($temp_dir) {
             TapestryImportExport::deleteTempDirectory($temp_dir['path']);
         }
+        // Reset import progress
+        TapestryImportExport::setImportStatus($postId, (object) [
+            'inProgress' => false,
+        ]);
     }
 }
 
