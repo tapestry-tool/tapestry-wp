@@ -13,7 +13,7 @@
       :active="activeButton === 'delete'"
       @click="handleDeleteNodes"
     >
-      <i class="fas fa-trash-alt fa-lg"></i>
+      <i class="fas fa-trash-alt"></i>
     </tapestry-toolbar-button>
 
     <div class="tapestry-toolbar-separator"></div>
