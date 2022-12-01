@@ -167,12 +167,9 @@ export default {
         client
           .getImportStatus()
           .then(status => {
-            if (status.message) {
+            if (status.inProgress && status.message) {
               this.importStatusMessage =
                 status.message + "... Please do not close this tab."
-            }
-            if (!status.inProgress) {
-              this.importStatusMessage = "Import is not in progress"
             }
           })
           .catch(err => {
