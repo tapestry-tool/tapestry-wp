@@ -39,7 +39,13 @@ export default {
     }
   },
   computed: {
-    ...mapState(["selection", "settings", "maxLevel", "currentDepth"]),
+    ...mapState([
+      "selection",
+      "settings",
+      "maxLevel",
+      "currentDepth",
+      "visibleNodes",
+    ]),
     ...mapGetters(["isVisible"]),
     show() {
       return this.isVisible(this.node.id) && this.visibility >= 0
@@ -104,7 +110,9 @@ export default {
         this.maxLevel,
         this.scale
       )
-      return `drop-shadow(${offset}px ${offset}px ${blur}px rgba(0, 0, 0, ${opacity}))`
+      const opacityMultiplier = this.visibleNodes.includes(this.node.id) ? 1 : 0.5
+      return `drop-shadow(${offset}px ${offset}px ${blur}px rgba(0, 0, 0, ${opacity *
+        opacityMultiplier}))`
     },
   },
   watch: {

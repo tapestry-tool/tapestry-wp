@@ -118,7 +118,7 @@ const assertVisibleNodes = visibleNodes => {
     .then(nodes => {
       for (const node of Object.values(nodes)) {
         if (expected.includes(node.id)) {
-          cy.getByTestId(`node-search-highlight-${node.id}`).should("be.visible")
+          cy.getNodeById(node.id).should("have.class", "desaturated")
         }
       }
     })

@@ -4,12 +4,14 @@
       v-show="show"
       :id="elementId"
       ref="node"
+      class="node-container"
       :aria-label="ariaLabel"
       :data-qa="`node-${node.id}`"
       :data-locked="!node.unlocked"
       :transform="`translate(${coordinates.x}, ${coordinates.y})`"
       :class="{
         desaturated: !isFilterMatched,
+        opaque: !isFilterMatched,
       }"
       :style="{
         cursor:
@@ -27,6 +29,7 @@
     >
       <circle
         ref="circle"
+        class="node-circle"
         :data-qa="`node-circle-${node.id}`"
         :fill="fill"
         :stroke="progressBackgroundColor"
@@ -90,11 +93,10 @@
           >
             <div
               class="meta"
-              :class="{
-                opaque: !isFilterMatched,
-              }"
               :style="{
-                color: node.textColor,
+                color: !isFilterMatched
+                  ? 'var(--text-color-tertiary)'
+                  : node.textColor,
                 fontSize: radius * 0.2 + 'px',
               }"
             >
@@ -228,6 +230,8 @@ export default {
       isFocused: false,
 
       lastClickTime: 0,
+
+      themedBackground: "#eee",
     }
   },
   computed: {
@@ -238,6 +242,7 @@ export default {
       "maxLevel",
       "currentDepth",
       "nodeNavigation",
+      "theme",
     ]),
     ...mapGetters([
       "getNode",
@@ -424,7 +429,9 @@ export default {
         .toString()
     },
     desaturatedBackgroundColor() {
-      return Helpers.saturateColor(this.node.backgroundColor, 0.7)
+      const background = this.themedBackground
+      const desaturated = Helpers.saturateColor(this.node.backgroundColor, 0.7)
+      return Helpers.mixColor(background, desaturated, 0.7)
     },
     thumbnailURL() {
       return !this.node.unlocked && this.node.lockedImageURL
@@ -511,6 +518,9 @@ export default {
           },
         })
       }
+    },
+    theme() {
+      this.getThemedBackground()
     },
   },
   mounted() {
@@ -670,6 +680,11 @@ export default {
     hasPermission(action) {
       return Helpers.hasPermission(this.node, action, this.settings.showRejected)
     },
+    getThemedBackground() {
+      this.themedBackground = getComputedStyle(this.$refs.node).getPropertyValue(
+        "--bg-color-primary"
+      )
+    },
   },
 }
 </script>
@@ -691,7 +706,7 @@ export default {
   filter: saturate(25%);
 }
 
-.opaque {
+.node-container.opaque > *:not(.node-circle) {
   opacity: 0.3;
 }
 
