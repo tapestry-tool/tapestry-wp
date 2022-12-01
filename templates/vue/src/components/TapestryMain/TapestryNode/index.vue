@@ -710,6 +710,10 @@ export default {
   opacity: 0.3;
 }
 
+.node-container {
+  outline: none;
+}
+
 .node-button {
   height: 55px;
   width: 55px;
