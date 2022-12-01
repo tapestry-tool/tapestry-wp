@@ -460,6 +460,17 @@ export default class Helpers {
     return TinyColor(hsl).toHexString()
   }
 
+  static mixColor(colorA, colorB, ratio) {
+    let rgbA = TinyColor(colorA).toRgb()
+    let rgbB = TinyColor(colorB).toRgb()
+    let rgb = {
+      r: rgbA.r * ratio + rgbB.r * (1 - ratio),
+      g: rgbA.g * ratio + rgbB.g * (1 - ratio),
+      b: rgbA.b * ratio + rgbB.b * (1 - ratio),
+    }
+    return TinyColor(rgb).toHexString()
+  }
+
   static getDropShadow(level, maxLevel, scale = 1) {
     return {
       offset: 4 * (maxLevel - level) * scale + 3,
