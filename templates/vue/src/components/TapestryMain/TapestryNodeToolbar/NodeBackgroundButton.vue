@@ -25,9 +25,10 @@
         tooltip="Remove Background Image"
         tooltip-placement="bottom"
         :active="activeButton === 'remove'"
+        danger
         @click="removeThumbnail"
       >
-        <i class="fas fa-times-circle fa-lg"></i>
+        <i class="fas fa-times-circle"></i>
       </tapestry-toolbar-button>
       <tapestry-toolbar-button
         :id="`background-image-button-${node.id}`"
