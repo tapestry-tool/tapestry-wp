@@ -100,27 +100,36 @@ export default {
 
 <style lang="scss" scoped>
 .tapestry-toolbar-button {
-  color: #59595b;
+  color: var(--text-color-primary);
   padding: 0;
   background: none;
-  font-size: 1.2em;
+  font-size: 1.4em; // 2em larger than menubar buttons
   transition: all 0.2s ease;
 
   &.not-available {
-    color: #c4c4c4;
+    color: var(--border-color);
     cursor: default;
   }
 
   &.selected {
-    background: #d7d7d7;
+    background: var(--bg-color-primary);
   }
 
   .button-content {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 52px;
-    height: 52px;
+    width: 46px;
+    height: 46px;
+    transition: all 0.2s ease;
+  }
+
+  &.selected,
+  &:not(.not-available):hover {
+    .button-content {
+      color: var(--highlight-color);
+      transform: scale(1.1);
+    }
   }
 }
 

@@ -11,7 +11,7 @@
       tooltip="Delete Link"
       @click="handleDeleteLink"
     >
-      <i class="fas fa-trash-alt fa-lg"></i>
+      <i class="fas fa-trash-alt"></i>
     </tapestry-toolbar-button>
 
     <template v-if="isSameLevelLink">
@@ -24,7 +24,7 @@
         tooltip="Reverse Link"
         @click="handleReverseLink"
       >
-        <i class="fas fa-exchange-alt fa-lg"></i>
+        <i class="fas fa-exchange-alt"></i>
       </tapestry-toolbar-button>
       <div class="vertex-title right">{{ target.title }}</div>
     </template>
@@ -119,7 +119,7 @@ export default {
   line-height: 52px;
   min-width: 52px;
   padding: 0 10px;
-  color: #59595b;
+  color: var(--text-color-secondary);
   font-weight: bold;
   font-size: 1.1rem;
 

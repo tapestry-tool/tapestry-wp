@@ -13,7 +13,7 @@
       :active="activeButton === 'delete'"
       @click="handleDeleteNodes"
     >
-      <i class="fas fa-trash-alt fa-lg"></i>
+      <i class="fas fa-trash-alt"></i>
     </tapestry-toolbar-button>
 
     <div class="tapestry-toolbar-separator"></div>
@@ -103,7 +103,7 @@ export default {
     },
   },
   methods: {
-    ...mapActions(["updateNode", "deleteNode"]),
+    ...mapActions(["batchUpdateNodes", "batchDeleteNodes"]),
     handleShowHide(show) {
       if (show !== this.show) {
         this.$emit("set-show", show)
@@ -143,10 +143,7 @@ export default {
         )
         .then(async close => {
           if (close) {
-            // TODO: delete all nodes in one request (and allow restoring them all at once via Undo)
-            for (const node of this.nodes) {
-              await this.deleteNode(node.id)
-            }
+            await this.batchDeleteNodes(this.selection)
           }
         })
         .catch(err => console.log(err))
@@ -155,17 +152,19 @@ export default {
         })
     },
     handleChangeLevels(diff) {
+      const updates = []
       for (const node of this.nodes) {
         if (node.level + diff < 1) {
           continue
         }
-        this.updateNode({
+        updates.push({
           id: node.id,
           newNode: {
             level: node.level + diff,
           },
         })
       }
+      this.batchUpdateNodes(updates)
     },
   },
 }
