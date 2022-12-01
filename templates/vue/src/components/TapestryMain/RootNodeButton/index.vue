@@ -189,6 +189,9 @@ export default {
 
             return response.rebuildH5PCache
           } else {
+            this.error = {
+              message: "An error occurred while uploading file.",
+            }
             return false
           }
         })
