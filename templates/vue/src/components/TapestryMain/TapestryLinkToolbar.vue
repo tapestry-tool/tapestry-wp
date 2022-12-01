@@ -9,6 +9,7 @@
       id="delete-link-btn"
       horizontal
       tooltip="Delete Link"
+      danger
       @click="handleDeleteLink"
     >
       <i class="fas fa-trash-alt"></i>

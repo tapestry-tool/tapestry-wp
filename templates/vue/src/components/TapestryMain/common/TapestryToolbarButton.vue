@@ -6,6 +6,7 @@
       horizontal: horizontal,
       'not-available': disabled,
       selected: isSelected,
+      danger: danger,
     }"
     @click="handleClick"
   >
@@ -56,6 +57,11 @@ export default {
       type: String,
       required: false,
       default: null,
+    },
+    danger: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
     disabled: {
       type: Boolean,
@@ -129,6 +135,10 @@ export default {
     .button-content {
       color: var(--highlight-color);
       transform: scale(1.1);
+    }
+
+    &.danger .button-content {
+      color: #dc3545;
     }
   }
 }
