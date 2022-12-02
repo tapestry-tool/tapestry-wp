@@ -127,9 +127,11 @@ export default {
         client
           .importTapestry(upload)
           .then(response => {
-            this.changes.permissions = new Set(response.changes.permissions)
-            this.changes.noChange = response.changes.noChange
-            this.$bvModal.show("import-changelog")
+            if (response) {
+              this.changes.permissions = new Set(response.changes.permissions)
+              this.changes.noChange = response.changes.noChange
+              this.$bvModal.show("import-changelog")
+            }
           }) // TODO: Change this so a refresh isn't required
           .catch(err => {
             this.error = err
@@ -146,15 +148,16 @@ export default {
       client
         .importTapestryFromZip(zipFile)
         .then(response => {
-          this.changes.permissions = new Set(response.changes.permissions)
-          this.changes.noChange = response.changes.noChange
-          this.warnings = response.warnings
-          this.exportWarnings = response.exportWarnings
+          if (response) {
+            this.changes.permissions = new Set(response.changes.permissions)
+            this.changes.noChange = response.changes.noChange
+            this.warnings = response.warnings
+            this.exportWarnings = response.exportWarnings
 
-          return response.rebuildH5PCache
-        })
-        .catch(err => {
-          this.error = err.response.data
+            return response.rebuildH5PCache
+          } else {
+            return false
+          }
         })
         .then(shouldRebuild => {
           if (shouldRebuild) {
@@ -163,11 +166,13 @@ export default {
             return WordpressApi.rebuildAllH5PCache()
           }
         })
-        .then(() => {
-          this.$bvModal.show("import-changelog")
-        })
         .catch(err => {
           this.error = err
+        })
+        .then(() => {
+          if (!this.error) {
+            this.$bvModal.show("import-changelog")
+          }
         })
         .finally(() => {
           this.isImporting = false

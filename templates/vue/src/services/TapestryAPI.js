@@ -1,5 +1,4 @@
 import axios from "axios"
-import Helpers from "../utils/Helpers"
 import { data } from "./wp"
 
 const { apiUrl, nonce, postId, adminAjaxUrl } = data
@@ -65,24 +64,26 @@ class TapestryApi {
   }
 
   async getTapestryExport(shouldExportComments) {
-    const url = `/tapestries/${this.postId}/export?exportComments=${
-      shouldExportComments ? 1 : 0
-    }`
+    let url = `/tapestries/${this.postId}/export`
+    if (shouldExportComments) {
+      url += "?exportComments=1"
+    }
     const response = await this.client.get(url)
     return response.data
   }
 
   async getTapestryExportAsZip(shouldExportComments) {
-    const url = `/tapestries/${this.postId}/export_zip?exportComments=${
-      shouldExportComments ? 1 : 0
-    }`
+    let url = `/tapestries/${this.postId}/export_zip`
+    if (shouldExportComments) {
+      url += "?exportComments=1"
+    }
     const response = await this.client.get(url)
     return response.data
   }
 
   async getNode(id) {
     const data = await this.getTapestry()
-    return data.nodes[Helpers.findNodeIndex(id, data)]
+    return data.nodes[id]
   }
 
   async getNodeProgress(id) {
@@ -205,6 +206,18 @@ class TapestryApi {
     return response
   }
 
+  async getNotifications() {
+    const url = `/tapestries/${this.postId}/notifications`
+    const response = await this.client.get(url)
+    return response.data
+  }
+
+  async updateNotifications(notifications) {
+    const url = `/tapestries/${this.postId}/notifications`
+    const response = await this.client.put(url, notifications)
+    return response
+  }
+
   /**
    * Upload audio to server
    *
@@ -228,6 +241,12 @@ class TapestryApi {
   async completeQuestion(nodeId, questionId, answerType, answer) {
     const url = `/users/activity?post_id=${this.postId}&node_id=${nodeId}&question_id=${questionId}`
     const response = await this.client.post(url, { answerType, answer })
+    return response
+  }
+
+  async getAllUsersAnswers(nodeId) {
+    const url = `/users/answers?post_id=${this.postId}&node_id=${nodeId}`
+    const response = await this.client.get(url)
     return response
   }
 

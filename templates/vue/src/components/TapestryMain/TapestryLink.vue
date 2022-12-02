@@ -4,6 +4,9 @@
       v-show="show"
       :data-qa="`link-${source.id}-${target.id}`"
       :class="{
+        'half-opaque':
+          (!source.accessible && source.hideWhenLocked) ||
+          (!target.accessible && target.hideWhenLocked),
         opaque:
           !visibleNodes.includes(source.id) || !visibleNodes.includes(target.id),
         disabled: !isLoggedIn,
@@ -79,6 +82,10 @@ line {
 .fade-enter,
 .fade-leave-to {
   opacity: 0;
+}
+
+.half-opaque {
+  opacity: 0.6;
 }
 
 .opaque {

@@ -10,6 +10,7 @@ describe("Export", () => {
   it("should be able to export a Tapestry", () => {
     cy.get(".operations-button").click()
     cy.contains(/export\/duplicate tapestry/i).click()
+    cy.getByTestId("include-media").click({ force: true })
     cy.getByTestId("export-tapestry-button").click()
 
     cy.wait("@export")
@@ -25,10 +26,7 @@ describe("Export", () => {
   it("should be able to export a Tapestry as a zip file", () => {
     cy.get(".operations-button").click()
     cy.contains(/export\/duplicate tapestry/i).click()
-    cy.getByTestId("export-type-toggle").click()
-    cy.contains(/Export as ZIP/i)
-      .should("be.visible")
-      .click()
+    cy.getByTestId("export-tapestry-button").click()
 
     cy.wait("@export_zip")
       .its("response.body")
@@ -41,7 +39,7 @@ describe("Export", () => {
     cy.contains(".alert-success", /xml file/i).should("not.exist")
   })
 
-  it("should be able to export a Tapestry and WordPress posts", () => {
+  it("should be able to export a Tapestry as a zip file and WordPress posts", () => {
     cy.getSelectedNode().then(node => {
       cy.editNode(node.id, {
         mediaType: "wp-post",
@@ -54,18 +52,14 @@ describe("Export", () => {
 
     cy.get(".operations-button").click()
     cy.contains(/export\/duplicate tapestry/i).click()
-    cy.getByTestId("export-type-toggle").click()
-    cy.contains(/Export as JSON/i)
-      .should("be.visible")
-      .click()
+    cy.getByTestId("export-tapestry-button").click()
 
-    cy.wait("@export")
+    cy.wait("@export_zip")
       .its("response.body")
-      .then(data => JSON.parse(data))
+      .then(JSON.parse)
       .then(data => {
+        expect("zipUrl" in data).to.be.true
         expect("wpPosts" in data).to.be.true
-        expect("json" in data).to.be.true
-        expect("nodes" in data.json).to.be.true
       })
 
     cy.contains(".alert-success", /exported/i).should("be.visible")
@@ -150,10 +144,7 @@ describe("Export", () => {
 
     cy.get(".operations-button").click()
     cy.contains(/export\/duplicate tapestry/i).click()
-    cy.getByTestId("export-type-toggle").click()
-    cy.contains(/Export as ZIP/i)
-      .should("be.visible")
-      .click()
+    cy.getByTestId("export-tapestry-button").click()
 
     cy.wait("@export_zip")
       .its("response.body")

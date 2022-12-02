@@ -20,7 +20,7 @@ describe("duplicate tapestry button", () => {
     )
 
     const screen = render(DuplicateTapestryButton, { fixture: oneNodeTapestry })
-    fireEvent.click(screen.getByText(/duplicate tapestry/i))
+    fireEvent.click(screen.getByText(/duplicate on this site/i))
 
     expect(client.addTapestry).toHaveBeenCalledTimes(1)
     await screen.findByText(/tapestry is ready/i)

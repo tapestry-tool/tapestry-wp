@@ -322,4 +322,68 @@ class TapestryHelpers
         }
         return false;
     }
+
+    /**
+     * Assumes the node's mediaURL is a local upload, and gets its file path
+     *
+     * @param TapestryNode  $node
+     */
+    public static function getPathToNodeMedia($node)
+    {
+        $upload_folder = wp_upload_dir()['basedir'];
+        $upload_folder_url = wp_upload_dir()['baseurl'];
+        $mediaURL = $node->getTypeData()->mediaURL;
+
+        $file_obj = new StdClass();
+        $file_obj->file_path = substr_replace($mediaURL, $upload_folder, 0, strlen($upload_folder_url));
+        $file_obj->name = pathinfo($mediaURL)['basename'];
+
+        return $file_obj;
+    }
+
+    /**
+     * Checks if a video can be uploaded to Kaltura.
+     * Only videos added via upload to WordPress can be transferred to Kaltura.
+     *
+     * @param TapestryNode  $node
+     * @return bool
+     */
+    public static function videoCanBeUploaded($node)
+    {
+        $nodeMeta = $node->getMeta();
+        $nodeTypeData = $node->getTypeData();
+        $upload_dir_url = wp_upload_dir()['baseurl'];
+
+        return $nodeMeta->mediaType == "video" && substr($nodeTypeData->mediaURL, 0, strlen($upload_dir_url)) === $upload_dir_url;
+    }
+
+    // Get the actual file size for large files.
+    // https://www.php.net/manual/en/function.filesize.php#113457
+    public static function getRealFileSize($path)
+    {
+        $fp = fopen($path, 'r');
+
+        $pos = 0;
+        $size = 1073741824;
+        fseek($fp, 0, SEEK_SET);
+        while ($size > 1) {
+            fseek($fp, $size, SEEK_CUR);
+
+            if (fgetc($fp) === false) {
+                fseek($fp, -$size, SEEK_CUR);
+                $size = (int)($size / 2);
+            } else {
+                fseek($fp, -1, SEEK_CUR);
+                $pos += $size;
+            }
+        }
+
+        while (fgetc($fp) !== false) {
+            $pos++;
+        }
+
+        fclose($fp);
+
+        return $pos;
+    }
 }

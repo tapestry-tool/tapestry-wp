@@ -449,3 +449,12 @@ export function addApiError({ commit }, error) {
 export function setTapestryErrorReporting({ commit }, isEnabled) {
   commit("setTapestryErrorReporting", isEnabled)
 }
+
+export async function updateNotifications({ commit, dispatch }, notifications) {
+  try {
+    await client.updateNotifications(notifications)
+    commit("setNotifications", notifications)
+  } catch (error) {
+    dispatch("addApiError", error)
+  }
+}

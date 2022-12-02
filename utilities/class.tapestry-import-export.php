@@ -180,21 +180,25 @@ class TapestryImportExport
             'nodes' => [],
             'settings' => [],
         ];
+        $export_log = [
+            'h5p' => [],
+            'media' => [],
+        ];
 
         $h5p_controller = new TapestryH5P();
         foreach ($tapestry_data->nodes as $node) {
             $node_warnings = [];
 
             if ($node->mediaType === 'h5p') {
-                self::_exportH5PNode($node, $zip, $node_warnings, $h5p_controller);
+                self::_exportH5PNode($node, $zip, $node_warnings, $export_log, $h5p_controller);
             } elseif ($node->mediaType === 'video') {
-                self::_exportMedia($node->typeData->mediaURL, $zip, $node_warnings);
+                self::_exportMedia($node->typeData->mediaURL, $zip, $node_warnings, $export_log);
             } elseif ($node->mediaType === 'activity') {
-                self::_exportActivityNode($node, $zip, $node_warnings);
+                self::_exportActivityNode($node, $zip, $node_warnings, $export_log);
             }
 
-            self::_exportMedia($node->imageURL, $zip, $node_warnings, $node->thumbnailFileId);
-            self::_exportMedia($node->lockedImageURL, $zip, $node_warnings, $node->lockedThumbnailFileId);
+            self::_exportMedia($node->imageURL, $zip, $node_warnings, $export_log, $node->thumbnailFileId);
+            self::_exportMedia($node->lockedImageURL, $zip, $node_warnings, $export_log, $node->lockedThumbnailFileId);
 
             if (!empty($node_warnings)) {
                 array_push($export_warnings['nodes'], [
@@ -206,17 +210,18 @@ class TapestryImportExport
         }
 
         if ($tapestry_data->settings) {
-            self::_exportMedia($tapestry_data->settings->backgroundUrl, $zip, $export_warnings['settings']);            
+            self::_exportMedia($tapestry_data->settings->backgroundUrl, $zip, $export_warnings['settings'], $export_log);
         }
 
         $tapestry_data->warnings = !empty($export_warnings['nodes']) || !empty($export_warnings['settings']);
 
-        $zip->addFromString('tapestry.json', json_encode($tapestry_data, JSON_PRETTY_PRINT));
+        $zip->addFromString('tapestry.json', json_encode($tapestry_data, JSON_PRETTY_PRINT | JSON_UNESCAPED_LINE_TERMINATORS | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
         $zip->close();
 
         return [
             'zipUrl' => $zip_url,
             'warnings' => $export_warnings,
+            'log' => $export_log,
         ];
     }
 
@@ -266,7 +271,7 @@ class TapestryImportExport
      * @param ZipArchive $zip   Zip file to add the archive to
      * @param array &$warnings  (Modified) Export warnings generated so far
      */
-    private static function _exportH5PNode($node, $zip, &$warnings, $h5p_controller)
+    private static function _exportH5PNode($node, $zip, &$warnings, &$log, $h5p_controller)
     {
         // If H5P plugin files are not available, nothing to do
         if (empty(H5P_DEFINED)) {
@@ -287,6 +292,7 @@ class TapestryImportExport
             }
 
             $zip->addFile($h5p_path, $h5p_name);
+            array_push($log['h5p'], $h5p_name);
 
             $node->typeData->mediaURL = $h5p_name;
         }
@@ -300,20 +306,20 @@ class TapestryImportExport
      * @param ZipArchive $zip   Zip file to add images to
      * @param array &$warnings  (Modified) Export warnings generated so far
      */
-    private static function _exportActivityNode($node, $zip, &$warnings)
+    private static function _exportActivityNode($node, $zip, &$warnings, &$log)
     {
         foreach ($node->typeData->activity->questions as $question) {
             $multiple_choice = $question->answerTypes->multipleChoice;
             if ($multiple_choice->enabled && $multiple_choice->useImages && isset($multiple_choice->choices)) {
                 foreach ($multiple_choice->choices as $choice) {
-                    self::_exportMedia($choice->imageUrl, $zip, $warnings);
+                    self::_exportMedia($choice->imageUrl, $zip, $warnings, $log);
                 }
             }
 
             $drag_drop = $question->answerTypes->dragDrop;
             if ($drag_drop->enabled && $drag_drop->useImages && isset($drag_drop->items)) {
                 foreach ($drag_drop->items as $item) {
-                    self::_exportMedia($item->imageUrl, $zip, $warnings);
+                    self::_exportMedia($item->imageUrl, $zip, $warnings, $log);
                 }
             }
         }
@@ -329,8 +335,9 @@ class TapestryImportExport
      * @param int $file_id          (Optional) WordPress attachment id of the media item.
      *                              If specified, is used instead of the URL to find the local path.
      */
-    private static function _exportMedia(&$media_url, $zip, &$warnings, $file_id = null)
+    private static function _exportMedia(&$media_url, $zip, &$warnings, &$log, $file_id = null)
     {
+        $path_to_media = "";
         if (!empty($file_id)) {
             // Retrieve the original file, not the resized version
             $path_to_media = get_attached_file($file_id);
@@ -338,7 +345,9 @@ class TapestryImportExport
             if (!$path_to_media) {
                 array_push($warnings, 'Could not find WordPress attachment. A thumbnail may be missing.');
             }
-        } else {
+        }
+
+        if (!$path_to_media) {
             $path_to_media = self::_getLocalPath($media_url);
         }
 
@@ -350,6 +359,7 @@ class TapestryImportExport
         }
         $media_name = basename($path_to_media);
         $zip->addFile($path_to_media, $media_name);
+        array_push($log['media'], $media_name);
         $media_url = $media_name;
     }
 
@@ -463,7 +473,8 @@ class TapestryImportExport
         }
     }
 
-    public static function getExportId() {
+    public static function getExportId()
+    {
         return uniqid();
     }
 
@@ -510,10 +521,10 @@ class TapestryImportExport
                 self::_importActivityNode($node, $temp_dir, $node_warnings, $imported_media);
             }
 
-            if (!empty($node->thumbnailFileId)) {
+            if (!empty($node->imageURL)) {
                 self::_importMedia($node->imageURL, $temp_dir, $node_warnings, $imported_media, true, $node->thumbnailFileId);
             }
-            if (!empty($node->lockedThumbnailFileId)) {
+            if (!empty($node->lockedImageURL)) {
                 self::_importMedia($node->lockedImageURL, $temp_dir, $node_warnings, $imported_media, true, $node->lockedThumbnailFileId);
             }
 
@@ -719,8 +730,15 @@ class TapestryImportExport
         $wp_upload_dir_path = $wp_upload_dir['basedir'] . DIRECTORY_SEPARATOR;
         $wp_upload_dir_url = $wp_upload_dir['baseurl'] . '/';
 
+        $protocols = array("https:", "http:");
+        $wp_upload_dir_url_no_protocol = str_replace($protocols, '', $wp_upload_dir_url);
+
         if (self::_stringStartsWith($url, $wp_upload_dir_url)) {
             $path = $wp_upload_dir_path . substr($url, strlen($wp_upload_dir_url));
+            return $path;
+        }
+        if (self::_stringStartsWith($url, $wp_upload_dir_url_no_protocol)) {
+            $path = $wp_upload_dir_path . substr($url, strlen($wp_upload_dir_url_no_protocol));
             return $path;
         }
         return false;
