@@ -404,48 +404,64 @@ class TapestryNode implements ITapestryNode
     public function importComments($comments)
     {
         $idMap = new stdClass();
+        $childComments = [];
 
-        // add oldest comment first, to guarantee the "parent" field points to a valid comment
-        for (end($comments); null !== key($comments); prev($comments)) {
-            $comment = current($comments);
+        foreach ($comments as $comment) {
+            $idMap = $this->_importComment($comment, $idMap);
+            $childComments = array_merge($childComments, $comment->children);
+        }
 
-            if (!isset($comment->timestamp) || !is_numeric($comment->timestamp) || !isset($comment->content) || 0 === strlen($comment->content)) {
-                continue;
+        if (count($childComments)) {
+            // add oldest comment first, to guarantee the "parent" field points to a valid comment
+            usort($childComments, function ($a, $b) {
+                return $a->id > $b->id;
+            });
+            foreach ($childComments as $comment) {
+                $idMap = $this->_importComment($comment, $idMap);
             }
-
-            $author = get_user_by('id', $comment->authorId);
-            $datetime = new DateTime('now', wp_timezone());
-            $datetime->setTimestamp(((int) $comment->timestamp) / 1000);
-
-            $commentData = [
-                'comment_date' => $datetime->format('Y-m-d H:i:s'),
-                'comment_author' => $comment->author ? $comment->author : 'Anonymous',
-                'user_id' => 0,
-                'comment_post_ID' => $this->nodePostId,
-                'comment_content' => $comment->content,
-            ];
-
-            if ($author && $author->user_nicename === $comment->author) {
-                $commentData['user_id'] = $author->ID;
-                $commentData['comment_author_email'] = $author->user_email;
-                $commentData['comment_author_url'] = $author->user_url;
-            }
-            if ($comment->parent && is_numeric($comment->parent) && isset($idMap->{$comment->parent})) {
-                $commentData['comment_parent'] = $idMap->{$comment->parent};
-            }
-
-            $newId = wp_new_comment($commentData, true);
-            if (false === $newId || is_wp_error($newId)) {
-                continue;
-            }
-            if (isset($comment->approved)) {
-                wp_set_comment_status($newId, $comment->approved ? 'approve' : 'hold', true);
-            }
-
-            $idMap->{$comment->id} = $newId;
         }
 
         $this->comments = $this->_getComments();
+    }
+
+    private function _importComment($comment, $idMap)
+    {
+        if (!isset($comment->timestamp) || !is_numeric($comment->timestamp) || !isset($comment->content) || 0 === strlen($comment->content)) {
+            return;
+        }
+
+        $author = get_user_by('id', $comment->authorId);
+        $datetime = new DateTime('now', wp_timezone());
+        $datetime->setTimestamp(((int) $comment->timestamp) / 1000);
+
+        $commentData = [
+            'comment_date' => $datetime->format('Y-m-d H:i:s'),
+            'comment_author' => $comment->author ? $comment->author : 'Anonymous',
+            'user_id' => 0,
+            'comment_post_ID' => $this->nodePostId,
+            'comment_content' => $comment->content,
+        ];
+
+        if ($author && $author->user_nicename === $comment->author) {
+            $commentData['user_id'] = $author->ID;
+            $commentData['comment_author_email'] = $author->user_email;
+            $commentData['comment_author_url'] = $author->user_url;
+        }
+        if ($comment->parent && is_numeric($comment->parent) && isset($idMap->{$comment->parent})) {
+            $commentData['comment_parent'] = $idMap->{$comment->parent};
+        }
+
+        $newId = wp_new_comment($commentData, true);
+        if (false === $newId || is_wp_error($newId)) {
+            return;
+        }
+        if (isset($comment->approved)) {
+            wp_set_comment_status($newId, $comment->approved ? 'approve' : 'hold', true);
+        }
+
+        $idMap->{$comment->id} = $newId;
+
+        return $idMap;
     }
 
     public function addComment($content, $replyingTo)
