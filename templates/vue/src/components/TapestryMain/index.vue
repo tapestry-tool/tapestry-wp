@@ -14,7 +14,10 @@
     @keydown="handleKey"
   >
     <div v-if="isEmptyTapestry" class="vertical-center">
-      <root-node-button v-if="isLoggedIn"></root-node-button>
+      <root-node-button
+        v-if="isLoggedIn"
+        @new-node="createNewNode"
+      ></root-node-button>
       <div v-else class="empty-message">The requested Tapestry is empty.</div>
     </div>
     <div v-else>
@@ -1226,17 +1229,22 @@ export default {
     },
     handleNodePlaceholderClick() {
       if (!this.isPanning && this.nodeEditingTitle === null) {
-        const newNode = Helpers.createDefaultNode()
+        this.createNewNode(true)
+      }
+    },
+    createNewNode(coordinates = false) {
+      const newNode = Helpers.createDefaultNode()
+      if (coordinates) {
         newNode.coordinates = {
           x: this.mouseCoordinates.x / this.scale,
           y: this.mouseCoordinates.y / this.scale,
         }
-        newNode.level = this.selectedNodeLevel
-        newNode.title = "Untitled"
-        this.addNode({ node: newNode }).then(id => {
-          this.nodeEditingTitle = id
-        })
       }
+      newNode.level = this.selectedNodeLevel
+      newNode.title = "Untitled"
+      this.addNode({ node: newNode }).then(id => {
+        this.nodeEditingTitle = id
+      })
     },
     setShowContextToolbar(type, show) {
       if (show) {
