@@ -292,7 +292,7 @@ export default {
   position: absolute;
   top: 0;
   left: 0;
-  transform: rotate(-45deg) translate(-5px, 1x);
+  transform: rotate(-45deg) translate(-5px, 1px);
   transform-origin: 0 0;
 }
 
