@@ -1,5 +1,5 @@
 <template>
-  <div class="toolbar-wrapper" aria-label="Tapestry Toolbar">
+  <div v-if="isLoggedIn" class="toolbar-wrapper" aria-label="Tapestry Toolbar">
     <div class="toolbar">
       <div class="tool-group">
         <tapestry-toolbar-button
@@ -16,45 +16,41 @@
         >
           <i class="fas fa-mouse-pointer"></i>
         </tapestry-toolbar-button>
-        <template v-if="isLoggedIn">
-          <tapestry-toolbar-button
-            id="tapestry-add-node-tool"
-            :tool="tools.ADD_NODE"
-            tooltip="Add Node"
-          >
-            <i class="fas fa-plus-circle"></i>
-          </tapestry-toolbar-button>
-          <tapestry-toolbar-button
-            id="tapestry-add-link-tool"
-            :tool="tools.ADD_LINK"
-            tooltip="Add Connection"
-          >
-            <i class="fas fa-arrows-alt-v"></i>
-          </tapestry-toolbar-button>
-          <settings-modal-button v-if="canEdit"></settings-modal-button>
-        </template>
+        <tapestry-toolbar-button
+          id="tapestry-add-node-tool"
+          :tool="tools.ADD_NODE"
+          tooltip="Add Node"
+        >
+          <i class="fas fa-plus-circle"></i>
+        </tapestry-toolbar-button>
+        <tapestry-toolbar-button
+          id="tapestry-add-link-tool"
+          :tool="tools.ADD_LINK"
+          tooltip="Add Connection"
+        >
+          <i class="fas fa-arrows-alt-v"></i>
+        </tapestry-toolbar-button>
+        <settings-modal-button v-if="canEdit"></settings-modal-button>
       </div>
-      <template v-if="isLoggedIn">
-        <div class="separator"></div>
-        <div class="tool-group">
-          <tapestry-toolbar-button
-            id="tapestry-undo-button"
-            :tooltip="undoTooltip"
-            :disabled="!canUndo"
-            @click="performUndo"
-          >
-            <i class="fas fa-undo"></i>
-          </tapestry-toolbar-button>
-          <tapestry-toolbar-button
-            id="tapestry-redo-button"
-            :tooltip="redoTooltip"
-            :disabled="!canRedo"
-            @click="performRedo"
-          >
-            <i class="fas fa-redo"></i>
-          </tapestry-toolbar-button>
-        </div>
-      </template>
+      <div class="separator"></div>
+      <div class="tool-group">
+        <tapestry-toolbar-button
+          id="tapestry-undo-button"
+          :tooltip="undoTooltip"
+          :disabled="!canUndo"
+          @click="performUndo"
+        >
+          <i class="fas fa-undo"></i>
+        </tapestry-toolbar-button>
+        <tapestry-toolbar-button
+          id="tapestry-redo-button"
+          :tooltip="redoTooltip"
+          :disabled="!canRedo"
+          @click="performRedo"
+        >
+          <i class="fas fa-redo"></i>
+        </tapestry-toolbar-button>
+      </div>
     </div>
   </div>
 </template>
