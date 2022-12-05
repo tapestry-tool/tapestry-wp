@@ -120,6 +120,7 @@ export default {
 .toolbar-wrapper {
   position: absolute;
   top: 0;
+  left: 10px;
   height: 100%;
   display: flex;
   flex-direction: column;
