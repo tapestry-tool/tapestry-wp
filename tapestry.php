@@ -212,6 +212,7 @@ function tapestry_enqueue_vue_app()
                 'wpCanEditTapestry' => current_user_can('edit_post', get_the_ID()),
                 'currentUser' => $currentUser,
                 'uploadDirArray' => wp_upload_dir(),
+                'uploadProgressFieldName' => ini_get('session.upload_progress.name'),
                 'kaltura' => array(
                     'kalturaStatus' => LOAD_KALTURA,
                     'partnerId' => $kaltura_partner_id,

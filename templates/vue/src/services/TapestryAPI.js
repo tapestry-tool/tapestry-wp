@@ -49,10 +49,11 @@ class TapestryApi {
     }
   }
 
-  async importTapestryFromZip(zipFile) {
+  async importTapestryFromZip(zipFile, uploadId) {
     const url = `/tapestries/${this.postId}/import_zip`
 
     const formData = new FormData()
+    formData.append(data.uploadProgressFieldName, uploadId)
     formData.append("file", zipFile)
     const response = await this.client.post(url, formData, {
       headers: {
@@ -63,8 +64,8 @@ class TapestryApi {
     return response.data
   }
 
-  async getImportStatus() {
-    const url = `/tapestries/${this.postId}/import_status`
+  async getImportStatus(uploadId) {
+    const url = `/tapestries/${this.postId}/import_status?upload_id=${uploadId}`
     const response = await this.client.get(url)
     return response.data
   }

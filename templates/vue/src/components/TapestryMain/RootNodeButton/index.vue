@@ -58,6 +58,7 @@ import client from "@/services/TapestryAPI"
 import WordpressApi from "@/services/WordpressApi"
 import ImportChangelog from "./ImportChangelog"
 import { mapMutations } from "vuex"
+import Helpers from "@/utils/Helpers"
 
 export default {
   name: "root-node-button",
@@ -66,8 +67,10 @@ export default {
   },
   data() {
     return {
+      uploadId: null,
       error: null,
       isDragover: false,
+      isUploading: false,
       isImporting: false,
       importStatusMessage: "",
       importStatusRefresh: null,
@@ -160,26 +163,17 @@ export default {
       reader.readAsText(file)
     },
     importTapestryFromZip(zipFile) {
+      this.uploadId = Helpers.createUUID()
       this.error = ""
+      this.isUploading = true
       this.isImporting = true
       this.importStatusMessage = "Uploading file..."
-      this.importStatusRefresh = setInterval(() => {
-        client
-          .getImportStatus()
-          .then(status => {
-            if (status.inProgress && status.message) {
-              this.importStatusMessage =
-                status.message + "... Please do not close this tab."
-            }
-          })
-          .catch(err => {
-            this.addApiError(err)
-          })
-      }, 5000)
+      this.importStatusRefresh = setInterval(this.updateImportStatus, 2000)
 
       client
-        .importTapestryFromZip(zipFile)
+        .importTapestryFromZip(zipFile, this.uploadId)
         .then(response => {
+          this.isUploading = false
           clearInterval(this.importStatusRefresh)
           if (response) {
             this.changes.permissions = new Set(response.changes.permissions)
@@ -196,6 +190,7 @@ export default {
           }
         })
         .catch(err => {
+          this.isUploading = false
           clearInterval(this.importStatusRefresh)
           this.error = err.response.data
         })
@@ -219,6 +214,30 @@ export default {
         .finally(() => {
           this.importStatusMessage = ""
           this.isImporting = false
+        })
+    },
+    updateImportStatus() {
+      client
+        .getImportStatus(this.uploadId)
+        .then(status => {
+          if (status.fileUpload && !status.inProgress && this.isUploading) {
+            const current = Helpers.formatFileSize(status.fileUpload.bytes_processed)
+            const total = Helpers.formatFileSize(status.fileUpload.content_length)
+            this.importStatusMessage = `Uploading file (${current} / ${total})...`
+          } else {
+            if (this.isUploading && this.isImporting) {
+              this.isUploading = false
+              clearInterval(this.importStatusRefresh)
+              this.importStatusRefresh = setInterval(this.updateImportStatus, 5000)
+            }
+            if (status.inProgress && status.message) {
+              this.importStatusMessage =
+                status.message + "... Please do not close this tab."
+            }
+          }
+        })
+        .catch(err => {
+          this.addApiError(err)
         })
     },
     getFileExtension(fileName) {

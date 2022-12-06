@@ -1,4 +1,6 @@
 <?php
+session_start();
+
 require_once __DIR__.'/../classes/class.tapestry-h5p.php';
 require_once __DIR__.'/class.tapestry-helpers.php';
 require_once __DIR__.'/class.tapestry-errors.php';
@@ -575,12 +577,23 @@ class TapestryImportExport
         ];
     }
 
-    public static function getImportStatus($tapestryPostId) {
+    public static function getImportStatus($tapestryPostId, $uploadId) {
         $status = get_post_meta($tapestryPostId, 'import', true);
         if (empty($status)) {
-            return (object) [
+            $status = (object) [
                 'inProgress' => false,
             ];
+        }
+
+        if (isset($uploadId) && !empty($uploadId)) {
+            $uploadProgress = $_SESSION[ini_get("session.upload_progress.prefix") . $uploadId];
+            if (isset($uploadProgress) && !empty($uploadProgress)) {
+                $status->fileUpload = (object) [
+                    'bytes_processed' => $uploadProgress['bytes_processed'],
+                    'content_length' => $uploadProgress['content_length'],
+                    'done' => $uploadProgress['done'],
+                ];
+            };
         }
 
         return $status;
