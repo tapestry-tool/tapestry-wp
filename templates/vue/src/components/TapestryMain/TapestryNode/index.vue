@@ -30,6 +30,9 @@
       <circle
         ref="circle"
         class="node-circle"
+        :class="{
+          opaque: !isFilterMatched && useImageFill,
+        }"
         :data-qa="`node-circle-${node.id}`"
         :fill="fill"
         :stroke="progressBackgroundColor"
@@ -368,21 +371,23 @@ export default {
       const radius = Helpers.getNodeRadius(this.node.level, this.scale)
       return this.isGrandChild ? Math.min(40, radius) : radius
     },
-    fill() {
+    useImageFill() {
       const showImages = this.settings.hasOwnProperty("renderImages")
         ? this.settings.renderImages
         : true
-
+      return !this.isGrandChild && showImages && this.thumbnailURL
+    },
+    fill() {
       const backgroundColor = Helpers.darkenColor(
         this.node.backgroundColor,
         this.node.level,
         this.maxLevel
       )
 
-      if (!this.isGrandChild && showImages && this.thumbnailURL) {
-        return `url(#node-image-${this.node.id})`
-      } else if (!this.isFilterMatched) {
+      if (!this.isFilterMatched) {
         return this.desaturatedBackgroundColor
+      } else if (this.useImageFill) {
+        return `url(#node-image-${this.node.id})`
       } else if (this.selected) {
         return "var(--highlight-color)"
       } else {
@@ -710,6 +715,10 @@ export default {
 
 .node-container.opaque > *:not(.node-circle) {
   opacity: 0.3;
+}
+
+.node-circle.opaque {
+  opacity: 0.8;
 }
 
 .node-button {
