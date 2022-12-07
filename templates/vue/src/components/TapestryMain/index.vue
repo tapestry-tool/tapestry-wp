@@ -77,7 +77,6 @@
               @dragend="handleNodeDragEnd"
               @mouseover="handleMouseover(id)"
               @mouseleave="activeNode = null"
-              @mounted="dragSelectEnabled ? updateSelectableNodes(node) : null"
               @click="handleNodeClick"
               @focus="handleNodeFocus(id)"
               @node-editing-title="nodeEditingTitle = $event"
@@ -443,6 +442,11 @@ export default {
     nodes() {
       this.updateViewBox()
     },
+    renderedLevels() {
+      if (this.dragSelectEnabled) {
+        DragSelectModular.updateSelectableNodes()
+      }
+    },
     isSidebarOpen() {
       setTimeout(() => {
         this.updateViewBox()
@@ -791,9 +795,6 @@ export default {
           }
         }
       )
-    },
-    updateSelectableNodes() {
-      DragSelectModular.updateSelectableNodes()
     },
     hasPermission(node, action) {
       return Helpers.hasPermission(node, action, this.settings.showRejected)

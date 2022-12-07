@@ -516,7 +516,6 @@ export default {
     },
   },
   mounted() {
-    this.$emit("mounted")
     this.$refs.circle.setAttribute("r", this.radius)
     this.$refs.halo.setAttribute("r", this.radius + this.selectHaloWidth / 2)
     const nodeRef = this.$refs.node
