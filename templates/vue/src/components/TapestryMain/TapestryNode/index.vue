@@ -12,10 +12,7 @@
         opaque: !visibleNodes.includes(node.id),
       }"
       :style="{
-        cursor:
-          node.unlocked || hasPermission('edit') || hasPermission('move')
-            ? 'pointer'
-            : 'not-allowed',
+        cursor: cursor,
       }"
       @focus="handleFocus"
       @blur="handleBlur"
@@ -270,6 +267,16 @@ export default {
       label +=
         "To go to the sidebar for this node, press S. To exit the Main Tapestry view, press the Q Key or the Escape Key."
       return label
+    },
+    cursor() {
+      if (this.isEditingTitle) {
+        return "text"
+      }
+      return this.node.unlocked ||
+        this.hasPermission("edit") ||
+        this.hasPermission("move")
+        ? "pointer"
+        : "not-allowed"
     },
     canAddChild() {
       return (
