@@ -155,7 +155,7 @@ import ZoomPanHelper from "@/utils/ZoomPanHelper"
 import { names } from "@/config/routes"
 import * as wp from "@/services/wp"
 import { interpolate } from "@/utils/interpolate"
-import { tools } from "@/utils/constants"
+import { nodeStatus, tools } from "@/utils/constants"
 // import { scaleConstants } from "@/utils/constants"
 
 export default {
@@ -1242,6 +1242,14 @@ export default {
       }
       newNode.level = this.selectedNodeLevel
       newNode.title = "Untitled"
+
+      if (!this.hasPermission(null, "add")) {
+        if (!this.settings.draftNodesEnabled) {
+          return
+        }
+        newNode.status = nodeStatus.DRAFT
+      }
+
       this.addNode({ node: newNode }).then(id => {
         this.nodeEditingTitle = id
       })

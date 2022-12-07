@@ -21,6 +21,7 @@
           <i class="fas fa-mouse-pointer"></i>
         </tapestry-toolbar-button>
         <tapestry-toolbar-button
+          v-if="canAddNode"
           id="tapestry-add-node-tool"
           :tool="tools.ADD_NODE"
           tooltip="Add Node"
@@ -63,8 +64,9 @@
 import TapestryToolbarButton from "../common/TapestryToolbarButton"
 import SettingsModalButton from "./SettingsModalButton"
 import { tools } from "@/utils/constants"
-import { mapActions, mapGetters } from "vuex"
+import { mapActions, mapGetters, mapState } from "vuex"
 import * as wp from "@/services/wp"
+import Helpers from "@/utils/Helpers"
 
 export default {
   components: {
@@ -77,14 +79,27 @@ export default {
     }
   },
   computed: {
+    ...mapState(["settings"]),
     ...mapGetters(["canUndo", "canRedo", "isAuthoringEnabled"]),
     platform() {
       return window.navigator.platform?.toLowerCase().indexOf("mac") !== -1
         ? "mac"
         : "windows"
     },
+    isLoggedIn() {
+      return wp.isLoggedIn()
+    },
     canEdit() {
       return wp.canEditTapestry()
+    },
+    canAddNode() {
+      if (!this.isLoggedIn) {
+        return false
+      }
+      return (
+        Helpers.hasPermission(null, "add", this.settings.showRejected) ||
+        this.settings.draftNodesEnabled
+      )
     },
     undoTooltip() {
       return `Undo (${this.platform === "mac" ? "Cmd" : "Ctrl"} + Z)`
