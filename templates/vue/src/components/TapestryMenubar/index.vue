@@ -17,18 +17,16 @@
             <embed-button data-qa="embed-modal-button"></embed-button>
           </b-col>
         </template>
-        <template v-if="canEdit">
-          <b-col class="p-0">
-            <help-button />
+        <b-col v-if="isAuthoringEnabled" class="p-0">
+          <help-button />
+        </b-col>
+        <template v-if="canEdit && !isEmptyTapestry">
+          <b-col v-if="settings.submitNodesEnabled" class="p-0">
+            <review-notifications />
           </b-col>
-          <template v-if="!isEmptyTapestry">
-            <b-col v-if="settings.submitNodesEnabled" class="p-0">
-              <review-notifications />
-            </b-col>
-            <b-col class="p-0">
-              <operations-button />
-            </b-col>
-          </template>
+          <b-col class="p-0">
+            <operations-button />
+          </b-col>
         </template>
       </b-row>
     </b-container>
@@ -56,7 +54,7 @@ export default {
   },
   computed: {
     ...mapState(["settings"]),
-    ...mapGetters(["isEmptyTapestry"]),
+    ...mapGetters(["isEmptyTapestry", "isAuthoringEnabled"]),
     canEdit() {
       return wp.canEditTapestry()
     },
