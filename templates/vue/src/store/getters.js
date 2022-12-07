@@ -171,6 +171,21 @@ export function hasPath(state) {
   }
 }
 
+export function isAuthoringEnabled(state) {
+  if (!wp.isLoggedIn()) {
+    return false
+  }
+  for (const id in state.nodes) {
+    if (
+      Helpers.hasPermission(state.nodes[id], "edit", state.settings.showRejected) ||
+      Helpers.hasPermission(state.nodes[id], "add", state.settings.showRejected)
+    ) {
+      return true
+    }
+  }
+  return false
+}
+
 export function favourites(state) {
   return state.favourites || []
 }

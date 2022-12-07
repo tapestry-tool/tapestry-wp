@@ -1,5 +1,9 @@
 <template>
-  <div v-if="isLoggedIn" class="toolbar-wrapper" aria-label="Tapestry Toolbar">
+  <div
+    v-if="isAuthoringEnabled"
+    class="toolbar-wrapper"
+    aria-label="Tapestry Toolbar"
+  >
     <div class="toolbar">
       <div class="tool-group">
         <tapestry-toolbar-button
@@ -73,7 +77,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["canUndo", "canRedo"]),
+    ...mapGetters(["canUndo", "canRedo", "isAuthoringEnabled"]),
     platform() {
       return window.navigator.platform?.toLowerCase().indexOf("mac") !== -1
         ? "mac"
@@ -81,9 +85,6 @@ export default {
     },
     canEdit() {
       return wp.canEditTapestry()
-    },
-    isLoggedIn() {
-      return wp.isLoggedIn()
     },
     undoTooltip() {
       return `Undo (${this.platform === "mac" ? "Cmd" : "Ctrl"} + Z)`
