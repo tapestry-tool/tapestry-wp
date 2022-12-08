@@ -6,7 +6,7 @@
     dominant-baseline="middle"
     fill="white"
     font-weight="900"
-    :font-size="fontSize"
+    :font-size="computedFontSize"
     :x="adjustX"
     :y="adjustY"
   >
@@ -86,6 +86,11 @@ export default {
       required: false,
       default: false,
     },
+    fontSize: {
+      type: Number,
+      required: false,
+      default: 32,
+    },
   },
   computed: {
     svgClass() {
@@ -105,13 +110,13 @@ export default {
       return textContent
     },
     adjustX() {
-      return this.icon === "play" ? 2 : 0
+      return this.icon === "play" ? this.fontSize * 0.0625 : 0
     },
     adjustY() {
-      return this.icon === "post" ? 4 : 2
+      return this.icon === "post" ? this.fontSize * 0.125 : this.fontSize * 0.0625
     },
-    fontSize() {
-      return this.icon === "post" ? 46 : 32
+    computedFontSize() {
+      return this.icon === "post" ? this.fontSize * 1.4375 : this.fontSize
     },
   },
 }
