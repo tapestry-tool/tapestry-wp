@@ -187,7 +187,13 @@ export function hasPermission({ settings }) {
   return (node, action) => {
     // Check 0: node is null case - this should only apply to creating a standalone node
     if (node === null) {
-      return action === userActions.ADD && wp.canEditTapestry()
+      if (action !== userActions.ADD) {
+        return false
+      }
+      if (wp.canEditTapestry()) {
+        return true
+      }
+      return Helpers.isActionAllowed(settings.defaultPermissions, action)
     }
 
     // Public users never have any permissions other than read
@@ -236,40 +242,8 @@ export function hasPermission({ settings }) {
       }
     }
 
-    // Check 3: User has a role with general edit permissions
-    const { id, roles } = wp.getCurrentUser()
-    const allowedRoles = ["administrator", "editor", "author"]
-    if (allowedRoles.some(role => roles.includes(role))) {
-      return true
-    }
-
-    const { public: publicPermissions, authenticated } = node.permissions
-    // Check 4: Node has public permissions
-    if (publicPermissions.includes(action)) {
-      return true
-    }
-
-    // Check 5: Node has authenticated permissions
-    if (wp.isLoggedIn() && authenticated && authenticated.includes(action)) {
-      return true
-    }
-
-    // Check 6: User has a role that is allowed in the node
-    const isRoleAllowed = roles.some(role => {
-      const permissions = node.permissions[role]
-      return permissions && permissions.includes(action)
-    })
-    if (isRoleAllowed) {
-      return true
-    }
-
-    // Check 7: User has a permission associated with its ID
-    const userPermissions = node.permissions[`user-${id}`]
-    if (userPermissions) {
-      return userPermissions.includes(action)
-    }
-
-    return false
+    // Check 3: Node permissions allow user to perform action
+    return Helpers.isActionAllowed(node.permissions, action)
   }
 }
 
