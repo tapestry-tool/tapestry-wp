@@ -243,18 +243,6 @@ li p {
     user-select: none;
 }
 
-.node .title {
-    padding-left: 0;
-    margin-top: 12px;
-    margin-bottom: 0;
-}
-
-.node .timecode {
-    font-size: 20px;
-    padding-left: 0;
-    margin: 0;
-}
-
 .imageOverlay {
     opacity: 0.5;
 }

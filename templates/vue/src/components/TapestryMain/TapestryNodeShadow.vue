@@ -2,7 +2,7 @@
   <transition name="fade">
     <circle
       v-show="show"
-      ref="circle"
+      :r="radius"
       :transform="`translate(${coordinates.x}, ${coordinates.y})`"
       :class="{
         opaque: !visibleNodes.includes(node.id),
@@ -16,7 +16,6 @@
 </template>
 
 <script>
-import * as d3 from "d3"
 import { mapGetters, mapState } from "vuex"
 import Helpers from "@/utils/Helpers"
 
@@ -115,24 +114,6 @@ export default {
       )
       return `drop-shadow(${offset}px ${offset}px ${blur}px rgba(0, 0, 0, ${opacity}))`
     },
-  },
-  watch: {
-    radius(newRadius) {
-      d3.select(this.$refs.circle)
-        .transition()
-        .duration(350)
-        .ease(d3.easePolyOut)
-        .on("start", () => {
-          this.transitioning = true
-        })
-        .on("end", () => {
-          this.transitioning = false
-        })
-        .attr("r", newRadius)
-    },
-  },
-  mounted() {
-    this.$refs.circle.setAttribute("r", this.radius)
   },
 }
 </script>
