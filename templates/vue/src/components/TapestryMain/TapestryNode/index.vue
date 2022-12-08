@@ -56,6 +56,7 @@
       </transition>
       <progress-bar
         v-if="!isGrandChild && node.nodeType !== '' && !node.hideProgress"
+        class="progress-bar"
         :x="coordinates.x"
         :y="coordinates.y"
         :radius="radius"
@@ -731,12 +732,18 @@ export default {
   filter: saturate(25%);
 }
 
-.node-container.opaque > *:not(.node-circle) {
-  opacity: 0.3;
-}
-
 .node-circle.opaque {
   opacity: 0.8;
+}
+
+.node-container.opaque {
+  & > *:not(.node-circle) {
+    opacity: 0.3;
+  }
+
+  .progress-bar {
+    stroke-opacity: 0.3;
+  }
 }
 
 .node-button {
