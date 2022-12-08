@@ -172,6 +172,9 @@ export function isAuthoringEnabled(state, { hasPermission }) {
   if (!wp.isLoggedIn()) {
     return false
   }
+  if (state.settings.draftNodesEnabled) {
+    return true
+  }
   for (const id in state.nodes) {
     if (
       hasPermission(state.nodes[id], "edit") ||
