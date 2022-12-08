@@ -334,6 +334,7 @@ export default {
       "getNeighbours",
       "getInitialNodeId",
       "isEmptyTapestry",
+      "hasPermission",
     ]),
     ...mapState(["settings", "visibleNodes", "apiError", "returnRoute", "maxLevel"]),
     ...mapState({
@@ -601,9 +602,6 @@ export default {
     ]),
     update(property, value) {
       this.setCurrentEditingNodeProperty({ property, value })
-    },
-    hasPermission(node, action) {
-      return Helpers.hasPermission(node, action, this.settings.showRejected)
     },
     isValid() {
       const isNodeValid = this.validateNodeRoute(this.nodeId)

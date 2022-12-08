@@ -224,6 +224,7 @@ export default {
       "getInitialNodeId",
       "getNodeNavId",
       "getNodeNavParent",
+      "hasPermission",
     ]),
     nodeNavLinkMode: {
       get() {
@@ -588,7 +589,6 @@ export default {
     this.zoomPanHelper && this.zoomPanHelper.unregister()
   },
   methods: {
-    ...mapActions(["updateNodeCoordinates"]),
     ...mapMutations(["select", "unselect", "clearSelection", "setCurrentTool"]),
     ...mapActions([
       "goToNodeChildren",
@@ -597,6 +597,7 @@ export default {
       "resetNodeNavigation",
       "addLink",
       "addNode",
+      "updateNodeCoordinates",
     ]),
     updateAppHeight() {
       if (this.$refs.app) {
@@ -795,9 +796,6 @@ export default {
           }
         }
       )
-    },
-    hasPermission(node, action) {
-      return Helpers.hasPermission(node, action, this.settings.showRejected)
     },
     updateViewBox() {
       const MAX_RADIUS = 240

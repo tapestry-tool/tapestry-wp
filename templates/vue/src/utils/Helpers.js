@@ -206,6 +206,9 @@ export default class Helpers {
     return outObject
   }
 
+  /**
+   * @deprecated Please use the hasPermission getter in the Vuex store instead. This method will be removed once all references to it are redirected to the store getter.
+   */
   static hasPermission(node, action, showRejected) {
     // Check 0: node is null case - this should only apply to creating a standalone node
     if (node === null) {

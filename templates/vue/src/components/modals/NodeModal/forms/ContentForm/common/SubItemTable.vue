@@ -55,7 +55,6 @@
 <script>
 import { mapGetters, mapState } from "vuex"
 import { names } from "@/config/routes"
-import Helpers from "@/utils/Helpers"
 
 export default {
   name: "sub-item-table",
@@ -73,9 +72,8 @@ export default {
   computed: {
     ...mapState({
       node: "currentEditingNode",
-      showRejected: state => state.settings.showRejected,
     }),
-    ...mapGetters(["getNode"]),
+    ...mapGetters(["getNode", "hasPermission"]),
     requiresSaving() {
       // Require saving if node is changing from non-multi-content / non-video to multi-content / video
       const node = this.getNode(this.node.id)
@@ -94,7 +92,7 @@ export default {
   },
   methods: {
     canEdit(node) {
-      return Helpers.hasPermission(node, "edit", this.showRejected)
+      return this.hasPermission(node, "edit")
     },
     addSubitem() {
       let newQuery = { ...this.$route.query, nav: "modal" }

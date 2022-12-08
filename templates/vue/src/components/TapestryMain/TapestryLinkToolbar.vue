@@ -35,8 +35,7 @@
 <script>
 import TapestryContextToolbar from "./TapestryContextToolbar"
 import TapestryToolbarButton from "./common/TapestryToolbarButton"
-import Helpers from "@/utils/Helpers"
-import { mapActions, mapGetters, mapState } from "vuex"
+import { mapActions, mapGetters } from "vuex"
 
 export default {
   components: {
@@ -69,8 +68,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(["settings"]),
-    ...mapGetters(["getNode"]),
+    ...mapGetters(["getNode", "hasPermission"]),
     source() {
       return this.link ? this.getNode(this.link.source) : null
     },
@@ -82,8 +80,8 @@ export default {
     },
     hasEditPermission() {
       return this.link
-        ? Helpers.hasPermission(this.source, "add", this.settings.showRejected) &&
-            Helpers.hasPermission(this.target, "add", this.settings.showRejected)
+        ? this.hasPermission(this.source, "add") &&
+            this.hasPermission(this.target, "add")
         : false
     },
   },

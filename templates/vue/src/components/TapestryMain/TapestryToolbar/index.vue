@@ -66,7 +66,6 @@ import SettingsModalButton from "./SettingsModalButton"
 import { tools } from "@/utils/constants"
 import { mapActions, mapGetters, mapState } from "vuex"
 import * as wp from "@/services/wp"
-import Helpers from "@/utils/Helpers"
 
 export default {
   components: {
@@ -80,7 +79,7 @@ export default {
   },
   computed: {
     ...mapState(["settings"]),
-    ...mapGetters(["canUndo", "canRedo", "isAuthoringEnabled"]),
+    ...mapGetters(["canUndo", "canRedo", "isAuthoringEnabled", "hasPermission"]),
     platform() {
       return window.navigator.platform?.toLowerCase().indexOf("mac") !== -1
         ? "mac"
@@ -96,10 +95,7 @@ export default {
       if (!this.isLoggedIn) {
         return false
       }
-      return (
-        Helpers.hasPermission(null, "add", this.settings.showRejected) ||
-        this.settings.draftNodesEnabled
-      )
+      return this.hasPermission(null, "add") || this.settings.draftNodesEnabled
     },
     undoTooltip() {
       return `Undo (${this.platform === "mac" ? "Cmd" : "Ctrl"} + Z)`

@@ -78,7 +78,7 @@
                 !thumbnailURL ||
                 selected ||
                 !node.unlocked ||
-                hasPermission('edit')
+                hasNodePermission('edit')
             "
             :data-qa="`node-title-${node.id}`"
             class="metaWrapper"
@@ -122,7 +122,7 @@
             :y="-radius"
             :fill="buttonBackgroundColor"
             :data-qa="`open-node-${node.id}`"
-            :disabled="!node.unlocked && !hasPermission('edit')"
+            :disabled="!node.unlocked && !hasNodePermission('edit')"
             :radius="radius"
             :icon="icon"
             @click="handleRequestOpen"
@@ -132,12 +132,12 @@
               v-if="canAddChild"
               :node="node"
               :fill="buttonBackgroundColor"
-              :x="canReview || hasPermission('edit') ? -radius * 0.25 : 0"
+              :x="canReview || hasNodePermission('edit') ? -radius * 0.25 : 0"
               :y="radius"
               :radius="radius"
             ></add-child-button>
             <node-button
-              v-if="hasPermission('edit')"
+              v-if="hasNodePermission('edit')"
               :x="
                 hasTooManyLevels && node.mediaType !== 'multi-content'
                   ? 0
@@ -247,6 +247,7 @@ export default {
       "isVisible",
       "getParent",
       "getNodeNavId",
+      "hasPermission",
     ]),
     ariaLabel() {
       let label = `${this.node.title}. You are on a level ${this.node.level} node. `
@@ -268,7 +269,7 @@ export default {
         label +=
           "You are not on the node navigation route. To view this node, press Enter. "
       }
-      if (this.hasPermission("edit")) {
+      if (this.hasNodePermission("edit")) {
         label += "To edit this node, press E. "
       }
       label +=
@@ -280,15 +281,15 @@ export default {
         return "text"
       }
       return this.node.unlocked ||
-        this.hasPermission("edit") ||
-        this.hasPermission("move")
+        this.hasNodePermission("edit") ||
+        this.hasNodePermission("move")
         ? "pointer"
         : "not-allowed"
     },
     canAddChild() {
       return (
         (this.node.mediaType === "multi-content" || !this.hasTooManyLevels) &&
-        (this.hasPermission("add") || this.settings.draftNodesEnabled)
+        (this.hasNodePermission("add") || this.settings.draftNodesEnabled)
       )
     },
     canReview() {
@@ -603,7 +604,7 @@ export default {
       return hours + ":" + minutes + ":" + sec
     },
     handleRequestOpen() {
-      if (this.node.unlocked || this.hasPermission("edit")) {
+      if (this.node.unlocked || this.hasNodePermission("edit")) {
         this.openNode(this.node.id)
       }
       client.recordAnalyticsEvent("user", "click", "open-node-button", this.node.id)
@@ -631,19 +632,20 @@ export default {
       evt.stopPropagation()
 
       const clickTime = new Date().getTime()
-      if (clickTime - this.lastClickTime < 300 && this.hasPermission("edit")) {
+      if (clickTime - this.lastClickTime < 300 && this.hasNodePermission("edit")) {
         this.$emit("node-editing-title", this.node.id)
         this.lastClickTime = 0
       } else {
         if (
-          this.hasPermission("edit") &&
+          this.hasNodePermission("edit") &&
           (evt.ctrlKey || evt.metaKey || evt.shiftKey)
         ) {
           this.selected ? this.unselect(this.node.id) : this.select(this.node.id)
-        } else if (this.node.unlocked || this.hasPermission("edit")) {
+        } else if (this.node.unlocked || this.hasNodePermission("edit")) {
           const shouldOpenLightbox =
-            this.root && this.node.hideMedia && !this.hasPermission("edit")
-          const shouldOpenToolbar = !shouldOpenLightbox && this.hasPermission("edit")
+            this.root && this.node.hideMedia && !this.hasNodePermission("edit")
+          const shouldOpenToolbar =
+            !shouldOpenLightbox && this.hasNodePermission("edit")
           this.$emit("click", {
             node: this.node,
             shouldOpenToolbar,
@@ -678,8 +680,8 @@ export default {
     handleBlur() {
       this.isFocused = false
     },
-    hasPermission(action) {
-      return Helpers.hasPermission(this.node, action, this.settings.showRejected)
+    hasNodePermission(action) {
+      return this.hasPermission(this.node, action)
     },
   },
 }
