@@ -237,9 +237,16 @@ class TapestryHelpers
         $user = new TapestryUser($userId);
         $canEditTapestry = $user->canEdit($tapestryPostId);
 
-        // Standalone nodes - only admins can publish
+        // Adding standalone nodes
         if ($nodeMetaId === null) {
-            return $action === UserActions::ADD && $canEditTapestry;
+            if ($action !== UserActions::ADD) {
+                return false;
+            }
+            if ($canEditTapestry) {
+                return true;
+            }
+            $defaultPermissions = TapestryNodePermissions::getDefaultNodePermissions($tapestryPostId);
+            return self::actionAllowedInPermissions($defaultPermissions, $action, $userId);
         }
 
         // Fetch information required by subsequent checks
@@ -281,7 +288,7 @@ class TapestryHelpers
         // Section 3: Override for admins / authors
 
         // User has edit permissions for Tapestry
-        if ($user->canEdit($tapestryPostId) && $superuser_override) {
+        if ($canEditTapestry && $superuser_override) {
             return true;
         }
         
@@ -294,18 +301,37 @@ class TapestryHelpers
 
         $nodePermissions = get_metadata_by_mid('post', $nodeMetaId)->meta_value->permissions;
 
+        if (self::actionAllowedInPermissions($nodePermissions, $action, $userId)) {
+            return true;
+        }
+        
+        // User is in a group that is allowed in the node
+        // ! This check is not implemented in the frontend
+        foreach ($groupIds as $groupId) {
+            if (
+                (property_exists($nodePermissions, 'group-'.$groupId))
+                && (in_array($action, $nodePermissions->{'group-'.$groupId}))
+            ) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public static function actionAllowedInPermissions($permissions, $action, $userId) {
         // User has a permission associated with its ID
         if (
-            property_exists($nodePermissions, 'user-'.$userId) &&
-            in_array($action, $nodePermissions->{'user-'.$userId})
+            property_exists($permissions, 'user-'.$userId) &&
+            in_array($action, $permissions->{'user-'.$userId})
         ) {
             return true;
         }
 
         // Node has public permissions
         if (
-            property_exists($nodePermissions, 'public') &&
-            in_array($action, $nodePermissions->public)
+            property_exists($permissions, 'public') &&
+            in_array($action, $permissions->public)
         ) {
             return true;
         }
@@ -313,8 +339,8 @@ class TapestryHelpers
         // Node has authenticated permissions
         if (
             is_user_logged_in() &&
-            property_exists($nodePermissions, 'authenticated') &&
-            in_array($action, $nodePermissions->authenticated)
+            property_exists($permissions, 'authenticated') &&
+            in_array($action, $permissions->authenticated)
         ) {
             return true;
         }
@@ -326,8 +352,8 @@ class TapestryHelpers
             foreach ($roles as $role) {
                 // Node has role-specific permissions
                 if (
-                    property_exists($nodePermissions, $role) &&
-                    in_array($action, $nodePermissions->$role)
+                    property_exists($permissions, $role) &&
+                    in_array($action, $permissions->$role)
                 ) {
                     return true;
                 }
@@ -335,17 +361,6 @@ class TapestryHelpers
                 if (in_array($role, $allowedRoles)) {
                     return true;
                 }
-            }
-        }
-        
-        // User is in a group that is allowed in the node
-        // ! This check is not implemented in the frontend
-        foreach ($groupIds as $groupId) {
-            if (
-                (property_exists($nodePermissions, 'group-'.$groupId))
-                && (in_array($action, $nodePermissions->{'group-'.$groupId}))
-            ) {
-                return true;
             }
         }
 

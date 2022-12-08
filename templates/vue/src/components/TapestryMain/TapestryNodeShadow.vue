@@ -3,7 +3,9 @@
     <circle
       v-show="show"
       ref="circle"
-      :transform="`translate(${coordinates.x}, ${coordinates.y})`"
+      :transform="
+        `translate(${coordinates.x}, ${coordinates.y}) scale(${nodeScale})`
+      "
       :fill="fill"
       :style="{
         filter: dropShadow,
@@ -66,12 +68,15 @@ export default {
     isGrandChild() {
       return this.visibility <= 0
     },
+    nodeScale() {
+      return Helpers.getNodeScale(this.node.level, this.scale)
+    },
     radius() {
       if (!this.show) {
         return 0
       }
-      const radius = Helpers.getNodeRadius(this.node.level, this.scale)
-      return this.isGrandChild ? Math.min(40, radius) : radius
+      const radius = Helpers.getNodeBaseRadius(this.node.level)
+      return this.isGrandChild ? Math.min(40 / this.nodeScale, radius) : radius
     },
     fill() {
       const showImages = this.settings.hasOwnProperty("renderImages")
@@ -107,8 +112,7 @@ export default {
     dropShadow() {
       const { offset, blur, opacity } = Helpers.getDropShadow(
         this.node.level,
-        this.maxLevel,
-        this.scale
+        this.maxLevel
       )
       const opacityMultiplier = this.visibleNodes.includes(this.node.id) ? 1 : 0.5
       return `drop-shadow(${offset}px ${offset}px ${blur}px rgba(0, 0, 0, ${opacity *

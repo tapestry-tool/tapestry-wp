@@ -1,5 +1,9 @@
 <template>
-  <div v-if="isLoggedIn" class="toolbar-wrapper" aria-label="Tapestry Toolbar">
+  <div
+    v-if="isAuthoringEnabled"
+    class="toolbar-wrapper"
+    aria-label="Tapestry Toolbar"
+  >
     <div class="toolbar">
       <div class="tool-group">
         <tapestry-toolbar-button
@@ -17,6 +21,7 @@
           <i class="fas fa-mouse-pointer"></i>
         </tapestry-toolbar-button>
         <tapestry-toolbar-button
+          v-if="canAddNode"
           id="tapestry-add-node-tool"
           :tool="tools.ADD_NODE"
           tooltip="Add Node"
@@ -59,7 +64,7 @@
 import TapestryToolbarButton from "../common/TapestryToolbarButton"
 import SettingsModalButton from "./SettingsModalButton"
 import { tools } from "@/utils/constants"
-import { mapActions, mapGetters } from "vuex"
+import { mapActions, mapGetters, mapState } from "vuex"
 import * as wp from "@/services/wp"
 
 export default {
@@ -73,17 +78,24 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["canUndo", "canRedo"]),
+    ...mapState(["settings"]),
+    ...mapGetters(["canUndo", "canRedo", "isAuthoringEnabled", "hasPermission"]),
     platform() {
       return window.navigator.platform?.toLowerCase().indexOf("mac") !== -1
         ? "mac"
         : "windows"
     },
+    isLoggedIn() {
+      return wp.isLoggedIn()
+    },
     canEdit() {
       return wp.canEditTapestry()
     },
-    isLoggedIn() {
-      return wp.isLoggedIn()
+    canAddNode() {
+      if (!this.isLoggedIn) {
+        return false
+      }
+      return this.hasPermission(null, "add") || this.settings.draftNodesEnabled
     },
     undoTooltip() {
       return `Undo (${this.platform === "mac" ? "Cmd" : "Ctrl"} + Z)`

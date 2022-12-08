@@ -60,7 +60,7 @@
 
 <script>
 import "vue-select/dist/vue-select.css"
-import { mapActions, mapMutations, mapState } from "vuex"
+import { mapActions, mapGetters, mapMutations, mapState } from "vuex"
 import { matchSorter } from "match-sorter"
 import client from "@/services/TapestryAPI"
 import * as wp from "@/services/wp"
@@ -94,6 +94,7 @@ export default {
   },
   computed: {
     ...mapState(["nodes", "settings"]),
+    ...mapGetters(["hasPermission"]),
     type: {
       get() {
         const search = this.$route.query.search
@@ -180,7 +181,7 @@ export default {
         const matches = this.getMatches(status, filterTypes.STATUS)
         statuses.push({
           value: status,
-          count: matches.filter(node => Helpers.hasPermission(node, "read")).length,
+          count: matches.filter(node => this.hasPermission(node, "read")).length,
           label: `${statusMap[status]}: ${matches.length}`,
         })
       }

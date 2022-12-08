@@ -77,7 +77,6 @@
               @dragend="handleNodeDragEnd"
               @mouseover="handleMouseover(id)"
               @mouseleave="activeNode = null"
-              @mounted="dragSelectEnabled ? updateSelectableNodes(node) : null"
               @click="handleNodeClick"
               @focus="handleNodeFocus(id)"
               @node-editing-title="nodeEditingTitle = $event"
@@ -155,7 +154,7 @@ import ZoomPanHelper from "@/utils/ZoomPanHelper"
 import { names } from "@/config/routes"
 import * as wp from "@/services/wp"
 import { interpolate } from "@/utils/interpolate"
-import { tools } from "@/utils/constants"
+import { nodeStatus, tools } from "@/utils/constants"
 // import { scaleConstants } from "@/utils/constants"
 
 export default {
@@ -226,6 +225,7 @@ export default {
       "getInitialNodeId",
       "getNodeNavId",
       "getNodeNavParent",
+      "hasPermission",
     ]),
     nodeNavLinkMode: {
       get() {
@@ -447,6 +447,11 @@ export default {
     nodes() {
       this.updateViewBox()
     },
+    renderedLevels() {
+      if (this.dragSelectEnabled) {
+        DragSelectModular.updateSelectableNodes()
+      }
+    },
     isSidebarOpen() {
       setTimeout(() => {
         this.updateViewBox()
@@ -614,7 +619,6 @@ export default {
     this.zoomPanHelper && this.zoomPanHelper.unregister()
   },
   methods: {
-    ...mapActions(["updateNodeCoordinates"]),
     ...mapMutations(["select", "unselect", "clearSelection", "setCurrentTool"]),
     ...mapActions([
       "goToNodeChildren",
@@ -623,6 +627,7 @@ export default {
       "resetNodeNavigation",
       "addLink",
       "addNode",
+      "updateNodeCoordinates",
     ]),
     updateAppHeight() {
       if (this.$refs.app) {
@@ -821,12 +826,6 @@ export default {
           }
         }
       )
-    },
-    updateSelectableNodes() {
-      DragSelectModular.updateSelectableNodes()
-    },
-    hasPermission(node, action) {
-      return Helpers.hasPermission(node, action, this.settings.showRejected)
     },
     updateViewBox() {
       const MAX_RADIUS = 240
@@ -1272,6 +1271,14 @@ export default {
       }
       newNode.level = this.selectedNodeLevel
       newNode.title = "Untitled"
+
+      if (!this.hasPermission(null, "add")) {
+        if (!this.settings.draftNodesEnabled) {
+          return
+        }
+        newNode.status = nodeStatus.DRAFT
+      }
+
       this.addNode({ node: newNode }).then(id => {
         this.nodeEditingTitle = id
       })

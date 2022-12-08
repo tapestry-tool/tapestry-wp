@@ -82,6 +82,10 @@ export default class DragSelectModular {
 
   static updateSelectableNodes() {
     if (DragSelectModular.dragSelect) {
+      // Clear current selectables set before adding up-to-date node elements
+      DragSelectModular.dragSelect.removeSelectables(
+        DragSelectModular.dragSelect.getSelectables()
+      )
       DragSelectModular.dragSelect.addSelectables(
         document.querySelectorAll(".node.selectable")
       )

@@ -8,16 +8,15 @@
       :aria-label="ariaLabel"
       :data-qa="`node-${node.id}`"
       :data-locked="!node.unlocked"
-      :transform="`translate(${coordinates.x}, ${coordinates.y})`"
+      :transform="
+        `translate(${coordinates.x}, ${coordinates.y}) scale(${nodeScale})`
+      "
       :class="{
         desaturated: !isFilterMatched,
         opaque: !isFilterMatched,
       }"
       :style="{
-        cursor:
-          node.unlocked || hasPermission('edit') || hasPermission('move')
-            ? 'pointer'
-            : 'not-allowed',
+        cursor: cursor,
       }"
       @focus="handleFocus"
       @blur="handleBlur"
@@ -85,7 +84,7 @@
                 !thumbnailURL ||
                 selected ||
                 !node.unlocked ||
-                hasPermission('edit')
+                hasNodePermission('edit')
             "
             :data-qa="`node-title-${node.id}`"
             class="metaWrapper"
@@ -124,46 +123,51 @@
             </div>
           </foreignObject>
         </transition>
-        <g v-show="radius >= 80">
+        <g v-show="radius * nodeScale >= 80">
           <node-button
             v-if="!node.hideMedia"
             :x="0"
             :y="-radius"
             :fill="buttonBackgroundColor"
             :data-qa="`open-node-${node.id}`"
-            :disabled="!node.unlocked && !hasPermission('edit')"
+            :disabled="!node.unlocked && !hasNodePermission('edit')"
+            :radius="radius"
+            :icon="icon"
             @click="handleRequestOpen"
-          >
-            <tapestry-icon :icon="icon" svg></tapestry-icon>
-          </node-button>
+          ></node-button>
           <template v-if="isLoggedIn">
             <add-child-button
               v-if="canAddChild"
               :node="node"
               :fill="buttonBackgroundColor"
-              :x="canReview || hasPermission('edit') ? -35 : 0"
+              :x="canReview || hasNodePermission('edit') ? -radius * 0.25 : 0"
               :y="radius"
+              :radius="radius"
             ></add-child-button>
             <node-button
-              v-if="hasPermission('edit')"
-              :x="hasTooManyLevels && node.mediaType !== 'multi-content' ? 0 : 35"
+              v-if="hasNodePermission('edit')"
+              :x="
+                hasTooManyLevels && node.mediaType !== 'multi-content'
+                  ? 0
+                  : radius * 0.25
+              "
               :y="radius"
               :fill="buttonBackgroundColor"
               :data-qa="`edit-node-${node.id}`"
+              :radius="radius"
+              icon="pen"
               @click="editNode(node.id)"
-            >
-              <tapestry-icon icon="pen" svg></tapestry-icon>
-            </node-button>
+            ></node-button>
             <node-button
               v-else-if="canReview"
-              :x="hasTooManyLevels ? 0 : 35"
+              :x="hasTooManyLevels ? 0 : radius * 0.25"
               :y="radius"
               :fill="buttonBackgroundColor"
               :data-qa="`review-node-${node.id}`"
+              :radius="radius"
+              icon="comment-dots"
               @click="reviewNode"
-            >
-              <tapestry-icon icon="comment-dots" svg></tapestry-icon>
-            </node-button>
+            ></node-button>
           </template>
         </g>
       </g>
@@ -254,6 +258,7 @@ export default {
       "isVisible",
       "getParent",
       "getNodeNavId",
+      "hasPermission",
     ]),
     ariaLabel() {
       let label = `${this.node.title}. You are on a level ${this.node.level} node. `
@@ -275,17 +280,27 @@ export default {
         label +=
           "You are not on the node navigation route. To view this node, press Enter. "
       }
-      if (this.hasPermission("edit")) {
+      if (this.hasNodePermission("edit")) {
         label += "To edit this node, press E. "
       }
       label +=
         "To go to the sidebar for this node, press S. To exit the Main Tapestry view, press the Q Key or the Escape Key."
       return label
     },
+    cursor() {
+      if (this.isEditingTitle) {
+        return "text"
+      }
+      return this.node.unlocked ||
+        this.hasNodePermission("edit") ||
+        this.hasNodePermission("move")
+        ? "pointer"
+        : "not-allowed"
+    },
     canAddChild() {
       return (
         (this.node.mediaType === "multi-content" || !this.hasTooManyLevels) &&
-        (this.hasPermission("add") || this.settings.draftNodesEnabled)
+        (this.hasNodePermission("add") || this.settings.draftNodesEnabled)
       )
     },
     canReview() {
@@ -364,12 +379,15 @@ export default {
       // make it grandchild when not visible too, to prevent buttons showing up while transitioning to hidden
       return this.visibility <= 0
     },
+    nodeScale() {
+      return Helpers.getNodeScale(this.node.level, this.scale)
+    },
     radius() {
       if (!this.show) {
         return 0
       }
-      const radius = Helpers.getNodeRadius(this.node.level, this.scale)
-      return this.isGrandChild ? Math.min(40, radius) : radius
+      const radius = Helpers.getNodeBaseRadius(this.node.level)
+      return this.isGrandChild ? Math.min(40 / this.nodeScale, radius) : radius
     },
     useImageFill() {
       const showImages = this.settings.hasOwnProperty("renderImages")
@@ -531,7 +549,6 @@ export default {
     },
   },
   mounted() {
-    this.$emit("mounted")
     this.$refs.circle.setAttribute("r", this.radius)
     this.$refs.halo.setAttribute("r", this.radius + this.selectHaloWidth / 2)
     const nodeRef = this.$refs.node
@@ -609,7 +626,7 @@ export default {
       return hours + ":" + minutes + ":" + sec
     },
     handleRequestOpen() {
-      if (this.node.unlocked || this.hasPermission("edit")) {
+      if (this.node.unlocked || this.hasNodePermission("edit")) {
         this.openNode(this.node.id)
       }
       client.recordAnalyticsEvent("user", "click", "open-node-button", this.node.id)
@@ -637,19 +654,20 @@ export default {
       evt.stopPropagation()
 
       const clickTime = new Date().getTime()
-      if (clickTime - this.lastClickTime < 300 && this.hasPermission("edit")) {
+      if (clickTime - this.lastClickTime < 300 && this.hasNodePermission("edit")) {
         this.$emit("node-editing-title", this.node.id)
         this.lastClickTime = 0
       } else {
         if (
-          this.hasPermission("edit") &&
+          this.hasNodePermission("edit") &&
           (evt.ctrlKey || evt.metaKey || evt.shiftKey)
         ) {
           this.selected ? this.unselect(this.node.id) : this.select(this.node.id)
-        } else if (this.node.unlocked || this.hasPermission("edit")) {
+        } else if (this.node.unlocked || this.hasNodePermission("edit")) {
           const shouldOpenLightbox =
-            this.root && this.node.hideMedia && !this.hasPermission("edit")
-          const shouldOpenToolbar = !shouldOpenLightbox && this.hasPermission("edit")
+            this.root && this.node.hideMedia && !this.hasNodePermission("edit")
+          const shouldOpenToolbar =
+            !shouldOpenLightbox && this.hasNodePermission("edit")
           this.$emit("click", {
             node: this.node,
             shouldOpenToolbar,
@@ -684,8 +702,8 @@ export default {
     handleBlur() {
       this.isFocused = false
     },
-    hasPermission(action) {
-      return Helpers.hasPermission(this.node, action, this.settings.showRejected)
+    hasNodePermission(action) {
+      return this.hasPermission(this.node, action)
     },
     getThemedBackground() {
       this.themedBackground = getComputedStyle(this.$refs.node).getPropertyValue(
@@ -764,11 +782,17 @@ export default {
   text-align: center;
   font-size: 30px;
 
+  p {
+    margin: 0;
+    padding: 0;
+  }
+
   .node-title {
-    padding-left: 0;
-    margin-top: 12px;
-    margin-bottom: 0;
     font-weight: bold;
+  }
+
+  .timecode {
+    font-size: 70%;
   }
 }
 </style>

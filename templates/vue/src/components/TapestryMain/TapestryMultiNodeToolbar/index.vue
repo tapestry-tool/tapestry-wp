@@ -43,7 +43,6 @@
 import TapestryContextToolbar from "../TapestryContextToolbar"
 import TapestryToolbarButton from "../common/TapestryToolbarButton"
 import NodesLevelSelect from "./NodesLevelSelect"
-import Helpers from "@/utils/Helpers"
 import { mapActions, mapGetters, mapState } from "vuex"
 
 export default {
@@ -74,8 +73,8 @@ export default {
     }
   },
   computed: {
-    ...mapState(["settings", "selection"]),
-    ...mapGetters(["getNode"]),
+    ...mapState(["selection"]),
+    ...mapGetters(["getNode", "hasPermission"]),
     nodes() {
       return this.selection.map(id => this.getNode(id))
     },
@@ -87,9 +86,7 @@ export default {
       return this.nodes.every(node => node.level === level) ? level : null
     },
     hasEditPermission() {
-      return this.nodes.every(node =>
-        Helpers.hasPermission(node, "edit", this.settings.showRejected)
-      )
+      return this.nodes.every(node => this.hasPermission(node, "edit"))
     },
   },
   watch: {
