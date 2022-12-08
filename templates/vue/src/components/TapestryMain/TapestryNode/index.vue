@@ -7,7 +7,9 @@
       :aria-label="ariaLabel"
       :data-qa="`node-${node.id}`"
       :data-locked="!node.unlocked"
-      :transform="`translate(${coordinates.x}, ${coordinates.y})`"
+      :transform="
+        `translate(${coordinates.x}, ${coordinates.y}) scale(${nodeScale})`
+      "
       :class="{
         opaque: !visibleNodes.includes(node.id),
       }"
@@ -113,7 +115,7 @@
             </div>
           </foreignObject>
         </transition>
-        <g v-show="radius >= 80">
+        <g v-show="radius * nodeScale >= 80">
           <node-button
             v-if="!node.hideMedia"
             :x="0"
@@ -121,38 +123,43 @@
             :fill="buttonBackgroundColor"
             :data-qa="`open-node-${node.id}`"
             :disabled="!node.unlocked && !hasPermission('edit')"
+            :radius="radius"
+            :icon="icon"
             @click="handleRequestOpen"
-          >
-            <tapestry-icon :icon="icon" svg></tapestry-icon>
-          </node-button>
+          ></node-button>
           <template v-if="isLoggedIn">
             <add-child-button
               v-if="canAddChild"
               :node="node"
               :fill="buttonBackgroundColor"
-              :x="canReview || hasPermission('edit') ? -35 : 0"
+              :x="canReview || hasPermission('edit') ? -radius * 0.25 : 0"
               :y="radius"
+              :radius="radius"
             ></add-child-button>
             <node-button
               v-if="hasPermission('edit')"
-              :x="hasTooManyLevels && node.mediaType !== 'multi-content' ? 0 : 35"
+              :x="
+                hasTooManyLevels && node.mediaType !== 'multi-content'
+                  ? 0
+                  : radius * 0.25
+              "
               :y="radius"
               :fill="buttonBackgroundColor"
               :data-qa="`edit-node-${node.id}`"
+              :radius="radius"
+              icon="pen"
               @click="editNode(node.id)"
-            >
-              <tapestry-icon icon="pen" svg></tapestry-icon>
-            </node-button>
+            ></node-button>
             <node-button
               v-else-if="canReview"
-              :x="hasTooManyLevels ? 0 : 35"
+              :x="hasTooManyLevels ? 0 : radius * 0.25"
               :y="radius"
               :fill="buttonBackgroundColor"
               :data-qa="`review-node-${node.id}`"
+              :radius="radius"
+              icon="comment-dots"
               @click="reviewNode"
-            >
-              <tapestry-icon icon="comment-dots" svg></tapestry-icon>
-            </node-button>
+            ></node-button>
           </template>
         </g>
       </g>
@@ -360,12 +367,15 @@ export default {
       // make it grandchild when not visible too, to prevent buttons showing up while transitioning to hidden
       return this.visibility <= 0
     },
+    nodeScale() {
+      return Helpers.getNodeScale(this.node.level, this.scale)
+    },
     radius() {
       if (!this.show) {
         return 0
       }
-      const radius = Helpers.getNodeRadius(this.node.level, this.scale)
-      return this.isGrandChild ? Math.min(40, radius) : radius
+      const radius = Helpers.getNodeBaseRadius(this.node.level)
+      return this.isGrandChild ? Math.min(40 / this.nodeScale, radius) : radius
     },
     fill() {
       const showImages = this.settings.hasOwnProperty("renderImages")
@@ -735,11 +745,17 @@ export default {
   text-align: center;
   font-size: 30px;
 
+  p {
+    margin: 0;
+    padding: 0;
+  }
+
   .node-title {
-    padding-left: 0;
-    margin-top: 12px;
-    margin-bottom: 0;
     font-weight: bold;
+  }
+
+  .timecode {
+    font-size: 70%;
   }
 }
 </style>
