@@ -15,10 +15,10 @@
       :x="x"
       :y="y"
       :fill="fill"
+      :radius="radius"
+      icon="plus"
       @click="addNode"
-    >
-      <tapestry-icon icon="plus" svg></tapestry-icon>
-    </node-button>
+    ></node-button>
   </g>
 </template>
 
@@ -53,6 +53,10 @@ export default {
       type: String,
       required: false,
       default: "#666",
+    },
+    radius: {
+      type: Number,
+      required: true,
     },
   },
   data() {
