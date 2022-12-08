@@ -484,20 +484,24 @@ export default class Helpers {
     return 140 * Math.pow(0.75, level - 1)
   }
 
-  static getNodeRadius(level, scale) {
-    const baseRadius = Helpers.getNodeBaseRadius(level)
+  static getNodeScale(level, scale) {
     const currentLevel = Helpers.getCurrentLevel(scale)
     if (level < currentLevel) {
       // growth rate should be slow for nodes higher than current level
       const baseScale = (level + 1) / store.state.scaleConstants.levelMultiplier
       return (
-        baseRadius *
-        (baseScale +
-          (scale - baseScale) / store.state.scaleConstants.largeNodeGrowthSupressor)
+        baseScale +
+        (scale - baseScale) / store.state.scaleConstants.largeNodeGrowthSupressor
       )
     } else {
-      return baseRadius * scale
+      return scale
     }
+  }
+
+  static getNodeRadius(level, scale) {
+    const baseRadius = Helpers.getNodeBaseRadius(level)
+    const nodeScale = Helpers.getNodeScale(level, scale)
+    return baseRadius * nodeScale
   }
 
   static getMinimapLinePoints(source, target) {
