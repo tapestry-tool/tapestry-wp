@@ -1,14 +1,14 @@
 <template>
   <svg
-    width="52"
-    height="52"
+    width="46"
+    height="46"
     preserveAspectRatio="xMidYMid slice"
     focusable="false"
     role="img"
   >
     <circle
-      cx="26"
-      cy="26"
+      cx="23"
+      cy="23"
       r="12"
       :fill="value ? 'url(#' + imagePatternId + ')' : '#868e96'"
       stroke="#868e96"
@@ -20,8 +20,8 @@
           :href="value"
           x="0"
           y="0"
-          width="24"
-          height="24"
+          width="23"
+          height="23"
         />
       </pattern>
     </defs>

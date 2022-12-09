@@ -109,6 +109,13 @@ $REST_API_ENDPOINTS = [
             'callback' => 'updateTapestryNode',
         ],
     ],
+    'BATCH_PUT_TAPESTRY_NODES' => (object) [
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_PUT_METHOD,
+            'callback' => 'batchUpdateNodes',
+        ],
+    ],
     'DELETE_TAPESTRY_NODE' => (object) [
         'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)',
         'ARGUMENTS' => [
@@ -116,11 +123,25 @@ $REST_API_ENDPOINTS = [
             'callback' => 'deleteTapestryNode',
         ],
     ],
+    'BATCH_DELETE_TAPESTRY_NODES' => (object) [
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_DELETE_METHOD,
+            'callback' => 'batchDeleteNodes',
+        ],
+    ],
     'RESTORE_TAPESTRY_NODE' => (object) [
         'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/restore',
         'ARGUMENTS' => [
             'methods' => $REST_API_POST_METHOD,
             'callback' => 'restoreTapestryNode',
+        ],
+    ],
+    'BATCH_RESTORE_TAPESTRY_NODES' => (object) [
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/restore',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_POST_METHOD,
+            'callback' => 'batchRestoreNodes',
         ],
     ],
     'PUT_TAPESTRY_NODE_SIZE' => (object) [
@@ -1087,6 +1108,68 @@ function updateTapestryNode($request)
 }
 
 /**
+ * Update multiple Tapestry Nodes in one request.
+ *
+ * @param object $request HTTP request
+ *
+ * @return object $response   HTTP response
+ */
+function batchUpdateNodes($request)
+{
+    $postId = $request['tapestryPostId'];
+    $nodesData = json_decode($request->get_body());
+    
+    try {
+        if (empty($postId) || !TapestryHelpers::isValidTapestry($postId)) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+        if (!is_array($nodesData)) {
+            throw new TapestryError('INVALID_DATA', 'The provided data of nodes is not an array.', 400);
+        }
+        
+        $tapestry = new Tapestry($postId);
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+
+    $successNodeIds = [];
+
+    foreach ($nodesData as $nodeData) {
+        try {
+            if (!isset($nodeData->id) || !is_numeric($nodeData->id)) {
+                throw new TapestryError('INVALID_NODE_META_ID');
+            }
+            if (!isset($nodeData->newNode)) {
+                throw new TapestryError('INVALID_NODE_DATA', 'The node data is invalid.', 400);
+            }
+            $nodeMetaId = $nodeData->id;
+            if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
+                throw new TapestryError('INVALID_NODE_META_ID');
+            }
+            if (!TapestryHelpers::userIsAllowed(UserActions::EDIT, $nodeMetaId, $postId)) {
+                throw new TapestryError('EDIT_NODE_PERMISSION_DENIED');
+            }
+            if (!TapestryHelpers::isChildNodeOfTapestry($nodeMetaId, $postId)) {
+                throw new TapestryError('INVALID_CHILD_NODE');
+            }
+
+            $node = $tapestry->getNode($nodeMetaId);
+
+            $node->set((object) $nodeData->newNode);
+
+            $node->save();
+
+            array_push($successNodeIds, $nodeMetaId);
+        } catch (TapestryError $e) {
+            // Do not care about details of errors while batch editing nodes
+            // Whether or not error(s) occurred can be determined from the length of the response $successNodeIds
+        }
+    }
+
+    return $successNodeIds;
+}
+
+/**
  * Delete Tapestry Node.
  *
  * @param object $request HTTP request
@@ -1122,6 +1205,64 @@ function deleteTapestryNode($request)
     }
 }
 
+/**
+ * Delete multiple Tapestry Nodes in one request.
+ *
+ * @param object $request HTTP request
+ *
+ * @return object $response   HTTP response
+ */
+function batchDeleteNodes($request)
+{
+    $postId = $request['tapestryPostId'];
+    $nodeIds = json_decode($request->get_body());
+
+    try {
+        if (empty($postId) || !TapestryHelpers::isValidTapestry($postId)) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+        if (empty($nodeIds) || !is_array($nodeIds)) {
+            throw new TapestryError('INVALID_NODE_META_ID');
+        }
+        
+        $tapestry = new Tapestry($postId);
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+
+    $successNodeIds = [];
+
+    foreach ($nodeIds as $nodeMetaId) {
+        try {
+            if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
+                throw new TapestryError('INVALID_NODE_META_ID');
+            }
+            if (!TapestryHelpers::userIsAllowed(UserActions::EDIT, $nodeMetaId, $postId)) {
+                throw new TapestryError('EDIT_NODE_PERMISSION_DENIED');
+            }
+            if (!TapestryHelpers::isChildNodeOfTapestry($nodeMetaId, $postId)) {
+                throw new TapestryError('INVALID_CHILD_NODE');
+            }
+    
+            $tapestry->deleteNodeFromTapestry($nodeMetaId);
+
+            array_push($successNodeIds, $nodeMetaId);
+        } catch (TapestryError $e) {
+            // Do not care about details of errors while batch deleting nodes
+            // Whether or not error(s) occurred can be determined from the length of the response $successNodeIds
+        }
+    }
+
+    return $successNodeIds;
+}
+
+/**
+ * Restore Tapestry Node after it has been deleted.
+ *
+ * @param object $request HTTP request
+ *
+ * @return object $response   HTTP response
+ */
 function restoreTapestryNode($request)
 {
     $postId = $request['tapestryPostId'];
@@ -1157,13 +1298,13 @@ function restoreTapestryNode($request)
         array_push($tapestryNodeIds, $nodeId); // for checks when recreating links below
 
         // Recreate links associated with node
-        $nodeData = json_decode($request->get_body());
         $links = [];
         if ($nodeData->links && is_array($nodeData->links)) {
             foreach ($nodeData->links as $link) {
                 // TODO: check if link already exists in tapestry
                 if (
                     $link->source && $link->target &&
+                    $link->source !== $link->target &&
                     in_array($link->source, $tapestryNodeIds) &&
                     in_array($link->target, $tapestryNodeIds) &&
                     ($link->source === $nodeId || $link->target === $nodeId) &&
@@ -1184,6 +1325,98 @@ function restoreTapestryNode($request)
 
         return (object) [
             'node' => $node,
+            'links' => $links,
+        ];
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+/**
+ * Restore multiple Tapestry Nodes in one request.
+ *
+ * @param object $request HTTP request
+ *
+ * @return object $response   HTTP response
+ */
+function batchRestoreNodes($request)
+{
+    $postId = $request['tapestryPostId'];
+    $data = json_decode($request->get_body());
+
+    try {
+        if (empty($postId) || !TapestryHelpers::isValidTapestry($postId)) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+        if (empty($data->ids) || !is_array($data->ids)) {
+            throw new TapestryError('INVALID_NODE_META_ID');
+        }
+
+        $tapestry = new Tapestry($postId);
+        $tapestryNodeIds = $tapestry->getNodeIds();
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+
+    $nodes = [];
+
+    foreach ($data->ids as $nodeMetaId) {
+        try {
+            if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
+                throw new TapestryError('INVALID_NODE_META_ID', 'Node not found. It may already be permanently deleted.');
+            }
+            if (!TapestryHelpers::userIsAllowed(UserActions::EDIT, $nodeMetaId, $postId)) {
+                throw new TapestryError('EDIT_NODE_PERMISSION_DENIED');
+            }
+            // Check if nodeId is already in tapestry nodes array
+            if (TapestryHelpers::isChildNodeOfTapestry($nodeMetaId, $postId)) {
+                throw new TapestryError('ALREADY_RESTORED', 'Node has already been restored', 400);
+            }
+            // Check if node originally belongs to tapestry
+            $nodeTapestryPostId = get_metadata_by_mid('post', $nodeMetaId)->post_id;
+            if ($nodeTapestryPostId !== $postId) {
+                throw new TapestryError('INVALID_NODE_TAPESTRY', 'Node does not belong to this tapestry', 400);
+            }
+
+            // Restore tapestry node
+            $node = $tapestry->restoreNode($nodeMetaId);
+            $nodeId = $node->id;
+            array_push($tapestryNodeIds, $nodeId); // for checks when recreating links below
+            array_push($nodes, $node);
+        } catch (TapestryError $e) {
+            // Do not care about details of errors while batch restoring nodes
+            // Whether or not error(s) occurred can be determined from the length of the response $nodes
+        }
+    }
+
+    try {
+        // Recreate links associated with node
+        $links = [];
+        if ($data->links && is_array($data->links)) {
+            foreach ($data->links as $link) {
+                // TODO: check if link already exists in tapestry
+                if (
+                    $link->source && $link->target &&
+                    $link->source !== $link->target &&
+                    in_array($link->source, $tapestryNodeIds) &&
+                    in_array($link->target, $tapestryNodeIds) &&
+                    (
+                        TapestryHelpers::nodeIsDraft($link->source, $postId) ||
+                        TapestryHelpers::nodeIsDraft($link->target, $postId) ||
+                        (
+                            TapestryHelpers::userIsAllowed(UserActions::ADD, $link->source, $postId) &&
+                            TapestryHelpers::userIsAllowed(UserActions::ADD, $link->source, $postId)
+                        )
+                    )
+                ) {
+                    $tapestry->addLink($link);
+                    array_push($links, $link);
+                }
+            }
+        }
+
+        return (object) [
+            'nodes' => $nodes,
             'links' => $links,
         ];
     } catch (TapestryError $e) {

@@ -9,9 +9,10 @@
       id="delete-link-btn"
       horizontal
       tooltip="Delete Link"
+      danger
       @click="handleDeleteLink"
     >
-      <i class="fas fa-trash-alt fa-lg"></i>
+      <i class="fas fa-trash-alt"></i>
     </tapestry-toolbar-button>
 
     <template v-if="isSameLevelLink">
@@ -24,7 +25,7 @@
         tooltip="Reverse Link"
         @click="handleReverseLink"
       >
-        <i class="fas fa-exchange-alt fa-lg"></i>
+        <i class="fas fa-exchange-alt"></i>
       </tapestry-toolbar-button>
       <div class="vertex-title right">{{ target.title }}</div>
     </template>
@@ -34,8 +35,7 @@
 <script>
 import TapestryContextToolbar from "./TapestryContextToolbar"
 import TapestryToolbarButton from "./common/TapestryToolbarButton"
-import Helpers from "@/utils/Helpers"
-import { mapActions, mapGetters, mapState } from "vuex"
+import { mapActions, mapGetters } from "vuex"
 
 export default {
   components: {
@@ -68,8 +68,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(["settings"]),
-    ...mapGetters(["getNode"]),
+    ...mapGetters(["getNode", "hasPermission"]),
     source() {
       return this.link ? this.getNode(this.link.source) : null
     },
@@ -81,8 +80,8 @@ export default {
     },
     hasEditPermission() {
       return this.link
-        ? Helpers.hasPermission(this.source, "add", this.settings.showRejected) &&
-            Helpers.hasPermission(this.target, "add", this.settings.showRejected)
+        ? this.hasPermission(this.source, "add") &&
+            this.hasPermission(this.target, "add")
         : false
     },
   },
@@ -119,7 +118,7 @@ export default {
   line-height: 52px;
   min-width: 52px;
   padding: 0 10px;
-  color: #59595b;
+  color: var(--text-color-secondary);
   font-weight: bold;
   font-size: 1.1rem;
 

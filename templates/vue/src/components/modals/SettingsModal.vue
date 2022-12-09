@@ -210,7 +210,7 @@
         >
           <b-form-group
             label="Default Permissions For New Nodes"
-            description="Newly created nodes in this tapestry will have these permissions by default."
+            description="Newly created nodes in this tapestry will have these permissions by default. Users can add standalone nodes if they have the add permission here."
           >
             <permissions-table v-model="defaultPermissions" />
           </b-form-group>

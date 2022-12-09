@@ -12,9 +12,10 @@
         horizontal
         tooltip="Delete Node"
         :active="activeButton === 'delete'"
+        danger
         @click="handleDeleteNode"
       >
-        <i class="fas fa-trash-alt fa-lg"></i>
+        <i class="fas fa-trash-alt"></i>
       </tapestry-toolbar-button>
 
       <div class="tapestry-toolbar-separator"></div>
@@ -27,7 +28,7 @@
           tooltip="View Node"
           @click="openModal(names.LIGHTBOX)"
         >
-          <img class="icon" :src="icons.media_button" />
+          <media-button-icon class="icon"></media-button-icon>
         </tapestry-toolbar-button>
 
         <div class="tapestry-toolbar-separator"></div>
@@ -58,11 +59,11 @@
           :active="activeButton === 'textColor'"
         >
           <div v-if="node.hideTitle" class="text-color-hidden-container">
-            <i class="fas fa-font fa-lg"></i>
+            <i class="fas fa-font"></i>
             <div class="slash"></div>
           </div>
           <div v-else class="text-color-icon-container">
-            <i class="fas fa-font"></i>
+            <i class="fas fa-font fa-sm"></i>
             <div class="color-box" :style="{ background: node.textColor }"></div>
           </div>
         </tapestry-toolbar-button>
@@ -135,10 +136,9 @@ import TapestryContextToolbar from "../TapestryContextToolbar"
 import TapestryToolbarButton from "../common/TapestryToolbarButton"
 import NodeLevelSelect from "./NodeLevelSelect"
 import NodeBackgroundButton from "./NodeBackgroundButton"
-import media_button from "@/assets/icons/media_button.svg"
-import Helpers from "@/utils/Helpers"
+import MediaButtonIcon from "./MediaButtonIcon"
 import { tools, swatches } from "@/utils/constants"
-import { mapActions, mapState } from "vuex"
+import { mapActions, mapGetters } from "vuex"
 import { names } from "@/config/routes"
 
 export default {
@@ -147,6 +147,7 @@ export default {
     TapestryToolbarButton,
     NodeLevelSelect,
     NodeBackgroundButton,
+    MediaButtonIcon,
     VSwatches,
   },
   model: {
@@ -174,20 +175,15 @@ export default {
       tools: tools,
       swatches: swatches,
       names: names,
-      icons: {
-        media_button,
-      },
 
       activeButton: null,
       justChanged: false,
     }
   },
   computed: {
-    ...mapState(["settings"]),
+    ...mapGetters(["hasPermission"]),
     hasEditPermission() {
-      return this.node
-        ? Helpers.hasPermission(this.node, "edit", this.settings.showRejected)
-        : false
+      return this.node ? this.hasPermission(this.node, "edit") : false
     },
     swatchesWithTransparentColor() {
       const swatches = [...this.swatches]
@@ -288,12 +284,12 @@ export default {
 
 .slash {
   width: 2px;
-  height: 40px;
+  height: 35px;
   background: #000;
   position: absolute;
   top: 0;
   left: 0;
-  transform: rotate(-45deg) translate(-2px, -4px);
+  transform: rotate(-45deg) translate(-5px, 1px);
   transform-origin: 0 0;
 }
 
@@ -307,6 +303,7 @@ export default {
   width: 20px;
   height: 5px;
   position: absolute;
+  margin-top: -3px;
 }
 
 .circle {

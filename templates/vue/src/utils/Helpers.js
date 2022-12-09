@@ -206,6 +206,9 @@ export default class Helpers {
     return outObject
   }
 
+  /**
+   * @deprecated Please use the hasPermission getter in the Vuex store instead. This method will be removed once all references to it are redirected to the store getter.
+   */
   static hasPermission(node, action, showRejected) {
     // Check 0: node is null case - this should only apply to creating a standalone node
     if (node === null) {
@@ -258,35 +261,41 @@ export default class Helpers {
       }
     }
 
-    // Check 3: User has a role with general edit permissions
+    // Check 3: Node permissions allow user to perform action
+    return Helpers.isActionAllowed(node.permissions, action)
+  }
+
+  static isActionAllowed(permissions, action) {
     const { id, roles } = wp.getCurrentUser()
+
+    // Check 1: User has a role with general edit permissions
     const allowedRoles = ["administrator", "editor", "author"]
     if (allowedRoles.some(role => roles.includes(role))) {
       return true
     }
 
-    const { public: publicPermissions, authenticated } = node.permissions
-    // Check 4: Node has public permissions
+    const { public: publicPermissions, authenticated } = permissions
+    // Check 2: Has public permissions
     if (publicPermissions.includes(action)) {
       return true
     }
 
-    // Check 5: Node has authenticated permissions
+    // Check 3: Has authenticated permissions
     if (wp.isLoggedIn() && authenticated && authenticated.includes(action)) {
       return true
     }
 
-    // Check 6: User has a role that is allowed in the node
+    // Check 4: User has a role that is allowed
     const isRoleAllowed = roles.some(role => {
-      const permissions = node.permissions[role]
-      return permissions && permissions.includes(action)
+      const rolePermissions = permissions[role]
+      return rolePermissions && rolePermissions.includes(action)
     })
     if (isRoleAllowed) {
       return true
     }
 
-    // Check 7: User has a permission associated with its ID
-    const userPermissions = node.permissions[`user-${id}`]
+    // Check 5: User has a permission associated with its ID
+    const userPermissions = permissions[`user-${id}`]
     if (userPermissions) {
       return userPermissions.includes(action)
     }
@@ -484,20 +493,24 @@ export default class Helpers {
     return 140 * Math.pow(0.75, level - 1)
   }
 
-  static getNodeRadius(level, scale) {
-    const baseRadius = Helpers.getNodeBaseRadius(level)
+  static getNodeScale(level, scale) {
     const currentLevel = Helpers.getCurrentLevel(scale)
     if (level < currentLevel) {
       // growth rate should be slow for nodes higher than current level
       const baseScale = (level + 1) / store.state.scaleConstants.levelMultiplier
       return (
-        baseRadius *
-        (baseScale +
-          (scale - baseScale) / store.state.scaleConstants.largeNodeGrowthSupressor)
+        baseScale +
+        (scale - baseScale) / store.state.scaleConstants.largeNodeGrowthSupressor
       )
     } else {
-      return baseRadius * scale
+      return scale
     }
+  }
+
+  static getNodeRadius(level, scale) {
+    const baseRadius = Helpers.getNodeBaseRadius(level)
+    const nodeScale = Helpers.getNodeScale(level, scale)
+    return baseRadius * nodeScale
   }
 
   static getMinimapLinePoints(source, target) {

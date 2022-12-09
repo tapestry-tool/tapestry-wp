@@ -1,24 +1,26 @@
 <template>
   <div class="tapestry-menubar" aria-label="Tapestry Menubar">
     <tapestry-filter
-      v-if="!settings.renderMap"
+      v-if="!settings.renderMap && !isEmptyTapestry"
       class="menubar-group"
       style="z-index: 10"
     />
-    <b-container v-if="isLoggedIn">
+    <b-container v-if="isLoggedIn && (canEdit || !isEmptyTapestry)">
       <b-row align-v="center" class="menubar-group">
-        <b-col class="p-0">
-          <user-settings-button
-            data-qa="user-settings-button"
-          ></user-settings-button>
-        </b-col>
-        <b-col class="p-0">
-          <embed-button data-qa="embed-modal-button"></embed-button>
-        </b-col>
-        <template v-if="canEdit">
+        <template v-if="!isEmptyTapestry">
           <b-col class="p-0">
-            <help-button />
+            <user-settings-button
+              data-qa="user-settings-button"
+            ></user-settings-button>
           </b-col>
+          <b-col class="p-0">
+            <embed-button data-qa="embed-modal-button"></embed-button>
+          </b-col>
+        </template>
+        <b-col v-if="isAuthoringEnabled" class="p-0">
+          <help-button />
+        </b-col>
+        <template v-if="canEdit && !isEmptyTapestry">
           <b-col v-if="settings.submitNodesEnabled" class="p-0">
             <review-notifications />
           </b-col>
@@ -32,7 +34,7 @@
 </template>
 
 <script>
-import { mapState } from "vuex"
+import { mapGetters, mapState } from "vuex"
 import UserSettingsButton from "./UserSettingsButton"
 import ReviewNotifications from "./ReviewNotifications"
 import HelpButton from "./HelpButton"
@@ -52,6 +54,7 @@ export default {
   },
   computed: {
     ...mapState(["settings"]),
+    ...mapGetters(["isEmptyTapestry", "isAuthoringEnabled"]),
     canEdit() {
       return wp.canEditTapestry()
     },
@@ -73,11 +76,16 @@ export default {
   flex-wrap: nowrap;
 
   button.menubar-button {
-    color: var(--text-color-tertiary);
-    padding: 0.5rem;
+    color: var(--text-color-primary);
+    padding: 0;
     background: none;
     font-size: 1.2em;
     transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 46px;
+    height: 46px;
 
     &.active,
     &:hover {
@@ -91,10 +99,11 @@ export default {
     height: 56px;
     background-color: var(--bg-color-secondary);
     border-radius: 8px;
-    padding: 0 0.5rem;
+    padding: 0 5px;
     margin-left: 0.5rem;
     display: flex;
     align-items: center;
+    border: 2px solid var(--border-color);
   }
 }
 </style>
