@@ -25,9 +25,10 @@
         tooltip="Remove Background Image"
         tooltip-placement="bottom"
         :active="activeButton === 'remove'"
+        danger
         @click="removeThumbnail"
       >
-        <i class="fas fa-times-circle fa-lg"></i>
+        <i class="fas fa-times-circle"></i>
       </tapestry-toolbar-button>
       <tapestry-toolbar-button
         :id="`background-image-button-${node.id}`"
@@ -45,7 +46,7 @@
           v-if="isImageUploading"
           style="width: 24px; height: 24px;"
         ></b-spinner>
-        <img v-else class="icon" :src="icons.add_node_background_image" />
+        <add-image-icon v-else class="icon"></add-image-icon>
       </tapestry-toolbar-button>
       <v-swatches
         :value="node.backgroundColor"
@@ -92,7 +93,7 @@ import VSwatches from "vue-swatches"
 import TapestryContextToolbar from "../TapestryContextToolbar"
 import TapestryToolbarButton from "../common/TapestryToolbarButton"
 import NodeThumbnailPreview from "./NodeThumbnailPreview"
-import add_node_background_image from "@/assets/icons/add_node_background_image.svg"
+import AddImageIcon from "./AddImageIcon"
 import { swatches } from "@/utils/constants"
 import { mapActions, mapMutations, mapState } from "vuex"
 import { data as wpData } from "@/services/wp"
@@ -103,6 +104,7 @@ export default {
     TapestryContextToolbar,
     TapestryToolbarButton,
     NodeThumbnailPreview,
+    AddImageIcon,
     VSwatches,
   },
   props: {
@@ -118,9 +120,6 @@ export default {
   data() {
     return {
       swatches: swatches,
-      icons: {
-        add_node_background_image,
-      },
 
       activeButton: null,
       isImageUploading: false,

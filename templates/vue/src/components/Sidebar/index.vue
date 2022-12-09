@@ -109,7 +109,7 @@ export default {
     NodeLicense,
   },
   computed: {
-    ...mapGetters(["getNode"]),
+    ...mapGetters(["getNode", "hasPermission"]),
     active: {
       get() {
         return this.$route.query.sidebar
@@ -133,7 +133,7 @@ export default {
       return this.getNode(this.nodeId)
     },
     canEdit() {
-      return Helpers.hasPermission(this.node, "edit")
+      return this.hasPermission(this.node, "edit")
     },
     isReviewParticipant() {
       if (wp.canEditTapestry()) {

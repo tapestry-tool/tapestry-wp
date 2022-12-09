@@ -14,7 +14,10 @@
     @keydown="handleKey"
   >
     <div v-if="isEmptyTapestry" class="vertical-center">
-      <root-node-button v-if="isLoggedIn"></root-node-button>
+      <root-node-button
+        v-if="isLoggedIn"
+        @new-node="createNewNode"
+      ></root-node-button>
       <div v-else class="empty-message">The requested Tapestry is empty.</div>
     </div>
     <div v-else>
@@ -74,7 +77,6 @@
               @dragend="handleNodeDragEnd"
               @mouseover="handleMouseover(id)"
               @mouseleave="activeNode = null"
-              @mounted="dragSelectEnabled ? updateSelectableNodes(node) : null"
               @click="handleNodeClick"
               @focus="handleNodeFocus(id)"
               @node-editing-title="nodeEditingTitle = $event"
@@ -152,7 +154,7 @@ import ZoomPanHelper from "@/utils/ZoomPanHelper"
 import { names } from "@/config/routes"
 import * as wp from "@/services/wp"
 import { interpolate } from "@/utils/interpolate"
-import { tools } from "@/utils/constants"
+import { nodeStatus, tools } from "@/utils/constants"
 // import { scaleConstants } from "@/utils/constants"
 
 export default {
@@ -222,6 +224,7 @@ export default {
       "getInitialNodeId",
       "getNodeNavId",
       "getNodeNavParent",
+      "hasPermission",
     ]),
     nodeNavLinkMode: {
       get() {
@@ -299,7 +302,14 @@ export default {
       return this.getNode(this.selectedId)
     },
     selectedNodeLevel() {
-      return this.getNode(this.selectedId)?.level ?? 1
+      return this.selectedNode?.level ?? 1
+    },
+    selectedNodeVisibility() {
+      return Helpers.getNodeVisibility(
+        this.selectedNodeLevel,
+        this.scale,
+        this.currentDepth
+      )
     },
     dragSelectEnabled() {
       return !this.settings.renderMap
@@ -401,6 +411,18 @@ export default {
         height: 0,
       }
     },
+    activeLinkVisibility() {
+      if (!this.activeLink) {
+        return 1
+      }
+
+      const source = this.getNode(this.activeLink.source)
+      const target = this.getNode(this.activeLink.target)
+      return Math.min(
+        Helpers.getNodeVisibility(source.level, this.scale, this.currentDepth),
+        Helpers.getNodeVisibility(target.level, this.scale, this.currentDepth)
+      )
+    },
   },
   watch: {
     isEmptyTapestry(empty) {
@@ -420,6 +442,11 @@ export default {
     },
     nodes() {
       this.updateViewBox()
+    },
+    renderedLevels() {
+      if (this.dragSelectEnabled) {
+        DragSelectModular.updateSelectableNodes()
+      }
     },
     isSidebarOpen() {
       setTimeout(() => {
@@ -455,6 +482,17 @@ export default {
     showContextToolbar(newVal, oldVal) {
       if (oldVal === "link") {
         this.activeLink = null
+      }
+    },
+    selectedNodeVisibility(visibility) {
+      if (this.showContextToolbar === "node" && visibility <= 0) {
+        this.setShowContextToolbar("node", false)
+      }
+    },
+    activeLinkVisibility(visibility) {
+      if (this.showContextToolbar === "link" && visibility < 0) {
+        // still show link toolbar when visibility == 0 so as not to confuse the user when they click on a link connecting node to grandchild node
+        this.setShowContextToolbar("link", false)
       }
     },
     browserDimensions: {
@@ -551,7 +589,6 @@ export default {
     this.zoomPanHelper && this.zoomPanHelper.unregister()
   },
   methods: {
-    ...mapActions(["updateNodeCoordinates"]),
     ...mapMutations(["select", "unselect", "clearSelection", "setCurrentTool"]),
     ...mapActions([
       "goToNodeChildren",
@@ -560,6 +597,7 @@ export default {
       "resetNodeNavigation",
       "addLink",
       "addNode",
+      "updateNodeCoordinates",
     ]),
     updateAppHeight() {
       if (this.$refs.app) {
@@ -759,12 +797,6 @@ export default {
         }
       )
     },
-    updateSelectableNodes() {
-      DragSelectModular.updateSelectableNodes()
-    },
-    hasPermission(node, action) {
-      return Helpers.hasPermission(node, action, this.settings.showRejected)
-    },
     updateViewBox() {
       const MAX_RADIUS = 240
       const MIN_TAPESTRY_WIDTH_FACTOR = 1.5
@@ -863,9 +895,26 @@ export default {
       const targetScale = Helpers.getTargetScale(node.level) * this.manualScale
       const deltaScale = targetScale - this.scale
 
+      const targetRadius = Helpers.getNodeRadius(
+        node.level,
+        this.maxLevel,
+        targetScale
+      )
       const targetViewBoxX = this.unscaledViewBox[0] * targetScale
       const targetViewBoxY = this.unscaledViewBox[1] * targetScale
 
+      // The offset if the node is in the center of view
+      let centerOffset = {
+        x:
+          node.coordinates.x * targetScale -
+          targetViewBoxX -
+          (this.viewBox[2] - targetRadius) / 2,
+        y:
+          node.coordinates.y * targetScale -
+          targetViewBoxY -
+          (this.viewBox[3] - targetRadius) / 2,
+      }
+      // The offset according to mouse position
       let targetOffset = {
         x:
           this.offset.x +
@@ -873,6 +922,14 @@ export default {
         y:
           this.offset.y +
           (node.coordinates.y - this.unscaledViewBox[1]) * deltaScale,
+      }
+      if (
+        (Math.abs(targetOffset.x - centerOffset.x) / this.viewBox[2]) * 2 > 0.6 ||
+        (Math.abs(targetOffset.y - centerOffset.y) / this.viewBox[3]) * 2 > 0.6
+      ) {
+        // Move towards the center offset position a bit
+        targetOffset.x -= (targetOffset.x - centerOffset.x) * 0.4
+        targetOffset.y -= (targetOffset.y - centerOffset.y) * 0.4
       }
       targetOffset = this.clampOffsetValue(targetOffset, targetScale)
 
@@ -1171,17 +1228,30 @@ export default {
     },
     handleNodePlaceholderClick() {
       if (!this.isPanning && this.nodeEditingTitle === null) {
-        const newNode = Helpers.createDefaultNode()
+        this.createNewNode(true)
+      }
+    },
+    createNewNode(coordinates = false) {
+      const newNode = Helpers.createDefaultNode()
+      if (coordinates) {
         newNode.coordinates = {
           x: this.mouseCoordinates.x / this.scale,
           y: this.mouseCoordinates.y / this.scale,
         }
-        newNode.level = this.selectedNodeLevel
-        newNode.title = "Untitled"
-        this.addNode({ node: newNode }).then(id => {
-          this.nodeEditingTitle = id
-        })
       }
+      newNode.level = this.selectedNodeLevel
+      newNode.title = "Untitled"
+
+      if (!this.hasPermission(null, "add")) {
+        if (!this.settings.draftNodesEnabled) {
+          return
+        }
+        newNode.status = nodeStatus.DRAFT
+      }
+
+      this.addNode({ node: newNode }).then(id => {
+        this.nodeEditingTitle = id
+      })
     },
     setShowContextToolbar(type, show) {
       if (show) {

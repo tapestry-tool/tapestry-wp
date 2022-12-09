@@ -41,7 +41,6 @@
 </template>
 
 <script>
-import { names } from "@/config/routes"
 import client from "@/services/TapestryAPI"
 import WordpressApi from "@/services/WordpressApi"
 import ImportChangelog from "./ImportChangelog"
@@ -66,15 +65,7 @@ export default {
   },
   methods: {
     addRootNode() {
-      this.$router.push({
-        name: names.MODAL,
-        params: {
-          nodeId: 0,
-          type: "add",
-          tab: "content",
-        },
-        query: this.$route.query,
-      })
+      this.$emit("new-node")
     },
     openFileBrowser() {
       this.$refs.fileInput.click()

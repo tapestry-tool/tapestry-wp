@@ -50,7 +50,6 @@
 import { mapActions, mapGetters, mapMutations } from "vuex"
 import { canEditTapestry } from "@/services/wp"
 import { names } from "@/config/routes"
-import Helpers from "@/utils/Helpers"
 
 export default {
   components: {
@@ -82,7 +81,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getNode"]),
+    ...mapGetters(["getNode", "hasPermission"]),
     isComplete() {
       if (canEditTapestry()) {
         return true
@@ -119,7 +118,7 @@ export default {
       this.completeNode(this.node.id)
     },
     canEditNode(node) {
-      return Helpers.hasPermission(node, "edit")
+      return this.hasPermission(node, "edit")
     },
     editNode(id) {
       this.setReturnRoute(this.$route)

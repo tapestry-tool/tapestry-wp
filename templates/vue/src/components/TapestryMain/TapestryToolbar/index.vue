@@ -1,5 +1,9 @@
 <template>
-  <div class="toolbar-wrapper" aria-label="Tapestry Toolbar">
+  <div
+    v-if="isAuthoringEnabled"
+    class="toolbar-wrapper"
+    aria-label="Tapestry Toolbar"
+  >
     <div class="toolbar">
       <div class="tool-group">
         <tapestry-toolbar-button
@@ -7,54 +11,51 @@
           :tool="tools.PAN"
           tooltip="Pan Tool"
         >
-          <i class="fas fa-arrows-alt fa-lg"></i>
+          <i class="fas fa-arrows-alt"></i>
         </tapestry-toolbar-button>
         <tapestry-toolbar-button
           id="tapestry-select-tool"
           :tool="tools.SELECT"
           tooltip="Select Tool"
         >
-          <i class="fas fa-mouse-pointer fa-lg"></i>
+          <i class="fas fa-mouse-pointer"></i>
         </tapestry-toolbar-button>
-        <template v-if="isLoggedIn">
-          <tapestry-toolbar-button
-            id="tapestry-add-node-tool"
-            :tool="tools.ADD_NODE"
-            tooltip="Add Node"
-          >
-            <i class="fas fa-plus-circle fa-lg"></i>
-          </tapestry-toolbar-button>
-          <tapestry-toolbar-button
-            id="tapestry-add-link-tool"
-            :tool="tools.ADD_LINK"
-            tooltip="Add Connection"
-          >
-            <i class="fas fa-arrows-alt-v fa-lg"></i>
-          </tapestry-toolbar-button>
-          <settings-modal-button v-if="canEdit"></settings-modal-button>
-        </template>
+        <tapestry-toolbar-button
+          v-if="canAddNode"
+          id="tapestry-add-node-tool"
+          :tool="tools.ADD_NODE"
+          tooltip="Add Node"
+        >
+          <i class="fas fa-plus-circle"></i>
+        </tapestry-toolbar-button>
+        <tapestry-toolbar-button
+          id="tapestry-add-link-tool"
+          :tool="tools.ADD_LINK"
+          tooltip="Add Connection"
+        >
+          <i class="fas fa-arrows-alt-v"></i>
+        </tapestry-toolbar-button>
+        <settings-modal-button v-if="canEdit"></settings-modal-button>
       </div>
-      <template v-if="isLoggedIn">
-        <div class="separator"></div>
-        <div class="tool-group">
-          <tapestry-toolbar-button
-            id="tapestry-undo-button"
-            :tooltip="undoTooltip"
-            :disabled="!canUndo"
-            @click="performUndo"
-          >
-            <i class="fas fa-undo fa-lg"></i>
-          </tapestry-toolbar-button>
-          <tapestry-toolbar-button
-            id="tapestry-redo-button"
-            :tooltip="redoTooltip"
-            :disabled="!canRedo"
-            @click="performRedo"
-          >
-            <i class="fas fa-redo fa-lg"></i>
-          </tapestry-toolbar-button>
-        </div>
-      </template>
+      <div class="separator"></div>
+      <div class="tool-group">
+        <tapestry-toolbar-button
+          id="tapestry-undo-button"
+          :tooltip="undoTooltip"
+          :disabled="!canUndo"
+          @click="performUndo"
+        >
+          <i class="fas fa-undo"></i>
+        </tapestry-toolbar-button>
+        <tapestry-toolbar-button
+          id="tapestry-redo-button"
+          :tooltip="redoTooltip"
+          :disabled="!canRedo"
+          @click="performRedo"
+        >
+          <i class="fas fa-redo"></i>
+        </tapestry-toolbar-button>
+      </div>
     </div>
   </div>
 </template>
@@ -63,7 +64,7 @@
 import TapestryToolbarButton from "../common/TapestryToolbarButton"
 import SettingsModalButton from "./SettingsModalButton"
 import { tools } from "@/utils/constants"
-import { mapActions, mapGetters } from "vuex"
+import { mapActions, mapGetters, mapState } from "vuex"
 import * as wp from "@/services/wp"
 
 export default {
@@ -77,17 +78,24 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["canUndo", "canRedo"]),
+    ...mapState(["settings"]),
+    ...mapGetters(["canUndo", "canRedo", "isAuthoringEnabled", "hasPermission"]),
     platform() {
       return window.navigator.platform?.toLowerCase().indexOf("mac") !== -1
         ? "mac"
         : "windows"
     },
+    isLoggedIn() {
+      return wp.isLoggedIn()
+    },
     canEdit() {
       return wp.canEditTapestry()
     },
-    isLoggedIn() {
-      return wp.isLoggedIn()
+    canAddNode() {
+      if (!this.isLoggedIn) {
+        return false
+      }
+      return this.hasPermission(null, "add") || this.settings.draftNodesEnabled
     },
     undoTooltip() {
       return `Undo (${this.platform === "mac" ? "Cmd" : "Ctrl"} + Z)`
@@ -124,6 +132,7 @@ export default {
 .toolbar-wrapper {
   position: absolute;
   top: 0;
+  left: 10px;
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -135,8 +144,8 @@ export default {
     justify-content: center;
     align-items: stretch;
 
-    background-color: #ededed;
-    border: 2px solid #f8f8f8;
+    background-color: var(--bg-color-secondary);
+    border: 2px solid var(--border-color);
     border-radius: 9px;
 
     .tool-group {
@@ -166,7 +175,7 @@ export default {
 
     .separator {
       height: 2px;
-      background-color: #f8f8f8;
+      background-color: var(--border-color);
     }
   }
 }
