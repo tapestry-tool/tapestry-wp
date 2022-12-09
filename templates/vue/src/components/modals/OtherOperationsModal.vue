@@ -43,9 +43,8 @@
           are automatically determined by the connections between nodes.
         </b-card-text>
         <b-card-text class="text-muted">
-          Currently, the algorithm does not work well when there are loops within the
-          tapestry. You can always make adjustments to the levels of nodes in the
-          node toolbar after transforming.
+          You can always make adjustments to the levels of nodes in the node toolbar
+          after transforming.
         </b-card-text>
         <b-row>
           <b-col lg="6">
