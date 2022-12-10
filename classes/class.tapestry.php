@@ -670,6 +670,7 @@ class Tapestry implements ITapestry
     private function _getTapestry($filterUserId)
     {
         // Get all the nodes from the database (we will need this info and only want to do it once)
+        $this->nodeObjects = [];
         foreach ($this->nodes as $nodeId) {
             $this->nodeObjects[$nodeId] = new TapestryNode($this->postId, $nodeId);
         }
