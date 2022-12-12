@@ -317,9 +317,10 @@ class TapestryUserProgress implements ITapestryUserProgress
                 $progress->$nodeId->content['userAnswers']->activity = new stdClass();
                 foreach ($questionIdArray as $questionId) {
                     $answer = get_user_meta($userId, 'tapestry_'.$this->postId.'_'.$nodeId.'_question_'.$questionId.'_answers', true);
-                    $progress->$nodeId->content['userAnswers']->activity->{$questionId} = (object) [
-                        'answers' => $answer,
-                    ];
+                    if (!isset($progress->$nodeId->content['userAnswers']->activity->{$questionId})) {
+                        $progress->$nodeId->content['userAnswers']->activity->{$questionId} = (object) ['answers' => []];
+                    }
+                    $progress->$nodeId->content['userAnswers']->activity->{$questionId}->answers = $answer;
                 }
             }
 
