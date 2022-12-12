@@ -2,8 +2,8 @@
   <div :class="{ 'can-pan': mouseMoved && !isDragSelecting }">
     <canvas
       ref="minimap"
-      :width="viewBox[2]"
-      :height="viewBox[3]"
+      :width="width * renderRatio"
+      :height="height * renderRatio"
       class="tapestry-minimap"
       :style="{
         width: width + 'px',
@@ -13,8 +13,8 @@
     <canvas
       id="tapestry-minimap"
       ref="viewbox"
-      :width="viewBox[2]"
-      :height="viewBox[3]"
+      :width="width * renderRatio"
+      :height="height * renderRatio"
       class="tapestry-minimap"
       :style="{
         width: width + 'px',
@@ -88,8 +88,19 @@ export default {
     height() {
       return this.width / this.aspectRatio
     },
+    renderRatio() {
+      // pixels in canvas context : pixels on screen
+      return Math.min(
+        10000 / this.width,
+        10000 / this.height,
+        this.viewBox[2] / this.width
+      )
+    },
+    renderScale() {
+      return (this.width * this.renderRatio) / this.viewBox[2]
+    },
     displayScale() {
-      return this.height / this.viewBox[3]
+      return this.width / this.viewBox[2]
     },
   },
   watch: {
@@ -146,17 +157,27 @@ export default {
           return
         }
 
-        c.clearRect(0, 0, this.viewBox[2], this.viewBox[3])
+        c.clearRect(
+          0,
+          0,
+          this.width * this.renderRatio,
+          this.height * this.renderRatio
+        )
         c.fillStyle = "#8495a188"
-        c.fillRect(0, 0, this.viewBox[2], this.viewBox[3])
+        c.fillRect(
+          0,
+          0,
+          this.width * this.renderRatio,
+          this.height * this.renderRatio
+        )
 
-        const viewX = this.offset.x / this.scale
-        const viewY = this.offset.y / this.scale
-        const viewWidth = this.viewBox[2] / this.scale
-        const viewHeight = this.viewBox[3] / this.scale
+        const viewX = (this.offset.x / this.scale) * this.renderScale
+        const viewY = (this.offset.y / this.scale) * this.renderScale
+        const viewWidth = (this.viewBox[2] / this.scale) * this.renderScale
+        const viewHeight = (this.viewBox[3] / this.scale) * this.renderScale
 
         c.strokeStyle = "#000000"
-        c.lineWidth = this.viewBox[2] * 0.005
+        c.lineWidth = this.viewBox[2] * 0.005 * this.renderScale
         this.viewPosition = {
           x: viewX,
           y: viewY,
@@ -176,7 +197,12 @@ export default {
 
         // 1. draw background
         c.fillStyle = "white"
-        c.fillRect(0, 0, this.viewBox[2], this.viewBox[3])
+        c.fillRect(
+          0,
+          0,
+          this.width * this.renderRatio,
+          this.height * this.renderRatio
+        )
 
         // 2. draw links
         for (const link of this.links) {
@@ -204,16 +230,16 @@ export default {
             continue
           }
           const { x, y } = this.transformCoordinates(node.coordinates)
-          const radius = Helpers.getNodeBaseRadius(node.level)
+          const radius = Helpers.getNodeBaseRadius(node.level) * this.renderScale
           c.beginPath()
           c.arc(x, y, radius, 0, Math.PI * 2)
           c.fillStyle = node.backgroundColor
 
           const shadow = Helpers.getDropShadow(node.level, this.maxLevel)
           c.shadowColor = `rgba(0, 0, 0, ${shadow.opacity})`
-          c.shadowBlur = shadow.blur
-          c.shadowOffsetX = shadow.offset
-          c.shadowOffsetY = shadow.offset
+          c.shadowBlur = shadow.blur * this.renderScale
+          c.shadowOffsetX = shadow.offset * this.renderScale
+          c.shadowOffsetY = shadow.offset * this.renderScale
           c.fill()
         }
         c.shadowColor = "rgba(0, 0, 0, 0)"
@@ -236,8 +262,8 @@ export default {
     },
     transformCoordinates(coordinates) {
       return {
-        x: coordinates.x - this.viewBox[0],
-        y: coordinates.y - this.viewBox[1],
+        x: (coordinates.x - this.viewBox[0]) * this.renderScale,
+        y: (coordinates.y - this.viewBox[1]) * this.renderScale,
       }
     },
     handleMousedown(event) {
