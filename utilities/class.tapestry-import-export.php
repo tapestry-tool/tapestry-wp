@@ -86,7 +86,7 @@ class TapestryImportExport
 
         // if permissions modified, add the role to changes
         foreach ($permissions as $key => $value) {
-            if (!array_key_exists($key, $filteredPerms)) {
+            if (!property_exists($filteredPerms, $key)) {
                 array_push($changes, $key);
             }
         }
