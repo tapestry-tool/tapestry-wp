@@ -137,9 +137,8 @@ import TapestryToolbarButton from "../common/TapestryToolbarButton"
 import NodeLevelSelect from "./NodeLevelSelect"
 import NodeBackgroundButton from "./NodeBackgroundButton"
 import MediaButtonIcon from "./MediaButtonIcon"
-import Helpers from "@/utils/Helpers"
 import { tools, swatches } from "@/utils/constants"
-import { mapActions, mapState } from "vuex"
+import { mapActions, mapGetters } from "vuex"
 import { names } from "@/config/routes"
 
 export default {
@@ -182,11 +181,9 @@ export default {
     }
   },
   computed: {
-    ...mapState(["settings"]),
+    ...mapGetters(["hasPermission"]),
     hasEditPermission() {
-      return this.node
-        ? Helpers.hasPermission(this.node, "edit", this.settings.showRejected)
-        : false
+      return this.node ? this.hasPermission(this.node, "edit") : false
     },
     swatchesWithTransparentColor() {
       const swatches = [...this.swatches]
@@ -292,7 +289,7 @@ export default {
   position: absolute;
   top: 0;
   left: 0;
-  transform: rotate(-45deg) translate(-5px, 1x);
+  transform: rotate(-45deg) translate(-5px, 1px);
   transform-origin: 0 0;
 }
 

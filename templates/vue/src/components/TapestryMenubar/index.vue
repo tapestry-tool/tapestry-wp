@@ -1,24 +1,26 @@
 <template>
   <div class="tapestry-menubar" aria-label="Tapestry Menubar">
     <tapestry-filter
-      v-if="!settings.renderMap"
+      v-if="!settings.renderMap && !isEmptyTapestry"
       class="menubar-group"
       style="z-index: 10"
     />
-    <b-container v-if="isLoggedIn">
+    <b-container v-if="isLoggedIn && (canEdit || !isEmptyTapestry)">
       <b-row align-v="center" class="menubar-group">
-        <b-col class="p-0">
-          <user-settings-button
-            data-qa="user-settings-button"
-          ></user-settings-button>
-        </b-col>
-        <b-col class="p-0">
-          <embed-button data-qa="embed-modal-button"></embed-button>
-        </b-col>
-        <template v-if="canEdit">
+        <template v-if="!isEmptyTapestry">
           <b-col class="p-0">
-            <help-button />
+            <user-settings-button
+              data-qa="user-settings-button"
+            ></user-settings-button>
           </b-col>
+          <b-col class="p-0">
+            <embed-button data-qa="embed-modal-button"></embed-button>
+          </b-col>
+        </template>
+        <b-col v-if="isAuthoringEnabled" class="p-0">
+          <help-button />
+        </b-col>
+        <template v-if="canEdit && !isEmptyTapestry">
           <b-col v-if="settings.submitNodesEnabled" class="p-0">
             <review-notifications />
           </b-col>
@@ -32,7 +34,7 @@
 </template>
 
 <script>
-import { mapState } from "vuex"
+import { mapGetters, mapState } from "vuex"
 import UserSettingsButton from "./UserSettingsButton"
 import ReviewNotifications from "./ReviewNotifications"
 import HelpButton from "./HelpButton"
@@ -52,6 +54,7 @@ export default {
   },
   computed: {
     ...mapState(["settings"]),
+    ...mapGetters(["isEmptyTapestry", "isAuthoringEnabled"]),
     canEdit() {
       return wp.canEditTapestry()
     },

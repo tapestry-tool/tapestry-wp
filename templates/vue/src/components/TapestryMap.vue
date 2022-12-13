@@ -106,7 +106,7 @@ export default {
   },
   computed: {
     ...mapState(["settings", "nodes"]),
-    ...mapGetters(["isEmptyTapestry", "getInitialNodeId"]),
+    ...mapGetters(["isEmptyTapestry", "getInitialNodeId", "hasPermission"]),
     url() {
       return "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
     },
@@ -249,7 +249,7 @@ export default {
       })
     },
     canEditNode(node) {
-      return Helpers.hasPermission(node, "edit")
+      return this.hasPermission(node, "edit")
     },
   },
 }

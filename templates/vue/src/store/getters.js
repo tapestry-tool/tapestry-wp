@@ -1,3 +1,4 @@
+import { nodeStatus, userActions } from "@/utils/constants"
 import Helpers from "@/utils/Helpers"
 import * as wp from "../services/wp"
 
@@ -89,17 +90,13 @@ export function hasMultiContentAncestor(_, { getParent, isNestedMultiContent }) 
   }
 }
 
-export function isVisible(state, { getNode, hasMultiContentAncestor }) {
-  const { showRejected } = state.settings
+export function isVisible(_, { getNode, hasMultiContentAncestor, hasPermission }) {
   return id => {
     const node = getNode(id)
-    if (!Helpers.hasPermission(node, "read", showRejected)) {
+    if (!hasPermission(node, "read")) {
       return false
     }
-    if (
-      !Helpers.hasPermission(node, "edit", showRejected) &&
-      !wp.canEditTapestry()
-    ) {
+    if (!hasPermission(node, "edit") && !wp.canEditTapestry()) {
       return (
         (node.unlocked || !node.hideWhenLocked) && !hasMultiContentAncestor(node.id)
       )
@@ -165,6 +162,88 @@ export function hasPath(state) {
       }
     }
     return false
+  }
+}
+
+export function isAuthoringEnabled(state, { hasPermission }) {
+  if (!wp.isLoggedIn()) {
+    return false
+  }
+  if (state.settings.draftNodesEnabled) {
+    return true
+  }
+  for (const id in state.nodes) {
+    if (
+      hasPermission(state.nodes[id], "edit") ||
+      hasPermission(state.nodes[id], "add")
+    ) {
+      return true
+    }
+  }
+  return false
+}
+
+export function hasPermission({ settings }) {
+  return (node, action) => {
+    // Check 0: node is null case - this should only apply to creating a standalone node
+    if (node === null) {
+      if (action !== userActions.ADD) {
+        return false
+      }
+      if (wp.canEditTapestry()) {
+        return true
+      }
+      return Helpers.isActionAllowed(settings.defaultPermissions, action)
+    }
+
+    // Public users never have any permissions other than read
+    if (action !== userActions.READ && !wp.isLoggedIn()) {
+      return false
+    }
+
+    // Checks related to draft nodes
+    /**
+     * If node is a draft (accepted draft nodes are PUBLISHED nodes, so they are not considered here):
+     * - If node is not submitted for review:
+     *  - Allow all actions except "add" for original author
+     *  - Allow all actions except "edit" for reviewer if node is rejected and showRejected is true
+     * - If node is submitted for review:
+     *  - Only allow "read" for original author
+     *  - Allow all actions except "edit" for reviewer
+     */
+    if (node.status === nodeStatus.DRAFT) {
+      if (node.author && wp.isCurrentUser(node.author.id)) {
+        if (action === userActions.READ || wp.canEditTapestry()) {
+          return true
+        }
+        return node.reviewStatus !== nodeStatus.SUBMIT && action !== userActions.ADD
+      }
+      if (wp.canEditTapestry()) {
+        if (action === userActions.EDIT) {
+          return false
+        }
+        return (
+          node.reviewStatus === nodeStatus.SUBMIT ||
+          (settings.showRejected && node.reviewStatus === nodeStatus.REJECT)
+        )
+      }
+      return false
+    }
+
+    // Check 1: User has edit permissions for Tapestry
+    if (wp.canEditTapestry()) {
+      return true
+    }
+
+    // Check 2: User is the author of the node (unless node was submitted, then accepted)
+    if (node.author && wp.isCurrentUser(node.author.id)) {
+      if (node.reviewStatus !== nodeStatus.ACCEPT) {
+        return true
+      }
+    }
+
+    // Check 3: Node permissions allow user to perform action
+    return Helpers.isActionAllowed(node.permissions, action)
   }
 }
 

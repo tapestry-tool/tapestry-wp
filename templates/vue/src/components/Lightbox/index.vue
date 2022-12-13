@@ -150,6 +150,7 @@ export default {
       "isMultiContent",
       "isMultiContentRow",
       "getInitialNodeId",
+      "hasPermission",
     ]),
     node() {
       const node = this.getNode(this.nodeId)
@@ -172,7 +173,7 @@ export default {
       return this.node.completed || this.node.skippable !== false
     },
     canEditNode() {
-      return Helpers.hasPermission(this.node, "edit")
+      return this.hasPermission(this.node, "edit")
     },
     shouldUseCustomDimensions() {
       return !(

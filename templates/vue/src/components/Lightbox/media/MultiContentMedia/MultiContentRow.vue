@@ -131,7 +131,6 @@ import { mapState, mapGetters, mapActions, mapMutations } from "vuex"
 import TapestryMedia from "../TapestryMedia"
 import LockedContent from "./common/LockedContent"
 import { names } from "@/config/routes"
-import Helpers from "@/utils/Helpers"
 
 export default {
   name: "multi-content-row",
@@ -193,10 +192,10 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["isFavourite", "getNode"]),
+    ...mapGetters(["isFavourite", "getNode", "hasPermission"]),
     ...mapState(["favourites"]),
     canEditNode() {
-      return Helpers.hasPermission(this.node, "edit")
+      return this.hasPermission(this.node, "edit")
     },
     htmlClass() {
       return [
