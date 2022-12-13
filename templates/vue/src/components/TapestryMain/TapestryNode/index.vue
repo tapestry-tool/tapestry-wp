@@ -736,13 +736,17 @@ export default {
   opacity: 0.8;
 }
 
-.node-container.opaque {
-  & > *:not(.node-circle) {
-    opacity: 0.3;
-  }
+.node-container {
+  outline: none;
 
-  .progress-bar {
-    stroke-opacity: 0.3;
+  &.opaque {
+    & > *:not(.node-circle) {
+      opacity: 0.3;
+    }
+
+    .progress-bar {
+      stroke-opacity: 0.3;
+    }
   }
 }
 
