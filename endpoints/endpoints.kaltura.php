@@ -147,7 +147,7 @@ class KalturaEndpoints
      * If nodeMetaId specified, requires permission to edit that node.
      * Otherwise, requires same permissions as adding nodes.
      */
-    public function uploadVideoToKaltura($request)
+    public static function uploadVideoToKaltura($request)
     {
         $tapestryPostId = $request['tapestryPostId'];
         $nodeMetaId = $request['nodeMetaId'];
@@ -212,7 +212,7 @@ class KalturaEndpoints
      *  useKalturaPlayer: false
      * }
      */
-    public function uploadVideosToKaltura($request)
+    public static function uploadVideosToKaltura($request)
     {
         $uploadRequest = json_decode($request->get_body());
         if (!is_object($uploadRequest)) {
@@ -279,7 +279,7 @@ class KalturaEndpoints
     /**
      * Gets Kaltura upload status
      */
-    public function getKalturaUploadStatus($request)
+    public static function getKalturaUploadStatus($request)
     {
         $inProgress = get_option(KalturaConstants::IN_PROGRESS_OPTION) === KalturaConstants::YES_VALUE;
         $latestTapestryPostId = get_option(KalturaConstants::LATEST_TAPESTRY_OPTION, '');
@@ -294,7 +294,7 @@ class KalturaEndpoints
     /**
      * Save Kaltura upload status
      */
-    public function saveVideoUploadStatus($video, $videosToUpload, $newStatus, $kalturaData = null)
+    public static function saveVideoUploadStatus($video, $videosToUpload, $newStatus, $kalturaData = null)
     {
         $video->uploadStatus = $newStatus;
         self::_updateUploadLog($videosToUpload);
@@ -307,7 +307,7 @@ class KalturaEndpoints
     /**
      * Clears Kaltura upload status
      */
-    public function cleanupKalturaUploadStatus()
+    public static function cleanupKalturaUploadStatus()
     {
         update_option(KalturaConstants::IN_PROGRESS_OPTION, KalturaConstants::NO_VALUE);
 
@@ -345,7 +345,7 @@ class KalturaEndpoints
      *  totalCount: 10,
      * }
      */
-    public function getKalturaUploadLog($request)
+    public static function getKalturaUploadLog($request)
     {
         $tapestryPostId = $request['tapestryPostId'];
 
@@ -394,7 +394,7 @@ class KalturaEndpoints
      * Forcefully sets the upload to "not in progress".
      * Should only be used as a last resort to fix upload issues.
      */
-    public function forceResetUploadStatus($request)
+    public static function forceResetUploadStatus($request)
     {
         update_option(KalturaConstants::IN_PROGRESS_OPTION, KalturaConstants::NO_VALUE);
         return (object) [
@@ -405,7 +405,7 @@ class KalturaEndpoints
     /**
      * Clear the upload error.
      */
-    public function clearUploadError($request)
+    public static function clearUploadError($request)
     {
         update_option(KalturaConstants::UPLOAD_ERROR_OPTION, '');
         return (object) [
@@ -425,7 +425,7 @@ class KalturaEndpoints
      *  { tapestryID: 7746, nodeID: 13004, nodeTitle: "Video", withinSizeLimit: true }
      * ]
      */
-    public function getVideosToUpload($request)
+    public static function getVideosToUpload($request)
     {
         try {
             $tapestryPostId = $request['tapestryPostId'];
@@ -435,7 +435,7 @@ class KalturaEndpoints
         }
     }
 
-    public function updateConvertingVideos($request)
+    public static function updateConvertingVideos($request)
     {
         $body = json_decode($request->get_body());
         $useKalturaPlayer = $body->useKalturaPlayer;
@@ -506,7 +506,7 @@ class KalturaEndpoints
     /**
      * Sends a signal to stop an ongoing Kaltura upload.
      */
-    public function stopKalturaUpload($request)
+    public static function stopKalturaUpload($request)
     {
         // This will create the option if it doesn't exist
         update_option(KalturaConstants::STOP_UPLOAD_OPTION, KalturaConstants::YES_VALUE, false);
@@ -517,7 +517,7 @@ class KalturaEndpoints
      *
      * @return bool Response: true if the video exists, and false otherwise.
      */
-    public function checkKalturaVideoExists($request)
+    public static function checkKalturaVideoExists($request)
     {
         try {
             if (!LOAD_KALTURA) {
@@ -549,7 +549,7 @@ class KalturaEndpoints
      *
      * @return - HTTP response: a video metadata object if the entry id is valid, and false otherwise.
      */
-    public function getKalturaVideoMeta($request)
+    public static function getKalturaVideoMeta($request)
     {
         try {
             if (!LOAD_KALTURA) {
