@@ -748,10 +748,6 @@ export default {
   }
 }
 
-.node-container {
-  outline: none;
-}
-
 .node-button {
   height: 55px;
   width: 55px;
