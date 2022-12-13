@@ -159,6 +159,9 @@ export default {
             return false
           }
         })
+        .catch(err => {
+          this.error = err.response.data
+        })
         .then(shouldRebuild => {
           if (shouldRebuild) {
             // The h5pMeta.details field is not generated for imported H5Ps
@@ -169,12 +172,10 @@ export default {
         .catch(err => {
           this.error = err
         })
-        .then(() => {
+        .finally(() => {
           if (!this.error) {
             this.$bvModal.show("import-changelog")
           }
-        })
-        .finally(() => {
           this.isImporting = false
         })
     },
