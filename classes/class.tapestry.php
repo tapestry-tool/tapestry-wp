@@ -510,6 +510,8 @@ class Tapestry implements ITapestry
         unset($this->settings->title);
         unset($this->settings->status);
 
+        $nodes = $this->_addH5PMeta($nodes);
+
         return (object) [
             'nodes' => $nodes,
             // 'groups' => $groups,
@@ -788,6 +790,7 @@ class Tapestry implements ITapestry
     private function _getTapestry($filterUserId)
     {
         // Get all the nodes from the database (we will need this info and only want to do it once)
+        $this->nodeObjects = [];
         foreach ($this->nodes as $nodeId) {
             $this->nodeObjects[$nodeId] = new TapestryNode($this->postId, $nodeId);
         }
