@@ -3,6 +3,7 @@
     <g
       v-show="show"
       ref="node"
+      class="node-container"
       :aria-label="ariaLabel"
       :data-qa="`node-${node.id}`"
       :data-locked="!node.unlocked"
@@ -610,6 +611,10 @@ export default {
 </style>
 
 <style lang="scss">
+.node-container {
+  outline: none;
+}
+
 .node-button {
   height: 55px;
   width: 55px;
