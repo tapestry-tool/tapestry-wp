@@ -272,7 +272,7 @@ import PermissionsTable from "../common/PermissionsTable"
 import DeleteNodeButton from "./DeleteNodeButton"
 import { names } from "@/config/routes"
 import Helpers from "@/utils/Helpers"
-import * as Comment from "@/utils/comments"
+import * as Comment from "@/utils/reviewComments"
 import { sizes, nodeStatus } from "@/utils/constants"
 import { getLinkMetadata } from "@/services/LinkPreviewApi"
 import DragSelectModular from "@/utils/dragSelectModular"
@@ -517,6 +517,7 @@ export default {
             DragSelectModular.removeDragSelectListener()
             this.loading = false
             this.initialize()
+            this.setTapestryErrorReporting(false)
           }
         } else {
           DragSelectModular.addDragSelectListener()
@@ -652,7 +653,6 @@ export default {
         }
       }
       this.setCurrentEditingNode(copy)
-      this.setTapestryErrorReporting(false)
     },
     validateTab(requestedTab) {
       // Tabs that are valid for ALL node types and modal types
