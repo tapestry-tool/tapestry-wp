@@ -627,7 +627,6 @@ describe("Activity", () => {
         )
         cy.contains(/done/i).click()
       })
-      cy.getByTestId("progress-bar").should("have.css", "color", "rgb(17, 17, 17)")
       cy.lightbox().should("not.exist")
     })
   })
