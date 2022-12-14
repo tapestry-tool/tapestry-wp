@@ -2,6 +2,7 @@
 
 require_once dirname(__FILE__).'/../utilities/class.tapestry-errors.php';
 require_once dirname(__FILE__).'/../utilities/class.tapestry-helpers.php';
+require_once dirname(__FILE__).'/../utilities/class.tapestry-user.php';
 require_once dirname(__FILE__).'/../interfaces/interface.tapestry-node.php';
 require_once dirname(__FILE__).'/../classes/class.tapestry-user-progress.php';
 require_once dirname(__FILE__).'/../classes/class.constants.php';
@@ -42,6 +43,7 @@ class TapestryNode implements ITapestryNode
     private $fullscreen;
     private $childOrdering;
     private $fitWindow;
+    private $comments;
     private $reviewComments;
     private $license;
     private $references;
@@ -92,6 +94,7 @@ class TapestryNode implements ITapestryNode
         $this->fullscreen = false;
         $this->childOrdering = [];
         $this->fitWindow = true;
+        $this->comments = [];
         $this->reviewComments = [];
         $this->license = '';
         $this->references = '';
@@ -106,6 +109,7 @@ class TapestryNode implements ITapestryNode
             $node = $this->_loadFromDatabase();
             $this->set($node);
             $this->author = $this->_getAuthorInfo(get_post_field('post_author', $this->nodePostId));
+            $this->comments = $this->_getComments();
         }
     }
 
@@ -392,6 +396,158 @@ class TapestryNode implements ITapestryNode
         return $nodeMeta->author->id == $userId;
     }
 
+    /**
+     * Import comments into this node as Wordpress comments.
+     *
+     * @param array $comments The list of comments to import
+     */
+    public function importComments($comments)
+    {
+        $idMap = new stdClass();
+        $childComments = [];
+
+        foreach ($comments as $comment) {
+            $idMap = $this->_importComment($comment, $idMap);
+            $childComments = array_merge($childComments, $comment->children);
+        }
+
+        if (count($childComments)) {
+            // add oldest comment first, to guarantee the "parent" field points to a valid comment
+            usort($childComments, function ($a, $b) {
+                return $a->id > $b->id;
+            });
+            foreach ($childComments as $comment) {
+                $idMap = $this->_importComment($comment, $idMap);
+            }
+        }
+
+        $this->comments = $this->_getComments();
+    }
+
+    private function _importComment($comment, $idMap)
+    {
+        if (!isset($comment->timestamp) || !is_numeric($comment->timestamp) || !isset($comment->content) || 0 === strlen($comment->content)) {
+            return;
+        }
+
+        $author = get_user_by('id', $comment->authorId);
+        $datetime = new DateTime('now', wp_timezone());
+        $datetime->setTimestamp(((int) $comment->timestamp) / 1000);
+
+        $commentData = [
+            'comment_date' => $datetime->format('Y-m-d H:i:s'),
+            'comment_author' => $comment->author ? $comment->author : 'Anonymous',
+            'user_id' => 0,
+            'comment_post_ID' => $this->nodePostId,
+            'comment_content' => $comment->content,
+        ];
+
+        if ($author && $author->user_nicename === $comment->author) {
+            $commentData['user_id'] = $author->ID;
+            $commentData['comment_author_email'] = $author->user_email;
+            $commentData['comment_author_url'] = $author->user_url;
+        }
+        if ($comment->parent && is_numeric($comment->parent) && isset($idMap->{$comment->parent})) {
+            $commentData['comment_parent'] = $idMap->{$comment->parent};
+        }
+
+        $newId = wp_new_comment($commentData, true);
+        if (false === $newId || is_wp_error($newId)) {
+            return;
+        }
+        if (isset($comment->approved)) {
+            wp_set_comment_status($newId, $comment->approved ? 'approve' : 'hold', true);
+        }
+
+        $idMap->{$comment->id} = $newId;
+
+        return $idMap;
+    }
+
+    public function addComment($content, $replyingTo)
+    {
+        $currentUser = wp_get_current_user();
+        $commentData = [
+            'comment_author' => $currentUser->user_nicename,
+            'comment_author_email' => $currentUser->user_email,
+            'comment_author_url' => $currentUser->user_url,
+            'user_id' => $currentUser->ID,
+            'comment_post_ID' => $this->nodePostId,
+            'comment_content' => $content,
+        ];
+
+        if (isset($replyingTo) && is_numeric($replyingTo)) {
+            $replyingTo = (int) $replyingTo;
+            $replyingComment = get_comment($replyingTo);
+            if (is_null($replyingComment) || (int) $replyingComment->comment_post_ID !== $this->nodePostId) {
+                throw new TapestryError('INVALID_COMMENT_REPLY', 'The comment you are replying to does not exist', 500);
+            }
+            $commentData['comment_parent'] = $replyingComment->comment_ID;
+        }
+
+        $commentId = wp_new_comment($commentData, true);
+        if (false === $commentId || is_wp_error($commentId)) {
+            throw new TapestryError('FAILED_TO_CREATE_COMMENT');
+        }
+
+        return $this->_getComments();
+    }
+
+    public function performCommentAction($commentId, $action)
+    {
+        $comment = get_comment($commentId);
+        if (is_null($comment)) {
+            throw new TapestryError('FAILED_TO_FIND_COMMENT', 'Comment not found', 500);
+        }
+        if ((int) $comment->comment_post_ID !== $this->nodePostId) {
+            throw new TapestryError('INVALID_COMMENT_ACTION', 'Comment does not belong to the node', 500);
+        }
+
+        // check permissions
+        $user = new TapestryUser();
+        switch ($action) {
+            case 'trash':
+                if (!$user->canEdit($this->tapestryPostId) && (int) $comment->user_id !== $user->getID()) {
+                    throw new TapestryError('INVALID_COMMENT_ACTION', 'You do not have permission to move this comment to Trash', 403);
+                }
+                break;
+            default:
+                if (!$user->canEdit($this->tapestryPostId)) {
+                    throw new TapestryError('INVALID_COMMENT_ACTION', 'You do not have permission to '.$action.' this comment', 403);
+                }
+                break;
+        }
+
+        // perform action
+        switch ($action) {
+            case 'trash':
+                if (!wp_delete_comment($comment)) {
+                    throw new TapestryError('COMMENT_ACTION_FAILED', 'Comment cannot be moved to trash. Check if you have privileges to delete comments.', 500);
+                }
+                break;
+            case 'spam':
+                if (!wp_spam_comment($comment)) {
+                    throw new TapestryError('COMMENT_ACTION_FAILED', 'Failed to mark comment as spam', 500);
+                }
+                break;
+            case 'unapprove':
+                if (true !== wp_set_comment_status($comment, 'hold', true)) {
+                    throw new TapestryError('COMMENT_ACTION_FAILED', 'Failed to unapprove comment', 500);
+                }
+                break;
+            case 'approve':
+                if (true !== wp_set_comment_status($comment, 'approve', true)) {
+                    throw new TapestryError('COMMENT_ACTION_FAILED', 'Failed to approve comment', 500);
+                }
+                break;
+            default:
+                throw new TapestryError('COMMENT_ACTION_FAILED', 'Unknown comment action', 500);
+                break;
+        }
+
+        return $this->_getComments();
+    }
+
     public function addReview($comments)
     {
         if (NodeStatus::PUBLISH === $this->status) {
@@ -405,11 +561,11 @@ class TapestryNode implements ITapestryNode
 
         // Validate _all_ comments before adding them in
         foreach ($comments as $comment) {
-            $this->_validateComment($comment);
+            $this->_validateReviewComment($comment);
         }
 
         foreach ($comments as $comment) {
-            if (CommentTypes::STATUS_CHANGE === $comment->type) {
+            if (ReviewCommentTypes::STATUS_CHANGE === $comment->type) {
                 $this->reviewStatus = $comment->to;
                 if (NodeStatus::ACCEPT === $comment->to) {
                     $this->status = NodeStatus::PUBLISH;
@@ -447,7 +603,7 @@ class TapestryNode implements ITapestryNode
         return $this->title;
     }
 
-    private function _validateComment($review)
+    private function _validateReviewComment($review)
     {
         $canEditTapestry = current_user_can('edit_post', $this->tapestryPostId);
 
@@ -460,12 +616,12 @@ class TapestryNode implements ITapestryNode
         }
 
         switch ($review->type) {
-            case CommentTypes::COMMENT:
+            case ReviewCommentTypes::COMMENT:
                 if (!isset($review->comment) || !is_string($review->comment) || 0 === strlen($review->comment)) {
                     throw new TapestryError('INVALID_REVIEW_COMMENT', 'A review comment must be a non-empty string.', 400);
                 }
                 break;
-            case CommentTypes::STATUS_CHANGE:
+            case ReviewCommentTypes::STATUS_CHANGE:
                 $validStatuses = [NodeStatus::SUBMIT, NodeStatus::REJECT, NodeStatus::ACCEPT];
 
                 if (!in_array($review->to, $validStatuses)) {
@@ -487,8 +643,8 @@ class TapestryNode implements ITapestryNode
                 $message = sprintf(
                     'Unknown review type %s. A review type can only be one of %s or %s.',
                     $review->type,
-                    CommentTypes::COMMENT,
-                    CommentTypes::STATUS_CHANGE
+                    ReviewCommentTypes::COMMENT,
+                    ReviewCommentTypes::STATUS_CHANGE
                 );
                 throw new TapestryError('INVALID_REVIEW', $message, 400);
         }
@@ -602,6 +758,7 @@ class TapestryNode implements ITapestryNode
             'conditions' => $this->conditions,
             'childOrdering' => $this->childOrdering,
             'fitWindow' => $this->fitWindow,
+            'comments' => $this->comments,
             'reviewComments' => $this->reviewComments,
             'license' => $this->license,
             'references' => $this->references,
@@ -674,5 +831,62 @@ class TapestryNode implements ITapestryNode
             'original_author_name' => '',
             'original_author_email' => '',
         ];
+    }
+
+    private function _getComments()
+    {
+        $user = new TapestryUser();
+        $userId = $user->getID();
+        $canEditTapestry = $user->canEdit($this->tapestryPostId);
+
+        $comments = get_comments([
+            'post_id' => $this->nodePostId,
+            'orderby' => 'comment_date',
+            'hierarchical' => 'threaded',
+        ]);
+
+        $renderedComments = [];
+
+        foreach ($comments as $comment) {
+            $renderedComment = $this->_renderComment($comment, $userId, $canEditTapestry);
+
+            if ($renderedComment) {
+                $renderedComment->children = [];
+
+                $children = $comment->get_children([
+                    'format' => 'flat',
+                    'orderby' => 'comment_date',
+                ]);
+                foreach ($children as $child) {
+                    $renderedChild = $this->_renderComment($child, $userId, $canEditTapestry);
+                    if ($renderedChild) {
+                        $renderedComment->children[] = $renderedChild;
+                    }
+                }
+
+                $renderedComments[] = $renderedComment;
+            }
+        }
+
+        return $renderedComments;
+    }
+
+    private function _renderComment($comment, $userId, $canEditTapestry)
+    {
+        if ('1' === $comment->comment_approved || (0 !== $userId && ((int) $comment->user_id === $userId || $canEditTapestry))) {
+            $datetime = new DateTime($comment->comment_date, wp_timezone());
+
+            return (object) [
+                'id' => (int) $comment->comment_ID,
+                'content' => $comment->comment_content,
+                'author' => $comment->comment_author,
+                'authorId' => (int) $comment->user_id,
+                'approved' => '1' === $comment->comment_approved ? true : false,
+                'timestamp' => $datetime->getTimestamp() * 1000,
+                'parent' => (int) $comment->comment_parent,
+            ];
+        }
+
+        return null;
     }
 }
