@@ -29,13 +29,24 @@ describe("Multi-content", () => {
 
       // Add multi-content node
       cy.getByTestId(`root-node-button`).click()
-      cy.getByTestId(`node-title`).type(node.title)
+      cy.get(".node").should("exist")
+      cy.store()
+        .its("state.nodes")
+        .then(nodes => {
+          expect(Object.keys(nodes)).to.have.length(1)
+          const id = Object.keys(nodes)[0]
+          cy.openModal("edit", id)
+        })
+
+      cy.getByTestId(`node-title`)
+        .clear()
+        .type(node.title)
       cy.getByTestId(`node-media-type`).select(node.mediaType)
       cy.getByTestId(`node-presentation-style`).select(node.presentationStyle)
 
       cy.getByTestId(`add-subitem`).should("be.disabled")
       cy.getByTestId(`save-node-button`).click()
-      cy.wait("@addNode")
+      cy.wait("@editNode")
 
       expectParentModalOpen()
 
@@ -47,7 +58,7 @@ describe("Multi-content", () => {
 
       cy.getByTestId(`add-subitem`).should("not.be.disabled")
       cy.getByTestId(`add-subitem`)
-        .click({ force: true })
+        .click()
         .then(() => {
           cy.getByTestId(`node-modal-header-back`)
             .contains(node.title)
