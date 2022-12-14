@@ -482,11 +482,11 @@ export default class Helpers {
   }
 
   static getTargetScale(level) {
-    return Math.max(1, level / store.state.scaleConstants.levelMultiplier)
+    return 1 / Math.pow(0.75, level - 1)
   }
 
   static getCurrentLevel(scale) {
-    return Math.floor(scale * store.state.scaleConstants.levelMultiplier)
+    return Math.floor(Math.log(1 / scale) / Math.log(0.75) + 1)
   }
 
   static getNodeBaseRadius(level) {
@@ -497,7 +497,7 @@ export default class Helpers {
     const currentLevel = Helpers.getCurrentLevel(scale)
     if (level < currentLevel) {
       // growth rate should be slow for nodes higher than current level
-      const baseScale = (level + 1) / store.state.scaleConstants.levelMultiplier
+      const baseScale = Helpers.getTargetScale(level + 1)
       return (
         baseScale +
         (scale - baseScale) / store.state.scaleConstants.largeNodeGrowthSupressor

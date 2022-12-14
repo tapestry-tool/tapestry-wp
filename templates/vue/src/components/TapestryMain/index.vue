@@ -184,7 +184,7 @@ export default {
       unscaledViewBox: [2200, 2700, 1600, 1100],
       viewBox: [2200, 2700, 1600, 1100],
       scale: 1,
-      manualScale: 1,
+      manualScale: 0,
       offset: { x: 0, y: 0 },
       appDimensions: null,
       zoomPanHelper: null,
@@ -314,9 +314,15 @@ export default {
     dragSelectEnabled() {
       return !this.settings.renderMap
     },
+    baseScale() {
+      if (!this.appDimensions) {
+        return 1
+      }
+      return Math.max(1, this.viewBox[2] / this.appDimensions.width / 2) // level 1 node will have radius 140 / 2 = 70 px on screen
+    },
     maxScale() {
       // TODO: may need to update how the smallest node size is calculated
-      return Math.max(
+      return this.baseScale * Math.max(
         (this.scaleConstants.maxNodeSizeToScreen *
           Math.min(this.viewBox[2], this.viewBox[3])) /
           Helpers.getNodeBaseRadius(this.maxLevel),
@@ -573,12 +579,8 @@ export default {
       this.zoomPanHelper.register()
     }
 
-    if (this.selectedId) {
-      this.zoomToAndCenterNode(this.getNode(this.selectedId))
-    }
-
     this.$nextTick(() => {
-      this.updateAppHeight()
+      this.updateAppHeight(true)
     })
 
     if (!this.isEmptyTapestry) {
@@ -599,7 +601,7 @@ export default {
       "addNode",
       "updateNodeCoordinates",
     ]),
-    updateAppHeight() {
+    updateAppHeight(initial = false) {
       if (this.$refs.app) {
         const bodyHeight = document.body.getBoundingClientRect().height
         const appHeight = this.$refs.app.getBoundingClientRect().height
@@ -613,6 +615,10 @@ export default {
       this.$nextTick(() => {
         this.fetchAppDimensions()
         this.updateViewBox()
+
+        if (initial && this.selectedId) {
+          this.zoomToAndCenterNode(this.getNode(this.selectedId))
+        }
       })
     },
     clampScale(scale) {
@@ -678,7 +684,7 @@ export default {
       const scaleChange = newScale / this.scale
 
       this.manualScale = Math.max(
-        1,
+        0,
         Math.min(this.maxScale / 2, this.manualScale + newScale - this.scale)
       )
 
@@ -743,8 +749,7 @@ export default {
       this.clampOffset()
     },
     zoomToAndCenterNode(node) {
-      const baseRadius = Helpers.getNodeBaseRadius(node.level, this.maxLevel)
-      const targetScale = 140 / baseRadius
+      const targetScale = this.baseScale * Helpers.getTargetScale(node.level) + this.manualScale
 
       const targetRadius = Helpers.getNodeRadius(
         node.level,
@@ -892,7 +897,7 @@ export default {
       }
 
       // zoom to the level that the node is on, and pan towards the node
-      const targetScale = Helpers.getTargetScale(node.level) * this.manualScale
+      const targetScale = this.baseScale * Helpers.getTargetScale(node.level) + this.manualScale
       const deltaScale = targetScale - this.scale
 
       const targetRadius = Helpers.getNodeRadius(

@@ -46,7 +46,6 @@ export const store = {
     },
     // * DEV: temporarily allow editing constants.js/scaleConstants
     scaleConstants: {
-      levelMultiplier: 1.7, // higher -> deep nodes get revealed faster
       largeNodeGrowthSupressor: 1.3, // [>=1] higher -> larger nodes grow slower
       lineWidthRatio: 0.05, // higher -> links are thicker
       widthDifferenceEnhancer: {

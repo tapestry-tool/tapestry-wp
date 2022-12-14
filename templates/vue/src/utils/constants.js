@@ -67,7 +67,6 @@ export const swatches = [
 
 // * DEV: this is not used; use store.state.scaleConstants temporarily
 export const scaleConstants = {
-  levelMultiplier: 1.7, // higher -> deep nodes get revealed faster
   largeNodeGrowthSupressor: 1.3, // [>=1] higher -> larger nodes grow slower
   lineWidthRatio: 0.05, // higher -> links are thicker
   widthDifferenceEnhancer: {

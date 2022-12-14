@@ -34,12 +34,6 @@
       </b-col>
     </b-row>
     <b-form-group
-      label="Level Multiplier"
-      description="Higher means deep nodes get revealed faster"
-    >
-      <b-form-input v-model="scaleConstants.levelMultiplier" number />
-    </b-form-group>
-    <b-form-group
       label="Large Node Growth Suppressor"
       description="Higher means larger nodes grow slower (must be >= 1)"
     >
