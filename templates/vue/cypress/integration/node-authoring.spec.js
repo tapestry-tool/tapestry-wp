@@ -19,14 +19,25 @@ describe("Node Authoring", () => {
     }
 
     cy.getByTestId(`root-node-button`).click()
-    cy.getByTestId(`node-title`).type(node.title)
-    cy.contains(/add description/i).click()
-    cy.getEditable(`node-description`).type(node.description)
+    cy.get(".node").should("exist")
+    cy.store()
+      .its("state.nodes")
+      .then(nodes => {
+        expect(Object.keys(nodes)).to.have.length(1)
+        const id = Object.keys(nodes)[0]
+        cy.openModal("edit", id)
 
-    cy.getByTestId(`node-media-type`).select(node.mediaType)
-    cy.getEditable(`node-text-content`).type(node.textContent)
+        cy.getByTestId(`node-title`)
+          .clear()
+          .type(node.title)
+        cy.contains(/add description/i).click()
+        cy.getEditable(`node-description`).type(node.description)
 
-    cy.submitModal()
+        cy.getByTestId(`node-media-type`).select(node.mediaType)
+        cy.getEditable(`node-text-content`).type(node.textContent)
+
+        cy.submitModal()
+      })
 
     cy.contains(node.title).should("be.visible")
     cy.store()
@@ -53,11 +64,20 @@ describe("Node Authoring", () => {
     }
 
     cy.getByTestId(`root-node-button`).click()
-    cy.contains(/add description/i).click()
-    cy.getEditable(`node-description`).type(node.description)
-    cy.getByTestId(`submit-node-modal`).click()
+    cy.get(".node").should("exist")
+    cy.store()
+      .its("state.nodes")
+      .then(nodes => {
+        expect(Object.keys(nodes)).to.have.length(1)
+        const id = Object.keys(nodes)[0]
+        cy.openModal("edit", id)
 
-    cy.contains("Please limit your description").should("not.exist")
+        cy.contains(/add description/i).click()
+        cy.getEditable(`node-description`).type(node.description)
+        cy.getByTestId(`submit-node-modal`).click()
+
+        cy.contains("Please limit your description").should("not.exist")
+      })
   })
 
   /**
