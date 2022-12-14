@@ -4,7 +4,7 @@
       <root-node-button v-if="canEdit" @click="addRootNode"></root-node-button>
       <div v-else class="empty-message">The requested Tapestry is empty.</div>
     </div>
-    <svg v-else id="vue-svg" :viewBox="viewBox">
+    <svg v-else id="vue-svg" ref="vue-svg" :viewBox="viewBox">
       <g class="links">
         <tapestry-link
           v-for="link in links"
@@ -116,7 +116,7 @@ export default {
   },
   mounted() {
     if (this.dragSelectEnabled) {
-      DragSelectModular.initializeDragSelect(this.$refs.app, this, this.nodes)
+      DragSelectModular.initializeDragSelect(this.$refs["vue-svg"], this, this.nodes)
     }
     this.updateViewBox()
     this.dragSelectReady = true
