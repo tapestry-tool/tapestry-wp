@@ -42,6 +42,7 @@ export async function addNode({ commit, dispatch, getters, state }, newNode) {
     const id = response.data.id
     nodeToAdd.id = id
     nodeToAdd.author = response.data.author
+    nodeToAdd.comments = response.data.comments
     nodeToAdd.permissions = response.data.permissions
     if (response.data.typeData.h5pMeta) {
       nodeToAdd.typeData.h5pMeta = response.data.typeData.h5pMeta
@@ -250,17 +251,17 @@ export async function getNodeHasDraftChildren({ dispatch }, id) {
   }
 }
 
-export async function getTapestryExport({ dispatch }) {
+export async function getTapestryExport({ dispatch }, shouldExportComments) {
   try {
-    return await client.getTapestryExport()
+    return await client.getTapestryExport(shouldExportComments)
   } catch (error) {
     dispatch("addApiError", error)
   }
 }
 
-export async function getTapestryExportAsZip({ dispatch }) {
+export async function getTapestryExportAsZip({ dispatch }, shouldExportComments) {
   try {
-    return await client.getTapestryExportAsZip()
+    return await client.getTapestryExportAsZip(shouldExportComments)
   } catch (error) {
     dispatch("addApiError", error)
   }
@@ -293,6 +294,42 @@ export async function reviewNode({ commit, dispatch }, { id, comments }) {
     commit("updateNode", {
       id,
       newNode: updates.data,
+    })
+  } catch (error) {
+    dispatch("addApiError", error)
+  }
+}
+
+export async function addComment(
+  { commit, dispatch },
+  { nodeId, comment, replyingTo }
+) {
+  try {
+    const comments = await client.addComment(nodeId, comment, replyingTo)
+    commit("updateNode", {
+      id: nodeId,
+      newNode: {
+        comments,
+      },
+    })
+    return true
+  } catch (error) {
+    dispatch("addApiError", error)
+  }
+  return false
+}
+
+export async function performCommentAction(
+  { commit, dispatch },
+  { nodeId, commentId, action }
+) {
+  try {
+    const comments = await client.performCommentAction(nodeId, commentId, action)
+    commit("updateNode", {
+      id: nodeId,
+      newNode: {
+        comments,
+      },
     })
   } catch (error) {
     dispatch("addApiError", error)

@@ -220,7 +220,7 @@ class Tapestry implements ITapestry
         }
 
         $tapestryNode->set($node);
-        $node = $tapestryNode->save($node);
+        $node = $tapestryNode->save();
 
         array_push($this->nodes, $node->id);
 
@@ -475,15 +475,20 @@ class Tapestry implements ITapestry
     /**
      * Retrieve a Tapestry post for export.
      *
+     * @param bool $includeComments whether to include the comments associated with each node
+     *
      * @return object $tapestry
      */
-    public function export()
+    public function export($includeComments)
     {
         $nodes = [];
         foreach ($this->nodes as $node) {
             $temp = (new TapestryNode($this->postId, $node))->get();
             if (NodeStatus::DRAFT == $temp->status) {
                 continue;
+            }
+            if (!$includeComments) {
+                unset($temp->comments);
             }
             $nodes[] = $temp;
         }
