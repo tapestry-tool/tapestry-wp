@@ -322,11 +322,14 @@ export default {
     },
     maxScale() {
       // TODO: may need to update how the smallest node size is calculated
-      return this.baseScale * Math.max(
-        (this.scaleConstants.maxNodeSizeToScreen *
-          Math.min(this.viewBox[2], this.viewBox[3])) /
-          Helpers.getNodeBaseRadius(this.maxLevel),
-        140 / Helpers.getNodeBaseRadius(this.maxLevel)
+      return (
+        this.baseScale *
+        Math.max(
+          (this.scaleConstants.maxNodeSizeToScreen *
+            Math.min(this.viewBox[2], this.viewBox[3])) /
+            Helpers.getNodeBaseRadius(this.maxLevel),
+          140 / Helpers.getNodeBaseRadius(this.maxLevel)
+        )
       )
     },
     routeName() {
@@ -749,7 +752,8 @@ export default {
       this.clampOffset()
     },
     zoomToAndCenterNode(node) {
-      const targetScale = this.baseScale * Helpers.getTargetScale(node.level) + this.manualScale
+      const targetScale =
+        this.baseScale * Helpers.getTargetScale(node.level) + this.manualScale
 
       const targetRadius = Helpers.getNodeRadius(
         node.level,
@@ -897,7 +901,8 @@ export default {
       }
 
       // zoom to the level that the node is on, and pan towards the node
-      const targetScale = this.baseScale * Helpers.getTargetScale(node.level) + this.manualScale
+      const targetScale =
+        this.baseScale * Helpers.getTargetScale(node.level) + this.manualScale
       const deltaScale = targetScale - this.scale
 
       const targetRadius = Helpers.getNodeRadius(
