@@ -356,8 +356,8 @@ export default {
       const absoluteX = relativeX + this.viewBox[0] + this.offset.x
       const absoluteY = relativeY + this.viewBox[1] + this.offset.y
       return {
-        x: absoluteX,
-        y: absoluteY,
+        x: absoluteX * this.downScale,
+        y: absoluteY * this.downScale,
       }
     },
     nodeToolbarPosition() {

@@ -466,7 +466,7 @@ export default class Helpers {
   static getDropShadow(level, maxLevel, scale = 1) {
     return {
       offset: 4 * (maxLevel - level) * scale + 3,
-      blur: Helpers.mapLevel(level, maxLevel, 16, 5),
+      blur: Helpers.mapLevel(level, maxLevel, 16, 5) * scale,
       opacity: Helpers.mapLevel(level, maxLevel, 0.2, 0.5),
     }
   }

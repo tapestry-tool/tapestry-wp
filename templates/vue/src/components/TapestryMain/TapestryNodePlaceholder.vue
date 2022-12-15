@@ -3,7 +3,10 @@
     <circle
       v-show="show"
       ref="circle"
-      :transform="`translate(${coordinates.x}, ${coordinates.y})`"
+      :transform="
+        `translate(${coordinates.x}, ${coordinates.y}) scale(${downScale *
+          nodeScale})`
+      "
       :fill="fill"
       :style="{
         filter: dropShadow,
@@ -22,6 +25,10 @@ export default {
   name: "tapestry-node-placeholder",
   props: {
     scale: {
+      type: Number,
+      required: true,
+    },
+    downScale: {
       type: Number,
       required: true,
     },
@@ -46,8 +53,11 @@ export default {
   },
   computed: {
     ...mapState(["maxLevel"]),
+    nodeScale() {
+      return Helpers.getNodeScale(this.level, this.scale)
+    },
     radius() {
-      return Helpers.getNodeRadius(this.level, this.scale)
+      return Helpers.getNodeBaseRadius(this.level)
     },
     fill() {
       return Helpers.darkenColor(
@@ -59,8 +69,7 @@ export default {
     dropShadow() {
       const { offset, blur, opacity } = Helpers.getDropShadow(
         this.level,
-        this.maxLevel,
-        this.scale
+        this.maxLevel
       )
       return `drop-shadow(${offset}px ${offset}px ${blur}px rgba(0, 0, 0, ${opacity}))`
     },
