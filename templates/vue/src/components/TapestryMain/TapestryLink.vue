@@ -19,6 +19,7 @@
         filter: dropShadow,
       }"
       :points="polygonPoints"
+      :transform="`scale(${downScale})`"
       @click="handleClick"
       @focus="handleFocus"
     ></polygon>
@@ -42,6 +43,10 @@ export default {
       required: true,
     },
     scale: {
+      type: Number,
+      required: true,
+    },
+    downScale: {
       type: Number,
       required: true,
     },

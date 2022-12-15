@@ -4,7 +4,8 @@
       v-show="show"
       ref="circle"
       :transform="
-        `translate(${coordinates.x}, ${coordinates.y}) scale(${nodeScale})`
+        `translate(${coordinates.x}, ${coordinates.y}) scale(${downScale *
+          nodeScale})`
       "
       :class="{
         opaque: !visibleNodes.includes(node.id),
@@ -37,6 +38,10 @@ export default {
       type: Number,
       required: true,
     },
+    downScale: {
+      type: Number,
+      required: true,
+    },
   },
   data() {
     return {
@@ -64,8 +69,8 @@ export default {
     },
     coordinates() {
       return {
-        x: this.node.coordinates.x * this.scale,
-        y: this.node.coordinates.y * this.scale,
+        x: this.node.coordinates.x * this.downScale * this.scale,
+        y: this.node.coordinates.y * this.downScale * this.scale,
       }
     },
     isGrandChild() {

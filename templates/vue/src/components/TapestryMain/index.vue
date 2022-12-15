@@ -44,6 +44,7 @@
               :key="id"
               :node="node"
               :scale="scale"
+              :down-scale="downScale"
               :root="id == selectedId"
               tabindex="-1"
             ></tapestry-node-shadow>
@@ -55,6 +56,7 @@
               :source="nodes[link.source]"
               :target="nodes[link.target]"
               :scale="scale"
+              :down-scale="downScale"
               tabindex="-1"
               @click="handleLinkClick(link)"
               @focus="handleLinkClick(link)"
@@ -66,6 +68,7 @@
               :key="id"
               :node="node"
               :scale="scale"
+              :down-scale="downScale"
               class="node"
               :class="{ selectable: true }"
               :data-id="id"
@@ -85,6 +88,7 @@
         </g>
         <tapestry-node-placeholder
           :scale="scale"
+          :down-scale="downScale"
           :show="showNodePlaceholder"
           :coordinates="mouseCoordinates"
           :level="selectedNodeLevel"
@@ -184,6 +188,7 @@ export default {
       unscaledViewBox: [2200, 2700, 1600, 1100],
       viewBox: [2200, 2700, 1600, 1100],
       scale: 1,
+      downScale: 1,
       manualScale: 0,
       offset: { x: 0, y: 0 },
       appDimensions: null,
@@ -274,8 +279,11 @@ export default {
     },
     computedViewBox() {
       // return this.viewBox.join(" ")
-      return `${this.viewBox[0] + this.offset.x} ${this.viewBox[1] +
-        this.offset.y} ${this.viewBox[2]} ${this.viewBox[3]}`
+      return `${(this.viewBox[0] + this.offset.x) * this.downScale} ${(this
+        .viewBox[1] +
+        this.offset.y) *
+        this.downScale} ${this.viewBox[2] * this.downScale} ${this.viewBox[3] *
+        this.downScale}`
     },
     background() {
       return this.settings.backgroundUrl
@@ -855,6 +863,12 @@ export default {
           tapestry.height += heightDiff
           tapestry.y -= heightDiff / 2
         }
+
+        // calculate downScale to keep actual SVG viewBox dimensions small (for optimal performance)
+        this.downScale = Math.min(
+          1,
+          1000 / Math.max(tapestry.width, tapestry.height)
+        )
 
         this.unscaledViewBox = [
           tapestry.x,
