@@ -210,7 +210,7 @@ class TapestryImportExport
         }
 
         if ($tapestry_data->settings) {
-            self::_exportMedia($tapestry_data->settings->backgroundUrl, $zip, $export_warnings['settings'], $export_log);            
+            self::_exportMedia($tapestry_data->settings->backgroundUrl, $zip, $export_warnings['settings'], $export_log);
         }
 
         $tapestry_data->warnings = !empty($export_warnings['nodes']) || !empty($export_warnings['settings']);
@@ -473,7 +473,8 @@ class TapestryImportExport
         }
     }
 
-    public static function getExportId() {
+    public static function getExportId()
+    {
         return uniqid();
     }
 

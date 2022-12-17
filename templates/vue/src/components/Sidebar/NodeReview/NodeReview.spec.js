@@ -2,7 +2,7 @@ import { fireEvent, waitFor } from "@testing-library/vue"
 import userEvent from "@testing-library/user-event"
 import { render } from "@/utils/test"
 import { nodeStatus } from "@/utils/constants"
-import * as Comment from "@/utils/comments"
+import * as Comment from "@/utils/reviewComments"
 import client from "@/services/TapestryAPI"
 import * as wp from "@/services/wp"
 
