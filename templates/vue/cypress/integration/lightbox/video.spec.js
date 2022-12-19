@@ -31,7 +31,7 @@ describe("Video", () => {
       cy.submitModal()
 
       cy.openLightbox(node.id).within(() => {
-        cy.get("video").should("have.attr", "src", url)
+        cy.get("video source").should("have.attr", "src", url)
 
         cy.get("video").should($el => {
           const video = $el.get(0)
@@ -104,7 +104,7 @@ describe("Video", () => {
       cy.get(".close").click()
 
       cy.openLightbox(selectedNode.id).within(() => {
-        cy.get("video").should("have.attr", "src", url)
+        cy.get("video source").should("have.attr", "src", url)
       })
     })
   })
@@ -132,7 +132,7 @@ describe("Video", () => {
 
       cy.openLightbox(node.id).within(() => {
         // Check that the media URL comes from Kaltura. We just check that the URL includes the Kaltura ID
-        cy.get("video")
+        cy.get("video source")
           .invoke("attr", "src")
           .should("include", kalturaId)
       })
