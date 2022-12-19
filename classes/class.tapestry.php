@@ -125,6 +125,9 @@ class Tapestry implements ITapestry
             if (!isset($this->settings->status)) {
                 $this->settings->status = get_post_status($this->postId);
             }
+            if (!isset($this->settings->showChildrenOfMulticontent)) {
+                $this->settings->showChildrenOfMulticontent = false;
+            }
         }
         if (isset($tapestry->notifications) && is_object($tapestry->notifications)) {
             $this->notifications = $tapestry->notifications;
@@ -214,7 +217,7 @@ class Tapestry implements ITapestry
 
         // Checks if user is logged in to prevent logged out user-0 from getting permissions
         // Only add user permissions if it is not a review node
-        if (is_user_logged_in() && 0 === count($node->reviewComments)) {
+        if (is_user_logged_in() && (!isset($node->reviewComments) || 0 === count($node->reviewComments))) {
             $userId = wp_get_current_user()->ID;
             $node->permissions->{'user-'.$userId} = ['read', 'add', 'edit'];
         }
@@ -475,15 +478,20 @@ class Tapestry implements ITapestry
     /**
      * Retrieve a Tapestry post for export.
      *
+     * @param bool $includeComments whether to include the comments associated with each node
+     *
      * @return object $tapestry
      */
-    public function export()
+    public function export($includeComments)
     {
         $nodes = [];
         foreach ($this->nodes as $node) {
             $temp = (new TapestryNode($this->postId, $node))->get();
             if (NodeStatus::DRAFT == $temp->status) {
                 continue;
+            }
+            if (!$includeComments) {
+                unset($temp->comments);
             }
             $nodes[] = $temp;
         }
@@ -495,6 +503,8 @@ class Tapestry implements ITapestry
         unset($this->settings->tapestrySlug);
         unset($this->settings->title);
         unset($this->settings->status);
+
+        $nodes = $this->_addH5PMeta($nodes);
 
         return (object) [
             'nodes' => $nodes,
@@ -606,6 +616,7 @@ class Tapestry implements ITapestry
         $settings->showAccess = true;
         $settings->showRejected = false;
         $settings->showAcceptedHighlight = true;
+        $settings->showChildrenOfMulticontent = false;
         $settings->defaultPermissions = TapestryNodePermissions::getDefaultNodePermissions($this->postId);
         $settings->superuserOverridePermissions = true;
         $settings->analyticsEnabled = false;
@@ -668,6 +679,7 @@ class Tapestry implements ITapestry
     private function _getTapestry($filterUserId)
     {
         // Get all the nodes from the database (we will need this info and only want to do it once)
+        $this->nodeObjects = [];
         foreach ($this->nodes as $nodeId) {
             $this->nodeObjects[$nodeId] = new TapestryNode($this->postId, $nodeId);
         }

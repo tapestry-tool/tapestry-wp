@@ -86,7 +86,7 @@ class TapestryImportExport
 
         // if permissions modified, add the role to changes
         foreach ($permissions as $key => $value) {
-            if (!array_key_exists($key, $filteredPerms)) {
+            if (!property_exists($filteredPerms, $key)) {
                 array_push($changes, $key);
             }
         }
@@ -520,10 +520,10 @@ class TapestryImportExport
                 self::_importActivityNode($node, $temp_dir, $node_warnings, $imported_media);
             }
 
-            if (!empty($node->thumbnailFileId)) {
+            if (!empty($node->imageURL)) {
                 self::_importMedia($node->imageURL, $temp_dir, $node_warnings, $imported_media, true, $node->thumbnailFileId);
             }
-            if (!empty($node->lockedThumbnailFileId)) {
+            if (!empty($node->lockedImageURL)) {
                 self::_importMedia($node->lockedImageURL, $temp_dir, $node_warnings, $imported_media, true, $node->lockedThumbnailFileId);
             }
 

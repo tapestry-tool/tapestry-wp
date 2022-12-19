@@ -38,8 +38,8 @@
         <b-button
           class="mr-1"
           size="sm"
-          :variant="isRemovable ? 'danger' : 'light'"
-          :disabled="disabled || !isRemovable"
+          variant="danger"
+          :disabled="disabled"
           @click="$emit('remove')"
         >
           Delete
@@ -165,11 +165,6 @@ export default {
       type: Boolean,
       required: false,
       default: false,
-    },
-    isRemovable: {
-      type: Boolean,
-      required: false,
-      default: true,
     },
     languages: {
       type: Array,

@@ -5,7 +5,6 @@
       controls
       crossorigin="anonymous"
       :autoplay="autoplay"
-      :src="node.typeData.mediaURL"
       :style="videoStyles"
       preload="metadata"
       @loadeddata="handleLoad"
@@ -16,6 +15,7 @@
       @timeupdate="updateVideoProgress"
       @error="handleError"
     >
+      <source type="video/mp4" :src="node.typeData.mediaURL" @error="handleError" />
       <track
         v-for="caption in visibleCaptions"
         :key="caption.id"

@@ -66,6 +66,14 @@
               {{ showAcceptedHighlight ? "Enabled" : "Disabled" }}
             </b-form-checkbox>
           </b-form-group>
+          <b-form-group
+            label="Show child nodes of multi-content nodes"
+            description="If enabled, child nodes of multi-content nodes will be shown to everyone. If disabled, chilld nodes of multi-content nodes will only be shown to users with edit permissions."
+          >
+            <b-form-checkbox v-model="showChildrenOfMulticontent" switch>
+              {{ showChildrenOfMulticontent ? "Enabled" : "Disabled" }}
+            </b-form-checkbox>
+          </b-form-group>
           <b-form-group label="Default Depth" class="mb-0">
             <b-form-input
               v-model="defaultDepth"
@@ -286,6 +294,7 @@ export default {
       superuserOverridePermissions: true,
       showRejected: false,
       showAcceptedHighlight: true,
+      showChildrenOfMulticontent: false,
       defaultDepth: 3,
       renderImages: true,
       analyticsEnabled: false,
@@ -356,6 +365,7 @@ export default {
         superuserOverridePermissions = true,
         showRejected = false,
         showAcceptedHighlight = true,
+        showChildrenOfMulticontent = false,
         defaultDepth = 3,
         renderImages = true,
         renderMap = false,
@@ -371,6 +381,7 @@ export default {
       this.superuserOverridePermissions = superuserOverridePermissions
       this.showRejected = showRejected
       this.showAcceptedHighlight = showAcceptedHighlight
+      this.showChildrenOfMulticontent = showChildrenOfMulticontent
       this.defaultDepth = defaultDepth
       this.renderImages = renderImages
       this.renderMap = renderMap
@@ -388,6 +399,7 @@ export default {
         superuserOverridePermissions: this.superuserOverridePermissions,
         showRejected: this.showRejected,
         showAcceptedHighlight: this.showAcceptedHighlight,
+        showChildrenOfMulticontent: this.showChildrenOfMulticontent,
         defaultDepth: parseInt(this.defaultDepth),
         renderImages: this.renderImages,
         renderMap: this.renderMap,
