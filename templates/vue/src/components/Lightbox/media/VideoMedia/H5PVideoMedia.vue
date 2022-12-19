@@ -144,7 +144,10 @@ export default {
       // default
       this.frameWidth = 0
       this.frameHeight = h5pDimensions.height
-      if (this.node.fitWindow || this.hasMultiContentContext) {
+      if (
+        (this.node.fullscreen && this.node.fitWindow) ||
+        this.hasMultiContentContext
+      ) {
         // Video should fit within the smaller of the viewport or the container it's in
         let containerDimensions = {
           height: window.innerHeight,
