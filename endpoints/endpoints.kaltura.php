@@ -591,7 +591,7 @@ class KalturaEndpoints
         }
     }
 
-    public function getLanguages($request)
+    public static function getLanguages($request)
     {
         try {
             if (!LOAD_KALTURA) {
@@ -605,7 +605,7 @@ class KalturaEndpoints
         }
     }
 
-    public function getVideoCaptions($request)
+    public static function getVideoCaptions($request)
     {
         try {
             if (!LOAD_KALTURA) {
@@ -621,7 +621,7 @@ class KalturaEndpoints
         }
     }
 
-    public function updateVideoCaptions($request)
+    public static function updateVideoCaptions($request)
     {
         try {
             if (!LOAD_KALTURA) {
