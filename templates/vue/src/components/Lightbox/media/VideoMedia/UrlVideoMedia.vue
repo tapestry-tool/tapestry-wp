@@ -15,7 +15,7 @@
       @timeupdate="updateVideoProgress"
       @error="handleError"
     >
-      <source type="video/mp4" :src="node.typeData.mediaURL" />
+      <source type="video/mp4" :src="node.typeData.mediaURL" @error="handleError" />
       <track
         v-for="caption in visibleCaptions"
         :key="caption.id"
