@@ -3,8 +3,8 @@ describe("Export", () => {
     cy.fixture("one-node.json").as("oneNode")
     cy.setup("@oneNode")
 
-    cy.intercept("GET", "**/tapestries/**/export").as("export")
-    cy.intercept("GET", "**/tapestries/**/export_zip").as("export_zip")
+    cy.intercept("GET", "**/tapestries/**/export?**").as("export")
+    cy.intercept("GET", "**/tapestries/**/export_zip?**").as("export_zip")
   })
 
   it("should be able to export a Tapestry", () => {

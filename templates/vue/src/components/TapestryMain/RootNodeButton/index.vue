@@ -172,12 +172,10 @@ export default {
         .catch(err => {
           this.error = err
         })
-        .then(() => {
+        .finally(() => {
           if (!this.error) {
             this.$bvModal.show("import-changelog")
           }
-        })
-        .finally(() => {
           this.isImporting = false
         })
     },
