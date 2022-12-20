@@ -1,5 +1,4 @@
 <?php
-session_start();
 
 require_once __DIR__.'/../classes/class.tapestry-h5p.php';
 require_once __DIR__.'/class.tapestry-helpers.php';
@@ -587,6 +586,7 @@ class TapestryImportExport
         }
 
         if (isset($uploadId) && !empty($uploadId)) {
+            session_start();
             $uploadProgress = $_SESSION[ini_get("session.upload_progress.prefix") . $uploadId];
             if (isset($uploadProgress) && !empty($uploadProgress)) {
                 $status->fileUpload = (object) [
