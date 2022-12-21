@@ -97,7 +97,6 @@ export default {
   },
   data() {
     return {
-      uploadId: null,
       error: null,
       isDragover: false,
       isImporting: false,
@@ -212,7 +211,6 @@ export default {
       reader.readAsText(file)
     },
     importTapestryFromZip(zipFile) {
-      this.uploadId = Helpers.createUUID()
       this.error = ""
       this.isImporting = true
       this.importStatusMessage = "Getting ready to import"
@@ -230,7 +228,7 @@ export default {
         })
 
       client
-        .importTapestryFromZip(zipFile, this.uploadId)
+        .importTapestryFromZip(zipFile)
         .then(response => {
           if (response) {
             this.changes.permissions = new Set(response.changes.permissions)
@@ -271,7 +269,7 @@ export default {
     },
     updateImportStatus() {
       client
-        .getImportStatus(this.uploadId)
+        .getImportStatus()
         .then(status => {
           if (!this.isUploading && status.inProgress && status.message) {
             this.importStatusMessage =

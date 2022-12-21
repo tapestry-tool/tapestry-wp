@@ -593,13 +593,12 @@ function importTapestryFromZip($request)
 function getTapestryImportStatus($request)
 {
     $postId = $request['tapestryPostId'];
-    $uploadId = $request['upload_id'];
     try {
         if (empty($postId) || !TapestryHelpers::isValidTapestry($postId)) {
             throw new TapestryError('INVALID_POST_ID');
         }
 
-        return TapestryImportExport::getImportStatus($postId, $uploadId);
+        return TapestryImportExport::getImportStatus($postId);
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }

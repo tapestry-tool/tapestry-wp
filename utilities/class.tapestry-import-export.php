@@ -577,7 +577,8 @@ class TapestryImportExport
         ];
     }
 
-    public static function getImportStatus($tapestryPostId, $uploadId) {
+    public static function getImportStatus($tapestryPostId)
+    {
         $status = get_post_meta($tapestryPostId, 'import', true);
         if (empty($status)) {
             $status = (object) [
@@ -585,22 +586,11 @@ class TapestryImportExport
             ];
         }
 
-        if (isset($uploadId) && !empty($uploadId)) {
-            session_start();
-            $uploadProgress = $_SESSION[ini_get("session.upload_progress.prefix") . $uploadId];
-            if (isset($uploadProgress) && !empty($uploadProgress)) {
-                $status->fileUpload = (object) [
-                    'bytes_processed' => $uploadProgress['bytes_processed'],
-                    'content_length' => $uploadProgress['content_length'],
-                    'done' => $uploadProgress['done'],
-                ];
-            };
-        }
-
         return $status;
     }
 
-    public static function setImportStatus($tapestryPostId, $status) {
+    public static function setImportStatus($tapestryPostId, $status)
+    {
         update_post_meta($tapestryPostId, 'import', $status);
     }
 
