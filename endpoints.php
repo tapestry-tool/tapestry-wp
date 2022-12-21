@@ -372,6 +372,14 @@ $REST_API_ENDPOINTS = [
             'permission_callback' => 'TapestryPermissions::putTapestrySettings',
         ],
     ],
+    'CLEAR_TAPESTRY_IMPORT_STATUS' => (object) [
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/import_status',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_DELETE_METHOD,
+            'callback' => 'clearImportStatus',
+            'permission_callback' => 'TapestryPermissions::putTapestrySettings',
+        ],
+    ],
     'OPTIMIZE_THUMBNAILS' => (object) [
         'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/optimize_thumbnails',
         'ARGUMENTS' => [
@@ -472,6 +480,14 @@ function exportTapestryAsZip($request)
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
+}
+
+function clearImportStatus($request)
+{
+    $postId = $request['tapestryPostId'];
+    TapestryImportExport::setImportStatus($postId, (object) [
+        'inProgress' => false,
+    ]);
 }
 
 /**

@@ -13,13 +13,13 @@
       <p>Or</p>
     </template>
     <b-button
-      class="import-button mx-1"
+      class="import-button mx-1 mb-4"
       :disabled="isImporting"
       @click="openFileBrowser"
     >
       <template v-if="isImporting">
         <b-spinner></b-spinner>
-        Importing
+        Import in progress
       </template>
       <div v-else>
         Import a Tapestry
@@ -30,25 +30,55 @@
       <br />
       Please try with another file.
     </div>
-    <div v-if="isImporting" style="margin-top: 16px;">
-      {{ importStatusMessage }}
-    </div>
-    <input
-      ref="fileInput"
-      data-qa="import-file-input"
-      type="file"
-      style="display: none;"
-      @change="handleFileChange"
-    />
-    <div
-      data-qa="import-file-drop"
-      :class="['dropbox', { 'drag-over': isDragover }]"
-      @dragenter="handleDragStart"
-      @dragover="handleDragStart"
-      @dragleave="handleDragEnd"
-      @dragend="handleDragEnd"
-      @drop="handleDragDrop"
-    ></div>
+    <b-card v-if="isImporting" style="margin-top: 16px; min-width: 100%;">
+      <h5>Step 1 - Upload file</h5>
+      <span v-if="isUploading && uploadBytesTotal > 100">
+        Uploading
+        <span v-if="uploadBytesTotal / uploadBytesProcessed >= 4">
+          {{ importFileProgressLabel }}
+        </span>
+      </span>
+      <b-progress
+        :max="uploadBytesTotal"
+        class="my-2"
+        height="2rem"
+        :variant="uploadBytesTotal === uploadBytesProcessed ? 'success' : 'primary'"
+      >
+        <b-progress-bar :value="uploadBytesProcessed">
+          <span v-if="uploadBytesTotal / uploadBytesProcessed < 4 && isUploading">
+            {{ importFileProgressLabel }}
+          </span>
+        </b-progress-bar>
+      </b-progress>
+      <h5>Step 2 - Import</h5>
+      <span v-if="isUploading">Waiting for step 1 to complete</span>
+      <span v-else>{{ importStatusMessage }}</span>
+      <b-progress
+        :value="isUploading ? 0 : 1"
+        :max="1"
+        height="2rem"
+        class="my-2"
+        animated
+      ></b-progress>
+    </b-card>
+    <template v-else>
+      <input
+        ref="fileInput"
+        data-qa="import-file-input"
+        type="file"
+        style="display: none;"
+        @change="handleFileChange"
+      />
+      <div
+        data-qa="import-file-drop"
+        :class="['dropbox', { 'drag-over': isDragover }]"
+        @dragenter="handleDragStart"
+        @dragover="handleDragStart"
+        @dragleave="handleDragEnd"
+        @dragend="handleDragEnd"
+        @drop="handleDragDrop"
+      ></div>
+    </template>
   </div>
 </template>
 
@@ -57,7 +87,7 @@ import { names } from "@/config/routes"
 import client from "@/services/TapestryAPI"
 import WordpressApi from "@/services/WordpressApi"
 import ImportChangelog from "./ImportChangelog"
-import { mapMutations } from "vuex"
+import { mapMutations, mapState } from "vuex"
 import Helpers from "@/utils/Helpers"
 
 export default {
@@ -70,10 +100,10 @@ export default {
       uploadId: null,
       error: null,
       isDragover: false,
-      isUploading: false,
       isImporting: false,
+      uploadBytesTotal: 1,
+      uploadBytesProcessed: 0,
       importStatusMessage: "",
-      importStatusRefresh: null,
       changes: {
         noChange: true,
         permissions: new Set(),
@@ -81,6 +111,25 @@ export default {
       warnings: {},
       exportWarnings: false,
     }
+  },
+  computed: {
+    ...mapState(["importProgress"]),
+    importFileProgressLabel() {
+      const uploaded = Helpers.formatFileSize(this.uploadBytesProcessed)
+      const total = Helpers.formatFileSize(this.uploadBytesTotal)
+      const perc =
+        Math.round((10000 * this.uploadBytesProcessed) / this.uploadBytesTotal) / 100
+      return `${uploaded} / ${total} (${perc}%)`
+    },
+    isUploading() {
+      return this.uploadBytesTotal / this.uploadBytesProcessed !== 1
+    },
+  },
+  watch: {
+    importProgress(progressEvent) {
+      this.uploadBytesProcessed = progressEvent.loaded
+      this.uploadBytesTotal = progressEvent.total
+    },
   },
   methods: {
     ...mapMutations(["addApiError"]),
@@ -165,16 +214,24 @@ export default {
     importTapestryFromZip(zipFile) {
       this.uploadId = Helpers.createUUID()
       this.error = ""
-      this.isUploading = true
       this.isImporting = true
-      this.importStatusMessage = "Uploading file..."
-      this.importStatusRefresh = setInterval(this.updateImportStatus, 2000)
+      this.importStatusMessage = "Getting ready to import"
+
+      client
+        .clearImportStatus()
+        .then(() => {
+          console.log("Cleared import status")
+        })
+        .catch(err => {
+          this.error = err.response.data
+        })
+        .finally(() => {
+          this.updateImportStatus()
+        })
 
       client
         .importTapestryFromZip(zipFile, this.uploadId)
         .then(response => {
-          this.isUploading = false
-          clearInterval(this.importStatusRefresh)
           if (response) {
             this.changes.permissions = new Set(response.changes.permissions)
             this.changes.noChange = response.changes.noChange
@@ -190,8 +247,6 @@ export default {
           }
         })
         .catch(err => {
-          this.isUploading = false
-          clearInterval(this.importStatusRefresh)
           this.error = err.response.data
         })
         .then(shouldRebuild => {
@@ -218,24 +273,20 @@ export default {
       client
         .getImportStatus(this.uploadId)
         .then(status => {
-          if (status.fileUpload && !status.inProgress && this.isUploading) {
-            const current = Helpers.formatFileSize(status.fileUpload.bytes_processed)
-            const total = Helpers.formatFileSize(status.fileUpload.content_length)
-            this.importStatusMessage = `Uploading file (${current} / ${total})...`
-          } else {
-            if (this.isUploading && this.isImporting) {
-              this.isUploading = false
-              clearInterval(this.importStatusRefresh)
-              this.importStatusRefresh = setInterval(this.updateImportStatus, 5000)
-            }
-            if (status.inProgress && status.message) {
-              this.importStatusMessage =
-                status.message + "... Please do not close this tab."
-            }
+          if (!this.isUploading && status.inProgress && status.message) {
+            this.importStatusMessage =
+              status.message + "... Please do not close this tab."
           }
         })
         .catch(err => {
           this.addApiError(err)
+        })
+        .finally(() => {
+          if (this.isImporting) {
+            setTimeout(() => {
+              this.updateImportStatus()
+            }, 2000)
+          }
         })
     },
     getFileExtension(fileName) {
@@ -300,12 +351,11 @@ export default {
 
 .dropbox {
   width: 100%;
-  height: 85%;
+  height: calc(100% - 40px);
   border: 3px dashed black;
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translateX(-50%);
+  position: absolute;
+  top: 40px;
+  left: 10px;
   opacity: 0;
   z-index: 0;
   bottom: 0;

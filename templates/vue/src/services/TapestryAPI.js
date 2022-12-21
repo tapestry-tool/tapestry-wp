@@ -1,4 +1,5 @@
 import axios from "axios"
+import store from "../store"
 import { data } from "./wp"
 
 const { apiUrl, nonce, postId, adminAjaxUrl } = data
@@ -59,6 +60,9 @@ class TapestryApi {
       headers: {
         "Content-Type": "multipart/form-data",
       },
+      onUploadProgress: progressEvent => {
+        store.state.importProgress = progressEvent
+      },
     })
 
     return response.data
@@ -67,6 +71,12 @@ class TapestryApi {
   async getImportStatus(uploadId) {
     const url = `/tapestries/${this.postId}/import_status?upload_id=${uploadId}`
     const response = await this.client.get(url)
+    return response.data
+  }
+
+  async clearImportStatus() {
+    const url = `/tapestries/${this.postId}/import_status`
+    const response = await this.client.delete(url)
     return response.data
   }
 
