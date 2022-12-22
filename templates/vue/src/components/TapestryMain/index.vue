@@ -290,6 +290,7 @@ export default {
       }
 
       let isInView = () => true
+      let linkIntersectsView = () => true
       if (Object.keys(this.nodes).length > 150) {
         // If # of nodes in tapestry > 150, only render nodes & links in view
         const x0 = this.viewBox[0] + this.offset.x,
@@ -302,15 +303,29 @@ export default {
             y = node.coordinates.y * this.scale
           return x - r < x1 && x + r > x0 && y - r < y1 && y + r > y0
         }
+        linkIntersectsView = (source, target) => {
+          const a0 = source.coordinates.x * this.scale,
+            b0 = source.coordinates.y * this.scale,
+            a1 = target.coordinates.x * this.scale,
+            b1 = target.coordinates.y * this.scale
+          return (
+            Helpers.lineIntersects(a0, b0, a1, b1, x0, y0, x1, y0) ||
+            Helpers.lineIntersects(a0, b0, a1, b1, x1, y0, x1, y1) ||
+            Helpers.lineIntersects(a0, b0, a1, b1, x1, y1, x0, y1) ||
+            Helpers.lineIntersects(a0, b0, a1, b1, x0, y1, x0, y0)
+          )
+        }
       }
 
       for (const link of this.links) {
-        // TODO: also show link if link goes through view
-        if (isInView(this.nodes[link.source]) || isInView(this.nodes[link.target])) {
-          levels[
-            Math.max(this.nodes[link.source].level, this.nodes[link.target].level) -
-              1
-          ].links.push(link)
+        const source = this.nodes[link.source]
+        const target = this.nodes[link.target]
+        if (
+          isInView(source) ||
+          isInView(target) ||
+          linkIntersectsView(source, target)
+        ) {
+          levels[Math.max(source.level, target.level) - 1].links.push(link)
         }
       }
       for (const id in this.nodes) {

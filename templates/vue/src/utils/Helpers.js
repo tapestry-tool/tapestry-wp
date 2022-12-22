@@ -573,6 +573,20 @@ export default class Helpers {
       dy2} ${x2 + dx2},${y2 + dy2}`
   }
 
+  /**
+   * Returns true if the line segment from (x1, y1) to (x2, y2) intersects
+   * with the line segment from (x3, y3) to (x4, y4).
+   */
+  static lineIntersects(x1, y1, x2, y2, x3, y3, x4, y4) {
+    const uA =
+      ((x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)) /
+      ((y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1))
+    const uB =
+      ((x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3)) /
+      ((y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1))
+    return uA >= 0 && uA <= 1 && uB >= 0 && uB <= 1
+  }
+
   static getNodeElementId(nodeId) {
     return `tapestry-node-${nodeId}`
   }
