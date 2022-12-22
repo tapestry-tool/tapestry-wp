@@ -256,6 +256,18 @@ export default {
         }
       }
     },
+    optimizationLevel() {
+      /**
+       * Optimization Level 0: No optimization
+       * Optimization Level 1:
+       *  - Condition: Total # of nodes in tapestry > 100
+       *  - Effect: Only render nodes & links in view
+       * TODO: Optimization Level 2:
+       *  - Condition: Total visible nodes in view > 100
+       *  - Effect: Also simplify node SVG elements
+       */
+      return Object.keys(this.nodes).length > 100 ? 1 : 0
+    },
     renderedLevels() {
       const levels = []
       for (let i = 1; i <= this.maxLevel; i++) {
@@ -265,14 +277,35 @@ export default {
           links: [],
         })
       }
+
+      let isInView = () => true
+      if (this.optimizationLevel > 0) {
+        const x0 = this.viewBox[0] + this.offset.x,
+          x1 = x0 + this.viewBox[2]
+        const y0 = this.viewBox[1] + this.offset.y,
+          y1 = y0 + this.viewBox[3]
+        const r = Helpers.getNodeBaseRadius(this.maxLevel) * this.scale
+        isInView = node => {
+          const x = node.coordinates.x * this.scale,
+            y = node.coordinates.y * this.scale
+          return x - r < x1 && x + r > x0 && y - r < y1 && y + r > y0
+        }
+      }
+
       for (const link of this.links) {
-        levels[
-          Math.max(this.nodes[link.source].level, this.nodes[link.target].level) - 1
-        ].links.push(link)
+        // TODO: also show link if link goes through view
+        if (isInView(this.nodes[link.source]) || isInView(this.nodes[link.target])) {
+          levels[
+            Math.max(this.nodes[link.source].level, this.nodes[link.target].level) -
+              1
+          ].links.push(link)
+        }
       }
       for (const id in this.nodes) {
         const node = this.nodes[id]
-        levels[node.level - 1].nodes[id] = node
+        if (isInView(node)) {
+          levels[node.level - 1].nodes[id] = node
+        }
       }
       levels.reverse()
       return levels
