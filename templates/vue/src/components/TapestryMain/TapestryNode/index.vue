@@ -113,7 +113,7 @@
             </div>
           </foreignObject>
         </transition>
-        <g v-show="radius * nodeScale >= 80">
+        <g v-if="!optimizationEnabled" v-show="radius * nodeScale >= 80">
           <node-button
             v-if="!node.hideMedia"
             v-show="isHovered || canEdit"
@@ -243,6 +243,7 @@ export default {
       "maxLevel",
       "currentDepth",
       "nodeNavigation",
+      "optimizationEnabled",
     ]),
     ...mapGetters([
       "getNode",
@@ -382,9 +383,11 @@ export default {
       return this.isGrandChild ? Math.min(40 / this.nodeScale, radius) : radius
     },
     fill() {
-      const showImages = this.settings.hasOwnProperty("renderImages")
-        ? this.settings.renderImages
-        : true
+      const showImages =
+        !this.optimizationEnabled &&
+        (this.settings.hasOwnProperty("renderImages")
+          ? this.settings.renderImages
+          : true)
 
       const backgroundColor = Helpers.darkenColor(
         this.node.backgroundColor,

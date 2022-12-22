@@ -38,7 +38,7 @@
           :coordinates="mouseCoordinates"
         />
         <g v-for="r in renderedLevels" :key="r.level">
-          <g class="node-shadows">
+          <g v-if="!optimizationEnabled" class="node-shadows">
             <tapestry-node-shadow
               v-for="(node, id) in r.nodes"
               :key="id"
@@ -256,17 +256,28 @@ export default {
         }
       }
     },
-    optimizationLevel() {
+    optimizationEnabled() {
       /**
-       * Optimization Level 0: No optimization
-       * Optimization Level 1:
-       *  - Condition: Total # of nodes in tapestry > 100
-       *  - Effect: Only render nodes & links in view
-       * TODO: Optimization Level 2:
-       *  - Condition: Total visible nodes in view > 100
-       *  - Effect: Also simplify node SVG elements
+       *  - Condition: Total visible nodes in view > 150 OR largest node radius on screen < 25px
+       *  - Effect: Simplify node SVG elements & disable shadows
        */
-      return Object.keys(this.nodes).length > 100 ? 1 : 0
+      if (this.nodesInView > 150) {
+        return true
+      }
+      if (!this.appDimensions) {
+        return false
+      }
+      const screenToSvgRatio = this.appDimensions.width / this.viewBox[2]
+      const largestNodeScreenRadius =
+        Helpers.getNodeBaseRadius(1) * this.scale * screenToSvgRatio
+      return largestNodeScreenRadius < 25
+    },
+    nodesInView() {
+      let count = 0
+      for (const level of this.renderedLevels) {
+        count += Object.keys(level.nodes).length
+      }
+      return count
     },
     renderedLevels() {
       const levels = []
@@ -279,12 +290,13 @@ export default {
       }
 
       let isInView = () => true
-      if (this.optimizationLevel > 0) {
+      if (Object.keys(this.nodes).length > 150) {
+        // If # of nodes in tapestry > 150, only render nodes & links in view
         const x0 = this.viewBox[0] + this.offset.x,
-          x1 = x0 + this.viewBox[2]
-        const y0 = this.viewBox[1] + this.offset.y,
+          x1 = x0 + this.viewBox[2],
+          y0 = this.viewBox[1] + this.offset.y,
           y1 = y0 + this.viewBox[3]
-        const r = Helpers.getNodeBaseRadius(this.maxLevel) * this.scale
+        const r = Helpers.getNodeBaseRadius(1) * this.scale
         isInView = node => {
           const x = node.coordinates.x * this.scale,
             y = node.coordinates.y * this.scale
@@ -308,6 +320,7 @@ export default {
         }
       }
       levels.reverse()
+
       return levels
     },
     computedViewBox() {
@@ -583,6 +596,12 @@ export default {
         this.linkToolNode = null
       }
     },
+    optimizationEnabled: {
+      immediate: true,
+      handler(optimizationEnabled) {
+        this.setOptimizationEnabled(optimizationEnabled)
+      },
+    },
   },
   mounted() {
     if (this.dragSelectEnabled) {
@@ -635,7 +654,13 @@ export default {
     this.zoomPanHelper && this.zoomPanHelper.unregister()
   },
   methods: {
-    ...mapMutations(["select", "unselect", "clearSelection", "setCurrentTool"]),
+    ...mapMutations([
+      "select",
+      "unselect",
+      "clearSelection",
+      "setCurrentTool",
+      "setOptimizationEnabled",
+    ]),
     ...mapActions([
       "goToNodeChildren",
       "goToNodeParent",

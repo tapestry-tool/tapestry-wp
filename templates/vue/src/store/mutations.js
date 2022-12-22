@@ -256,3 +256,7 @@ export function setFullscreenDropzone(state, fullscreenDropzone) {
 export function setNotifications(state, notifications) {
   state.notifications = notifications
 }
+
+export function setOptimizationEnabled(state, optimizationEnabled) {
+  state.optimizationEnabled = optimizationEnabled
+}

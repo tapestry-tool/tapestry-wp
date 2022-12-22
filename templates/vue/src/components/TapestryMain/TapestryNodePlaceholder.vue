@@ -52,7 +52,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(["maxLevel"]),
+    ...mapState(["maxLevel", "optimizationEnabled"]),
     nodeScale() {
       return Helpers.getNodeScale(this.level, this.scale)
     },
@@ -67,6 +67,9 @@ export default {
       )
     },
     dropShadow() {
+      if (this.optimizationEnabled) {
+        return "none"
+      }
       const { offset, blur, opacity } = Helpers.getDropShadow(
         this.level,
         this.maxLevel

@@ -52,7 +52,7 @@ export default {
     },
   },
   computed: {
-    ...mapState(["visibleNodes", "maxLevel", "currentDepth"]),
+    ...mapState(["visibleNodes", "maxLevel", "currentDepth", "optimizationEnabled"]),
     ...mapGetters(["getNeighbours", "isVisible"]),
     show() {
       return (
@@ -80,6 +80,9 @@ export default {
       return Helpers.getLinkElementId(this.source.id, this.target.id)
     },
     dropShadow() {
+      if (this.optimizationEnabled) {
+        return "none"
+      }
       const { offset, blur, opacity } = Helpers.getDropShadow(
         this.source.level,
         this.maxLevel,

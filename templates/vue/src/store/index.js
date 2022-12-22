@@ -66,6 +66,7 @@ export const store = {
         error: 0,
       },
     },
+    optimizationEnabled: false,
   },
   getters,
   mutations,
