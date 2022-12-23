@@ -27,16 +27,18 @@
     </b-button>
     <div v-if="error" style="margin-top: 16px;">
       {{ error.message }}
-      <br />
-      Please try with another file.
     </div>
-    <b-card v-if="isImporting" style="margin-top: 16px; min-width: 100%;">
+    <b-card
+      v-if="isImporting && showImportProgress"
+      style="margin-top: 16px; min-width: 100%;"
+    >
       <h5>Step 1 - Upload file</h5>
       <span v-if="isUploading && uploadBytesTotal > 100">
         Uploading
         <span v-if="uploadBytesTotal / uploadBytesProcessed >= 4">
           {{ importFileProgressLabel }}
         </span>
+        <a href="javascript:void(0)" class="ml-2" @click="cancelUpload">Cancel</a>
       </span>
       <b-progress
         :max="uploadBytesTotal"
@@ -83,6 +85,7 @@
 </template>
 
 <script>
+import axios from "axios"
 import { names } from "@/config/routes"
 import client from "@/services/TapestryAPI"
 import WordpressApi from "@/services/WordpressApi"
@@ -100,6 +103,7 @@ export default {
       error: null,
       isDragover: false,
       isImporting: false,
+      showImportProgress: false,
       uploadBytesTotal: 1,
       uploadBytesProcessed: 0,
       importStatusMessage: "",
@@ -109,6 +113,7 @@ export default {
       },
       warnings: {},
       exportWarnings: false,
+      cancelTokenSource: null,
     }
   },
   computed: {
@@ -176,6 +181,7 @@ export default {
           break
         case "zip":
           this.error = null
+          this.showImportProgress = true
           this.importTapestryFromZip(file)
           break
         default:
@@ -187,7 +193,7 @@ export default {
     importTapestry(file) {
       const reader = new FileReader()
       reader.onload = async e => {
-        this.error = ""
+        this.error = {}
 
         this.isImporting = true
         this.importStatusMessage = ""
@@ -211,15 +217,12 @@ export default {
       reader.readAsText(file)
     },
     importTapestryFromZip(zipFile) {
-      this.error = ""
+      this.error = {}
       this.isImporting = true
       this.importStatusMessage = "Getting ready to import"
 
       client
         .clearImportStatus()
-        .then(() => {
-          console.log("Cleared import status")
-        })
         .catch(err => {
           this.error = err.response.data
         })
@@ -227,25 +230,35 @@ export default {
           this.updateImportStatus()
         })
 
+      this.cancelTokenSource = axios.CancelToken.source()
+
       client
-        .importTapestryFromZip(zipFile)
+        .importTapestryFromZip(zipFile, this.cancelTokenSource)
         .then(response => {
+          let shouldRebuild = false
           if (response) {
             this.changes.permissions = new Set(response.changes.permissions)
             this.changes.noChange = response.changes.noChange
             this.warnings = response.warnings
             this.exportWarnings = response.exportWarnings
 
-            return response.rebuildH5PCache
+            shouldRebuild = response.rebuildH5PCache
           } else {
             this.error = {
               message: "An error occurred while uploading file.",
             }
-            return false
+            shouldRebuild = false
           }
+          return shouldRebuild
         })
         .catch(err => {
-          this.error = err.response.data
+          if (err.response) {
+            this.error = err.response.data
+          } else {
+            this.error = {
+              message: err.message,
+            }
+          }
         })
         .then(shouldRebuild => {
           if (shouldRebuild) {
@@ -264,8 +277,12 @@ export default {
             this.$bvModal.show("import-changelog")
           }
           this.importStatusMessage = ""
+          this.showImportProgress = false
           this.isImporting = false
         })
+    },
+    cancelUpload() {
+      this.cancelTokenSource.cancel("You cancelled the upload.")
     },
     updateImportStatus() {
       client
@@ -281,9 +298,12 @@ export default {
         })
         .finally(() => {
           if (this.isImporting) {
-            setTimeout(() => {
-              this.updateImportStatus()
-            }, 2000)
+            setTimeout(
+              () => {
+                this.updateImportStatus()
+              },
+              this.isUploading ? 2000 : 50
+            )
           }
         })
     },

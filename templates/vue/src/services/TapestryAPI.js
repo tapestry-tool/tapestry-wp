@@ -50,7 +50,7 @@ class TapestryApi {
     }
   }
 
-  async importTapestryFromZip(zipFile) {
+  async importTapestryFromZip(zipFile, cancelTokenSource) {
     const url = `/tapestries/${this.postId}/import_zip`
 
     const formData = new FormData()
@@ -62,6 +62,7 @@ class TapestryApi {
       onUploadProgress: progressEvent => {
         store.state.importProgress = progressEvent
       },
+      cancelToken: cancelTokenSource.token,
     })
 
     return response.data
