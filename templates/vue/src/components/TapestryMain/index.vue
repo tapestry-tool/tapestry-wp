@@ -256,6 +256,13 @@ export default {
         }
       }
     },
+    isLargeTapestry() {
+      /**
+       *  - Condition: Total number of nodes in tapestry > 150
+       *  - Effect: Only render nodes & links visible in view & disable interpolation when click-to-zoom or auto-zoom to a node
+       */
+      return Object.keys(this.nodes).length > 150
+    },
     optimizationEnabled() {
       /**
        *  - Condition: Total visible nodes in view > 150 OR largest node radius on screen < 25px
@@ -291,7 +298,7 @@ export default {
 
       let isInView = () => true
       let linkIntersectsView = () => true
-      if (Object.keys(this.nodes).length > 150) {
+      if (this.isLargeTapestry) {
         // If # of nodes in tapestry > 150, only render nodes & links in view
         const x0 = this.viewBox[0] + this.offset.x,
           x1 = x0 + this.viewBox[2],
@@ -855,6 +862,18 @@ export default {
       }
       targetOffset = this.clampOffsetValue(targetOffset, targetScale)
 
+      if (this.isLargeTapestry) {
+        this.scale = targetScale
+        this.offset.x = targetOffset.x
+        this.offset.y = targetOffset.y
+        this.viewBox[0] = targetViewBoxX
+        this.viewBox[1] = targetViewBoxY
+
+        if (!this.nodeNavLinkMode) {
+          this.showContextToolbar = "node"
+        }
+        return
+      }
       this.isTransitioning = true
       interpolate(
         {
@@ -1030,6 +1049,18 @@ export default {
       }
       targetOffset = this.clampOffsetValue(targetOffset, targetScale)
 
+      if (this.isLargeTapestry) {
+        this.scale = targetScale
+        this.offset.x = targetOffset.x
+        this.offset.y = targetOffset.y
+        this.viewBox[0] = targetViewBoxX
+        this.viewBox[1] = targetViewBoxY
+
+        if (shouldOpenToolbar) {
+          this.showContextToolbar = "node"
+        }
+        return
+      }
       this.isTransitioning = true
       interpolate(
         {
