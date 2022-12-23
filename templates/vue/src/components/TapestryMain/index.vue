@@ -1158,8 +1158,8 @@ export default {
       this.dragOffsetDelta.y = 0
       for (const id of Object.keys(this.dragCoordinates)) {
         const node = this.getNode(id)
-        node.coordinates.x += (dx - offsetX) / this.scale
-        node.coordinates.y += (dy - offsetY) / this.scale
+        node.coordinates.x += (dx - offsetX) / (this.downScale * this.scale)
+        node.coordinates.y += (dy - offsetY) / (this.downScale * this.scale)
       }
 
       // detect dragging to edge of view
@@ -1201,8 +1201,8 @@ export default {
       const { x: offsetX, y: offsetY } = this.dragOffsetDelta
       for (const [id, originalCoordinates] of Object.entries(this.dragCoordinates)) {
         const node = this.getNode(id)
-        node.coordinates.x += (dx - offsetX) / this.scale
-        node.coordinates.y += (dy - offsetY) / this.scale
+        node.coordinates.x += (dx - offsetX) / (this.downScale * this.scale)
+        node.coordinates.y += (dy - offsetY) / (this.downScale * this.scale)
         const coordinates = {
           x: node.coordinates.x,
           y: node.coordinates.y,
