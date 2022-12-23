@@ -1139,14 +1139,14 @@ export default {
         const deltaY = speed * this.dragEdgeDirection.y
 
         if (deltaX !== 0 || deltaY !== 0) {
-          this.offset.x += deltaX
-          this.offset.y += deltaY
+          this.offset.x += deltaX / this.downScale
+          this.offset.y += deltaY / this.downScale
           this.dragOffsetDelta.x += deltaX
           this.dragOffsetDelta.y += deltaY
           for (const id of Object.keys(this.dragCoordinates)) {
             const node = this.getNode(id)
-            node.coordinates.x += deltaX / this.scale
-            node.coordinates.y += deltaY / this.scale
+            node.coordinates.x += deltaX / (this.downScale * this.scale)
+            node.coordinates.y += deltaY / (this.downScale * this.scale)
           }
         }
       }, triggerInterval)
@@ -1165,12 +1165,14 @@ export default {
       // detect dragging to edge of view
       const marginRatio = 0.1
       if (
-        Math.abs(x - this.viewBox[0] - this.offset.x) <=
+        Math.abs(x / this.downScale - this.viewBox[0] - this.offset.x) <=
         this.viewBox[2] * marginRatio
       ) {
         this.dragEdgeDirection.x = -1
       } else if (
-        Math.abs(this.viewBox[0] + this.offset.x + this.viewBox[2] - x) <=
+        Math.abs(
+          this.viewBox[0] + this.offset.x + this.viewBox[2] - x / this.downScale
+        ) <=
         this.viewBox[2] * marginRatio
       ) {
         this.dragEdgeDirection.x = 1
@@ -1178,12 +1180,14 @@ export default {
         this.dragEdgeDirection.x = 0
       }
       if (
-        Math.abs(y - this.viewBox[1] - this.offset.y) <=
+        Math.abs(y / this.downScale - this.viewBox[1] - this.offset.y) <=
         this.viewBox[3] * marginRatio
       ) {
         this.dragEdgeDirection.y = -1
       } else if (
-        Math.abs(this.viewBox[1] + this.offset.y + this.viewBox[3] - y) <=
+        Math.abs(
+          this.viewBox[1] + this.offset.y + this.viewBox[3] - y / this.downScale
+        ) <=
         this.viewBox[3] * marginRatio
       ) {
         this.dragEdgeDirection.y = 1
