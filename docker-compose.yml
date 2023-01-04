@@ -51,7 +51,7 @@ services:
   db:
     image: mysql:latest
     ports:
-      - ${IP}:3306:3306 # change ip if required
+      - ${IP}:3206:3306 # change ip if required
     command:
       [
         "--default_authentication_plugin=mysql_native_password",

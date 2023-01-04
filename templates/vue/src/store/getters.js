@@ -77,7 +77,7 @@ export function hasMultiContentAncestor(_, { getParent, isNestedMultiContent }) 
 }
 
 export function isVisible(state, { getNode, hasMultiContentAncestor }) {
-  const { showRejected } = state.settings
+  const { showRejected, showChildrenOfMulticontent } = state.settings
   return id => {
     const node = getNode(id)
     if (node.nodeType === "") {
@@ -88,7 +88,8 @@ export function isVisible(state, { getNode, hasMultiContentAncestor }) {
     }
     if (!Helpers.hasPermission(node, "edit", showRejected)) {
       return (
-        (node.unlocked || !node.hideWhenLocked) && !hasMultiContentAncestor(node.id)
+        (node.unlocked || !node.hideWhenLocked) &&
+        (showChildrenOfMulticontent || !hasMultiContentAncestor(node.id))
       )
     }
     return true

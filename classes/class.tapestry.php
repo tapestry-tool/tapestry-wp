@@ -125,6 +125,9 @@ class Tapestry implements ITapestry
             if (!isset($this->settings->status)) {
                 $this->settings->status = get_post_status($this->postId);
             }
+            if (!isset($this->settings->showChildrenOfMulticontent)) {
+                $this->settings->showChildrenOfMulticontent = false;
+            }
         }
         if (isset($tapestry->notifications) && is_object($tapestry->notifications)) {
             $this->notifications = $tapestry->notifications;
@@ -220,7 +223,7 @@ class Tapestry implements ITapestry
         }
 
         $tapestryNode->set($node);
-        $node = $tapestryNode->save($node);
+        $node = $tapestryNode->save();
 
         array_push($this->nodes, $node->id);
 
@@ -475,15 +478,20 @@ class Tapestry implements ITapestry
     /**
      * Retrieve a Tapestry post for export.
      *
+     * @param bool $includeComments whether to include the comments associated with each node
+     *
      * @return object $tapestry
      */
-    public function export()
+    public function export($includeComments)
     {
         $nodes = [];
         foreach ($this->nodes as $node) {
             $temp = (new TapestryNode($this->postId, $node))->get();
             if (NodeStatus::DRAFT == $temp->status) {
                 continue;
+            }
+            if (!$includeComments) {
+                unset($temp->comments);
             }
             $nodes[] = $temp;
         }
@@ -608,6 +616,7 @@ class Tapestry implements ITapestry
         $settings->showAccess = true;
         $settings->showRejected = false;
         $settings->showAcceptedHighlight = true;
+        $settings->showChildrenOfMulticontent = false;
         $settings->defaultPermissions = TapestryNodePermissions::getDefaultNodePermissions($this->postId);
         $settings->superuserOverridePermissions = true;
         $settings->analyticsEnabled = false;
