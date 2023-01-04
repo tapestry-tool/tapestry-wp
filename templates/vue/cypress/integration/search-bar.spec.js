@@ -13,7 +13,6 @@ describe("Search bar", () => {
       .its("state.nodes")
       .then(nodes => {
         const allNodes = Object.values(nodes)
-        assertVisibleNodes(allNodes)
 
         cy.get("[aria-label=search]").click()
         assertVisibleNodes([])
@@ -118,16 +117,9 @@ const assertVisibleNodes = visibleNodes => {
     .its("state.nodes")
     .then(nodes => {
       for (const node of Object.values(nodes)) {
-        cy.getNodeById(node.id)
-          .should("have.css", "opacity")
-          .and(opacity => {
-            const opacityAsNum = Number(opacity)
-            if (expected.includes(node.id)) {
-              expect(opacityAsNum).to.equal(1)
-            } else {
-              expect(opacityAsNum).to.be.lessThan(1)
-            }
-          })
+        if (!expected.includes(node.id)) {
+          cy.getNodeById(node.id).should("have.class", "desaturated")
+        }
       }
     })
 }

@@ -186,6 +186,7 @@ export default {
       scale: 1,
       manualScale: 1,
       offset: { x: 0, y: 0 },
+      savedZoomParams: null,
       appDimensions: null,
       zoomPanHelper: null,
       isPanning: false,
@@ -285,6 +286,9 @@ export default {
     },
     isLoggedIn() {
       return wp.isLoggedIn()
+    },
+    isFilteringTapestry() {
+      return !!this.$route.query.search
     },
     canEdit() {
       return wp.canEditTapestry()
@@ -454,6 +458,32 @@ export default {
         this.fetchAppDimensions()
       }, 300)
     },
+    isFilteringTapestry: {
+      immediate: true,
+      handler(isFilteringTapestry) {
+        if (isFilteringTapestry) {
+          this.savedZoomParams = {
+            scale: this.scale,
+            offset: { ...this.offset },
+          }
+          this.scale = 1
+          this.offset.x = 0
+          this.offset.y = 0
+          this.viewBox[0] = this.unscaledViewBox[0]
+          this.viewBox[1] = this.unscaledViewBox[1]
+          this.showContextToolbar = false
+        } else if (this.savedZoomParams) {
+          if (this.scale === 1 && this.offset.x === 0 && this.offset.y === 0) {
+            this.scale = this.savedZoomParams.scale
+            this.offset.x = this.savedZoomParams.offset.x
+            this.offset.y = this.savedZoomParams.offset.y
+            this.viewBox[0] = this.unscaledViewBox[0] * this.scale
+            this.viewBox[1] = this.unscaledViewBox[1] * this.scale
+          }
+          this.savedZoomParams = null
+        }
+      },
+    },
     selectedId: {
       immediate: true,
       handler(nodeId) {
@@ -573,7 +603,7 @@ export default {
       this.zoomPanHelper.register()
     }
 
-    if (this.selectedId) {
+    if (this.selectedId && !this.isFilteringTapestry) {
       this.zoomToAndCenterNode(this.getNode(this.selectedId))
     }
 

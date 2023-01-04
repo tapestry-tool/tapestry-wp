@@ -5,7 +5,11 @@
         v-model="currentDepth"
         aria-label="Change the depth of the Tapestry view"
         class="slider"
+        :class="{
+          disabled: isFilteringTapestry,
+        }"
         type="range"
+        :disabled="isFilteringTapestry"
         min="1"
         :max="maxDepth"
         :style="{ '--zoomInBg': zoomInBg, '--zoomOutBg': zoomOutBg }"
@@ -22,6 +26,11 @@ import Helpers from "@/utils/Helpers"
 import client from "@/services/TapestryAPI"
 
 export default {
+  data() {
+    return {
+      savedDepth: 3,
+    }
+  },
   computed: {
     ...mapState(["nodes", "settings", "maxLevel"]),
     ...mapGetters(["getNeighbours", "getNode"]),
@@ -56,6 +65,9 @@ export default {
     zoomOutBg() {
       return "url(" + Helpers.getImagePath(ZoomOut) + ")"
     },
+    isFilteringTapestry() {
+      return !!this.$route.query.search
+    },
   },
   watch: {
     currentDepth(depth, oldDepth) {
@@ -72,11 +84,26 @@ export default {
         this.updateNodeTypes()
       },
     },
+    isFilteringTapestry: {
+      immediate: true,
+      handler(isFilteringTapestry) {
+        if (isFilteringTapestry) {
+          this.savedDepth = this.currentDepth
+          this.setCurrentDepth(this.maxLevel)
+        } else {
+          this.currentDepth = this.savedDepth
+        }
+      },
+    },
   },
   created() {
     const { depth } = this.$route.query
     if (depth) {
-      this.currentDepth = depth
+      if (this.isFilteringTapestry) {
+        this.savedDepth = depth
+      } else {
+        this.currentDepth = depth
+      }
     }
   },
   methods: {
@@ -246,6 +273,21 @@ export default {
     height: 20px;
     border-radius: 50%;
     background: var(--highlight-color);
+  }
+
+  &.disabled {
+    &::-webkit-slider-thumb {
+      background: #c2c2c2;
+      cursor: not-allowed;
+    }
+    &::-moz-range-thumb {
+      background: #c2c2c2;
+      cursor: not-allowed;
+    }
+    &::-ms-thumb {
+      background: #c2c2c2;
+      cursor: not-allowed;
+    }
   }
 
   &:focus {

@@ -77,7 +77,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(["nodes", "links", "maxLevel", "browserDimensions"]),
+    ...mapState(["nodes", "links", "maxLevel", "browserDimensions", "visibleNodes"]),
     ...mapGetters(["isVisible"]),
     aspectRatio() {
       return this.viewBox[2] / this.viewBox[3]
@@ -91,12 +91,21 @@ export default {
     displayScale() {
       return this.height / this.viewBox[3]
     },
+    isFilteringTapestry() {
+      return !!this.$route.query.search
+    },
   },
   watch: {
     nodes() {
       this.drawMinimap()
     },
     links() {
+      this.drawMinimap()
+    },
+    visibleNodes() {
+      this.drawMinimap()
+    },
+    isFilteringTapestry() {
       this.drawMinimap()
     },
     scale() {
@@ -198,6 +207,10 @@ export default {
         }
 
         // 3. draw nodes
+        const highlightColor = getComputedStyle(this.$refs.minimap).getPropertyValue(
+          "--highlight-color"
+        )
+
         for (const id in this.nodes) {
           const node = this.nodes[id]
           if (!this.isVisible(id)) {
@@ -215,6 +228,16 @@ export default {
           c.shadowOffsetX = shadow.offset
           c.shadowOffsetY = shadow.offset
           c.fill()
+
+          if (this.isFilteringTapestry && this.visibleNodes.includes(node.id)) {
+            c.save()
+            c.beginPath()
+            c.arc(x, y, radius + 40, 0, Math.PI * 2)
+            c.fillStyle = highlightColor
+            c.globalAlpha = 0.4
+            c.fill()
+            c.restore()
+          }
         }
         c.shadowColor = "rgba(0, 0, 0, 0)"
 

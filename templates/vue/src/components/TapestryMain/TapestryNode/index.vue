@@ -12,7 +12,8 @@
         `translate(${coordinates.x}, ${coordinates.y}) scale(${nodeScale})`
       "
       :class="{
-        opaque: !visibleNodes.includes(node.id),
+        desaturated: !isFilterMatched,
+        opaque: !isFilterMatched,
       }"
       :style="{
         cursor: cursor,
@@ -27,6 +28,10 @@
     >
       <circle
         ref="circle"
+        class="node-circle"
+        :class="{
+          opaque: !isFilterMatched && useImageFill,
+        }"
         :data-qa="`node-circle-${node.id}`"
         :fill="fill"
         :stroke="progressBackgroundColor"
@@ -51,6 +56,7 @@
       </transition>
       <progress-bar
         v-if="!isGrandChild && node.nodeType !== '' && !node.hideProgress"
+        class="progress-bar"
         :x="coordinates.x"
         :y="coordinates.y"
         :radius="radius"
@@ -91,7 +97,9 @@
             <div
               class="meta"
               :style="{
-                color: node.textColor,
+                color: !isFilterMatched
+                  ? 'var(--text-color-tertiary)'
+                  : node.textColor,
                 fontSize: radius * 0.2 + 'px',
               }"
             >
@@ -231,6 +239,8 @@ export default {
       isFocused: false,
 
       lastClickTime: 0,
+
+      themedBackground: "#eee",
     }
   },
   computed: {
@@ -241,6 +251,7 @@ export default {
       "maxLevel",
       "currentDepth",
       "nodeNavigation",
+      "theme",
     ]),
     ...mapGetters([
       "getNode",
@@ -379,23 +390,23 @@ export default {
       const radius = Helpers.getNodeBaseRadius(this.node.level)
       return this.isGrandChild ? Math.min(40 / this.nodeScale, radius) : radius
     },
-    fill() {
+    useImageFill() {
       const showImages = this.settings.hasOwnProperty("renderImages")
         ? this.settings.renderImages
         : true
-
+      return !this.isGrandChild && showImages && this.thumbnailURL
+    },
+    fill() {
       const backgroundColor = Helpers.darkenColor(
         this.node.backgroundColor,
         this.node.level,
         this.maxLevel
       )
 
-      if (!this.isGrandChild) {
-        if (showImages && this.thumbnailURL) {
-          return `url(#node-image-${this.node.id})`
-        } else {
-          return backgroundColor
-        }
+      if (!this.isFilterMatched) {
+        return this.desaturatedBackgroundColor
+      } else if (this.useImageFill) {
+        return `url(#node-image-${this.node.id})`
       } else if (this.selected) {
         return "var(--highlight-color)"
       } else {
@@ -443,6 +454,11 @@ export default {
         .desaturate()
         .toString()
     },
+    desaturatedBackgroundColor() {
+      const background = this.themedBackground
+      const desaturated = Helpers.saturateColor(this.node.backgroundColor, 0.7)
+      return Helpers.mixColor(background, desaturated, 0.7)
+    },
     thumbnailURL() {
       return !this.node.unlocked && this.node.lockedImageURL
         ? this.node.lockedImageURL
@@ -467,6 +483,9 @@ export default {
         this.node.reviewStatus !== nodeStatus.ACCEPT ||
         this.settings.showAcceptedHighlight
       )
+    },
+    isFilterMatched() {
+      return this.visibleNodes.includes(this.node.id)
     },
     selectHaloWidth() {
       return this.radius * 0.1
@@ -525,6 +544,9 @@ export default {
           },
         })
       }
+    },
+    theme() {
+      this.getThemedBackground()
     },
   },
   mounted() {
@@ -684,15 +706,16 @@ export default {
     hasNodePermission(action) {
       return this.hasPermission(this.node, action)
     },
+    getThemedBackground() {
+      this.themedBackground = getComputedStyle(this.$refs.node).getPropertyValue(
+        "--bg-color-primary"
+      )
+    },
   },
 }
 </script>
 
 <style lang="scss" scoped>
-.opaque {
-  opacity: 0.2;
-}
-
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.2s;
@@ -705,8 +728,26 @@ export default {
 </style>
 
 <style lang="scss">
+.desaturated {
+  filter: saturate(25%);
+}
+
+.node-circle.opaque {
+  opacity: 0.8;
+}
+
 .node-container {
   outline: none;
+
+  &.opaque {
+    & > *:not(.node-circle) {
+      opacity: 0.3;
+    }
+
+    .progress-bar {
+      stroke-opacity: 0.3;
+    }
+  }
 }
 
 .node-button {

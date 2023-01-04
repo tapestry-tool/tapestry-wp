@@ -6,9 +6,6 @@
       :transform="
         `translate(${coordinates.x}, ${coordinates.y}) scale(${nodeScale})`
       "
-      :class="{
-        opaque: !visibleNodes.includes(node.id),
-      }"
       :fill="fill"
       :style="{
         filter: dropShadow,
@@ -47,9 +44,9 @@ export default {
     ...mapState([
       "selection",
       "settings",
-      "visibleNodes",
       "maxLevel",
       "currentDepth",
+      "visibleNodes",
     ]),
     ...mapGetters(["isVisible"]),
     show() {
@@ -117,7 +114,9 @@ export default {
         this.node.level,
         this.maxLevel
       )
-      return `drop-shadow(${offset}px ${offset}px ${blur}px rgba(0, 0, 0, ${opacity}))`
+      const opacityMultiplier = this.visibleNodes.includes(this.node.id) ? 1 : 0.5
+      return `drop-shadow(${offset}px ${offset}px ${blur}px rgba(0, 0, 0, ${opacity *
+        opacityMultiplier}))`
     },
   },
   watch: {
@@ -142,10 +141,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.opaque {
-  opacity: 0.2;
-}
-
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.2s;
