@@ -23,7 +23,7 @@ export const store = {
     favourites: [],
     visibleNodes: [],
     apiError: null,
-    displayErrors: false,
+    displayErrors: true,
     theme: "",
     userAnswers: {},
     returnRoute: null,

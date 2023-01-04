@@ -484,15 +484,27 @@ export default {
       // save initial coordinates of nodes
       this.dragCoordinates = {}
       if (this.selection.length) {
-        this.dragCoordinates = this.selection.reduce((coordinates, nodeId) => {
-          const node = this.getNode(nodeId)
-          coordinates[nodeId] = {
+        const selectedNodes = this.selection.map(nodeId => this.getNode(nodeId))
+        const movableNodes = this.settings.allowMovingAllNodes
+          ? selectedNodes
+          : selectedNodes.filter(node => this.hasPermission(node, "move"))
+        if (movableNodes.length === 0) {
+          return
+        }
+        this.dragCoordinates = movableNodes.reduce((coordinates, node) => {
+          coordinates[node.id] = {
             x: node.coordinates.x,
             y: node.coordinates.y,
           }
           return coordinates
         }, {})
       } else {
+        if (
+          !this.settings.allowMovingAllNodes &&
+          !this.hasPermission(node, "move")
+        ) {
+          return
+        }
         this.dragCoordinates[node.id] = {
           x: node.coordinates.x,
           y: node.coordinates.y,

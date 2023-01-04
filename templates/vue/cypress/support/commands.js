@@ -59,17 +59,14 @@ Cypress.Commands.add("getSelectedNode", () =>
     .then(({ nodes, selectedNodeId }) => nodes[selectedNodeId])
 )
 
-Cypress.Commands.add("addNode", { prevSubject: false }, (parent, node) => {
+Cypress.Commands.add("addNode", { prevSubject: false }, (parentId, node) => {
   cy.intercept("POST", `**/nodes`).as("addNode")
   cy.store().then(store => {
-    store.dispatch("addNode", deepMerge(store.getters.createDefaultNode(), node))
-    cy.wait("@addNode")
-    cy.getNodeByTitle(node.title).then(({ id }) => {
-      store.commit("updateVisibleNodes", [...store.state.visibleNodes, id])
-      if (parent) {
-        cy.addLink(parent.id || parent, id)
-      }
+    store.dispatch("addNode", {
+      node: deepMerge(store.getters.createDefaultNode(), node),
+      parentId,
     })
+    cy.wait("@addNode")
   })
 })
 
@@ -123,6 +120,15 @@ Cypress.Commands.add("openLightbox", { prevSubject: "optional" }, (node, id) => 
 })
 
 Cypress.Commands.add("closeLightbox", () => cy.getByTestId("close-lightbox").click())
+
+// -- Sidebar --
+
+Cypress.Commands.add("sidebar", () => cy.getByTestId("sidebar"))
+
+Cypress.Commands.add("openSidebar", () => {
+  cy.getByTestId("sidebar-toggle").click()
+  return cy.sidebar()
+})
 
 // -- Links --
 
@@ -178,8 +184,6 @@ Cypress.Commands.add("changeMediaFormat", format =>
 )
 
 // -- Utils --
-
-Cypress.Commands.add("sidebar", () => cy.getByTestId("sidebar"))
 
 Cypress.Commands.add("app", () => cy.window().its("app"))
 

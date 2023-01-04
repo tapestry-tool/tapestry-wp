@@ -8,7 +8,6 @@ require_once dirname(__FILE__).'/../classes/class.tapestry-user-progress.php';
 require_once dirname(__FILE__).'/../classes/class.tapestry-h5p.php';
 require_once dirname(__FILE__).'/../classes/class.constants.php';
 require_once dirname(__FILE__).'/../interfaces/interface.tapestry.php';
-require_once dirname(__FILE__).'/class.constants.php';
 
 /**
  * TODO: Implement group functionality. Currently all the group-related
@@ -109,6 +108,9 @@ class Tapestry implements ITapestry
             if (!isset($this->settings->analyticsEnabled)) {
                 $this->settings->analyticsEnabled = false;
             }
+            if (!isset($this->settings->allowMovingAllNodes)) {
+                $this->settings->allowMovingAllNodes = false;
+            }
             if (!isset($this->settings->draftNodesEnabled)) {
                 $this->settings->draftNodesEnabled = true;
                 $this->settings->submitNodesEnabled = true;
@@ -124,6 +126,9 @@ class Tapestry implements ITapestry
             }
             if (!isset($this->settings->status)) {
                 $this->settings->status = get_post_status($this->postId);
+            }
+            if (!isset($this->settings->showChildrenOfMulticontent)) {
+                $this->settings->showChildrenOfMulticontent = false;
             }
         }
         if (isset($tapestry->notifications) && is_object($tapestry->notifications)) {
@@ -220,7 +225,7 @@ class Tapestry implements ITapestry
         }
 
         $tapestryNode->set($node);
-        $node = $tapestryNode->save($node);
+        $node = $tapestryNode->save();
 
         array_push($this->nodes, $node->id);
 
@@ -475,15 +480,20 @@ class Tapestry implements ITapestry
     /**
      * Retrieve a Tapestry post for export.
      *
+     * @param bool $includeComments whether to include the comments associated with each node
+     *
      * @return object $tapestry
      */
-    public function export()
+    public function export($includeComments)
     {
         $nodes = [];
         foreach ($this->nodes as $node) {
             $temp = (new TapestryNode($this->postId, $node))->get();
             if (NodeStatus::DRAFT == $temp->status) {
                 continue;
+            }
+            if (!$includeComments) {
+                unset($temp->comments);
             }
             $nodes[] = $temp;
         }
@@ -608,11 +618,13 @@ class Tapestry implements ITapestry
         $settings->showAccess = true;
         $settings->showRejected = false;
         $settings->showAcceptedHighlight = true;
+        $settings->showChildrenOfMulticontent = false;
         $settings->defaultPermissions = TapestryNodePermissions::getDefaultNodePermissions($this->postId);
         $settings->superuserOverridePermissions = true;
         $settings->analyticsEnabled = false;
         $settings->draftNodesEnabled = true;
         $settings->submitNodesEnabled = true;
+        $settings->allowMovingAllNodes = false;
         $settings->permalink = get_permalink($this->postId);
 
         return $settings;
@@ -816,8 +828,8 @@ class Tapestry implements ITapestry
 
     private function _userIsAllowed($node, $superuser_override, $userId)
     {
-        return TapestryHelpers::userIsAllowed('READ', $node, $this->postId, $superuser_override, $userId)
-        || TapestryHelpers::userIsAllowed('ADD', $node, $this->postId, $superuser_override, $userId)
-        || TapestryHelpers::userIsAllowed('EDIT', $node, $this->postId, $superuser_override, $userId);
+        return TapestryHelpers::userIsAllowed(UserActions::READ, $node, $this->postId, $superuser_override, $userId)
+        || TapestryHelpers::userIsAllowed(UserActions::ADD, $node, $this->postId, $superuser_override, $userId)
+        || TapestryHelpers::userIsAllowed(UserActions::EDIT, $node, $this->postId, $superuser_override, $userId);
     }
 }

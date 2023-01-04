@@ -63,14 +63,20 @@ class TapestryApi {
     return response.data
   }
 
-  async getTapestryExport() {
-    const url = `/tapestries/${this.postId}/export`
+  async getTapestryExport(shouldExportComments) {
+    let url = `/tapestries/${this.postId}/export`
+    if (shouldExportComments) {
+      url += "?exportComments=1"
+    }
     const response = await this.client.get(url)
     return response.data
   }
 
-  async getTapestryExportAsZip() {
-    const url = `/tapestries/${this.postId}/export_zip`
+  async getTapestryExportAsZip(shouldExportComments) {
+    let url = `/tapestries/${this.postId}/export_zip`
+    if (shouldExportComments) {
+      url += "?exportComments=1"
+    }
     const response = await this.client.get(url)
     return response.data
   }
@@ -92,9 +98,9 @@ class TapestryApi {
    *
    * @return  {Object}
    */
-  async addNode(node) {
+  async addNode(payload) {
     const url = `/tapestries/${this.postId}/nodes`
-    const response = await this.client.post(url, node)
+    const response = await this.client.post(url, payload)
     return response
   }
 
@@ -147,6 +153,24 @@ class TapestryApi {
   async getNodeHasDraftChildren(id) {
     const url = `/tapestries/${this.postId}/nodes/${id}/nodeHasDraftChildren`
     const response = await this.client.get(url)
+    return response.data
+  }
+
+  async addComment(id, comment, replyingTo) {
+    const url = `/tapestries/${this.postId}/nodes/${id}/comments`
+    const response = await this.client.post(url, {
+      comment,
+      replyingTo,
+    })
+    return response.data
+  }
+
+  async performCommentAction(id, commentId, action) {
+    const url = `/tapestries/${this.postId}/nodes/${id}/comments`
+    const response = await this.client.put(url, {
+      id: commentId,
+      action: action,
+    })
     return response.data
   }
 
