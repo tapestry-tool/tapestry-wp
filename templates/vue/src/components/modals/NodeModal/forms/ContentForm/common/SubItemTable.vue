@@ -13,7 +13,12 @@
               {{ subItemNode.title }}
             </b-td>
             <b-td class="text-right">
-              <b-link @click="handleEdit(subItemNode.id)">Edit</b-link>
+              <b-link
+                v-if="canEdit(subItemNode)"
+                @click="handleEdit(subItemNode.id)"
+              >
+                Edit
+              </b-link>
             </b-td>
           </b-tr>
         </b-tbody>
@@ -50,6 +55,7 @@
 <script>
 import { mapGetters, mapState } from "vuex"
 import { names } from "@/config/routes"
+import Helpers from "@/utils/Helpers"
 
 export default {
   name: "sub-item-table",
@@ -67,6 +73,7 @@ export default {
   computed: {
     ...mapState({
       node: "currentEditingNode",
+      showRejected: state => state.settings.showRejected,
     }),
     ...mapGetters(["getNode"]),
     requiresSaving() {
@@ -84,6 +91,9 @@ export default {
     },
   },
   methods: {
+    canEdit(node) {
+      return Helpers.hasPermission(node, "edit", this.showRejected)
+    },
     addSubitem() {
       let newQuery = { ...this.$route.query, nav: "modal" }
       if (this.isPopups) {
