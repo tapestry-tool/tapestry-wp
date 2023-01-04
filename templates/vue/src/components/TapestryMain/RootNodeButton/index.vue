@@ -273,7 +273,7 @@ export default {
           this.error = err
         })
         .finally(() => {
-          if (!this.error) {
+          if (!this.error?.message) {
             this.$bvModal.show("import-changelog")
           }
           this.importStatusMessage = ""
