@@ -373,18 +373,21 @@ export default {
     canPublish() {
       if (this.type === "add") {
         return (
-          Helpers.hasPermission(this.parent, this.type) &&
+          this.hasPermission(this.parent, this.type) &&
           (!this.parent || this.parent.status !== "draft")
         )
       } else if (this.node.status === "draft" && this.type === "edit") {
-        return this.getNeighbours(this.nodeId).some(neighbourId => {
-          let neighbour = this.getNode(neighbourId)
-          return (
-            neighbour.status !== "draft" && Helpers.hasPermission(neighbour, "add")
-          )
-        })
+        return (
+          this.hasPermission(null, "add") ||
+          this.getNeighbours(this.nodeId).some(neighbourId => {
+            let neighbour = this.getNode(neighbourId)
+            return (
+              neighbour.status !== "draft" && this.hasPermission(neighbour, "add")
+            )
+          })
+        )
       } else {
-        return Helpers.hasPermission(this.node, this.type)
+        return this.hasPermission(this.node, this.type)
       }
     },
     authoredNode() {
@@ -591,6 +594,9 @@ export default {
     update(property, value) {
       this.setCurrentEditingNodeProperty({ property, value })
     },
+    hasPermission(node, action) {
+      return Helpers.hasPermission(node, action, this.settings.showRejected)
+    },
     setLoading(status) {
       this.loading = status
     },
@@ -622,7 +628,7 @@ export default {
       if (!this.nodes.hasOwnProperty(nodeId)) {
         return false
       }
-      const isAllowed = Helpers.hasPermission(this.getNode(nodeId), this.type)
+      const isAllowed = this.hasPermission(this.getNode(nodeId), this.type)
       const messages = {
         edit: `You don't have permission to edit this node`,
         add: `You don't have permission to add to this node`,
@@ -924,28 +930,12 @@ export default {
     },
     async submitNode() {
       if (this.type === "add") {
-        const id = await this.addNode(this.node)
+        const id = await this.addNode({
+          node: this.node,
+          parentId: this.parentId,
+        })
         this.update("id", id)
-        if (this.parent) {
-          // Add link from parent node to this node
-          const newLink = {
-            source: this.parent.id,
-            target: id,
-            value: 1,
-            type: "",
-            addedOnNodeCreation: true,
-          }
-          await this.addLink(newLink)
-          // do not update parent's child ordering if the current node is a draft node since draft shouldn't appear in multi-content nodes
-          if (this.node.status !== "draft") {
-            this.$store.commit("updateNode", {
-              id: this.parent.id,
-              newNode: {
-                childOrdering: [...this.parent.childOrdering],
-              },
-            })
-          }
-        } else {
+        if (!this.parent) {
           this.updateRootNode(id)
         }
       } else {
