@@ -209,7 +209,7 @@ export default class Helpers {
   static hasPermission(node, action, showRejected) {
     // Check 0: node is null case - this should only apply to creating the root node.
     if (node === null) {
-      return wp.canEditTapestry()
+      return action === userActions.ADD && wp.canEditTapestry()
     }
 
     // Public users never have any permissions other than read
@@ -484,20 +484,24 @@ export default class Helpers {
     return 140 * Math.pow(0.75, level - 1)
   }
 
-  static getNodeRadius(level, scale) {
-    const baseRadius = Helpers.getNodeBaseRadius(level)
+  static getNodeScale(level, scale) {
     const currentLevel = Helpers.getCurrentLevel(scale)
     if (level < currentLevel) {
       // growth rate should be slow for nodes higher than current level
       const baseScale = (level + 1) / store.state.scaleConstants.levelMultiplier
       return (
-        baseRadius *
-        (baseScale +
-          (scale - baseScale) / store.state.scaleConstants.largeNodeGrowthSupressor)
+        baseScale +
+        (scale - baseScale) / store.state.scaleConstants.largeNodeGrowthSupressor
       )
     } else {
-      return baseRadius * scale
+      return scale
     }
+  }
+
+  static getNodeRadius(level, scale) {
+    const baseRadius = Helpers.getNodeBaseRadius(level)
+    const nodeScale = Helpers.getNodeScale(level, scale)
+    return baseRadius * nodeScale
   }
 
   static getMinimapLinePoints(source, target) {

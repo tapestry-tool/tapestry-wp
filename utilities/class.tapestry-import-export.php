@@ -86,7 +86,7 @@ class TapestryImportExport
 
         // if permissions modified, add the role to changes
         foreach ($permissions as $key => $value) {
-            if (!array_key_exists($key, $filteredPerms)) {
+            if (!property_exists($filteredPerms, $key)) {
                 array_push($changes, $key);
             }
         }
@@ -210,7 +210,7 @@ class TapestryImportExport
         }
 
         if ($tapestry_data->settings) {
-            self::_exportMedia($tapestry_data->settings->backgroundUrl, $zip, $export_warnings['settings'], $export_log);            
+            self::_exportMedia($tapestry_data->settings->backgroundUrl, $zip, $export_warnings['settings'], $export_log);
         }
 
         $tapestry_data->warnings = !empty($export_warnings['nodes']) || !empty($export_warnings['settings']);
@@ -473,7 +473,8 @@ class TapestryImportExport
         }
     }
 
-    public static function getExportId() {
+    public static function getExportId()
+    {
         return uniqid();
     }
 
@@ -520,10 +521,10 @@ class TapestryImportExport
                 self::_importActivityNode($node, $temp_dir, $node_warnings, $imported_media);
             }
 
-            if (!empty($node->thumbnailFileId)) {
+            if (!empty($node->imageURL)) {
                 self::_importMedia($node->imageURL, $temp_dir, $node_warnings, $imported_media, true, $node->thumbnailFileId);
             }
-            if (!empty($node->lockedThumbnailFileId)) {
+            if (!empty($node->lockedImageURL)) {
                 self::_importMedia($node->lockedImageURL, $temp_dir, $node_warnings, $imported_media, true, $node->lockedThumbnailFileId);
             }
 

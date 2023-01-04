@@ -3,10 +3,13 @@
     <g
       v-show="show"
       ref="node"
+      class="node-container"
       :aria-label="ariaLabel"
       :data-qa="`node-${node.id}`"
       :data-locked="!node.unlocked"
-      :transform="`translate(${coordinates.x}, ${coordinates.y})`"
+      :transform="
+        `translate(${coordinates.x}, ${coordinates.y}) scale(${nodeScale})`
+      "
       :class="{
         opaque: !visibleNodes.includes(node.id),
         'has-thumbnail': node.thumbnailURL,
@@ -32,6 +35,15 @@
       ></circle>
       <transition name="fade">
         <circle
+          v-show="root && !isGrandChild"
+          ref="halo"
+          fill="none"
+          :stroke-width="selectHaloWidth"
+          :stroke="selectHaloColor"
+        ></circle>
+      </transition>
+      <transition name="fade">
+        <circle
           v-show="(!node.hideTitle && !isHovered) || !node.unlocked || selected"
           :r="radius"
           :fill="overlayFill"
@@ -53,7 +65,7 @@
         v-if="!isGrandChild && node.nodeType !== '' && !node.hideProgress"
         :x="coordinates.x"
         :y="coordinates.y"
-        :radius="radius"
+        :radius="root ? radius + selectHaloWidth : radius"
         :locked="!node.unlocked"
         :status="node.status"
         :reviewStatus="node.reviewStatus"
@@ -91,7 +103,7 @@
             </div>
           </foreignObject>
         </transition>
-        <g v-show="radius >= 80">
+        <g v-show="radius * nodeScale >= 80">
           <node-button
             v-if="!node.hideMedia"
             :x="0"
@@ -99,38 +111,43 @@
             :fill="buttonBackgroundColor"
             :data-qa="`open-node-${node.id}`"
             :disabled="!node.unlocked && !hasPermission('edit')"
+            :radius="radius"
+            :icon="icon"
             @click="handleRequestOpen"
-          >
-            <tapestry-icon :icon="icon" svg></tapestry-icon>
-          </node-button>
+          ></node-button>
           <template v-if="isLoggedIn">
             <add-child-button
               v-if="canAddChild"
               :node="node"
               :fill="buttonBackgroundColor"
-              :x="canReview || hasPermission('edit') ? -35 : 0"
+              :x="canReview || hasPermission('edit') ? -radius * 0.25 : 0"
               :y="radius"
+              :radius="radius"
             ></add-child-button>
             <node-button
               v-if="hasPermission('edit')"
-              :x="hasTooManyLevels && node.mediaType !== 'multi-content' ? 0 : 35"
+              :x="
+                hasTooManyLevels && node.mediaType !== 'multi-content'
+                  ? 0
+                  : radius * 0.25
+              "
               :y="radius"
               :fill="buttonBackgroundColor"
               :data-qa="`edit-node-${node.id}`"
+              :radius="radius"
+              icon="pen"
               @click="editNode(node.id)"
-            >
-              <tapestry-icon icon="pen" svg></tapestry-icon>
-            </node-button>
+            ></node-button>
             <node-button
               v-else-if="canReview"
-              :x="hasTooManyLevels ? 0 : 35"
+              :x="hasTooManyLevels ? 0 : radius * 0.25"
               :y="radius"
               :fill="buttonBackgroundColor"
               :data-qa="`review-node-${node.id}`"
+              :radius="radius"
+              icon="comment-dots"
               @click="reviewNode"
-            >
-              <tapestry-icon icon="comment-dots" svg></tapestry-icon>
-            </node-button>
+            ></node-button>
           </template>
         </g>
       </g>
@@ -322,13 +339,15 @@ export default {
       // make it grandchild when not visible too, to prevent buttons showing up while transitioning to hidden
       return this.visibility <= 0
     },
+    nodeScale() {
+      return Helpers.getNodeScale(this.node.level, this.scale)
+    },
     radius() {
       if (!this.show) {
         return 0
       }
-      const radius =
-        Helpers.getNodeRadius(this.node.level, this.scale) * (this.root ? 1.2 : 1)
-      return this.isGrandChild ? Math.min(40, radius) : radius
+      const radius = Helpers.getNodeBaseRadius(this.node.level)
+      return this.isGrandChild ? Math.min(40 / this.nodeScale, radius) : radius
     },
     fill() {
       const showImages = this.settings.hasOwnProperty("renderImages")
@@ -419,6 +438,12 @@ export default {
         this.settings.showAcceptedHighlight
       )
     },
+    selectHaloWidth() {
+      return this.radius * 0.1
+    },
+    selectHaloColor() {
+      return "#49cfff"
+    },
   },
   watch: {
     radius(newRadius) {
@@ -433,11 +458,18 @@ export default {
           this.transitioning = false
         })
         .attr("r", newRadius)
+
+      d3.select(this.$refs.halo)
+        .transition()
+        .duration(350)
+        .ease(d3.easePolyOut)
+        .attr("r", newRadius + this.selectHaloWidth / 2)
     },
   },
   mounted() {
     this.$emit("mounted")
     this.$refs.circle.setAttribute("r", this.radius)
+    this.$refs.halo.setAttribute("r", this.radius + this.selectHaloWidth / 2)
     const nodeRef = this.$refs.node
     if (this.root) {
       nodeRef.setAttribute("tabindex", "0")
@@ -582,6 +614,10 @@ export default {
 </style>
 
 <style lang="scss">
+.node-container {
+  outline: none;
+}
+
 .node-button {
   height: 55px;
   width: 55px;
@@ -624,11 +660,18 @@ export default {
   flex-direction: column;
   text-align: center;
   font-size: 30px;
+
+  p {
+    margin: 0;
+    padding: 0;
+  }
+
   .title {
-    padding-left: 0;
-    margin-top: 12px;
-    margin-bottom: 0;
     font-weight: bold;
+  }
+
+  .timecode {
+    font-size: 70%;
   }
 }
 </style>

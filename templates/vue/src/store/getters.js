@@ -1,4 +1,5 @@
 import Helpers from "@/utils/Helpers"
+import * as wp from "../services/wp"
 
 export function getDirectChildren(state) {
   return id => {
@@ -77,7 +78,7 @@ export function hasMultiContentAncestor(_, { getParent, isNestedMultiContent }) 
 }
 
 export function isVisible(state, { getNode, hasMultiContentAncestor }) {
-  const { showRejected } = state.settings
+  const { showRejected, showChildrenOfMulticontent } = state.settings
   return id => {
     const node = getNode(id)
     if (node.nodeType === "") {
@@ -86,9 +87,13 @@ export function isVisible(state, { getNode, hasMultiContentAncestor }) {
     if (!Helpers.hasPermission(node, "read", showRejected)) {
       return false
     }
-    if (!Helpers.hasPermission(node, "edit", showRejected)) {
+    if (
+      !Helpers.hasPermission(node, "edit", showRejected) &&
+      !wp.canEditTapestry()
+    ) {
       return (
-        (node.unlocked || !node.hideWhenLocked) && !hasMultiContentAncestor(node.id)
+        (node.unlocked || !node.hideWhenLocked) &&
+        (showChildrenOfMulticontent || !hasMultiContentAncestor(node.id))
       )
     }
     return true
@@ -247,4 +252,24 @@ export function getLinkNavigation(_, { getDirectChildren, getDirectParents }) {
       currentLinked,
     }
   }
+}
+
+export function getNodeDimensions(state, { isVisible }) {
+  const box = {
+    x0: 30000,
+    y0: 30000,
+    x: 0,
+    y: 0,
+  }
+  for (const node of Object.values(state.nodes)) {
+    if (node.nodeType !== "" && isVisible(node.id)) {
+      const { x, y } = node.coordinates
+      box.x0 = Math.min(x, box.x0)
+      box.y0 = Math.min(y, box.y0)
+      box.x = Math.max(x, box.x)
+      box.y = Math.max(y, box.y)
+    }
+  }
+
+  return box
 }
