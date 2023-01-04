@@ -16,7 +16,7 @@ class NodeStatus
     public const ACCEPT = 'accepted';
 }
 
-class CommentTypes
+class ReviewCommentTypes
 {
     public const COMMENT = 'Comment';
     public const STATUS_CHANGE = 'StatusChange';

@@ -128,6 +128,15 @@ Cypress.Commands.add("openLightbox", { prevSubject: "optional" }, (node, id) => 
 
 Cypress.Commands.add("closeLightbox", () => cy.getByTestId("close-lightbox").click())
 
+// -- Sidebar --
+
+Cypress.Commands.add("sidebar", () => cy.getByTestId("sidebar"))
+
+Cypress.Commands.add("openSidebar", () => {
+  cy.getByTestId("sidebar-toggle").click()
+  return cy.sidebar()
+})
+
 // -- Links --
 
 Cypress.Commands.add("link", (source, target) =>
@@ -182,8 +191,6 @@ Cypress.Commands.add("changeMediaFormat", format =>
 )
 
 // -- Utils --
-
-Cypress.Commands.add("sidebar", () => cy.getByTestId("sidebar"))
 
 Cypress.Commands.add("app", () => cy.window().its("app"))
 

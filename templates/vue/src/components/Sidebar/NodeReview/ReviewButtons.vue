@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import * as Comment from "@/utils/comments"
+import * as Comment from "@/utils/reviewComments"
 import { nodeStatus } from "@/utils/constants"
 
 export default {

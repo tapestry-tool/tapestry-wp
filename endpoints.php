@@ -172,6 +172,20 @@ $REST_API_ENDPOINTS = [
             'callback' => 'updateTapestryNodeCoordinates',
         ],
     ],
+    'POST_TAPESTRY_NODE_COMMENT' => (object) [
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/comments',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_POST_METHOD,
+            'callback' => 'addTapestryNodeComment',
+        ],
+    ],
+    'PERFORM_TAPESTRY_NODE_COMMENT_ACTION' => (object) [
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/comments',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_PUT_METHOD,
+            'callback' => 'performTapestryNodeCommentAction',
+        ],
+    ],
     'GET_TAPESTRY_NODE_HAS_DRAFT_CHILDREN' => (object) [
         'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/nodeHasDraftChildren',
         'ARGUMENTS' => [
@@ -397,6 +411,8 @@ foreach ($REST_API_ENDPOINTS as $ENDPOINT) {
 function exportTapestryAsJson($request)
 {
     $postId = $request['tapestryPostId'];
+    $exportComments = isset($request['exportComments']) && $request['exportComments'] === '1';
+
     try {
         if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
             throw new TapestryError('INVALID_POST_ID');
@@ -405,7 +421,7 @@ function exportTapestryAsJson($request)
         $export_id = TapestryImportExport::getExportId();
 
         $tapestry = new Tapestry($postId);
-        $tapestry_data = $tapestry->export();
+        $tapestry_data = $tapestry->export($exportComments);
         
         $result = ['json' => $tapestry_data, 'exportId' => $export_id];
 
@@ -428,6 +444,7 @@ function exportTapestryAsJson($request)
 function exportTapestryAsZip($request)
 {
     $postId = $request['tapestryPostId'];
+    $exportComments = isset($request['exportComments']) && $request['exportComments'] === '1';
 
     try {
         if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
@@ -439,7 +456,7 @@ function exportTapestryAsZip($request)
 
         // Export Tapestry to an object
         $tapestry = new Tapestry($postId);
-        $tapestry_data = $tapestry->export();
+        $tapestry_data = $tapestry->export($exportComments);
 
         // If the Tapestry contains WordPress posts, separately export them too
         $wp_posts = TapestryImportExport::exportWpPostsInTapestry($tapestry_data, $export_id);
@@ -660,12 +677,17 @@ function importTapestry($postId, $tapestryData)
     if (isset($tapestryData->nodes) && isset($tapestryData->links)) {
         $idMap = new stdClass();
 
-        // Construct ID map and add nodes to new Tapestry
+        // Construct ID map and add nodes to new Tapestry, as well as import comments associated with nodes (if any)
         foreach ($tapestryData->nodes as $node) {
             $oldNodeId = $node->id;
             $newNode = $tapestry->addNode($node);
             $newNodeId = $newNode->id;
             $idMap->$oldNodeId = $newNodeId;
+            
+            if (isset($node->comments)) {
+                $newTapestryNode = $tapestry->getNode($newNodeId);
+                $newTapestryNode->importComments($node->comments);
+            }
         }
 
         // Now update any node data that relies on IDs
@@ -781,6 +803,81 @@ function addTapestryNode($request)
             ]);
         }
         return $result;
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+function addTapestryNodeComment($request)
+{
+    $postId = $request['tapestryPostId'];
+    $nodeMetaId = $request['nodeMetaId'];
+    $data = json_decode($request->get_body());
+    $comment = $data->comment;
+    $replyingTo = $data->replyingTo;
+    
+    try {
+        if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+        if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
+            throw new TapestryError('INVALID_NODE_META_ID');
+        }
+        if (!TapestryHelpers::isChildNodeOfTapestry($nodeMetaId, $postId)) {
+            throw new TapestryError('INVALID_CHILD_NODE');
+        }
+        if (!is_user_logged_in()) {
+            throw new TapestryError('INVALID_USER_ID');
+        }
+        if (!isset($comment)) {
+            throw new TapestryError('INVALID_COMMENT', 'Comment should not be empty', 400);
+        }
+        $comment = trim($comment);
+        if (strlen($comment) == 0) {
+            throw new TapestryError('INVALID_COMMENT', 'Comment should not be empty', 400);
+        }
+
+        $node = new TapestryNode($postId, $nodeMetaId);
+        return $node->addComment($comment, $replyingTo);
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+function performTapestryNodeCommentAction($request)
+{
+    $postId = $request['tapestryPostId'];
+    $nodeMetaId = $request['nodeMetaId'];
+    $data = json_decode($request->get_body());
+    $commentId = $data->id;
+    $action = $data->action;
+
+    try {
+        if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+        if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
+            throw new TapestryError('INVALID_NODE_META_ID');
+        }
+        if (!TapestryHelpers::isChildNodeOfTapestry($nodeMetaId, $postId)) {
+            throw new TapestryError('INVALID_CHILD_NODE');
+        }
+        if (!is_user_logged_in()) {
+            throw new TapestryError('INVALID_USER_ID');
+        }
+        if (!isset($commentId)) {
+            throw new TapestryError('INVALID_COMMENT_ID', 'Comment ID should not be empty', 400);
+        }
+        if (!is_numeric($commentId)) {
+            throw new TapestryError('INVALID_COMMENT_ID', 'Comment ID should be a number', 400);
+        }
+        if (!isset($action)) {
+            throw new TapestryError('INVALID_COMMENT_ACTION', 'Comment action should not be empty', 400);
+        }
+        $commentId = (int) $commentId;
+
+        $node = new TapestryNode($postId, $nodeMetaId);
+        return $node->performCommentAction($commentId, $action);
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
