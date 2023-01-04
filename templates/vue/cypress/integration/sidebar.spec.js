@@ -21,7 +21,7 @@ describe("Sidebar", () => {
   })
 
   it("should be able to view node information via the sidebar", () => {
-    cy.findByLabelText("open sidebar").click()
+    cy.openSidebar()
     assertActive("information")
 
     cy.sidebar().within(() => cy.contains(/view/i).click())
