@@ -41,6 +41,7 @@ export const userActions = {
   READ: "read",
   ADD: "add",
   EDIT: "edit",
+  MOVE: "move",
 }
 
 export const DEFAULT_DEPTH = 3

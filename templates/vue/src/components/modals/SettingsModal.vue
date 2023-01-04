@@ -66,6 +66,14 @@
               {{ showAcceptedHighlight ? "Enabled" : "Disabled" }}
             </b-form-checkbox>
           </b-form-group>
+          <b-form-group
+            label="Show child nodes of multi-content nodes"
+            description="If enabled, child nodes of multi-content nodes will be shown to everyone. If disabled, chilld nodes of multi-content nodes will only be shown to users with edit permissions."
+          >
+            <b-form-checkbox v-model="showChildrenOfMulticontent" switch>
+              {{ showChildrenOfMulticontent ? "Enabled" : "Disabled" }}
+            </b-form-checkbox>
+          </b-form-group>
           <b-form-group label="Default Depth" label-for="default-depth" class="mb-0">
             <b-form-input
               id="default-depth"
@@ -95,6 +103,14 @@
           >
             <b-form-checkbox v-model="renderImages" switch>
               {{ renderImages ? "Enabled" : "Disabled" }}
+            </b-form-checkbox>
+          </b-form-group>
+          <b-form-group
+            label="Allow moving all nodes"
+            description="When enabled, users can move all nodes even if they don't have permission to move them. Note that this only allows them to move the nodes locally; the movement will not be saved unless the user has move permission for that node."
+          >
+            <b-form-checkbox v-model="allowMovingAllNodes" switch>
+              {{ allowMovingAllNodes ? "Enabled" : "Disabled" }}
             </b-form-checkbox>
           </b-form-group>
           <b-form-group
@@ -315,11 +331,13 @@ export default {
       superuserOverridePermissions: true,
       showRejected: false,
       showAcceptedHighlight: true,
+      showChildrenOfMulticontent: false,
       defaultDepth: 3,
       renderImages: true,
       analyticsEnabled: false,
       draftNodesEnabled: true,
       submitNodesEnabled: true,
+      allowMovingAllNodes: false,
       renderMap: false,
       mapBounds: { neLat: 90, neLng: 180, swLat: -90, swLng: -180 },
     }
@@ -392,12 +410,14 @@ export default {
         superuserOverridePermissions = true,
         showRejected = false,
         showAcceptedHighlight = true,
+        showChildrenOfMulticontent = false,
         defaultDepth = 3,
         renderImages = true,
         renderMap = false,
         analyticsEnabled = false,
         draftNodesEnabled = true,
         submitNodesEnabled = true,
+        allowMovingAllNodes = false,
         mapBounds = { neLat: 90, neLng: 180, swLat: -90, swLng: -180 },
       } = this.settings
       this.backgroundUrl = backgroundUrl
@@ -407,12 +427,14 @@ export default {
       this.superuserOverridePermissions = superuserOverridePermissions
       this.showRejected = showRejected
       this.showAcceptedHighlight = showAcceptedHighlight
+      this.showChildrenOfMulticontent = showChildrenOfMulticontent
       this.defaultDepth = defaultDepth
       this.renderImages = renderImages
       this.renderMap = renderMap
       this.analyticsEnabled = analyticsEnabled
       this.draftNodesEnabled = draftNodesEnabled
       this.submitNodesEnabled = submitNodesEnabled
+      this.allowMovingAllNodes = allowMovingAllNodes
       this.mapBounds = mapBounds
     },
     async updateSettings() {
@@ -424,12 +446,14 @@ export default {
         superuserOverridePermissions: this.superuserOverridePermissions,
         showRejected: this.showRejected,
         showAcceptedHighlight: this.showAcceptedHighlight,
+        showChildrenOfMulticontent: this.showChildrenOfMulticontent,
         defaultDepth: parseInt(this.defaultDepth),
         renderImages: this.renderImages,
         renderMap: this.renderMap,
         analyticsEnabled: this.analyticsEnabled,
         draftNodesEnabled: this.draftNodesEnabled,
         submitNodesEnabled: this.submitNodesEnabled,
+        allowMovingAllNodes: this.allowMovingAllNodes,
         mapBounds: this.mapBounds,
       })
       await this.$store.dispatch("updateSettings", settings)

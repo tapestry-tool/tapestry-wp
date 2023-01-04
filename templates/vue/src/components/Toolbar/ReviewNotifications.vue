@@ -42,7 +42,7 @@ import moment from "moment"
 import TapestryIcon from "@/components/common/TapestryIcon"
 import { names } from "@/config/routes"
 import { nodeStatus } from "@/utils/constants"
-import * as Comment from "@/utils/comments"
+import * as Comment from "@/utils/reviewComments"
 
 export default {
   components: {
@@ -59,9 +59,13 @@ export default {
       return Object.values(this.nodes)
         .filter(node => node.reviewStatus === nodeStatus.SUBMIT)
         .map(node => {
-          const lastSubmit = node.reviewComments
-            .reverse()
-            .find(evt => evt.type === Comment.types.STATUS_CHANGE)
+          let lastSubmitTime
+          for (let i = node.reviewComments.length - 1; i >= 0; i--) {
+            if (node.reviewComments[i].type === Comment.types.STATUS_CHANGE) {
+              lastSubmitTime = node.reviewComments[i].timestamp
+              break
+            }
+          }
           return {
             ...node,
             link: {
@@ -74,7 +78,7 @@ export default {
                 sidebar: "review",
               },
             },
-            submitTime: moment(lastSubmit.timestamp).fromNow(),
+            submitTime: moment(lastSubmitTime).fromNow(),
           }
         })
     },
