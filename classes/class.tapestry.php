@@ -108,6 +108,9 @@ class Tapestry implements ITapestry
             if (!isset($this->settings->analyticsEnabled)) {
                 $this->settings->analyticsEnabled = false;
             }
+            if (!isset($this->settings->allowMovingAllNodes)) {
+                $this->settings->allowMovingAllNodes = false;
+            }
             if (!isset($this->settings->draftNodesEnabled)) {
                 $this->settings->draftNodesEnabled = true;
                 $this->settings->submitNodesEnabled = true;
@@ -621,6 +624,7 @@ class Tapestry implements ITapestry
         $settings->analyticsEnabled = false;
         $settings->draftNodesEnabled = true;
         $settings->submitNodesEnabled = true;
+        $settings->allowMovingAllNodes = false;
         $settings->permalink = get_permalink($this->postId);
 
         return $settings;
