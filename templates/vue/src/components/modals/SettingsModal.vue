@@ -105,14 +105,6 @@
             </b-form-checkbox>
           </b-form-group>
           <b-form-group
-            label="Allow moving all nodes"
-            description="When enabled, users can move all nodes even if they don't have permission to move them. Note that this only allows them to move the nodes locally; the movement will not be saved unless the user has move permission for that node."
-          >
-            <b-form-checkbox v-model="allowMovingAllNodes" switch>
-              {{ allowMovingAllNodes ? "Enabled" : "Disabled" }}
-            </b-form-checkbox>
-          </b-form-group>
-          <b-form-group
             label="Geography map"
             :description="
               'Replace Tapestry with a map of Earth with placeholders for each node.' +
@@ -230,6 +222,14 @@
               switch
             >
               {{ submitNodesEnabled ? "Enabled" : "Disabled" }}
+            </b-form-checkbox>
+          </b-form-group>
+          <b-form-group
+            label="Allow moving all nodes"
+            description="When enabled, users can move all nodes even if they don't have permission to move them. Note that this only allows them to move the nodes locally; the movement will not be saved unless the user has move permission for that node."
+          >
+            <b-form-checkbox v-model="allowMovingAllNodes" switch>
+              {{ allowMovingAllNodes ? "Enabled" : "Disabled" }}
             </b-form-checkbox>
           </b-form-group>
         </b-tab>
