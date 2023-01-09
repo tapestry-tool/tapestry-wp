@@ -201,7 +201,7 @@ export default class Helpers {
   static hasPermission(node, action, showRejected) {
     // Check 0: node is null case - this should only apply to creating the root node.
     if (node === null) {
-      return wp.canEditTapestry()
+      return action === userActions.ADD && wp.canEditTapestry()
     }
 
     // Public users never have any permissions other than read
