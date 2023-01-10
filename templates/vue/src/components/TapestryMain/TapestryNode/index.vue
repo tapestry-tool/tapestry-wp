@@ -387,18 +387,18 @@ export default {
             }
           }
         })
-        .on("drag", () => {
+        .on("drag", event => {
           for (const id of Object.keys(this.coordinates)) {
             const node = this.getNode(id)
-            node.coordinates.x += d3.event.dx
-            node.coordinates.y += d3.event.dy
+            node.coordinates.x += event.dx
+            node.coordinates.y += event.dy
           }
         })
-        .on("end", () => {
+        .on("end", event => {
           for (const [id, originalCoordinates] of Object.entries(this.coordinates)) {
             const node = this.getNode(id)
-            node.coordinates.x += d3.event.dx
-            node.coordinates.y += d3.event.dy
+            node.coordinates.x += event.dx
+            node.coordinates.y += event.dy
             let coordinates = {
               x: node.coordinates.x,
               y: node.coordinates.y,
