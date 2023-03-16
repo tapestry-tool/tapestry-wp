@@ -2,8 +2,8 @@
   <b-overlay :show="disableFields">
     <template #overlay>
       <div class="no-kaltura-notice">
-        This information cannot be edited because Kaltura is not available on the
-        server.
+        Edits to captions are temporarily disabled while the Kaltura migration is
+        underway.
       </div>
     </template>
     <div :aria-hidden="disableFields">
@@ -126,7 +126,8 @@ export default {
       return wp.getKalturaStatus()
     },
     disableFields() {
-      return this.mediaFormat === "kaltura" && !this.kalturaAvailable
+      return this.mediaFormat === "kaltura" // ! temporarily disable editing Kaltura captions; re-enable after Kaltura migration
+      // return this.mediaFormat === "kaltura" && !this.kalturaAvailable
     },
     captions: {
       get() {
