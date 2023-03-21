@@ -256,8 +256,10 @@ export default {
       }
       this.scrollToTop()
     },
-    state(state) {
-      this.scrollToTop(state === states.COMPLETION_SCREEN ? "instant" : "smooth")
+    state(state, oldState) {
+      if (oldState !== "") {
+        this.scrollToTop(state === states.COMPLETION_SCREEN ? "instant" : "smooth")
+      }
     },
   },
   mounted() {
