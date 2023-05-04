@@ -1,5 +1,5 @@
 <template>
-  <span>
+  <span v-if="showTooltip">
     <i
       v-if="node.completed"
       :id="`node-${node.id}-checkmark`"
@@ -13,6 +13,7 @@
       Already completed
     </b-tooltip>
   </span>
+  <i v-else-if="node.completed" class="fas fa-check-circle fa-xs"></i>
 </template>
 
 <script>
@@ -22,6 +23,11 @@ export default {
     node: {
       type: Object,
       required: true,
+    },
+    showTooltip: {
+      type: Boolean,
+      required: false,
+      default: true,
     },
   },
 }

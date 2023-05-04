@@ -26,8 +26,9 @@
       <span class="page-nav-title">
         {{ node.typeData.menuTitle ? node.typeData.menuTitle : node.title }}
       </span>
+      <completed-icon :node="node" class="mx-2" :show-tooltip="false" />
     </div>
-    <ul class="page-menu-item fa-ul">
+    <ul class="page-menu-items fa-ul">
       <page-menu-item
         v-for="row in rows"
         :key="row.node.id"
@@ -47,10 +48,14 @@
  * The `<page-menu-item>` component is a child component used in PageMenu used recursively
  * for nested navigation.
  */
+import CompletedIcon from "@/components/common/CompletedIcon"
 import { mapGetters } from "vuex"
 
 export default {
   name: "page-menu-item",
+  components: {
+    CompletedIcon,
+  },
   props: {
     node: {
       type: Object,
@@ -143,11 +148,11 @@ export default {
 .page-menu-item-wrapper {
   cursor: pointer;
 }
-.page-menu-item {
-  &.fa-ul {
-    margin-top: 1.5em;
-    margin-bottom: 1.5em;
-  }
+.page-menu-items {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+  margin-left: 1.5em;
+  margin-right: -0.5em;
 
   li {
     margin-bottom: 1.5em;
