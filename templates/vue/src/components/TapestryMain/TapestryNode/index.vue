@@ -372,15 +372,27 @@ export default {
         .on("start", () => {
           this.coordinates = {}
           if (this.selection.length) {
-            this.coordinates = this.selection.reduce((coordinates, nodeId) => {
-              const node = this.getNode(nodeId)
-              coordinates[nodeId] = {
+            const selectedNodes = this.selection.map(nodeId => this.getNode(nodeId))
+            const movableNodes = this.settings.allowMovingAllNodes
+              ? selectedNodes
+              : selectedNodes.filter(node => this.hasPermission(node, "move"))
+            if (movableNodes.length === 0) {
+              return
+            }
+            this.coordinates = movableNodes.reduce((coordinates, node) => {
+              coordinates[node.id] = {
                 x: node.coordinates.x,
                 y: node.coordinates.y,
               }
               return coordinates
             }, {})
           } else {
+            if (
+              !this.settings.allowMovingAllNodes &&
+              !this.hasPermission(this.node, "move")
+            ) {
+              return
+            }
             this.coordinates[this.node.id] = {
               x: this.node.coordinates.x,
               y: this.node.coordinates.y,

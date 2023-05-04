@@ -35,17 +35,21 @@ export async function updateUserSettings({ commit, dispatch }, userSettings) {
 }
 
 // nodes
-export async function addNode({ commit, dispatch, getters, state }, newNode) {
+export async function addNode(
+  { commit, dispatch, getters, state },
+  { node, parentId }
+) {
   try {
-    const response = await client.addNode(JSON.stringify(newNode))
-    const nodeToAdd = { ...newNode }
-    const id = response.data.id
+    const response = await client.addNode({ node, parentId })
+    const { node: newNode, link } = response.data
+    const nodeToAdd = { ...node }
+    const id = newNode.id
     nodeToAdd.id = id
-    nodeToAdd.author = response.data.author
-    nodeToAdd.comments = response.data.comments
-    nodeToAdd.permissions = response.data.permissions
-    if (response.data.typeData.h5pMeta) {
-      nodeToAdd.typeData.h5pMeta = response.data.typeData.h5pMeta
+    nodeToAdd.author = newNode.author
+    nodeToAdd.comments = newNode.comments
+    nodeToAdd.permissions = newNode.permissions
+    if (newNode.typeData.h5pMeta) {
+      nodeToAdd.typeData.h5pMeta = newNode.typeData.h5pMeta
     }
 
     commit("addNode", nodeToAdd)
@@ -57,6 +61,21 @@ export async function addNode({ commit, dispatch, getters, state }, newNode) {
         [getters.yOrFy]: nodeToAdd.coordinates.y,
       },
     })
+
+    if (parentId) {
+      const parent = getters.getNode(parentId)
+      commit("updateNode", {
+        id: parentId,
+        newNode: {
+          childOrdering: [...parent.childOrdering, id],
+        },
+      })
+    }
+
+    if (link) {
+      commit("addLink", link)
+    }
+
     return id
   } catch (error) {
     dispatch("addApiError", error)

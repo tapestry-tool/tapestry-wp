@@ -13,7 +13,7 @@ class TapestryUser
      */
     public function __construct($_userId = null)
     {
-        if ($_userId = null) {
+        if ($_userId == null) {
             $this->user = wp_get_current_user();
         } else {
             $this->user = get_user_by('id', $_userId);

@@ -385,10 +385,29 @@ add_action('plugins_loaded', function () {
         // Analytics
 
         register_activation_hook(__FILE__, 'create_tapestry_analytics_schema');
-        function create_tapestry_analytics_schema()
+        function create_tapestry_analytics_schema($isNetworkActivated)
         {
             $analytics = new TapestryAnalytics();
-            $analytics->createSchema();
+            $analytics->createSchema($isNetworkActivated);
+        }
+
+        add_action('wpmu_new_blog', 'create_tapestry_analytics_schema_for_blog', 10, 6);
+        function create_tapestry_analytics_schema_for_blog($blogId)
+        {
+            if (is_plugin_active_for_network(basename(__DIR__). "/" . basename(__FILE__))) {
+                switch_to_blog($blogId);
+                $analytics = new TapestryAnalytics();
+                $analytics->createSchema(false);
+                restore_current_blog();
+            }
+        }
+
+        add_filter('wpmu_drop_tables', 'drop_tapestry_analytics_schema_for_blog');
+        function drop_tapestry_analytics_schema_for_blog($tables)
+        {
+            $analytics = new TapestryAnalytics();
+            $tables[] = $analytics->getTableName();
+            return $tables;
         }
 
         add_action('wp_ajax_nopriv_tapestry_tool_log_event', 'tapestry_tool_log_event');
