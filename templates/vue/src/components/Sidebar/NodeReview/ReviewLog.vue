@@ -23,7 +23,7 @@ import moment from "moment"
 import CommentEvent from "./review-log/CommentEvent"
 import StatusChangeEvent from "./review-log/StatusChangeEvent"
 
-import * as Comment from "@/utils/comments"
+import * as Comment from "@/utils/reviewComments"
 
 export default {
   components: {

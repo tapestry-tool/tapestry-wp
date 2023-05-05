@@ -21,7 +21,7 @@ export const store = {
     favourites: [],
     visibleNodes: [],
     apiError: null,
-    displayErrors: false,
+    displayErrors: true,
     avatar: {},
     theme: "",
     cos: {},

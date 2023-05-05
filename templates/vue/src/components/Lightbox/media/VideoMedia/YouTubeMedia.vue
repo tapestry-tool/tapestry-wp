@@ -26,7 +26,7 @@
 import { mapState, mapActions } from "vuex"
 import Helpers from "@/utils/Helpers"
 import client from "@/services/TapestryAPI"
-import { SEEK_THRESHOLD } from "./video.config"
+import { SEEK_THRESHOLD } from "./_config"
 import { data as wpData } from "@/services/wp"
 
 // Set as per https://developers.google.com/youtube/iframe_api_reference#Playback_status

@@ -21,6 +21,11 @@
       posts by going to Tools -> Import in the WordPress dashboard, then import the
       tapestry.
     </b-form-text>
+    <b-form-checkbox v-model="shouldExportComments" class="pb-1" switch>
+      {{
+        shouldExportComments ? "Export comments on nodes" : "Don't export comments"
+      }}
+    </b-form-checkbox>
     <div class="alerts">
       <b-alert
         v-if="apiError == null"
@@ -99,6 +104,7 @@ export default {
   },
   data() {
     return {
+      shouldExportComments: true,
       isExporting: false,
       hasExported: false,
       hasExportedWpPosts: false,
@@ -133,7 +139,9 @@ export default {
       this.isExporting = false
     },
     async exportTapestryAsJson() {
-      const exportedTapestry = await this.getTapestryExport()
+      const exportedTapestry = await this.getTapestryExport(
+        this.shouldExportComments
+      )
       if (!exportedTapestry) return
 
       const exportId = exportedTapestry.exportId
@@ -148,7 +156,9 @@ export default {
       // Rebuild H5P cache before exporting to ensure H5P export files are up to date
       await WordpressApi.rebuildAllH5PCache()
 
-      const exportedTapestry = await this.getTapestryExportAsZip()
+      const exportedTapestry = await this.getTapestryExportAsZip(
+        this.shouldExportComments
+      )
       if (!exportedTapestry) return
 
       const exportId = exportedTapestry.exportId
