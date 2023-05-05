@@ -10,11 +10,13 @@
 // Prevent linter warning on use of kWidget variable
 /*global kWidget*/
 
+import videoMediaMixins from "./_mixins.js"
 import client from "@/services/TapestryAPI"
 import { mapState, mapMutations } from "vuex"
 
 export default {
   name: "kaltura-media",
+  mixins: [videoMediaMixins],
   props: {
     node: {
       type: Object,
@@ -190,30 +192,21 @@ export default {
       this.lastTime = currentTime
     },
     setFrameDimensions() {
-      const kalturaPlayerBarHeight = 36
-
       const kalturaVideo = document.getElementById(this.playerId)
+      const media = kalturaVideo.evaluate("{mediaProxy.entry}")
 
-      const fitHeight = window.innerHeight
-      const playerWidth = kalturaVideo.evaluate("{video.player.width}")
-      const entry = kalturaVideo.evaluate("{mediaProxy.entry}")
-
-      if (entry) {
-        // Proportionally make the frame smaller
-        let scaleFactor = fitHeight / entry.height
-        this.frameHeight = entry.height * scaleFactor + kalturaPlayerBarHeight
-        this.frameWidth = entry.width * scaleFactor
-        // if the width is bigger than the available space, we need to scale based on the width
-        if (this.frameWidth > playerWidth) {
-          scaleFactor = playerWidth / entry.width
-          this.frameHeight = entry.height * scaleFactor + kalturaPlayerBarHeight
-          this.frameWidth = entry.width * scaleFactor
+      if (media) {
+        const containerDimensions = {
+          width: kalturaVideo.evaluate("{video.player.width}"),
+          height: window.innerHeight,
         }
-
-        this.$emit("change:dimensions", {
-          width: this.frameWidth,
-          height: this.frameHeight,
-        })
+        const updatedDimensions = this.fitMediaInContainer(
+          media,
+          containerDimensions
+        )
+        // Account for the height of the kaltura player bar
+        updatedDimensions.height += 36
+        this.$emit("change:dimensions", updatedDimensions)
       }
     },
     playVideo() {
