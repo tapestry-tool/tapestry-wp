@@ -115,9 +115,9 @@ class TapestryApi {
    *
    * @return  {Object}
    */
-  async addNode(node) {
+  async addNode(payload) {
     const url = `/tapestries/${this.postId}/nodes`
-    const response = await this.client.post(url, node)
+    const response = await this.client.post(url, payload)
     return response
   }
 

@@ -10,6 +10,8 @@ class TapestryAnalytics implements ITapestryAnalytics
 {
     private $cookieName = 'tapestry_guid';
     private $tableNameNoPrefix = 'tapestry_analytics_events';
+    private $dbOptionName = 'tapestry_analytics_schema_version';
+    private $dbVersion = '0.1';
 
     private $userID = '';
     private $userUUID = '';
@@ -26,6 +28,11 @@ class TapestryAnalytics implements ITapestryAnalytics
         $this->tableName = $wpdb->prefix.$this->tableNameNoPrefix;
         $this->userUUID = $this->getUserUUID();
         $this->userID = apply_filters('determine_current_user', false);
+    }
+
+    public function getTableName()
+    {
+        return $this->tableName;
     }
 
     /**
@@ -60,11 +67,25 @@ class TapestryAnalytics implements ITapestryAnalytics
         }
     }
 
-    public function createSchema()
+    public function createSchema($createForNetwork)
     {
         global $wpdb;
+        if (is_multisite() && $createForNetwork) {
+            // Get all blogs in the network and activate plugin on each one
+            $blog_ids = $wpdb->get_col("SELECT blog_id FROM $wpdb->blogs");
+            foreach ($blog_ids as $blog_id) {
+                switch_to_blog($blog_id);
+                $this->_createSchemaForCurrentBlog();
+                restore_current_blog();
+            }
+        } else {
+            $this->_createSchemaForCurrentBlog();
+        }
+    }
 
-        add_option('tapestry_analytics_schema_version', '0.1');
+    private function _createSchemaForCurrentBlog()
+    {
+        global $wpdb;
 
         // Create table for logging events
         $charset_collate = $wpdb->get_charset_collate();
@@ -83,6 +104,8 @@ class TapestryAnalytics implements ITapestryAnalytics
 
         require_once ABSPATH.'wp-admin/includes/upgrade.php';
         dbDelta($sql);
+
+        add_option($this->dbOptionName, $this->dbVersion);
     }
 
     /**
