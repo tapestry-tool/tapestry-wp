@@ -50,8 +50,26 @@
         @input="update('description', $event)"
       />
     </b-form-group>
-    <div v-else class="text-right mt-n3 mb-n2">
+    <div v-else class="text-right mt-n3 mb-2">
       <a href="#" class="small" @click="addDesc = true">Add Description</a>
+    </div>
+    <b-form-group
+      v-if="addLearningObjectives || node.learningObjectives.length"
+      label="Learning Objectives"
+    >
+      <rich-text-form
+        id="node-learning-objectives"
+        :value="node.learningObjectives"
+        data-qa="node-learning-objectives"
+        placeholder="Enter learning objectives"
+        :maxLength="maxDescriptionLength"
+        @input="update('learningObjectives', $event)"
+      />
+    </b-form-group>
+    <div v-else class="text-right mt-n3 mb-n2">
+      <a href="#" class="small" @click="addLearningObjectives = true">
+        Add Learning Objectives
+      </a>
     </div>
     <b-form-group v-show="isPopupCandidate" label="Popup">
       <popup-form :is-candidate="isPopupCandidate" />
@@ -148,6 +166,7 @@ export default {
   data() {
     return {
       addDesc: false,
+      addLearningObjectives: false,
       addMenuTitle: false,
       disableKalturaOption: false,
     }
@@ -279,7 +298,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .title-checkbox {
   padding-top: 3px;
   text-align: right;
