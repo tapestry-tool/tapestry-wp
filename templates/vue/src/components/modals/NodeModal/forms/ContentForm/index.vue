@@ -160,7 +160,7 @@ export default {
     ...mapGetters(["isMultiContentRow"]),
     shouldShowTitle: {
       get() {
-        return this.node.typeData.showTitle
+        return this.node.typeData.showTitle !== false
       },
       set(value) {
         this.update("typeData.showTitle", value)
