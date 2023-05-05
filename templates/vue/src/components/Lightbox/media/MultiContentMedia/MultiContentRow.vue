@@ -14,6 +14,7 @@
           ></i>
           <i v-else class="fas fa-lock fa-sm title-row-icon"></i>
           {{ node.title }}
+          <completed-icon v-if="node.completed" :node="node" class="mx-2" large />
           <locked-content
             v-if="disabled"
             :node="node"
@@ -104,6 +105,7 @@
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex"
 import TapestryMedia from "../TapestryMedia"
 import LockedContent from "./common/LockedContent"
+import CompletedIcon from "@/components/common/CompletedIcon"
 import { names } from "@/config/routes"
 import Helpers from "@/utils/Helpers"
 
@@ -114,6 +116,7 @@ export default {
     MultiContentMedia: () => import("../MultiContentMedia"),
     MultiContentRows: () => import("./MultiContentRows"),
     LockedContent,
+    CompletedIcon,
   },
 
   props: {
