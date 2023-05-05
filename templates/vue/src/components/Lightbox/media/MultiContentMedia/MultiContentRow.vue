@@ -82,7 +82,7 @@
             context="multi-content"
             :level="level + 1"
             @load="handleLoad"
-            @complete="complete"
+            @complete="completeChild"
           />
         </div>
         <multi-content-media
@@ -182,7 +182,7 @@ export default {
     },
   },
   methods: {
-    ...mapActions(["toggleFavourite"]),
+    ...mapActions(["toggleFavourite", "completeNode"]),
     ...mapMutations(["setReturnRoute"]),
     toggle() {
       this.isVisible = !this.isVisible
@@ -202,6 +202,12 @@ export default {
     },
     complete() {
       this.$emit("complete", this.node.id)
+    },
+    completeChild(nodeId) {
+      const node = this.getNode(nodeId)
+      if (!node.completed) {
+        this.completeNode(node.id)
+      }
     },
     handleLoad(el) {
       this.$emit("load", el)
