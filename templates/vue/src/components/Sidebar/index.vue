@@ -497,10 +497,10 @@ export default {
         }
 
         .content-header {
-          margin: 1em -1em 0.2em;
+          margin: 1em 0 0.2em;
           position: relative;
           border-bottom: solid 2px #6b747d;
-          padding: 0.2em 1em;
+          padding: 0.2em 0;
           font-size: 1.75em;
         }
 
