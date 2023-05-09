@@ -118,7 +118,6 @@ export default {
     LockedContent,
     CompletedIcon,
   },
-
   props: {
     node: {
       type: Object,

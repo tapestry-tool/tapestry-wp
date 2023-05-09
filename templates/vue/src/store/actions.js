@@ -295,7 +295,9 @@ export async function completeQuestion(
     commit("completeQuestion", { nodeId, questionId, answerType, answer })
   } catch (error) {
     dispatch("addApiError", error)
+    return false
   }
+  return true
 }
 
 export async function saveAudio({ dispatch }, { nodeId, questionId, audio }) {

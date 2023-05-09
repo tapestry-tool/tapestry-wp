@@ -242,7 +242,7 @@ export default {
           break
         }
       }
-      await this.completeQuestion({
+      const completionSuccess = await this.completeQuestion({
         nodeId: this.node.id,
         questionId: this.question.id,
         answerType: this.formType,
@@ -250,9 +250,19 @@ export default {
       })
       this.submitting = false
 
-      client.recordAnalyticsEvent("user", "submit", "question", this.question.id, {
-        type: this.formType,
-      })
+      if (completionSuccess) {
+        client.recordAnalyticsEvent("user", "submit", "question", this.question.id, {
+          type: this.formType,
+        })
+        this.$root.$bvToast.toast("Your answer has been saved", {
+          variant: "success",
+          solid: true,
+          isStatus: true,
+          noCloseButton: true,
+          toaster: "b-toaster-bottom-center",
+        })
+      }
+
       this.$emit("submit")
     },
     formIsCompleted(type) {
