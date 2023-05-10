@@ -2,6 +2,9 @@ import { createMachine } from "xstate"
 
 export const OnboardingStates = {
   Welcome: "Welcome",
+  AddLaterTooltip: "AddLaterTooltip",
+  AddAnotherTooltip: "AddAnotherTooltip",
+  ToggleRingsTooltip: "ToggleRingsTooltip",
   MoveConnections: "MoveConnections",
   LetsAddConnections: "LetsAddConnections",
   WaitToOpenConnectionsTab: "WaitToOpenConnectionsTab",
@@ -9,9 +12,6 @@ export const OnboardingStates = {
   MoveConnectionToCirclesFinish: "MoveConnectionToCirclesFinish",
   MoveBetweenCircles: "MoveBetweenCircles",
   AddMoreConfirmation: "AddMoreConfirmation",
-  AddLaterTooltip: "AddLaterTooltip",
-  AddAnotherTooltip: "AddAnotherTooltip",
-  ToggleRingsTooltip: "ToggleRingsTooltip",
   Form: "Form",
   FormClosed: "FormClosed",
   Finish: "Finish",

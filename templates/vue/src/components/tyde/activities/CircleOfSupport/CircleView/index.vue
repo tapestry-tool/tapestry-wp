@@ -8,16 +8,16 @@
       :communities="communities"
       :draggable="!dragDisabled && !isReadOnly"
       :toolTipPositioned="toolTipPositioned"
-      @back="handleBack"
-      @add-connection="handleConnectionOpen"
-      @connection-opened="handleConnectionOpened"
-      @edit-connection="handleEditConnection"
+      @connection-submitted="$emit('connection-submitted')"
       @add-community="$emit('add-community', $event)"
       @delete-connection="$emit('delete-connection', $event)"
+      @back="handleBack"
+      @add-connection="handleAddConnection"
+      @connection-opened="handleConnectionOpened"
+      @edit-connection="handleEditConnection"
       @drag:start="handleDragStart"
       @drag:move="handleDragMove"
       @drag:end="handleDragEnd"
-      @connection-submitted="$emit('connection-submitted')"
       @connection-closed="handleConnectionClosed"
     />
     <li
@@ -440,7 +440,7 @@ export default {
         )
       )
     },
-    handleConnectionOpen(event) {
+    handleAddConnection(event) {
       this.state = States.AddConnection
       this.$emit("add-connection", event)
     },
