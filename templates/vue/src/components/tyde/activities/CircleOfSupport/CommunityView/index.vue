@@ -39,6 +39,7 @@
       :connections="connections"
       :parent-state="state"
       :activeView="activeView"
+      :has-connection-in-circles="hasConnectionInCircles"
       @tooltip-positioned="handleToolTipPositioned"
       @tooltip-removed="handleTooltipRemoved"
       @add-community="$emit('add-community', $event)"
@@ -83,6 +84,10 @@ export default {
     },
     activeView: {
       type: Number,
+      required: true,
+    },
+    hasConnectionInCircles: {
+      type: Boolean,
       required: true,
     },
   },

@@ -544,9 +544,6 @@ export default {
         if (!goalsTabNode || !this.nodes[goalsTabNode]) {
           this.tydeModeTabs.goals = this.rootId
         }
-        if (!this.circleViewNode) {
-          this.circleViewNode = this.rootId
-        }
       }
 
       const settings = Object.assign(this.settings, {
