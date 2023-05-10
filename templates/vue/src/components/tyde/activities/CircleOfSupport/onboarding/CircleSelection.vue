@@ -9,7 +9,7 @@
       </b-row>
       <b-row>
         <b-col>
-          <img src="@/assets/circle-selections.gif" />
+          <img :src="gifUrl" />
         </b-col>
       </b-row>
       <b-row>
@@ -34,9 +34,16 @@
 
 <script>
 import CosModal from "../CosModal"
+import gifSrc from "@/assets/circle-selections.gif"
+
 export default {
   components: {
     CosModal,
+  },
+  computed: {
+    gifUrl() {
+      return gifSrc
+    },
   },
 }
 </script>

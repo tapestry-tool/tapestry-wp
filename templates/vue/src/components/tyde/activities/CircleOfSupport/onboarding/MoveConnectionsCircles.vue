@@ -7,8 +7,8 @@
           connections tab into one of the circle rings.
         </h3>
       </b-row>
-      <b-row>
-        <img src="@/assets/add-connection-to-circle.gif" />
+      <b-row align-h="center">
+        <img :src="gifUrl" />
       </b-row>
       <b-row align-h="center" class="py-2">
         <h4 class="ob-secondary">
@@ -37,9 +37,16 @@
 
 <script>
 import CosModal from "../CosModal"
+import gifSrc from "@/assets/add-connection-to-circle.gif"
+
 export default {
   components: {
     CosModal,
+  },
+  computed: {
+    gifUrl() {
+      return gifSrc
+    },
   },
 }
 </script>
