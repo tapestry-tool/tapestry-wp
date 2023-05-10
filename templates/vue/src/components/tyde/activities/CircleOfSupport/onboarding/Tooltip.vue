@@ -9,7 +9,6 @@
 </template>
 
 <script>
-// import Helpers from "@/utils/Helpers"
 export default {
   data() {
     return {
@@ -28,10 +27,12 @@ export default {
   right: 22px;
   bottom: 95px;
 }
+
 .left {
   left: 22px;
   bottom: 95px;
 }
+
 .tooltip-container {
   position: absolute;
   padding: 2rem;
@@ -40,6 +41,7 @@ export default {
   border-radius: 1rem;
   z-index: 100;
 }
+
 .tooltip-container::before {
   content: "";
   position: absolute;
@@ -51,6 +53,7 @@ export default {
   bottom: -23px;
   z-index: 5;
 }
+
 .tooltip-container::after {
   content: "";
   display: block;
@@ -62,6 +65,7 @@ export default {
   border-top: 24px solid #bbb;
   bottom: -24px;
 }
+
 .right::before,
 .right::after {
   right: 25px;

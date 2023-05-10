@@ -7,14 +7,17 @@
       :connections="connections"
       :communities="communities"
       :draggable="!dragDisabled && !isReadOnly"
+      :toolTipPositioned="toolTipPositioned"
       @back="handleBack"
-      @add-connection="$emit('add-connection', $event)"
+      @add-connection="handleConnectionOpen"
       @edit-connection="handleEditConnection"
       @add-community="$emit('add-community', $event)"
       @delete-connection="$emit('delete-connection', $event)"
       @drag:start="handleDragStart"
       @drag:move="handleDragMove"
       @drag:end="handleDragEnd"
+      @connection-submitted="$emit('connection-submitted')"
+      @connection-closed="handleConnectionClosed"
     />
     <li
       v-for="(circle, index) in circlesWithData"
@@ -92,6 +95,14 @@
       :topType="currentAvatar.topType"
       :topColor="currentAvatar.topColor"
     ></avataaars>
+    <onboarding
+      :communities="communities"
+      :connections="connections"
+      :parent-state="state"
+      :activeView="activeView"
+      @tooltip-positioned="handleToolTipPositioned"
+      @tooltip-removed="handleTooltipRemoved"
+    />
   </ul>
 </template>
 
@@ -100,6 +111,7 @@ import Twemoji from "twemoji"
 import avatarOptions from "@/components/modals/UserSettingsModal/avatarOptions.js"
 import Helpers from "@/utils/Helpers"
 import client from "@/services/TapestryAPI"
+import OnBoarding from "../onboarding/index.vue"
 import ConnectionsTab from "../ConnectionsTab"
 import ConnectionTooltip from "../ConnectionTooltip"
 import SingleConnection from "../SingleConnection"
@@ -117,6 +129,9 @@ const USER_AVATAR_SPACE = 20
 const States = {
   Home: 0,
   EditConnection: 1,
+  ConnectionClosed: 4,
+  AddConnection: 5,
+  MoveConnection: 6,
 }
 
 export default {
@@ -126,6 +141,7 @@ export default {
     ConnectionTooltip,
     SingleConnection,
     Avataaars,
+    onboarding: OnBoarding,
   },
   model: {
     prop: "circles",
@@ -149,15 +165,21 @@ export default {
       required: false,
       default: false,
     },
+    activeView: {
+      type: Number,
+      required: true,
+    },
   },
   data() {
     return {
       activeCircle: CircleStates.All,
       activeCircleOrig: null,
       state: States.Home,
+      lastState: States.Home,
       activeConnectionId: null,
       draggingConnection: null,
       dragDisabled: false,
+      toolTipPositioned: false,
     }
   },
   computed: {
@@ -208,6 +230,11 @@ export default {
       })
     },
   },
+  watch: {
+    state(_, lastState) {
+      this.lastState = lastState
+    },
+  },
   methods: {
     getEmojiImgFromUnicode(unicode) {
       let div = document.createElement("div")
@@ -232,6 +259,7 @@ export default {
       this.activeCircle = this.getActiveCircle(connectionRef)
     },
     async handleDragEnd() {
+      this.state = States.MoveConnection
       clearTimeout(this.timeout)
 
       if (this.draggingConnection) {
@@ -253,9 +281,9 @@ export default {
         connectionRef.style.setProperty("--x", `0px`)
         connectionRef.style.setProperty("--y", `0px`)
         this.draggingConnection = null
-
         setTimeout(() => this.$refs.connectionsTab.show(), 300)
       } else {
+        this.state = States.MoveConnection
         this.activeCircle = this.activeCircleOrig
       }
     },
@@ -404,6 +432,23 @@ export default {
           document.getElementById("cos")
         )
       )
+    },
+    handleConnectionOpen(event) {
+      this.state = States.AddConnection
+      this.$emit("add-connection", event)
+    },
+    handleConnectionClosed() {
+      if (this.state === States.ConnectionClosed) {
+        this.state === States.Home
+      } else {
+        this.state = States.ConnectionClosed
+      }
+    },
+    handleToolTipPositioned() {
+      this.toolTipPositioned = true
+    },
+    handleTooltipRemoved() {
+      this.toolTipPositioned = false
     },
   },
 }

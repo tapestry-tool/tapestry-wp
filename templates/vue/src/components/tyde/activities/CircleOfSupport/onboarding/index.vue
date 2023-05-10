@@ -24,6 +24,25 @@
       :connections="connections"
       @ob-finish="send(OnboardingEvents.Done)"
     />
+    <move-connections-circles
+      v-if="isState('Circles.MoveConnections')"
+      @continue="send(OnboardingEvents.Continue)"
+    />
+    <add-confirmation-circles
+      v-if="isState('Circles.AddMoreConfirmation')"
+      :connections="connections"
+      @later="send(OnboardingEvents.AddLater)"
+      @another="send(OnboardingEvents.AddAnother)"
+    />
+    <add-later-circles
+      v-if="isState('Circles.AddLaterTooltip')"
+      @continue="handleContinue"
+    />
+    <finish-view-circles
+      v-if="isState('Circles.Finish')"
+      :connections="connections"
+      @ob-finish="send(OnboardingEvents.Done)"
+    />
     <tooltip
       v-if="isState('Communities.AddLaterTooltip')"
       class="right"
@@ -65,6 +84,52 @@
         Got it &#8594;
       </b-button>
     </tooltip>
+    <top-tooltip
+      v-if="isState('Circles.Welcome')"
+      class="left"
+      :activeView="activeView"
+      @tooltip-positioned="$emit('tooltip-positioned')"
+    >
+      <h3 v-if="activeView === 1" style="max-width:300px;">
+        Click here to toggle back to the community view.
+      </h3>
+      <h3 v-else style="max-width:300px;">
+        Click here to toggle to the circle view.
+      </h3>
+      <b-button
+        v-if="activeView === 1"
+        pill
+        variant="secondary"
+        @click="handleClick(OnboardingEvents.Continue)"
+      >
+        Continue &#8594;
+      </b-button>
+    </top-tooltip>
+    <tooltip
+      v-if="isState('Circles.AddAnotherTooltip')"
+      class="left"
+      @tooltip-positioned="$emit('tooltip-positioned')"
+    >
+      <h3 style="max-width:300px;">
+        Try adding some connections into your circle.
+      </h3>
+      <b-button pill variant="secondary" @click="handleClick(OnboardingEvents.Add)">
+        Got it &#8594;
+      </b-button>
+    </tooltip>
+    <top-tooltip
+      v-if="isState('Circles.ToggleRingsTooltip')"
+      :activeView="activeView"
+      class="right"
+      @tooltip-positioned="$emit('tooltip-positioned')"
+    >
+      <h3 style="max-width:300px;">
+        Toggle the circle rings by pressing the circle in this box.
+      </h3>
+      <b-button pill variant="secondary" @click="handleContinue">
+        Continue &#8594;
+      </b-button>
+    </top-tooltip>
   </div>
 </template>
 
@@ -73,9 +138,14 @@ import { interpret } from "xstate"
 import onboardingMachine, { OnboardingEvents } from "./onboardingMachine"
 import WelcomeCommunities from "./WelcomeCommunities"
 import AddConfirmation from "./AddConfirmation"
+import AddConfirmationCircles from "./AddConfirmationCircles"
+import AddLaterCircles from "./AddLaterCircles"
 import WelcomeConnections from "./WelcomeConnections"
 import ObFinishView from "./ObFinishView"
+import FinishViewCircles from "./FinishViewCircles"
 import Tooltip from "./Tooltip"
+import TopTooltip from "./TopTooltip"
+import MoveConnectionsCircles from "./MoveConnectionsCircles.vue"
 const States = {
   Home: 0,
   AddCommunity: 1,
@@ -83,14 +153,20 @@ const States = {
   EditConnection: 3,
   ConnectionClosed: 4,
   AddConnection: 5,
+  MoveConnection: 6,
 }
 export default {
   components: {
     WelcomeCommunities,
     AddConfirmation,
+    AddConfirmationCircles,
     WelcomeConnections,
     ObFinishView,
     Tooltip,
+    MoveConnectionsCircles,
+    AddLaterCircles,
+    FinishViewCircles,
+    TopTooltip,
   },
   props: {
     connections: {
@@ -102,6 +178,10 @@ export default {
       required: true,
     },
     parentState: {
+      type: Number,
+      required: true,
+    },
+    activeView: {
       type: Number,
       required: true,
     },
@@ -127,6 +207,9 @@ export default {
         this.handleConnectionClosed()
         this.$emit("connection-closed")
       }
+      if (this.parentState === States.MoveConnection) {
+        this.handleConnectionMoved()
+      }
     },
   },
   mounted() {
@@ -136,23 +219,35 @@ export default {
     this.initializeOnboarding()
   },
   methods: {
+    handleConnectionMoved() {
+      if (this.onboarding.current.matches("Circles.Form")) {
+        this.send(OnboardingEvents.Added)
+      }
+    },
     handleConnectionClosed() {
-      if (this.onboarding.current.matches("Connections.FormClosed")) {
+      if (
+        this.onboarding.current.matches("Connections.FormClosed") ||
+        this.onboarding.current.matches("Circles.FormClosed")
+      ) {
         this.send(OnboardingEvents.Continue)
       }
     },
     handleConnectionSubmitted() {
       if (
+        this.onboarding.current.matches("Circles.Form") ||
         this.onboarding.current.matches("Connections.Form") ||
-        this.onboarding.current.matches("Connections.AddAnotherTooltip")
+        this.onboarding.current.matches("Connections.AddAnotherTooltip") ||
+        this.onboarding.current.matches("Circles.AddAnotherTooltip")
       ) {
         this.send(OnboardingEvents.Added)
       }
     },
     HandleCommunityAdded() {
       if (
+        this.onboarding.current.matches("Circles.Form") ||
         this.onboarding.current.matches("Communities.Form") ||
-        this.onboarding.current.matches("Communities.AddAnotherTooltip")
+        this.onboarding.current.matches("Communities.AddAnotherTooltip") ||
+        this.onboarding.current.matches("Circles.AddAnotherTooltip")
       ) {
         this.send(OnboardingEvents.Added)
       }
@@ -169,7 +264,7 @@ export default {
       if (Object.values(this.communities).length > 0) {
         startingEvent = OnboardingEvents.Continue
         if (Object.values(this.connections).length > 0) {
-          startingEvent = OnboardingEvents.Done
+          startingEvent = OnboardingEvents.CommunityOnboardingComplete
         }
       }
       this.send(startingEvent)
