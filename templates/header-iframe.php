@@ -11,6 +11,9 @@
         #tapestry-sidebar-container {
             display: none !important;
         }
+        html {
+            margin-top: 0 !important;
+        }
     </style>
 </head>
 <body <?php body_class(); ?>>
