@@ -25,6 +25,7 @@
         <div id="emoji-picker">
           <twemoji-picker
             id="twemoji-picker"
+            twemojiPath="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/"
             :emojiData="emojiDataAll"
             :emojiGroups="emojiGroups"
             :skinsSelection="true"
