@@ -80,9 +80,9 @@ export default {
           this.linkX = this.x + 30
           this.linkY = this.y + 30
         })
-        .on("drag", () => {
-          this.linkX += d3.event.dx
-          this.linkY += d3.event.dy
+        .on("drag", event => {
+          this.linkX += event.dx
+          this.linkY += event.dy
         })
         .on("end", async () => {
           const linkExists = this.links.find(link => {

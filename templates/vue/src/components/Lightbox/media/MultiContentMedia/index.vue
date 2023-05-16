@@ -38,12 +38,19 @@
             @complete="complete"
           />
           <div v-if="isUnitChild && pageIndex !== -1" class="unit-navigation">
-            <button :disabled="pageIndex === 0" @click="prevPage">
+            <button
+              :class="{
+                hidden: pageIndex === 0,
+              }"
+              @click="prevPage"
+            >
               <i class="fas fa-chevron-left" />
               <div>Previous</div>
             </button>
             <button
-              :disabled="pageIndex === filteredPages.length - 1"
+              :class="{
+                hidden: pageIndex === filteredPages.length - 1,
+              }"
               @click="nextPage"
             >
               <div>Next</div>
@@ -404,6 +411,10 @@ button[disabled] {
     height: 1rem;
     line-height: 1rem;
     color: #0073aa;
+
+    &.hidden {
+      visibility: hidden;
+    }
 
     &:not(:disabled):hover {
       color: var(--highlight-color);
