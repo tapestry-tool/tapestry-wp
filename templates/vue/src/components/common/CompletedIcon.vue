@@ -50,7 +50,7 @@ export default {
 <style lang="scss" scoped>
 i {
   font-size: 60%;
-  color: #00bb00;
+  color: var(--bg-color-primary);
 
   &.large {
     font-size: 80%;
