@@ -99,7 +99,9 @@ export default {
         .filter(row => !row.node.popup)
     },
     contentSelected() {
-      return this.node.id === this.$route.params.row || this.childrenSelected.length
+      return (
+        this.node.id === this.$route.params.rowId || this.childrenSelected.length
+      )
     },
     disabledFrom() {
       return this.rows.findIndex(row => !row.node.completed)
