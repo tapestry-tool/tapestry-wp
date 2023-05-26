@@ -2,10 +2,10 @@
   <cos-modal show>
     <b-container class="modal-container">
       <b-row align-h="center">
-        <h3 style="min-height:100px;">
+        <h3 class="py-2">
           🎉 Great job!🎉
         </h3>
-        <h3>
+        <h3 class="py-2">
           Don't forget to keep your circle of support updated. You can always come
           back here to add connections, communities, and update your circles.
         </h3>
