@@ -25,9 +25,9 @@
         Import a Tapestry
       </div>
     </b-button>
-    <div v-if="error" style="margin-top: 16px;">
+    <b-alert v-if="error" style="margin-top: 16px;" variant="warning" show>
       {{ error.message }}
-    </div>
+    </b-alert>
     <b-card
       v-if="isImporting && showImportProgress"
       style="margin-top: 16px; min-width: 100%;"
@@ -193,7 +193,7 @@ export default {
     importTapestry(file) {
       const reader = new FileReader()
       reader.onload = async e => {
-        this.error = {}
+        this.error = null
 
         this.isImporting = true
         this.importStatusMessage = ""
@@ -217,7 +217,7 @@ export default {
       reader.readAsText(file)
     },
     importTapestryFromZip(zipFile) {
-      this.error = {}
+      this.error = null
       this.isImporting = true
       this.importStatusMessage = "Getting ready to import"
 
