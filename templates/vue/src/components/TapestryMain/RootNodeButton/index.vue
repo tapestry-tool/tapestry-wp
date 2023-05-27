@@ -298,12 +298,9 @@ export default {
         })
         .finally(() => {
           if (this.isImporting) {
-            setTimeout(
-              () => {
-                this.updateImportStatus()
-              },
-              this.isUploading ? 2000 : 50
-            )
+            setTimeout(() => {
+              this.updateImportStatus()
+            }, 2000)
           }
         })
     },
