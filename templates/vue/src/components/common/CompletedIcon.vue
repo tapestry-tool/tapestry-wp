@@ -1,7 +1,12 @@
 <template>
-  <span v-if="showTooltip">
+  <span v-if="node.completed" class="completed-icon">
     <i
-      v-if="node.completed"
+      class="far fa-check-circle fa-xs"
+      :class="{
+        large: large,
+      }"
+    ></i>
+    <i
       :id="`node-${node.id}-checkmark`"
       class="fas fa-check-circle fa-xs"
       :class="{
@@ -9,6 +14,7 @@
       }"
     ></i>
     <b-tooltip
+      v-if="showTooltip"
       :target="`node-${node.id}-checkmark`"
       placement="right"
       triggers="hover"
@@ -16,13 +22,6 @@
       Already completed
     </b-tooltip>
   </span>
-  <i
-    v-else-if="node.completed"
-    class="fas fa-check-circle fa-xs"
-    :class="{
-      large: large,
-    }"
-  ></i>
 </template>
 
 <script>
@@ -48,9 +47,20 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.completed-icon {
+  position: relative;
+  display: inline-block;
+}
+
 i {
   font-size: 60%;
-  color: var(--bg-color-primary);
+  color: #eee;
+  position: absolute;
+  bottom: -2px;
+
+  &.far {
+    color: #5d656c;
+  }
 
   &.large {
     font-size: 80%;
