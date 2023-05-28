@@ -731,7 +731,7 @@ class KalturaEndpoints
 
         foreach ($tapestry->getNodeIds() as $nodeID) {
             $node = new TapestryNode($tapestryPostId, $nodeID);
-            if (TapestryHelpers::videoCanBeUploaded($node)) {
+            if (KalturaApi::videoCanBeUploaded($node)) {
                 $video = (object) [
                 'tapestryID' => (int) $tapestryPostId,
                 'nodeID' => $nodeID,
@@ -879,7 +879,7 @@ class KalturaEndpoints
 
         foreach ($nodeIds as $nodeId) {
             $node = new TapestryNode($tapestryPostId, $nodeId);
-            if (TapestryHelpers::videoCanBeUploaded($node) && KalturaApi::checkVideoFileSize($node)) {
+            if (KalturaApi::videoCanBeUploaded($node) && KalturaApi::checkVideoFileSize($node)) {
                 array_push($uploadLog, (object) [
                     'tapestryID' => $tapestryPostId,
                     'nodeID' => $nodeId,

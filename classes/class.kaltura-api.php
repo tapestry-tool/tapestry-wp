@@ -583,6 +583,22 @@
         }
 
         /**
+         * Checks if a video can be uploaded to Kaltura.
+         * Only videos added via upload to WordPress can be transferred to Kaltura.
+         *
+         * @param TapestryNode $node
+         *
+         * @return bool
+         */
+        public static function videoCanBeUploaded($node)
+        {
+            $nodeMeta = $node->getMeta();
+            $nodeTypeData = $node->getTypeData();
+
+            return 'video' == $nodeMeta->mediaType && TapestryHelpers::isLocalUpload($node->getTypeData()->mediaURL);
+        }
+
+        /**
          * Checks if the user has defined a maximum video upload size for Kaltura that is smaller than the WordPress max upload size,
          * and if so, whether a video is too large to be uploaded.
          *
