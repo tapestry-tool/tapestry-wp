@@ -8,6 +8,7 @@
           input-test-id="node-video-mp4-url"
           placeholder="Enter URL for MP4 video"
           required
+          is-video
           @isUploading="handleUploadChange"
         />
       </b-form-group>

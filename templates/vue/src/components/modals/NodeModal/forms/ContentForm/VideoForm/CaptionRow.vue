@@ -89,7 +89,7 @@
                 :disabled="disabled"
                 :file-types="allowSrt ? '.vtt, .srt' : '.vtt'"
                 :placeholder="`Upload a VTT${allowSrt ? ' or SRT' : ''} file`"
-                :is-image="false"
+                is-video
                 :input-test-id="`caption-url-${index}`"
                 :file-upload-id="
                   `caption-file-upload-${isPending ? 'pending' : ''}-${caption.id}`
