@@ -825,7 +825,7 @@ class KalturaEndpoints
                         KalturaApi::saveAndDeleteLocalVideo($node, $response, $useKalturaPlayer, $video->file->file_path);
                         $numSuccessfullyUploaded++;
 
-                        $failedCaptions = TapestryHelpers::uploadVideoCaptions($node, $kalturaApi, $response);
+                        $failedCaptions = self::_uploadVideoCaptions($node, $kalturaApi, $response);
                         if ($failedCaptions > 0) {
                             $plural = $failedCaptions !== 1 ? 's' : '';
                             $video->additionalInfo = $failedCaptions . ' caption' . $plural . ' failed to upload. Please edit the node to check.';
