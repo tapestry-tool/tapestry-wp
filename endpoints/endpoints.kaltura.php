@@ -481,7 +481,7 @@ class KalturaEndpoints
                     if ($response->status === EntryStatus::READY) {
                         self::_saveVideoUploadStatusInNode($node, KalturaUploadStatus::COMPLETE, $response);
 
-                        $file_path = TapestryHelpers::getPathToNodeMedia($node)->file_path;
+                        $file_path = TapestryHelpers::getPathToMedia($node->getTypeData()->mediaURL)->file_path;
                         KalturaApi::saveAndDeleteLocalVideo($node, $response, $useKalturaPlayer, $file_path);
 
                         $video->currentStatus = KalturaUploadStatus::COMPLETE;
@@ -885,7 +885,7 @@ class KalturaEndpoints
                     'nodeID' => $nodeId,
                     'nodeTitle' => $node->getTitle(),
                     'uploadStatus' => KalturaUploadStatus::NOT_STARTED,
-                    'file' => TapestryHelpers::getPathToNodeMedia($node),
+                    'file' => TapestryHelpers::getPathToMedia($node->getTypeData()->mediaURL),
                     'kalturaID' => '',
                     'additionalInfo' => '',
                     'timestamp' => $timestamp,
