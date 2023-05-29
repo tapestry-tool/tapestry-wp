@@ -12,7 +12,7 @@ module.exports = {
     "^@/(.*)$": "<rootDir>/src/$1",
   },
   testMatch: ["**/*.spec.[tj]s?(x)"],
-  transformIgnorePatterns: ["/node_modules/(?!(vue-youtube-embed)/).*/"],
+  transformIgnorePatterns: ["/node_modules/(?!(vue-youtube-embed|d3|d3-.+|internmap|delaunator|robust-predicates)/).*/"],
   setupFilesAfterEnv: ["./config/jest-setup.js"],
   collectCoverage: true,
   coverageDirectory: "coverage-jest",

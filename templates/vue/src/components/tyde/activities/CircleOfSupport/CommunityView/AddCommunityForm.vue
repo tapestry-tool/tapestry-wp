@@ -20,6 +20,7 @@
           <div id="emoji-picker" style="position: relative">
             <twemoji-picker
               id="twemoji-picker"
+              twemojiPath="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/"
               :emojiData="emojiAllData"
               :emojiGroups="emojiGroups"
               :skinsSelection="true"
