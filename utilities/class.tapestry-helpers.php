@@ -427,28 +427,6 @@ class TapestryHelpers
     }
 
     /**
-     * Checks if a node with video content can be uploaded to Kaltura.
-     * Only H5P or Video nodes whose videos are local uploads can be transferred to Kaltura.
-     *
-     * @param TapestryNode  $node
-     * @return bool
-     */
-    public static function videoCanBeUploaded($node)
-    {
-        $nodeMeta = $node->getMeta();
-
-        if ($nodeMeta->mediaType === 'video') {
-            // URL videos can be uploaded if mediaURL is a local upload on this site
-            return self::isLocalUpload($node->getTypeData()->mediaURL);
-        } elseif (H5P_DEFINED && $nodeMeta->mediaType === 'h5p') {
-            // H5P videos can be uploaded if the video 'path' attribute is a relative path
-            return TapestryH5P::hasRelativeVideoUrl($node);
-        }
-
-        return false;
-    }
-
-    /**
      * Checks if a URL represents a local upload (a file in the WordPress upload directory).
      * Only checks the URL form, not that the file actually exists.
      */
