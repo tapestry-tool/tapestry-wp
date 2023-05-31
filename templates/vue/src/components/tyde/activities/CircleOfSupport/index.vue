@@ -140,7 +140,7 @@ export default {
       }
     },
     async handleDeleteConnection(connectionId) {
-      delete this.cos.connections[connectionId]
+      this.$delete(this.cos.connections, connectionId)
 
       Object.values(this.cos.communities).forEach(community => {
         this.removeConnectionFromCommunity(community.id, connectionId)
@@ -156,7 +156,7 @@ export default {
     async handleDeleteCommunity(communityId) {
       await client.cos.deleteCommunity(communityId)
 
-      delete this.cos.communities[communityId]
+      this.$delete(this.cos.communities, communityId)
 
       Object.values(this.cos.connections).forEach(connection => {
         this.removeCommunityFromConnection(connection.id, communityId)
