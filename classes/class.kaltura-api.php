@@ -559,13 +559,14 @@ class KalturaApi
             $typeData->mediaURL = $kalturaData->dataUrl.'?.mp4';
             $typeData->kalturaId = $kalturaData->id;
 
-            // Save Kaltura account info so we can still show Kaltura player, even if LOAD_KALTURA is currently false
-            if (!isset($typeData->kalturaData)) {
-                $typeData->kalturaData = [];
-            }
-            $typeData->kalturaData['partnerId'] = self::getKalturaPartnerId();
-            $typeData->kalturaData['serviceUrl'] = self::getKalturaServiceUrl();
-            $typeData->kalturaData['uniqueConfiguration'] = self::getKalturaUniqueConfig();
+    /**
+     * Updates the metadata (language, label, etc) of a Kaltura caption asset.
+     *
+     * @param object $caption New metadata for the caption
+     */
+    private function _updateCaptionAsset($kclient, $caption)
+    {
+        $captionPlugin = CaptionPlugin::get($kclient);
 
             $typeData->videoPlayer = $useKalturaPlayer ? 'kaltura' : 'regular';
         } elseif ('h5p' === $nodeMeta->mediaType) {
