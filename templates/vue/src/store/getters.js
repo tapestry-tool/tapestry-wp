@@ -113,13 +113,8 @@ export function getQuestion(state) {
 }
 
 export function getAnswers(state) {
-  return (nodeId, questionId) => {
-    if (state?.userAnswers?.[nodeId]?.activity?.[questionId]?.answers) {
-      return state.userAnswers[nodeId].activity[questionId].answers
-    } else {
-      return {}
-    }
-  }
+  return (nodeId, questionId) =>
+    state.userAnswers?.[nodeId]?.activity?.[questionId]?.answers ?? {}
 }
 
 export function hasPath(state) {

@@ -14,6 +14,7 @@
           ></i>
           <i v-else class="fas fa-lock fa-sm title-row-icon"></i>
           {{ node.title }}
+          <completed-icon v-if="node.completed" :node="node" class="mx-2" large />
           <locked-content
             v-if="disabled"
             :node="node"
@@ -82,7 +83,7 @@
             context="multi-content"
             :level="level + 1"
             @load="handleLoad"
-            @complete="complete"
+            @complete="completeChild"
           />
         </div>
         <multi-content-media
@@ -104,6 +105,7 @@
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex"
 import TapestryMedia from "../TapestryMedia"
 import LockedContent from "./common/LockedContent"
+import CompletedIcon from "@/components/common/CompletedIcon"
 import { names } from "@/config/routes"
 import Helpers from "@/utils/Helpers"
 
@@ -114,8 +116,8 @@ export default {
     MultiContentMedia: () => import("../MultiContentMedia"),
     MultiContentRows: () => import("./MultiContentRows"),
     LockedContent,
+    CompletedIcon,
   },
-
   props: {
     node: {
       type: Object,
@@ -182,7 +184,7 @@ export default {
     },
   },
   methods: {
-    ...mapActions(["toggleFavourite"]),
+    ...mapActions(["toggleFavourite", "completeNode"]),
     ...mapMutations(["setReturnRoute"]),
     toggle() {
       this.isVisible = !this.isVisible
@@ -202,6 +204,12 @@ export default {
     },
     complete() {
       this.$emit("complete", this.node.id)
+    },
+    completeChild(nodeId) {
+      const node = this.getNode(nodeId)
+      if (!node.completed) {
+        this.completeNode(node.id)
+      }
     },
     handleLoad(el) {
       this.$emit("load", el)
