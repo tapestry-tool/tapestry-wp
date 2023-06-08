@@ -369,6 +369,19 @@ add_action('plugins_loaded', function () {
             return $response;
         }
 
+        // Set the extension and mime type for .vtt files so Wordpress allows their upload
+
+        add_filter('wp_check_filetype_and_ext', 'wpse_file_and_ext', 10, 4);
+        function wpse_file_and_ext($types, $file, $filename, $mimes)
+        {
+            if (false !== strpos($filename, '.vtt')) {
+                $types['ext'] = 'vtt';
+                $types['type'] = 'text/vtt';
+            }
+
+            return $types;
+        }
+
         // Analytics
 
         register_activation_hook(__FILE__, 'create_tapestry_analytics_schema');

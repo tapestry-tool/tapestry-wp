@@ -139,7 +139,11 @@ class TapestryError extends Error
             'STATUS' => ['status' => 401],
         ],
         'UPLOAD_FILE_NOT_FOUND' => [
-            'MESSAGE' => 'File was not found on the server',
+            'MESSAGE' => 'Uploaded file was not found on the server',
+            'STATUS' => ['status' => 500],
+        ],
+        'KALTURA_ERROR' => [
+            'MESSAGE' => 'An unexpected error occurred on Kaltura',
             'STATUS' => ['status' => 500],
         ],
     ];

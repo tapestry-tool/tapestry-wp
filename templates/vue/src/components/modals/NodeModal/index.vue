@@ -445,7 +445,24 @@ export default {
     },
     hasUnsavedChanges() {
       const oldNode = this.getNode(this.nodeId)
-      return this.type === "add" || !Helpers.nodeEqual(oldNode, this.node)
+      return (
+        this.type === "add" ||
+        !Helpers.nodeEqual(oldNode, this.node, {
+          captionUrl: (oldUrl, newUrl) => {
+            // Caption URLs fetched from Kaltura include a string that identifies the current Kaltura session, which changes every time -
+            // so we use a custom comparison that only compares the caption asset ID
+            if (oldUrl !== newUrl) {
+              const oldUrlParams = new URLSearchParams(oldUrl)
+              const newUrlParams = new URLSearchParams(newUrl)
+              return (
+                oldUrlParams.get("captionAssetId") ===
+                newUrlParams.get("captionAssetId")
+              )
+            }
+            return true
+          },
+        })
+      )
     },
     isMultiContentNodeChild() {
       return this.parent && this.parent.mediaType == "multi-content"
@@ -542,7 +559,7 @@ export default {
       },
     },
     hasSubmissionApiError() {
-      if (this.apiError) {
+      if (this.apiError && !this.errors.includes(this.apiError.error)) {
         this.errors.push(this.apiError.error)
       }
     },
@@ -592,6 +609,7 @@ export default {
       "updateNode",
       "updateLockedStatus",
       "setTapestryErrorReporting",
+      "addApiError",
     ]),
     update(property, value) {
       this.setCurrentEditingNodeProperty({ property, value })
@@ -876,7 +894,14 @@ export default {
           ])
         }
 
-        if (this.node.mediaFormat === "kaltura") {
+        if (this.node.mediaFormat === "kaltura" && wp.getKalturaStatus()) {
+          try {
+            await this.updateKalturaVideoCaptions()
+          } catch (error) {
+            this.addApiError(error)
+            return
+          }
+
           if (!this.node.typeData.kalturaData) {
             this.update("typeData.kalturaData", {
               id: this.node.typeData.kalturaId,
@@ -1078,6 +1103,30 @@ export default {
       if (!this.node.mediaType) {
         errMsgs.push("Please select a Content Type")
       } else if (this.node.mediaType === "video") {
+        const captions = this.node.typeData.captions
+        if (
+          this.node.mediaFormat === "kaltura" &&
+          this.node.typeData.videoPlayer === "kaltura"
+        ) {
+          if (
+            captions &&
+            captions.some(
+              caption =>
+                !caption.captionUrl?.endsWith(".vtt") &&
+                !caption.captionUrl?.endsWith(".srt")
+            )
+          ) {
+            errMsgs.push("Please upload a WebVTT or SRT file for each caption")
+          }
+        } else if (this.node.mediaFormat !== "youtube") {
+          if (
+            captions &&
+            captions.some(caption => !caption.captionUrl?.endsWith(".vtt"))
+          ) {
+            errMsgs.push("Please upload a WebVTT file for each caption")
+          }
+        }
+
         if (this.node.mediaFormat === "kaltura") {
           if (wp.getKalturaStatus()) {
             try {
@@ -1349,6 +1398,29 @@ export default {
       const serviceUrl = wp.data.kaltura.serviceUrl
       const mediaURL = `${serviceUrl}/p/${partnerId}/sp/${partnerId}00/playManifest/entryId/${this.node.typeData.kalturaId}/format/url/protocol/https?.mp4`
       this.update("typeData.mediaURL", mediaURL)
+    },
+    async updateKalturaVideoCaptions() {
+      if (this.node.typeData.captions) {
+        // "Push" changes made to Kaltura captions to Kaltura, then save results in node
+        const result = await KalturaAPI.updateVideoCaptions(
+          this.node.typeData.kalturaId,
+          this.node.typeData.captions,
+          this.node.typeData.defaultCaptionId
+        )
+
+        // Merge old pending captions and new pending captions by caption ID
+        const currentPendingCaptions = this.node.typeData.pendingCaptions ?? []
+        const newPendingCaptions = result.pendingCaptions
+        for (let caption of currentPendingCaptions) {
+          if (newPendingCaptions.every(c => c.id !== caption.id)) {
+            newPendingCaptions.push(caption)
+          }
+        }
+
+        this.update("typeData.captions", result.captions)
+        this.update("typeData.pendingCaptions", newPendingCaptions)
+        this.update("typeData.defaultCaptionId", result.defaultCaptionId)
+      }
     },
   },
 }
