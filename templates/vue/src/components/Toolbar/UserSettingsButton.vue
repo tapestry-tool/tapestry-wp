@@ -1,6 +1,25 @@
 <template>
   <button class="user-settings-button" @click="open">
-    <span :class="`${iconClass}`"></span>
+    <avataaars
+      v-if="showAvatar"
+      class="avatar"
+      :isCircle="currentAvatar.isCircle"
+      :circleColor="currentAvatar.circleColor"
+      :accessoriesType="currentAvatar.accessoriesType"
+      :clotheType="currentAvatar.clotheType"
+      :clotheColor="currentAvatar.clotheColor"
+      :eyebrowType="currentAvatar.eyebrowType"
+      :eyeType="currentAvatar.eyeType"
+      :facialHairColor="currentAvatar.facialHairColor"
+      :facialHairType="currentAvatar.facialHairType"
+      :graphicType="currentAvatar.graphicType"
+      :hairColor="currentAvatar.hairColor"
+      :mouthType="currentAvatar.mouthType"
+      :skinColor="currentAvatar.skinColor"
+      :topType="currentAvatar.topType"
+      :topColor="currentAvatar.topColor"
+    ></avataaars>
+    <span v-else class="fas fa-user fa-s"></span>
     <user-settings-modal
       :show="avatarFormOpen"
       :tab="tab"
@@ -14,19 +33,24 @@
 import client from "@/services/TapestryAPI"
 import { names } from "@/config/routes"
 import UserSettingsModal from "../modals/UserSettingsModal"
+import Avataaars from "vuejs-avataaars"
+import avatarOptions from "@/components/modals/UserSettingsModal/avatarOptions"
+import { mapState } from "vuex"
 
 export default {
   components: {
     UserSettingsModal,
+    Avataaars,
   },
   props: {
-    iconClass: {
-      type: String,
+    showAvatar: {
+      type: Boolean,
       required: false,
-      default: "fas fa-user fa-s",
+      default: false,
     },
   },
   computed: {
+    ...mapState(["avatar"]),
     avatarFormOpen: {
       get() {
         return this.$route.name === names.USERSETTINGS
@@ -38,6 +62,12 @@ export default {
           query: this.$route.query,
         })
       },
+    },
+    currentAvatar() {
+      if (this.avatar && Object.keys(this.avatar).length) {
+        return this.avatar
+      }
+      return avatarOptions.defaultAvatar
     },
     tab() {
       return this.$route.params.tab
@@ -95,10 +125,6 @@ export default {
     background: none;
     color: var(--highlight-color);
     transform: scale(1.1);
-  }
-
-  &:only-child {
-    margin-right: 12px;
   }
 }
 </style>

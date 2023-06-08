@@ -66,6 +66,14 @@
               {{ showAcceptedHighlight ? "Enabled" : "Disabled" }}
             </b-form-checkbox>
           </b-form-group>
+          <b-form-group
+            label="Show child nodes of multi-content nodes"
+            description="If enabled, child nodes of multi-content nodes will be shown to everyone. If disabled, chilld nodes of multi-content nodes will only be shown to users with edit permissions."
+          >
+            <b-form-checkbox v-model="showChildrenOfMulticontent" switch>
+              {{ showChildrenOfMulticontent ? "Enabled" : "Disabled" }}
+            </b-form-checkbox>
+          </b-form-group>
           <b-form-group label="Default Depth" class="mb-0">
             <b-form-input
               v-model="defaultDepth"
@@ -89,50 +97,6 @@
           @click="$emit('change:tab', 'advanced')"
         >
           <b-form-group
-            label="Export/Duplicate"
-            description="Export your tapestry to a file and then you can import it on another site.
-              Duplicating will create a copy of this tapestry on this site."
-          >
-            <b-row class="mb-2">
-              <b-col>
-                <b-button
-                  id="export-button"
-                  block
-                  variant="light"
-                  :class="isExporting ? 'disabled' : ''"
-                  :disabled="isExporting"
-                  @click="exportTapestry"
-                >
-                  <b-spinner v-if="isExporting" small></b-spinner>
-                  <div :style="isExporting ? 'opacity: 50%;' : ''">
-                    Export Tapestry
-                  </div>
-                </b-button>
-                <b-alert
-                  v-if="apiError == null"
-                  :show="hasExported"
-                  variant="success"
-                  style="margin-top: 1em;"
-                >
-                  Your Tapestry has been exported! Find the .json file in your
-                  downloads.
-                </b-alert>
-                <b-alert
-                  v-else
-                  :show="hasExported"
-                  variant="danger"
-                  style="margin-top: 1em;"
-                >
-                  {{ apiError.error }}
-                </b-alert>
-              </b-col>
-              <b-col>
-                <duplicate-tapestry-button />
-              </b-col>
-            </b-row>
-          </b-form-group>
-          <b-form-group
-            class="mt-4"
             label="Show thumbnails"
             description="When disabled, node thumbnails will not be rendered on the screen. Turning this off may improve performance."
           >
@@ -140,28 +104,6 @@
               {{ renderImages ? "Enabled" : "Disabled" }}
             </b-form-checkbox>
           </b-form-group>
-          <b-form-group
-            class="mt-4"
-            label="Thumbnail optimization"
-            description="This will convert all existing thumbnails into optimized thumbnails"
-          >
-            <b-button
-              id="optimize-thumbnails-button"
-              block
-              variant="light"
-              :class="isOptimizing ? 'disabled' : ''"
-              :disabled="isOptimizing"
-              @click="optimizeThumbnails"
-            >
-              <b-spinner v-if="isOptimizing" small></b-spinner>
-              <div :style="isOptimizing ? 'opacity: 50%;' : ''">
-                Optimize All Thumbnails
-              </div>
-            </b-button>
-          </b-form-group>
-          <b-alert :show="hasOptimized" variant="success" style="margin-top: 1em;">
-            Thumbnails have been successfully optimized!
-          </b-alert>
           <b-form-group
             label="Geography map"
             :description="
@@ -361,6 +303,14 @@
               {{ submitNodesEnabled ? "Enabled" : "Disabled" }}
             </b-form-checkbox>
           </b-form-group>
+          <b-form-group
+            label="Allow moving all nodes"
+            description="When enabled, users can move all nodes even if they don't have permission to move them. Note that this only allows them to move the nodes locally; the movement will not be saved unless the user has move permission for that node."
+          >
+            <b-form-checkbox v-model="allowMovingAllNodes" switch>
+              {{ allowMovingAllNodes ? "Enabled" : "Disabled" }}
+            </b-form-checkbox>
+          </b-form-group>
         </b-tab>
       </b-tabs>
     </b-container>
@@ -384,14 +334,12 @@
 </template>
 
 <script>
-import { mapGetters, mapState, mapActions } from "vuex"
-import FileUpload from "../common/FileUpload"
-import DuplicateTapestryButton from "./DuplicateTapestryButton"
-import PermissionsTable from "../common/PermissionsTable"
+import { mapGetters, mapState } from "vuex"
+import FileUpload from "./common/FileUpload"
+import PermissionsTable from "./common/PermissionsTable"
 import DragSelectModular from "@/utils/dragSelectModular"
 import { data as wpData } from "@/services/wp"
-import client from "@/services/TapestryAPI"
-import Combobox from "../common/Combobox.vue"
+import Combobox from "./common/Combobox.vue"
 
 const editorRoles = ["editor", "administrator", "author"]
 const defaultPermissions = Object.fromEntries(
@@ -406,7 +354,6 @@ export default {
   name: "settings-modal",
   components: {
     FileUpload,
-    DuplicateTapestryButton,
     PermissionsTable,
     Combobox,
   },
@@ -435,20 +382,17 @@ export default {
       superuserOverridePermissions: true,
       showRejected: false,
       showAcceptedHighlight: true,
+      showChildrenOfMulticontent: false,
       defaultDepth: 3,
-      isExporting: false,
       renderImages: true,
       analyticsEnabled: false,
       tydeModeEnabled: false,
       tydeModeTabs: { default: {}, goals: "", profile: "" },
       draftNodesEnabled: true,
       submitNodesEnabled: true,
+      allowMovingAllNodes: false,
       renderMap: false,
       mapBounds: { neLat: 90, neLng: 180, swLat: -90, swLng: -180 },
-      hasExported: false,
-      exportFailed: false,
-      isOptimizing: false,
-      hasOptimized: false,
     }
   },
   computed: {
@@ -509,7 +453,6 @@ export default {
     })
   },
   methods: {
-    ...mapActions(["getTapestryExport"]),
     closeModal() {
       this.$emit("close")
     },
@@ -522,6 +465,7 @@ export default {
         superuserOverridePermissions = true,
         showRejected = false,
         showAcceptedHighlight = true,
+        showChildrenOfMulticontent = false,
         defaultDepth = 3,
         renderImages = true,
         renderMap = false,
@@ -530,6 +474,7 @@ export default {
         analyticsEnabled = false,
         draftNodesEnabled = true,
         submitNodesEnabled = true,
+        allowMovingAllNodes = false,
         mapBounds = { neLat: 90, neLng: 180, swLat: -90, swLng: -180 },
       } = this.settings
       this.backgroundUrl = backgroundUrl
@@ -539,6 +484,7 @@ export default {
       this.superuserOverridePermissions = superuserOverridePermissions
       this.showRejected = showRejected
       this.showAcceptedHighlight = showAcceptedHighlight
+      this.showChildrenOfMulticontent = showChildrenOfMulticontent
       this.defaultDepth = defaultDepth
       this.renderImages = renderImages
       this.renderMap = renderMap
@@ -547,6 +493,7 @@ export default {
       this.analyticsEnabled = analyticsEnabled
       this.draftNodesEnabled = draftNodesEnabled
       this.submitNodesEnabled = submitNodesEnabled
+      this.allowMovingAllNodes = allowMovingAllNodes
       this.mapBounds = mapBounds
 
       if (!this.tydeModeTabs.default) {
@@ -582,6 +529,7 @@ export default {
         superuserOverridePermissions: this.superuserOverridePermissions,
         showRejected: this.showRejected,
         showAcceptedHighlight: this.showAcceptedHighlight,
+        showChildrenOfMulticontent: this.showChildrenOfMulticontent,
         defaultDepth: parseInt(this.defaultDepth),
         renderImages: this.renderImages,
         renderMap: this.renderMap,
@@ -590,6 +538,7 @@ export default {
         analyticsEnabled: this.analyticsEnabled,
         draftNodesEnabled: this.draftNodesEnabled,
         submitNodesEnabled: this.submitNodesEnabled,
+        allowMovingAllNodes: this.allowMovingAllNodes,
         mapBounds: this.mapBounds,
       })
       await this.$store.dispatch("updateSettings", settings)
@@ -597,52 +546,6 @@ export default {
     },
     isUploading(status) {
       this.fileUploading = status
-    },
-    async exportTapestry() {
-      this.isExporting = true
-      const exportedTapestry = await this.getTapestryExport()
-      if (!exportedTapestry) {
-        this.isExporting = false
-        this.hasExported = true
-        return
-      }
-      const blob = new Blob([JSON.stringify(exportedTapestry, null, 2)], {
-        type: "application/json",
-      })
-      const fileUrl = URL.createObjectURL(blob)
-      const a = document.createElement("a")
-      a.style.display = "none"
-      a.href = fileUrl
-      a.download = `${this.settings.title}.json`
-      document.body.appendChild(a)
-      a.click()
-      URL.revokeObjectURL(fileUrl)
-      document.body.removeChild(a)
-
-      this.isExporting = false
-      this.hasExported = true
-    },
-    async optimizeThumbnails() {
-      this.isOptimizing = true
-      client
-        .optimizeNodeThumbnails()
-        .finally(() => {
-          this.isOptimizing = false
-          this.hasOptimized = true
-          setTimeout(() => {
-            this.hasOptimized = false
-          }, 10000)
-        })
-        .catch(err => {
-          console.log(err)
-          this.$bvToast.toast(
-            "Sorry, an error occurred. Some or all of the nodes were not optimized.",
-            {
-              title: "Optimization did not complete",
-              variant: "danger",
-            }
-          )
-        })
     },
     isValidLat(coord) {
       return this.getCoord(coord, 0) <= 90 && this.getCoord(coord, 0) >= -90
@@ -683,32 +586,6 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-#export-button {
-  position: relative;
-  > span {
-    position: absolute;
-    height: 1.5em;
-    width: 1.5em;
-  }
-  &.disabled {
-    pointer-events: none;
-    cursor: not-allowed;
-  }
-}
-
-#optimize-thumbnails-button {
-  position: relative;
-  > span {
-    position: absolute;
-    height: 1.5em;
-    width: 1.5em;
-  }
-  &.disabled {
-    pointer-events: none;
-    cursor: not-allowed;
-  }
 }
 
 #save-button {

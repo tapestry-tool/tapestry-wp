@@ -9,7 +9,7 @@ class TapestryError extends Error
     protected $message;
     protected $status;
 
-    const ERRORS = [
+    public const ERRORS = [
         'INVALID_USER_ID' => [
             'MESSAGE' => 'UserID is invalid or user is not logged in.',
             'STATUS' => ['status' => 404],
@@ -94,6 +94,10 @@ class TapestryError extends Error
             'MESSAGE' => 'Failed to save audio to the server.',
             'STATUS' => ['status' => 500],
         ],
+        'FAILED_TO_CREATE_COMMENT' => [
+            'MESSAGE' => 'Failed to create the comment',
+            'STATUS' => ['status' => 500],
+        ],
         'CANNOT_DELETE_ROOT' => [
             'MESSAGE' => 'Root node can only be deleted if there are no other nodes in the tapestry',
             'STATUS' => ['status' => 400],
@@ -109,6 +113,38 @@ class TapestryError extends Error
         'TAPESTRY_NOT_EMPTY' => [
             'MESSAGE' => 'The Tapestry is not empty',
             'STATUS' => ['status' => 400],
+        ],
+        'INVALID_TAPESTRY_DATA' => [
+            'MESSAGE' => 'Tapestry data is invalid',
+            'STATUS' => ['status' => 400],
+        ],
+        'INVALID_ZIP' => [
+            'MESSAGE' => 'Zip file is invalid',
+            'STATUS' => ['status' => 400],
+        ],
+        'FAILED_TO_IMPORT' => [
+            'MESSAGE' => 'Unable to import Tapestry',
+            'STATUS' => ['status' => 500],
+        ],
+        'FAILED_TO_EXPORT' => [
+            'MESSAGE' => 'Unable to export Tapestry',
+            'STATUS' => ['status' => 500],
+        ],
+        'KALTURA_NOT_AVAILABLE' => [
+            'MESSAGE' => 'Kaltura is not enabled on the server.',
+            'STATUS' => ['status' => 400],
+        ],
+        'FAILED_TO_ESTABLISH_KALTURA_SESSION' => [
+            'MESSAGE' => 'Unable to establish Kaltura session',
+            'STATUS' => ['status' => 401],
+        ],
+        'UPLOAD_FILE_NOT_FOUND' => [
+            'MESSAGE' => 'Uploaded file was not found on the server',
+            'STATUS' => ['status' => 500],
+        ],
+        'KALTURA_ERROR' => [
+            'MESSAGE' => 'An unexpected error occurred on Kaltura',
+            'STATUS' => ['status' => 500],
         ],
     ];
 

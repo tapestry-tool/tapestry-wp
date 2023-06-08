@@ -8,7 +8,9 @@
     >
       <span>
         <tapestry-icon icon="comment-dots" />
-        <span v-show="!isEmpty" class="count">{{ nodesPendingReview.length }}</span>
+        <b-badge v-show="!isEmpty" class="notification-badge" pill variant="danger">
+          {{ nodesPendingReview.length }}
+        </b-badge>
       </span>
     </button>
     <div v-show="showMenu" class="menu">
@@ -40,7 +42,7 @@ import moment from "moment"
 import TapestryIcon from "@/components/common/TapestryIcon"
 import { names } from "@/config/routes"
 import { nodeStatus } from "@/utils/constants"
-import * as Comment from "@/utils/comments"
+import * as Comment from "@/utils/reviewComments"
 
 export default {
   components: {
@@ -57,9 +59,13 @@ export default {
       return Object.values(this.nodes)
         .filter(node => node.reviewStatus === nodeStatus.SUBMIT)
         .map(node => {
-          const lastSubmit = node.reviewComments
-            .reverse()
-            .find(evt => evt.type === Comment.types.STATUS_CHANGE)
+          let lastSubmitTime
+          for (let i = node.reviewComments.length - 1; i >= 0; i--) {
+            if (node.reviewComments[i].type === Comment.types.STATUS_CHANGE) {
+              lastSubmitTime = node.reviewComments[i].timestamp
+              break
+            }
+          }
           return {
             ...node,
             link: {
@@ -72,7 +78,7 @@ export default {
                 sidebar: "review",
               },
             },
-            submitTime: moment(lastSubmit.timestamp).fromNow(),
+            submitTime: moment(lastSubmitTime).fromNow(),
           }
         })
     },
@@ -153,7 +159,6 @@ ul {
 button {
   padding: 0.5rem;
   background: none;
-  color: #999;
   font-size: 1.2em;
   transition: all 0.2s ease;
   outline: none;
@@ -166,15 +171,11 @@ button {
   }
 }
 
-.count {
-  position: absolute;
-  top: 2px;
-  font-size: 0.5em;
-  color: white;
-  background: red;
-  padding: 0 4px;
-  border-radius: 4px;
-  transform: translateX(-8px);
+.notification-badge {
+  position: absolute !important;
+  top: 0 !important;
+  right: -3px !important;
+  font-size: 0.7rem !important;
 }
 
 h1 {

@@ -8,13 +8,21 @@
  *
  * @return object null
  */
+?>
 
-get_header();
+<?php
+$iframe_mode = array_key_exists('iframe', $_GET);
+
+if ($iframe_mode) {
+    load_template(__DIR__ . '/header-iframe.php');
+} else {
+    get_header();
+}
 ?>
 
 <div id="primary" class="content-area col-md-12">
     <?php
-    $main_classes = implode(" ", array_map(function($role) {
+    $main_classes = implode(" ", array_map(function ($role) {
         return "role-" . $role;
     }, wp_get_current_user()->roles));
     if (current_user_can("edit_post", get_the_ID())) {
@@ -72,4 +80,10 @@ get_header();
     </main><!-- #main -->
 </div><!-- #primary -->
 
-<?php get_footer(); ?>
+<?php
+if ($iframe_mode) {
+    load_template(__DIR__ . '/footer-iframe.php');
+} else {
+    get_footer();
+}
+?>

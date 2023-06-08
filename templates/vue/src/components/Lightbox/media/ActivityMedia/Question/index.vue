@@ -54,7 +54,7 @@
             :node="node"
             :question="question"
             :answer="answer || ''"
-            @skipQuestion="$emit('skipQuestion')"
+            @skip-question="$emit('skip-question')"
             @submit="handleSubmit"
           ></component>
         </div>
@@ -138,7 +138,7 @@ export default {
               this.question.followUp.questionId
             ]
           ) {
-            // eslint-disable-next-line vue/no-side-effects-in-computed-properties
+            // eslint-disable-next-line vue/no-side-effects-in-computed-properties, vue/no-mutating-props
             this.question.followUp.nodeId = tempNodeId
             // eslint-disable-next-line vue/no-side-effects-in-computed-properties
             this.prevQuestionId = this.question.followUp.questionId
@@ -222,6 +222,8 @@ export default {
         return this.$emit("submit")
       }
 
+      this.$emit("before-submit")
+
       let submittedAnswer = null
 
       switch (this.formType) {
@@ -240,7 +242,7 @@ export default {
           break
         }
       }
-      await this.completeQuestion({
+      const completionSuccess = await this.completeQuestion({
         nodeId: this.node.id,
         questionId: this.question.id,
         answerType: this.formType,
@@ -248,9 +250,19 @@ export default {
       })
       this.submitting = false
 
-      client.recordAnalyticsEvent("user", "submit", "question", this.question.id, {
-        type: this.formType,
-      })
+      if (completionSuccess) {
+        client.recordAnalyticsEvent("user", "submit", "question", this.question.id, {
+          type: this.formType,
+        })
+        this.$root.$bvToast.toast("Your answer has been saved", {
+          variant: "success",
+          solid: true,
+          isStatus: true,
+          noCloseButton: true,
+          toaster: "b-toaster-bottom-center",
+        })
+      }
+
       this.$emit("submit")
     },
     formIsCompleted(type) {

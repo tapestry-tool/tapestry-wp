@@ -36,16 +36,21 @@ export async function updateUserSettings({ commit, dispatch }, userSettings) {
 }
 
 // nodes
-export async function addNode({ commit, dispatch, getters, state }, newNode) {
+export async function addNode(
+  { commit, dispatch, getters, state },
+  { node, parentId }
+) {
   try {
-    const response = await client.addNode(JSON.stringify(newNode))
-    const nodeToAdd = { ...newNode }
-    const id = response.data.id
+    const response = await client.addNode({ node, parentId })
+    const { node: newNode, link } = response.data
+    const nodeToAdd = { ...node }
+    const id = newNode.id
     nodeToAdd.id = id
-    nodeToAdd.author = response.data.author
-    nodeToAdd.permissions = response.data.permissions
-    if (response.data.typeData.h5pMeta) {
-      nodeToAdd.typeData.h5pMeta = response.data.typeData.h5pMeta
+    nodeToAdd.author = newNode.author
+    nodeToAdd.comments = newNode.comments
+    nodeToAdd.permissions = newNode.permissions
+    if (newNode.typeData.h5pMeta) {
+      nodeToAdd.typeData.h5pMeta = newNode.typeData.h5pMeta
     }
 
     commit("addNode", nodeToAdd)
@@ -57,6 +62,21 @@ export async function addNode({ commit, dispatch, getters, state }, newNode) {
         [getters.yOrFy]: nodeToAdd.coordinates.y,
       },
     })
+
+    if (parentId) {
+      const parent = getters.getNode(parentId)
+      commit("updateNode", {
+        id: parentId,
+        newNode: {
+          childOrdering: [...parent.childOrdering, id],
+        },
+      })
+    }
+
+    if (link) {
+      commit("addLink", link)
+    }
+
     return id
   } catch (error) {
     dispatch("addApiError", error)
@@ -130,6 +150,9 @@ export async function updateNodeProgress(
     const { id, progress } = payload
 
     const node = getters.getNode(id)
+    if ((node.completed && progress !== 1) || node.progress === progress) {
+      return
+    }
 
     if (!Helpers.nodeAndUserAreDyad(node)) {
       if (!wp.isLoggedIn()) {
@@ -174,6 +197,11 @@ export async function completeNode(context, nodeId) {
   }
   const { commit, dispatch, getters } = context
   const node = getters.getNode(nodeId)
+
+  if (node.completed) {
+    return
+  }
+
   if (!Helpers.nodeAndUserAreDyad(node)) {
     try {
       if (!wp.isLoggedIn()) {
@@ -202,10 +230,9 @@ export async function completeNode(context, nodeId) {
   }
 }
 
-async function unlockNodes({ commit, getters, state, dispatch }) {
+async function unlockNodes({ commit, getters, dispatch }) {
   try {
-    let { userProgress } = state
-    const progress = userProgress ? userProgress : await client.getUserProgress()
+    const progress = await client.getUserProgress()
     for (const [id, nodeProgress] of Object.entries(progress)) {
       const currentNode = getters.getNode(id)
       if (
@@ -249,9 +276,17 @@ export async function getNodeHasDraftChildren({ dispatch }, id) {
   }
 }
 
-export async function getTapestryExport({ dispatch }) {
+export async function getTapestryExport({ dispatch }, shouldExportComments) {
   try {
-    return await client.getTapestryExport()
+    return await client.getTapestryExport(shouldExportComments)
+  } catch (error) {
+    dispatch("addApiError", error)
+  }
+}
+
+export async function getTapestryExportAsZip({ dispatch }, shouldExportComments) {
+  try {
+    return await client.getTapestryExportAsZip(shouldExportComments)
   } catch (error) {
     dispatch("addApiError", error)
   }
@@ -268,8 +303,11 @@ export async function completeQuestion(
       commit("completeQuestion", { nodeId, questionId, answerType, answer })
     } catch (error) {
       dispatch("addApiError", error)
+      return false
     }
+    return true
   }
+  return false
 }
 
 export async function saveAudio({ dispatch }, { nodeId, questionId, audio }) {
@@ -287,6 +325,42 @@ export async function reviewNode({ commit, dispatch }, { id, comments }) {
     commit("updateNode", {
       id,
       newNode: updates.data,
+    })
+  } catch (error) {
+    dispatch("addApiError", error)
+  }
+}
+
+export async function addComment(
+  { commit, dispatch },
+  { nodeId, comment, replyingTo }
+) {
+  try {
+    const comments = await client.addComment(nodeId, comment, replyingTo)
+    commit("updateNode", {
+      id: nodeId,
+      newNode: {
+        comments,
+      },
+    })
+    return true
+  } catch (error) {
+    dispatch("addApiError", error)
+  }
+  return false
+}
+
+export async function performCommentAction(
+  { commit, dispatch },
+  { nodeId, commentId, action }
+) {
+  try {
+    const comments = await client.performCommentAction(nodeId, commentId, action)
+    commit("updateNode", {
+      id: nodeId,
+      newNode: {
+        comments,
+      },
     })
   } catch (error) {
     dispatch("addApiError", error)
@@ -405,4 +479,13 @@ export function addApiError({ commit }, error) {
 
 export function setTapestryErrorReporting({ commit }, isEnabled) {
   commit("setTapestryErrorReporting", isEnabled)
+}
+
+export async function updateNotifications({ commit, dispatch }, notifications) {
+  try {
+    await client.updateNotifications(notifications)
+    commit("setNotifications", notifications)
+  } catch (error) {
+    dispatch("addApiError", error)
+  }
 }

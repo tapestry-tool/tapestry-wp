@@ -59,24 +59,19 @@ Cypress.Commands.add("getSelectedNode", () =>
     .then(({ nodes, selectedNodeId }) => nodes[selectedNodeId])
 )
 
-Cypress.Commands.add("addNode", { prevSubject: false }, (parent, node) => {
-  cy.server()
-  cy.route("POST", `**/nodes`).as("addNode")
+Cypress.Commands.add("addNode", { prevSubject: false }, (parentId, node) => {
+  cy.intercept("POST", `**/nodes`).as("addNode")
   cy.store().then(store => {
-    store.dispatch("addNode", deepMerge(store.getters.createDefaultNode(), node))
-    cy.wait("@addNode")
-    cy.getNodeByTitle(node.title).then(({ id }) => {
-      store.commit("updateVisibleNodes", [...store.state.visibleNodes, id])
-      if (parent) {
-        cy.addLink(parent.id || parent, id)
-      }
+    store.dispatch("addNode", {
+      node: deepMerge(store.getters.createDefaultNode(), node),
+      parentId,
     })
+    cy.wait("@addNode")
   })
 })
 
 Cypress.Commands.add("editNode", { prevSubject: false }, (id, newNode) => {
-  cy.server()
-  cy.route("PUT", `**/nodes/**`).as("editNode")
+  cy.intercept("PUT", `**/nodes/**`).as("editNode")
 
   cy.store().then(store => store.dispatch("updateNode", { id, newNode }))
 
@@ -87,9 +82,6 @@ Cypress.Commands.add(
   "updateNodeProgress",
   { prevSubject: false },
   (id, progress) => {
-    cy.server()
-    cy.route("POST", `**/users/progress`).as("saveProgress")
-
     cy.store().then(store => store.dispatch("updateNodeProgress", { id, progress }))
 
     cy.store()
@@ -102,8 +94,7 @@ Cypress.Commands.add(
 )
 
 Cypress.Commands.add("deleteNode", () => {
-  cy.server()
-  cy.route("DELETE", `**/nodes/**`).as("deleteNode")
+  cy.intercept("DELETE", `**/nodes/**`).as("deleteNode")
 
   cy.contains(/delete/i).click()
   cy.wait("@deleteNode")
@@ -129,6 +120,15 @@ Cypress.Commands.add("openLightbox", { prevSubject: "optional" }, (node, id) => 
 
 Cypress.Commands.add("closeLightbox", () => cy.getByTestId("close-lightbox").click())
 
+// -- Sidebar --
+
+Cypress.Commands.add("sidebar", () => cy.getByTestId("sidebar"))
+
+Cypress.Commands.add("openSidebar", () => {
+  cy.getByTestId("sidebar-toggle").click()
+  return cy.sidebar()
+})
+
 // -- Links --
 
 Cypress.Commands.add("link", (source, target) =>
@@ -136,8 +136,7 @@ Cypress.Commands.add("link", (source, target) =>
 )
 
 Cypress.Commands.add("addLink", (source, target) => {
-  cy.server()
-  cy.route("POST", "**/links").as("postLink")
+  cy.intercept("POST", "**/links").as("postLink")
   cy.store()
     .its("dispatch")
     .then(dispatch => dispatch("addLink", { source, target }))
@@ -154,22 +153,20 @@ Cypress.Commands.add("openModal", (type, id) => {
       return cy.getByTestId(`edit-node-${id}`).click()
     case "settings":
       return cy.getByTestId("settings-button").click()
+    case "user-answers":
+      return cy.getByTestId("user-answers-button").click()
     default:
       throw new Error(`Unknown modal type: ${type}`)
   }
 })
 
-Cypress.Commands.add("submitModal", () => {
-  cy.server()
-  cy.route("PUT", `**/nodes/**/permissions`).as("editPermissions")
-
+Cypress.Commands.add("submitModal", timeout => {
   cy.getByTestId("submit-node-modal").click()
-  cy.getByTestId("node-modal", { timeout: 10000 }).should("not.be.visible")
+  cy.getByTestId("node-modal", { timeout: timeout ?? 10000 }).should("not.exist")
 })
 
 Cypress.Commands.add("submitSettingsModal", () => {
-  cy.server()
-  cy.route("PUT", `**/settings`).as("save")
+  cy.intercept("PUT", `**/settings`).as("save")
 
   cy.getByTestId("settings-modal").within(() => {
     cy.getByTestId("submit-button").click()
@@ -181,9 +178,11 @@ Cypress.Commands.add("changeMediaType", type =>
   cy.getByTestId(`node-media-type`).select(type)
 )
 
-// -- Utils --
+Cypress.Commands.add("changeMediaFormat", format =>
+  cy.getByTestId(`node-media-format`).select(format)
+)
 
-Cypress.Commands.add("sidebar", () => cy.getByTestId("sidebar"))
+// -- Utils --
 
 Cypress.Commands.add("app", () => cy.window().its("app"))
 

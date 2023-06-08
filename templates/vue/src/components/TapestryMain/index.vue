@@ -13,7 +13,7 @@
           :target="nodes[link.target]"
         ></tapestry-link>
       </g>
-      <g v-if="dragSelectEnabled && dragSelectReady" class="nodes">
+      <g v-if="!dragSelectEnabled || dragSelectReady" class="nodes">
         <tapestry-node
           v-for="(node, id) in nodes"
           :key="id"
@@ -82,7 +82,7 @@ export default {
       return Number(this.$route.params.nodeId)
     },
     dragSelectEnabled() {
-      return !this.settings.renderMap
+      return !Helpers.isTouchEnabledDevice()
     },
     editableNodes() {
       return this.nodes.length
@@ -151,42 +151,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-#app-container {
-  position: relative;
-  transform: scale(1);
-  transform-origin: top left;
-  transition: all 0.2s ease-out;
-  width: 100%;
-  z-index: 0;
-
-  @media screen and (min-width: 500px) {
-    width: calc(100% - 2.5em);
-
-    &.sidebar-open {
-      width: calc(100% - min(400px, max(300px, 25vw)) - 2.5em);
-      padding-right: 0;
-
-      .toolbar {
-        padding-right: 1.5vw;
-      }
-    }
+#tapestry {
+  .empty-message {
+    margin: 30vh auto;
   }
-  #tapestry {
-    .empty-message {
-      margin: 30vh auto;
-    }
-    svg {
-      position: relative;
-    }
+  svg {
+    position: relative;
   }
-}
-</style>
-
-<style lang="scss">
-#app {
-  background-size: cover;
-}
-#app-container .btn-link {
-  background: transparent;
 }
 </style>

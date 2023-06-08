@@ -1,83 +1,110 @@
 <template>
-  <div ref="wrapper" class="page-nav-wrapper">
-    <aside
-      ref="container"
-      data-qa="page-nav-container"
-      :class="[
-        'page-nav',
-        {
-          lightbox: !isFullScreen,
-          fullscreen: isFullScreen,
-          closed: !opened,
-          'is-unit-child': unitsMenuVisible,
-        },
-      ]"
-      :style="{ height: isFullScreen ? '100vh' : dimensions.height + 'px' }"
+  <div>
+    <transition
+      name="slide-fade"
+      :css="animate"
+      @after-enter="animate = false"
+      @enter-cancelled="animate = false"
+      @after-leave="animate = false"
+      @leave-cancelled="animate = false"
     >
-      <button
+      <aside
+        v-show="menuVisible"
+        ref="wrapper"
         :class="[
-          'page-nav-toggle',
+          'page-nav-wrapper',
           {
-            fullscreen: isFullScreen,
-          },
-        ]"
-        data-qa="page-nav-toggle"
-        @click="opened = !opened"
-      >
-        <i
-          v-if="!opened"
-          class="fas fa-bars fa-lg"
-          style="color: var(--text-color-primary);"
-        ></i>
-        <i v-else class="fas fa-times fa-lg"></i>
-      </button>
-      <div v-if="unitsMenuVisible">
-        <b-dropdown class="unit-switch-dropdown" block split :text="parentNodeTitle">
-          <b-dropdown-item
-            v-for="page in pages"
-            :key="page.id"
-            @click="changePage(page.id)"
-          >
-            {{ page.title }}
-          </b-dropdown-item>
-        </b-dropdown>
-        <h5 class="pl-2 py-1 mb-4">{{ node.title }}</h5>
-      </div>
-      <div
-        :class="[
-          'page-nav-content',
-          'mb-auto',
-          {
+            lightbox: !isFullScreen,
             fullscreen: isFullScreen,
             closed: !opened,
+            'unit-child': unitsMenuVisible,
           },
         ]"
       >
-        <ul class="page-menu-items fa-ul">
-          <page-menu-item
-            v-for="row in rows"
-            :key="row.node.id"
-            :node="row.node"
-            :lockRows="lockRows"
-            :disabled="disabledRow(row.node)"
-            @scroll-to="scrollToRef"
-          />
-        </ul>
-      </div>
-      <a
-        v-if="isLoggedIn"
-        :href="logoutUrl"
-        class="mt-auto ml-3 pt-4"
+        <div
+          ref="container"
+          data-qa="page-nav-container"
+          class="page-nav"
+          :style="{ height: isFullScreen ? '100vh' : dimensions.height + 'px' }"
+        >
+          <div v-if="unitsMenuVisible">
+            <b-dropdown
+              class="unit-switch-dropdown"
+              block
+              split
+              :text="parentNodeTitle"
+            >
+              <b-dropdown-item
+                v-for="(page, pageIndex) in pages"
+                :key="page.id"
+                :active="activePageIndex === pageIndex"
+                :disabled="!page.accessible"
+                @click="changePage(page.id)"
+              >
+                <div v-if="!page.accessible" class="disabled-item">
+                  <div>{{ page.title }}</div>
+                  <i class="fas fa-lock" />
+                </div>
+                <template v-else>
+                  {{ page.title }}
+                  <completed-icon
+                    :node="page"
+                    class="menu-completed-icon mx-2"
+                    :show-tooltip="false"
+                  />
+                </template>
+              </b-dropdown-item>
+            </b-dropdown>
+            <h5 class="pl-2 py-1 mb-4">
+              {{ node.title }}
+              <completed-icon :node="node" class="mx-2" :show-tooltip="false" />
+            </h5>
+          </div>
+          <div v-if="pageMenuVisible" class="page-nav-content mb-auto">
+            <ul class="page-menu-items fa-ul">
+              <page-menu-item
+                v-for="row in rows"
+                :key="row.node.id"
+                :node="row.node"
+                :lockRows="lockRows"
+                :disabled="disabledRow(row.node)"
+                @scroll-to="scrollToRef"
+              />
+            </ul>
+          </div>
+          <a
+            v-if="isLoggedIn"
+            :href="logoutUrl"
+            class="logout-link mt-auto ml-3 pt-4"
+          >
+            Logout
+          </a>
+        </div>
+      </aside>
+    </transition>
+    <button
+      :class="[
+        'page-nav-toggle',
+        {
+          fullscreen: isFullScreen,
+        },
+      ]"
+      data-qa="page-nav-toggle"
+      @click="toggleMenu"
+    >
+      <i
+        v-if="!opened"
+        class="fas fa-bars fa-lg"
         style="color: var(--text-color-primary);"
-      >
-        Logout
-      </a>
-    </aside>
+      ></i>
+      <i v-else class="fas fa-times fa-lg"></i>
+    </button>
   </div>
 </template>
 
 <script>
 import { mapGetters } from "vuex"
+import CompletedIcon from "@/components/common/CompletedIcon"
 import PageMenuItem from "./PageMenuItem"
 import { isLoggedIn, data as wpData } from "@/services/wp"
 import Helpers from "@/utils/Helpers"
@@ -85,6 +112,7 @@ import Helpers from "@/utils/Helpers"
 export default {
   name: "page-menu",
   components: {
+    CompletedIcon,
     PageMenuItem,
   },
   props: {
@@ -102,12 +130,20 @@ export default {
       required: false,
       default: false,
     },
+    pages: {
+      type: [Array, Boolean],
+      required: true,
+    },
+    activePageIndex: {
+      type: Number,
+      required: true,
+    },
   },
   data() {
     return {
       opened: false,
-      pages: false,
-      selectedPage: this.node.id,
+      browserWidth: Helpers.getBrowserWidth(),
+      animate: false,
     }
   },
   computed: {
@@ -146,14 +182,14 @@ export default {
     isFullScreen() {
       return this.fullScreen || this.node.fullscreen
     },
-    browserWidth() {
-      return Helpers.getBrowserWidth()
+    menuVisible() {
+      return this.opened || (this.isFullScreen && this.browserWidth > 800)
     },
     unitsMenuVisible() {
-      if (!this.pages || this.parentNode.childOrdering.length <= 1) {
-        return false
-      }
-      return this.opened || (this.browserWidth > 800 && this.node.fullscreen)
+      return this.pages && this.parentNode.childOrdering.length > 1
+    },
+    pageMenuVisible() {
+      return this.node.accessible && this.node.typeData.showNavBar
     },
     isLoggedIn() {
       return isLoggedIn()
@@ -162,24 +198,16 @@ export default {
       return wpData.logoutUrl
     },
   },
-  watch: {
-    parentNode() {
-      this.updatePages()
-    },
-  },
   mounted() {
-    this.updatePages()
+    this.computeBrowserWidth()
+    window.addEventListener("resize", this.computeBrowserWidth)
+  },
+  beforeDestroy() {
+    window.removeEventListener("resize", this.computeBrowserWidth)
   },
   methods: {
-    updatePages() {
-      if (
-        this.parentNode?.mediaType === "multi-content" &&
-        this.parentNode?.presentationStyle === "unit"
-      ) {
-        this.pages = this.parentNode.childOrdering.map(this.getNode)
-      } else {
-        this.pages = false
-      }
+    computeBrowserWidth() {
+      this.browserWidth = Helpers.getBrowserWidth()
     },
     disabledRow(node) {
       const index = this.rows.findIndex(row => row.node.id === node.id)
@@ -202,12 +230,18 @@ export default {
       return nodes
     },
     changePage(pageNodeId) {
-      this.selectedPage = pageNodeId
-      this.$root.$emit("open-node", pageNodeId)
+      this.$emit("change-page", pageNodeId)
+    },
+    toggleMenu() {
+      // Only animate the enter/leave if triggered by the toggle button
+      this.animate = true
+      this.opened = !this.opened
     },
     scrollToRef(nodeId) {
       this.$nextTick(() => {
-        const container = document.getElementById(`multicontent-container`)
+        const container = document.querySelector(
+          `#multicontent-container .media-container`
+        )
         const navbar = document.getElementById(`tapestry-navbar`)
         const yOffset = (navbar ? -navbar.getBoundingClientRect().bottom : 0) + 10
         const element = document.getElementById(`row-${nodeId}`)
@@ -223,101 +257,77 @@ export default {
 }
 </script>
 
-<style lang="scss">
-.has-navbar ~ .page-nav-wrapper > .page-nav {
-  padding-top: 8rem !important;
+<style lang="scss" scoped>
+.page-nav-toggle {
+  background-color: transparent;
+  padding: 0;
+  position: absolute;
+  left: 20px;
+  top: 20px;
+  z-index: 11;
+
+  &.fullscreen {
+    top: 40px;
+    @media screen and (min-width: 801px) {
+      display: none;
+    }
+  }
 }
 
 .page-nav-wrapper {
+  position: relative;
+  z-index: 0;
+  min-width: 200px;
+
+  &.lightbox {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 11;
+    border-radius: 15px 0 0 15px;
+  }
+
+  &.fullscreen {
+    position: absolute;
+    height: 100vh;
+    margin: -24px 24px 0 -24px;
+    z-index: 11;
+
+    .page-nav {
+      padding: 4rem 1.5rem 3rem 1.5rem;
+    }
+
+    @media screen and (min-width: 801px) {
+      position: relative;
+    }
+  }
+
+  &.unit-child {
+    width: 250px;
+    max-width: 25vw;
+  }
+
   .page-nav {
-    position: relative;
-    color: white;
+    color: #ffffff;
     background: #5d656c;
     padding: 2.2rem 1.5rem;
-    transform: translateY(0);
-    transition: all 0.2s ease-in-out;
     font-size: 14px;
     text-align: left;
-    z-index: 0;
     overflow-y: auto;
-    min-width: 200px;
     display: flex;
     flex-direction: column;
 
-    &.lightbox {
-      position: absolute;
-      left: 0;
-      top: 0;
-      z-index: 11;
-      border-radius: 15px 0 0 15px;
-
-      &.closed {
-        background: transparent;
-        min-width: 20px;
-        max-width: 20px;
-      }
-    }
-
-    &.fullscreen {
-      height: "100vh";
-      margin: -24px 24px 0 -24px;
-      z-index: 11;
-
-      &.closed {
-        @media screen and (max-width: 800px) {
-          min-width: calc(16.33px + 3rem);
-          width: calc(16.33px + 3rem);
-        }
-      }
-    }
-
-    &.is-unit-child {
-      width: 250px;
-      max-width: 25vw;
-    }
-
     @media screen and (min-width: 960px) {
-      font-size: calc(14px + (2 * (100vw - 960px) / 1280px - 960px));
+      font-size: clamp(14px, 1.3vw, 16px);
     }
 
-    @media screen and (min-width: 1280px) {
-      font-size: 16px;
-    }
-
-    .page-nav-toggle {
-      background-color: transparent;
-      padding: 0;
-      margin-bottom: 1em;
-
-      &.fullscreen {
-        @media screen and (min-width: 801px) {
-          display: none;
-        }
-      }
-    }
-
-    .page-nav-toggle + .page-nav-content {
-      margin-top: 9em;
-    }
-
-    .page-nav-container {
+    .page-nav {
       text-align: left;
     }
 
     .page-nav-content {
-      &.fullscreen {
-        &.closed {
-          @media screen and (max-width: 800px) {
-            display: none;
-          }
-
-          @media screen and (min-width: 801px) {
-            display: block;
-          }
-        }
-      }
-      &.closed {
-        display: none;
+      &:first-child {
+        margin-top: 9em;
       }
 
       .page-menu-items {
@@ -325,11 +335,47 @@ export default {
         margin-right: -0.5em;
       }
     }
+
+    .logout-link {
+      color: #ffffff;
+    }
+  }
+}
+
+$slide-fade-speed: 0.3s;
+
+.slide-fade-enter-active {
+  animation: slide-fade $slide-fade-speed ease;
+
+  &.page-nav {
+    animation: slide-fade $slide-fade-speed ease;
+  }
+}
+.slide-fade-leave-active {
+  animation: slide-fade $slide-fade-speed ease reverse;
+
+  &.page-nav {
+    animation: slide-fade $slide-fade-speed ease reverse;
+  }
+}
+
+@keyframes slide-fade {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
   }
 }
 </style>
 
 <style lang="scss">
+.has-navbar ~ .page-nav-wrapper > .page-nav {
+  padding-top: 8rem !important;
+}
+
 .unit-switch-dropdown {
   margin: 1.2rem -24px !important;
   button {
@@ -370,6 +416,24 @@ export default {
       a {
         white-space: normal !important;
       }
+    }
+
+    .dropdown-item.active,
+    .dropdown-item:active {
+      color: #ffffff;
+      background-color: var(--highlight-color);
+
+      .menu-completed-icon i {
+        color: #ffffff;
+      }
+    }
+
+    .disabled-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: gray;
+      cursor: not-allowed;
     }
   }
 }

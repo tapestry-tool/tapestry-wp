@@ -7,6 +7,7 @@
       {
         'media-wrapper-no-scroll':
           node.mediaFormat === 'mp4' ||
+          node.mediaFormat === 'kaltura' ||
           node.mediaFormat === 'h5p' ||
           node.mediaFormat === 'youtube',
       },
@@ -117,12 +118,6 @@ export default {
       default: false,
     },
   },
-  data() {
-    return {
-      timeSinceLastSaved: new Date(),
-      lastHoveredRowId: null,
-    }
-  },
   computed: {
     ...mapGetters(["getNode"]),
     node() {
@@ -134,7 +129,7 @@ export default {
           return true
         }
       }
-      return ["mp4", "youtube"].includes(this.node.mediaFormat)
+      return ["mp4", "youtube", "kaltura"].includes(this.node.mediaFormat)
     },
   },
   beforeDestroy() {
@@ -154,7 +149,6 @@ export default {
         },
         query: this.$route.query,
       })
-      this.lastHoveredRowId = this.nodeId
     },
     handleLoad(args) {
       this.$emit("load", args)

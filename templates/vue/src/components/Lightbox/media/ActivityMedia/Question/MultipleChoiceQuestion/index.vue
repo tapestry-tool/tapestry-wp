@@ -28,7 +28,7 @@
       <b-button
         v-if="question.optional"
         variant="link"
-        @click="$emit('skipQuestion')"
+        @click="$emit('skip-question')"
       >
         Skip
       </b-button>
@@ -62,7 +62,9 @@ export default {
   },
   data() {
     return {
-      userSelection: this.allowSelectMultiple ? [] : null,
+      userSelection: this.question.answerTypes.multipleChoice.allowSelectMultiple
+        ? []
+        : null,
       submitPressed: false,
     }
   },

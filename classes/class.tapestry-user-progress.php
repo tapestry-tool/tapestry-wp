@@ -114,6 +114,18 @@ class TapestryUserProgress implements ITapestryUserProgress
     }
 
     /**
+     * Get all the answers from all the users for all activities in a Tapestry.
+     *
+     * @return object $allAnswers all users' answers from a Tapestry
+     */
+    public function getAllUsersAnswers()
+    {
+        $this->_checkPostId();
+
+        return $this->_getAllUsersAnswers();
+    }
+
+    /**
      * Update User's h5p video setting for a tapestry post.
      *
      * @param string $h5pSettingsData stores volume,
@@ -239,6 +251,48 @@ class TapestryUserProgress implements ITapestryUserProgress
         update_user_meta($this->_userId, 'tapestry_'.$this->postId.'_'.$this->nodeMetaId.'_question_'.$questionId.'_answers', $userAnswer);
     }
 
+    private function _getAllUsersAnswers()
+    {
+        $tapestry = new Tapestry($this->postId);
+        $tapestryNode = new TapestryNode($this->postId);
+        $nodeIds = $tapestry->getNodeIds();
+        $activityNodes = [];
+        foreach ($nodeIds as $nodeId) {
+            $node = $tapestry->getNode($nodeId);
+            if ('activity' === $node->getMediaType()) {
+                array_push($activityNodes, $node);
+            }
+        }
+        $allUsersAnswers = (object) [];
+        $users = get_users(['fields' => ['ID', 'display_name']]);
+        foreach ($activityNodes as $activity) {
+            $activityId = $activity->getNodeId();
+            $typeData = $activity->getTypeData();
+            $activityQuestions = $typeData->activity->questions;
+            $activityAnswers = (object) [];
+            foreach ($activityQuestions as $question) {
+                $questionId = $question->id;
+                $questionAnswers = [];
+                foreach ($users as $user) {
+                    // Wordpress get_users returns an extra 'id' field for no reason, so we are removing it manually here:
+                    unset($user->id);
+
+                    $user_answer = get_user_meta($user->ID, 'tapestry_'.$this->postId.'_'.$activityId.'_question_'.$questionId.'_answers', true);
+                    if ('' != $user_answer && is_array($user_answer)) {
+                        $userAnswers = array_merge((array) $user, $user_answer);
+                        array_push($questionAnswers, $userAnswers);
+                    } else {
+                        array_push($questionAnswers, (array) $user);
+                    }
+                }
+                $activityAnswers->$questionId = $questionAnswers;
+            }
+            $allUsersAnswers->$activityId = $activityAnswers;
+        }
+
+        return $allUsersAnswers;
+    }
+
     private function _getUserProgress($tapestry = null)
     {
         $progress = new stdClass();
@@ -296,6 +350,9 @@ class TapestryUserProgress implements ITapestryUserProgress
                 $progress->$nodeId->content['userAnswers']->activity = new stdClass();
                 foreach ($questionIdArray as $questionId) {
                     $answer = get_user_meta($userId, 'tapestry_'.$this->postId.'_'.$nodeId.'_question_'.$questionId.'_answers', true);
+                    if (!isset($progress->$nodeId->content['userAnswers']->activity->{$questionId})) {
+                        $progress->$nodeId->content['userAnswers']->activity->{$questionId} = (object) ['answers' => []];
+                    }
                     $progress->$nodeId->content['userAnswers']->activity->{$questionId}->answers = $answer;
                 }
             }

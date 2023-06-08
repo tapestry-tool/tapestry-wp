@@ -1,13 +1,14 @@
 <template>
-  <div>
+  <div v-if="license">
     <b-form-group label="Copyright/Licensing">
       <combobox
-        v-model="node.license.type"
+        :value="license.type"
         item-text="name"
         item-value="type"
         :options="licenses"
         placeholder="Please select a license"
         class="combobox mb-0"
+        @input="update('license.type', $event)"
       >
         <template v-slot="{ option }">
           <div class="license-option">
@@ -19,23 +20,25 @@
         </template>
       </combobox>
       <b-form-group
-        v-if="node.license.type === licenseTypes.CUSTOM"
+        v-if="license.type === licenseTypes.CUSTOM"
         label="License link"
         class="mt-3"
       >
         <b-form-input
-          v-model="node.license.link"
+          :value="license.link"
           placeholder="Paste a link to your license starting with http:// or https://"
+          @input="update('license.link', $event)"
         ></b-form-input>
       </b-form-group>
       <b-form-group
-        v-if="node.license.type === licenseTypes.CUSTOM"
+        v-if="license.type === licenseTypes.CUSTOM"
         label="License description"
         class="mb-0"
       >
         <rich-text-form
-          v-model="node.license.description"
+          :value="license.description"
           placeholder="Describe your license"
+          @input="update('license.description', $event)"
         ></rich-text-form>
       </b-form-group>
     </b-form-group>
@@ -46,19 +49,17 @@
 import Combobox from "@/components/modals/common/Combobox"
 import RichTextForm from "./ContentForm/RichTextForm"
 import { licenses, licenseTypes } from "@/utils/constants"
+import { mapMutations, mapState } from "vuex"
 
 export default {
   components: {
     Combobox,
     RichTextForm,
   },
-  props: {
-    node: {
-      type: Object,
-      required: true,
-    },
-  },
   computed: {
+    ...mapState({
+      license: state => state.currentEditingNode.license,
+    }),
     licenseTypes() {
       return licenseTypes
     },
@@ -69,14 +70,25 @@ export default {
       }))
     },
   },
-  mounted() {
-    if (!this.node.license) {
-      this.node.license = {
-        ...this.licenses[0],
-        link: "",
-        description: "",
-      }
-    }
+  watch: {
+    license: {
+      handler(license) {
+        if (!license) {
+          this.update("license", {
+            ...this.licenses[0],
+            link: "",
+            description: "",
+          })
+        }
+      },
+      immediate: true,
+    },
+  },
+  methods: {
+    ...mapMutations(["setCurrentEditingNodeProperty"]),
+    update(property, value) {
+      this.setCurrentEditingNodeProperty({ property, value })
+    },
   },
 }
 </script>

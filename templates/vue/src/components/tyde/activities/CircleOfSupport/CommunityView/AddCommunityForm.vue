@@ -20,6 +20,7 @@
           <div id="emoji-picker" style="position: relative">
             <twemoji-picker
               id="twemoji-picker"
+              twemojiPath="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/"
               :emojiData="emojiAllData"
               :emojiGroups="emojiGroups"
               :skinsSelection="true"
@@ -193,7 +194,7 @@ export default {
       return Twemoji.parse(div).innerHTML
     },
     handleEmojiSelect(emoji) {
-      this.community.icon = emoji
+      this.handleChange("icon", emoji)
     },
     handleChange(prop, value) {
       this.$emit("change", { ...this.community, [prop]: value })

@@ -28,7 +28,9 @@
             @clicked="editNode"
           />
         </div>
-        <slot></slot>
+        <div class="content-cutoff">
+          <slot></slot>
+        </div>
       </div>
     </transition>
   </div>
@@ -102,7 +104,12 @@ export default {
     if (this.node.mediaType === "multi-content") {
       setTimeout(() => {
         const rowId = this.$route.params.rowId
-        const container = document.getElementById(`multicontent-container`)
+        const container = document.querySelector(
+          `#multicontent-container .media-container`
+        )
+        if (!container) {
+          return
+        }
         const navbar = document.getElementById(`tapestry-navbar`)
         let y = navbar ? -navbar.getBoundingClientRect().bottom : 0
         if (rowId) {
@@ -156,6 +163,12 @@ export default {
     box-shadow: 0 0 100px -40px #000;
     border-radius: 15px;
     height: 100%;
+
+    .content-cutoff {
+      position: relative;
+      height: 100%;
+      overflow: hidden;
+    }
 
     .buttons-container {
       position: absolute;

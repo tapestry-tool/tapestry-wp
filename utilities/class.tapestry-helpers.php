@@ -1,13 +1,13 @@
 <?php
 
-require_once dirname(__FILE__).'/class.tapestry-node-permissions.php';
+require_once dirname(__FILE__).'/../classes/class.constants.php';
 
 /**
  * Tapestry Helper Functions.
  */
 class TapestryHelpers
 {
-    const POST_TYPES = [
+    public const POST_TYPES = [
         'TAPESTRY' => 'tapestry',
         'TAPESTRY_NODE' => 'tapestry_node',
     ];
@@ -165,8 +165,6 @@ class TapestryHelpers
         }
 
         // not an image in our gallery. let's upload it.
-        include_once(ABSPATH . 'wp-admin/includes/image.php');
-
         $imagetype = end(explode('/', getimagesize($imageURL)['mime']));
         $uniq_name = date('dmY').''.(int) microtime(true);
         $filename = $uniq_name.'.'.$imagetype;
@@ -178,7 +176,21 @@ class TapestryHelpers
         fwrite($savefile, $contents);
         fclose($savefile);
 
-        $wp_filetype = wp_check_filetype(basename($filename), null);
+        return self::createAttachment($uploadfile, true);
+    }
+
+    /**
+     * Add a media item (image, video) as a WordPress attachment.
+     *
+     * @param string $filepath          Filepath of the file to add.
+     * @param bool $generate_metadata   If true, also generates metadata and image sub-sizes.
+     */
+    public static function createAttachment($filepath, $generate_metadata = false)
+    {
+        include_once(ABSPATH . 'wp-admin/includes/image.php');
+
+        $filename = basename($filepath);
+        $wp_filetype = wp_check_filetype($filename, null);
         $attachment = array(
             'post_mime_type' => $wp_filetype['type'],
             'post_title' => $filename,
@@ -186,17 +198,21 @@ class TapestryHelpers
             'post_status' => 'inherit'
         );
 
-        $attachment_id = wp_insert_attachment($attachment, $uploadfile);
-        $imagenew = get_post($attachment_id);
-        $fullsizepath = get_attached_file($imagenew->ID);
-        $attach_data = wp_generate_attachment_metadata($attachment_id, $fullsizepath);
-        wp_update_attachment_metadata($attachment_id, $attach_data);
+        $attachment_id = wp_insert_attachment($attachment, $filepath);
+
+        if ($generate_metadata) {
+            $imagenew = get_post($attachment_id);
+            $fullsizepath = get_attached_file($imagenew->ID);
+            $attach_data = wp_generate_attachment_metadata($attachment_id, $fullsizepath);
+            wp_update_attachment_metadata($attachment_id, $attach_data);
+        }
 
         return $attachment_id;
     }
 
     /**
      * Check if the current user is allowed to an action to a node.
+     * The checks are similar to the Helpers.hasPermission checks in the frontend.
      *
      * @param string $action         action to be performed
      * @param Number $nodeMetaId     node meta ID
@@ -206,68 +222,130 @@ class TapestryHelpers
      */
     public static function userIsAllowed($action, $nodeMetaId, $tapestryPostId, $superuser_override = true, $_userId = null)
     {
-        $options = TapestryNodePermissions::getNodePermissions();
-        $nodePostId = get_metadata_by_mid('post', $nodeMetaId)->meta_value->post_id;
-       
-        $tapestry = new Tapestry($tapestryPostId);
-        $node = $tapestry->getNode($nodeMetaId);
+        // Section 1: Fetching of information & special cases
 
         $userId = $_userId;
         if (is_null($userId)) {
             $userId = wp_get_current_user()->ID;
         }
-        $groupIds = self::getGroupIdsOfUser($userId, $tapestryPostId);
-        $user = new TapestryUser($userId);
 
-        // If node is submitted or accepted, users without edit access cannot edit node
-        $isEditableReviewStatus = isset($node->reviewStatus) && ($node->reviewStatus === "submitted" || $node->reviewStatus === "accepted");
-        if ($action === "EDIT" && $isEditableReviewStatus && !$user->canEdit($tapestryPostId)) {
+        // Guests never have any permissions other than read
+        if ($userId === 0 && $action !== UserActions::READ) {
             return false;
         }
 
+        $user = new TapestryUser($userId);
+        $canEditTapestry = $user->canEdit($tapestryPostId);
+
+        // Standalone nodes - only admins can publish
+        if ($nodeMetaId === null) {
+            return $action === UserActions::ADD && $canEditTapestry;
+        }
+
+        // Fetch information required by subsequent checks
+        $nodePostId = get_metadata_by_mid('post', $nodeMetaId)->meta_value->post_id;
+
+        $tapestry = new Tapestry($tapestryPostId);
+        $node = $tapestry->getNode($nodeMetaId);
+        $nodeMeta = $node->getMeta();
+
+        $groupIds = self::getGroupIdsOfUser($userId, $tapestryPostId);
+
+        // Section 2: Checks related to draft nodes
+
+        /**
+         * If node is a draft (accepted draft nodes are PUBLISHED nodes, so they are not considered here):
+         * - If node is not submitted for review:
+         *  - Allow all actions except "add" for original author
+         *  - Allow all actions except "edit" for reviewer if node is rejected and showRejected is true
+         * - If node is submitted for review:
+         *  - Only allow "read" for original author
+         *  - Allow all actions except "edit" for reviewer
+         */
+        if ($nodeMeta->status === NodeStatus::DRAFT) {
+            if ($user->isAuthorOfThePost($nodePostId)) {
+                if ($action === UserActions::READ || $canEditTapestry) {
+                    return true;
+                }
+                return $nodeMeta->reviewStatus !== NodeStatus::SUBMIT && $action !== UserActions::ADD;
+            }
+            if ($canEditTapestry) {
+                if ($action === UserActions::EDIT) {
+                    return false;
+                }
+                return $nodeMeta->reviewStatus === NodeStatus::SUBMIT || $nodeMeta->reviewStatus === NodeStatus::REJECT;
+            }
+            return false;
+        }
+
+        // Section 3: Override for admins / authors
+
+        // User has edit permissions for Tapestry
         if ($user->canEdit($tapestryPostId) && $superuser_override) {
             return true;
-        } elseif ($user->isAuthorOfThePost($nodePostId) && $node->getMeta()->status === "draft" && $node->getMeta()->reviewStatus !== "submitted") {
+        }
+
+        // User is the author of the node (unless node was submitted, then accepted)
+        if ($user->isAuthorOfThePost($nodePostId) && $nodeMeta->reviewStatus !== NodeStatus::ACCEPT) {
             return true;
-        } elseif ($user->isAuthorOfThePost($nodePostId) && $node->getMeta()->reviewStatus === "submitted" && $action === 'MOVE') {
+        }
+
+        // Section 4: Node-specific permissions
+
+        $nodePermissions = get_metadata_by_mid('post', $nodeMetaId)->meta_value->permissions;
+
+        // User has a permission associated with its ID
+        if (
+            property_exists($nodePermissions, 'user-'.$userId) &&
+            in_array($action, $nodePermissions->{'user-'.$userId})
+        ) {
             return true;
-        } else {
-            $nodePermissions = get_metadata_by_mid('post', $nodeMetaId)->meta_value->permissions;
+        }
+
+        // Node has public permissions
+        if (
+            property_exists($nodePermissions, 'public') &&
+            in_array($action, $nodePermissions->public)
+        ) {
+            return true;
+        }
+
+        // Node has authenticated permissions
+        if (
+            is_user_logged_in() &&
+            property_exists($nodePermissions, 'authenticated') &&
+            in_array($action, $nodePermissions->authenticated)
+        ) {
+            return true;
+        }
+
+        // User has a role that is allowed in the node
+        if (is_user_logged_in()) {
+            $roles = wp_get_current_user()->roles;
+            $allowedRoles = ['administrator', 'editor', 'author'];
+            foreach ($roles as $role) {
+                // Node has role-specific permissions
+                if (
+                    property_exists($nodePermissions, $role) &&
+                    in_array($action, $nodePermissions->$role)
+                ) {
+                    return true;
+                }
+                // The role has general edit permissions
+                if (in_array($role, $allowedRoles)) {
+                    return true;
+                }
+            }
+        }
+
+        // User is in a group that is allowed in the node
+        // ! This check is not implemented in the frontend
+        foreach ($groupIds as $groupId) {
             if (
-                property_exists($nodePermissions, 'user-'.$userId) &&
-                in_array($options[$action], $nodePermissions->{'user-'.$userId})
+                (property_exists($nodePermissions, 'group-'.$groupId))
+                && (in_array($action, $nodePermissions->{'group-'.$groupId}))
             ) {
                 return true;
-            } elseif (
-                property_exists($nodePermissions, 'public') &&
-                in_array($options[$action], $nodePermissions->public)
-            ) {
-                return true;
-            } elseif (
-                is_user_logged_in() &&
-                property_exists($nodePermissions, 'authenticated') &&
-                in_array($options[$action], $nodePermissions->authenticated)
-            ) {
-                return true;
-            } elseif (is_user_logged_in()) {
-                $roles = wp_get_current_user()->roles;
-                foreach ($roles as $role) {
-                    if (
-                        property_exists($nodePermissions, $role) &&
-                        in_array($options[$action], $nodePermissions->$role)
-                    ) {
-                        return true;
-                    }
-                }
-            } else {
-                foreach ($groupIds as $groupId) {
-                    if (
-                        (property_exists($nodePermissions, 'group-'.$groupId))
-                        && (in_array($options[$action], $nodePermissions->{'group-'.$groupId}))
-                    ) {
-                        return true;
-                    }
-                }
             }
         }
 
@@ -306,5 +384,68 @@ class TapestryHelpers
             }
         }
         return false;
+    }
+
+    /**
+     * Get the file path of a local WordPress upload by its URL.
+     *
+     * @param string $url
+     * @return object|null     Returns null if the URL is not a local upload.
+     */
+    public static function getPathToMedia($url)
+    {
+        if (!self::isLocalUpload($url)) {
+            return null;
+        }
+
+        $upload_folder = wp_upload_dir()['basedir'];
+        $upload_folder_url = wp_upload_dir()['baseurl'];
+
+        $file_obj = new stdClass();
+        $file_obj->file_path = substr_replace($url, $upload_folder, 0, strlen($upload_folder_url));
+        $file_obj->name = pathinfo($url, PATHINFO_BASENAME);
+        $file_obj->extension = pathinfo($url, PATHINFO_EXTENSION);
+
+        return $file_obj;
+    }
+
+    /**
+     * Checks if a URL represents a local upload (a file in the WordPress upload directory).
+     * Only checks the URL form, not that the file actually exists.
+     */
+    public static function isLocalUpload($url)
+    {
+        $upload_dir_url = wp_upload_dir()['baseurl'];
+        return substr($url, 0, strlen($upload_dir_url)) === $upload_dir_url;
+    }
+
+    // Get the actual file size for large files.
+    // https://www.php.net/manual/en/function.filesize.php#113457
+    public static function getRealFileSize($path)
+    {
+        $fp = fopen($path, 'r');
+
+        $pos = 0;
+        $size = 1073741824;
+        fseek($fp, 0, SEEK_SET);
+        while ($size > 1) {
+            fseek($fp, $size, SEEK_CUR);
+
+            if (fgetc($fp) === false) {
+                fseek($fp, -$size, SEEK_CUR);
+                $size = (int)($size / 2);
+            } else {
+                fseek($fp, -1, SEEK_CUR);
+                $pos += $size;
+            }
+        }
+
+        while (fgetc($fp) !== false) {
+            $pos++;
+        }
+
+        fclose($fp);
+
+        return $pos;
     }
 }

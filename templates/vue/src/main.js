@@ -1,3 +1,5 @@
+import "core-js/stable"
+
 import BootstrapVue from "bootstrap-vue"
 import Vue from "vue"
 import App from "./App.vue"
@@ -8,6 +10,8 @@ import vSelect from "vue-select"
 
 import "bootstrap/dist/css/bootstrap.css"
 import "bootstrap-vue/dist/bootstrap-vue.css"
+
+import "./assets/styles/onboarding-colors.css"
 
 Vue.use(VueYouTubeEmbed)
 Vue.use(BootstrapVue)

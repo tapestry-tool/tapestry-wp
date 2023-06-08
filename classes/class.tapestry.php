@@ -8,7 +8,6 @@ require_once dirname(__FILE__).'/../classes/class.tapestry-user-progress.php';
 require_once dirname(__FILE__).'/../classes/class.tapestry-h5p.php';
 require_once dirname(__FILE__).'/../classes/class.constants.php';
 require_once dirname(__FILE__).'/../interfaces/interface.tapestry.php';
-require_once dirname(__FILE__).'/class.constants.php';
 
 /**
  * TODO: Implement group functionality. Currently all the group-related
@@ -27,6 +26,7 @@ class Tapestry implements ITapestry
     private $settings;
     private $rootId;
     private $nodes;
+    private $notifications;
 
     private $nodeObjects; // Used only in the set up so we don't have to retrieve the nodes from the db multiple times
     private $visitedNodeIds; // Used in _recursivelySetAccessible function
@@ -50,6 +50,7 @@ class Tapestry implements ITapestry
         // $this->groups = [];
         $this->rootId = 0;
         $this->settings = $this->_getDefaultSettings();
+        $this->notifications = $this->_getDefaultNotifications();
 
         if (TapestryHelpers::isValidTapestry($this->postId)) {
             $tapestry = $this->_loadFromDatabase();
@@ -107,10 +108,31 @@ class Tapestry implements ITapestry
             if (!isset($this->settings->analyticsEnabled)) {
                 $this->settings->analyticsEnabled = false;
             }
+            if (!isset($this->settings->allowMovingAllNodes)) {
+                $this->settings->allowMovingAllNodes = false;
+            }
             if (!isset($this->settings->draftNodesEnabled)) {
                 $this->settings->draftNodesEnabled = true;
                 $this->settings->submitNodesEnabled = true;
             }
+            if (!isset($this->settings->permalink)) {
+                $this->settings->permalink = get_permalink($this->postId);
+            }
+            if (!isset($this->settings->tapestrySlug)) {
+                $this->settings->tapestrySlug = get_post($this->postId)->post_name;
+            }
+            if (!isset($this->settings->title)) {
+                $this->settings->title = get_the_title($this->postId);
+            }
+            if (!isset($this->settings->status)) {
+                $this->settings->status = get_post_status($this->postId);
+            }
+            if (!isset($this->settings->showChildrenOfMulticontent)) {
+                $this->settings->showChildrenOfMulticontent = false;
+            }
+        }
+        if (isset($tapestry->notifications) && is_object($tapestry->notifications)) {
+            $this->notifications = $tapestry->notifications;
         }
     }
 
@@ -157,6 +179,34 @@ class Tapestry implements ITapestry
     }
 
     /**
+     * Get settings.
+     *
+     * @return object $settings
+     */
+    public function getSettings()
+    {
+        if (!$this->postId) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+
+        return $this->settings;
+    }
+
+    /**
+     * Get notifications.
+     *
+     * @return object $notifications
+     */
+    public function getNotifications()
+    {
+        if (!$this->postId) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+
+        return $this->notifications;
+    }
+
+    /**
      * Add a new node.
      *
      * @param object $node Tapestry node
@@ -169,13 +219,13 @@ class Tapestry implements ITapestry
 
         // Checks if user is logged in to prevent logged out user-0 from getting permissions
         // Only add user permissions if it is not a review node
-        if (is_user_logged_in() && 0 === count($node->reviewComments)) {
+        if (is_user_logged_in() && (!isset($node->reviewComments) || 0 === count($node->reviewComments))) {
             $userId = wp_get_current_user()->ID;
             $node->permissions->{'user-'.$userId} = ['read', 'add', 'edit'];
         }
 
         $tapestryNode->set($node);
-        $node = $tapestryNode->save($node);
+        $node = $tapestryNode->save();
 
         array_push($this->nodes, $node->id);
 
@@ -375,7 +425,10 @@ class Tapestry implements ITapestry
             $traversedNodeIds = [];
             foreach ($nodesData as $node) {
                 if ($node->unlocked && !in_array($node->id, $traversedNodeIds)) {
-                    $this->_traverseNodesAndApplyFunction($nodesData, $node, false,
+                    $this->_traverseNodesAndApplyFunction(
+                        $nodesData,
+                        $node,
+                        false,
                         function ($n) {
                             $n->accessible = $n->unlocked;
                         },
@@ -446,9 +499,11 @@ class Tapestry implements ITapestry
     /**
      * Retrieve a Tapestry post for export.
      *
+     * @param bool $includeComments whether to include the comments associated with each node
+     *
      * @return object $tapestry
      */
-    public function export()
+    public function export($includeComments)
     {
         $nodes = [];
         foreach ($this->nodes as $node) {
@@ -456,24 +511,28 @@ class Tapestry implements ITapestry
             if (NodeStatus::DRAFT == $temp->status) {
                 continue;
             }
+            if (!$includeComments) {
+                unset($temp->comments);
+            }
             $nodes[] = $temp;
         }
         // $groups = [];
         // foreach ($this->groups as $group) {
         //     $groups[] = (new TapestryGroup($this->postId, $$group))->get();
         // }
-        $parsedUrl = parse_url($this->settings->permalink);
         unset($this->settings->permalink);
         unset($this->settings->tapestrySlug);
         unset($this->settings->title);
         unset($this->settings->status);
+
+        $nodes = $this->_addH5PMeta($nodes);
 
         return (object) [
             'nodes' => $nodes,
             // 'groups' => $groups,
             'links' => $this->links,
             'settings' => $this->settings,
-            'site-url' => $parsedUrl['scheme'].'://'.$parsedUrl['host'],
+            'site-url' => get_bloginfo('url'),
         ];
     }
 
@@ -578,14 +637,27 @@ class Tapestry implements ITapestry
         $settings->showAccess = true;
         $settings->showRejected = false;
         $settings->showAcceptedHighlight = true;
+        $settings->showChildrenOfMulticontent = false;
         $settings->defaultPermissions = TapestryNodePermissions::getDefaultNodePermissions($this->postId);
         $settings->superuserOverridePermissions = true;
         $settings->analyticsEnabled = false;
         $settings->draftNodesEnabled = true;
         $settings->submitNodesEnabled = true;
+        $settings->allowMovingAllNodes = false;
         $settings->permalink = get_permalink($this->postId);
 
         return $settings;
+    }
+
+    private function _getDefaultNotifications()
+    {
+        return (object) [
+            'kaltura' => (object) [
+                'total' => 0,
+                'success' => 0,
+                'error' => 0,
+            ],
+        ];
     }
 
     private function _getAuthor()
@@ -605,6 +677,7 @@ class Tapestry implements ITapestry
             'links' => $this->links,
             'settings' => $this->settings,
             'rootId' => $this->rootId,
+            'notifications' => $this->notifications,
         ];
     }
 
@@ -628,6 +701,7 @@ class Tapestry implements ITapestry
     private function _getTapestry($filterUserId)
     {
         // Get all the nodes from the database (we will need this info and only want to do it once)
+        $this->nodeObjects = [];
         foreach ($this->nodes as $nodeId) {
             $this->nodeObjects[$nodeId] = new TapestryNode($this->postId, $nodeId);
         }
@@ -659,7 +733,7 @@ class Tapestry implements ITapestry
 
     private function _filterTapestry($tapestry, $filterUserId)
     {
-        $tapestry->nodes = $this->_filterNodesMetaIdsByAccess();
+        $tapestry->nodes = $this->_filterNodesMetaIdsByAccess($filterUserId);
         $tapestry->links = $this->_filterLinksByNodeMetaIds($tapestry->links, $tapestry->nodes);
 
         return $tapestry;
@@ -700,7 +774,7 @@ class Tapestry implements ITapestry
         return $nodes;
     }
 
-    private function _filterNodesMetaIdsByAccess()
+    private function _filterNodesMetaIdsByAccess($filterUserId)
     {
         $currentUser = new TapestryUser();
         $currentUserId = $currentUser->getID();
@@ -744,14 +818,24 @@ class Tapestry implements ITapestry
                 $nodesPermitted[$nodeId]->permitted = false;
             }
 
-            $this->_traverseNodesAndApplyFunction($nodesPermitted, $nodesPermitted[$this->rootId], false,
-                function ($n) use ($superuserOverridePermissions, $currentUserId, $filterUserId) {
-                    $n->permitted = $this->_userIsAllowed($n->id, $superuserOverridePermissions, $currentUserId) ||
-                    (-1 !== $filterUserId && $this->_userIsAllowed($n->id, $superuserOverridePermissions, $filterUserId));
-                }, function ($n) {
-                    return true;
+            $traversedNodeIds = [];
+            foreach ($nodesPermitted as $node) {
+                if (!in_array($node->id, $traversedNodeIds)) {
+                    $this->_traverseNodesAndApplyFunction(
+                        $nodesPermitted,
+                        $nodesPermitted[$node->id],
+                        false,
+                        function ($n) use ($superuserOverridePermissions, $currentUserId, $filterUserId) {
+                            $n->permitted = $this->_userIsAllowed($n->id, $superuserOverridePermissions, $currentUserId) ||
+                            (-1 !== $filterUserId && $this->_userIsAllowed($n->id, $superuserOverridePermissions, $filterUserId));
+                        },
+                        function ($n) {
+                            return true;
+                        }
+                    );
+                    $traversedNodeIds = array_merge($traversedNodeIds, $this->visitedNodeIds);
                 }
-            );
+            }
 
             $nodes = array_filter($nodes, function ($nodeId) use ($nodesPermitted) {
                 return $nodesPermitted[$nodeId]->permitted;
@@ -763,8 +847,8 @@ class Tapestry implements ITapestry
 
     private function _userIsAllowed($node, $superuser_override, $userId)
     {
-        return TapestryHelpers::userIsAllowed('READ', $node, $this->postId, $superuser_override, $userId)
-        || TapestryHelpers::userIsAllowed('ADD', $node, $this->postId, $superuser_override, $userId)
-        || TapestryHelpers::userIsAllowed('EDIT', $node, $this->postId, $superuser_override, $userId);
+        return TapestryHelpers::userIsAllowed(UserActions::READ, $node, $this->postId, $superuser_override, $userId)
+        || TapestryHelpers::userIsAllowed(UserActions::ADD, $node, $this->postId, $superuser_override, $userId)
+        || TapestryHelpers::userIsAllowed(UserActions::EDIT, $node, $this->postId, $superuser_override, $userId);
     }
 }

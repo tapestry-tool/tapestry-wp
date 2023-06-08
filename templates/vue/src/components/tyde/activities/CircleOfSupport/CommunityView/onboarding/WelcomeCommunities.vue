@@ -112,7 +112,7 @@ button {
 }
 h1,
 h3 {
-  color: $onbording-title-color;
+  color: var(--onbording-title-color);
 }
 .modal {
   position: absolute;
@@ -123,7 +123,7 @@ h3 {
   align-items: flex-start;
   z-index: 999;
   background-color: white;
-  border: $onbording-border-color solid;
+  border: var(--onbording-border-color) solid;
   border-radius: 15px;
 }
 </style>

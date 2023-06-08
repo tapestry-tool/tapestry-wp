@@ -22,7 +22,7 @@
     </b-navbar>
     <user-settings-button
       v-if="!canEditTapestry"
-      icon-class="fas fa-cog fa-s"
+      show-avatar
       class="user-settings-button"
     ></user-settings-button>
   </div>
@@ -155,7 +155,6 @@ export default {
     top: 3px;
     right: -4em;
     background: #fff !important;
-    padding: 0.5em 0.75em !important;
     border-radius: 100%;
     border: solid 2px #c4e4ea;
 

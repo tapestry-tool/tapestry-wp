@@ -1,30 +1,39 @@
 <template>
-  <b-col :class="htmlClass" cols="12" :lg="node.typeData.halfWidth ? 6 : 12">
-    <div v-if="presentationStyle === 'accordion'" class="button-row">
-      <button class="trigger-row-btn" :disabled="disabled" @click="toggle">
-        <i v-if="!disabled" :class="isVisible ? 'fas fa-minus' : 'fas fa-plus'"></i>
-        <i v-else class="fas fa-lock fa-sm title-row-ico"></i>
-        {{ node.title }}
-        <locked-content
-          v-if="disabled"
-          :node="node"
-          :condition-node="conditionNode"
-        ></locked-content>
-      </button>
-      <a v-if="canEditNode" @click="editNode">
-        <i class="fas fa-pencil-alt fa-sm pr-2"></i>
-      </a>
-      <a
-        v-if="!disabled"
-        class="favourite-btn"
-        :class="{ 'is-favourite': isFavourite(node.id) }"
-        @click="toggleFavourite(node.id)"
-      >
-        <i class="fas fa-heart fa-sm"></i>
-      </a>
-    </div>
-    <div v-if="isVisible" class="multi-content-row">
-      <div v-if="presentationStyle !== 'accordion'" class="title-row-icon">
+  <b-col
+    v-if="node.unlocked || !node.hideWhenLocked"
+    :class="htmlClass"
+    cols="12"
+    :lg="node.typeData.halfWidth ? 6 : 12"
+  >
+    <div class="multi-content-row">
+      <div v-if="presentationStyle === 'accordion'" class="button-row">
+        <button class="trigger-row-btn" :disabled="disabled" @click="toggle">
+          <i
+            v-if="!disabled"
+            :class="isVisible ? 'fas fa-minus' : 'fas fa-plus'"
+          ></i>
+          <i v-else class="fas fa-lock fa-sm title-row-icon"></i>
+          {{ node.title }}
+          <completed-icon v-if="node.completed" :node="node" class="mx-2" large />
+          <locked-content
+            v-if="disabled"
+            :node="node"
+            :condition-node="conditionNode"
+          ></locked-content>
+        </button>
+        <a v-if="canEditNode" @click="editNode">
+          <i class="fas fa-pencil-alt fa-sm pr-2"></i>
+        </a>
+        <a
+          v-if="!disabled"
+          class="favourite-btn"
+          :class="{ 'is-favourite': isFavourite(node.id) }"
+          @click="toggleFavourite(node.id)"
+        >
+          <i class="fas fa-heart fa-sm"></i>
+        </a>
+      </div>
+      <div v-else class="title-row-icon">
         <i v-if="disabled" class="fas fa-lock fa-sm"></i>
         <span v-else>
           <a>
@@ -52,16 +61,21 @@
           :condition-node="conditionNode"
         ></locked-content>
       </div>
-      <div v-else :data-qa="`row-content-${node.id}`" class="row-content">
+      <div
+        v-if="!disabled && isVisible"
+        :data-qa="`row-content-${node.id}`"
+        class="row-content"
+      >
         <div v-if="node.mediaType !== 'multi-content'">
           <tapestry-media
             :node-id="node.id"
-            :dimensions="dimensions"
+            :dimensions="tapestryMediaDimensions"
             context="multi-content"
             :hide-title="presentationStyle === 'accordion'"
             style="margin-bottom: 24px;"
             @complete="complete"
             @load="handleLoad(null)"
+            @change:dimensions="updateDimensions"
           />
           <multi-content-rows
             v-if="children.length > 0"
@@ -70,7 +84,7 @@
             context="multi-content"
             :level="level + 1"
             @load="handleLoad"
-            @complete="complete"
+            @complete="completeChild"
           />
         </div>
         <multi-content-media
@@ -92,6 +106,7 @@
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex"
 import TapestryMedia from "../TapestryMedia"
 import LockedContent from "./common/LockedContent"
+import CompletedIcon from "@/components/common/CompletedIcon"
 import { names } from "@/config/routes"
 import { dyadLinkedUser } from "@/services/wp"
 import Helpers from "@/utils/Helpers"
@@ -103,8 +118,8 @@ export default {
     MultiContentMedia: () => import("../MultiContentMedia"),
     MultiContentRows: () => import("./MultiContentRows"),
     LockedContent,
+    CompletedIcon,
   },
-
   props: {
     node: {
       type: Object,
@@ -152,7 +167,8 @@ export default {
   },
   data() {
     return {
-      isVisible: true,
+      isVisible: this.presentationStyle === "page",
+      tapestryMediaDimensions: this.dimensions,
     }
   },
   computed: {
@@ -174,11 +190,8 @@ export default {
       return dyadLinkedUser() && this.node.isDyad
     },
   },
-  mounted() {
-    this.isVisible = this.presentationStyle === "page"
-  },
   methods: {
-    ...mapActions(["toggleFavourite"]),
+    ...mapActions(["toggleFavourite", "completeNode"]),
     ...mapMutations(["setReturnRoute"]),
     toggle() {
       this.isVisible = !this.isVisible
@@ -199,11 +212,22 @@ export default {
     complete() {
       this.$emit("complete", this.node.id)
     },
+    completeChild(nodeId) {
+      const node = this.getNode(nodeId)
+      if (!node.completed) {
+        this.completeNode(node.id)
+      }
+    },
     handleLoad(el) {
       this.$emit("load", el)
     },
     handleAutoClose() {
       this.$emit("close")
+    },
+    updateDimensions(newDimensions) {
+      if (typeof newDimensions.height === "undefined" || newDimensions.height > 0) {
+        this.tapestryMediaDimensions = { ...this.dimensions, ...newDimensions }
+      }
     },
   },
 }
@@ -250,12 +274,16 @@ button[disabled] {
 .multi-content-row {
   background: var(--bg-color-layered);
   border-radius: 4px;
-  padding: 8px 16px;
   margin-bottom: 8px;
+
+  .row-content {
+    padding: 8px 16px;
+  }
 
   .title-row-icon {
     position: absolute;
     right: 12px;
+    top: 8px;
     text-align: right;
     z-index: 100;
     a {

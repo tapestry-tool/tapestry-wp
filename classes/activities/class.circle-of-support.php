@@ -20,7 +20,7 @@ class CircleOfSupport
 
         if ($userId) {
             global $TYDE_DYAD_ROLES;
-            $this->isDyadUser = !!array_intersect(get_userdata($userId)->roles, array_keys($TYDE_DYAD_ROLES));
+            $this->isDyadUser = (bool) array_intersect(get_userdata($userId)->roles, array_keys($TYDE_DYAD_ROLES));
             $linkedUserId = get_the_author_meta('linked_dyad_user_id', $userId);
             if ($this->isDyadUser && $linkedUserId) {
                 $userId = $linkedUserId;

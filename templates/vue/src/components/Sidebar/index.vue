@@ -1,6 +1,7 @@
 <template>
   <div
     v-if="node"
+    id="tapestry-sidebar-container"
     ref="wrapper"
     data-qa="sidebar"
     :class="['sidebar-container', { closed: closed }]"
@@ -30,8 +31,17 @@
         <tapestry-icon icon="comment-dots" />
       </button>
       <button
+        v-if="showComments"
+        :class="['anchor-button', { active: active === 'comments' }]"
+        aria-label="comments"
+        @click.stop="scrollToRef('comments')"
+      >
+        <tapestry-icon icon="comments" />
+      </button>
+      <button
         :aria-label="closed ? 'open sidebar' : 'close sidebar'"
         :class="['toggle-button', { closed: closed }]"
+        data-qa="sidebar-toggle"
         @click.stop="active = closed ? 'info' : undefined"
       >
         <tapestry-icon :icon="closed ? 'chevron-left' : 'chevron-right'" />
@@ -108,6 +118,10 @@
           <h2 class="content-header">Review</h2>
           <node-review :node="node"></node-review>
         </section>
+        <section v-if="showComments" ref="comments" data-name="comments">
+          <h2 class="content-header">Comments</h2>
+          <node-comments :node="node"></node-comments>
+        </section>
       </div>
     </aside>
   </div>
@@ -122,14 +136,14 @@ import { licenseTypes, licenses } from "@/utils/constants"
 import * as wp from "@/services/wp"
 import TapestryIcon from "@/components/common/TapestryIcon"
 import NodeReview from "./NodeReview"
+import NodeComments from "./NodeComments"
 
 const PADDING_OFFSET = 48
-
-const tabOrder = ["info", "copyright", "review"]
 
 export default {
   components: {
     NodeReview,
+    NodeComments,
     TapestryIcon,
   },
   computed: {
@@ -146,6 +160,16 @@ export default {
           })
         }
       },
+    },
+    tabOrder() {
+      const tabOrder = ["info", "copyright"]
+      if (this.isReviewParticipant) {
+        tabOrder.push("review")
+      }
+      if (this.showComments) {
+        tabOrder.push("comments")
+      }
+      return tabOrder
     },
     closed() {
       return this.active === undefined
@@ -176,6 +200,9 @@ export default {
         return this.node.reviewStatus || this.node.status === nodeStatus.DRAFT
       }
       return false
+    },
+    showComments() {
+      return this.node.status === nodeStatus.PUBLISH
     },
   },
   watch: {
@@ -242,9 +269,9 @@ export default {
       }
     },
     nextTab() {
-      const nextTabIndex = tabOrder.indexOf(this.active)
-      if (nextTabIndex >= 0 && nextTabIndex < tabOrder.length - 1) {
-        return tabOrder[nextTabIndex + 1]
+      const nextTabIndex = this.tabOrder.indexOf(this.active)
+      if (nextTabIndex >= 0 && nextTabIndex < this.tabOrder.length - 1) {
+        return this.tabOrder[nextTabIndex + 1]
       }
       return this.active
     },
@@ -257,8 +284,9 @@ export default {
             el = el.$el
           }
           if (el) {
-            console.error("Cannot scroll to non-existing element ", el)
             this.$refs.content.scroll(0, el.offsetTop - PADDING_OFFSET)
+          } else {
+            console.error("Cannot scroll to non-existing element ", el)
           }
         })
       }

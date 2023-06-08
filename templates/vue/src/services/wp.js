@@ -24,8 +24,11 @@ export const getCurrentUser = () => ({
 
 export const isCurrentUser = id => parseInt(id) === wpData.currentUser.ID
 
-export const isLoggedIn = () => Boolean(wpData.currentUser.ID)
+export const isLoggedIn = () =>
+  wpData.iframe_mode !== "1" && Boolean(wpData.currentUser.ID)
 
 export const canEditTapestry = () => wpData.wpCanEditTapestry === "1"
 
 export const dyadLinkedUser = () => wpData.dyadLinkedWpUser
+
+export const getKalturaStatus = () => wpData.kaltura.kalturaStatus

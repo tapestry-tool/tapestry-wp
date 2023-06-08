@@ -1,10 +1,9 @@
 .php_cs.cache
+.php-cs-fixer.cache
 .DS_Store
 *.icloud
 
-cypress/videos
-cypress/screenshots
-cypress.json
-
 data/
 bin/config.sh
+
+vendor/

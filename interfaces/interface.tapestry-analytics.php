@@ -5,7 +5,6 @@
  */
 interface ITapestryAnalytics
 {
-
     /**
      * Log an analytics event
      *
@@ -14,9 +13,12 @@ interface ITapestryAnalytics
      * @return bool success?
      */
     public function log($data);
-    
+
     /**
      * Create the schema for saving the analytics (should only be run once when plugin activated)
+     *
+     * @param bool $createForNetwork whether to create the schema for the whole network
+     * (if multisite) or just current site
      */
-    public function createSchema();
+    public function createSchema($createForNetwork);
 }

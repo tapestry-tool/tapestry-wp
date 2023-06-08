@@ -1,5 +1,5 @@
 import axios from "axios"
-import Helpers from "../utils/Helpers"
+import store from "../store"
 import { data } from "./wp"
 
 const { apiUrl, nonce, postId, adminAjaxUrl } = data
@@ -40,20 +40,6 @@ class TapestryApi {
     return response.data
   }
 
-  async getAllRoles() {
-    const usersRequest = await this.client.get(`/roles`)
-    const users = usersRequest.data
-    let wp_roles = new Set()
-    //defaults
-    wp_roles.add("public")
-    wp_roles.add("authenticated")
-    for (let role of Object.keys(users)) {
-      wp_roles.add(role)
-    }
-    wp_roles.delete("administrator")
-    return wp_roles
-  }
-
   async importTapestry(data) {
     const url = `/tapestries/${this.postId}`
     try {
@@ -64,15 +50,57 @@ class TapestryApi {
     }
   }
 
-  async getTapestryExport() {
-    const url = `/tapestries/${this.postId}/export`
+  async importTapestryFromZip(zipFile, cancelTokenSource) {
+    const url = `/tapestries/${this.postId}/import_zip`
+
+    const formData = new FormData()
+    formData.append("file", zipFile)
+    const response = await this.client.post(url, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+      onUploadProgress: progressEvent => {
+        store.state.importProgress = progressEvent
+      },
+      cancelToken: cancelTokenSource.token,
+    })
+
+    return response.data
+  }
+
+  async getImportStatus() {
+    const url = `/tapestries/${this.postId}/import_status`
+    const response = await this.client.get(url)
+    return response.data
+  }
+
+  async clearImportStatus() {
+    const url = `/tapestries/${this.postId}/import_status`
+    const response = await this.client.delete(url)
+    return response.data
+  }
+
+  async getTapestryExport(shouldExportComments) {
+    let url = `/tapestries/${this.postId}/export`
+    if (shouldExportComments) {
+      url += "?exportComments=1"
+    }
+    const response = await this.client.get(url)
+    return response.data
+  }
+
+  async getTapestryExportAsZip(shouldExportComments) {
+    let url = `/tapestries/${this.postId}/export_zip`
+    if (shouldExportComments) {
+      url += "?exportComments=1"
+    }
     const response = await this.client.get(url)
     return response.data
   }
 
   async getNode(id) {
     const data = await this.getTapestry()
-    return data.nodes[Helpers.findNodeIndex(id, data)]
+    return data.nodes[id]
   }
 
   async getNodeProgress(id) {
@@ -87,9 +115,9 @@ class TapestryApi {
    *
    * @return  {Object}
    */
-  async addNode(node) {
+  async addNode(payload) {
     const url = `/tapestries/${this.postId}/nodes`
-    const response = await this.client.post(url, node)
+    const response = await this.client.post(url, payload)
     return response
   }
 
@@ -145,6 +173,24 @@ class TapestryApi {
     return response.data
   }
 
+  async addComment(id, comment, replyingTo) {
+    const url = `/tapestries/${this.postId}/nodes/${id}/comments`
+    const response = await this.client.post(url, {
+      comment,
+      replyingTo,
+    })
+    return response.data
+  }
+
+  async performCommentAction(id, commentId, action) {
+    const url = `/tapestries/${this.postId}/nodes/${id}/comments`
+    const response = await this.client.put(url, {
+      id: commentId,
+      action: action,
+    })
+    return response.data
+  }
+
   async optimizeNodeThumbnails() {
     const url = `${apiUrl}/tapestries/${this.postId}/optimize_thumbnails`
     return await this.client.post(url)
@@ -177,6 +223,18 @@ class TapestryApi {
     return response
   }
 
+  async getNotifications() {
+    const url = `/tapestries/${this.postId}/notifications`
+    const response = await this.client.get(url)
+    return response.data
+  }
+
+  async updateNotifications(notifications) {
+    const url = `/tapestries/${this.postId}/notifications`
+    const response = await this.client.put(url, notifications)
+    return response
+  }
+
   /**
    * Upload audio to server
    *
@@ -200,6 +258,12 @@ class TapestryApi {
   async completeQuestion(nodeId, questionId, answerType, answer) {
     const url = `/users/activity?post_id=${this.postId}&node_id=${nodeId}&question_id=${questionId}`
     const response = await this.client.post(url, { answerType, answer })
+    return response
+  }
+
+  async getAllUsersAnswers(nodeId) {
+    const url = `/users/answers?post_id=${this.postId}&node_id=${nodeId}`
+    const response = await this.client.get(url)
     return response
   }
 

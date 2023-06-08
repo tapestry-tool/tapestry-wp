@@ -13,8 +13,13 @@ export const names = {
   MODAL: "modal",
   SETTINGS: "settings",
   LINKMODAL: "linkmodal",
+  USERANSWERS: "userAnswers",
   USERSETTINGS: "userSettings",
   HELP: "help",
+  EMBED: "embed",
+  EXPORTDUPLICATE: "exportDuplicate",
+  KALTURAMODAL: "kalturaModal",
+  OTHEROPERATIONS: "otherOperations",
 }
 
 const ROOT_PATH = `/nodes/:nodeId(\\d+)`
@@ -52,8 +57,18 @@ export default [
         redirect: `${ROOT_PATH}/settings/appearance`,
         children: [
           {
-            path: `/:tab`,
+            path: `:tab`,
             name: names.SETTINGS,
+          },
+        ],
+      },
+      {
+        path: `user-answers`,
+        redirect: `${ROOT_PATH}/user-answers/answers`,
+        children: [
+          {
+            path: `:tab`,
+            name: names.USERANSWERS,
           },
         ],
       },
@@ -70,6 +85,28 @@ export default [
       {
         path: `help`,
         name: names.HELP,
+      },
+      {
+        path: `embed`,
+        name: names.EMBED,
+      },
+      {
+        path: `export-duplicate`,
+        name: names.EXPORTDUPLICATE,
+      },
+      {
+        path: `kalturamodal`,
+        redirect: `${ROOT_PATH}/kalturamodal/upload`,
+        children: [
+          {
+            path: `:tab`,
+            name: names.KALTURAMODAL,
+          },
+        ],
+      },
+      {
+        path: `other-operations`,
+        name: names.OTHEROPERATIONS,
       },
     ],
   },

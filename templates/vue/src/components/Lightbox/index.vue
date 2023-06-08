@@ -28,17 +28,13 @@
       <multi-content-media
         v-if="node.mediaType === 'multi-content'"
         id="multicontent-container"
+        context="lightbox"
         :node="node"
+        :menu-dimensions="dimensions"
         :row-id="rowId"
         :class="{ 'has-navbar': settings.tydeModeEnabled }"
         @close="handleAutoClose"
         @complete="complete"
-      />
-      <page-menu
-        v-if="node.typeData.showNavBar && node.presentationStyle === 'page'"
-        :node="node"
-        :dimensions="dimensions"
-        :full-screen="settings.tydeModeEnabled"
       />
       <tapestry-media
         v-if="node.mediaType !== 'multi-content'"
@@ -146,13 +142,6 @@ export default {
         }
       }
 
-      if (this.node.mediaType === "multi-content") {
-        styles.display = "flex"
-        // Reversed because PageMenu is placed after MultiContentMedia for refs to correctly render
-        styles.flexDirection = "row-reverse"
-        return Object.assign(styles, { padding: "24px" })
-      }
-
       if (this.node.mediaType === "text" || this.node.mediaType === "wp-post") {
         return Object.assign(styles, {
           background: "var(--background-color);",
@@ -167,7 +156,8 @@ export default {
         return {}
       }
 
-      const { mediaWidth: width, mediaHeight: height } = this.node.typeData
+      const width = this.node.typeData.mediaWidth ?? 960
+      const height = this.node.typeData.mediaHeight ?? 600
       const browserWidth = Helpers.getBrowserWidth()
       const browserHeight = Helpers.getBrowserHeight()
 
@@ -268,11 +258,11 @@ export default {
     ...mapActions(["completeNode", "updateNodeProgress"]),
     complete(nodeId) {
       const node = this.getNode(nodeId || this.nodeId)
-      if (!node.completed) {
-        this.completeNode(node.id)
-      }
       if (node.progress !== 1) {
         this.updateNodeProgress({ id: node.id, progress: 1 })
+      }
+      if (!node.completed) {
+        this.completeNode(node.id)
       }
     },
     handleUserClose() {
@@ -304,7 +294,11 @@ export default {
       }
     },
     updateDimensions(dimensions) {
-      if (dimensions.height <= this.lightboxDimensions.height) {
+      if (dimensions.height > 0) {
+        dimensions.height = Math.min(
+          dimensions.height,
+          this.lightboxDimensions.height
+        )
         this.dimensions = {
           ...this.dimensions,
           ...dimensions,
@@ -325,8 +319,15 @@ export default {
         this.node.presentationStyle === "unit" &&
         this.node.childOrdering?.length
       ) {
-        const pageNode = this.getNode(this.node.childOrdering[0])
-        this.$root.$emit("open-node", pageNode.id)
+        const firstVisible = this.node.childOrdering.find(id => {
+          const node = this.getNode(id)
+          return node.unlocked || !node.hideWhenLocked
+        })
+        if (firstVisible) {
+          this.$root.$emit("open-node", firstVisible)
+        } else {
+          this.applyDimensions()
+        }
       } else {
         this.applyDimensions()
       }
