@@ -45,7 +45,7 @@
                   aria-label="Kaltura ID hint"
                 ></i>
                 <b-tooltip role="tooltip" target="kaltura-info">
-                  Video ID can be found in the Kaltura managment console under
+                  Video ID can be found in the Kaltura Management Console under
                   Content->Entries.
                 </b-tooltip>
               </b-input-group-append>

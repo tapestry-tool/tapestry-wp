@@ -604,6 +604,7 @@ export default {
       "setReturnRoute",
       "setCurrentEditingNode",
       "setCurrentEditingNodeProperty",
+      "addApiError",
     ]),
     ...mapActions([
       "addNode",
@@ -898,7 +899,7 @@ export default {
 
         if (this.node.mediaFormat === "kaltura" && wp.getKalturaStatus()) {
           try {
-            await this.updateKalturaCaptions()
+            await this.updateKalturaVideoCaptions()
           } catch (error) {
             this.addApiError(error)
             return
@@ -1401,7 +1402,7 @@ export default {
       const mediaURL = `${serviceUrl}/p/${partnerId}/sp/${partnerId}00/playManifest/entryId/${this.node.typeData.kalturaId}/format/url/protocol/https?.mp4`
       this.update("typeData.mediaURL", mediaURL)
     },
-    async updateKalturaCaptions() {
+    async updateKalturaVideoCaptions() {
       if (this.node.typeData.captions) {
         // "Push" changes made to Kaltura captions to Kaltura, then save results in node
         const result = await KalturaAPI.updateVideoCaptions(

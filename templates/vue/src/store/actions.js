@@ -150,8 +150,7 @@ export async function updateNodeProgress(
     const { id, progress } = payload
 
     const node = getters.getNode(id)
-
-    if (node.completed || node.progress === progress) {
+    if ((node.completed && progress !== 1) || node.progress === progress) {
       return
     }
 
@@ -304,8 +303,11 @@ export async function completeQuestion(
       commit("completeQuestion", { nodeId, questionId, answerType, answer })
     } catch (error) {
       dispatch("addApiError", error)
+      return false
     }
+    return true
   }
+  return false
 }
 
 export async function saveAudio({ dispatch }, { nodeId, questionId, audio }) {
