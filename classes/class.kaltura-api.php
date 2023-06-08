@@ -558,16 +558,6 @@ class KalturaApi
             $typeData = $node->getTypeData();
             $typeData->mediaURL = $kalturaData->dataUrl.'?.mp4';
             $typeData->kalturaId = $kalturaData->id;
-
-    /**
-     * Updates the metadata (language, label, etc) of a Kaltura caption asset.
-     *
-     * @param object $caption New metadata for the caption
-     */
-    private function _updateCaptionAsset($kclient, $caption)
-    {
-        $captionPlugin = CaptionPlugin::get($kclient);
-
             $typeData->videoPlayer = $useKalturaPlayer ? 'kaltura' : 'regular';
         } elseif ('h5p' === $nodeMeta->mediaType) {
             TapestryH5P::updateVideoURL($node, $kalturaData->dataUrl);
