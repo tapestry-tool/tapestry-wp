@@ -481,7 +481,7 @@ class KalturaEndpoints
                     if ($response->status === EntryStatus::READY) {
                         self::_saveVideoUploadStatusInNode($node, KalturaUploadStatus::COMPLETE, $response);
 
-                        $file_path = TapestryHelpers::getPathToMedia($node->getTypeData()->mediaURL)->file_path;
+                        $file_path = TapestryHelpers::getVideoPath($node)->file_path;
                         KalturaApi::saveAndDeleteLocalVideo($node, $response, $useKalturaPlayer, $file_path);
 
                         $video->currentStatus = KalturaUploadStatus::COMPLETE;
@@ -736,6 +736,7 @@ class KalturaEndpoints
                 'tapestryID' => (int) $tapestryPostId,
                 'nodeID' => $nodeID,
                 'nodeTitle' => $node->getTitle(),
+                'nodeType' => $node->getMeta()->mediaType === 'video' ? 'Video' : 'H5P',
                 'withinSizeLimit' => KalturaApi::checkVideoFileSize($node),
             ];
                 array_push($videosToUpload, $video);
@@ -789,7 +790,7 @@ class KalturaEndpoints
                 try {
                     $kalturaData = $kalturaApi->uploadVideo($video->file, $category);
                 } catch (Throwable $e) {
-                    $error_msg = "Unable to upload video '".$video->file->name."' to Kaltura due to: ".$e->getMessage();
+                    $error_msg = "Unable to upload video".($video->file->name ? " \"".$video->file->name."\"" : "")." to Kaltura due to: ".$e->getMessage();
 
                     error_log($error_msg."\nStack trace: \n".$e->getTraceAsString());
 
@@ -884,8 +885,9 @@ class KalturaEndpoints
                     'tapestryID' => $tapestryPostId,
                     'nodeID' => $nodeId,
                     'nodeTitle' => $node->getTitle(),
+                    'nodeType' => $node->getMeta()->mediaType === 'video' ? 'Video' : 'H5P',
                     'uploadStatus' => KalturaUploadStatus::NOT_STARTED,
-                    'file' => TapestryHelpers::getPathToMedia($node->getTypeData()->mediaURL),
+                    'file' => TapestryHelpers::getVideoPath($node),
                     'kalturaID' => '',
                     'additionalInfo' => '',
                     'timestamp' => $timestamp,
@@ -907,6 +909,7 @@ class KalturaEndpoints
                 'tapestryID' => $video->tapestryID,
                 'nodeID' => $video->nodeID,
                 'nodeTitle' => $video->nodeTitle,
+                'nodeType' => $video->nodeType,
                 'uploadStatus' => $video->uploadStatus,
                 'kalturaID' => $video->kalturaID,
                 'additionalInfo' => $video->additionalInfo,

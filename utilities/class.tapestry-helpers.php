@@ -1,5 +1,6 @@
 <?php
 
+require_once dirname(__FILE__).'/../classes/class.tapestry-h5p.php';
 require_once dirname(__FILE__).'/../classes/class.constants.php';
 
 /**
@@ -407,6 +408,22 @@ class TapestryHelpers
         $file_obj->extension = pathinfo($url, PATHINFO_EXTENSION);
 
         return $file_obj;
+    }
+
+    /**
+     * Returns the path to the video in a H5P or Video node.
+     *
+     * @param TapestryNode $node
+     */
+    public static function getVideoPath($node)
+    {
+        $nodeMeta = $node->getMeta();
+        if ($nodeMeta->mediaType === 'video') {
+            return self::getPathToMedia($node->getTypeData()->mediaURL);
+        } elseif ($nodeMeta->mediaType === 'h5p') {
+            return TapestryH5P::getPathToH5PVideo($node);
+        }
+        return null;
     }
 
     /**

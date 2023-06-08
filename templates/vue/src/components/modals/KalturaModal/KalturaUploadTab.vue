@@ -22,7 +22,7 @@
         empty-text="There are no videos to upload in this Tapestry."
         selected-variant=""
         primary-key="nodeID"
-        :fields="['selected', 'nodeID', 'nodeTitle']"
+        :fields="['selected', 'nodeID', 'nodeTitle', 'nodeType']"
         :items="getVideosToUpload"
         @row-selected="handleVideoSelected"
       >
@@ -36,7 +36,9 @@
         </template>
         <template #cell(selected)="{rowSelected, selectRow, unselectRow, item}">
           <b-form-checkbox
-            :aria-label="`Select node ${item.nodeID}, ${item.nodeTitle}`"
+            :aria-label="
+              `Select node ${item.nodeID}, ${item.nodeTitle}, ${item.nodeType} node`
+            "
             :checked="rowSelected"
             :disabled="isUploading || !item.withinSizeLimit"
             class="d-inline"
@@ -59,7 +61,8 @@
       <b-form-group
         description="Your videos can keep using a basic HTML5 video player if you
           uncheck this, but the basic player does not provide features such as
-          captions, quality, and bandwidth adjustments."
+          captions, quality, and bandwidth adjustments. Please note this does not
+          apply to H5P videos."
       >
         <b-form-checkbox v-model="useKalturaPlayer" :disabled="isUploading">
           Switch uploaded videos to use Kaltura media player

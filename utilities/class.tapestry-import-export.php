@@ -186,12 +186,11 @@ class TapestryImportExport
             'media' => [],
         ];
 
-        $h5p_controller = new TapestryH5P();
         foreach ($tapestry_data->nodes as $node) {
             $node_warnings = [];
 
             if ($node->mediaType === 'h5p') {
-                self::_exportH5PNode($node, $zip, $node_warnings, $export_log, $h5p_controller);
+                self::_exportH5PNode($node, $zip, $node_warnings, $export_log);
             } elseif ($node->mediaType === 'video') {
                 self::_exportMedia($node->typeData->mediaURL, $zip, $node_warnings, $export_log);
             } elseif ($node->mediaType === 'activity') {
@@ -272,7 +271,7 @@ class TapestryImportExport
      * @param ZipArchive $zip   Zip file to add the archive to
      * @param array &$warnings  (Modified) Export warnings generated so far
      */
-    private static function _exportH5PNode($node, $zip, &$warnings, &$log, $h5p_controller)
+    private static function _exportH5PNode($node, $zip, &$warnings, &$log)
     {
         // If H5P plugin files are not available, nothing to do
         if (empty(H5P_DEFINED)) {
@@ -281,7 +280,7 @@ class TapestryImportExport
         }
 
         $h5p_id = $node->typeData->h5pMeta->id;
-        $h5p_data = $h5p_controller->getH5P($h5p_id);
+        $h5p_data = TapestryH5P::getH5P($h5p_id);
 
         if ($h5p_data !== null) {
             // Find the H5P export file and add it to the zip
