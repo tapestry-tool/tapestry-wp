@@ -34,7 +34,7 @@
 import ISO6391 from "iso-639-1"
 import { mapMutations } from "vuex"
 import client from "@/services/TapestryAPI"
-import { SEEK_THRESHOLD } from "./video.config"
+import { SEEK_THRESHOLD } from "./_config"
 import PlayScreen from "./PlayScreen"
 
 export default {

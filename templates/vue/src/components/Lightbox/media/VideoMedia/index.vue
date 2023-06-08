@@ -59,7 +59,7 @@ import KalturaMedia from "./KalturaMedia.vue"
 import Popup from "./Popup"
 import EndScreen from "./EndScreen"
 import CompletedIcon from "@/components/common/CompletedIcon"
-import { COMPLETION_THRESHOLD } from "./video.config"
+import { COMPLETION_THRESHOLD } from "./_config"
 import Loading from "@/components/common/Loading"
 import client from "@/services/TapestryAPI"
 
@@ -96,7 +96,7 @@ export default {
     TapestryMedia: () => import("../TapestryMedia"),
     "youtube-media": YouTubeMedia,
     "h5p-video-media": H5PVideoMedia,
-    "kaltura-video-media": KalturaMedia,
+    "kaltura-media": KalturaMedia,
     UrlVideoMedia,
     Popup,
     EndScreen,
@@ -150,7 +150,7 @@ export default {
             this.node.typeData.kalturaData?.partnerId &&
             this.node.typeData.kalturaData?.serviceUrl &&
             this.node.typeData.kalturaData?.uniqueConfiguration
-            ? "kaltura-video-media"
+            ? "kaltura-media"
             : "url-video-media"
         default:
           throw new Error(`Unknown video type: ${this.node.mediaFormat}`)
@@ -160,7 +160,7 @@ export default {
       if (
         this.context !== "lightbox" &&
         this.videoComponent !== "youtube-media" &&
-        this.videoComponent !== "kaltura-video-media"
+        this.videoComponent !== "kaltura-media"
       ) {
         return "auto"
       } else {

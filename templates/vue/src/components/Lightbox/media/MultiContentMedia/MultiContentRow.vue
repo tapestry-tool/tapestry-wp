@@ -69,12 +69,13 @@
         <div v-if="node.mediaType !== 'multi-content'">
           <tapestry-media
             :node-id="node.id"
-            :dimensions="dimensions"
+            :dimensions="tapestryMediaDimensions"
             context="multi-content"
             :hide-title="presentationStyle === 'accordion'"
             style="margin-bottom: 24px;"
             @complete="complete"
             @load="handleLoad(null)"
+            @change:dimensions="updateDimensions"
           />
           <multi-content-rows
             v-if="children.length > 0"
@@ -166,6 +167,7 @@ export default {
   data() {
     return {
       isVisible: this.presentationStyle === "page",
+      tapestryMediaDimensions: this.dimensions,
     }
   },
   computed: {
@@ -216,6 +218,11 @@ export default {
     },
     handleAutoClose() {
       this.$emit("close")
+    },
+    updateDimensions(newDimensions) {
+      if (typeof newDimensions.height === "undefined" || newDimensions.height > 0) {
+        this.tapestryMediaDimensions = { ...this.dimensions, ...newDimensions }
+      }
     },
   },
 }

@@ -209,3 +209,7 @@ export function setCurrentEditingNodeProperty(state, { property, value }) {
 export function setNotifications(state, notifications) {
   state.notifications = notifications
 }
+
+export function addKalturaScriptLoaded(state, script) {
+  state.kalturaScriptsLoaded.push(script)
+}
