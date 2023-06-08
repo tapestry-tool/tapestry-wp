@@ -1,7 +1,7 @@
 <template>
   <div class="answer-container mx-auto mb-3" data-qa="answer-display">
     <b-tabs
-      v-if="answers.length > 1"
+      v-if="hasAnswer && answers.length > 1"
       vertical
       no-nav-style
       nav-class="nav-tablist mt-4 pt-4"
@@ -33,6 +33,14 @@
       ></completed-activity-media>
     </div>
     <div v-else class="p-2 my-4">
+      <b-alert
+        v-if="!isLoggedIn"
+        show
+        variant="warning"
+        class="loggedout-alert mx-auto"
+      >
+        Please login to have your answers saved.
+      </b-alert>
       <em>This question has not been answered yet.</em>
     </div>
   </div>
@@ -42,6 +50,7 @@
 import { mapGetters, mapState } from "vuex"
 import CompletedActivityMedia from "@/components/Lightbox/media/common/CompletedActivityMedia"
 import TapestryIcon from "@/components/common/TapestryIcon"
+import * as wp from "@/services/wp"
 
 export default {
   name: "answer-media",
@@ -79,6 +88,9 @@ export default {
     },
     hasAnswer() {
       return this.answers?.length ? true : false
+    },
+    isLoggedIn() {
+      return wp.isLoggedIn()
     },
   },
   mounted() {
@@ -126,6 +138,10 @@ export default {
     &:before {
       display: none;
     }
+  }
+
+  .loggedout-alert {
+    max-width: 500px;
   }
 }
 </style>

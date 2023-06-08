@@ -34,7 +34,6 @@
             :context="context"
             :level="level"
             @load="$emit('load')"
-            @change-row="changeRow"
             @complete="complete"
           />
           <div v-if="isUnitChild && pageIndex !== -1" class="unit-navigation">
@@ -98,7 +97,6 @@ import LockedContent from "./common/LockedContent"
 import PageMenu from "./PageMenu"
 import TapestryModal from "../../TapestryModal"
 import MultiContentRows from "./MultiContentRows"
-import { names } from "@/config/routes"
 
 export default {
   name: "multi-content-media",
@@ -287,12 +285,7 @@ export default {
     },
     complete(rowId) {
       const completeMultiContentNode = () => {
-        if (
-          !this.node.completed &&
-          this.rows.every(
-            row => row.node.completed || row.node.title === "Resources"
-          )
-        ) {
+        if (!this.node.completed && this.rows.every(row => row.node.completed)) {
           this.$emit("complete", this.node.id)
         }
       }
@@ -301,22 +294,6 @@ export default {
         this.completeNode(rowId).then(completeMultiContentNode)
       } else {
         completeMultiContentNode()
-      }
-    },
-    changeRow(rowInfo) {
-      const { rowId } = rowInfo
-      if (rowId) {
-        this.$router.push({
-          name: names.LIGHTBOX,
-          params: { nodeId: this.node.id, rowId },
-          query: this.$route.query,
-        })
-      } else {
-        this.$router.push({
-          name: names.LIGHTBOX,
-          params: { nodeId: this.node.id },
-          query: this.$route.query,
-        })
       }
     },
   },

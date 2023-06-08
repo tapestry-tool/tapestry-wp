@@ -1,4 +1,5 @@
 import axios from "axios"
+import store from "../store"
 import { data } from "./wp"
 
 const { apiUrl, nonce, postId, adminAjaxUrl } = data
@@ -49,7 +50,7 @@ class TapestryApi {
     }
   }
 
-  async importTapestryFromZip(zipFile) {
+  async importTapestryFromZip(zipFile, cancelTokenSource) {
     const url = `/tapestries/${this.postId}/import_zip`
 
     const formData = new FormData()
@@ -58,8 +59,24 @@ class TapestryApi {
       headers: {
         "Content-Type": "multipart/form-data",
       },
+      onUploadProgress: progressEvent => {
+        store.state.importProgress = progressEvent
+      },
+      cancelToken: cancelTokenSource.token,
     })
 
+    return response.data
+  }
+
+  async getImportStatus() {
+    const url = `/tapestries/${this.postId}/import_status`
+    const response = await this.client.get(url)
+    return response.data
+  }
+
+  async clearImportStatus() {
+    const url = `/tapestries/${this.postId}/import_status`
+    const response = await this.client.delete(url)
     return response.data
   }
 

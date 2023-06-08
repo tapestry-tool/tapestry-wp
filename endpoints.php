@@ -364,6 +364,22 @@ $REST_API_ENDPOINTS = [
             'permission_callback' => 'TapestryPermissions::putTapestrySettings',
         ],
     ],
+    'GET_TAPESTRY_IMPORT_STATUS' => (object) [
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/import_status',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => 'getTapestryImportStatus',
+            'permission_callback' => 'TapestryPermissions::putTapestrySettings',
+        ],
+    ],
+    'CLEAR_TAPESTRY_IMPORT_STATUS' => (object) [
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/import_status',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_DELETE_METHOD,
+            'callback' => 'clearImportStatus',
+            'permission_callback' => 'TapestryPermissions::putTapestrySettings',
+        ],
+    ],
     'OPTIMIZE_THUMBNAILS' => (object) [
         'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/optimize_thumbnails',
         'ARGUMENTS' => [
@@ -466,6 +482,14 @@ function exportTapestryAsZip($request)
     }
 }
 
+function clearImportStatus($request)
+{
+    $postId = $request['tapestryPostId'];
+    TapestryImportExport::setImportStatus($postId, (object) [
+        'inProgress' => false,
+    ]);
+}
+
 /**
  * Imports a Tapestry from an uploaded zip file.
  *
@@ -477,10 +501,26 @@ function importTapestryFromZip($request)
     $file_params = $request->get_file_params();
 
     try {
+        if (empty($postId) || !TapestryHelpers::isValidTapestry($postId)) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+
+        $tapestry = new Tapestry($postId);
+        if (!$tapestry->isEmpty()) {
+            throw new TapestryError('TAPESTRY_NOT_EMPTY');
+        }
+        TapestryImportExport::setImportStatus($postId, (object) [
+            'inProgress' => true,
+            'message' => 'Reading file content',
+        ]);
+
         if (!array_key_exists('file', $file_params)) {
             throw new TapestryError('INVALID_ZIP', 'Could not find zip file');
         }
         $zip_path = $file_params['file']['tmp_name'];
+        if (!isset($zip_path) || empty($zip_path)) {
+            throw new TapestryError('INVALID_ZIP', 'Could not find zip file');
+        }
 
         $zip = new ZipArchive();
         if ($zip->open($zip_path, ZipArchive::RDONLY) !== true) {
@@ -507,9 +547,24 @@ function importTapestryFromZip($request)
 
         // Re-create all media referenced by the Tapestry data on this site,
         // and update references to new URLs
-        $importResult = TapestryImportExport::importExternalMedia($tapestry_data, $temp_dir['path'], $temp_dir['url']);
+        $importResult = TapestryImportExport::importExternalMedia($postId, $tapestry_data, $temp_dir['path'], $temp_dir['url']);
 
+        TapestryImportExport::setImportStatus($postId, (object) [
+            'inProgress' => true,
+            'message' => 'Finishing up',
+        ]);
         $importedTapestry = importTapestry($postId, $tapestry_data);
+
+        if ($importResult['rebuildH5PCache']) {
+            // Delete h5p cachedassets if h5p nodes were imported
+            $cachedAssetsDir = wp_upload_dir()['basedir'] . DIRECTORY_SEPARATOR . 'h5p' . DIRECTORY_SEPARATOR . 'cachedassets';
+            if (is_dir($cachedAssetsDir)) {
+                $files_to_delete = glob($cachedAssetsDir . DIRECTORY_SEPARATOR . "*");
+                if ($files_to_delete !== false) {
+                    array_map('unlink', $files_to_delete);
+                }
+            }
+        }
 
         return [
             'changes' => $changes,
@@ -528,6 +583,24 @@ function importTapestryFromZip($request)
         if ($temp_dir) {
             TapestryImportExport::deleteTempDirectory($temp_dir['path']);
         }
+        // Reset import progress
+        TapestryImportExport::setImportStatus($postId, (object) [
+            'inProgress' => false,
+        ]);
+    }
+}
+
+function getTapestryImportStatus($request)
+{
+    $postId = $request['tapestryPostId'];
+    try {
+        if (empty($postId) || !TapestryHelpers::isValidTapestry($postId)) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+
+        return TapestryImportExport::getImportStatus($postId);
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
 }
 
