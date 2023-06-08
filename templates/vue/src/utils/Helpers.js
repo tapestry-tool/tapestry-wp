@@ -80,6 +80,16 @@ export default class Helpers {
     return matchArray === null ? null : matchArray[1] // Returns '' if link is not youtube URL
   }
 
+  // modified version of: https://stackoverflow.com/a/20732091
+  static formatFileSize(size) {
+    var i = size == 0 ? 0 : Math.floor(Math.log(size) / Math.log(1000))
+    return (
+      (size / Math.pow(1000, i)).toFixed(2) * 1 +
+      " " +
+      ["B", "kB", "MB", "GB", "TB"][i]
+    )
+  }
+
   /**
    * Checks if two operands are different from one another
    * Note: We evaluate Null, "", {}, [], false, 0, and Undefined all as being the same
