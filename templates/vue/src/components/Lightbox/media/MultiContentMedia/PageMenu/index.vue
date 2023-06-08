@@ -423,7 +423,7 @@ $slide-fade-speed: 0.3s;
       color: #ffffff;
       background-color: var(--highlight-color);
 
-      .menu-completed-icon {
+      .menu-completed-icon i {
         color: #ffffff;
       }
     }

@@ -1,11 +1,5 @@
 <template>
-  <span v-if="node.completed" class="completed-icon">
-    <i
-      class="far fa-check-circle fa-xs"
-      :class="{
-        large: large,
-      }"
-    ></i>
+  <span v-if="node.completed">
     <i
       :id="`node-${node.id}-checkmark`"
       class="fas fa-check-circle fa-xs"
@@ -47,20 +41,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.completed-icon {
-  position: relative;
-  display: inline-block;
-}
-
 i {
   font-size: 60%;
-  color: #eee;
-  position: absolute;
-  bottom: -2px;
-
-  &.far {
-    color: #5d656c;
-  }
+  color: #00bb00;
 
   &.large {
     font-size: 80%;

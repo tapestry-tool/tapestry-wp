@@ -286,7 +286,12 @@ export default {
     },
     complete(rowId) {
       const completeMultiContentNode = () => {
-        if (!this.node.completed && this.rows.every(row => row.node.completed)) {
+        if (
+          !this.node.completed &&
+          this.rows.every(
+            row => row.node.completed || row.node.title === "Resources"
+          )
+        ) {
           this.$emit("complete", this.node.id)
         }
       }
