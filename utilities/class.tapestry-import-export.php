@@ -1,4 +1,5 @@
 <?php
+
 require_once __DIR__.'/../classes/class.tapestry-h5p.php';
 require_once __DIR__.'/class.tapestry-helpers.php';
 require_once __DIR__.'/class.tapestry-errors.php';
@@ -483,6 +484,7 @@ class TapestryImportExport
     /**
      * Uploads all media (images, videos, H5Ps) referenced by the imported Tapestry.
      *
+     * @param string $postId            Post ID of the Tapestry
      * @param object $tapestry_data     Data of the Tapestry
      * @param string $temp_dir          Path to the directory where zip was extracted.
      * @param string $temp_url          URL of the directory where zip was extracted.
@@ -501,7 +503,7 @@ class TapestryImportExport
      *                                       True if any H5P contents were added.
      *               ]
      */
-    public static function importExternalMedia($tapestry_data, $temp_dir, $temp_url)
+    public static function importExternalMedia($postId, $tapestry_data, $temp_dir, $temp_url)
     {
         $warnings = [
             'nodes' => [],
@@ -510,21 +512,45 @@ class TapestryImportExport
 
         $imported_h5ps = [];
         $imported_media = [];
+        $node_count = count($tapestry_data->nodes);
+        $node_index = 0;
         foreach ($tapestry_data->nodes as $node) {
+            $node_index++;
+            $node_str = $node->title . ' (Node ' . $node_index . '/' . $node_count . ')';
             $node_warnings = [];
 
             if ($node->mediaType === 'h5p') {
+                TapestryImportExport::setImportStatus($postId, (object) [
+                    'inProgress' => true,
+                    'message' => 'Uploading H5P: ' . $node_str,
+                ]);
                 self::_importH5PNode($node, $temp_dir, $temp_url, $node_warnings, $imported_h5ps);
             } elseif ($node->mediaType === 'video') {
+                TapestryImportExport::setImportStatus($postId, (object) [
+                    'inProgress' => true,
+                    'message' => 'Uploading Video: ' . $node_str,
+                ]);
                 self::_importMedia($node->typeData->mediaURL, $temp_dir, $node_warnings, $imported_media);
             } elseif ($node->mediaType === 'activity') {
+                TapestryImportExport::setImportStatus($postId, (object) [
+                    'inProgress' => true,
+                    'message' => 'Uploading Activity: ' . $node_str,
+                ]);
                 self::_importActivityNode($node, $temp_dir, $node_warnings, $imported_media);
             }
 
             if (!empty($node->imageURL)) {
+                TapestryImportExport::setImportStatus($postId, (object) [
+                    'inProgress' => true,
+                    'message' => 'Uploading Node Thumbnail: ' . $node_str,
+                ]);
                 self::_importMedia($node->imageURL, $temp_dir, $node_warnings, $imported_media, true, $node->thumbnailFileId);
             }
             if (!empty($node->lockedImageURL)) {
+                TapestryImportExport::setImportStatus($postId, (object) [
+                    'inProgress' => true,
+                    'message' => 'Uploading Node Thumbnail: ' . $node_str,
+                ]);
                 self::_importMedia($node->lockedImageURL, $temp_dir, $node_warnings, $imported_media, true, $node->lockedThumbnailFileId);
             }
 
@@ -538,6 +564,10 @@ class TapestryImportExport
         }
 
         if ($tapestry_data->settings) {
+            TapestryImportExport::setImportStatus($postId, (object) [
+                'inProgress' => true,
+                'message' => 'Uploading Tapestry background',
+            ]);
             self::_importMedia($tapestry_data->settings->backgroundUrl, $temp_dir, $warnings['settings'], $imported_media);
         }
 
@@ -545,6 +575,23 @@ class TapestryImportExport
             'warnings' => $warnings,
             'rebuildH5PCache' => count($imported_h5ps) > 0,
         ];
+    }
+
+    public static function getImportStatus($tapestryPostId)
+    {
+        $status = get_post_meta($tapestryPostId, 'import', true);
+        if (empty($status)) {
+            $status = (object) [
+                'inProgress' => false,
+            ];
+        }
+
+        return $status;
+    }
+
+    public static function setImportStatus($tapestryPostId, $status)
+    {
+        update_post_meta($tapestryPostId, 'import', $status);
     }
 
     /**
