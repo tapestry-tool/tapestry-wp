@@ -584,6 +584,7 @@ export default {
       "setReturnRoute",
       "setCurrentEditingNode",
       "setCurrentEditingNodeProperty",
+      "addApiError",
     ]),
     ...mapActions([
       "addNode",
