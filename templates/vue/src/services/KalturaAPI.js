@@ -45,6 +45,18 @@ class KalturaApi {
     return response.data
   }
 
+  async getVideoCaptions(entryId) {
+    const url = `/video/captions?entry_id=${entryId}`
+    const response = await this.client.get(url)
+    return response.data
+  }
+
+  async updateVideoCaptions(entryId, captions, defaultCaptionId) {
+    const url = `/video/captions?entry_id=${entryId}`
+    const response = await this.client.put(url, { captions, defaultCaptionId })
+    return response.data
+  }
+
   async uploadVideos(nodeIds, useKalturaPlayer) {
     const url = `/videos`
     const response = await this.client.post(url, {
@@ -73,6 +85,12 @@ class KalturaApi {
 
   async getUploadLog(page, perPage) {
     const url = `/videos/log?tapestryPostId=${this.postId}&page=${page}&count=${perPage}`
+    const response = await this.client.get(url)
+    return response.data
+  }
+
+  async getLanguages() {
+    const url = `/languages`
     const response = await this.client.get(url)
     return response.data
   }

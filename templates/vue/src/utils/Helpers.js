@@ -147,16 +147,18 @@ export default class Helpers {
    * Reference: https://stackoverflow.com/questions/25456013/javascript-deepequal-comparison/25456134
    * @param {Object} src
    * @param {Object} other
+   * @param {Object} customCompareProps
    * @param {Array} ignoreProps
    */
-  static nodeEqual(src, other, ignoreProps = []) {
+  static nodeEqual(src, other, customCompareProps = {}, ignoreProps = []) {
     if (src === other) {
       return true
     } else if (Array.isArray(src) && Array.isArray(other)) {
       if (src.length !== other.length) return false
 
       for (let i = 0; i < src.length; i++) {
-        if (!Helpers.nodeEqual(src[i], other[i])) return false
+        if (!Helpers.nodeEqual(src[i], other[i], customCompareProps, ignoreProps))
+          return false
       }
     } else if (
       typeof src == "object" &&
@@ -167,7 +169,18 @@ export default class Helpers {
       for (let prop in src) {
         if (ignoreProps.includes(prop)) continue
         if (other.hasOwnProperty(prop)) {
-          if (!Helpers.nodeEqual(src[prop], other[prop])) {
+          if (prop in customCompareProps) {
+            if (!customCompareProps[prop](src[prop], other[prop])) {
+              return false
+            }
+          } else if (
+            !Helpers.nodeEqual(
+              src[prop],
+              other[prop],
+              customCompareProps,
+              ignoreProps
+            )
+          ) {
             return false
           }
         } else {

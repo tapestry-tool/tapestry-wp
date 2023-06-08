@@ -160,9 +160,9 @@ Cypress.Commands.add("openModal", (type, id) => {
   }
 })
 
-Cypress.Commands.add("submitModal", () => {
+Cypress.Commands.add("submitModal", timeout => {
   cy.getByTestId("submit-node-modal").click()
-  cy.getByTestId("node-modal", { timeout: 10000 }).should("not.exist")
+  cy.getByTestId("node-modal", { timeout: timeout ?? 10000 }).should("not.exist")
 })
 
 Cypress.Commands.add("submitSettingsModal", () => {

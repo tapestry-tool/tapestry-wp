@@ -128,6 +128,27 @@ class KalturaEndpoints
                     'permission_callback' => 'KalturaEndpoints::canUploadToKaltura',
                 ],
             ],
+            'GET_KALTURA_AVAILABLE_LANGUAGES' => (object) [
+                'ROUTE' => '/kaltura/languages',
+                'ARGUMENTS' => [
+                    'methods' => $REST_API_GET_METHOD,
+                    'callback' => 'KalturaEndpoints::getLanguages',
+                ],
+            ],
+            'GET_KALTURA_VIDEO_CAPTIONS' => (object) [
+                'ROUTE' => '/kaltura/video/captions',
+                'ARGUMENTS' => [
+                    'methods' => $REST_API_GET_METHOD,
+                    'callback' => 'KalturaEndpoints::getVideoCaptions',
+                ],
+            ],
+            'PUT_KALTURA_VIDEO_CAPTIONS' => (object) [
+                'ROUTE' => '/kaltura/video/captions',
+                'ARGUMENTS' => [
+                    'methods' => $REST_API_PUT_METHOD,
+                    'callback' => 'KalturaEndpoints::updateVideoCaptions',
+                ],
+            ],
         ];
     }
 
@@ -289,19 +310,6 @@ class KalturaEndpoints
             'latestTapestryID' => $latestTapestryPostId,
             'error' => !empty($error),
         ];
-    }
-
-    /**
-     * Save Kaltura upload status
-     */
-    public static function saveVideoUploadStatus($video, $videosToUpload, $newStatus, $kalturaData = null)
-    {
-        $video->uploadStatus = $newStatus;
-        self::_updateUploadLog($videosToUpload);
-
-        $node = new TapestryNode($video->tapestryID, $video->nodeID);
-        self::_saveVideoUploadStatusInNode($node, $newStatus, $kalturaData);
-        return $node;
     }
 
     /**
@@ -473,7 +481,7 @@ class KalturaEndpoints
                     if ($response->status === EntryStatus::READY) {
                         self::_saveVideoUploadStatusInNode($node, KalturaUploadStatus::COMPLETE, $response);
 
-                        $file_path = TapestryHelpers::getPathToNodeMedia($node)->file_path;
+                        $file_path = TapestryHelpers::getPathToMedia($node->getTypeData()->mediaURL)->file_path;
                         KalturaApi::saveAndDeleteLocalVideo($node, $response, $useKalturaPlayer, $file_path);
 
                         $video->currentStatus = KalturaUploadStatus::COMPLETE;
@@ -570,9 +578,79 @@ class KalturaEndpoints
         }
     }
 
+    public static function getLanguages($request)
+    {
+        try {
+            if (!LOAD_KALTURA) {
+                throw new TapestryError('KALTURA_NOT_AVAILABLE');
+            }
+    
+            $kaltura_api = new KalturaApi();
+            return $kaltura_api->getLanguages();
+        } catch (TapestryError $e) {
+            return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+        }
+    }
+
+    public static function getVideoCaptions($request)
+    {
+        try {
+            if (!LOAD_KALTURA) {
+                throw new TapestryError('KALTURA_NOT_AVAILABLE');
+            }
+    
+            $video_entry_id = $request['entry_id'];
+    
+            $kaltura_api = new KalturaApi();
+            return $kaltura_api->getCaptionsAndDefaultCaption($video_entry_id);
+        } catch (TapestryError $e) {
+            return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+        }
+    }
+
+    public static function updateVideoCaptions($request)
+    {
+        try {
+            if (!LOAD_KALTURA) {
+                throw new TapestryError('KALTURA_NOT_AVAILABLE');
+            }
+    
+            $video_entry_id = $request['entry_id'];
+            $body = json_decode($request->get_body());
+            $captions = $body->captions;
+            $default_caption_id = $body->defaultCaptionId;
+    
+            if (!isset($captions) || !is_array($captions)) {
+                return null;
+            }
+    
+            try {
+                $kaltura_api = new KalturaApi();
+                return $kaltura_api->setCaptionsAndDefaultCaption($video_entry_id, $captions, $default_caption_id, true);
+            } catch (TapestryError $e) {
+                return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+            }
+        } catch (TapestryError $e) {
+            return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+        }
+    }
+    
     /*******************************************************/
     /**                 PRIVATE FUNCTIONS                 **/
     /*******************************************************/
+
+    /**
+     * Save Kaltura upload status
+     */
+    private static function _saveVideoUploadStatus($video, $videosToUpload, $newStatus, $kalturaData = null)
+    {
+        $video->uploadStatus = $newStatus;
+        self::_updateUploadLog($videosToUpload);
+
+        $node = new TapestryNode($video->tapestryID, $video->nodeID);
+        self::_saveVideoUploadStatusInNode($node, $newStatus, $kalturaData);
+        return $node;
+    }
 
     /**
      * Update the Kaltura upload status of a video node.
@@ -653,7 +731,7 @@ class KalturaEndpoints
 
         foreach ($tapestry->getNodeIds() as $nodeID) {
             $node = new TapestryNode($tapestryPostId, $nodeID);
-            if (TapestryHelpers::videoCanBeUploaded($node)) {
+            if (KalturaApi::videoCanBeUploaded($node)) {
                 $video = (object) [
                 'tapestryID' => (int) $tapestryPostId,
                 'nodeID' => $nodeID,
@@ -705,7 +783,7 @@ class KalturaEndpoints
             $batch = array_slice($videosToUpload, $batchStart, KalturaConstants::UPLOAD_BATCH_SIZE);
 
             foreach ($batch as $video) {
-                self::saveVideoUploadStatus($video, $videosToUpload, KalturaUploadStatus::UPLOADING);
+                self::_saveVideoUploadStatus($video, $videosToUpload, KalturaUploadStatus::UPLOADING);
 
                 $kalturaData = null;
                 try {
@@ -716,13 +794,13 @@ class KalturaEndpoints
                     error_log($error_msg."\nStack trace: \n".$e->getTraceAsString());
 
                     $video->additionalInfo = $error_msg;
-                    self::saveVideoUploadStatus($video, $videosToUpload, KalturaUploadStatus::ERROR);
+                    self::_saveVideoUploadStatus($video, $videosToUpload, KalturaUploadStatus::ERROR);
                     $numUploadedWithError++;
                     continue;
                 }
 
                 $video->kalturaID = $kalturaData->id;
-                self::saveVideoUploadStatus($video, $videosToUpload, KalturaUploadStatus::CONVERTING, $kalturaData);
+                self::_saveVideoUploadStatus($video, $videosToUpload, KalturaUploadStatus::CONVERTING, $kalturaData);
             }
 
             // Filter out videos that did not successfully upload so we don't get an infinite loop
@@ -743,16 +821,23 @@ class KalturaEndpoints
                     }
 
                     if ($response->status === EntryStatus::READY) {
-                        $node = self::saveVideoUploadStatus($video, $videosToUpload, KalturaUploadStatus::COMPLETE);
+                        $node = self::_saveVideoUploadStatus($video, $videosToUpload, KalturaUploadStatus::COMPLETE);
                         KalturaApi::saveAndDeleteLocalVideo($node, $response, $useKalturaPlayer, $video->file->file_path);
                         $numSuccessfullyUploaded++;
+
+                        $failedCaptions = self::_uploadVideoCaptions($node, $kalturaApi, $response);
+                        if ($failedCaptions > 0) {
+                            $plural = $failedCaptions !== 1 ? 's' : '';
+                            $video->additionalInfo = $failedCaptions . ' caption' . $plural . ' failed to upload. Please edit the node to check.';
+                            self::_saveVideoUploadStatus($video, $videosToUpload, KalturaUploadStatus::COMPLETE, null, false);
+                        }
                     } elseif ($response->status === EntryStatus::ERROR_CONVERTING) {
                         $video->additionalInfo = 'An error occurred: Could not convert the video.';
-                        self::saveVideoUploadStatus($video, $videosToUpload, KalturaUploadStatus::ERROR);
+                        self::_saveVideoUploadStatus($video, $videosToUpload, KalturaUploadStatus::ERROR);
                         $numUploadedWithError++;
                     } else {
                         $video->additionalInfo = 'An error occurred: Expected the video to be converting, but it was not.';
-                        self::saveVideoUploadStatus($video, $videosToUpload, KalturaUploadStatus::ERROR);
+                        self::_saveVideoUploadStatus($video, $videosToUpload, KalturaUploadStatus::ERROR);
                         $numUploadedWithError++;
                     }
 
@@ -773,7 +858,7 @@ class KalturaEndpoints
 
         // Mark remaining videos as canceled, if any
         for ($i = $batchStart; $i < count($videosToUpload); $i++) {
-            self::saveVideoUploadStatus($videosToUpload[$i], $videosToUpload, KalturaUploadStatus::CANCELED);
+            self::_saveVideoUploadStatus($videosToUpload[$i], $videosToUpload, KalturaUploadStatus::CANCELED);
         }
 
         return (object) [
@@ -794,13 +879,13 @@ class KalturaEndpoints
 
         foreach ($nodeIds as $nodeId) {
             $node = new TapestryNode($tapestryPostId, $nodeId);
-            if (TapestryHelpers::videoCanBeUploaded($node) && KalturaApi::checkVideoFileSize($node)) {
+            if (KalturaApi::videoCanBeUploaded($node) && KalturaApi::checkVideoFileSize($node)) {
                 array_push($uploadLog, (object) [
                     'tapestryID' => $tapestryPostId,
                     'nodeID' => $nodeId,
                     'nodeTitle' => $node->getTitle(),
                     'uploadStatus' => KalturaUploadStatus::NOT_STARTED,
-                    'file' => TapestryHelpers::getPathToNodeMedia($node),
+                    'file' => TapestryHelpers::getPathToMedia($node->getTypeData()->mediaURL),
                     'kalturaID' => '',
                     'additionalInfo' => '',
                     'timestamp' => $timestamp,
@@ -851,5 +936,28 @@ class KalturaEndpoints
         // Replace the same videos at the end of the list
         array_splice($uploadLog, -count($videos), count($uploadLog), self::_filterLoggedVideos($videos));
         update_option(KalturaConstants::UPLOAD_LOG_OPTION, $uploadLog);
+    }
+
+    private static function _uploadVideoCaptions($node, $kalturaApi, $kalturaData)
+    {
+        $typeData = $node->getTypeData();
+        $captions = $typeData->captions;
+        if (!isset($captions) || !is_array($captions)) {
+            return 0;
+        }
+
+        try {
+            $captionData = $kalturaApi->setCaptionsAndDefaultCaption($kalturaData->id, $captions, $typeData->defaultCaptionId, false);
+
+            $typeData->captions = $captionData->captions;
+            $typeData->pendingCaptions = $captionData->pendingCaptions;
+            $typeData->defaultCaptionId = $captionData->defaultCaptionId;
+        } catch (TapestryError $e) {
+            $typeData->pendingCaptions = $captions;
+        }
+
+        $node->save();
+
+        return count($typeData->pendingCaptions);
     }
 }

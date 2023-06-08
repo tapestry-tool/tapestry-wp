@@ -181,7 +181,7 @@ class TapestryHelpers
 
     /**
      * Add a media item (image, video) as a WordPress attachment.
-     * 
+     *
      * @param string $filepath          Filepath of the file to add.
      * @param bool $generate_metadata   If true, also generates metadata and image sub-sizes.
      */
@@ -387,37 +387,36 @@ class TapestryHelpers
     }
 
     /**
-     * Assumes the node's mediaURL is a local upload, and gets its file path
+     * Get the file path of a local WordPress upload by its URL.
      *
-     * @param TapestryNode  $node
+     * @param string $url
+     * @return object|null     Returns null if the URL is not a local upload.
      */
-    public static function getPathToNodeMedia($node)
+    public static function getPathToMedia($url)
     {
+        if (!self::isLocalUpload($url)) {
+            return null;
+        }
+
         $upload_folder = wp_upload_dir()['basedir'];
         $upload_folder_url = wp_upload_dir()['baseurl'];
-        $mediaURL = $node->getTypeData()->mediaURL;
 
-        $file_obj = new StdClass();
-        $file_obj->file_path = substr_replace($mediaURL, $upload_folder, 0, strlen($upload_folder_url));
-        $file_obj->name = pathinfo($mediaURL)['basename'];
+        $file_obj = new stdClass();
+        $file_obj->file_path = substr_replace($url, $upload_folder, 0, strlen($upload_folder_url));
+        $file_obj->name = pathinfo($url, PATHINFO_BASENAME);
+        $file_obj->extension = pathinfo($url, PATHINFO_EXTENSION);
 
         return $file_obj;
     }
 
     /**
-     * Checks if a video can be uploaded to Kaltura.
-     * Only videos added via upload to WordPress can be transferred to Kaltura.
-     *
-     * @param TapestryNode  $node
-     * @return bool
+     * Checks if a URL represents a local upload (a file in the WordPress upload directory).
+     * Only checks the URL form, not that the file actually exists.
      */
-    public static function videoCanBeUploaded($node)
+    public static function isLocalUpload($url)
     {
-        $nodeMeta = $node->getMeta();
-        $nodeTypeData = $node->getTypeData();
         $upload_dir_url = wp_upload_dir()['baseurl'];
-
-        return $nodeMeta->mediaType == "video" && substr($nodeTypeData->mediaURL, 0, strlen($upload_dir_url)) === $upload_dir_url;
+        return substr($url, 0, strlen($upload_dir_url)) === $upload_dir_url;
     }
 
     // Get the actual file size for large files.

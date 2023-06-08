@@ -152,7 +152,6 @@ export default {
       disableKalturaOption: false,
     }
   },
-
   computed: {
     ...mapState({
       node: "currentEditingNode",

@@ -7,6 +7,13 @@ import { names } from "@/config/routes"
 
 const node = oneNodeTapestry.nodes[0]
 
+jest.mock("@/services/KalturaAPI", () => {
+  return {
+    ...jest.requireActual("@/services/KalturaAPI"),
+    getLanguages: jest.fn(),
+  }
+})
+
 describe("node modal: content - video", () => {
   let screen
 
