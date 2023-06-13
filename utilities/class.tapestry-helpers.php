@@ -154,60 +154,60 @@ class TapestryHelpers
      *
      * @param string $imageURL
      *
-     * @return string $attachment_id
+     * @return string $attachmentId
      */
     public static function attachImageByURL($imageURL)
     {
         // is this already an image in our gallery?
-        $attachment_id = attachment_url_to_postid($imageURL);
-        if ($attachment_id) {
-            return $attachment_id;
+        $attachmentId = attachment_url_to_postid($imageURL);
+        if ($attachmentId) {
+            return $attachmentId;
         }
 
         // not an image in our gallery. let's upload it.
-        $imagetype = end(explode('/', getimagesize($imageURL)['mime']));
-        $uniq_name = date('dmY').''.(int) microtime(true);
-        $filename = $uniq_name.'.'.$imagetype;
+        $imageType = end(explode('/', getimagesize($imageURL)['mime']));
+        $uniqueName = date('dmY').''.(int) microtime(true);
+        $filename = $uniqueName.'.'.$imageType;
 
-        $uploaddir = wp_upload_dir();
-        $uploadfile = $uploaddir['path'] . '/' . $filename;
-        $contents= file_get_contents($imageURL);
-        $savefile = fopen($uploadfile, 'w');
-        fwrite($savefile, $contents);
-        fclose($savefile);
+        $uploadDir = wp_upload_dir();
+        $uploadFile = $uploadDir['path'] . '/' . $filename;
+        $contents = file_get_contents($imageURL);
+        $saveFile = fopen($uploadFile, 'w');
+        fwrite($saveFile, $contents);
+        fclose($saveFile);
 
-        return self::createAttachment($uploadfile, true);
+        return self::createAttachment($uploadFile, true);
     }
 
     /**
      * Add a media item (image, video) as a WordPress attachment.
      *
      * @param string $filepath          Filepath of the file to add.
-     * @param bool $generate_metadata   If true, also generates metadata and image sub-sizes.
+     * @param bool $generateMetadata   If true, also generates metadata and image sub-sizes.
      */
-    public static function createAttachment($filepath, $generate_metadata = false)
+    public static function createAttachment($filepath, $generateMetadata = false)
     {
         include_once(ABSPATH . 'wp-admin/includes/image.php');
 
         $filename = basename($filepath);
-        $wp_filetype = wp_check_filetype($filename, null);
+        $wpFiletype = wp_check_filetype($filename, null);
         $attachment = array(
-            'post_mime_type' => $wp_filetype['type'],
+            'post_mime_type' => $wpFiletype['type'],
             'post_title' => $filename,
             'post_content' => '',
             'post_status' => 'inherit'
         );
 
-        $attachment_id = wp_insert_attachment($attachment, $filepath);
+        $attachmentId = wp_insert_attachment($attachment, $filepath);
 
-        if ($generate_metadata) {
-            $imagenew = get_post($attachment_id);
+        if ($generateMetadata) {
+            $imagenew = get_post($attachmentId);
             $fullsizepath = get_attached_file($imagenew->ID);
-            $attach_data = wp_generate_attachment_metadata($attachment_id, $fullsizepath);
-            wp_update_attachment_metadata($attachment_id, $attach_data);
+            $attachData = wp_generate_attachment_metadata($attachmentId, $fullsizepath);
+            wp_update_attachment_metadata($attachmentId, $attachData);
         }
 
-        return $attachment_id;
+        return $attachmentId;
     }
 
     /**
@@ -220,7 +220,7 @@ class TapestryHelpers
      *
      * @return bool
      */
-    public static function userIsAllowed($action, $nodeMetaId, $tapestryPostId, $superuser_override = true, $_userId = null)
+    public static function userIsAllowed($action, $nodeMetaId, $tapestryPostId, $superuserOverride = true, $_userId = null)
     {
         // Section 1: Fetching of information & special cases
 
@@ -281,7 +281,7 @@ class TapestryHelpers
         // Section 3: Override for admins / authors
 
         // User has edit permissions for Tapestry
-        if ($user->canEdit($tapestryPostId) && $superuser_override) {
+        if ($user->canEdit($tapestryPostId) && $superuserOverride) {
             return true;
         }
 
@@ -398,15 +398,15 @@ class TapestryHelpers
             return null;
         }
 
-        $upload_folder = wp_upload_dir()['basedir'];
-        $upload_folder_url = wp_upload_dir()['baseurl'];
+        $uploadFolder = wp_upload_dir()['basedir'];
+        $uploadFolderUrl = wp_upload_dir()['baseurl'];
 
-        $file_obj = new stdClass();
-        $file_obj->file_path = substr_replace($url, $upload_folder, 0, strlen($upload_folder_url));
-        $file_obj->name = pathinfo($url, PATHINFO_BASENAME);
-        $file_obj->extension = pathinfo($url, PATHINFO_EXTENSION);
+        $fileObj = new stdClass();
+        $fileObj->filePath = substr_replace($url, $uploadFolder, 0, strlen($uploadFolderUrl));
+        $fileObj->name = pathinfo($url, PATHINFO_BASENAME);
+        $fileObj->extension = pathinfo($url, PATHINFO_EXTENSION);
 
-        return $file_obj;
+        return $fileObj;
     }
 
     /**
@@ -415,8 +415,8 @@ class TapestryHelpers
      */
     public static function isLocalUpload($url)
     {
-        $upload_dir_url = wp_upload_dir()['baseurl'];
-        return substr($url, 0, strlen($upload_dir_url)) === $upload_dir_url;
+        $uploadDirUrl = wp_upload_dir()['baseurl'];
+        return substr($url, 0, strlen($uploadDirUrl)) === $uploadDirUrl;
     }
 
     // Get the actual file size for large files.

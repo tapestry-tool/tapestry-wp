@@ -174,9 +174,9 @@ class TapestryUserProgress implements ITapestryUserProgress
         }
 
         $nodeMetadata = get_metadata_by_mid('post', $nodeId)->meta_value;
-        $completed_value = get_user_meta($userId, 'tapestry_'.$this->postId.'_node_completed_'.$nodeId, true);
-        if (null !== $completed_value) {
-            return '1' === $completed_value;
+        $completedValue = get_user_meta($userId, 'tapestry_'.$this->postId.'_node_completed_'.$nodeId, true);
+        if (null !== $completedValue) {
+            return '1' === $completedValue;
         } else {
             return isset($nodeMetadata->completed) && $nodeMetadata->completed ? true : false;
         }
@@ -197,8 +197,8 @@ class TapestryUserProgress implements ITapestryUserProgress
         $hasAnswer = false;
 
         foreach ($userIds as $userId) {
-            $user_answer = get_user_meta($userId->ID, 'tapestry_'.$postId.'_'.$nodeMetaId.'_question_'.$questionId.'_answers', true);
-            if ('' != $user_answer && is_array($user_answer) && array_key_exists($answerType, $user_answer)) {
+            $userAnswer = get_user_meta($userId->ID, 'tapestry_'.$postId.'_'.$nodeMetaId.'_question_'.$questionId.'_answers', true);
+            if ('' != $userAnswer && is_array($userAnswer) && array_key_exists($answerType, $userAnswer)) {
                 $hasAnswer = true;
                 break;
             }
@@ -253,9 +253,9 @@ class TapestryUserProgress implements ITapestryUserProgress
                     // Wordpress get_users returns an extra 'id' field for no reason, so we are removing it manually here:
                     unset($user->id);
 
-                    $user_answer = get_user_meta($user->ID, 'tapestry_'.$this->postId.'_'.$activityId.'_question_'.$questionId.'_answers', true);
-                    if ('' != $user_answer && is_array($user_answer)) {
-                        $userAnswers = array_merge((array) $user, $user_answer);
+                    $userAnswer = get_user_meta($user->ID, 'tapestry_'.$this->postId.'_'.$activityId.'_question_'.$questionId.'_answers', true);
+                    if ('' != $userAnswer && is_array($userAnswer)) {
+                        $userAnswers = array_merge((array) $user, $userAnswer);
                         array_push($questionAnswers, $userAnswers);
                     } else {
                         array_push($questionAnswers, (array) $user);
@@ -286,10 +286,10 @@ class TapestryUserProgress implements ITapestryUserProgress
 
             $userId = $this->_userId;
 
-            $progress_value = get_user_meta($userId, 'tapestry_'.$this->postId.'_progress_node_'.$nodeId, true);
+            $progressValue = get_user_meta($userId, 'tapestry_'.$this->postId.'_progress_node_'.$nodeId, true);
             $progress->$nodeId = new stdClass();
-            if (null !== $progress_value) {
-                $progress->$nodeId->progress = (float) $progress_value;
+            if (null !== $progressValue) {
+                $progress->$nodeId->progress = (float) $progressValue;
             } else {
                 $progress->$nodeId->progress = 0;
             }
@@ -324,8 +324,8 @@ class TapestryUserProgress implements ITapestryUserProgress
                 }
             }
 
-            $completed_value = $this->isCompleted($nodeId, $userId);
-            $progress->$nodeId->completed = $completed_value;
+            $completedValue = $this->isCompleted($nodeId, $userId);
+            $progress->$nodeId->completed = $completedValue;
         }
 
         return $progress;
@@ -455,8 +455,8 @@ class TapestryUserProgress implements ITapestryUserProgress
 
     private function _isJson($string)
     {
-        $test_json = json_decode($string);
-        if (null !== $test_json) {
+        $testJson = json_decode($string);
+        if (null !== $testJson) {
             return true;
         } else {
             return false;

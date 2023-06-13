@@ -48,15 +48,15 @@ class KalturaApi
     {
         $user = wp_get_current_user()->ID;
 
-        $kaltura_admin_secret = self::getKalturaAdminSecret();
-        $kaltura_partner_id = self::getKalturaPartnerId();
-        $kaltura_service_url = self::getKalturaServiceUrl();
+        $kalturaAdminSecret = self::getKalturaAdminSecret();
+        $kalturaPartnerId = self::getKalturaPartnerId();
+        $kalturaServiceUrl = self::getKalturaServiceUrl();
 
-        $kconf = new Configuration($kaltura_partner_id);
-        $kconf->setServiceUrl($kaltura_service_url);
+        $kconf = new Configuration($kalturaPartnerId);
+        $kconf->setServiceUrl($kalturaServiceUrl);
         $kclient = new Client($kconf);
         try {
-            $ksession = $kclient->session->start($kaltura_admin_secret, $user, $type, $kaltura_partner_id);
+            $ksession = $kclient->session->start($kalturaAdminSecret, $user, $type, $kalturaPartnerId);
         } catch (Exception $e) {
             error_log('Kaltura Client Error: '.$e);
         }
@@ -80,7 +80,7 @@ class KalturaApi
      */
     public function uploadVideo($file, $categoryName)
     {
-        $filepath = $file->file_path;
+        $filepath = $file->filePath;
         $filename = $file->name;
 
         if (!file_exists($filepath)) {
@@ -396,7 +396,7 @@ class KalturaApi
     private function _deleteLocalUpload($file)
     {
         if ($file) {
-            wp_delete_file($file->file_path);
+            wp_delete_file($file->filePath);
         }
     }
 
@@ -419,7 +419,7 @@ class KalturaApi
             } else {
                 return null;
             }
-        } elseif (!in_array($file->extension, $allowedExtensions) || !file_exists($file->file_path)) {
+        } elseif (!in_array($file->extension, $allowedExtensions) || !file_exists($file->filePath)) {
             // File is a local upload, but does not exist/has invalid extension
             if ($throwErrors) {
                 throw new TapestryError('UPLOAD_FILE_NOT_FOUND');
@@ -430,7 +430,7 @@ class KalturaApi
 
         $uploadToken = new UploadToken();
         $token = $kclient->uploadToken->add($uploadToken);
-        $upload = $kclient->uploadToken->upload($token->id, $file->file_path);
+        $upload = $kclient->uploadToken->upload($token->id, $file->filePath);
 
         return $token->id;
     }
@@ -612,25 +612,25 @@ class KalturaApi
     public static function checkVideoFileSize($node)
     {
         // Overridden value in WordPress settings
-        $max_file_size_setting = get_option('tapestry_kaltura_upload_max_file_size');
+        $maxFileSizeSetting = get_option('tapestry_kaltura_upload_max_file_size');
 
         // Value defined in wp-config.php
-        $max_file_size_constant = defined('TAPESTRY_KALTURA_UPLOAD_MAX_FILE_SIZE') ? TAPESTRY_KALTURA_UPLOAD_MAX_FILE_SIZE : null;
+        $maxFileSizeConstant = defined('TAPESTRY_KALTURA_UPLOAD_MAX_FILE_SIZE') ? TAPESTRY_KALTURA_UPLOAD_MAX_FILE_SIZE : null;
 
-        $user_defined_size_string = !empty($max_file_size_setting) ? $max_file_size_setting : $max_file_size_constant;
-        if (empty($user_defined_size_string)) {
+        $userDefinedSizeString = !empty($maxFileSizeSetting) ? $maxFileSizeSetting : $maxFileSizeConstant;
+        if (empty($userDefinedSizeString)) {
             return true;
         }
 
-        $user_defined_max_upload_size = wp_convert_hr_to_bytes($user_defined_size_string);
+        $userDefinedMaxUploadSize = wp_convert_hr_to_bytes($userDefinedSizeString);
 
-        if ($user_defined_max_upload_size >= wp_max_upload_size()) {
+        if ($userDefinedMaxUploadSize >= wp_max_upload_size()) {
             return true;
         }
 
         $file = TapestryHelpers::getPathToMedia($node->getTypeData()->mediaURL);
-        $filesize = TapestryHelpers::getRealFileSize($file->file_path);
+        $filesize = TapestryHelpers::getRealFileSize($file->filePath);
 
-        return $filesize <= $user_defined_max_upload_size;
+        return $filesize <= $userDefinedMaxUploadSize;
     }
 }

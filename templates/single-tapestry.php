@@ -11,9 +11,9 @@
 ?>
 
 <?php
-$iframe_mode = array_key_exists('iframe', $_GET);
+$iframeMode = array_key_exists('iframe', $_GET);
 
-if ($iframe_mode) {
+if ($iframeMode) {
     load_template(__DIR__ . '/header-iframe.php');
 } else {
     get_header();
@@ -81,7 +81,7 @@ if ($iframe_mode) {
 </div><!-- #primary -->
 
 <?php
-if ($iframe_mode) {
+if ($iframeMode) {
     load_template(__DIR__ . '/footer-iframe.php');
 } else {
     get_footer();

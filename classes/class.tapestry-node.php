@@ -165,9 +165,9 @@ class TapestryNode implements ITapestryNode
             } else {
                 $this->thumbnailFileId = $node->thumbnailFileId;
                 set_post_thumbnail($this->nodePostId, $this->thumbnailFileId);
-                $post_thumbnail_url = get_the_post_thumbnail_url($this->nodePostId, 'tapestry_thumb');
-                if ($post_thumbnail_url) {
-                    $this->imageURL = $post_thumbnail_url;
+                $postThumbnailUrl = get_the_post_thumbnail_url($this->nodePostId, 'tapestry_thumb');
+                if ($postThumbnailUrl) {
+                    $this->imageURL = $postThumbnailUrl;
                 }
             }
         }
@@ -179,9 +179,9 @@ class TapestryNode implements ITapestryNode
                 $this->lockedThumbnailFileId = '';
             } else {
                 $this->lockedThumbnailFileId = $node->lockedThumbnailFileId;
-                $image_url = wp_get_attachment_image_url($this->lockedThumbnailFileId, 'tapestry_thumb');
-                if ($image_url) {
-                    $this->lockedImageURL = $image_url;
+                $imageUrl = wp_get_attachment_image_url($this->lockedThumbnailFileId, 'tapestry_thumb');
+                if ($imageUrl) {
+                    $this->lockedImageURL = $imageUrl;
                 }
             }
         }
@@ -314,7 +314,6 @@ class TapestryNode implements ITapestryNode
     public function getLockedState()
     {
         $conditions = $this->conditions;
-        $userProgress = new TapestryUserProgress($this->tapestryPostId, $this->nodeMetaId);
 
         foreach ($conditions as $condition) {
             $condition->fulfilled = false;
