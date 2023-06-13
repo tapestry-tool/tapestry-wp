@@ -1,7 +1,7 @@
 import axios from "axios"
 import { data } from "./wp"
 
-const API_URL = `${data.rest_url}/wp/v2`
+const API_URL = `${data.restUrl}/wp/v2`
 const ADMIN_AJAX_URL = data.adminAjaxUrl
 
 let wp_posts_cache = []

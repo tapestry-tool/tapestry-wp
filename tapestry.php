@@ -213,14 +213,14 @@ add_action('plugins_loaded', function () {
                     'tapestry_d3_vue', // vue script handle defined in wp_register_script.
                     'wpData', // javascript object that will made availabe to Vue.
                     [ // wordpress data to be made available to the Vue app in 'wpData'
-                        'iframe_mode' => $iframeMode,
-                        'directory_uri' => plugin_dir_url(__FILE__).'templates/vue/dist', // child theme directory path.
-                        'vue_uri' => $vueUrl, // path to vue
-                        'rest_url' => untrailingslashit(esc_url_raw(rest_url())), // URL to the REST endpoint.
+                        'iframeMode' => $iframeMode,
+                        'directoryUrl' => plugin_dir_url(__FILE__).'templates/vue/dist', // child theme directory path.
+                        'vueUrl' => $vueUrl, // path to vue
+                        'restUrl' => untrailingslashit(esc_url_raw(rest_url())), // URL to the REST endpoint.
                         'wpUrl' => get_bloginfo('url'),
                         'logoutUrl' => wp_logout_url(get_permalink()),
-                        'app_path' => $post->post_name, // page where the custom page template is loaded.
-                        'post_categories' => get_terms([
+                        'appPath' => $post->post_name, // page where the custom page template is loaded.
+                        'postCategories' => get_terms([
                             'taxonomy' => 'category', // default post categories.
                             'hide_empty' => true,
                             'fields' => 'names',
@@ -228,8 +228,8 @@ add_action('plugins_loaded', function () {
                         'nonce' => wp_create_nonce('wp_rest'),
                         'wpUserId' => apply_filters('determine_current_user', false),
                         'adminAjaxUrl' => admin_url('admin-ajax.php'),
-                        'file_upload_nonce' => wp_create_nonce('media-form'),
-                        'upload_url' => admin_url('async-upload.php'),
+                        'fileUploadNonce' => wp_create_nonce('media-form'),
+                        'uploadUrl' => admin_url('async-upload.php'),
                         'roles' => $wp_roles->get_names(),
                         'wpCanEditTapestry' => current_user_can('edit_post', get_the_ID()),
                         'currentUser' => $currentUser,

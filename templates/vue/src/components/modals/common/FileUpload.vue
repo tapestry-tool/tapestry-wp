@@ -320,7 +320,7 @@ export default {
           ? event.dataTransfer.files[0]
           : event.target.files[0].name
       )
-      formData.append("_wpnonce", wpData.file_upload_nonce)
+      formData.append("_wpnonce", wpData.fileUploadNonce)
 
       this.error = null
       this.confirmedUpload = true
@@ -328,7 +328,7 @@ export default {
       let CancelToken = axios.CancelToken
       this.uploadSource = CancelToken.source()
       axios
-        .post(wpData.upload_url, formData, {
+        .post(wpData.uploadUrl, formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },
