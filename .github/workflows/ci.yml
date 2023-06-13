@@ -43,7 +43,7 @@ jobs:
           KALTURA_ADMIN_SECRET: ${{ secrets.KALTURA_ADMIN_SECRET }}
           KALTURA_PARTNER_ID: ${{ secrets.KALTURA_PARTNER_ID }}
           KALTURA_SERVICE_URL: ${{ secrets.KALTURA_SERVICE_URL }}
-          KALTURA_UNIQUE_CONFIG: ${{ secrets.KALTURA_UNIQUE_CONFIG }}
+          KALTURA_UI_CONFIG: ${{ secrets.KALTURA_UI_CONFIG }}
         run: sh ./bin/install.sh
       - name: Setup link preview config
         working-directory: templates/vue

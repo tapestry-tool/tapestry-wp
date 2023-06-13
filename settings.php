@@ -35,7 +35,7 @@ function register_tapestry_settings()
     register_setting('tapestry_kaltura_config', 'kaltura_admin_secret', array_merge($args, ['description' => 'Kaltura Administrator Secret']));
     register_setting('tapestry_kaltura_config', 'kaltura_partner_id', array_merge($args, ['description' => 'Kaltura Partner ID']));
     register_setting('tapestry_kaltura_config', 'kaltura_service_url', array_merge($args, ['description' => 'Kaltura Service URL']));
-    register_setting('tapestry_kaltura_config', 'kaltura_unique_config', array_merge($args, ['description' => 'Kaltura Unique Configuration']));
+    register_setting('tapestry_kaltura_config', 'kaltura_ui_config', array_merge($args, ['description' => 'Kaltura UI Configuration']));
     register_setting('tapestry_kaltura_config', 'tapestry_kaltura_upload_max_file_size', array_merge($args, ['description' => 'Maximum file size for Kaltura upload']));
 }
 
@@ -89,7 +89,7 @@ function tapestry_kaltura_config_section_cb()
     $kalturaAdminSecret = get_option('kaltura_admin_secret', '');
     $kalturaPartnerId = get_option('kaltura_partner_id', '');
     $kalturaServiceUrl = get_option('kaltura_service_url', '');
-    $kalturaUniqueConfig = get_option('kaltura_unique_config', '');
+    $kalturaUIConfig = get_option('kaltura_ui_config', '');
     $kalturaUploadMaxFileSize = get_option('tapestry_kaltura_upload_max_file_size', ''); ?>
     <p>
         Use a different set of Kaltura configuration variables on this site only.
@@ -133,12 +133,12 @@ function tapestry_kaltura_config_section_cb()
                 </tr>
                 <tr>
                     <th scope="row">
-                        <label for="kaltura_unique_config">Kaltura Unique Configuration</label>
+                        <label for="kaltura_ui_config">Kaltura UI Configuration</label>
                     </th>
                     <td>
-                        <input type="text" id="kaltura_unique_config" name="kaltura_unique_config" value="<?php echo $kalturaUniqueConfig ?>">
+                        <input type="text" id="kaltura_ui_config" name="kaltura_ui_config" value="<?php echo $kalturaUIConfig ?>">
                         <p class="description">
-                            The Kaltura Unique Configuration sets the media player design.
+                            The Kaltura UI Configuration sets the media player design.
                             It can be found in the Studio tab in the Kaltura admin dashboard.
                         </p>
                     </td>

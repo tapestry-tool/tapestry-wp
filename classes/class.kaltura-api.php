@@ -534,9 +534,9 @@ class KalturaApi
         return KALTURA_OVERRIDE_CONFIG ? get_option('kaltura_service_url') : (KALTURA_DEFAULT_CONFIG ? KALTURA_SERVICE_URL : null);
     }
 
-    public static function getKalturaUniqueConfig()
+    public static function getKalturaUIConfig()
     {
-        return KALTURA_OVERRIDE_CONFIG ? get_option('kaltura_unique_config') : (KALTURA_DEFAULT_CONFIG ? KALTURA_UNIQUE_CONFIG : null);
+        return KALTURA_OVERRIDE_CONFIG ? get_option('kaltura_ui_config') : (KALTURA_DEFAULT_CONFIG ? KALTURA_UI_CONFIG : null);
     }
 
     /**
@@ -573,7 +573,7 @@ class KalturaApi
         }
         $typeData->kalturaData['partnerId'] = self::getKalturaPartnerId();
         $typeData->kalturaData['serviceUrl'] = self::getKalturaServiceUrl();
-        $typeData->kalturaData['uniqueConfiguration'] = self::getKalturaUniqueConfig();
+        $typeData->kalturaData['uiConfiguration'] = self::getKalturaUIConfig();
 
         $typeData->videoPlayer = $useKalturaPlayer ? 'kaltura' : 'regular';
 

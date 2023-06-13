@@ -907,7 +907,7 @@ export default {
               id: this.node.typeData.kalturaId,
               partnerId: wp.data.kaltura.partnerId,
               serviceUrl: wp.data.kaltura.serviceUrl,
-              uniqueConfiguration: wp.data.kaltura.uniqueConfiguration,
+              uiConfiguration: wp.data.kaltura.uiConfiguration,
             })
           } else {
             this.update("typeData.kalturaData.id", this.node.typeData.kalturaId)
@@ -917,8 +917,8 @@ export default {
               wp.data.kaltura.serviceUrl
             )
             this.update(
-              "typeData.kalturaData.uniqueConfiguration",
-              wp.data.kaltura.uniqueConfiguration
+              "typeData.kalturaData.uiConfiguration",
+              wp.data.kaltura.uiConfiguration
             )
           }
           this.updateKalturaVideoMediaURL()

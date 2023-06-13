@@ -50,6 +50,14 @@ function tapestry_accordion_row_update()
     }
 }
 
+function tapestry_kaltura_uiconf_update()
+{
+    $uniqueConfig = get_option('kaltura_unique_config');
+    if ($uniqueConfig !== false) {
+        add_option('kaltura_ui_config', $uniqueConfig);
+    }
+}
+
 function tapestry_plugin_update()
 {
     global $TAPESTRY_VERSION_NUMBER;
@@ -61,6 +69,10 @@ function tapestry_plugin_update()
         tapestry_accordion_update();
         tapestry_accordion_row_update();
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        update_option('tapestry_plugin_version', $TAPESTRY_VERSION_NUMBER);
+    }
+    if (version_compare($installedVersion, '2.57.0-beta', '<')) {
+        tapestry_kaltura_uiconf_update();
         update_option('tapestry_plugin_version', $TAPESTRY_VERSION_NUMBER);
     }
 }

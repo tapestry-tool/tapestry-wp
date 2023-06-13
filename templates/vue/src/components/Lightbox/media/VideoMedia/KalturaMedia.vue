@@ -71,8 +71,10 @@ export default {
     const kalturaScript = document.createElement("script")
     const partnerId = this.node.typeData.kalturaData.partnerId
     const serviceUrl = this.node.typeData.kalturaData.serviceUrl
-    const uniqueConfiguration = this.node.typeData.kalturaData.uniqueConfiguration
-    kalturaScript.src = `${serviceUrl}/p/${partnerId}/sp/${partnerId}00/embedIframeJs/uiconf_id/${uniqueConfiguration}/partner_id/${partnerId}`
+    const uiConfiguration =
+      this.node.typeData.kalturaData.uiConfiguration ??
+      this.node.typeData.kalturaData.uniqueConfiguration
+    kalturaScript.src = `${serviceUrl}/p/${partnerId}/sp/${partnerId}00/embedIframeJs/uiconf_id/${uiConfiguration}/partner_id/${partnerId}`
 
     kalturaScript.id = "kaltura-script"
 
@@ -80,7 +82,7 @@ export default {
       kWidget.embed({
         targetId: `kaltura-container-${this.node.id}`,
         wid: `_${partnerId}`,
-        uiconf_id: uniqueConfiguration,
+        uiconf_id: uiConfiguration,
         entry_id: this.kalturaId,
         flashvars: {
           autoPlay: this.autoplay,

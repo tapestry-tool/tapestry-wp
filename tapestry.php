@@ -39,7 +39,7 @@ add_action('plugins_loaded', function () {
             !empty(get_option('kaltura_admin_secret')) &&
             !empty(get_option('kaltura_partner_id')) &&
             !empty(get_option('kaltura_service_url')) &&
-            !empty(get_option('kaltura_unique_config'))
+            !empty(get_option('kaltura_ui_config'))
         );
 
         // Record whether Kaltura configuration variables are defined in wp-config.php
@@ -48,7 +48,7 @@ add_action('plugins_loaded', function () {
             (defined('KALTURA_ADMIN_SECRET') && !empty(KALTURA_ADMIN_SECRET)) &&
             (defined('KALTURA_PARTNER_ID') && !empty(KALTURA_PARTNER_ID)) &&
             (defined('KALTURA_SERVICE_URL') && !empty(KALTURA_SERVICE_URL)) &&
-            (defined('KALTURA_UNIQUE_CONFIG') && !empty(KALTURA_UNIQUE_CONFIG))
+            (defined('KALTURA_UI_CONFIG') && !empty(KALTURA_UI_CONFIG))
         );
 
         define(
@@ -197,7 +197,7 @@ add_action('plugins_loaded', function () {
                 // pass Kaltura account variables to frontend; will be null if LOAD_KALTURA is false
                 $kalturaPartnerId = KalturaApi::getKalturaPartnerId();
                 $kalturaServiceUrl = KalturaApi::getKalturaServiceUrl();
-                $kalturaUniqueConfiguration = KalturaApi::getKalturaUniqueConfig();
+                $kalturaUIConfiguration = KalturaApi::getKalturaUIConfig();
 
                 $currentUser = wp_get_current_user();
                 $currentUser->data = (object) [
@@ -238,7 +238,7 @@ add_action('plugins_loaded', function () {
                             'kalturaStatus' => LOAD_KALTURA,
                             'partnerId' => $kalturaPartnerId,
                             'serviceUrl' => $kalturaServiceUrl,
-                            'uniqueConfiguration' => $kalturaUniqueConfiguration,
+                            'uiConfiguration' => $kalturaUIConfiguration,
                         ),
                     ]
                 );
