@@ -228,11 +228,23 @@ export default {
         { wch: 15 },
         { wch: 50 },
       ]
+      const sheetNames = {}
       this.activityNodes.forEach(activity => {
         const formattedAnswers = this.formatAnswers(activity.id)
         const answerSheet = XLSX.utils.json_to_sheet(formattedAnswers)
         answerSheet["!cols"] = wscols
-        XLSX.utils.book_append_sheet(newWorkBook, answerSheet, `${activity.title}`)
+
+        let sheetName = activity.title.substr(0, 25).replaceAll(/[\\/?*[\]:]/g, "")
+        if (sheetNames[sheetName]) {
+          let i = 1
+          while (i < 100 && sheetNames[`${sheetName} (${i})`]) {
+            i++
+          }
+          sheetName += ` (${i})`
+        }
+        sheetNames[sheetName] = true
+
+        XLSX.utils.book_append_sheet(newWorkBook, answerSheet, sheetName)
       })
       XLSX.writeFile(newWorkBook, "answers.xlsx")
     },
