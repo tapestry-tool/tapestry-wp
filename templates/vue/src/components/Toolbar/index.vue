@@ -27,6 +27,9 @@
                 data-qa="user-answers-button"
               ></user-answers-button>
             </b-col>
+            <b-col v-if="isAdmin" class="p-0">
+              <all-user-progress-button></all-user-progress-button>
+            </b-col>
             <b-col v-if="canEdit" class="p-0">
               <settings-modal-button :max-depth="maxDepth"></settings-modal-button>
             </b-col>
@@ -50,6 +53,7 @@ import { mapMutations, mapState } from "vuex"
 import TapestryDepthSlider from "./TapestryDepthSlider"
 import SettingsModalButton from "./SettingsModalButton"
 import UserAnswersButton from "./UserAnswersButton"
+import AllUserProgressButton from "./AllUserProgressButton"
 import UserSettingsButton from "./UserSettingsButton"
 import TapestryFilter from "./TapestryFilter"
 import ReviewNotifications from "./ReviewNotifications"
@@ -69,6 +73,7 @@ export default {
     EmbedButton,
     OperationsButton,
     UserAnswersButton,
+    AllUserProgressButton,
   },
   data() {
     return {

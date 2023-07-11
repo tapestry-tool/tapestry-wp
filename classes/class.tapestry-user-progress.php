@@ -112,6 +112,18 @@ class TapestryUserProgress implements ITapestryUserProgress
     }
 
     /**
+     * Get the progress value and completed status of all users for all nodes in a Tapestry.
+     *
+     * @return array $allUserProgress all users' progress for all nodes in a Tapestry
+     */
+    public function getAllUserProgress()
+    {
+        $this->_checkPostId();
+
+        return $this->_getAllUserProgress();
+    }
+
+    /**
      * Update User's h5p video setting for a tapestry post.
      *
      * @param string $h5pSettingsData stores volume,
@@ -267,6 +279,36 @@ class TapestryUserProgress implements ITapestryUserProgress
         }
 
         return $allUsersAnswers;
+    }
+
+    private function _getAllUserProgress()
+    {
+        $tapestry = new Tapestry($this->postId);
+        $nodeIds = $tapestry->getNodeIds();
+        $allUserProgress = [];
+
+        $users = get_users(['fields' => ['ID', 'display_name']]);
+
+        foreach ($users as $user) {
+            $userProgress = new stdClass();
+            $userProgress->userId = $user->ID;
+            $userProgress->displayName = $user->display_name;
+            foreach ($nodeIds as $nodeId) {
+                $userProgress->$nodeId = new stdClass();
+                $isCompleted = $this->isCompleted($nodeId, $user->ID);
+                $userProgress->$nodeId->completed = $isCompleted;
+
+                $progressValue = get_user_meta($user->ID, 'tapestry_'.$this->postId.'_progress_node_'.$nodeId, true);
+                if (null !== $progressValue) {
+                    $userProgress->$nodeId->progress = (float) $progressValue;
+                } else {
+                    $userProgress->$nodeId->progress = 0;
+                }
+            }
+            array_push($allUserProgress, $userProgress);
+        }
+
+        return $allUserProgress;
     }
 
     private function _getUserProgress($tapestry = null)

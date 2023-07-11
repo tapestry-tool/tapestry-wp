@@ -14,6 +14,7 @@ export const names = {
   SETTINGS: "settings",
   LINKMODAL: "linkmodal",
   USERANSWERS: "userAnswers",
+  ALLUSERPROGRESS: "allUserProgress",
   USERSETTINGS: "userSettings",
   HELP: "help",
   EMBED: "embed",
@@ -71,6 +72,10 @@ export default [
             name: names.USERANSWERS,
           },
         ],
+      },
+      {
+        path: `all-user-progress`,
+        name: names.ALLUSERPROGRESS,
       },
       {
         path: `user-settings`,

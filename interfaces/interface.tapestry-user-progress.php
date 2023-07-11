@@ -47,6 +47,13 @@ interface ITapestryUserProgress
     public function getAllUsersAnswers();
 
     /**
+     * Get the progress value and completed status of all users for all nodes in a Tapestry.
+     * 
+     * @return array $allUserProgress all users' progress for all nodes in a Tapestry
+     */
+    public function getAllUserProgress();
+
+    /**
      * Update User's h5p video setting for a tapestry post.
      *
      * @param string $h5pSettingsData stores volume,

@@ -247,6 +247,13 @@ $REST_API_ENDPOINTS = [
             'callback' => 'getAllUsersAnswers',
         ],
     ],
+    'GET_TAPESTRY_USER_ALL_PROGRESS' => (object) [
+        'ROUTE' => 'users/allProgress',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => 'getAllUserProgress',
+        ],
+    ],
     'GET_TAPESTRY_USER_H5P_SETTING' => (object) [
         'ROUTE' => 'users/h5psettings/(?P<tapestryPostId>[\d]+)',
         'ARGUMENTS' => [
@@ -1719,6 +1726,21 @@ function getAllUsersAnswers($request)
     }
 }
 
+function getAllUserProgress($request)
+{
+    $postId = $request['post_id'];
+
+    try {
+        $user = new TapestryUser();
+        if (!$user->canEdit($postId)) {
+            throw new TapestryError('TAPESTRY_PERMISSION_DENIED');
+        }
+        $userProgress = new TapestryUserProgress($postId);
+        return $userProgress->getAllUserProgress();
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
 
 
 /**
