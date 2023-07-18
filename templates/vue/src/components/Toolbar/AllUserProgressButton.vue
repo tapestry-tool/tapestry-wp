@@ -29,11 +29,13 @@ export default {
         return this.$route.name === names.ALLUSERPROGRESS
       },
       set(open) {
-        this.$router.push({
-          name: open ? names.ALLUSERPROGRESS : names.APP,
-          params: this.$route.params,
-          query: this.$route.query,
-        })
+        if (open || this.$route.name === names.ALLUSERPROGRESS) {
+          this.$router.push({
+            name: open ? names.ALLUSERPROGRESS : names.APP,
+            params: this.$route.params,
+            query: this.$route.query,
+          })
+        }
       },
     },
   },

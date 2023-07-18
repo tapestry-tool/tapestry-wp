@@ -19,6 +19,12 @@
           :fields="fields"
           :items="allUserProgress"
         >
+          <template #head()="data">
+            <span v-if="data.field.nonProgressField">{{ data.label }}</span>
+            <span v-else class="node-link" @click="openNode(data.field.key)">
+              {{ data.label }}
+            </span>
+          </template>
           <template #cell()="data">
             <div v-if="data.field.nonProgressField">{{ data.value }}</div>
             <div v-else>
@@ -41,6 +47,7 @@
 import client from "@/services/TapestryAPI"
 import { mapState } from "vuex"
 import CircularProgress from "@/components/common/CircularProgress"
+import { names } from "@/config/routes"
 
 export default {
   name: "all-user-progress-modal",
@@ -92,13 +99,29 @@ export default {
     closeModal() {
       this.$emit("close")
     },
+    openNode(nodeId) {
+      this.$router.push({
+        name: names.LIGHTBOX,
+        params: { nodeId: nodeId },
+        query: this.$route.query,
+      })
+    },
   },
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .modal-content,
 .progress-table {
   height: 70vh;
+}
+
+.node-link {
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+    color: var(--highlight-color);
+  }
 }
 </style>
