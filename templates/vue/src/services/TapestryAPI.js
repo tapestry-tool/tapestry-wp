@@ -267,6 +267,12 @@ class TapestryApi {
     return response
   }
 
+  async getAllUserProgress() {
+    const url = `/users/allProgress?post_id=${this.postId}`
+    const response = await this.client.get(url)
+    return response
+  }
+
   async getH5pSettings() {
     const url = `/users/h5pSettings?post_id=${this.postId}`
     const response = await this.client.get(url)

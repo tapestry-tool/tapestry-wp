@@ -25,6 +25,9 @@
       <b-dropdown-item-button @click="open(names.EXPORTDUPLICATE)">
         Export/Duplicate Tapestry
       </b-dropdown-item-button>
+      <b-dropdown-item-button @click="open(names.ALLUSERPROGRESS)">
+        View All User Progress
+      </b-dropdown-item-button>
       <b-dropdown-item-button
         v-if="showKalturaOption"
         @click="open(names.KALTURAMODAL)"
@@ -45,6 +48,10 @@
       :show="openOperation === names.EXPORTDUPLICATE"
       @close="close(names.EXPORTDUPLICATE)"
     ></export-duplicate-modal>
+    <all-user-progress-modal
+      :show="openOperation === names.ALLUSERPROGRESS"
+      @close="close(names.ALLUSERPROGRESS)"
+    ></all-user-progress-modal>
     <kaltura-modal
       v-if="showKalturaOption"
       :show="openOperation === names.KALTURAMODAL"
@@ -60,6 +67,7 @@
 <script>
 import client from "@/services/TapestryAPI"
 import ExportDuplicateModal from "@/components/modals/ExportDuplicateModal"
+import AllUserProgressModal from "@/components/modals/AllUserProgressModal"
 import KalturaModal from "@/components/modals/KalturaModal"
 import OtherOperationsModal from "@/components/modals/OtherOperationsModal"
 import { names } from "@/config/routes"
@@ -69,11 +77,13 @@ import { mapState } from "vuex"
 
 const operationModalNames = [
   names.EXPORTDUPLICATE,
+  names.ALLUSERPROGRESS,
   names.OTHEROPERATIONS,
   names.KALTURAMODAL,
 ]
 const operationAnalyticsNames = {
   [names.EXPORTDUPLICATE]: "export-duplicate",
+  [names.ALLUSERPROGRESS]: "all-user-progress",
   [names.KALTURAMODAL]: "kaltura-modal",
   [names.OTHEROPERATIONS]: "other-operations",
 }
@@ -84,6 +94,7 @@ const defaultTabs = {
 export default {
   components: {
     ExportDuplicateModal,
+    AllUserProgressModal,
     KalturaModal,
     OtherOperationsModal,
   },
