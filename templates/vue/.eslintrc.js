@@ -34,6 +34,7 @@ module.exports = {
         endOfLine: "auto",
       },
     ],
+    "cypress/unsafe-to-chain-command": "off",
   },
   parser: "vue-eslint-parser",
   parserOptions: {
