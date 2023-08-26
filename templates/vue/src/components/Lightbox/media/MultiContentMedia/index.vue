@@ -6,7 +6,7 @@
       :style="navBarStyle"
       data-qa="multi-content"
     >
-      <header>
+      <header v-if="!showProgramCompletion">
         <h1
           v-if="showTitle"
           :class="{
@@ -21,6 +21,27 @@
       <template v-if="node.presentationStyle">
         <div v-if="node.presentationStyle === 'unit'">
           There's currently no content here.
+        </div>
+        <program-completion v-else-if="showProgramCompletion" />
+        <div v-else-if="showCompletion" class="multi-content-completion">
+          <h1>{{ node.typeData.confirmationTitleText }}</h1>
+          <p>{{ node.typeData.confirmationBodyText }}</p>
+          <div class="button-container">
+            <button
+              :class="{
+                hidden: pageIndex === filteredPages.length - 1,
+              }"
+              class="button-completion"
+              @click="nextPage"
+            >
+              <i class="far fa-arrow-alt-circle-right fa-4x"></i>
+              <p>{{ node.typeData.continueButtonText }}</p>
+            </button>
+            <button class="button-completion" @click="handleCancel">
+              <i class="far fa-times-circle fa-4x"></i>
+              <p>{{ node.typeData.cancelLinkText }}</p>
+            </button>
+          </div>
         </div>
         <template v-else>
           <div v-if="!node.accessible">
@@ -47,8 +68,22 @@
               <div>Previous</div>
             </button>
             <button
+              v-if="
+                settings.tydeModeEnabled && pageIndex === filteredPages.length - 1
+              "
+              :disabled="!canFinish"
+              :title="!canFinish ? 'Complete all units to finish' : null"
+              @click="handleFinish"
+            >
+              <div>Finish</div>
+              <i class="fas fa-chevron-right" />
+            </button>
+            <button
+              v-else
               :class="{
-                hidden: pageIndex === filteredPages.length - 1,
+                hidden:
+                  !settings.tydeModeEnabled &&
+                  pageIndex === filteredPages.length - 1,
               }"
               @click="nextPage"
             >
@@ -58,25 +93,6 @@
           </div>
         </template>
       </template>
-      <tapestry-modal
-        v-if="showCompletion"
-        :node-id="node.id"
-        :allow-close="false"
-        @close="handleCancel"
-      >
-        <h1>{{ node.typeData.confirmationTitleText }}</h1>
-        <p>{{ node.typeData.confirmationBodyText }}</p>
-        <div class="button-container">
-          <button class="button-completion" @click="handleClose">
-            <i class="far fa-arrow-alt-circle-right fa-4x"></i>
-            <p>{{ node.typeData.continueButtonText }}</p>
-          </button>
-          <button class="button-completion" @click="handleCancel">
-            <i class="far fa-times-circle fa-4x"></i>
-            <p>{{ node.typeData.cancelLinkText }}</p>
-          </button>
-        </div>
-      </tapestry-modal>
     </div>
     <page-menu
       v-if="showPageMenu"
@@ -85,6 +101,7 @@
       :full-screen="settings.tydeModeEnabled"
       :pages="filteredPages"
       :active-page-index="pageIndex"
+      :show-program-completion="showProgramCompletion"
       @change-page="changePage"
     ></page-menu>
   </div>
@@ -98,6 +115,7 @@ import LockedContent from "./common/LockedContent"
 import PageMenu from "./PageMenu"
 import TapestryModal from "../../TapestryModal"
 import MultiContentRows from "./MultiContentRows"
+import ProgramCompletion from "@/components/tyde/ProgramCompletion"
 
 export default {
   name: "multi-content-media",
@@ -107,6 +125,7 @@ export default {
     PageMenu,
     TapestryModal,
     MultiContentRows,
+    ProgramCompletion,
   },
   props: {
     node: {
@@ -142,7 +161,9 @@ export default {
   data() {
     return {
       activeIndex: -1,
+      userCompletedUnit: false,
       showCompletion: false,
+      showProgramCompletion: false,
       isMounted: false,
       navBarStyle: {},
       pages: false,
@@ -223,6 +244,9 @@ export default {
       }
       return this.isUnitChild && this.parentNode.childOrdering.length > 1
     },
+    canFinish() {
+      return this.parentNode && this.parentNode.completed
+    },
   },
   watch: {
     parentNode() {
@@ -277,22 +301,42 @@ export default {
         this.changePage(this.filteredPages[this.pageIndex - 1].id)
     },
     nextPage() {
-      this.pageIndex >= 0 &&
-        this.pageIndex < this.filteredPages.length - 1 &&
-        this.changePage(this.filteredPages[this.pageIndex + 1].id)
+      if (this.userCompletedUnit && !this.showCompletion) {
+        this.showCompletion = true
+        this.userCompletedUnit = false
+      } else {
+        this.pageIndex >= 0 &&
+          this.pageIndex < this.filteredPages.length - 1 &&
+          this.changePage(this.filteredPages[this.pageIndex + 1].id)
+      }
     },
     disableRow(index) {
       return this.lockRows && this.disabledFrom >= 0 && index > this.disabledFrom
     },
     complete(rowId) {
-      const completeMultiContentNode = () => {
+      const completeMultiContentNode = (nodeOverride = null) => {
+        const isSelf = nodeOverride === null
+        const node = isSelf ? this.node : nodeOverride
         if (
-          !this.node.completed &&
-          this.rows.every(
-            row => row.node.completed || row.node.title === "Resources"
-          )
+          !node.completed &&
+          node.childOrdering.every(childId => {
+            const child = this.getNode(childId)
+            return child.completed || child.title === "Resources"
+          })
         ) {
-          this.$emit("complete", this.node.id)
+          console.log(
+            "completeMultiContentNode",
+            node.id,
+            node.title,
+            "from",
+            this.node.id,
+            this.node.title
+          )
+          this.$emit("complete", node.id)
+          if (isSelf && this.isUnitChild) {
+            this.userCompletedUnit = true
+            completeMultiContentNode(this.parentNode)
+          }
         }
       }
       const rowIndex = this.rows.findIndex(row => row.node.id == rowId)
@@ -301,6 +345,9 @@ export default {
       } else {
         completeMultiContentNode()
       }
+    },
+    handleFinish() {
+      this.showProgramCompletion = true
     },
   },
 }
