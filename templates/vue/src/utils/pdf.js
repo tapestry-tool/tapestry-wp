@@ -69,9 +69,18 @@ const drawBox = (doc, base, boxSize, options = {}) => {
     textAlign = null,
     icon = null,
     iconSize = boxSize.h - paddings.sm * 2,
+    borderRadius = Math.min(boxSize.w, boxSize.h) * 0.25,
   } = options
   doc.setFillColor(fillColor)
-  doc.rect(base.x, base.y, boxSize.w, boxSize.h, "F")
+  doc.roundedRect(
+    base.x,
+    base.y,
+    boxSize.w,
+    boxSize.h,
+    borderRadius,
+    borderRadius,
+    "F"
+  )
   if (icon) {
     addImage(
       doc,
@@ -145,8 +154,7 @@ const generateSummary = (avatarImg, profileSummary) => {
   addImage(doc, SummaryBackground, 0, 0, 11.54, 16.14)
 
   doc.setFillColor("#ffffff")
-  doc.rect(1, 1, 5.8, 2, "F")
-  // doc.lines([[6, 0], [0, 2], [-6, 0], [0, -2]], 1, 1, [1, 1], "F")
+  drawBox(doc, { x: 1, y: 1 }, { w: 5.8, h: 2 }, { borderRadius: 0.3 })
 
   doc.setFontSize(fontSizes.title)
   doc.text(getUserFullName(), 3, 1.85, { align: "left" })
@@ -273,7 +281,8 @@ const generateSummary = (avatarImg, profileSummary) => {
   drawBox(
     doc,
     { x: 7.8, y: choicesBeginY },
-    { w: boxSizes.lg.w, h: choicesBoxHeight }
+    { w: boxSizes.lg.w, h: choicesBoxHeight },
+    { borderRadius: 0.3 }
   )
   addImage(
     doc,
@@ -290,13 +299,13 @@ const generateSummary = (avatarImg, profileSummary) => {
   })
   doc.setFontSize(fontSizes.small)
   doc.text(
-    choicesList,
-    7.8 + paddings.sm,
-    choicesBeginY + paddings.sm + paddings.lg,
+    choicesList.map(v => "- " + v),
+    7.8 + paddings.md,
+    choicesBeginY + paddings.md + paddings.lg,
     {
       align: "left",
       baseline: "top",
-      maxWidth: boxSizes.lg.w - paddings.sm * 2,
+      maxWidth: boxSizes.lg.w - paddings.md * 2,
       lineHeightFactor: 1.5,
     }
   )
@@ -329,7 +338,7 @@ const generateSummary = (avatarImg, profileSummary) => {
     doc,
     base,
     { w: bottomBoxWidth, h: bottomBoxHeight },
-    { layout: "x", padding: paddings.lg }
+    { layout: "x", padding: paddings.lg, borderRadius: 0.3 }
   )
   addImage(doc, SkillsIcon, bottomBoxX + 0.3, bottomBoxY + 0.3, 0.4, 0.4)
   doc.setFontSize(fontSizes.subtitle)
@@ -339,7 +348,7 @@ const generateSummary = (avatarImg, profileSummary) => {
   })
   doc.setFontSize(fontSizes.small)
   doc.text(
-    skillsList,
+    skillsList.map(v => "- " + v),
     bottomBoxX + paddings.md,
     bottomBoxY + paddings.md + paddings.lg,
     {
@@ -381,7 +390,7 @@ const generateSummary = (avatarImg, profileSummary) => {
     doc,
     base,
     { w: bottomBoxWidth, h: bottomBoxHeight },
-    { layout: "x", padding: paddings.lg }
+    { layout: "x", padding: paddings.lg, borderRadius: 0.3 }
   )
   addImage(doc, PreferencesIcon, bottomBoxX + 0.3, bottomBoxY + 0.3, 0.4, 0.4)
   doc.setFontSize(fontSizes.subtitle)
@@ -391,7 +400,7 @@ const generateSummary = (avatarImg, profileSummary) => {
   })
   doc.setFontSize(fontSizes.small)
   doc.text(
-    preferencesList,
+    preferencesList.map(v => "- " + v),
     bottomBoxX + paddings.md,
     bottomBoxY + paddings.md + paddings.lg,
     {
@@ -425,7 +434,7 @@ const generateSummary = (avatarImg, profileSummary) => {
     doc,
     base,
     { w: bottomBoxWidth, h: bottomBoxHeight },
-    { layout: "x", padding: paddings.lg }
+    { layout: "x", padding: paddings.lg, borderRadius: 0.3 }
   )
   addImage(doc, QualitiesIcon, bottomBoxX + 0.3, bottomBoxY + 0.3, 0.4, 0.4)
   doc.setFontSize(fontSizes.subtitle)
@@ -435,7 +444,7 @@ const generateSummary = (avatarImg, profileSummary) => {
   })
   doc.setFontSize(fontSizes.small)
   doc.text(
-    qualitiesList,
+    qualitiesList.map(v => "- " + v),
     bottomBoxX + paddings.md,
     bottomBoxY + paddings.md + paddings.lg,
     {
