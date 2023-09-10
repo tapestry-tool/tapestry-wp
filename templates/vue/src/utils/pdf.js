@@ -3,6 +3,13 @@ import moment from "moment"
 import "./pdf.WorkSans.font"
 import CertificateTemplate from "@/assets/certificate-template.png"
 import SummaryBackground from "@/assets/summary-background.png"
+import ChoicesIcon from "@/assets/icons/tyde/profile/choices.png"
+import HobbiesIcon from "@/assets/icons/tyde/profile/hobbies.png"
+import InterestsIcon from "@/assets/icons/tyde/profile/interests.png"
+import PreferencesIcon from "@/assets/icons/tyde/profile/preferences.png"
+import QualitiesIcon from "@/assets/icons/tyde/profile/qualities.png"
+import SkillsIcon from "@/assets/icons/tyde/profile/skills.png"
+import StrengthsIcon from "@/assets/icons/tyde/profile/strengths.png"
 import Helpers from "./Helpers"
 import * as wp from "@/services/wp"
 
@@ -14,6 +21,12 @@ const getUserFullName = () => {
   return userData.display_name
 }
 
+const addImage = (doc, imageSrc, x, y, w, h) => {
+  const img = new Image()
+  img.src = Helpers.getImagePath(imageSrc)
+  doc.addImage(img, "PNG", x, y, w, h)
+}
+
 const generateCertificate = () => {
   const doc = new jsPDF({
     orientation: "landscape",
@@ -21,9 +34,7 @@ const generateCertificate = () => {
     format: [13.02, 18.23],
   })
 
-  const img = new Image()
-  img.src = Helpers.getImagePath(CertificateTemplate)
-  doc.addImage(img, "PNG", 0, 0, 18.23, 13.02)
+  addImage(doc, CertificateTemplate, 0, 0, 18.23, 13.02)
 
   doc.setFont("WorkSans", "normal", "normal")
   doc.setFontSize(62)
@@ -72,18 +83,35 @@ const drawBox = (doc, base, boxSize, options = {}) => {
     text = null,
     fontSize = null,
     textAlign = null,
+    icon = null,
+    iconSize = boxSize.h - paddings.sm * 2,
   } = options
   doc.setFillColor(fillColor)
   doc.rect(base.x, base.y, boxSize.w, boxSize.h, "F")
+  if (icon) {
+    addImage(
+      doc,
+      icon,
+      base.x + paddings.sm,
+      base.y + boxSize.h / 2 - iconSize / 2,
+      iconSize,
+      iconSize
+    )
+  }
   if (text) {
     if (fontSize) {
       doc.setFontSize(fontSize)
     }
-    doc.text(text, base.x + paddings.sm, base.y + boxSize.h / 2, {
-      align: textAlign ?? "left",
-      maxWidth: boxSize.w - paddings.sm * 2,
-      baseline: "middle",
-    })
+    doc.text(
+      text,
+      base.x + paddings.sm + (icon ? iconSize + paddings.sm : 0),
+      base.y + boxSize.h / 2,
+      {
+        align: textAlign ?? "left",
+        maxWidth: boxSize.w - paddings.sm * 2,
+        baseline: "middle",
+      }
+    )
   }
   if (layout === "y" || layout === "both") {
     base.y += boxSize.h + padding
@@ -109,9 +137,7 @@ const generateSummary = (avatarImg, profileSummary) => {
 
   doc.setFont("WorkSans", "normal", "normal")
 
-  const img = new Image()
-  img.src = Helpers.getImagePath(SummaryBackground)
-  doc.addImage(img, "PNG", 0, 0, 11.54, 16.14)
+  addImage(doc, SummaryBackground, 0, 0, 11.54, 16.14)
 
   doc.setFillColor("#ffffff")
   doc.rect(1, 1, 5.8, 2, "F")
@@ -137,6 +163,7 @@ const generateSummary = (avatarImg, profileSummary) => {
     text: "Hobbies",
     fontSize: fontSizes.subtitle,
     textAlign: "left",
+    icon: HobbiesIcon,
   })
   drawBox(doc, base, boxSizes.sm, {
     layout: "y",
@@ -165,6 +192,8 @@ const generateSummary = (avatarImg, profileSummary) => {
     text: "Strengths",
     fontSize: fontSizes.subtitle,
     textAlign: "left",
+    icon: StrengthsIcon,
+    iconSize: 0.4,
   })
   drawBox(doc, base, boxSizes.sm, {
     layout: "y",
@@ -204,6 +233,8 @@ const generateSummary = (avatarImg, profileSummary) => {
     text: "Interests",
     fontSize: fontSizes.subtitle,
     textAlign: "left",
+    icon: InterestsIcon,
+    iconSize: 0.4,
   })
   const userInterests = profileSummary?.["My Interests"]?.["Top interests"]?.text
   if (userInterests && Array.isArray(userInterests) && userInterests.length <= 3) {
@@ -239,8 +270,16 @@ const generateSummary = (avatarImg, profileSummary) => {
     { x: 7.8, y: choicesBeginY },
     { w: boxSizes.lg.w, h: choicesBoxHeight }
   )
+  addImage(
+    doc,
+    ChoicesIcon,
+    7.8 + paddings.sm,
+    choicesBeginY + paddings.sm,
+    0.4,
+    0.4
+  )
   doc.setFontSize(fontSizes.subtitle)
-  doc.text("Choices", 7.8 + paddings.sm, choicesBeginY + paddings.sm, {
+  doc.text("Choices", 7.8 + paddings.sm + 0.5, choicesBeginY + paddings.sm + 0.08, {
     align: "left",
     baseline: "top",
   })
@@ -287,8 +326,9 @@ const generateSummary = (avatarImg, profileSummary) => {
     { w: bottomBoxWidth, h: bottomBoxHeight },
     { layout: "x", padding: paddings.lg }
   )
+  addImage(doc, SkillsIcon, bottomBoxX + 0.3, bottomBoxY + 0.3, 0.4, 0.4)
   doc.setFontSize(fontSizes.subtitle)
-  doc.text("Skills", bottomBoxX + paddings.md, bottomBoxY + paddings.md, {
+  doc.text("Skills", bottomBoxX + paddings.md + 0.5, bottomBoxY + paddings.md, {
     align: "left",
     baseline: "top",
   })
@@ -338,8 +378,9 @@ const generateSummary = (avatarImg, profileSummary) => {
     { w: bottomBoxWidth, h: bottomBoxHeight },
     { layout: "x", padding: paddings.lg }
   )
+  addImage(doc, PreferencesIcon, bottomBoxX + 0.3, bottomBoxY + 0.3, 0.4, 0.4)
   doc.setFontSize(fontSizes.subtitle)
-  doc.text("Preferences", bottomBoxX + paddings.md, bottomBoxY + paddings.md, {
+  doc.text("Preferences", bottomBoxX + paddings.md + 0.5, bottomBoxY + paddings.md, {
     align: "left",
     baseline: "top",
   })
@@ -381,8 +422,9 @@ const generateSummary = (avatarImg, profileSummary) => {
     { w: bottomBoxWidth, h: bottomBoxHeight },
     { layout: "x", padding: paddings.lg }
   )
+  addImage(doc, QualitiesIcon, bottomBoxX + 0.3, bottomBoxY + 0.3, 0.4, 0.4)
   doc.setFontSize(fontSizes.subtitle)
-  doc.text("Qualities", bottomBoxX + paddings.md, bottomBoxY + paddings.md, {
+  doc.text("Qualities", bottomBoxX + paddings.md + 0.5, bottomBoxY + paddings.md, {
     align: "left",
     baseline: "top",
   })
