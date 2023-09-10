@@ -13,39 +13,7 @@ import StrengthsIcon from "@/assets/icons/tyde/profile/strengths.png"
 import Helpers from "./Helpers"
 import * as wp from "@/services/wp"
 
-const getUserFullName = () => {
-  const userData = wp.data.currentUser.data
-  if (userData.first_name && userData.last_name) {
-    return `${userData.first_name} ${userData.last_name}`
-  }
-  return userData.display_name
-}
-
-const addImage = (doc, imageSrc, x, y, w, h) => {
-  const img = new Image()
-  img.src = Helpers.getImagePath(imageSrc)
-  doc.addImage(img, "PNG", x, y, w, h)
-}
-
-const generateCertificate = () => {
-  const doc = new jsPDF({
-    orientation: "landscape",
-    unit: "in",
-    format: [13.02, 18.23],
-  })
-
-  addImage(doc, CertificateTemplate, 0, 0, 18.23, 13.02)
-
-  doc.setFont("WorkSans", "normal", "normal")
-  doc.setFontSize(62)
-  doc.text(getUserFullName(), 18.23 / 2, 6.5, { align: "center" })
-
-  doc.setFontSize(28)
-  const dateStr = moment().format("MMMM D, YYYY")
-  doc.text(dateStr, 10.05, 11.05, { align: "center" })
-
-  return doc
-}
+/* CONSTANTS */
 
 const fontSizes = {
   title: 22,
@@ -73,6 +41,22 @@ const paddings = {
   sm: 0.2,
   md: 0.4,
   lg: 0.6,
+}
+
+/* UTILITY FUNCTIONS */
+
+const getUserFullName = () => {
+  const userData = wp.data.currentUser.data
+  if (userData.first_name && userData.last_name) {
+    return `${userData.first_name} ${userData.last_name}`
+  }
+  return userData.display_name
+}
+
+const addImage = (doc, imageSrc, x, y, w, h) => {
+  const img = new Image()
+  img.src = Helpers.getImagePath(imageSrc)
+  doc.addImage(img, "PNG", x, y, w, h)
 }
 
 const drawBox = (doc, base, boxSize, options = {}) => {
@@ -127,7 +111,28 @@ const addToList = (list, potentialItems) => {
   }
 }
 
-// eslint-disable-next-line no-unused-vars
+/* PDF GENERATION FUNCTIONS */
+
+const generateCertificate = () => {
+  const doc = new jsPDF({
+    orientation: "landscape",
+    unit: "in",
+    format: [13.02, 18.23],
+  })
+
+  addImage(doc, CertificateTemplate, 0, 0, 18.23, 13.02)
+
+  doc.setFont("WorkSans", "normal", "normal")
+  doc.setFontSize(62)
+  doc.text(getUserFullName(), 18.23 / 2, 6.5, { align: "center" })
+
+  doc.setFontSize(28)
+  const dateStr = moment().format("MMMM D, YYYY")
+  doc.text(dateStr, 10.05, 11.05, { align: "center" })
+
+  return doc
+}
+
 const generateSummary = (avatarImg, profileSummary) => {
   const doc = new jsPDF({
     orientation: "portrait",
