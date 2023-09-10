@@ -11,11 +11,11 @@
         Download Certificate
       </b-button>
     </p>
-    <pdf
-      v-if="certificate"
-      :src="certificate.output('datauristring')"
-      :page="1"
-    ></pdf>
+    <pdf v-if="certificate" :src="certificate.output('datauristring')" :page="1">
+      <template slot="loading">
+        <loading />
+      </template>
+    </pdf>
     <h2>Summary</h2>
     <p>
       <b-button variant="primary" @click="downloadSummary">
@@ -41,7 +41,11 @@
       :topType="currentAvatar.topType"
       :topColor="currentAvatar.topColor"
     ></avataaars>
-    <pdf v-if="summary" :src="summary.output('datauristring')" :page="1"></pdf>
+    <pdf v-if="summary" :src="summary.output('datauristring')" :page="1">
+      <template slot="loading">
+        <loading />
+      </template>
+    </pdf>
   </div>
 </template>
 
@@ -52,11 +56,13 @@ import Avataaars from "vuejs-avataaars"
 import avatarOptions from "@/components/modals/UserSettingsModal/avatarOptions"
 import { mapGetters, mapState } from "vuex"
 import canvg from "canvg"
+import Loading from "@/components/common/Loading"
 
 export default {
   components: {
     pdf,
     Avataaars,
+    Loading,
   },
   data() {
     return {

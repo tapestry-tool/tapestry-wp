@@ -4,11 +4,17 @@ import "./pdf.WorkSans.font"
 import CertificateTemplate from "@/assets/certificate-template.png"
 import SummaryBackground from "@/assets/summary-background.png"
 import Helpers from "./Helpers"
+import * as wp from "@/services/wp"
 
-// eslint-disable-next-line no-unused-vars
-const generateCertificate = name => {
-  // TODO: clean up code
-  // TODO: determine user name (pass in as param)
+const getUserFullName = () => {
+  const userData = wp.data.currentUser.data
+  if (userData.first_name && userData.last_name) {
+    return `${userData.first_name} ${userData.last_name}`
+  }
+  return userData.display_name
+}
+
+const generateCertificate = () => {
   const doc = new jsPDF({
     orientation: "landscape",
     unit: "in",
@@ -19,40 +25,13 @@ const generateCertificate = name => {
   img.src = Helpers.getImagePath(CertificateTemplate)
   doc.addImage(img, "PNG", 0, 0, 18.23, 13.02)
 
-  // doc.saveGraphicsState()
-  // doc.setTextColor("#2f77cc")
-  // doc.text("CERTIFICATE", 5.5, 3, { align: "center" })
-  // doc.restoreGraphicsState()
-
-  // doc.text("awarded to", 5.5, 3.5, { align: "center" })
-
   doc.setFont("WorkSans", "normal", "normal")
   doc.setFontSize(62)
-  doc.text("Luke Skywalker", 18.23 / 2, 6.5, { align: "center" })
-
-  // doc.setLineWidth(0.02)
-  // doc.setDrawColor("#2f77cc")
-  // doc.line(3, 4.4 + 0.2, 8, 4.4 + 0.2)
-
-  // doc.setFontSize(18)
-  // doc.text("for successful completion of the", 5.5, 5.4, { align: "center" })
-
-  // doc.setFontSize(20)
-  // doc.text("Transitioning Youth with Disabilities and Employment Program", 5.5, 6, { align: "center" })
-
-  // doc.setFontSize(16)
-  // doc.text("Date Issued", 6, 8, { align: "center" })
-  // doc.text("Awarded By", 9, 8, { align: "center" })
+  doc.text(getUserFullName(), 18.23 / 2, 6.5, { align: "center" })
 
   doc.setFontSize(28)
   const dateStr = moment().format("MMMM D, YYYY")
   doc.text(dateStr, 10.05, 11.05, { align: "center" })
-  // doc.setFont("helvetica", "italic", "bold")
-  // doc.text("Dr. Rachelle Hole", 9, 7.5, { align: "center" })
-
-  // const dateStrWidth = Math.max(dateStr.length * 0.075, 0.8)
-  // doc.line(6 - dateStrWidth, 7.5 + 0.2, 6 + dateStrWidth, 7.5 + 0.2)
-  // doc.line(9 - 1.1, 7.5 + 0.2, 9 + 1.1, 7.5 + 0.2)
 
   return doc
 }
@@ -139,7 +118,7 @@ const generateSummary = (avatarImg, profileSummary) => {
   // doc.lines([[6, 0], [0, 2], [-6, 0], [0, -2]], 1, 1, [1, 1], "F")
 
   doc.setFontSize(fontSizes.title)
-  doc.text("Luke Skywalker", 3, 1.85, { align: "left" })
+  doc.text(getUserFullName(), 3, 1.85, { align: "left" })
   doc.setFontSize(fontSizes.body)
   doc.text("Profile Summary", 3, 2.35, { align: "left" })
 

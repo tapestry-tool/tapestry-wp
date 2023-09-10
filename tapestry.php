@@ -226,7 +226,9 @@ add_action('plugins_loaded', function () {
                     'ID' => $currentUser->data->ID,
                     'user_nicename'=> $currentUser->data->user_nicename,
                     'user_email'=> $currentUser->data->user_email,
-                    'display_name'=> $currentUser->data->display_name
+                    'display_name'=> $currentUser->data->display_name,
+                    'first_name'=> $currentUser->get("first_name"),
+                    'last_name'=> $currentUser->get("last_name"),
                 ];
         
                 $iframe_mode = array_key_exists('iframe', $_GET) ? 1 : 0;
