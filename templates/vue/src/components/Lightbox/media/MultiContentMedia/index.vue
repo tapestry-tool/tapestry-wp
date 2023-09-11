@@ -304,10 +304,13 @@ export default {
       if (this.userCompletedUnit && !this.showCompletion) {
         this.showCompletion = true
         this.userCompletedUnit = false
-      } else {
+      } else if (
         this.pageIndex >= 0 &&
-          this.pageIndex < this.filteredPages.length - 1 &&
-          this.changePage(this.filteredPages[this.pageIndex + 1].id)
+        this.pageIndex < this.filteredPages.length - 1
+      ) {
+        this.showCompletion = false
+        this.userCompletedUnit = false
+        this.changePage(this.filteredPages[this.pageIndex + 1].id)
       }
     },
     disableRow(index) {
