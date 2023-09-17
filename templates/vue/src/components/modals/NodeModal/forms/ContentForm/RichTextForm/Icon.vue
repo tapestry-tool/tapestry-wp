@@ -62,7 +62,7 @@ export default {
         remove,
       }
       let usedIcon = lookup[this.name]
-      return `${data.vue_uri}/${usedIcon.split("dist")[1]}`
+      return `${data.vueUrl}/${usedIcon.split("dist")[1]}`
     },
   },
 }

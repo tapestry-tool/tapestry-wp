@@ -149,7 +149,8 @@ export default {
           return this.node.typeData.videoPlayer === "kaltura" &&
             this.node.typeData.kalturaData?.partnerId &&
             this.node.typeData.kalturaData?.serviceUrl &&
-            this.node.typeData.kalturaData?.uniqueConfiguration
+            (this.node.typeData.kalturaData?.uniqueConfiguration ||
+              this.node.typeData.kalturaData?.uiConfiguration)
             ? "kaltura-video-media"
             : "url-video-media"
         default:

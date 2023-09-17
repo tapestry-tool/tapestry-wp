@@ -425,12 +425,12 @@ function exportTapestryAsJson($request)
             throw new TapestryError('INVALID_POST_ID');
         }
         // Create an ID to identify this export run
-        $export_id = TapestryImportExport::getExportId();
+        $exportId = TapestryImportExport::getExportId();
 
         $tapestry = new Tapestry($postId);
-        $tapestry_data = $tapestry->export($exportComments);
+        $tapestryData = $tapestry->export($exportComments);
         
-        $result = ['json' => $tapestry_data, 'exportId' => $export_id];
+        $result = ['json' => $tapestryData, 'exportId' => $exportId];
 
         return $result;
     } catch (TapestryError $e) {
@@ -459,22 +459,22 @@ function exportTapestryAsZip($request)
         }
 
         // Create an ID to identify this export run
-        $export_id = TapestryImportExport::getExportId();
+        $exportId = TapestryImportExport::getExportId();
 
         // Export Tapestry to an object
         $tapestry = new Tapestry($postId);
-        $tapestry_data = $tapestry->export($exportComments);
+        $tapestryData = $tapestry->export($exportComments);
 
         // If the Tapestry contains WordPress posts, separately export them too
-        $wp_posts = TapestryImportExport::exportWpPostsInTapestry($tapestry_data, $export_id);
+        $wpPosts = TapestryImportExport::exportWpPostsInTapestry($tapestryData, $exportId);
 
         // Create zip file containing the Tapestry data as a JSON file,
         // and all media referenced by the Tapestry data
-        $result = TapestryImportExport::exportExternalMedia($tapestry_data);
-        $result['exportId'] = $export_id;
+        $result = TapestryImportExport::exportExternalMedia($tapestryData);
+        $result['exportId'] = $exportId;
 
-        if ($wp_posts) {
-            $result['wpPosts'] = $wp_posts;
+        if ($wpPosts) {
+            $result['wpPosts'] = $wpPosts;
         }
         return $result;
     } catch (TapestryError $e) {
@@ -498,7 +498,7 @@ function clearImportStatus($request)
 function importTapestryFromZip($request)
 {
     $postId = $request['tapestryPostId'];
-    $file_params = $request->get_file_params();
+    $fileParams = $request->get_file_params();
 
     try {
         if (empty($postId) || !TapestryHelpers::isValidTapestry($postId)) {
@@ -514,16 +514,16 @@ function importTapestryFromZip($request)
             'message' => 'Reading file content',
         ]);
 
-        if (!array_key_exists('file', $file_params)) {
+        if (!array_key_exists('file', $fileParams)) {
             throw new TapestryError('INVALID_ZIP', 'Could not find zip file');
         }
-        $zip_path = $file_params['file']['tmp_name'];
-        if (!isset($zip_path) || empty($zip_path)) {
+        $zipPath = $fileParams['file']['tmp_name'];
+        if (!isset($zipPath) || empty($zipPath)) {
             throw new TapestryError('INVALID_ZIP', 'Could not find zip file');
         }
 
         $zip = new ZipArchive();
-        if ($zip->open($zip_path, ZipArchive::RDONLY) !== true) {
+        if ($zip->open($zipPath, ZipArchive::RDONLY) !== true) {
             throw new TapestryError('FAILED_TO_IMPORT');
         }
 
@@ -532,36 +532,36 @@ function importTapestryFromZip($request)
         if ($contents === false) {
             throw new TapestryError('INVALID_ZIP', 'Could not find tapestry.json in zip');
         }
-        $tapestry_data = json_decode($contents);
-        TapestryImportExport::validateTapestryData($tapestry_data);
+        $tapestryData = json_decode($contents);
+        TapestryImportExport::validateTapestryData($tapestryData);
         TapestryImportExport::validateTapestryZipStructure($zip);
 
-        $changes = TapestryImportExport::prepareImport($tapestry_data);
+        $changes = TapestryImportExport::prepareImport($tapestryData);
 
         // Extract zip file to a temporary directory
-        $temp_dir = TapestryImportExport::createTempDirectory($parent_dir);
-        if (!$temp_dir) {
+        $tempDir = TapestryImportExport::createTempDirectory($parentDir);
+        if (!$tempDir) {
             throw new TapestryError('FAILED_TO_IMPORT');
         }
-        $zip->extractTo($temp_dir['path']);
+        $zip->extractTo($tempDir['path']);
 
         // Re-create all media referenced by the Tapestry data on this site,
         // and update references to new URLs
-        $importResult = TapestryImportExport::importExternalMedia($postId, $tapestry_data, $temp_dir['path'], $temp_dir['url']);
+        $importResult = TapestryImportExport::importExternalMedia($postId, $tapestryData, $tempDir['path'], $tempDir['url']);
 
         TapestryImportExport::setImportStatus($postId, (object) [
             'inProgress' => true,
             'message' => 'Finishing up',
         ]);
-        $importedTapestry = importTapestry($postId, $tapestry_data);
+        $importedTapestry = importTapestry($postId, $tapestryData);
 
         if ($importResult['rebuildH5PCache']) {
             // Delete h5p cachedassets if h5p nodes were imported
             $cachedAssetsDir = wp_upload_dir()['basedir'] . DIRECTORY_SEPARATOR . 'h5p' . DIRECTORY_SEPARATOR . 'cachedassets';
             if (is_dir($cachedAssetsDir)) {
-                $files_to_delete = glob($cachedAssetsDir . DIRECTORY_SEPARATOR . "*");
-                if ($files_to_delete !== false) {
-                    array_map('unlink', $files_to_delete);
+                $filesToDelete = glob($cachedAssetsDir . DIRECTORY_SEPARATOR . "*");
+                if ($filesToDelete !== false) {
+                    array_map('unlink', $filesToDelete);
                 }
             }
         }
@@ -570,7 +570,7 @@ function importTapestryFromZip($request)
             'changes' => $changes,
             'warnings' => $importResult['warnings'],
             'rebuildH5PCache' => $importResult['rebuildH5PCache'],  // Whether the H5P cache needs rebuilding
-            'exportWarnings' => !empty($tapestry_data->warnings),   // Whether the provided file was exported with warnings
+            'exportWarnings' => !empty($tapestryData->warnings),   // Whether the provided file was exported with warnings
             'tapestry' => $importedTapestry,                        // Data of imported Tapestry
         ];
     } catch (TapestryError $e) {
@@ -580,8 +580,8 @@ function importTapestryFromZip($request)
         if ($zip) {
             $zip->close();
         }
-        if ($temp_dir) {
-            TapestryImportExport::deleteTempDirectory($temp_dir['path']);
+        if ($tempDir) {
+            TapestryImportExport::deleteTempDirectory($tempDir['path']);
         }
         // Reset import progress
         TapestryImportExport::setImportStatus($postId, (object) [
@@ -1077,7 +1077,6 @@ function reverseTapestryLink($request)
 {
     $postId = $request['tapestryPostId'];
     $newLink = json_decode($request->get_body());
-
 
     try {
         if (!$newLink->source || !$newLink->target) {

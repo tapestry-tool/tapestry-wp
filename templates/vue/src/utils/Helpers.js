@@ -66,7 +66,7 @@ export default class Helpers {
   }
 
   static getImagePath(image) {
-    return `${wp.data.vue_uri}/${image.split("dist")[1]}`
+    return `${wp.data.vueUrl}/${image.split("dist")[1]}`
   }
 
   // src: https://stackoverflow.com/questions/7394748/whats-the-right-way-to-decode-a-string-that-has-special-html-entities-in-it?lq=1

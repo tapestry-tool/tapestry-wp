@@ -65,8 +65,8 @@ Do you have access to Kaltura and want to offload your videos to be saved there 
 1. Run `composer install` in the tapestry plugin root folder. If successful, you will be able to see a `vendor` folder containing `kaltura`.
 
 2. Edit your Wordpress `wp-config.php` file and add the following lines right above the comment "That's all, stop editing! Happy publishing":
-   ` define('KALTURA_ADMIN_SECRET', ''); define('KALTURA_PARTNER_ID', ''); define('KALTURA_SERVICE_URL', ''); define('KALTURA_UNIQUE_CONFIG', ''); `
-   The Kaltura Admininstrator Secret and Partner ID can be found by going to your Kaltura Settings > Integration tab in the Kaltura admin. The service URL is simply the main domain where your Kaltura videos are hosted on. The Kaltura Unique Configuration sets the media player design. It can be found in the Studio tab.
+   ` define('KALTURA_ADMIN_SECRET', ''); define('KALTURA_PARTNER_ID', ''); define('KALTURA_SERVICE_URL', ''); define('KALTURA_UI_CONFIG', ''); `
+   The Kaltura Admininstrator Secret and Partner ID can be found by going to your Kaltura Settings > Integration tab in the Kaltura admin. The service URL is simply the main domain where your Kaltura videos are hosted on. The Kaltura UI Configuration sets the media player design. It can be found in the Studio tab.
 
 3. Note the following PHP configurations affect file uploading and HTTP request execution time limits on the server. This might be relevant for Kaltura and regular file upload as well. We recommend you find your active `php.ini` file and edit the following configurations:
    ```

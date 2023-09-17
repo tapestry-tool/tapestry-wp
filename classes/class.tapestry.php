@@ -826,10 +826,10 @@ class Tapestry implements ITapestry
         return $nodes;
     }
 
-    private function _userIsAllowed($node, $superuser_override, $userId)
+    private function _userIsAllowed($node, $superuserOverride, $userId)
     {
-        return TapestryHelpers::userIsAllowed(UserActions::READ, $node, $this->postId, $superuser_override, $userId)
-        || TapestryHelpers::userIsAllowed(UserActions::ADD, $node, $this->postId, $superuser_override, $userId)
-        || TapestryHelpers::userIsAllowed(UserActions::EDIT, $node, $this->postId, $superuser_override, $userId);
+        return TapestryHelpers::userIsAllowed(UserActions::READ, $node, $this->postId, $superuserOverride, $userId)
+        || TapestryHelpers::userIsAllowed(UserActions::ADD, $node, $this->postId, $superuserOverride, $userId)
+        || TapestryHelpers::userIsAllowed(UserActions::EDIT, $node, $this->postId, $superuserOverride, $userId);
     }
 }

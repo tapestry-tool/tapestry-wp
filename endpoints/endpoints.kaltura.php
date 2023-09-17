@@ -194,17 +194,17 @@ class KalturaEndpoints
                 throw new TapestryError('EDIT_NODE_PERMISSION_DENIED');
             }
 
-            $file_params = $request->get_file_params();
-            $file_path = $file_params['file']['tmp_name'];
+            $fileParams = $request->get_file_params();
+            $filePath = $fileParams['file']['tmp_name'];
 
-            $file_obj = (object) [
-                'file_path' => $file_path,
-                'name' => $file_params['file']['name'],
+            $fileObj = (object) [
+                'filePath' => $filePath,
+                'name' => $fileParams['file']['name'],
             ];
 
             $category = KalturaApi::getKalturaCategoryName(new Tapestry($tapestryPostId));
             $kalturaApi = new KalturaApi();
-            $response = $kalturaApi->uploadVideo($file_obj, $category);
+            $response = $kalturaApi->uploadVideo($fileObj, $category);
 
             while ($response->status === EntryStatus::PRECONVERT && $response->duration === 0) {
                 // Wait for the video's duration to load (or conversion to error out/complete)
@@ -456,8 +456,8 @@ class KalturaEndpoints
         foreach ($tapestries as $post) {
             $tapestry = new Tapestry($post->ID);
 
-            foreach ($tapestry->getNodeIds() as $nodeID) {
-                $node = $tapestry->getNode($nodeID);
+            foreach ($tapestry->getNodeIds() as $nodeId) {
+                $node = $tapestry->getNode($nodeId);
                 $kalturaData = $node->getTypeData()->kalturaData;
 
                 if (isset($kalturaData)
@@ -470,7 +470,7 @@ class KalturaEndpoints
 
                     $video = (object) [
                         'tapestryID' => $post->ID,
-                        'nodeID' => $nodeID,
+                        'nodeID' => $nodeId,
                         'nodeTitle' => $node->getTitle(),
                         'kalturaID' => $kalturaID,
                         'previousStatus' => KalturaUploadStatus::CONVERTING,
@@ -481,8 +481,8 @@ class KalturaEndpoints
                     if ($response->status === EntryStatus::READY) {
                         self::_saveVideoUploadStatusInNode($node, KalturaUploadStatus::COMPLETE, $response);
 
-                        $file_path = TapestryHelpers::getPathToMedia($node->getTypeData()->mediaURL)->file_path;
-                        KalturaApi::saveAndDeleteLocalVideo($node, $response, $useKalturaPlayer, $file_path);
+                        $filePath = TapestryHelpers::getPathToMedia($node->getTypeData()->mediaURL)->filePath;
+                        KalturaApi::saveAndDeleteLocalVideo($node, $response, $useKalturaPlayer, $filePath);
 
                         $video->currentStatus = KalturaUploadStatus::COMPLETE;
                     } elseif ($response->status !== EntryStatus::PRECONVERT) {
@@ -585,8 +585,8 @@ class KalturaEndpoints
                 throw new TapestryError('KALTURA_NOT_AVAILABLE');
             }
     
-            $kaltura_api = new KalturaApi();
-            return $kaltura_api->getLanguages();
+            $kalturaApi = new KalturaApi();
+            return $kalturaApi->getLanguages();
         } catch (TapestryError $e) {
             return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
         }
@@ -599,10 +599,10 @@ class KalturaEndpoints
                 throw new TapestryError('KALTURA_NOT_AVAILABLE');
             }
     
-            $video_entry_id = $request['entry_id'];
+            $videoEntryId = $request['entry_id'];
     
-            $kaltura_api = new KalturaApi();
-            return $kaltura_api->getCaptionsAndDefaultCaption($video_entry_id);
+            $kalturaApi = new KalturaApi();
+            return $kalturaApi->getCaptionsAndDefaultCaption($videoEntryId);
         } catch (TapestryError $e) {
             return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
         }
@@ -615,18 +615,18 @@ class KalturaEndpoints
                 throw new TapestryError('KALTURA_NOT_AVAILABLE');
             }
     
-            $video_entry_id = $request['entry_id'];
+            $videoEntryId = $request['entry_id'];
             $body = json_decode($request->get_body());
             $captions = $body->captions;
-            $default_caption_id = $body->defaultCaptionId;
+            $defaultCaptionId = $body->defaultCaptionId;
     
             if (!isset($captions) || !is_array($captions)) {
                 return null;
             }
     
             try {
-                $kaltura_api = new KalturaApi();
-                return $kaltura_api->setCaptionsAndDefaultCaption($video_entry_id, $captions, $default_caption_id, true);
+                $kalturaApi = new KalturaApi();
+                return $kalturaApi->setCaptionsAndDefaultCaption($videoEntryId, $captions, $defaultCaptionId, true);
             } catch (TapestryError $e) {
                 return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
             }
@@ -671,29 +671,29 @@ class KalturaEndpoints
         $node->save();
     }
 
-    private static function _amendUploadLog($updated_videos)
+    private static function _amendUploadLog($updatedVideos)
     {
-        $node_map = (object) [];
+        $nodeMap = (object) [];
 
-        foreach ($updated_videos as $video) {
-            $node_key = $video->tapestryID.'-'.$video->nodeID;
-            $node_map->{$node_key} = $video;
+        foreach ($updatedVideos as $video) {
+            $nodeKey = $video->tapestryID.'-'.$video->nodeID;
+            $nodeMap->{$nodeKey} = $video;
         }
 
         $uploadLog = get_option(KalturaConstants::UPLOAD_LOG_OPTION, []);
 
         // Update the most recent entry in the upload log for each video
-        for (end($uploadLog); key($uploadLog) !== null && !empty($node_map); prev($uploadLog)) {
+        for (end($uploadLog); key($uploadLog) !== null && !empty($nodeMap); prev($uploadLog)) {
             $video = current($uploadLog);
 
-            $node_key = $video->tapestryID.'-'.$video->nodeID;
-            $updated_node = $node_map->{$node_key};
+            $nodeKey = $video->tapestryID.'-'.$video->nodeID;
+            $updatedNode = $nodeMap->{$nodeKey};
 
-            if ($updated_node) {
-                $video->uploadStatus = $updated_node->currentStatus;
-                $video->additionalInfo = $updated_node->additionalInfo;
+            if ($updatedNode) {
+                $video->uploadStatus = $updatedNode->currentStatus;
+                $video->additionalInfo = $updatedNode->additionalInfo;
 
-                unset($node_map->{$node_key});
+                unset($nodeMap->{$nodeKey});
             }
         }
         update_option(KalturaConstants::UPLOAD_LOG_OPTION, $uploadLog);
@@ -729,12 +729,12 @@ class KalturaEndpoints
         $videosToUpload = array();
         $tapestry = new Tapestry($tapestryPostId);
 
-        foreach ($tapestry->getNodeIds() as $nodeID) {
-            $node = new TapestryNode($tapestryPostId, $nodeID);
+        foreach ($tapestry->getNodeIds() as $nodeId) {
+            $node = new TapestryNode($tapestryPostId, $nodeId);
             if (KalturaApi::videoCanBeUploaded($node)) {
                 $video = (object) [
                 'tapestryID' => (int) $tapestryPostId,
-                'nodeID' => $nodeID,
+                'nodeID' => $nodeId,
                 'nodeTitle' => $node->getTitle(),
                 'withinSizeLimit' => KalturaApi::checkVideoFileSize($node),
             ];
@@ -775,8 +775,8 @@ class KalturaEndpoints
         for ($batchStart; $batchStart < count($videosToUpload); $batchStart += KalturaConstants::UPLOAD_BATCH_SIZE) {
             // Retrieve fresh value without caching, since we expect the option value to change underneath
             $GLOBALS['wp_object_cache']->delete(KalturaConstants::STOP_UPLOAD_OPTION, 'options');
-            $stop_requested = get_option(KalturaConstants::STOP_UPLOAD_OPTION);
-            if ($stop_requested === KalturaConstants::YES_VALUE) {
+            $stopRequested = get_option(KalturaConstants::STOP_UPLOAD_OPTION);
+            if ($stopRequested === KalturaConstants::YES_VALUE) {
                 break;
             }
 
@@ -822,7 +822,7 @@ class KalturaEndpoints
 
                     if ($response->status === EntryStatus::READY) {
                         $node = self::_saveVideoUploadStatus($video, $videosToUpload, KalturaUploadStatus::COMPLETE);
-                        KalturaApi::saveAndDeleteLocalVideo($node, $response, $useKalturaPlayer, $video->file->file_path);
+                        KalturaApi::saveAndDeleteLocalVideo($node, $response, $useKalturaPlayer, $video->file->filePath);
                         $numSuccessfullyUploaded++;
 
                         $failedCaptions = self::_uploadVideoCaptions($node, $kalturaApi, $response);

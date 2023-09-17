@@ -40,8 +40,8 @@ class TapestryH5P implements ITapestryH5P
                                 FROM '.$wpdb->prefix.'h5p_contents content
                                 WHERE content.id = %d;', (int) $id);
 
-        $h5p_content = $wpdb->get_row($sql);
+        $h5pContent = $wpdb->get_row($sql);
 
-        return $h5p_content;
+        return $h5pContent;
     }
 }

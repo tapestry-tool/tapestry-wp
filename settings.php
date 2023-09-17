@@ -7,10 +7,10 @@ add_action('admin_menu', 'add_tapestry_settings_page');
 
 function add_tapestry_settings_page()
 {
-    $tapestry_settings_page_hook_suffix = add_options_page('tapestry_plugin_settings', 'Tapestry', 'administrator', 'tapestry_settings_page', 'tapestry_settings_page_cb');
+    $tapestrySettingsPageHookSuffix = add_options_page('tapestry_plugin_settings', 'Tapestry', 'administrator', 'tapestry_settings_page', 'tapestry_settings_page_cb');
 
-    add_action('admin_enqueue_scripts', function ($hook_suffix) use ($tapestry_settings_page_hook_suffix) {
-        load_tapestry_settings_page_scripts($hook_suffix, $tapestry_settings_page_hook_suffix);
+    add_action('admin_enqueue_scripts', function ($hookSuffix) use ($tapestrySettingsPageHookSuffix) {
+        load_tapestry_settings_page_scripts($hookSuffix, $tapestrySettingsPageHookSuffix);
     });
 }
 
@@ -35,7 +35,7 @@ function register_tapestry_settings()
     register_setting('tapestry_kaltura_config', 'kaltura_admin_secret', array_merge($args, ['description' => 'Kaltura Administrator Secret']));
     register_setting('tapestry_kaltura_config', 'kaltura_partner_id', array_merge($args, ['description' => 'Kaltura Partner ID']));
     register_setting('tapestry_kaltura_config', 'kaltura_service_url', array_merge($args, ['description' => 'Kaltura Service URL']));
-    register_setting('tapestry_kaltura_config', 'kaltura_unique_config', array_merge($args, ['description' => 'Kaltura Unique Configuration']));
+    register_setting('tapestry_kaltura_config', 'kaltura_ui_config', array_merge($args, ['description' => 'Kaltura UI Configuration']));
     register_setting('tapestry_kaltura_config', 'tapestry_kaltura_upload_max_file_size', array_merge($args, ['description' => 'Maximum file size for Kaltura upload']));
 }
 
@@ -49,9 +49,9 @@ function tapestry_settings_init()
     }
 }
 
-function load_tapestry_settings_page_scripts($hook_suffix, $tapestry_settings_page_hook_suffix)
+function load_tapestry_settings_page_scripts($hookSuffix, $tapestrySettingsPageHookSuffix)
 {
-    if ($hook_suffix === $tapestry_settings_page_hook_suffix) {
+    if ($hookSuffix === $tapestrySettingsPageHookSuffix) {
         wp_enqueue_style('tapestry_settings_styles', plugin_dir_url(__FILE__).'settings.css');
         wp_enqueue_script('tapestry_settings_script_js', plugin_dir_url(__FILE__).'settings.js');
 
@@ -86,11 +86,11 @@ function tapestry_db_section_cb()
 
 function tapestry_kaltura_config_section_cb()
 {
-    $kaltura_admin_secret = get_option('kaltura_admin_secret', '');
-    $kaltura_partner_id = get_option('kaltura_partner_id', '');
-    $kaltura_service_url = get_option('kaltura_service_url', '');
-    $kaltura_unique_config = get_option('kaltura_unique_config', '');
-    $kaltura_upload_max_file_size = get_option('tapestry_kaltura_upload_max_file_size', ''); ?>
+    $kalturaAdminSecret = get_option('kaltura_admin_secret', '');
+    $kalturaPartnerId = get_option('kaltura_partner_id', '');
+    $kalturaServiceUrl = get_option('kaltura_service_url', '');
+    $kalturaUIConfig = get_option('kaltura_ui_config', '');
+    $kalturaUploadMaxFileSize = get_option('tapestry_kaltura_upload_max_file_size', ''); ?>
     <p>
         Use a different set of Kaltura configuration variables on this site only.
         If you wish to do this, the first four configuration variables must be provided.
@@ -105,7 +105,7 @@ function tapestry_kaltura_config_section_cb()
                         <label for="kaltura_admin_secret">Kaltura Administrator Secret</label>
                     </th>
                     <td>
-                        <input type="password" id="kaltura_admin_secret" name="kaltura_admin_secret" value="<?php echo $kaltura_admin_secret ?>">
+                        <input type="password" id="kaltura_admin_secret" name="kaltura_admin_secret" value="<?php echo $kalturaAdminSecret ?>">
                         <p class="description">
                             The Kaltura Admininstrator Secret can be found in the Settings > Integration tab in the Kaltura admin dashboard.
                         </p>
@@ -116,7 +116,7 @@ function tapestry_kaltura_config_section_cb()
                         <label for="kaltura_partner_id">Kaltura Partner ID</label>
                     </th>
                     <td>
-                        <input type="text" id="kaltura_partner_id" name="kaltura_partner_id" value="<?php echo $kaltura_partner_id ?>">
+                        <input type="text" id="kaltura_partner_id" name="kaltura_partner_id" value="<?php echo $kalturaPartnerId ?>">
                         <p class="description">
                             The Kaltura Partner ID can be found in the Kaltura Settings > Integration tab in the Kaltura admin dashboard.
                         </p>
@@ -127,18 +127,18 @@ function tapestry_kaltura_config_section_cb()
                         <label for="kaltura_service_url">Kaltura Service URL</label>
                     </th>
                     <td>
-                        <input type="text" id="kaltura_service_url" name="kaltura_service_url" value="<?php echo $kaltura_service_url ?>">
+                        <input type="text" id="kaltura_service_url" name="kaltura_service_url" value="<?php echo $kalturaServiceUrl ?>">
                         <p class="description">The Kaltura Service URL is the main domain where your Kaltura videos are hosted.</p>
                     </td>
                 </tr>
                 <tr>
                     <th scope="row">
-                        <label for="kaltura_unique_config">Kaltura Unique Configuration</label>
+                        <label for="kaltura_ui_config">Kaltura UI Configuration</label>
                     </th>
                     <td>
-                        <input type="text" id="kaltura_unique_config" name="kaltura_unique_config" value="<?php echo $kaltura_unique_config ?>">
+                        <input type="text" id="kaltura_ui_config" name="kaltura_ui_config" value="<?php echo $kalturaUIConfig ?>">
                         <p class="description">
-                            The Kaltura Unique Configuration sets the media player design.
+                            The Kaltura UI Configuration sets the media player design.
                             It can be found in the Studio tab in the Kaltura admin dashboard.
                         </p>
                     </td>
@@ -148,7 +148,7 @@ function tapestry_kaltura_config_section_cb()
                         <label for="kaltura_upload_max_file_size">Kaltura Upload Max File Size</label>
                     </th>
                     <td>
-                        <input type="text" placeholder="Examples: 20M, 500K" id="kaltura_upload_max_file_size" name="tapestry_kaltura_upload_max_file_size" value="<?php echo $kaltura_upload_max_file_size ?>">
+                        <input type="text" placeholder="Examples: 20M, 500K" id="kaltura_upload_max_file_size" name="tapestry_kaltura_upload_max_file_size" value="<?php echo $kalturaUploadMaxFileSize ?>">
                         <p class="description">
                             If specified, videos larger than this file size cannot be uploaded to Kaltura.
                             <br/>
@@ -174,7 +174,7 @@ function tapestry_kaltura_upload_section_cb()
 {
     $kaltura_category_structure = sanitize_kaltura_category_structure(get_option('kaltura_category_structure'));
 
-    $site_url = get_bloginfo('url');
+    $siteUrl = get_bloginfo('url');
     $current_date = date('Y/m/d'); ?>
     <h4>Categorization</h4>
     <p>
@@ -198,7 +198,7 @@ function tapestry_kaltura_upload_section_cb()
                         </label>
                     </th>
                     <td>
-                        <code>Tapestry > <?php echo $site_url ?> > <?php echo $current_date ?></code>
+                        <code>Tapestry > <?php echo $siteUrl ?> > <?php echo $current_date ?></code>
                     </td>
                 </tr>
                 <tr>
@@ -214,7 +214,7 @@ function tapestry_kaltura_upload_section_cb()
                         </label>
                     </th>
                     <td>
-                        <code>Tapestry > <?php echo $site_url ?> > Sample Tapestry</code>
+                        <code>Tapestry > <?php echo $siteUrl ?> > Sample Tapestry</code>
                     </td>
                 </tr>
             </tbody>
@@ -281,7 +281,7 @@ function tapestry_kaltura_upload_section_cb()
 function run_db_commands()
 {
     if (isset($_POST['clean_h5p_nodes'])) {
-        $query_args = array(
+        $queryArgs = array(
             'post_type' => 'tapestry_node',
             'meta_query' => array(
                 array(
@@ -296,14 +296,14 @@ function run_db_commands()
                 ),
             ),
         );
-        $h5p_query = new WP_Query($query_args);
+        $h5p_query = new WP_Query($queryArgs);
         while ($h5p_query->have_posts()) {
             $h5p_query->the_post();
-            $post_id = get_the_ID();
-            $node_meta_data = get_post_meta($post_id, 'tapestry_node_data', true);
-            if (isset($node_meta_data->mediaFormat) && $node_meta_data->mediaFormat == 'h5p' && isset($node_meta_data->mediaType) && $node_meta_data->mediaType == 'video') {
-                $node_meta_data->mediaType = 'h5p';
-                update_post_meta($post_id, 'tapestry_node_data', $node_meta_data);
+            $postId = get_the_ID();
+            $nodeMetaData = get_post_meta($postId, 'tapestry_node_data', true);
+            if (isset($nodeMetaData->mediaFormat) && $nodeMetaData->mediaFormat == 'h5p' && isset($nodeMetaData->mediaType) && $nodeMetaData->mediaType == 'video') {
+                $nodeMetaData->mediaType = 'h5p';
+                update_post_meta($postId, 'tapestry_node_data', $nodeMetaData);
             }
         }
         add_action('admin_notices', 'tapestry_h5p_conf_notice');
