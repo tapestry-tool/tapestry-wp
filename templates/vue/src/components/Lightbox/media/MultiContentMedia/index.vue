@@ -294,6 +294,8 @@ export default {
         : false
     },
     changePage(pageNodeId) {
+      this.showCompletion = false
+      this.showProgramCompletion = false
       this.$root.$emit("open-node", pageNodeId)
     },
     prevPage() {
