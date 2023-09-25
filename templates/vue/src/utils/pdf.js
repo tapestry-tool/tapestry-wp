@@ -11,7 +11,6 @@ import QualitiesIcon from "@/assets/icons/tyde/profile/qualities.png"
 import SkillsIcon from "@/assets/icons/tyde/profile/skills.png"
 import StrengthsIcon from "@/assets/icons/tyde/profile/strengths.png"
 import Helpers from "./Helpers"
-import * as wp from "@/services/wp"
 
 /* CONSTANTS */
 
@@ -44,14 +43,6 @@ const paddings = {
 }
 
 /* UTILITY FUNCTIONS */
-
-const getUserFullName = () => {
-  const userData = wp.data.currentUser.data
-  if (userData.first_name && userData.last_name) {
-    return `${userData.first_name} ${userData.last_name}`
-  }
-  return userData.display_name
-}
 
 const addImage = (doc, imageSrc, x, y, w, h) => {
   const img = new Image()
@@ -122,7 +113,7 @@ const addToList = (list, potentialItems) => {
 
 /* PDF GENERATION FUNCTIONS */
 
-const generateCertificate = () => {
+const generateCertificate = name => {
   const doc = new jsPDF({
     orientation: "landscape",
     unit: "in",
@@ -133,7 +124,7 @@ const generateCertificate = () => {
 
   doc.setFont("WorkSans", "normal", "normal")
   doc.setFontSize(62)
-  doc.text(getUserFullName(), 18.23 / 2, 6.5, { align: "center" })
+  doc.text(name, 18.23 / 2, 6.5, { align: "center" })
 
   doc.setFontSize(28)
   const dateStr = moment().format("MMMM D, YYYY")
@@ -142,7 +133,7 @@ const generateCertificate = () => {
   return doc
 }
 
-const generateSummary = (avatarImg, profileSummary) => {
+const generateSummary = (avatarImg, profileSummary, name) => {
   const doc = new jsPDF({
     orientation: "portrait",
     unit: "in",
@@ -157,7 +148,7 @@ const generateSummary = (avatarImg, profileSummary) => {
   drawBox(doc, { x: 1, y: 1 }, { w: 5.8, h: 2 }, { borderRadius: 0.3 })
 
   doc.setFontSize(fontSizes.title)
-  doc.text(getUserFullName(), 3, 1.85, { align: "left" })
+  doc.text(name, 3, 1.85, { align: "left" })
   doc.setFontSize(fontSizes.body)
   doc.text("Profile Summary", 3, 2.35, { align: "left" })
 

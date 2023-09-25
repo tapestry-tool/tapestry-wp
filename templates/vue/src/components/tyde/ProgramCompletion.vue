@@ -1,27 +1,54 @@
 <template>
   <div class="tyde-program-completion-screen">
     <h2>Congratulations!</h2>
-    <p>
-      You have completed the TYDE program. You can find your certificate and summary
-      documents below.
-    </p>
-    <h2>Certificate</h2>
-    <p>
-      <b-button variant="primary" @click="downloadCertificate">
-        Download Certificate
-      </b-button>
-    </p>
-    <pdf v-if="certificate" :src="certificate.output('datauristring')" :page="1">
-      <template slot="loading">
-        <loading />
-      </template>
-    </pdf>
-    <h2>Summary</h2>
-    <p>
-      <b-button variant="primary" @click="downloadSummary">
-        Download Summary
-      </b-button>
-    </p>
+    <div v-if="!isNameSet">
+      <p>
+        You have completed the TYDE program. To receive your certificate of
+        completion and a summary of your profile, please enter your name:
+      </p>
+      <p>
+        <b-input
+          v-model="name"
+          class="name-input"
+          placeholder="Enter your name"
+        ></b-input>
+        <b-btn variant="primary" @click="setName">Submit</b-btn>
+      </p>
+      <p class="text-muted">
+        The information you enter here is only used for the generation of the
+        certificate and summary PDF documents, and is not stored locally or on the
+        server.
+      </p>
+    </div>
+    <div v-else>
+      <p>
+        You have completed the TYDE program. You can find your certificate of
+        completion and a summary of your profile below. You can download and save
+        these documents by clicking the buttons below.
+      </p>
+      <h2>Certificate</h2>
+      <p>
+        <b-button variant="primary" @click="downloadCertificate">
+          Download Certificate
+        </b-button>
+      </p>
+      <pdf v-if="certificate" :src="certificate.output('datauristring')" :page="1">
+        <template slot="loading">
+          <loading />
+        </template>
+      </pdf>
+      <h2>Summary</h2>
+      <p>
+        <b-button variant="primary" @click="downloadSummary">
+          Download Summary
+        </b-button>
+      </p>
+      <pdf v-if="summary" :src="summary.output('datauristring')" :page="1">
+        <template slot="loading">
+          <loading />
+        </template>
+      </pdf>
+    </div>
     <avataaars
       ref="avatar"
       class="hidden"
@@ -41,11 +68,6 @@
       :topType="currentAvatar.topType"
       :topColor="currentAvatar.topColor"
     ></avataaars>
-    <pdf v-if="summary" :src="summary.output('datauristring')" :page="1">
-      <template slot="loading">
-        <loading />
-      </template>
-    </pdf>
   </div>
 </template>
 
@@ -66,6 +88,8 @@ export default {
   },
   data() {
     return {
+      name: "",
+      isNameSet: false,
       certificate: null,
       summary: null,
     }
@@ -80,12 +104,17 @@ export default {
       return avatarOptions.defaultAvatar
     },
   },
-  mounted() {
-    this.certificate = generateCertificate()
-    const profileSummary = this.getTYDEProfileSummary
-    this.summary = generateSummary(this.generateAvatarImage(), profileSummary)
-  },
   methods: {
+    setName() {
+      this.isNameSet = true
+      this.certificate = generateCertificate(this.name)
+      const profileSummary = this.getTYDEProfileSummary
+      this.summary = generateSummary(
+        this.generateAvatarImage(),
+        profileSummary,
+        this.name
+      )
+    },
     downloadCertificate() {
       this.certificate.save("certificate.pdf")
     },
@@ -122,5 +151,9 @@ export default {
 }
 h2 {
   margin: 1rem 0;
+}
+.name-input {
+  width: 300px;
+  margin: 0 auto 10px auto;
 }
 </style>
