@@ -178,6 +178,9 @@ export default {
       "isMultiContent",
     ]),
     ...mapState(["favourites", "rootId", "settings"]),
+    nodeId() {
+      return this.node.id
+    },
     parentNode() {
       const parentNodeId = this.getParent(this.node.id)
       return this.getNode(parentNodeId)
@@ -249,6 +252,10 @@ export default {
     },
   },
   watch: {
+    nodeId() {
+      this.showCompletion = false
+      this.showProgramCompletion = false
+    },
     parentNode() {
       this.updatePages()
     },
@@ -329,14 +336,6 @@ export default {
             return child.completed || child.title === "Resources"
           })
         ) {
-          console.log(
-            "completeMultiContentNode",
-            node.id,
-            node.title,
-            "from",
-            this.node.id,
-            this.node.title
-          )
           this.$emit("complete", node.id)
           if (isSelf && this.isUnitChild) {
             this.userCompletedUnit = true
