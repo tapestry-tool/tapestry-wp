@@ -1,5 +1,5 @@
 <template>
-  <span v-if="compactMode && !isImage" class="d-flex">
+  <span v-if="compactMode && isVideo" class="d-flex">
     <b-form-input
       :placeholder="placeholder"
       :value="value"
@@ -201,7 +201,7 @@
       <b-row>
         <b-col cols="auto" class="upload-label mr-auto text-muted">
           Upload completed successfully. Make sure to publish / save to keep this
-          image.
+          {{ isVideo ? "video" : "image" }}.
         </b-col>
         <b-col cols="auto">
           <b-button size="sm" variant="secondary" @click="confirmUpload">
@@ -272,10 +272,10 @@ export default {
       required: false,
       default: false,
     },
-    isImage: {
+    isVideo: {
       type: Boolean,
       required: false,
-      default: true,
+      default: false,
     },
   },
   data() {

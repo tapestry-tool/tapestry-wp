@@ -47,10 +47,18 @@
                 </div>
                 <template v-else>
                   {{ page.title }}
+                  <completed-icon
+                    :node="page"
+                    class="menu-completed-icon mx-2"
+                    :show-tooltip="false"
+                  />
                 </template>
               </b-dropdown-item>
             </b-dropdown>
-            <h5 class="pl-2 py-1 mb-4">{{ node.title }}</h5>
+            <h5 class="pl-2 py-1 mb-4">
+              {{ node.title }}
+              <completed-icon :node="node" class="mx-2" :show-tooltip="false" />
+            </h5>
           </div>
           <div v-if="pageMenuVisible" class="page-nav-content mb-auto">
             <ul class="page-menu-items fa-ul">
@@ -96,6 +104,7 @@
 
 <script>
 import { mapGetters } from "vuex"
+import CompletedIcon from "@/components/common/CompletedIcon"
 import PageMenuItem from "./PageMenuItem"
 import { isLoggedIn, data as wpData } from "@/services/wp"
 import Helpers from "@/utils/Helpers"
@@ -103,6 +112,7 @@ import Helpers from "@/utils/Helpers"
 export default {
   name: "page-menu",
   components: {
+    CompletedIcon,
     PageMenuItem,
   },
   props: {
@@ -412,6 +422,10 @@ $slide-fade-speed: 0.3s;
     .dropdown-item:active {
       color: #ffffff;
       background-color: var(--highlight-color);
+
+      .menu-completed-icon i {
+        color: #ffffff;
+      }
     }
 
     .disabled-item {

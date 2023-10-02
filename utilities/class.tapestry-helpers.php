@@ -410,20 +410,6 @@ class TapestryHelpers
     }
 
     /**
-     * Checks if a video can be uploaded to Kaltura.
-     * Only videos added via upload to WordPress can be transferred to Kaltura.
-     *
-     * @param TapestryNode  $node
-     * @return bool
-     */
-    public static function videoCanBeUploaded($node)
-    {
-        $nodeMeta = $node->getMeta();
-        $nodeTypeData = $node->getTypeData();
-        return $nodeMeta->mediaType == "video" && self::isLocalUpload($node->getTypeData()->mediaURL);
-    }
-
-    /**
      * Checks if a URL represents a local upload (a file in the WordPress upload directory).
      * Only checks the URL form, not that the file actually exists.
      */

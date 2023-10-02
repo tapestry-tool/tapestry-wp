@@ -118,12 +118,6 @@ export default {
       default: false,
     },
   },
-  data() {
-    return {
-      timeSinceLastSaved: new Date(),
-      lastHoveredRowId: null,
-    }
-  },
   computed: {
     ...mapGetters(["getNode"]),
     node() {
@@ -155,7 +149,6 @@ export default {
         },
         query: this.$route.query,
       })
-      this.lastHoveredRowId = this.nodeId
     },
     handleLoad(args) {
       this.$emit("load", args)

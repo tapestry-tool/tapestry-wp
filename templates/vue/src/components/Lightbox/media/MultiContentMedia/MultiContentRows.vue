@@ -104,12 +104,6 @@ export default {
     complete(rowId) {
       this.$emit("complete", rowId)
     },
-    changeRow(rowInfo) {
-      this.$emit("change-row", { context: this.context, ...rowInfo })
-    },
-    areAllPopup(nodes) {
-      return nodes.every(node => node.popup !== null)
-    },
     handleAutoClose() {
       this.$emit("close")
     },
