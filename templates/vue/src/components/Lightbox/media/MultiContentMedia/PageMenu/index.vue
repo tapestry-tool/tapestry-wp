@@ -37,7 +37,7 @@
               <b-dropdown-item
                 v-for="(page, pageIndex) in pages"
                 :key="page.id"
-                :active="activePageIndex === pageIndex"
+                :active="!showProgramCompletion && activePageIndex === pageIndex"
                 :disabled="!page.accessible"
                 @click="changePage(page.id)"
               >
@@ -55,12 +55,18 @@
                 </template>
               </b-dropdown-item>
             </b-dropdown>
-            <h5 class="pl-2 py-1 mb-4">
+            <h5 v-if="showProgramCompletion" class="pl-2 py-1 mb-4">
+              Program Completed
+            </h5>
+            <h5 v-else class="pl-2 py-1 mb-4">
               {{ node.title }}
               <completed-icon :node="node" class="mx-2" :show-tooltip="false" />
             </h5>
           </div>
-          <div v-if="pageMenuVisible" class="page-nav-content mb-auto">
+          <div
+            v-if="pageMenuVisible && !showProgramCompletion"
+            class="page-nav-content mb-auto"
+          >
             <ul class="page-menu-items fa-ul">
               <page-menu-item
                 v-for="row in rows"
@@ -137,6 +143,11 @@ export default {
     activePageIndex: {
       type: Number,
       required: true,
+    },
+    showProgramCompletion: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   data() {
