@@ -6,6 +6,8 @@
         :connections="cos.connections"
         :communities="cos.communities"
         :is-read-only="isReadOnly"
+        :activeView="view"
+        :has-connection-in-circles="hasConnectionInCircles"
         @add-connection="addConnection"
         @edit-connection="editConnection"
         @delete-connection="handleDeleteConnection"
@@ -18,6 +20,8 @@
         :connections="cos.connections"
         :communities="cos.communities"
         :is-read-only="isReadOnly"
+        :activeView="view"
+        :has-connection-in-circles="hasConnectionInCircles"
         @add-connection="addConnection"
         @edit-connection="editConnection"
         @delete-connection="handleDeleteConnection"
@@ -34,8 +38,13 @@
             <div class="community-view"></div>
           </button>
           <button
-            :class="['change-view', { active: view === views.Circle }]"
+            :class="[
+              'change-view',
+              { active: view === views.Circle },
+              { disabled: !circleViewEnabled },
+            ]"
             aria-label="Circle view"
+            :disabled="!circleViewEnabled"
             @click="view = views.Circle"
           >
             <div class="circle-view"></div>
@@ -50,7 +59,7 @@
 </template>
 
 <script>
-import { mapState } from "vuex"
+import { mapState, mapGetters } from "vuex"
 import client from "@/services/TapestryAPI"
 import { dyadLinkedUser } from "@/services/wp"
 import CommunityView from "./CommunityView"
@@ -69,16 +78,28 @@ export default {
   data() {
     return {
       view: CosView.Community,
+      hasConnectionInCircles: false,
     }
   },
   computed: {
-    ...mapState(["cos"]),
+    ...mapState(["cos", "settings"]),
+    ...mapGetters(["getNode"]),
     views() {
       return CosView
     },
     isReadOnly() {
       return !!dyadLinkedUser()
     },
+    circleViewEnabled() {
+      const circleViewNode = this.getNode(this.settings.circleViewNode)
+      return circleViewNode ? circleViewNode && circleViewNode.completed : true
+    },
+  },
+  updated() {
+    this.countConnectionsInCircle(this.cos)
+  },
+  mounted() {
+    this.countConnectionsInCircle(this.cos)
   },
   methods: {
     addConnection({ communities, ...newConnection }) {
@@ -119,7 +140,7 @@ export default {
       }
     },
     async handleDeleteConnection(connectionId) {
-      delete this.cos.connections[connectionId]
+      this.$delete(this.cos.connections, connectionId)
 
       Object.values(this.cos.communities).forEach(community => {
         this.removeConnectionFromCommunity(community.id, connectionId)
@@ -135,11 +156,23 @@ export default {
     async handleDeleteCommunity(communityId) {
       await client.cos.deleteCommunity(communityId)
 
-      delete this.cos.communities[communityId]
+      this.$delete(this.cos.communities, communityId)
 
       Object.values(this.cos.connections).forEach(connection => {
         this.removeCommunityFromConnection(connection.id, communityId)
       })
+    },
+    countConnectionsInCircle(cos) {
+      let count = 0
+      let connections = Object.keys(cos.connections)
+      cos.circles.forEach(circle => {
+        connections.forEach(connection => {
+          if (circle.includes(connection)) {
+            count = count + 1
+          }
+        })
+      })
+      this.hasConnectionInCircles = count > 0
     },
   },
 }
@@ -173,6 +206,15 @@ export default {
   -ms-transform: translateY(-50%);
   transform: translateY(-50%);
   overflow: hidden;
+}
+
+.disabled {
+  opacity: 0.5;
+  &:hover {
+    cursor: not-allowed;
+    stroke: #999;
+    stroke-width: 6;
+  }
 }
 
 .contents {
@@ -244,5 +286,12 @@ export default {
   border-radius: 50%;
   border: 2px solid var(--cos-bg-tertiary);
   background: white;
+}
+
+.disabled {
+  // cursor: not-allowed;
+  background-color: #6c757d;
+  border-color: #6c757d;
+  opacity: 0.65;
 }
 </style>

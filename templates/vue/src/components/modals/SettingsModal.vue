@@ -242,6 +242,28 @@
               </b-col>
             </b-row>
           </b-form-group>
+          <b-form-group v-if="tydeModeEnabled">
+            <b-row style="margin: 17px 0;">
+              <b-col cols="6">
+                Enable circle view when this node is complete:
+              </b-col>
+              <b-col cols="6">
+                <combobox
+                  v-model="circleViewNode"
+                  :options="nodesValues"
+                  :placeholder="nodesValues[0].title"
+                  item-text="title"
+                  item-value="id"
+                >
+                  <template v-slot="slotProps">
+                    <p>
+                      {{ slotProps.option.title }}
+                    </p>
+                  </template>
+                </combobox>
+              </b-col>
+            </b-row>
+          </b-form-group>
           <b-form-group
             class="mt-4"
             label="Enable analytics"
@@ -388,6 +410,7 @@ export default {
       analyticsEnabled: false,
       tydeModeEnabled: false,
       tydeModeTabs: { default: {}, goals: "", profile: "" },
+      circleViewNode: null,
       draftNodesEnabled: true,
       submitNodesEnabled: true,
       allowMovingAllNodes: false,
@@ -471,6 +494,7 @@ export default {
         renderMap = false,
         tydeModeEnabled = false,
         tydeModeTabs = { default: {}, goals: "", profile: "" },
+        circleViewNode = null,
         analyticsEnabled = false,
         draftNodesEnabled = true,
         submitNodesEnabled = true,
@@ -490,6 +514,7 @@ export default {
       this.renderMap = renderMap
       this.tydeModeEnabled = tydeModeEnabled
       this.tydeModeTabs = tydeModeTabs
+      this.circleViewNode = circleViewNode
       this.analyticsEnabled = analyticsEnabled
       this.draftNodesEnabled = draftNodesEnabled
       this.submitNodesEnabled = submitNodesEnabled
@@ -535,6 +560,7 @@ export default {
         renderMap: this.renderMap,
         tydeModeEnabled: this.tydeModeEnabled,
         tydeModeTabs: this.tydeModeTabs,
+        circleViewNode: this.circleViewNode,
         analyticsEnabled: this.analyticsEnabled,
         draftNodesEnabled: this.draftNodesEnabled,
         submitNodesEnabled: this.submitNodesEnabled,

@@ -2,9 +2,16 @@ import { createMachine } from "xstate"
 
 export const OnboardingStates = {
   Welcome: "Welcome",
-  AddMoreConfirmation: "AddMoreConfirmation",
   AddLaterTooltip: "AddLaterTooltip",
   AddAnotherTooltip: "AddAnotherTooltip",
+  ToggleRingsTooltip: "ToggleRingsTooltip",
+  MoveConnections: "MoveConnections",
+  LetsAddConnections: "LetsAddConnections",
+  WaitToOpenConnectionsTab: "WaitToOpenConnectionsTab",
+  WaitForConnectionTabToClose: "WaitForConnectionTabToClose",
+  MoveConnectionToCirclesFinish: "MoveConnectionToCirclesFinish",
+  MoveBetweenCircles: "MoveBetweenCircles",
+  AddMoreConfirmation: "AddMoreConfirmation",
   Form: "Form",
   FormClosed: "FormClosed",
   Finish: "Finish",
@@ -15,6 +22,7 @@ const Events = {
   Empty: "Empty",
   NoUserCommunities: "NoUserCommunities",
   NoConnections: "NoConnections",
+  NoConnectionsInCircle: "NoConnectionsInCircle",
   Done: "Done",
   Continue: "Continue",
   AddLater: "AddLater",
@@ -30,7 +38,7 @@ export const OnboardingEvents = Events
  * using xstate.
  */
 const onboardingMachine = createMachine({
-  id: "CommunityViewOnboarding",
+  id: "CoSOnboarding",
   initial: "Idle",
   states: {
     Idle: {
@@ -38,6 +46,7 @@ const onboardingMachine = createMachine({
         [Events.Empty]: "#Communities.Welcome",
         [Events.NoUserCommunities]: "#Communities.AddMoreConfirmation",
         [Events.NoConnections]: "#Connections.AddMoreConfirmation",
+        [Events.NoConnectionsInCircle]: "#Circles.Welcome",
         [Events.Continue]: "#Connections",
         [Events.Done]: OnboardingStates.Complete,
       },
@@ -88,7 +97,7 @@ const onboardingMachine = createMachine({
         AddMoreConfirmation: {
           on: {
             [Events.AddAnother]: OnboardingStates.AddAnotherTooltip,
-            [Events.AddLater]: "#Complete",
+            [Events.AddLater]: "#Circles",
           },
         },
         AddAnotherTooltip: {
@@ -108,6 +117,64 @@ const onboardingMachine = createMachine({
           },
         },
         Finish: {
+          on: {
+            [Events.Continue]: "#Circles",
+            [Events.Done]: "#Complete",
+          },
+        },
+      },
+    },
+    Circles: {
+      id: "Circles",
+      initial: OnboardingStates.Welcome,
+      states: {
+        Welcome: {
+          on: {
+            [Events.Continue]: OnboardingStates.LetsAddConnections,
+          },
+        },
+        LetsAddConnections: {
+          on: {
+            [Events.Continue]: OnboardingStates.AddAnotherTooltip,
+          },
+        },
+        AddAnotherTooltip: {
+          on: {
+            [Events.Continue]: OnboardingStates.WaitToOpenConnectionsTab,
+          },
+        },
+        WaitToOpenConnectionsTab: {
+          on: {
+            [Events.Continue]: OnboardingStates.MoveConnections,
+          },
+        },
+        MoveConnections: {
+          on: {
+            [Events.Continue]: OnboardingStates.WaitForConnectionTabToClose,
+          },
+        },
+        WaitForConnectionTabToClose: {
+          on: {
+            [Events.Continue]: OnboardingStates.MoveConnectionToCirclesFinish,
+          },
+        },
+        MoveConnectionToCirclesFinish: {
+          on: {
+            [Events.Continue]: OnboardingStates.MoveBetweenCircles,
+          },
+        },
+        MoveBetweenCircles: {
+          on: {
+            [Events.Continue]: OnboardingStates.ToggleRingsTooltip,
+          },
+        },
+        ToggleRingsTooltip: {
+          on: {
+            [Events.Continue]: OnboardingStates.Finish,
+          },
+        },
+        Finish: {
+          type: "final",
           on: {
             [Events.Done]: "#Complete",
           },

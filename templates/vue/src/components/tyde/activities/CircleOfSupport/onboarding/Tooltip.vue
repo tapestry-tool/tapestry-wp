@@ -2,18 +2,24 @@
   <div
     ref="tooltip"
     class="tooltip-container"
-    :style="{ opacity: positioned ? 1 : 0 }"
+    :style="[{ opacity: positioned ? 1 : 0 }]"
   >
     <slot></slot>
   </div>
 </template>
 
 <script>
-// import Helpers from "@/utils/Helpers"
 export default {
+  props: {
+    activeView: {
+      type: Number,
+      required: true,
+    },
+  },
   data() {
     return {
       positioned: false,
+      onTopLeftCircleView: false,
     }
   },
   mounted() {
@@ -26,12 +32,28 @@ export default {
 <style scoped lang="scss">
 .right {
   right: 22px;
-  bottom: 95px;
 }
+
 .left {
   left: 22px;
+
+  &.top {
+    left: 10px;
+  }
+}
+
+.top {
+  top: 200px;
+
+  &.left {
+    top: 110px;
+  }
+}
+
+.bottom {
   bottom: 95px;
 }
+
 .tooltip-container {
   position: absolute;
   padding: 2rem;
@@ -40,6 +62,7 @@ export default {
   border-radius: 1rem;
   z-index: 100;
 }
+
 .tooltip-container::before {
   content: "";
   position: absolute;
@@ -47,10 +70,9 @@ export default {
   height: 0;
   border-left: 24px solid transparent;
   border-right: 24px solid transparent;
-  border-top: 24px solid #fff;
-  bottom: -23px;
   z-index: 5;
 }
+
 .tooltip-container::after {
   content: "";
   display: block;
@@ -59,9 +81,8 @@ export default {
   height: 0;
   border-left: 24px solid transparent;
   border-right: 24px solid transparent;
-  border-top: 24px solid #bbb;
-  bottom: -24px;
 }
+
 .right::before,
 .right::after {
   right: 25px;
@@ -69,5 +90,21 @@ export default {
 .left::before,
 .left::after {
   left: 25px;
+}
+.top::before {
+  top: -22px;
+  border-bottom: 24px solid #fff;
+}
+.top::after {
+  top: -27px;
+  border-bottom: 24px solid #ccc;
+}
+.bottom::before {
+  bottom: -22px;
+  border-top: 24px solid #fff;
+}
+.bottom::after {
+  bottom: -27px;
+  border-top: 24px solid #ccc;
 }
 </style>

@@ -89,26 +89,26 @@ export default {
           d3
             .drag()
             .container(document.getElementById("cos"))
-            .on("start", () => {
+            .on("start", event => {
               this.isDragging = true
               this.$emit("drag:start", {
-                x: d3.event.x,
-                y: d3.event.y,
+                x: event.x,
+                y: event.y,
                 connection: this.connection,
               })
             })
-            .on("drag", () => {
+            .on("drag", event => {
               this.$emit("drag:move", {
-                x: d3.event.x,
-                y: d3.event.y,
+                x: event.x,
+                y: event.y,
                 connection: this.connection,
               })
             })
-            .on("end", () => {
+            .on("end", event => {
               this.isDragging = false
               this.$emit("drag:end", {
-                x: d3.event.x,
-                y: d3.event.y,
+                x: event.x,
+                y: event.y,
                 connection: this.connection,
               })
             })
