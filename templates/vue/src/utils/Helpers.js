@@ -366,6 +366,7 @@ export default class Helpers {
     const baseNode = {
       type: "tapestry_node",
       description: "",
+      learningObjectives: "",
       conditions: [],
       behaviour: "new-window",
       status: "publish",

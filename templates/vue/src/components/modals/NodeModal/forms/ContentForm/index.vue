@@ -20,38 +20,58 @@
         Show title in page
       </b-form-checkbox>
     </b-form-group>
-    <div v-if="isMultiContentChild">
-      <b-form-group
-        v-if="addMenuTitle || node.typeData.menuTitle"
-        label="Custom Menu Title"
-      >
-        <b-form-input
-          id="node-nav-title"
-          :value="node.typeData.menuTitle"
-          data-qa="node-nav-title"
-          placeholder="Enter custom menu title"
-          autofocus
-          @update="update('typeData.menuTitle', $event)"
+    <div class="optional-fields">
+      <div v-if="isMultiContentChild">
+        <b-form-group
+          v-if="addMenuTitle || node.typeData.menuTitle"
+          label="Custom Menu Title"
+        >
+          <b-form-input
+            id="node-nav-title"
+            :value="node.typeData.menuTitle"
+            data-qa="node-nav-title"
+            placeholder="Enter custom menu title"
+            autofocus
+            @update="update('typeData.menuTitle', $event)"
+          />
+        </b-form-group>
+        <div v-else class="text-right">
+          <a href="#" class="small" @click="addMenuTitle = true">
+            Add Custom Menu Title
+          </a>
+        </div>
+      </div>
+      <b-form-group v-if="addDesc || node.description.length" label="Description">
+        <rich-text-form
+          id="node-description"
+          :value="node.description"
+          data-qa="node-description"
+          placeholder="Enter description"
+          :maxLength="maxDescriptionLength"
+          @input="update('description', $event)"
         />
       </b-form-group>
-      <div v-else class="text-right mt-n3 mb-2">
-        <a href="#" class="small" @click="addMenuTitle = true">
-          Add Custom Menu Title
+      <div v-else class="text-right">
+        <a href="#" class="small" @click="addDesc = true">Add Description</a>
+      </div>
+      <b-form-group
+        v-if="addLearningObjectives || node.learningObjectives.length"
+        label="Learning Objectives"
+      >
+        <rich-text-form
+          id="node-learning-objectives"
+          :value="node.learningObjectives"
+          data-qa="node-learning-objectives"
+          placeholder="Enter learning objectives"
+          :maxLength="maxDescriptionLength"
+          @input="update('learningObjectives', $event)"
+        />
+      </b-form-group>
+      <div v-else class="text-right">
+        <a href="#" class="small" @click="addLearningObjectives = true">
+          Add Learning Objectives
         </a>
       </div>
-    </div>
-    <b-form-group v-if="addDesc || node.description.length" label="Description">
-      <rich-text-form
-        id="node-description"
-        :value="node.description"
-        data-qa="node-description"
-        placeholder="Enter description"
-        :maxLength="maxDescriptionLength"
-        @input="update('description', $event)"
-      />
-    </b-form-group>
-    <div v-else class="text-right mt-n3 mb-n2">
-      <a href="#" class="small" @click="addDesc = true">Add Description</a>
     </div>
     <b-form-group v-show="isPopupCandidate" label="Popup">
       <popup-form :is-candidate="isPopupCandidate" />
@@ -148,6 +168,7 @@ export default {
   data() {
     return {
       addDesc: false,
+      addLearningObjectives: false,
       addMenuTitle: false,
       disableKalturaOption: false,
     }
@@ -159,7 +180,7 @@ export default {
     ...mapGetters(["isMultiContentRow"]),
     shouldShowTitle: {
       get() {
-        return this.node.typeData.showTitle
+        return this.node.typeData.showTitle !== false
       },
       set(value) {
         this.update("typeData.showTitle", value)
@@ -278,9 +299,21 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .title-checkbox {
   padding-top: 3px;
   text-align: right;
+}
+.optional-fields > div {
+  margin-bottom: -0.5rem;
+
+  &:first-child,
+  & + div {
+    margin-top: -1rem;
+  }
+
+  &:has(+ div) {
+    margin-bottom: 0.5rem;
+  }
 }
 </style>

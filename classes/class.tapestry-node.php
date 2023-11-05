@@ -80,6 +80,7 @@ class TapestryNode implements ITapestryNode
         $this->mediaFormat = '';
         $this->mediaDuration = 0;
         $this->description = '';
+        $this->learningObjectives = '';
         $this->behaviour = 'new-window';
         $this->type = 'tapestry_node';
         $this->typeData = (object) [];
@@ -200,6 +201,9 @@ class TapestryNode implements ITapestryNode
         }
         if (isset($node->description) && is_string($node->description)) {
             $this->description = $node->description;
+        }
+        if (isset($node->learningObjectives) && is_string($node->learningObjectives)) {
+            $this->learningObjectives = $node->learningObjectives;
         }
         if (isset($node->coordinates) && is_object($node->coordinates)) {
             $this->coordinates = $node->coordinates;
@@ -744,6 +748,7 @@ class TapestryNode implements ITapestryNode
             'mediaFormat' => $this->mediaFormat,
             'mediaDuration' => $this->mediaDuration,
             'description' => $this->description,
+            'learningObjectives' => $this->learningObjectives,
             'behaviour' => $this->behaviour,
             'typeData' => $this->typeData,
             'coordinates' => $this->coordinates,

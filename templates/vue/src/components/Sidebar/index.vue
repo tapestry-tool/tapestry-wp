@@ -80,6 +80,10 @@
           <h2 class="content-header">About</h2>
           <div class="content-body" v-html="node.description"></div>
         </section>
+        <section v-if="node.learningObjectives">
+          <h2 class="content-header">Learning Objectives</h2>
+          <div class="content-body" v-html="node.learningObjectives"></div>
+        </section>
         <section ref="copyright" data-name="copyright">
           <section v-if="node.license">
             <h2 class="content-header">
@@ -493,10 +497,10 @@ export default {
         }
 
         .content-header {
-          margin: 1em -1em 0.2em;
+          margin: 1em 0 0.2em;
           position: relative;
           border-bottom: solid 2px #6b747d;
-          padding: 0.2em 1em;
+          padding: 0.2em 0;
           font-size: 1.75em;
         }
 
