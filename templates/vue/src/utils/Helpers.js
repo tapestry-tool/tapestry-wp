@@ -1,5 +1,6 @@
 import * as wp from "@/services/wp"
-import { nodeStatus, userActions } from "./constants"
+import { nodeStatus, TWEMOJI_PATH, userActions } from "./constants"
+import twemoji from "twemoji"
 
 /**
  * Helper Functions
@@ -509,5 +510,13 @@ export default class Helpers {
     }
 
     tooltip.style.transform = `translate(${x}px, ${y}px)`
+  }
+
+  static getEmojiImgFromUnicode(unicode) {
+    let div = document.createElement("div")
+    div.textContent = unicode
+    return twemoji.parse(div, {
+      base: TWEMOJI_PATH,
+    }).innerHTML
   }
 }

@@ -9,11 +9,7 @@
     >
       <tapestry-icon v-if="isOpen" icon="chevron-down" />
       <span v-else>
-        <img
-          height="40"
-          width="40"
-          src="https://twemoji.maxcdn.com/v/13.1.0/72x72/1f60a.png"
-        />
+        <img height="40" width="40" :src="`${TWEMOJI_PATH}72x72/1f60a.png`" />
       </span>
     </cos-popup-button>
     <div
@@ -51,6 +47,8 @@ import client from "@/services/TapestryAPI"
 import CosPopupButton from "../CosPopupButton"
 import AddConnectionForm from "./AddConnectionForm"
 import ConnectionsList from "./ConnectionsList"
+import { TWEMOJI_PATH } from "@/utils/constants"
+
 const States = {
   Home: 0,
   Add: 1,
@@ -85,6 +83,8 @@ export default {
   },
   data() {
     return {
+      TWEMOJI_PATH: TWEMOJI_PATH,
+
       isOpen: false,
       isHidden: false,
       state: States.Home,

@@ -24,7 +24,7 @@
 
 <script>
 import TapestryIcon from "@/components/common/TapestryIcon"
-import Twemoji from "twemoji"
+import Helpers from "@/utils/Helpers"
 
 export default {
   components: {
@@ -47,9 +47,7 @@ export default {
   },
   methods: {
     getEmojiImgFromUnicode(unicode) {
-      let div = document.createElement("div")
-      div.textContent = unicode
-      return Twemoji.parse(div).innerHTML
+      return Helpers.getEmojiImgFromUnicode(unicode)
     },
   },
 }

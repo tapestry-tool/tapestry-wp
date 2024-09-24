@@ -72,11 +72,7 @@
       "
     />
     <div class="user">
-      <img
-        height="40"
-        width="40"
-        src="https://twemoji.maxcdn.com/v/13.1.0/72x72/1f60a.png"
-      />
+      <img height="40" width="40" :src="`${TWEMOJI_PATH}72x72/1f60a.png`" />
     </div>
     <avataaars
       class="user"
@@ -110,7 +106,6 @@
 </template>
 
 <script>
-import Twemoji from "twemoji"
 import avatarOptions from "@/components/modals/UserSettingsModal/avatarOptions.js"
 import Helpers from "@/utils/Helpers"
 import client from "@/services/TapestryAPI"
@@ -122,6 +117,7 @@ import CircleToggle from "./CircleToggle"
 import { CircleStates } from "./states"
 import Avataaars from "vuejs-avataaars"
 import { mapState } from "vuex"
+import { TWEMOJI_PATH } from "@/utils/constants"
 
 const CONNECTION_SPACE = 0
 const CONNECTION_OFFSET = 46
@@ -180,6 +176,8 @@ export default {
   },
   data() {
     return {
+      TWEMOJI_PATH: TWEMOJI_PATH,
+
       activeCircle: CircleStates.All,
       activeCircleOrig: null,
       state: States.Home,
@@ -245,9 +243,7 @@ export default {
   },
   methods: {
     getEmojiImgFromUnicode(unicode) {
-      let div = document.createElement("div")
-      div.textContent = unicode
-      return Twemoji.parse(div).innerHTML
+      return Helpers.getEmojiImgFromUnicode(unicode)
     },
     handleDragStart({ x, y, connection }) {
       this.activeCircleOrig = this.activeCircle

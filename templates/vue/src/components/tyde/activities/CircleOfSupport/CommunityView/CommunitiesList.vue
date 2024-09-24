@@ -88,7 +88,6 @@
 </template>
 
 <script>
-import Twemoji from "twemoji"
 import TapestryIcon from "@/components/common/TapestryIcon"
 import Helpers from "@/utils/Helpers"
 import ConnectionTooltip from "../ConnectionTooltip"
@@ -183,9 +182,7 @@ export default {
   },
   methods: {
     getEmojiImgFromUnicode(unicode) {
-      let div = document.createElement("div")
-      div.textContent = unicode
-      return Twemoji.parse(div).innerHTML
+      return Helpers.getEmojiImgFromUnicode(unicode)
     },
     editCommunity(community) {
       this.$emit("edit-community", community)
