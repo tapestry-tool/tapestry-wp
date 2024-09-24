@@ -15,7 +15,6 @@
 </template>
 
 <script>
-import { data } from "@/services/wp"
 import tyde from "@/assets/icons/tyde/tyde.svg"
 import tydeUnselected from "@/assets/icons/tyde/tyde-unselected.svg"
 import goals from "@/assets/icons/tyde/goals.svg"
@@ -24,6 +23,7 @@ import profile from "@/assets/icons/tyde/profile.svg"
 import profileUnselected from "@/assets/icons/tyde/profile-unselected.svg"
 import cos from "@/assets/icons/tyde/cos.svg"
 import cosUnselected from "@/assets/icons/tyde/cos-unselected.svg"
+import Helpers from "@/utils/Helpers"
 
 export default {
   name: "tyde-icon",
@@ -92,9 +92,6 @@ export default {
     })
   },
   methods: {
-    createUrl(selected) {
-      return `${data.vue_uri}/${selected.split("dist")[1]}`
-    },
     selectIcon() {
       let selectedIcon = null
 
@@ -113,7 +110,7 @@ export default {
           break
       }
 
-      this.url = this.createUrl(selectedIcon)
+      this.url = Helpers.getImagePath(selectedIcon)
     },
   },
 }
