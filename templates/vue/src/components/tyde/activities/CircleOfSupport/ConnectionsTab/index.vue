@@ -12,6 +12,14 @@
         <img height="40" width="40" :src="`${TWEMOJI_PATH}72x72/1f60a.png`" />
       </span>
     </cos-popup-button>
+    <b-tooltip
+      v-if="!isOpen && !toolTipPositioned"
+      target="connections-tab-popup-trigger"
+      placement="top"
+      triggers="hover"
+    >
+      Add a connection
+    </b-tooltip>
     <div
       v-if="state === states.Add || state === states.Edit"
       :class="{ 'content-wrapper': isOpen }"
