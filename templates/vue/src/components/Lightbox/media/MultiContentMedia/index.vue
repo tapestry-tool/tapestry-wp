@@ -271,6 +271,21 @@ export default {
     if (!this.node.completed && this.rows.every(row => row.node.completed)) {
       this.$emit("complete", this.node.id)
     }
+
+    // if this node is completed, check for parent node completion
+    // this is also just in case it hasn't done this properly before
+    if (this.node.completed && this.isUnitChild && !this.parentNode.completed) {
+      const allUnitsCompleted = this.parentNode.childOrdering.every(childId => {
+        const child = this.getNode(childId)
+        return child.completed
+      })
+      if (allUnitsCompleted) {
+        console.log(
+          "All units completed but parent node not marked as completed, marking now"
+        )
+        this.$emit("complete", this.parentNode.id)
+      }
+    }
   },
   methods: {
     ...mapMutations(["updateNode"]),

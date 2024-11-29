@@ -28,6 +28,8 @@ if (!function_exists('is_plugin_active')) {
 
 add_action('plugins_loaded', function () {
     global $TAPESTRY_VERSION_NUMBER;
+    global $TYDE_YOUTH_ROLES;
+    global $TYDE_DYAD_ROLES;
     if (!isset($TAPESTRY_VERSION_NUMBER)) {
 
         // Used to force-refresh assets and run updates
