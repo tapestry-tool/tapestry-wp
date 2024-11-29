@@ -20,7 +20,7 @@
           <div id="emoji-picker" style="position: relative">
             <twemoji-picker
               id="twemoji-picker"
-              twemojiPath="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/"
+              :twemojiPath="TWEMOJI_PATH"
               :emojiData="emojiAllData"
               :emojiGroups="emojiGroups"
               :skinsSelection="true"
@@ -77,12 +77,13 @@
 </template>
 
 <script>
-import Twemoji from "twemoji"
 import { TwemojiPicker } from "@kevinfaguiar/vue-twemoji-picker"
 import EmojiAllData from "@kevinfaguiar/vue-twemoji-picker/emoji-data/en/emoji-all-groups.json"
 import EmojiGroups from "@kevinfaguiar/vue-twemoji-picker/emoji-data/emoji-groups.json"
 import client from "@/services/TapestryAPI"
 import { MAX_COMMUNITY_NAME_LENGTH } from "../cos.config"
+import { TWEMOJI_PATH } from "@/utils/constants"
+import Helpers from "@/utils/Helpers"
 
 export default {
   components: {
@@ -100,6 +101,8 @@ export default {
   },
   data() {
     return {
+      TWEMOJI_PATH: TWEMOJI_PATH,
+
       showPicker: false,
       isLoading: false,
       isInputTouched: false,
@@ -189,9 +192,7 @@ export default {
   },
   methods: {
     getEmojiImgFromUnicode(unicode) {
-      let div = document.createElement("div")
-      div.textContent = unicode
-      return Twemoji.parse(div).innerHTML
+      return Helpers.getEmojiImgFromUnicode(unicode)
     },
     handleEmojiSelect(emoji) {
       this.handleChange("icon", emoji)

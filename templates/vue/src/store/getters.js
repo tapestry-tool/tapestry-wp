@@ -224,3 +224,39 @@ export function getNodeDimensions(state, { isVisible }) {
 
   return box
 }
+
+export function getTYDEProfileSummary(
+  state,
+  { getNode, getDirectChildren, getAnswers, getQuestion }
+) {
+  const profileNodeId = state.settings.tydeModeTabs.profile
+  const childNodeIds = getDirectChildren(profileNodeId)
+
+  const profileSummary = {}
+  for (const childId of childNodeIds) {
+    const child = getNode(childId)
+    const answerNodes = getDirectChildren(childId).map(getNode)
+    const answerSummary = {}
+    for (const answerNode of answerNodes) {
+      let answers = getAnswers(
+        answerNode.typeData.activityId,
+        answerNode.typeData.questionId
+      )
+      if (answers.hasOwnProperty("multipleChoice")) {
+        const question = getQuestion(answerNode.typeData.questionId)
+        answers = {
+          ...answers,
+          multipleChoice: answers.multipleChoice.map(
+            choiceId =>
+              question.answerTypes.multipleChoice.choices.find(
+                choice => choice.id == choiceId
+              )?.value
+          ),
+        }
+      }
+      answerSummary[answerNode.title] = answers
+    }
+    profileSummary[child.title] = answerSummary
+  }
+  return profileSummary
+}

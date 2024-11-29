@@ -13,6 +13,14 @@
         >
           <tapestry-icon :icon="show ? 'chevron-down' : 'plus'" />
         </cos-popup-button>
+        <b-tooltip
+          v-if="!show && !disabled"
+          target="community-tab-popup-trigger"
+          placement="top"
+          triggers="hover"
+        >
+          Add a community
+        </b-tooltip>
       </template>
       <template #content>
         <div class="content-wrapper">

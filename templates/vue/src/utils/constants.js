@@ -45,3 +45,6 @@ export const userActions = {
 }
 
 export const DEFAULT_DEPTH = 3
+
+export const TWEMOJI_PATH =
+  "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/"

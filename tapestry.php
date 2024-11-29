@@ -28,6 +28,8 @@ if (!function_exists('is_plugin_active')) {
 
 add_action('plugins_loaded', function () {
     global $TAPESTRY_VERSION_NUMBER;
+    global $TYDE_YOUTH_ROLES;
+    global $TYDE_DYAD_ROLES;
     if (!isset($TAPESTRY_VERSION_NUMBER)) {
 
         // Used to force-refresh assets and run updates
@@ -226,7 +228,9 @@ add_action('plugins_loaded', function () {
                     'ID' => $currentUser->data->ID,
                     'user_nicename'=> $currentUser->data->user_nicename,
                     'user_email'=> $currentUser->data->user_email,
-                    'display_name'=> $currentUser->data->display_name
+                    'display_name'=> $currentUser->data->display_name,
+                    'first_name'=> $currentUser->get("first_name"),
+                    'last_name'=> $currentUser->get("last_name"),
                 ];
         
                 $iframe_mode = array_key_exists('iframe', $_GET) ? 1 : 0;

@@ -36,6 +36,7 @@
 </template>
 
 <script>
+import Helpers from "@/utils/Helpers"
 import CosModal from "../CosModal"
 import gifSrc from "@/assets/add-connection-to-circle.gif"
 
@@ -45,7 +46,7 @@ export default {
   },
   computed: {
     gifUrl() {
-      return gifSrc
+      return Helpers.getImagePath(gifSrc)
     },
   },
 }

@@ -24,8 +24,9 @@
 </template>
 
 <script>
-import Twemoji from "twemoji"
+import Helpers from "@/utils/Helpers"
 import * as d3 from "d3"
+
 export default {
   props: {
     connection: {
@@ -116,9 +117,7 @@ export default {
       }
     },
     getEmojiImgFromUnicode(unicode) {
-      let div = document.createElement("div")
-      div.textContent = unicode
-      return Twemoji.parse(div).innerHTML
+      return Helpers.getEmojiImgFromUnicode(unicode)
     },
   },
 }
